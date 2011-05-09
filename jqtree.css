@@ -1,0 +1,61 @@
+ul.tree,
+ul.tree ul {
+	list-style-position: outside;
+	list-style-type: none;
+	margin-bottom: 0;
+}
+
+ul.tree ul.folder {
+	margin-left: 12px;
+}
+
+ul.tree li ul.closed {
+	display: none;
+}
+
+ul.tree li {
+	margin-left: 0;
+}
+
+ul.tree span.folder {
+	background-image: url(treeDownTriangleBlack.png);
+	background-repeat: no-repeat;
+	padding-left: 12px;
+	background-position: 0 50%;
+}
+
+ul.tree span.folder,
+ul.tree span.node {
+	cursor: pointer;
+}
+
+ul.tree span.node {
+	padding-left: 12px;
+}
+
+ul.tree span.folder.closed {
+	background-image: url(treeRightTriangleBlack.png);
+}
+
+span.dragging {
+	color: #fff;
+	background: #000;
+	opacity: 0.6;
+	cursor: pointer;
+	padding: 2px 8px;
+}
+
+ul.tree span.ghost {
+	border: dashed 2px #aaa;
+	margin-left: 12px;
+	color: #fff;
+}
+
+ul.tree span.ghost.folder {
+	margin-left: 0;
+	background-image: none;
+}
+
+ul.tree span.ghost.inside {
+	margin-left: 36px;
+}
