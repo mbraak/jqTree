@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>jqTree</title>
+	<link rel="stylesheet" href="css_960/reset.css">
+	<link rel="stylesheet" href="css_960/text.css">
+	<link rel="stylesheet" href="css_960/960.css">
+	<link rel="stylesheet" href="../jqtree.css">
+	<script src="js/jquery-1.5.2.min.js"></script>
+	<script src="js/jquery-ui-1.8.11.custom.min.js"></script>
+	<script src="../classy.js"></script>
+	<script src="../tree.js"></script>
+	<script src="../tree.jquery.js"></script>
+	<style>
+		div#tree1 {
+			width: 300px;
+			border: solid 1px #ccc;
+		}
+	</style>
+</head>
+<body>
+</body>
+	<h1>Dinosaur family tree</h1>
+	<div id="tree1" />
+	<script>
+		$(function() {
+			var data = [
+				{
+					label: 'Saurischia',
+					children: [
+						{label: 'Herrerasaurians'},
+						{
+							label: 'Theropods',
+							children: [
+								{label: 'Coelophysoids'},
+								{label: 'Ceratosaurians'},
+								{label: 'Spinosauroids'},
+								{label: 'Carnosaurians'},
+								{
+									label: 'Coelurosaurians',
+									children: [
+										{label: 'Tyrannosauroids'},
+										{label: 'Ornithomimosaurians'},
+										{label: 'Therizinosauroids'},
+										{label: 'Oviraptorosaurians'},
+										{label: 'Dromaeosaurids'},
+										{label: 'Troodontids'},
+										{label: 'Avialans'}
+									]
+								}
+							]
+						},
+						{
+							label: 'Sauropodomorphs',
+							children: [
+								{label: 'Prosauropods'},
+								{
+									label: 'Sauropods',
+									children: [
+										{label: 'Diplodocoids'},
+										{
+											label: 'Macronarians',
+											children: [
+												{label: 'Brachiosaurids'},
+												{label: 'Titanosaurians'}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					label: 'Ornithischians',
+					children: [
+						{label: 'Heterodontosaurids'},
+						{
+							label: 'Thyreophorans',
+							children: [
+								{label: 'Ankylosaurians'},
+								{label: 'Stegosaurians'}
+							]
+						},
+						{
+							label: 'Ornithopods',
+							children: [
+								{label: 'Hadrosaurids'}
+							]
+						},
+						{label: 'Pachycephalosaurians'},
+						{label: 'Ceratopsians'}
+					]
+				}
+			];
+
+			$('#tree1').tree({
+				data: data,
+				autoOpen: 0
+			});
+		});
+	</script>
+</html>
