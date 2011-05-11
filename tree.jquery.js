@@ -7,7 +7,6 @@
 // todo: variables must start with _?
 // todo: speed up hit detection; perhaps use a treshold; or better algorithm
 // todo: change cursor for moving / over node that can be moved
-// todo: fix size of ghost for folder (opened and closed)
 // todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
 // todo: extra data in input json data
 // todo: use jqueryui icons for folder triangles
