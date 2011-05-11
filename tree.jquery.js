@@ -45,19 +45,19 @@
 
         _createDomElements: function(tree) {
             function createUl(depth, is_open) {
-                var classes;
+                var classes = [];
                 if (! depth) {
-                    classes = 'tree';
+                    classes.push('tree');
                 }
                 else {
-                    classes = 'folder';
+                    classes.push('folder');
                     if (! is_open) {
-                        classes += " closed";
+                        classes.push('closed');
                     }
                 }
 
                 var $element = $('<ul />');
-                $element.addClass(classes);
+                $element.addClass(classes.join(' '));
                 return $element;
             }
 
