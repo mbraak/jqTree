@@ -15,12 +15,14 @@
 // todo: github demo page
 // todo: unit test
 // todo: documentation
+// todo: click are for toggling folder
 
 (function($) {
     $.widget("ui.tree", $.ui.mouse, {
         widgetEventPrefix: "tree",
         options: {
-            autoOpen: false  // true / false / int (open n levels starting at 0)
+            autoOpen: false,  // true / false / int (open n levels starting at 0)
+            displayTestNodes: false
         },
 
         _create: function() {
@@ -304,7 +306,10 @@
         _refreshHitAreas: function() {
             this.hit_areas = this._getHitAreas();
             this._removeHintNodes();
-            this.hint_nodes = this._createHintNodes(this.hit_areas);
+
+            if (this.options.displayTestNodes) {
+                this.hint_nodes = this._createHintNodes(this.hit_areas);
+            }
         },
 
         /* Get hit areas for elements in the tree.
