@@ -11,7 +11,6 @@
 // todo: extra data in input json data
 // todo: use jqueryui icons for folder triangles
 // todo: use extra span for folder icon
-// todo: github demo page
 // todo: unit test
 // todo: documentation
 // todo: click are for toggling folder
