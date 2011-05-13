@@ -15,7 +15,6 @@
 // todo: unit test
 // todo: documentation
 // todo: click are for toggling folder
-// todo: do not use Classy
 
 (function($) {
     var Position = {
@@ -207,7 +206,7 @@
         },
 
         _click: function(e) {
-            var nodeElement = this._getNodeElement($(e.srcElement));
+            var nodeElement = this._getNodeElement($(e.target));
             if (nodeElement && (nodeElement.node.hasChildren())) {
                 nodeElement.toggle();
 
@@ -246,7 +245,7 @@
         },
 
         _mouseCapture: function(event) {
-            this.current_item = this._getNodeElement($(event.srcElement));
+            this.current_item = this._getNodeElement($(event.target));
 
             return (this.current_item != null);
         },
