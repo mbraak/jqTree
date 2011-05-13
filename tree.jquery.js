@@ -1,11 +1,12 @@
 // todo: bigger area for opening folder while moving
+// todo: speed up hit detection; perhaps use a treshold; or better algorithm
+// todo: click area for toggling folder
+// todo: move event
+// todo: click event
 // todo: check for invalid move
 // todo: drag handle
 // todo: display move hint
-// todo: move event
-// todo: click event
 // todo: variables must start with _?
-// todo: speed up hit detection; perhaps use a treshold; or better algorithm
 // todo: change cursor for moving / over node that can be moved
 // todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
 // todo: extra data in input json data
@@ -13,7 +14,6 @@
 // todo: use extra span for folder icon
 // todo: unit test
 // todo: documentation
-// todo: click are for toggling folder
 
 (function($) {
     var Position = {
