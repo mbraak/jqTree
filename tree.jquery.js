@@ -14,6 +14,7 @@
 // todo: use extra span for folder icon
 // todo: unit test
 // todo: documentation
+// todo: scroll while moving a node?
 
 (function($) {
     var Position = {
@@ -283,16 +284,7 @@
             this.positionAbs = this.position;
             this.helper.offset(this.position);
 
-            var self = this;
-            var hovered_rectangle = null;
-            $.each(this.hit_areas, function() {
-                if (
-                    (self._intersectsWithPointer(this)) &&
-                    (! hovered_rectangle)
-                ) {
-                    hovered_rectangle = this;
-                }
-            });
+            var hovered_rectangle = this._findHoveredRectangle();
 
             var cursor = this.helper.offset();
             cursor.right = cursor.left + this.current_item.$element.outerWidth();
@@ -324,6 +316,42 @@
             }
 
             return true;
+        },
+
+        _getPointerRectangle: function() {
+            var offset = this.helper.offset();
+
+            return {
+                left: offset.left,
+                top: offset.top,
+                right: offset.left + this.current_item.$element.outerWidth(),
+                bottom: offset.top + this.current_item.$element.outerHeight()
+            };
+        },
+
+        _findHoveredRectangle: function() {
+            var tries = 0;
+            var pointer_rectangle = this._getPointerRectangle();
+
+            for (var i=0; i < this.hit_areas.length; i++) {
+                var area = this.hit_areas[i];
+                tries += 1;
+                // todo: binary search
+
+                var rectangle = {
+                    left: area.left,
+                    top: area.top,
+                    right: area.left + area.width,
+                    bottom: area.top + area.height
+                };
+                if (intersects(rectangle, pointer_rectangle)) {
+                    //console.log('insersection tries', tries);
+                    return area;
+                }
+            }
+
+            //console.log('insersection tries', tries);
+            return null;
         },
 
         _mouseStop: function() {
@@ -691,5 +719,29 @@
             (r1.right >= r2.left) &&
             (r1.left <= r2.right)
         );
+    }
+
+    function get_intersection_x(r1, r2) {
+        if (r1.right < r2.left) {
+            return -1;
+        }
+        else if (r1.left > r2.right) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    function get_intersection_y(r1, r2) {
+        if (r1.bottom < r2.top) {
+            return -1;
+        }
+        else if (r1.top > r2.bottom) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
 })(jQuery);
