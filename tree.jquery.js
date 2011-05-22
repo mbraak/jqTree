@@ -116,6 +116,70 @@
 
     var Tree = Node;
 
+    var Area = function(left, top, right, bottom) {
+        this.init(left, top, right, bottom);
+    };
+
+    $.extend(Area.prototype, {
+         init: function(left, top, right, bottom) {
+             this.left = left;
+             this.top = top;
+             this.right = right;
+             this.bottom = bottom;
+
+             this.children = [];
+         },
+
+        addArea: function(area) {
+            this.children.push(area);
+        },
+
+        findIntersectingArea: function(area) {
+            if (! this.intersects(area)) {
+                return null;
+            }
+            else {
+                for (var i=0; i < this.children.length; i++) {
+                    var result = this.children[i].findIntersectingArea(area);
+                    if (result) {
+                        return result;
+                    }
+                }
+
+                return this;
+            }
+        },
+
+        intersects: function(area) {
+            return (
+                (this.bottom >= area.top) &&
+                (this.top <= area.bottom) &&
+                (this.right >= area.left) &&
+                (this.left <= area.right)
+            );
+        },
+
+        duplicate: function() {
+            return new Area(
+                this.left,
+                this.top,
+                this.right,
+                this.bottom
+            );
+        }
+    });
+
+    Area.createFromElement = function($element) {
+        var offset = $element.offset();
+
+        return new Area(
+            offset.left,
+            offset.top,
+            offset.left + $element.outerWidth(),
+            offset.top + $element.outerHeight()
+        );
+    };
+
     $.widget("ui.tree", $.ui.mouse, {
         widgetEventPrefix: "tree",
         options: {
@@ -290,7 +354,9 @@
             cursor.right = cursor.left + this.current_item.$element.outerWidth();
             cursor.bottom = cursor.top + this.current_item.$element.outerHeight();
 
-            if (! hovered_rectangle) {
+            if (
+                ! ((hovered_rectangle) && hovered_rectangle.node)
+            ) {
                 this._removeGhost();
                 this._removeHover();
                 this._stopOpenFolderTimer();
@@ -330,28 +396,9 @@
         },
 
         _findHoveredRectangle: function() {
-            var tries = 0;
-            var pointer_rectangle = this._getPointerRectangle();
-
-            for (var i=0; i < this.hit_areas.length; i++) {
-                var area = this.hit_areas[i];
-                tries += 1;
-                // todo: binary search
-
-                var rectangle = {
-                    left: area.left,
-                    top: area.top,
-                    right: area.left + area.width,
-                    bottom: area.top + area.height
-                };
-                if (intersects(rectangle, pointer_rectangle)) {
-                    //console.log('insersection tries', tries);
-                    return area;
-                }
-            }
-
-            //console.log('insersection tries', tries);
-            return null;
+            return this.area.findIntersectingArea(
+                this._getPointerRectangle()
+            );
         },
 
         _mouseStop: function() {
@@ -429,106 +476,133 @@
         },
 
         _refreshHitAreas: function() {
-            this.hit_areas = this._getHitAreas();
+            this.area = this._generateAreaAndChildren();
             this._removeHintNodes();
 
+            /*
             if (this.options.displayTestNodes) {
                 this.hint_nodes = this._createHintNodes(this.hit_areas);
             }
+            */
         },
 
-        /* Get hit areas for elements in the tree.
-        * Area:
-        *   left, top, width, height
-        *   node
-        *   move_to: Position.BEFORE, AFTER or INSIDE
-        * */
-        _getHitAreas: function() {
-            function getAreaForNode(node) {
+        _generateAreaAndChildren: function() {
+            function getHitAreaForNode(node) {
                 var $span = $(node.element).find('span:first');
                 var offset = $span.offset();
-                var height = $span.outerHeight();
-                var left = offset.left + 12;
 
-                return {
-                    left: left,
-                    top: offset.top + height / 2,
-                    width: 24,
-                    height: 2
-                };
+                var area = new Area(
+                    offset.left,
+                    offset.top,
+                    offset.left + $span.outerWidth(),
+                    offset.top + $span.outerHeight()
+                );
+                area.name = node.name;
+                return area;
             }
 
-            function getAreaForFolder(node) {
-                var $li = $(node.element);
-                var $span = $(node.element).find('span:first');
+            function getHitAreaForFolder(folder) {
+                var $li = $(folder.element);
+                var $span = $(folder.element).find('span:first');
                 var offset = $li.offset();
                 var span_height = $span.outerHeight();
                 var top = $li.offset().top + span_height;
 
-                return {
-                    left: offset.left + 6,
-                    top: top,
-                    width: 2,
-                    height: $li.height() - span_height
-                };
+                var area = new Area(
+                    offset.left + 6,
+                    top,
+                    offset.left + 8,
+                    top + $li.height() - span_height
+                );
+                area.name = folder.name;
+                return area;
             }
 
-            var hit_areas = [];
-            var area;
+            function addHitAreasForNode(node, parent_area) {
+                // after node
+                var node_area = getHitAreaForNode(node);
 
-            this._iterateVisibleNodes(function(node) {
-                if (node.hasChildren()) {
-                    if (node.is_open) {
-                        // after folder
-                        area = getAreaForFolder(node);
-                        area.node = node;
-                        area.move_to = Position.AFTER;
-                        hit_areas.push(area);
+                var area = node_area.duplicate();
+                area.node = node;
+                area.name = node.name;
+                area.move_to = Position.AFTER;
 
-                        // before first child in folder
-                        area = getAreaForNode(node);
-                        area.node = node.children[0];
-                        area.move_to = Position.BEFORE;
-                        hit_areas.push(area);
+                area.left += 12;
+                area.right = area.left + 24;
+
+                var height = area.bottom - area.top;
+                area.top += height / 2;
+                area.bottom = area.top + 2;
+
+                parent_area.addArea(area);
+
+                // inside node
+                area = node_area.duplicate();
+                area.top = area.top + height / 2;
+                area.bottom = area.top + 2;
+                area.left += 24;
+
+                area.move_to = Position.INSIDE;
+                area.name = node.name;
+                area.node = node;
+                parent_area.addArea(area);
+            }
+
+            function addHitAreasForOpenFolder(folder, parent_area) {
+                // after folder
+                var area = getHitAreaForFolder(folder);
+                area.node = folder;
+                area.name = folder.name;
+                area.move_to = Position.AFTER;
+                parent_area.addArea(area);
+
+                // before first child in folder
+                area = getHitAreaForNode(folder);
+                area.node = folder.children[0];
+                area.move_to = Position.BEFORE;
+                area.name = folder.children[0].name;
+                parent_area.addArea(area);
+            }
+
+            function addHitAreasForClosedFolder(folder, parent_area) {
+                var area = getHitAreaForNode(folder);
+                area.node = folder;
+                area.name = folder.name;
+                area.move_to = Position.INSIDE;
+                parent_area.addArea(area);
+            }
+
+            function addNodes(children, parent_area) {
+                $.each(children, function(i, node) {
+                    var area = Area.createFromElement($(node.element));
+                    area.name = node.name;
+                    parent_area.addArea(area);
+
+                    if (! node.hasChildren()) {
+                        addHitAreasForNode(node, area);
                     }
                     else {
-                        area = getAreaForNode(node);
-                        area.node = node;
-                        area.move_to = Position.INSIDE;
-                        hit_areas.push(area);
+                        if (node.is_open) {
+                            addHitAreasForOpenFolder(node, area);
+                        }
+                        else {
+                            addHitAreasForClosedFolder(node, area);
+                        }
                     }
-                }
-                else {
-                    // after node
-                    area = getAreaForNode(node);
-                    area.node = node;
-                    area.move_to = Position.AFTER;
-                    hit_areas.push(area);
 
-                    // inside node
-                    area = $.extend({}, area);
-                    area.left += 24;
-                    area.move_to = Position.INSIDE;
-                    hit_areas.push(area);
-                }
-            });
+                    if (node.hasChildren() && node.is_open) {
+                        addNodes(node.children, area);
+                    }
+                });
+            }
 
-            return hit_areas;
+            var main_area = Area.createFromElement(this.element);
+            main_area.name = 'tree';
+            addNodes(this.tree.children, main_area);
+            return main_area;
         },
 
-        _iterateVisibleNodes: function(callback) {
-            this.tree.iterate(function(node) {
-                callback(node);
-
-                if (node.hasChildren()) {
-                    return node.is_open;
-                }
-                else {
-                    return true;
-                }
-            });
-        },
-
+        /*
         _createHintNodes: function(hit_areas) {
             var hint_nodes = [];
 
@@ -551,6 +625,7 @@
 
             return hint_nodes;
         },
+        */
 
         _removeHover: function() {
             this.hovered_rectangle = null;
