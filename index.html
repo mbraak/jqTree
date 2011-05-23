@@ -18,7 +18,6 @@
 	</style>
 </head>
 <body>
-</body>
 	<h1>Dinosaur family tree</h1>
 	<div id="tree1" />
 	<script>
@@ -95,8 +94,10 @@
 
 			$('#tree1').tree({
 				data: data,
-				autoOpen: 0
+				autoOpen: 0,
+				displayTestNodes: false
 			});
 		});
 	</script>
+</body>
 </html>
