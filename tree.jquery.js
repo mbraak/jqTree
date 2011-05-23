@@ -503,6 +503,11 @@
                     offset.left + $span.outerWidth(),
                     offset.top + $span.outerHeight()
                 );
+
+                var height = area.bottom - area.top;
+                area.top += (height / 2) - 1;
+                area.bottom = area.top + 2;
+
                 area.name = node.name;
                 return area;
             }
@@ -535,18 +540,13 @@
 
                 area.left += 12;
                 area.right = area.left + 24;
-
-                var height = area.bottom - area.top;
-                area.top += height / 2;
-                area.bottom = area.top + 2;
+                area.color = 'blue';
 
                 parent_area.addArea(area);
 
                 // inside node
                 area = node_area.duplicate();
-                area.top = area.top + height / 2;
-                area.bottom = area.top + 2;
-                area.left += 24;
+                area.left += 36;
 
                 area.move_to = Position.INSIDE;
                 area.name = node.name;
@@ -614,6 +614,7 @@
             var self = this;
             main_area.iterate(function(area) {
                 if (area.node) {
+                    var color = area.color || '#000';
                     var $span = $('<span class="hit"></span>');
                     $span.css({
                         position: 'absolute',
@@ -622,8 +623,8 @@
                         display: 'block',
                         width: area.right - area.left,
                         height: area.bottom - area.top,
-                        opacity: '0.2',
-                        border: 'solid 1px #000'
+                        opacity: '0.5',
+                        border: 'solid 1px ' + color
                      });
                     self.element.append($span);
                     hint_nodes.push($span);
