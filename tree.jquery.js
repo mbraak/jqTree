@@ -166,6 +166,14 @@
                 this.right,
                 this.bottom
             );
+        },
+
+        iterate: function(callback) {
+            callback(this);
+
+            $.each(this.children, function(i, area) {
+                area.iterate(callback);
+            });
         }
     });
 
@@ -479,11 +487,9 @@
             this.area = this._generateAreaAndChildren();
             this._removeHintNodes();
 
-            /*
             if (this.options.displayTestNodes) {
-                this.hint_nodes = this._createHintNodes(this.hit_areas);
+                this.hint_nodes = this._createHintNodes(this.area);
             }
-            */
         },
 
         _generateAreaAndChildren: function() {
@@ -602,30 +608,30 @@
             return main_area;
         },
 
-        /*
-        _createHintNodes: function(hit_areas) {
+        _createHintNodes: function(main_area) {
             var hint_nodes = [];
 
             var self = this;
-            $.each(hit_areas, function() {
-                var $node = $('<span class="hit"></span>');
-                $node.css({
-                    position: 'absolute',
-                    left: this.left,
-                    top: this.top,
-                    display: 'block',
-                    width: this.width,
-                    height: this.height,
-                    'background-color': '#000',
-                    opacity: '0.2'
-                 });
-                self.element.append($node);
-                hint_nodes.push($node);
+            main_area.iterate(function(area) {
+                if (area.node) {
+                    var $span = $('<span class="hit"></span>');
+                    $span.css({
+                        position: 'absolute',
+                        left: area.left,
+                        top: area.top,
+                        display: 'block',
+                        width: area.right - area.left,
+                        height: area.bottom - area.top,
+                        opacity: '0.2',
+                        border: 'solid 1px #000'
+                     });
+                    self.element.append($span);
+                    hint_nodes.push($span);
+                }
             });
 
             return hint_nodes;
         },
-        */
 
         _removeHover: function() {
             this.hovered_rectangle = null;
