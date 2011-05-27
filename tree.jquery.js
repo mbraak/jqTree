@@ -15,6 +15,9 @@
 // todo: unit test
 // todo: documentation
 // todo: scroll while moving a node?
+// todo: smooth animation while moving node
+
+_TestClasses = {};
 
 (function($) {
     var Position = {
@@ -23,9 +26,13 @@
         INSIDE: 3
     };
 
+    _TestClasses.Position = Position;
+
     var Node = function(name) {
         this.init(name);
     };
+
+    _TestClasses.Node = Node;
 
     $.extend(Node.prototype, {
         init: function(name) {
@@ -34,6 +41,22 @@
             this.parent = null;
         },
 
+        /* Create tree from data.
+
+          Structure of data is:
+            [
+                {
+                    label: 'node1',
+                    children: [
+                        { label: 'child1' },
+                        { label: 'child2' }
+                    ]
+                },
+                {
+                    label: 'node2'
+                }
+            ]
+        */
         loadFromData: function(data) {
             this.children = [];
 
@@ -116,9 +139,13 @@
 
     var Tree = Node;
 
+    _TestClasses.Tree = Tree;
+
     var Area = function(left, top, right, bottom) {
         this.init(left, top, right, bottom);
     };
+
+    _TestClasses.Area = Area;
 
     $.extend(Area.prototype, {
          init: function(left, top, right, bottom) {
