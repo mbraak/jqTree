@@ -16,6 +16,7 @@
 // todo: documentation
 // todo: scroll while moving a node?
 // todo: smooth animation while moving node
+// todo: test on different browsers
 
 _TestClasses = {};
 
@@ -71,16 +72,36 @@ _TestClasses = {};
             });
         },
 
+        /*
+        Add child.
+
+        tree.addChild(
+            new Node('child1')
+        );
+        */
         addChild: function(node) {
             this.children.push(node);
             node.parent = this;
         },
 
+        /*
+        Add child at position. Index starts at 0.
+
+        tree.addChildAtPosition(
+            new Node('abc'),
+            1
+        );
+        */
         addChildAtPosition: function(node, index) {
             this.children.splice(index, 0, node);
             node.parent = this;
         },
 
+        /*
+        Remove child.
+
+        tree.removeChile(tree.children[0]);
+         */
         removeChild: function(node) {
             this.children.splice(
                 this.getChildIndex(node),
@@ -88,14 +109,44 @@ _TestClasses = {};
             );
         },
 
+        /*
+        Get child index.
+
+        var index = getChildIndex(node);
+        */
         getChildIndex: function(node) {
             return this.children.indexOf(node);
         },
 
+        /*
+        Does the tree have children?
+
+        if (tree.hasChildren()) {
+            //
+        }
+        */
         hasChildren: function() {
             return (this.children.length != 0);
         },
 
+        /*
+        Iterate over all the nodes in the tree.
+
+        Calls callback with (node, level).
+
+        The callback must return true to continue the iteration on current node.
+
+        tree.iterate(
+            function(node, level) {
+               console.log(node.name);
+
+               // stop iteration after level 2
+               return (level <= 2);
+            }
+        );
+
+        Todo: remove level, use different function for recursion (_iterate).
+         */
         iterate: function(callback, level) {
             if (! level) {
                 level = 0;

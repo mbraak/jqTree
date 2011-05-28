@@ -79,4 +79,150 @@ test("Create tree from data", function() {
     );
 });
 
+test("tree addChild", function() {
+    var tree = new Tree('tree1');
+    tree.addChild(
+        new Node('abc')
+    );
+    tree.addChild(
+        new Node('def')
+    );
+
+    equal(
+        format_nodes(tree.children),
+        'abc def',
+        'children'
+    );
+
+    var node = tree.children[0];
+    equal(
+        node.parent.name,
+        'tree1',
+        'parent of node'
+    );
+});
+
+test('tree addChildAtPosition', function() {
+    var tree = new Tree();
+    tree.addChildAtPosition(new Node('abc'), 0);  // first
+    tree.addChildAtPosition(new Node('ghi'), 2);  // index 2 does not exist
+    tree.addChildAtPosition(new Node('def'), 1);
+    tree.addChildAtPosition(new Node('123'), 0);
+
+    equal(
+        format_nodes(tree.children),
+        '123 abc def ghi',
+        'children'
+    );
+});
+
+test('tree removeChild', function() {
+    var tree = new Tree();
+
+    var abc = new Node('abc');
+    var def = new Node('def');
+    var ghi = new Node('ghi');
+    tree.addChild(abc);
+    tree.addChild(def);
+    tree.addChild(ghi);
+
+    equal(
+        format_nodes(tree.children),
+        'abc def ghi',
+        'children'
+    );
+
+    // remove 'def'
+    tree.removeChild(def);
+    equal(
+        format_nodes(tree.children),
+        'abc ghi',
+        'children'
+    );
+
+    // remove 'ghi'
+    tree.removeChild(ghi);
+    equal(
+        format_nodes(tree.children),
+        'abc',
+        'children'
+    );
+
+    // remove 'abc'
+    tree.removeChild(abc);
+    equal(
+        format_nodes(tree.children),
+        '',
+        'children'
+    );
+});
+
+test('tree getChildIndex', function() {
+    var tree = new Tree();
+
+    var abc = new Node('abc');
+    var def = new Node('def');
+    var ghi = new Node('ghi');
+    tree.addChild(abc);
+    tree.addChild(def);
+    tree.addChild(ghi);
+
+    equal(
+        tree.getChildIndex(def),
+        1,
+        'indef of def'
+    );
+});
+
+test('tree hasChildren', function() {
+    var tree = new Tree();
+    equal(
+        tree.hasChildren(),
+        false,
+        'tree without children'
+    );
+
+    tree.addChild(new Node('abc'));
+    equal(
+        tree.hasChildren(),
+        true,
+        'tree has children'
+    );
+});
+
+test('tree iterate', function() {
+    var tree = new Tree();
+    tree.loadFromData(example_data);
+
+    // iterate over all the nodes
+    var nodes = [];
+    tree.iterate(
+        function(node, level) {
+            nodes.push(node);
+            return true;
+        }
+    );
+
+    equal(
+        format_nodes(nodes),
+        'node1 child1 child2 node2',
+        'all nodes'
+    );
+
+    // iterate over nodes on first level
+    nodes = [];
+    tree.iterate(
+        function(node, level) {
+            nodes.push(node);
+            return false;
+        }
+    );
+
+    equal(
+        format_nodes(nodes),
+        'node1 node2',
+        'nodes on first level'
+    );
+});
+
 });
