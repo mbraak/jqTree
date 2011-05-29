@@ -318,6 +318,7 @@ _TestClasses = {};
             }
 
             function createLi(name, has_children, is_open) {
+                /*
                 var span_classes = [];
                 if (! has_children) {
                     span_classes.push('node');
@@ -340,6 +341,35 @@ _TestClasses = {};
                     $li.addClass(folder_classes.join(' '));
                 }
 
+                return $li;
+                */
+
+                if (has_children) {
+                    return createFolderLi(name, is_open);
+                }
+                else {
+                    return createNodeLi(name);
+                }
+            }
+
+            function createNodeLi(name) {
+                return $('<li><span class="node">'+ name +'</span></li>');
+            }
+
+            function createFolderLi(name, is_open) {
+                var span_classes = ['folder'];
+
+                if (! is_open) {
+                    span_classes.push('closed');
+                }
+                var $li = $('<li><span class="'+ span_classes.join(' ') +'">&nbsp;</span><span>'+ name +'</span></li>');
+
+                // todo: add li class in text
+                var folder_classes = ['folder'];
+                if (! is_open) {
+                    folder_classes.push('closed');
+                }
+                $li.addClass(folder_classes.join(' '));
                 return $li;
             }
 

@@ -20,7 +20,9 @@ ul.tree li {
 ul.tree span.folder {
 	background-image: url(treeDownTriangleBlack.png);
 	background-repeat: no-repeat;
-	padding-left: 12px;
+	width: 12px;
+	display: block;
+	float: left;
 	background-position: 0 50%;
 }
 
