@@ -161,6 +161,14 @@ _TestClasses = {};
             });
         },
 
+        /*
+        Move node relative to another node.
+
+        Argument position: Position.BEFORE, Position.AFTER or Position.Inside
+
+        // move node1 after node2
+        tree.moveNode(node1, node2, Position.AFTER);
+        */
         moveNode: function(moved_node, target_node, position) {
             // todo: check for illegal move
             moved_node.parent.removeChild(moved_node);

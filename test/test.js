@@ -2,6 +2,7 @@ $(function() {
 
 var Tree = _TestClasses.Tree;
 var Node = _TestClasses.Node;
+var Position = _TestClasses.Position;
 
 var example_data = [
     {
@@ -224,5 +225,55 @@ test('tree iterate', function() {
         'nodes on first level'
     );
 });
+
+test('tree moveNode', function() {
+    var tree = Tree.createFromData(example_data);
+
+    var node1 = tree.children[0];
+    var node2 = tree.children[1];
+    var child1 = node1.children[0];
+    var child2 = node1.children[1];
+    equal(node2.name, 'node2', 'node2 name');
+    equal(child2.name, 'child2', 'child2 name');
+
+    // move child2 after node2
+    tree.moveNode(child2, node2, Position.AFTER);
+    equal(
+        format_nodes(tree.children),
+        'node1 node2 child2',
+        'tree nodes at first level'
+    );
+    equal(
+        format_nodes(node1.children),
+        'child1',
+        'node1 children'
+    );
+
+    // move child1 inside node2
+    tree.moveNode(child1, node2, Position.INSIDE);
+    equal(
+        format_nodes(node2.children),
+        'child1',
+        'node2 children'
+    );
+    equal(
+        format_nodes(node1.children),
+        '',
+        'node2 children'
+    );
+
+    // move child2 before child1
+    tree.moveNode(child2, child1, Position.BEFORE);
+    equal(
+        format_nodes(node2.children),
+        'child2 child1',
+        'node2 children'
+    );
+    equal(
+        format_nodes(tree.children),
+        'node1 node2',
+        'tree nodes at first level'
+    );
+})
 
 });
