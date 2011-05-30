@@ -23,8 +23,7 @@ ul.tree span.folder {
 	float: left;
 }
 
-ul.tree span.folder,
-ul.tree span.node {
+ul.tree span {
 	cursor: pointer;
 }
 

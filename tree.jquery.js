@@ -1,4 +1,3 @@
-// todo: bigger area for opening folder while moving
 // todo: speed up hit detection; perhaps use a treshold; or better algorithm
 // todo: click area for toggling folder
 // todo: move event
@@ -146,7 +145,7 @@ _TestClasses = {};
         );
 
         Todo: remove level, use different function for recursion (_iterate).
-         */
+        */
         iterate: function(callback, level) {
             if (! level) {
                 level = 0;
@@ -368,7 +367,13 @@ _TestClasses = {};
         },
 
         _click: function(e) {
-            var nodeElement = this._getNodeElement($(e.target));
+            var $target = $(e.target);
+
+            if (! $target.is('span.folder')) {
+                return;
+            }
+
+            var nodeElement = this._getNodeElement($target);
             if (nodeElement && (nodeElement.node.hasChildren())) {
                 nodeElement.toggle();
 
