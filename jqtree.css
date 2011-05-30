@@ -1,7 +1,6 @@
 ul.tree,
 ul.tree ul {
-	list-style-position: outside;
-	list-style-type: none;
+	list-style: none outside;
 	margin-bottom: 0;
 }
 
@@ -18,12 +17,10 @@ ul.tree li {
 }
 
 ul.tree span.folder {
-	background-image: url(treeDownTriangleBlack.png);
-	background-repeat: no-repeat;
+	background: url(treeDownTriangleBlack.png) no-repeat 0 50%;
 	width: 12px;
 	display: block;
 	float: left;
-	background-position: 0 50%;
 }
 
 ul.tree span.folder,
