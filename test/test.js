@@ -47,11 +47,11 @@ test("create jqtree from data", function() {
         'first child is li.folder.closed'
     );
     ok(
-        $('#tree1 ul.tree li:eq(0) > span').is('span.folder.closed'),
+        $('#tree1 ul.tree li:eq(0) > span:first').is('span.folder.closed'),
         'span in first folder'
     );
     equal(
-        $('#tree1 ul.tree li:eq(0) > span').text(),
+        $('#tree1 ul.tree li:eq(0) > span:eq(1)').text(),
         'node1'
     );
 
