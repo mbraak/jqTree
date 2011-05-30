@@ -50,7 +50,10 @@ span.dragging {
 ul.tree span.ghost {
 	border: dashed 2px #aaa;
 	margin-left: 12px;
+	width: auto;
 	color: #fff;
+	float: none;
+	display: inline;
 }
 
 ul.tree span.ghost.folder {

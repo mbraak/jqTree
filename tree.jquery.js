@@ -610,7 +610,15 @@ _TestClasses = {};
 
         _generateAreaAndChildren: function() {
             function getHitAreaForNode(node) {
-                var $span = $(node.element).find('span:first');
+                var $span;
+
+                if (node.hasChildren()) {
+                    $span = $(node.element).find('span:eq(1)');
+                }
+                else {
+                    $span = $(node.element).find('span:first');
+                }
+
                 var offset = $span.offset();
 
                 var area = new Area(
@@ -630,7 +638,7 @@ _TestClasses = {};
 
             function getHitAreaForFolder(folder) {
                 var $li = $(folder.element);
-                var $span = $(folder.element).find('span:first');
+                var $span = $(folder.element).find('span:eq(1)');
                 var offset = $li.offset();
                 var span_height = $span.outerHeight();
                 var top = $li.offset().top + span_height;
