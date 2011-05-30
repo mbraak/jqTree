@@ -318,32 +318,6 @@ _TestClasses = {};
             }
 
             function createLi(name, has_children, is_open) {
-                /*
-                var span_classes = [];
-                if (! has_children) {
-                    span_classes.push('node');
-                }
-                else {
-                    span_classes.push('folder');
-
-                    if (! is_open) {
-                        span_classes.push('closed');
-                    }
-                }
-
-                var $li = $('<li><span class="'+ span_classes.join(' ') +'">'+ name +'</span></li>');
-
-                if (has_children) {
-                    var folder_classes = ['folder'];
-                    if (! is_open) {
-                        folder_classes.push('closed');
-                    }
-                    $li.addClass(folder_classes.join(' '));
-                }
-
-                return $li;
-                */
-
                 if (has_children) {
                     return createFolderLi(name, is_open);
                 }
@@ -578,25 +552,6 @@ _TestClasses = {};
                 left: event.pageX - this.offset.click.left,
                 top: event.pageY - this.offset.click.top
             };
-        },
-
-        _intersectsWithPointer: function(item) {
-            var offset = this.helper.offset();
-
-            var r1 = {
-                left: offset.left,
-                top: offset.top,
-                right: offset.left + this.current_item.$element.outerWidth(),
-                bottom: offset.top + this.current_item.$element.outerHeight()
-            };
-
-            var r2 = {
-                left: item.left,
-                top: item.top,
-                right: item.left + item.width,
-                bottom: item.top + item.height
-            };  
-            return intersects(r1, r2);
         },
 
         _refreshHitAreas: function() {
@@ -917,37 +872,4 @@ _TestClasses = {};
             );
         }
     });
-
-    function intersects(r1, r2) {
-        return (
-            (r1.bottom >= r2.top) &&
-            (r1.top <= r2.bottom) &&
-            (r1.right >= r2.left) &&
-            (r1.left <= r2.right)
-        );
-    }
-
-    function get_intersection_x(r1, r2) {
-        if (r1.right < r2.left) {
-            return -1;
-        }
-        else if (r1.left > r2.right) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
-
-    function get_intersection_y(r1, r2) {
-        if (r1.bottom < r2.top) {
-            return -1;
-        }
-        else if (r1.top > r2.bottom) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
 })(jQuery);
