@@ -114,7 +114,7 @@ _TestClasses = {};
         var index = getChildIndex(node);
         */
         getChildIndex: function(node) {
-            return this.children.indexOf(node);
+            return $.inArray(node, this.children);
         },
 
         /*
