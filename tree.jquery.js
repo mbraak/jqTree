@@ -875,6 +875,10 @@ _TestClasses = {};
                     $ul.addClass('closed');
                 }
             );
-        }
+        },
+
+        getSpan: function() {
+            return this.$element.children('span:eq(1)');
+        },
     });
 })(jQuery);
