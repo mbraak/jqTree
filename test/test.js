@@ -54,9 +54,69 @@ test("create jqtree from data", function() {
         $('#tree1 ul.tree li:eq(0) > span:eq(1)').text(),
         'node1'
     );
-
-    $('#tree1').empty();
 });
+
+function isNodeClosed($node) {
+    return (
+        ($node.is('li.folder.closed')) &&
+        ($node.find('span:eq(0)').is('span.folder.closed')) &&
+        ($node.find('ul:eq(0)').is('ul.folder.closed'))
+    );
+}
+
+function isNodeOpen($node) {
+    return (
+        ($node.is('li.folder')) &&
+        ($node.find('span:eq(0)').is('span.folder')) &&
+        ($node.find('ul:eq(0)').is('ul.folder')) &&
+        (! $node.is('li.folder.closed')) &&
+        (! $node.find('span:eq(0)').is('span.folder.closed')) &&
+        (! $node.find('ul:eq(0)').is('ul.folder.closed'))
+    );
+}
+
+test('jqtree toggle', function() {
+    // create tree
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var tree = $tree.tree('getTree');
+    var node1 = tree.children[0];
+    var $node1 = $tree.find('ul.tree li:eq(0)');
+
+    // node1 is initially closed
+    ok(isNodeClosed($node1));
+
+    stop();
+
+    // open node1
+    $tree.tree(
+        'toggle',
+        node1,
+        function() {
+            start();
+
+            ok(isNodeOpen($node1));
+
+            stop();
+
+            // close node1
+            $tree.tree(
+                'toggle',
+                node1,
+                function() {
+                    start();
+
+                    ok(isNodeClosed($node1));
+                }
+            );
+        }
+    );
+});
+
+// todo: test jqtree.getTree()
 
 module("Tree");
 test("Create tree from data", function() {

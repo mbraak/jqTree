@@ -16,6 +16,10 @@
 // todo: scroll while moving a node?
 // todo: smooth animation while moving node
 // todo: test on different browsers
+// todo: span.folder -> a.toggler
+// todo: no empty span -> unicode char
+// todo: no span for text
+// todo: only li has class closed
 
 _TestClasses = {};
 
@@ -278,6 +282,16 @@ _TestClasses = {};
         options: {
             autoOpen: false,  // true / false / int (open n levels starting at 0)
             displayTestNodes: false
+        },
+
+        getTree: function() {
+            return this.tree;
+        },
+
+        toggle: function(node, on_finished) {
+            if (node.hasChildren()) {
+                new FolderElement(node).toggle(on_finished);
+            }
         },
 
         _create: function() {
@@ -837,48 +851,57 @@ _TestClasses = {};
     };
 
     $.extend(FolderElement.prototype, NodeElement.prototype, {
-        toggle: function() {
+        toggle: function(on_finished) {
             if (this.node.is_open) {
-                this.close();
+                this.close(on_finished);
             }
             else {
-                this.open();
+                this.open(on_finished);
             }
         },
 
-        open: function(on_opened) {
+        open: function(on_finished) {
             this.node.is_open = true;
 
             var $ul = this.getUl();
-            this.getSpan().removeClass('closed');
+            this.getButton().removeClass('closed');
+            this.getLi().removeClass('closed');
 
             $ul.slideDown(
                 'fast',
                 function() {
                     $ul.removeClass('closed');
-                    if (on_opened) {
-                        on_opened();
+                    if (on_finished) {
+                        on_finished();
                     }
                 }
             );
         },
 
-        close: function() {
+        close: function(on_finished) {
             this.node.is_open = false;
 
             var $ul = this.getUl();
-            this.getSpan().addClass('closed');
+            this.getButton().addClass('closed');
+            this.getLi().addClass('closed');
 
             $ul.slideUp(
                 'fast',
                 function() {
                     $ul.addClass('closed');
+                    if (on_finished) {
+                        on_finished();
+                    }
                 }
             );
         },
 
+        getButton: function() {
+            return this.$element.children('span:first');
+        },
+
         getSpan: function() {
             return this.$element.children('span:eq(1)');
-        },
+        }
     });
 })(jQuery);
