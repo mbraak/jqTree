@@ -24,6 +24,25 @@ var format_nodes = function(nodes) {
     return strings.join(' ');
 };
 
+var isNodeClosed = function($node) {
+    return (
+        ($node.is('li.folder.closed')) &&
+        ($node.find('span:eq(0)').is('span.folder.closed')) &&
+        ($node.find('ul:eq(0)').is('ul.folder.closed'))
+    );
+}
+
+var isNodeOpen = function($node) {
+    return (
+        ($node.is('li.folder')) &&
+        ($node.find('span:eq(0)').is('span.folder')) &&
+        ($node.find('ul:eq(0)').is('ul.folder')) &&
+        (! $node.is('li.folder.closed')) &&
+        (! $node.find('span:eq(0)').is('span.folder.closed')) &&
+        (! $node.find('ul:eq(0)').is('ul.folder.closed'))
+    );
+}
+
 module("jqtree");
 test("create jqtree from data", function() {
     $('#tree1').tree({
@@ -55,25 +74,6 @@ test("create jqtree from data", function() {
         'node1'
     );
 });
-
-function isNodeClosed($node) {
-    return (
-        ($node.is('li.folder.closed')) &&
-        ($node.find('span:eq(0)').is('span.folder.closed')) &&
-        ($node.find('ul:eq(0)').is('ul.folder.closed'))
-    );
-}
-
-function isNodeOpen($node) {
-    return (
-        ($node.is('li.folder')) &&
-        ($node.find('span:eq(0)').is('span.folder')) &&
-        ($node.find('ul:eq(0)').is('ul.folder')) &&
-        (! $node.is('li.folder.closed')) &&
-        (! $node.find('span:eq(0)').is('span.folder.closed')) &&
-        (! $node.find('ul:eq(0)').is('ul.folder.closed'))
-    );
-}
 
 test('jqtree toggle', function() {
     // create tree
@@ -117,6 +117,26 @@ test('jqtree toggle', function() {
 });
 
 // todo: test jqtree.getTree()
+test("click event", function() {
+    stop(2000);
+
+    var $tree = $('#tree1');
+    var tree = $tree.tree('getTree');
+
+    // create tree
+    $tree.tree({
+        data: example_data,
+        onClick: function(node) {
+            start();
+            equal(node.name, 'node1');
+        }
+    });
+
+    // click on node1
+    var $node1 = $tree.find('ul.tree li:eq(0)');
+    var $text_span = $node1.find('span:eq(1)');
+    $text_span.click();
+});
 
 module("Tree");
 test("Create tree from data", function() {

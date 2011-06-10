@@ -1,5 +1,4 @@
 // todo: speed up hit detection; perhaps use a treshold; or better algorithm
-// todo: click area for toggling folder
 // todo: move event
 // todo: click event
 // todo: check for invalid move
@@ -281,7 +280,8 @@ _TestClasses = {};
         widgetEventPrefix: "tree",
         options: {
             autoOpen: false,  // true / false / int (open n levels starting at 0)
-            displayTestNodes: false
+            displayTestNodes: false,
+            onClick: null
         },
 
         getTree: function() {
@@ -383,16 +383,22 @@ _TestClasses = {};
         _click: function(e) {
             var $target = $(e.target);
 
-            if (! $target.is('span.folder')) {
-                return;
+            if ($target.is('span.folder')) {
+                var nodeElement = this._getNodeElement($target);
+                if (nodeElement && (nodeElement.node.hasChildren())) {
+                    nodeElement.toggle();
+
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
             }
-
-            var nodeElement = this._getNodeElement($target);
-            if (nodeElement && (nodeElement.node.hasChildren())) {
-                nodeElement.toggle();
-
-                e.preventDefault();
-                e.stopPropagation();
+            else if ($target.is('span')) {
+                if (this.options.onClick) {
+                    var node = this._getNode($target);
+                    if (node) {
+                        this.options.onClick(node);
+                    }
+                }
             }
         },
 
