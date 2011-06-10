@@ -7,6 +7,7 @@ var Position = _TestClasses.Position;
 var example_data = [
     {
         label: 'node1',
+        id: 123,  // extra data
         children: [
             { label: 'child1' },
             { label: 'child2' }
@@ -157,6 +158,11 @@ test("Create tree from data", function() {
         format_nodes(tree.children[1].children),
         '',
         'children of node2'
+    );
+    equal(
+        tree.children[0].id,
+        123,
+        'id'
     );
 });
 

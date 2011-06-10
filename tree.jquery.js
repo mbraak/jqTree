@@ -65,7 +65,15 @@ _TestClasses = {};
 
             var self = this;
             $.each(data, function() {
+                // todo: node property is 'name', but we use 'label' here
                 var node = new Node(this.label);
+
+                $.each(this, function(key, value) {
+                    if (key != 'label') {
+                        node[key] = value;
+                    }
+                });
+
                 self.addChild(node);
 
                 if (this.children) {
