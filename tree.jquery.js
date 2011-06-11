@@ -1,13 +1,9 @@
-// todo: speed up hit detection; perhaps use a treshold; or better algorithm
 // todo: move event
-// todo: click event
 // todo: check for invalid move
 // todo: drag handle
 // todo: display move hint
-// todo: variables must start with _?
 // todo: change cursor for moving / over node that can be moved
 // todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
-// todo: extra data in input json data
 // todo: use jqueryui icons for folder triangles
 // todo: use extra span for folder icon
 // todo: unit test
@@ -19,10 +15,23 @@
 // todo: no empty span -> unicode char
 // todo: no span for text
 // todo: only li has class closed
+// todo: dnd optional
+// todo: plugins (also for dnd and state)?
+// todo: rename to jquery.tree.js?
 
 _TestClasses = {};
 
 (function($) {
+    var indexOf = function(elem, array) {
+        for (var i = 0, length = array.length; i < length; i++) {
+            if (array[i] == elem) {
+                return i;
+            }
+        }
+
+        return -1;
+    };
+
     var Position = {
         BEFORE: 1,
         AFTER: 2,
@@ -155,7 +164,7 @@ _TestClasses = {};
             }
         );
 
-        Todo: remove level, use different function for recursion (_iterate).
+        Todo: remove level parameter, use different function for recursion (_iterate).
         */
         iterate: function(callback, level) {
             if (! level) {
@@ -289,7 +298,10 @@ _TestClasses = {};
         options: {
             autoOpen: false,  // true / false / int (open n levels starting at 0)
             displayTestNodes: false,
-            onClick: null
+            onClick: null,
+            saveState: false,
+            onSetStateFromStorage: null,
+            onGetStateFromStorage: null
         },
 
         getTree: function() {
@@ -299,6 +311,70 @@ _TestClasses = {};
         toggle: function(node, on_finished) {
             if (node.hasChildren()) {
                 new FolderElement(node).toggle(on_finished);
+            }
+
+            if (this.options.saveState) {
+                this._saveState();
+            }
+        },
+
+        _getState: function() {
+            var state = [];
+
+            this.tree.iterate(function(node) {
+                if (
+                    node.is_open &&
+                    node.id &&
+                    node.hasChildren()
+                ) {
+                    state.push(node.id);
+                }
+                return true;
+            });
+
+            return state.join(',');
+        },
+
+        _setState: function(state) {
+            var open_nodes = state.split(',');
+            this.tree.iterate(function(node) {
+                if (
+                    node.id &&
+                    node.hasChildren() &&
+                    (indexOf(node.id, open_nodes) != -1)
+                ) {
+                    node.is_open = true;
+                }
+                return true;
+            });
+        },
+
+        _saveState: function() {
+            if (this.options.onSetStateFromStorage) {
+                this.options.onSetStateFromStorage(this._getState());
+            }
+            else {
+                $.cookie('tree', this._getState(), {path: '/'});
+            }
+
+        },
+
+        _restoreState: function() {
+            var state;
+
+            if (this.options.onGetStateFromStorage) {
+                state = this.options.onGetStateFromStorage();
+            }
+            else {
+                state = $.cookie('tree', {path: '/'});
+            }
+
+            if (! state) {
+                return false;
+            }
+            else {
+                this._setState(state);
+                return true;
             }
         },
 
@@ -315,7 +391,10 @@ _TestClasses = {};
             this.hint_nodes = [];
         },
 
-        destroy: function() {
+        _destroy: function() {
+            this.element.empty();
+            this.tree = null;
+
             this._mouseDestroy();
             return this;
         },
@@ -395,6 +474,10 @@ _TestClasses = {};
                 var nodeElement = this._getNodeElement($target);
                 if (nodeElement && (nodeElement.node.hasChildren())) {
                     nodeElement.toggle();
+
+                    if (this.options.saveState) {
+                        this._saveState();
+                    }
 
                     e.preventDefault();
                     e.stopPropagation();
@@ -767,6 +850,13 @@ _TestClasses = {};
 
         _openNodes: function() {
             var max_level;
+
+            if (this.options.saveState) {
+                if (this._restoreState()) {
+                    return;
+                }
+            }
+
             if (this.options.autoOpen === false) {
                 return;
             }

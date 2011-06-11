@@ -14,7 +14,11 @@ var example_data = [
         ]
     },
     {
-        label: 'node2'
+        label: 'node2',
+        id: 124,
+        children: [
+            { label: 'child3' }
+        ]
     }
 ];
 
@@ -44,7 +48,12 @@ var isNodeOpen = function($node) {
     );
 }
 
-module("jqtree");
+module("jqtree", {
+    teardown: function() {
+        $('#tree1').tree('destroy');
+    }
+});
+
 test("create jqtree from data", function() {
     $('#tree1').tree({
         data: example_data
@@ -99,7 +108,7 @@ test('jqtree toggle', function() {
         function() {
             start();
 
-            ok(isNodeOpen($node1));
+            ok(isNodeOpen($node1), 'node1 is open');
 
             stop();
 
@@ -110,7 +119,7 @@ test('jqtree toggle', function() {
                 function() {
                     start();
 
-                    ok(isNodeClosed($node1));
+                    ok(isNodeClosed($node1), 'node1 is closed');
                 }
             );
         }
@@ -118,13 +127,13 @@ test('jqtree toggle', function() {
 });
 
 // todo: test jqtree.getTree()
+
 test("click event", function() {
     stop(2000);
 
-    var $tree = $('#tree1');
-    var tree = $tree.tree('getTree');
-
     // create tree
+    var $tree = $('#tree1');
+
     $tree.tree({
         data: example_data,
         onClick: function(node) {
@@ -139,8 +148,55 @@ test("click event", function() {
     $text_span.click();
 });
 
+test('saveState', function() {
+    var $tree = $('#tree1');
+
+    var saved_state;
+
+    function setState(state) {
+        saved_state = state;
+    }
+
+    function getState() {
+        return saved_state;
+    }
+
+    function createTree() {
+        $tree.tree({
+            data: example_data,
+            saveState: true,
+            onSetStateFromStorage: setState,
+            onGetStateFromStorage: getState
+        });
+    }
+
+    // create tree
+    createTree();
+
+    // nodes are initially closed
+    var tree = $tree.tree('getTree');
+    tree.iterate(function(node) {
+        ok(! node.is_open, 'closed');
+        return true;
+    });
+
+    // open node1
+    $tree.tree('toggle', tree.children[0]);
+
+    // node1 is open
+    ok(tree.children[0].is_open, 'node1 is_open');
+
+    // create tree again
+    $tree.tree('destroy');
+    createTree();
+
+    tree = $tree.tree('getTree');
+    ok(tree.children[0].is_open, 'node1 is_open');
+    ok(! tree.children[1].is_open, 'node2 is closed');
+});
+
 module("Tree");
-test("Create tree from data", function() {
+test("create tree from data", function() {
     var tree = new Tree();
     tree.loadFromData(example_data);
 
@@ -156,7 +212,7 @@ test("Create tree from data", function() {
     );
     equal(
         format_nodes(tree.children[1].children),
-        '',
+        'child3',
         'children of node2'
     );
     equal(
@@ -292,7 +348,7 @@ test('tree iterate', function() {
 
     equal(
         format_nodes(nodes),
-        'node1 child1 child2 node2',
+        'node1 child1 child2 node2 child3',
         'all nodes'
     );
 
@@ -339,7 +395,7 @@ test('tree moveNode', function() {
     tree.moveNode(child1, node2, Position.INSIDE);
     equal(
         format_nodes(node2.children),
-        'child1',
+        'child3 child1',
         'node2 children'
     );
     equal(
@@ -352,7 +408,7 @@ test('tree moveNode', function() {
     tree.moveNode(child2, child1, Position.BEFORE);
     equal(
         format_nodes(node2.children),
-        'child2 child1',
+        'child3 child2 child1',
         'node2 children'
     );
     equal(
