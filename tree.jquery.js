@@ -1,11 +1,9 @@
-// todo: move event
 // todo: check for invalid move
 // todo: drag handle
 // todo: display move hint
 // todo: change cursor for moving / over node that can be moved
 // todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
 // todo: use jqueryui icons for folder triangles
-// todo: use extra span for folder icon
 // todo: unit test
 // todo: documentation
 // todo: scroll while moving a node?
@@ -18,6 +16,8 @@
 // todo: dnd optional
 // todo: plugins (also for dnd and state)?
 // todo: rename to jquery.tree.js?
+// todo: move a node to root position
+// todo: prevent accidental move on touchpad
 
 _TestClasses = {};
 
@@ -35,7 +35,20 @@ _TestClasses = {};
     var Position = {
         BEFORE: 1,
         AFTER: 2,
-        INSIDE: 3
+        INSIDE: 3,
+
+        getName: function(position) {
+            return this._getNames()[position];
+        },
+
+        _getNames: function() {
+            // todo: cache
+            var names = {};
+            names[Position.BEFORE] = 'before';
+            names[Position.AFTER] = 'after';
+            names[Position.INSIDE] = 'inside';
+            return names;
+        }
     };
 
     _TestClasses.Position = Position;
@@ -298,8 +311,9 @@ _TestClasses = {};
         options: {
             autoOpen: false,  // true / false / int (open n levels starting at 0)
             displayTestNodes: false,
-            onClick: null,
             saveState: false,
+            onClick: null,
+            onMoveNode: null,
             onSetStateFromStorage: null,
             onGetStateFromStorage: null
         },
@@ -644,6 +658,14 @@ _TestClasses = {};
 
                 if (this.hovered_rectangle.move_to == Position.INSIDE) {
                     this.hovered_rectangle.node.is_open = true;
+                }
+
+                if (this.options.onMoveNode) {
+                    this.options.onMoveNode(
+                        this.current_item.node,
+                        this.hovered_rectangle.node,
+                        Position.getName(this.hovered_rectangle.move_to)
+                    );
                 }
             }
 
