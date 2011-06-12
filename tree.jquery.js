@@ -4,7 +4,6 @@
 // todo: change cursor for moving / over node that can be moved
 // todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
 // todo: use jqueryui icons for folder triangles
-// todo: unit test
 // todo: documentation
 // todo: scroll while moving a node?
 // todo: smooth animation while moving node
@@ -18,6 +17,7 @@
 // todo: rename to jquery.tree.js?
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
+// todo: contextmenu
 
 _TestClasses = {};
 
@@ -313,6 +313,7 @@ _TestClasses = {};
             displayTestNodes: false,
             saveState: false,
             onClick: null,
+            onContextMenu: null,
             onMoveNode: null,
             onSetStateFromStorage: null,
             onGetStateFromStorage: null
@@ -398,6 +399,8 @@ _TestClasses = {};
 
             this._createDomElements(this.tree);
             this.element.click($.proxy(this._click, this));
+            this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
+
             this._mouseInit();
 
             this.hovered_rectangle = null;
@@ -482,6 +485,11 @@ _TestClasses = {};
         },
 
         _click: function(e) {
+            // todo: handle rightclick
+            if (e.ctrlKey) {
+                return;
+            }
+
             var $target = $(e.target);
 
             if ($target.is('span.folder')) {
@@ -503,6 +511,28 @@ _TestClasses = {};
                     if (node) {
                         this.options.onClick(node);
                     }
+                }
+            }
+        },
+
+        _contextmenu: function(e) {
+            if (! this.options.onContextMenu) {
+                return;
+            }
+
+            var $target = $(e.target);
+
+            if (
+                ($target.is('span')) &&
+                (! $target.is('span.folder'))
+            ) {
+                var node = this._getNode($target);
+                if (node) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    this.options.onContextMenu(node);
+                    return false;
                 }
             }
         },
