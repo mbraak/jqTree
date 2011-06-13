@@ -14,10 +14,10 @@
 // todo: only li has class closed
 // todo: dnd optional
 // todo: plugins (also for dnd and state)?
-// todo: rename to jquery.tree.js?
+// todo: rename to jquery.tree.js? also css-file?
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
-// todo: contextmenu
+// todo: code style; variables with _
 
 _TestClasses = {};
 
@@ -312,7 +312,8 @@ _TestClasses = {};
             autoOpen: false,  // true / false / int (open n levels starting at 0)
             saveState: false,
             dragAndDrop: false,
-            onClick: null,
+            selectable: false,
+            onClick: null,  // todo: renamed to onClickNode?
             onContextMenu: null,
             onMoveNode: null,
             onSetStateFromStorage: null,
@@ -324,6 +325,7 @@ _TestClasses = {};
             return this.tree;
         },
 
+        // todo: is toggle really used?
         toggle: function(node, on_finished) {
             if (node.hasChildren()) {
                 new FolderElement(node).toggle(on_finished);
@@ -332,6 +334,34 @@ _TestClasses = {};
             if (this.options.saveState) {
                 this._saveState();
             }
+        },
+
+        getSelectedNode: function() {
+            return this.selected_node;
+        },
+
+        _create: function() {
+            this.tree = Tree.createFromData(this.options.data);
+            this._openNodes();
+
+            this._createDomElements(this.tree);
+            this.element.click($.proxy(this._click, this));
+            this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
+
+            this._mouseInit();
+
+            this.hovered_rectangle = null;
+            this.selected_node = null;
+            this.$ghost = null;
+            this.hint_nodes = [];
+        },
+
+        _destroy: function() {
+            this.element.empty();
+            this.tree = null;
+
+            this._mouseDestroy();
+            return this;
         },
 
         _getState: function() {
@@ -392,29 +422,6 @@ _TestClasses = {};
                 this._setState(state);
                 return true;
             }
-        },
-
-        _create: function() {
-            this.tree = Tree.createFromData(this.options.data);
-            this._openNodes();
-
-            this._createDomElements(this.tree);
-            this.element.click($.proxy(this._click, this));
-            this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
-
-            this._mouseInit();
-
-            this.hovered_rectangle = null;
-            this.$ghost = null;
-            this.hint_nodes = [];
-        },
-
-        _destroy: function() {
-            this.element.empty();
-            this.tree = null;
-
-            this._mouseDestroy();
-            return this;
         },
 
         _createDomElements: function(tree) {
@@ -507,9 +514,19 @@ _TestClasses = {};
                 }
             }
             else if ($target.is('span')) {
-                if (this.options.onClick) {
-                    var node = this._getNode($target);
-                    if (node) {
+                var node = this._getNode($target);
+                if (node) {
+                    if (this.options.selectable) {
+                        if (this.selected_node) {
+                            this._getNodeElementForNode(this.selected_node).deselect();
+                        }
+
+                        this._getNodeElementForNode(node).select();
+
+                        this.selected_node = node;
+                    }
+
+                    if (this.options.onClick) {
                         this.options.onClick(node);
                     }
                 }
@@ -1016,6 +1033,14 @@ _TestClasses = {};
 
         createGhost: function() {
            return $('<li><span class="ghost">'+ this.node.name +'</span></li>');
+        },
+
+        select: function() {
+            this.getSpan().addClass('selected');
+        },
+
+        deselect: function() {
+            this.getSpan().removeClass('selected');
         }
     });
 

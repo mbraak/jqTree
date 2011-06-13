@@ -195,6 +195,35 @@ test('saveState', function() {
     ok(! tree.children[1].is_open, 'node2 is closed');
 });
 
+test('getSelectedNode', function() {
+    var $tree = $('#tree1');
+
+    // create tree
+    $tree.tree({
+        data: example_data,
+        selectable: true
+    });
+
+    // there is no node selected
+    equal(
+        $tree.tree('getSelectedNode'),
+        null,
+        'getSelectedNode'
+    );
+
+    // select node1
+    var $node1 = $tree.find('ul.tree li:eq(0)');
+    var $text_span = $node1.find('span:eq(1)');
+    $text_span.click();
+
+    // node1 is selected
+    equal(
+        $tree.tree('getSelectedNode').name,
+        'node1',
+        'getSelectedNode'
+    );
+});
+
 module("Tree");
 test("create tree from data", function() {
     var tree = new Tree();

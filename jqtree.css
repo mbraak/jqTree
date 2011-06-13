@@ -28,7 +28,7 @@ ul.tree span {
 }
 
 ul.tree span.node {
-	padding-left: 12px;
+	margin-left: 12px;
 }
 
 ul.tree span.folder.closed {
@@ -59,4 +59,9 @@ ul.tree span.ghost.folder {
 
 ul.tree span.ghost.inside {
 	margin-left: 36px;
+}
+
+ul.tree span.selected {
+    background: #000;
+    color: #fff;
 }
