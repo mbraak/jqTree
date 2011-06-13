@@ -4,11 +4,11 @@ ul.tree ul {
 	margin-bottom: 0;
 }
 
-ul.tree ul.folder {
+ul.tree ul {
 	margin-left: 12px;
 }
 
-ul.tree li ul.closed {
+ul.tree li.closed > ul {
 	display: none;
 }
 
@@ -16,22 +16,29 @@ ul.tree li {
 	margin-left: 0;
 }
 
-ul.tree span.folder {
+ul.tree a.toggler {
 	background: url(treeDownTriangleBlack.png) no-repeat 0 50%;
 	width: 12px;
 	display: block;
 	float: left;
+	text-indent: -9999px;
 }
 
-ul.tree span {
+ul.tree span,
+ul.tree a {
 	cursor: pointer;
 }
 
-ul.tree span.node {
-	padding-left: 12px;
+ul.tree li > span {
+	margin-left: 12px;
+	padding: 2px;
 }
 
-ul.tree span.folder.closed {
+ul.tree li.folder > span {
+	margin-left: 0;
+}
+
+ul.tree a.toggler.closed {
 	background-image: url(treeRightTriangleBlack.png);
 }
 
@@ -59,4 +66,9 @@ ul.tree span.ghost.folder {
 
 ul.tree span.ghost.inside {
 	margin-left: 36px;
+}
+
+ul.tree span.selected {
+    background: #000;
+    color: #fff;
 }

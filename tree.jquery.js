@@ -1,33 +1,48 @@
-// todo: speed up hit detection; perhaps use a treshold; or better algorithm
-// todo: click area for toggling folder
-// todo: move event
-// todo: click event
 // todo: check for invalid move
 // todo: drag handle
 // todo: display move hint
-// todo: variables must start with _?
 // todo: change cursor for moving / over node that can be moved
 // todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
-// todo: extra data in input json data
 // todo: use jqueryui icons for folder triangles
-// todo: use extra span for folder icon
-// todo: unit test
 // todo: documentation
 // todo: scroll while moving a node?
 // todo: smooth animation while moving node
 // todo: test on different browsers
-// todo: span.folder -> a.toggler
-// todo: no empty span -> unicode char
-// todo: no span for text
-// todo: only li has class closed
+// todo: plugins (also for dnd and state)?
+// todo: rename to jquery.tree.js? also css-file?
+// todo: move a node to root position
+// todo: prevent accidental move on touchpad
 
 _TestClasses = {};
 
 (function($) {
+    var indexOf = function(elem, array) {
+        for (var i = 0, length = array.length; i < length; i++) {
+            if (array[i] == elem) {
+                return i;
+            }
+        }
+
+        return -1;
+    };
+
     var Position = {
         BEFORE: 1,
         AFTER: 2,
-        INSIDE: 3
+        INSIDE: 3,
+
+        getName: function(position) {
+            return this._getNames()[position];
+        },
+
+        _getNames: function() {
+            // todo: cache
+            var names = {};
+            names[Position.BEFORE] = 'before';
+            names[Position.AFTER] = 'after';
+            names[Position.INSIDE] = 'inside';
+            return names;
+        }
     };
 
     _TestClasses.Position = Position;
@@ -66,7 +81,15 @@ _TestClasses = {};
 
             var self = this;
             $.each(data, function() {
+                // todo: node property is 'name', but we use 'label' here
                 var node = new Node(this.label);
+
+                $.each(this, function(key, value) {
+                    if (key != 'label') {
+                        node[key] = value;
+                    }
+                });
+
                 self.addChild(node);
 
                 if (this.children) {
@@ -148,7 +171,7 @@ _TestClasses = {};
             }
         );
 
-        Todo: remove level, use different function for recursion (_iterate).
+        Todo: remove level parameter, use different function for recursion (_iterate).
         */
         iterate: function(callback, level) {
             if (! level) {
@@ -281,6 +304,14 @@ _TestClasses = {};
         widgetEventPrefix: "tree",
         options: {
             autoOpen: false,  // true / false / int (open n levels starting at 0)
+            saveState: false,
+            dragAndDrop: false,
+            selectable: false,
+            onClick: null,  // todo: renamed to onClickNode?
+            onContextMenu: null,
+            onMoveNode: null,
+            onSetStateFromStorage: null,
+            onGetStateFromStorage: null,
             displayTestNodes: false
         },
 
@@ -288,10 +319,19 @@ _TestClasses = {};
             return this.tree;
         },
 
+        // todo: is toggle really used?
         toggle: function(node, on_finished) {
             if (node.hasChildren()) {
                 new FolderElement(node).toggle(on_finished);
             }
+
+            if (this.options.saveState) {
+                this._saveState();
+            }
+        },
+
+        getSelectedNode: function() {
+            return this.selected_node;
         },
 
         _create: function() {
@@ -300,16 +340,82 @@ _TestClasses = {};
 
             this._createDomElements(this.tree);
             this.element.click($.proxy(this._click, this));
+            this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
+
             this._mouseInit();
 
             this.hovered_rectangle = null;
+            this.selected_node = null;
             this.$ghost = null;
             this.hint_nodes = [];
         },
 
-        destroy: function() {
+        _destroy: function() {
+            this.element.empty();
+            this.tree = null;
+
             this._mouseDestroy();
             return this;
+        },
+
+        _getState: function() {
+            var state = [];
+
+            this.tree.iterate(function(node) {
+                if (
+                    node.is_open &&
+                    node.id &&
+                    node.hasChildren()
+                ) {
+                    state.push(node.id);
+                }
+                return true;
+            });
+
+            return state.join(',');
+        },
+
+        _setState: function(state) {
+            var open_nodes = state.split(',');
+            this.tree.iterate(function(node) {
+                if (
+                    node.id &&
+                    node.hasChildren() &&
+                    (indexOf(node.id, open_nodes) != -1)
+                ) {
+                    node.is_open = true;
+                }
+                return true;
+            });
+        },
+
+        _saveState: function() {
+            if (this.options.onSetStateFromStorage) {
+                this.options.onSetStateFromStorage(this._getState());
+            }
+            else {
+                $.cookie('tree', this._getState(), {path: '/'});
+            }
+
+        },
+
+        _restoreState: function() {
+            var state;
+
+            if (this.options.onGetStateFromStorage) {
+                state = this.options.onGetStateFromStorage();
+            }
+            else {
+                state = $.cookie('tree', {path: '/'});
+            }
+
+            if (! state) {
+                return false;
+            }
+            else {
+                this._setState(state);
+                return true;
+            }
         },
 
         _createDomElements: function(tree) {
@@ -317,12 +423,6 @@ _TestClasses = {};
                 var classes = [];
                 if (! depth) {
                     classes.push('tree');
-                }
-                else {
-                    classes.push('folder');
-                    if (! is_open) {
-                        classes.push('closed');
-                    }
                 }
 
                 var $element = $('<ul />');
@@ -340,16 +440,17 @@ _TestClasses = {};
             }
 
             function createNodeLi(name) {
-                return $('<li><span class="node">'+ name +'</span></li>');
+                return $('<li><span>'+ name +'</span></li>');
             }
 
             function createFolderLi(name, is_open) {
-                var span_classes = ['folder'];
+                var button_classes = ['toggler'];
 
                 if (! is_open) {
-                    span_classes.push('closed');
+                    button_classes.push('closed');
                 }
-                var $li = $('<li><span class="'+ span_classes.join(' ') +'">&nbsp;</span><span>'+ name +'</span></li>');
+
+                var $li = $('<li><a class="'+ button_classes.join(' ') +'">&raquo;</a><span>'+ name +'</span></li>');
 
                 // todo: add li class in text
                 var folder_classes = ['folder'];
@@ -381,18 +482,65 @@ _TestClasses = {};
         },
 
         _click: function(e) {
-            var $target = $(e.target);
-
-            if (! $target.is('span.folder')) {
+            // todo: handle rightclick
+            if (e.ctrlKey) {
                 return;
             }
 
-            var nodeElement = this._getNodeElement($target);
-            if (nodeElement && (nodeElement.node.hasChildren())) {
-                nodeElement.toggle();
+            var $target = $(e.target);
 
-                e.preventDefault();
-                e.stopPropagation();
+            if ($target.is('a.toggler')) {
+                var node_element = this._getNodeElement($target);
+                if (node_element && (node_element.node.hasChildren())) {
+                    node_element.toggle();
+
+                    if (this.options.saveState) {
+                        this._saveState();
+                    }
+
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+            else if ($target.is('span')) {
+                var node = this._getNode($target);
+                if (node) {
+                    if (this.options.selectable) {
+                        if (this.selected_node) {
+                            this._getNodeElementForNode(this.selected_node).deselect();
+                        }
+
+                        this._getNodeElementForNode(node).select();
+
+                        this.selected_node = node;
+                    }
+
+                    if (this.options.onClick) {
+                        this.options.onClick(node);
+                    }
+                }
+            }
+        },
+
+        _contextmenu: function(e) {
+            if (! this.options.onContextMenu) {
+                return;
+            }
+
+            var $target = $(e.target);
+
+            if (
+                ($target.is('span')) &&
+                (! $target.is('span.folder'))
+            ) {
+                var node = this._getNode($target);
+                if (node) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    this.options.onContextMenu(node);
+                    return false;
+                }
             }
         },
 
@@ -426,12 +574,20 @@ _TestClasses = {};
         },
 
         _mouseCapture: function(event) {
+            if (! this.options.dragAndDrop) {
+                return;
+            }
+
             this.current_item = this._getNodeElement($(event.target));
 
             return (this.current_item != null);
         },
 
         _mouseStart: function(event) {
+            if (! this.options.dragAndDrop) {
+                return;
+            }
+
             var $element = this.current_item.$element;
 
             //The element's absolute position on the page minus margins
@@ -460,6 +616,10 @@ _TestClasses = {};
         },
 
         _mouseDrag: function(event) {
+            if (! this.options.dragAndDrop) {
+                return;
+            }
+
             //Compute the helpers position
             this.position = this._generatePosition(event);
             this.positionAbs = this.position;
@@ -501,6 +661,21 @@ _TestClasses = {};
             return true;
         },
 
+        _mouseStop: function() {
+            if (! this.options.dragAndDrop) {
+                return;
+            }
+
+            this._moveItem();
+            this._clear();
+            this._removeHover();
+            this._removeGhost();
+            this._removeHintNodes();
+
+            this.current_item.$element.show();
+            return false;
+        },
+
         _getPointerRectangle: function() {
             var offset = this.helper.offset();
 
@@ -516,17 +691,6 @@ _TestClasses = {};
             return this.area.findIntersectingArea(
                 this._getPointerRectangle()
             );
-        },
-
-        _mouseStop: function() {
-            this._moveItem();
-            this._clear();
-            this._removeHover();
-            this._removeGhost();
-            this._removeHintNodes();
-
-            this.current_item.$element.show();
-            return false;
         },
 
         _getGhost: function() {
@@ -547,6 +711,14 @@ _TestClasses = {};
 
                 if (this.hovered_rectangle.move_to == Position.INSIDE) {
                     this.hovered_rectangle.node.is_open = true;
+                }
+
+                if (this.options.onMoveNode) {
+                    this.options.onMoveNode(
+                        this.current_item.node,
+                        this.hovered_rectangle.node,
+                        Position.getName(this.hovered_rectangle.move_to)
+                    );
                 }
             }
 
@@ -584,15 +756,7 @@ _TestClasses = {};
 
         _generateAreaAndChildren: function() {
             function getHitAreaForNode(node) {
-                var $span;
-
-                if (node.hasChildren()) {
-                    $span = $(node.element).find('span:eq(1)');
-                }
-                else {
-                    $span = $(node.element).find('span:first');
-                }
-
+                var $span = $(node.element).find('span:first');
                 var offset = $span.offset();
 
                 var area = new Area(
@@ -612,7 +776,7 @@ _TestClasses = {};
 
             function getHitAreaForFolder(folder) {
                 var $li = $(folder.element);
-                var $span = $(folder.element).find('span:eq(1)');
+                var $span = $(folder.element).find('span:first');
                 var offset = $li.offset();
                 var span_height = $span.outerHeight();
                 var top = $li.offset().top + span_height;
@@ -753,6 +917,13 @@ _TestClasses = {};
 
         _openNodes: function() {
             var max_level;
+
+            if (this.options.saveState) {
+                if (this._restoreState()) {
+                    return;
+                }
+            }
+
             if (this.options.autoOpen === false) {
                 return;
             }
@@ -843,6 +1014,14 @@ _TestClasses = {};
 
         createGhost: function() {
            return $('<li><span class="ghost">'+ this.node.name +'</span></li>');
+        },
+
+        select: function() {
+            this.getSpan().addClass('selected');
+        },
+
+        deselect: function() {
+            this.getSpan().removeClass('selected');
         }
     });
 
@@ -862,46 +1041,42 @@ _TestClasses = {};
 
         open: function(on_finished) {
             this.node.is_open = true;
-
-            var $ul = this.getUl();
             this.getButton().removeClass('closed');
-            this.getLi().removeClass('closed');
 
-            $ul.slideDown(
+            this.getUl().slideDown(
                 'fast',
-                function() {
-                    $ul.removeClass('closed');
-                    if (on_finished) {
-                        on_finished();
-                    }
-                }
+                $.proxy(
+                    function() {
+                        this.getLi().removeClass('closed');
+                        if (on_finished) {
+                            on_finished();
+                        }
+                    },
+                    this
+                )
             );
         },
 
         close: function(on_finished) {
             this.node.is_open = false;
-
-            var $ul = this.getUl();
             this.getButton().addClass('closed');
-            this.getLi().addClass('closed');
 
-            $ul.slideUp(
+            this.getUl().slideUp(
                 'fast',
-                function() {
-                    $ul.addClass('closed');
-                    if (on_finished) {
-                        on_finished();
-                    }
-                }
+                $.proxy(
+                    function() {
+                        this.getLi().addClass('closed');
+                        if (on_finished) {
+                            on_finished();
+                        }
+                    },
+                    this
+                )
             );
         },
 
         getButton: function() {
-            return this.$element.children('span:first');
-        },
-
-        getSpan: function() {
-            return this.$element.children('span:eq(1)');
+            return this.$element.children('a.toggler');
         }
     });
 })(jQuery);
