@@ -10,7 +10,6 @@
 // todo: test on different browsers
 // todo: span.folder -> a.toggler
 // todo: no empty span -> unicode char
-// todo: no span for text
 // todo: only li has class closed
 // todo: dnd optional
 // todo: plugins (also for dnd and state)?
@@ -455,12 +454,12 @@ _TestClasses = {};
             }
 
             function createFolderLi(name, is_open) {
-                var span_classes = ['folder'];
+                var span_classes = ['toggler'];
 
                 if (! is_open) {
                     span_classes.push('closed');
                 }
-                var $li = $('<li><span class="'+ span_classes.join(' ') +'">&nbsp;</span><span>'+ name +'</span></li>');
+                var $li = $('<li><a class="'+ span_classes.join(' ') +'">&raquo;</a><span>'+ name +'</span></li>');
 
                 // todo: add li class in text
                 var folder_classes = ['folder'];
@@ -499,7 +498,7 @@ _TestClasses = {};
 
             var $target = $(e.target);
 
-            if ($target.is('span.folder')) {
+            if ($target.is('a.toggler')) {
                 var node_element = this._getNodeElement($target);
                 if (node_element && (node_element.node.hasChildren())) {
                     node_element.toggle();
@@ -1094,11 +1093,7 @@ _TestClasses = {};
         },
 
         getButton: function() {
-            return this.$element.children('span:first');
-        },
-
-        getSpan: function() {
-            return this.$element.children('span:eq(1)');
+            return this.$element.children('a.toggler');
         }
     });
 })(jQuery);
