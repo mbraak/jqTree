@@ -310,13 +310,14 @@ _TestClasses = {};
         widgetEventPrefix: "tree",
         options: {
             autoOpen: false,  // true / false / int (open n levels starting at 0)
-            displayTestNodes: false,
             saveState: false,
+            dragAndDrop: false,
             onClick: null,
             onContextMenu: null,
             onMoveNode: null,
             onSetStateFromStorage: null,
-            onGetStateFromStorage: null
+            onGetStateFromStorage: null,
+            displayTestNodes: false
         },
 
         getTree: function() {
@@ -567,12 +568,20 @@ _TestClasses = {};
         },
 
         _mouseCapture: function(event) {
+            if (! this.options.dragAndDrop) {
+                return;
+            }
+
             this.current_item = this._getNodeElement($(event.target));
 
             return (this.current_item != null);
         },
 
         _mouseStart: function(event) {
+            if (! this.options.dragAndDrop) {
+                return;
+            }
+
             var $element = this.current_item.$element;
 
             //The element's absolute position on the page minus margins
@@ -601,6 +610,10 @@ _TestClasses = {};
         },
 
         _mouseDrag: function(event) {
+            if (! this.options.dragAndDrop) {
+                return;
+            }
+
             //Compute the helpers position
             this.position = this._generatePosition(event);
             this.positionAbs = this.position;
@@ -642,6 +655,21 @@ _TestClasses = {};
             return true;
         },
 
+        _mouseStop: function() {
+            if (! this.options.dragAndDrop) {
+                return;
+            }
+
+            this._moveItem();
+            this._clear();
+            this._removeHover();
+            this._removeGhost();
+            this._removeHintNodes();
+
+            this.current_item.$element.show();
+            return false;
+        },
+
         _getPointerRectangle: function() {
             var offset = this.helper.offset();
 
@@ -657,17 +685,6 @@ _TestClasses = {};
             return this.area.findIntersectingArea(
                 this._getPointerRectangle()
             );
-        },
-
-        _mouseStop: function() {
-            this._moveItem();
-            this._clear();
-            this._removeHover();
-            this._removeGhost();
-            this._removeHintNodes();
-
-            this.current_item.$element.show();
-            return false;
         },
 
         _getGhost: function() {
