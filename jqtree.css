@@ -4,11 +4,11 @@ ul.tree ul {
 	margin-bottom: 0;
 }
 
-ul.tree ul.folder {
+ul.tree ul {
 	margin-left: 12px;
 }
 
-ul.tree li ul.closed {
+ul.tree li.closed > ul {
 	display: none;
 }
 
@@ -29,8 +29,13 @@ ul.tree a {
 	cursor: pointer;
 }
 
-ul.tree span.node {
+ul.tree li > span {
 	margin-left: 12px;
+	padding: 2px;
+}
+
+ul.tree li.folder > span {
+	margin-left: 0;
 }
 
 ul.tree a.toggler.closed {

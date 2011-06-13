@@ -8,10 +8,6 @@
 // todo: scroll while moving a node?
 // todo: smooth animation while moving node
 // todo: test on different browsers
-// todo: span.folder -> a.toggler
-// todo: no empty span -> unicode char
-// todo: only li has class closed
-// todo: dnd optional
 // todo: plugins (also for dnd and state)?
 // todo: rename to jquery.tree.js? also css-file?
 // todo: move a node to root position
@@ -428,12 +424,6 @@ _TestClasses = {};
                 if (! depth) {
                     classes.push('tree');
                 }
-                else {
-                    classes.push('folder');
-                    if (! is_open) {
-                        classes.push('closed');
-                    }
-                }
 
                 var $element = $('<ul />');
                 $element.addClass(classes.join(' '));
@@ -450,16 +440,17 @@ _TestClasses = {};
             }
 
             function createNodeLi(name) {
-                return $('<li><span class="node">'+ name +'</span></li>');
+                return $('<li><span>'+ name +'</span></li>');
             }
 
             function createFolderLi(name, is_open) {
-                var span_classes = ['toggler'];
+                var button_classes = ['toggler'];
 
                 if (! is_open) {
-                    span_classes.push('closed');
+                    button_classes.push('closed');
                 }
-                var $li = $('<li><a class="'+ span_classes.join(' ') +'">&raquo;</a><span>'+ name +'</span></li>');
+
+                var $li = $('<li><a class="'+ button_classes.join(' ') +'">&raquo;</a><span>'+ name +'</span></li>');
 
                 // todo: add li class in text
                 var folder_classes = ['folder'];
@@ -765,15 +756,7 @@ _TestClasses = {};
 
         _generateAreaAndChildren: function() {
             function getHitAreaForNode(node) {
-                var $span;
-
-                if (node.hasChildren()) {
-                    $span = $(node.element).find('span:eq(1)');
-                }
-                else {
-                    $span = $(node.element).find('span:first');
-                }
-
+                var $span = $(node.element).find('span:first');
                 var offset = $span.offset();
 
                 var area = new Area(
@@ -793,7 +776,7 @@ _TestClasses = {};
 
             function getHitAreaForFolder(folder) {
                 var $li = $(folder.element);
-                var $span = $(folder.element).find('span:eq(1)');
+                var $span = $(folder.element).find('span:first');
                 var offset = $li.offset();
                 var span_height = $span.outerHeight();
                 var top = $li.offset().top + span_height;
@@ -1058,37 +1041,37 @@ _TestClasses = {};
 
         open: function(on_finished) {
             this.node.is_open = true;
-
-            var $ul = this.getUl();
             this.getButton().removeClass('closed');
-            this.getLi().removeClass('closed');
 
-            $ul.slideDown(
+            this.getUl().slideDown(
                 'fast',
-                function() {
-                    $ul.removeClass('closed');
-                    if (on_finished) {
-                        on_finished();
-                    }
-                }
+                $.proxy(
+                    function() {
+                        this.getLi().removeClass('closed');
+                        if (on_finished) {
+                            on_finished();
+                        }
+                    },
+                    this
+                )
             );
         },
 
         close: function(on_finished) {
             this.node.is_open = false;
-
-            var $ul = this.getUl();
             this.getButton().addClass('closed');
-            this.getLi().addClass('closed');
 
-            $ul.slideUp(
+            this.getUl().slideUp(
                 'fast',
-                function() {
-                    $ul.addClass('closed');
-                    if (on_finished) {
-                        on_finished();
-                    }
-                }
+                $.proxy(
+                    function() {
+                        this.getLi().addClass('closed');
+                        if (on_finished) {
+                            on_finished();
+                        }
+                    },
+                    this
+                )
             );
         },
 

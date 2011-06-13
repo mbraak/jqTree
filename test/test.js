@@ -32,19 +32,18 @@ var format_nodes = function(nodes) {
 var isNodeClosed = function($node) {
     return (
         ($node.is('li.folder.closed')) &&
-        ($node.find('span:eq(0)').is('span.folder.closed')) &&
-        ($node.find('ul:eq(0)').is('ul.folder.closed'))
+        ($node.find('a:eq(0)').is('a.toggler.closed')) &&
+        ($node.find('ul:eq(0)').is('ul'))
     );
 }
 
 var isNodeOpen = function($node) {
     return (
         ($node.is('li.folder')) &&
-        ($node.find('span:eq(0)').is('span.folder')) &&
-        ($node.find('ul:eq(0)').is('ul.folder')) &&
+        ($node.find('a:eq(0)').is('a.toggler')) &&
+        ($node.find('ul:eq(0)').is('ul')) &&
         (! $node.is('li.folder.closed')) &&
-        (! $node.find('span:eq(0)').is('span.folder.closed')) &&
-        (! $node.find('ul:eq(0)').is('ul.folder.closed'))
+        (! $node.find('span:eq(0)').is('a.toggler.closed'))
     );
 }
 
@@ -76,11 +75,11 @@ test("create jqtree from data", function() {
         'first child is li.folder.closed'
     );
     ok(
-        $('#tree1 ul.tree li:eq(0) > span:first').is('span.folder.closed'),
-        'span in first folder'
+        $('#tree1 ul.tree li:eq(0) > a:first').is('a.toggler.closed'),
+        'button in first folder'
     );
     equal(
-        $('#tree1 ul.tree li:eq(0) > span:eq(1)').text(),
+        $('#tree1 ul.tree li:eq(0) > span').text(),
         'node1'
     );
 });
@@ -97,7 +96,7 @@ test('jqtree toggle', function() {
     var $node1 = $tree.find('ul.tree li:eq(0)');
 
     // node1 is initially closed
-    ok(isNodeClosed($node1));
+    ok(isNodeClosed($node1), 'node1 is open');
 
     stop();
 
@@ -143,8 +142,8 @@ test("click event", function() {
     });
 
     // click on node1
-    var $node1 = $tree.find('ul.tree li:eq(0)');
-    var $text_span = $node1.find('span:eq(1)');
+    var $node1 = $tree.find('ul.tree li:first');
+    var $text_span = $node1.find('span:first');
     $text_span.click();
 });
 
@@ -213,7 +212,7 @@ test('getSelectedNode', function() {
 
     // select node1
     var $node1 = $tree.find('ul.tree li:eq(0)');
-    var $text_span = $node1.find('span:eq(1)');
+    var $text_span = $node1.find('span:first');
     $text_span.click();
 
     // node1 is selected
