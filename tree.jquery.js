@@ -17,7 +17,6 @@
 // todo: rename to jquery.tree.js? also css-file?
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
-// todo: code style; variables with _
 
 _TestClasses = {};
 
@@ -501,9 +500,9 @@ _TestClasses = {};
             var $target = $(e.target);
 
             if ($target.is('span.folder')) {
-                var nodeElement = this._getNodeElement($target);
-                if (nodeElement && (nodeElement.node.hasChildren())) {
-                    nodeElement.toggle();
+                var node_element = this._getNodeElement($target);
+                if (node_element && (node_element.node.hasChildren())) {
+                    node_element.toggle();
 
                     if (this.options.saveState) {
                         this._saveState();
