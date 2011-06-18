@@ -42,7 +42,7 @@ ul.tree a.toggler.closed {
 	background-image: url(treeRightTriangleBlack.png);
 }
 
-/* todo: ion ul.tree? */
+/* todo: in ul.tree? */
 span.dragging {
 	color: #fff;
 	background: #000;
