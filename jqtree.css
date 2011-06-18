@@ -42,6 +42,7 @@ ul.tree a.toggler.closed {
 	background-image: url(treeRightTriangleBlack.png);
 }
 
+/* todo: in ul.tree? */
 span.dragging {
 	color: #fff;
 	background: #000;
@@ -69,6 +70,6 @@ ul.tree span.ghost.inside {
 }
 
 ul.tree span.selected {
-    background: #000;
-    color: #fff;
+	background: #000;
+	color: #fff;
 }

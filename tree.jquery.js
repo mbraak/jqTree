@@ -304,7 +304,7 @@ _TestClasses = {};
         widgetEventPrefix: "tree",
         options: {
             autoOpen: false,  // true / false / int (open n levels starting at 0)
-            saveState: false,
+            saveState: false,  // true / false / string (cookie name)
             dragAndDrop: false,
             selectable: false,
             onClick: null,  // todo: renamed to onClickNode?
@@ -394,9 +394,12 @@ _TestClasses = {};
                 this.options.onSetStateFromStorage(this._getState());
             }
             else {
-                $.cookie('tree', this._getState(), {path: '/'});
+                $.cookie(
+                    this._getCookieName(),
+                    this._getState(),
+                    {path: '/'}
+                );
             }
-
         },
 
         _restoreState: function() {
@@ -406,7 +409,10 @@ _TestClasses = {};
                 state = this.options.onGetStateFromStorage();
             }
             else {
-                state = $.cookie('tree', {path: '/'});
+                state = $.cookie(
+                    this._getCookieName(),
+                    {path: '/'}
+                );
             }
 
             if (! state) {
@@ -415,6 +421,15 @@ _TestClasses = {};
             else {
                 this._setState(state);
                 return true;
+            }
+        },
+
+        _getCookieName: function() {
+            if (typeof this.options.saveState == 'string') {
+                return typeof this.options.saveState;
+            }
+            else {
+                return 'tree';
             }
         },
 
