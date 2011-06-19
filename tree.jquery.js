@@ -426,7 +426,7 @@ _TestClasses = {};
 
         _getCookieName: function() {
             if (typeof this.options.saveState == 'string') {
-                return typeof this.options.saveState;
+                return this.options.saveState;
             }
             else {
                 return 'tree';
