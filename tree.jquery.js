@@ -313,6 +313,7 @@ _TestClasses = {};
             onSetStateFromStorage: null,
             onGetStateFromStorage: null,
             onCreateLi: null,
+            onMustAddHitArea: null,
             displayTestNodes: false
         },
 
@@ -780,6 +781,8 @@ _TestClasses = {};
         },
 
         _generateAreaAndChildren: function() {
+            var self = this;
+
             function getHitAreaForNode(node) {
                 var $span = $(node.element).find('span:first');
                 var offset = $span.offset();
@@ -871,15 +874,22 @@ _TestClasses = {};
                     area.name = node.name;
                     parent_area.addArea(area);
 
-                    if (! node.hasChildren()) {
-                        addHitAreasForNode(node, area);
+                    var must_add_hit_areas = true;
+                    if (self.options.onMustAddHitArea) {
+                        must_add_hit_areas = self.options.onMustAddHitArea(node);
                     }
-                    else {
-                        if (node.is_open) {
-                            addHitAreasForOpenFolder(node, area);
+
+                    if (must_add_hit_areas) {
+                        if (! node.hasChildren()) {
+                            addHitAreasForNode(node, area);
                         }
                         else {
-                            addHitAreasForClosedFolder(node, area);
+                            if (node.is_open) {
+                                addHitAreasForOpenFolder(node, area);
+                            }
+                            else {
+                                addHitAreasForClosedFolder(node, area);
+                            }
                         }
                     }
 
