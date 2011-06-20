@@ -312,6 +312,7 @@ _TestClasses = {};
             onMoveNode: null,
             onSetStateFromStorage: null,
             onGetStateFromStorage: null,
+            onCreateLi: null,
             displayTestNodes: false
         },
 
@@ -434,6 +435,8 @@ _TestClasses = {};
         },
 
         _createDomElements: function(tree) {
+            var self = this;
+
             function createUl(depth, is_open) {
                 var classes = [];
                 if (! depth) {
@@ -445,31 +448,38 @@ _TestClasses = {};
                 return $element;
             }
 
-            function createLi(name, has_children, is_open) {
-                if (has_children) {
-                    return createFolderLi(name, is_open);
+            function createLi(node) {
+                var $li;
+                if (node.hasChildren()) {
+                    $li = createFolderLi(node);
                 }
                 else {
-                    return createNodeLi(name);
+                    $li = createNodeLi(node);
                 }
+
+                if (self.options.onCreateLi) {
+                    self.options.onCreateLi(node, $li);
+                }
+
+                return $li;
             }
 
-            function createNodeLi(name) {
-                return $('<li><span>'+ name +'</span></li>');
+            function createNodeLi(node) {
+                return $('<li><span>'+ node.name +'</span></li>');
             }
 
-            function createFolderLi(name, is_open) {
+            function createFolderLi(node) {
                 var button_classes = ['toggler'];
 
-                if (! is_open) {
+                if (! node.is_open) {
                     button_classes.push('closed');
                 }
 
-                var $li = $('<li><a class="'+ button_classes.join(' ') +'">&raquo;</a><span>'+ name +'</span></li>');
+                var $li = $('<li><a class="'+ button_classes.join(' ') +'">&raquo;</a><span>'+ node.name +'</span></li>');
 
                 // todo: add li class in text
                 var folder_classes = ['folder'];
-                if (! is_open) {
+                if (! node.is_open) {
                     folder_classes.push('closed');
                 }
                 $li.addClass(folder_classes.join(' '));
@@ -481,7 +491,7 @@ _TestClasses = {};
                 $element.append(ul);
 
                 $.each(children, function() {
-                    var $li = createLi(this.name, this.hasChildren(), this.is_open);
+                    var $li = createLi(this);
                     ul.append($li);
 
                     this.element = $li[0];
