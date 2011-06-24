@@ -1,3 +1,18 @@
+/*
+Copyright 2011 Marco Braak
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 // todo: check for invalid move
 // todo: drag handle
 // todo: display move hint
@@ -312,6 +327,8 @@ _TestClasses = {};
             onMoveNode: null,
             onSetStateFromStorage: null,
             onGetStateFromStorage: null,
+            onCreateLi: null,
+            onMustAddHitArea: null,
             displayTestNodes: false
         },
 
@@ -426,7 +443,7 @@ _TestClasses = {};
 
         _getCookieName: function() {
             if (typeof this.options.saveState == 'string') {
-                return typeof this.options.saveState;
+                return this.options.saveState;
             }
             else {
                 return 'tree';
@@ -434,6 +451,8 @@ _TestClasses = {};
         },
 
         _createDomElements: function(tree) {
+            var self = this;
+
             function createUl(depth, is_open) {
                 var classes = [];
                 if (! depth) {
@@ -445,31 +464,38 @@ _TestClasses = {};
                 return $element;
             }
 
-            function createLi(name, has_children, is_open) {
-                if (has_children) {
-                    return createFolderLi(name, is_open);
+            function createLi(node) {
+                var $li;
+                if (node.hasChildren()) {
+                    $li = createFolderLi(node);
                 }
                 else {
-                    return createNodeLi(name);
+                    $li = createNodeLi(node);
                 }
+
+                if (self.options.onCreateLi) {
+                    self.options.onCreateLi(node, $li);
+                }
+
+                return $li;
             }
 
-            function createNodeLi(name) {
-                return $('<li><span>'+ name +'</span></li>');
+            function createNodeLi(node) {
+                return $('<li><span>'+ node.name +'</span></li>');
             }
 
-            function createFolderLi(name, is_open) {
+            function createFolderLi(node) {
                 var button_classes = ['toggler'];
 
-                if (! is_open) {
+                if (! node.is_open) {
                     button_classes.push('closed');
                 }
 
-                var $li = $('<li><a class="'+ button_classes.join(' ') +'">&raquo;</a><span>'+ name +'</span></li>');
+                var $li = $('<li><a class="'+ button_classes.join(' ') +'">&raquo;</a><span>'+ node.name +'</span></li>');
 
                 // todo: add li class in text
                 var folder_classes = ['folder'];
-                if (! is_open) {
+                if (! node.is_open) {
                     folder_classes.push('closed');
                 }
                 $li.addClass(folder_classes.join(' '));
@@ -481,7 +507,7 @@ _TestClasses = {};
                 $element.append(ul);
 
                 $.each(children, function() {
-                    var $li = createLi(this.name, this.hasChildren(), this.is_open);
+                    var $li = createLi(this);
                     ul.append($li);
 
                     this.element = $li[0];
@@ -770,6 +796,8 @@ _TestClasses = {};
         },
 
         _generateAreaAndChildren: function() {
+            var self = this;
+
             function getHitAreaForNode(node) {
                 var $span = $(node.element).find('span:first');
                 var offset = $span.offset();
@@ -861,15 +889,22 @@ _TestClasses = {};
                     area.name = node.name;
                     parent_area.addArea(area);
 
-                    if (! node.hasChildren()) {
-                        addHitAreasForNode(node, area);
+                    var must_add_hit_areas = true;
+                    if (self.options.onMustAddHitArea) {
+                        must_add_hit_areas = self.options.onMustAddHitArea(node);
                     }
-                    else {
-                        if (node.is_open) {
-                            addHitAreasForOpenFolder(node, area);
+
+                    if (must_add_hit_areas) {
+                        if (! node.hasChildren()) {
+                            addHitAreasForNode(node, area);
                         }
                         else {
-                            addHitAreasForClosedFolder(node, area);
+                            if (node.is_open) {
+                                addHitAreasForOpenFolder(node, area);
+                            }
+                            else {
+                                addHitAreasForClosedFolder(node, area);
+                            }
                         }
                     }
 
