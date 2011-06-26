@@ -579,7 +579,7 @@ _TestClasses = {};
                     e.preventDefault();
                     e.stopPropagation();
 
-                    this.options.onContextMenu(node);
+                    this.options.onContextMenu(e, node);
                     return false;
                 }
             }
