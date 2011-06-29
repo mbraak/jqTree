@@ -301,6 +301,13 @@ _TestClasses = {};
             $.each(this.children, function(i, area) {
                 area.iterate(callback);
             });
+        },
+
+        setMinimumWidth: function(minimum_width) {
+            var width = this.right - this.left;
+            if (width < minimum_width) {
+                this.right = this.left + minimum_width;
+            }
         }
     });
 
@@ -579,7 +586,7 @@ _TestClasses = {};
                     e.preventDefault();
                     e.stopPropagation();
 
-                    this.options.onContextMenu(node);
+                    this.options.onContextMenu(e, node);
                     return false;
                 }
             }
@@ -852,6 +859,7 @@ _TestClasses = {};
                 // inside node
                 area = node_area.duplicate();
                 area.left += 36;
+                area.setMinimumWidth(24);
 
                 area.move_to = Position.INSIDE;
                 area.name = node.name;
