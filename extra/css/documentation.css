@@ -1,0 +1,11 @@
+pre {
+	background: #333;
+	color: #fff;
+	padding: 1em;
+	font-size: 0.9em;
+}
+
+div#tree1 {
+	border: solid 1px #333;
+	padding:  1em;
+}
