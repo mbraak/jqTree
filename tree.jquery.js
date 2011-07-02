@@ -354,22 +354,45 @@ _TestClasses = {};
             }
         },
 
+        selectNode: function(node) {
+            if (this.options.selectable) {
+                if (this.selected_node) {
+                    this._getNodeElementForNode(this.selected_node).deselect();
+                }
+
+                this._getNodeElementForNode(node).select();
+                this.selected_node = node;
+
+                if (this.options.saveState) {
+                    this._saveState();
+                }
+            }
+        },
+
         getSelectedNode: function() {
             return this.selected_node;
         },
 
         _create: function() {
             this.tree = Tree.createFromData(this.options.data);
+            this.selected_node = null;
             this._openNodes();
 
             this._createDomElements(this.tree);
+
+            if (this.selected_node) {
+                var node_element = this._getNodeElementForNode(this.selected_node);
+                if (node_element) {
+                    node_element.select();
+                }
+            }
+
             this.element.click($.proxy(this._click, this));
             this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
 
             this._mouseInit();
 
             this.hovered_rectangle = null;
-            this.selected_node = null;
             this.$ghost = null;
             this.hint_nodes = [];
         },
@@ -383,7 +406,7 @@ _TestClasses = {};
         },
 
         _getState: function() {
-            var state = [];
+            var open_nodes = [];
 
             this.tree.iterate(function(node) {
                 if (
@@ -391,16 +414,25 @@ _TestClasses = {};
                     node.id &&
                     node.hasChildren()
                 ) {
-                    state.push(node.id);
+                    open_nodes.push(node.id);
                 }
                 return true;
             });
 
-            return state.join(',');
+            var selected_node = '';
+            if (this.selected_node) {
+                selected_node = this.selected_node.id;
+            }
+
+            return open_nodes.join(',') + ':' + selected_node;
         },
 
         _setState: function(state) {
-            var open_nodes = state.split(',');
+            var strings = state.split(':');
+            var open_nodes = strings[0].split(',');
+            var selected_node_id = strings[1];
+
+            var self = this;
             this.tree.iterate(function(node) {
                 if (
                     node.id &&
@@ -409,6 +441,11 @@ _TestClasses = {};
                 ) {
                     node.is_open = true;
                 }
+
+                if (selected_node_id && (node.id == selected_node_id)) {
+                    self.selected_node = node;
+                }
+
                 return true;
             });
         },
@@ -553,15 +590,7 @@ _TestClasses = {};
             else if ($target.is('span')) {
                 var node = this._getNode($target);
                 if (node) {
-                    if (this.options.selectable) {
-                        if (this.selected_node) {
-                            this._getNodeElementForNode(this.selected_node).deselect();
-                        }
-
-                        this._getNodeElementForNode(node).select();
-
-                        this.selected_node = node;
-                    }
+                    this.selectNode(node);
 
                     if (this.options.onClick) {
                         this.options.onClick(node);
