@@ -165,7 +165,8 @@ test('saveState', function() {
             data: example_data,
             saveState: true,
             onSetStateFromStorage: setState,
-            onGetStateFromStorage: getState
+            onGetStateFromStorage: getState,
+            selectable: true
         });
     }
 
@@ -185,6 +186,16 @@ test('saveState', function() {
     // node1 is open
     ok(tree.children[0].is_open, 'node1 is_open');
 
+    // select node2
+    $tree.tree('selectNode', tree.children[1]);
+
+    // node2 is selected
+    equal(
+        $tree.tree('getSelectedNode').name,
+        'node2',
+        'getSelectedNode'
+    );
+
     // create tree again
     $tree.tree('destroy');
     createTree();
@@ -192,6 +203,13 @@ test('saveState', function() {
     tree = $tree.tree('getTree');
     ok(tree.children[0].is_open, 'node1 is_open');
     ok(! tree.children[1].is_open, 'node2 is closed');
+
+    // node2 is selected
+    equal(
+        $tree.tree('getSelectedNode').name,
+        'node2',
+        'getSelectedNode'
+    );
 });
 
 test('getSelectedNode', function() {
@@ -211,9 +229,9 @@ test('getSelectedNode', function() {
     );
 
     // select node1
-    var $node1 = $tree.find('ul.tree li:eq(0)');
-    var $text_span = $node1.find('span:first');
-    $text_span.click();
+    var tree = $tree.tree('getTree');
+    var node1 = tree.children[0];
+    $tree.tree('selectNode', node1);
 
     // node1 is selected
     equal(
