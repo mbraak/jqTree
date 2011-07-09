@@ -370,7 +370,7 @@ _TestClasses = {};
         },
 
         getSelectedNode: function() {
-            return this.selected_node;
+            return this.selected_node || false;
         },
 
         _create: function() {
