@@ -1,5 +1,5 @@
 pre {
-	background: #333;
+	background-color: #333;
 	color: #fff;
 	padding: 1em;
 	font-size: 0.9em;
@@ -7,5 +7,42 @@ pre {
 
 div#tree1 {
 	border: solid 1px #333;
-	padding:  1em;
+	padding: 1em;
+}
+
+h1 {
+	color: #C7518C;
+	background-color: #F35EA1;
+	padding: 0.2em 2em;
+	font-family: 'Corben', arial, serif;
+	font-size: 36px;
+	margin-top: 0.5em;
+	text-align: center;
+}
+
+a {
+	color: #C7518C;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+h4 {
+	font-size: 12px;
+	margin-bottom: 0.5em;
+}
+
+.syntaxhighlighter {
+	padding-bottom: 0.2em;
+}
+
+div.code .syntaxhighlighter.dark {
+	padding: 1em 0 1em 1em;
+}
+
+.syntaxhighlighter.dark {
+	margin: 0;
+}
+
+div.code {
+	margin-bottom: 1.5em;
 }
