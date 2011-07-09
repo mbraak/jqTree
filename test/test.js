@@ -224,7 +224,7 @@ test('getSelectedNode', function() {
     // there is no node selected
     equal(
         $tree.tree('getSelectedNode'),
-        null,
+        false,
         'getSelectedNode'
     );
 

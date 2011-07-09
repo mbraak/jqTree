@@ -6,26 +6,41 @@
 	<link rel="stylesheet" href="extra/css_960/reset.css">
 	<link rel="stylesheet" href="extra/css_960/text.css">
 	<link rel="stylesheet" href="extra/css_960/960.css">
+	<link rel="stylesheet" href="extra/syntax_highlighter/shCore.css">
+	<link rel="stylesheet" href="extra/syntax_highlighter/shCoreDefault.css">
+	<link rel="stylesheet" href="extra/syntax_highlighter/shThemeRDark.css">
 	<link rel="stylesheet" href="jqtree.css">
 	<link rel="stylesheet" href="extra/css/documentation.css">
-	<script src="extra/js/jquery-1.5.2.min.js"></script>
-	<script src="extra/js/jquery-ui.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Corben:bold&v1' rel='stylesheet' type='text/css'>
+	<script src="extra/js/jquery-1.6.2.min.js"></script>
+	<script src="extra/js/jquery-ui1.9m5.min.js"></script>
+	<script src="extra/syntax_highlighter/shCore.js"></script>
+	<script src="extra/syntax_highlighter/shBrushJScript.js"></script>
 	<script src="tree.jquery.js"></script>
 </head>
 <body>
 <div class="container_12">
-	<h2>jqTree</h2>
-	<p>
-		JqTree is a tree widget written in jQuery UI.
-	</p>
-	<ul>
-		<li>Create a tree from JSON data.</li>
-		<li>Drag and drop.</li>
-	</ul>
-</div>
-<div class="container_12">
-	<div class="grid_6">
-<pre>
+	<div class="grid_12 alpha omega">
+		<h1>jqTree</h1>
+	</div>
+	<div class="grid_12 alpha omega">
+		<p>
+			JqTree is a tree widget written in jQuery UI.
+		</p>
+		<h4>Features</h4>
+		<ul>
+			<li>Create a tree from JSON data</li>
+			<li>Drag and drop</li>
+			<li>Works on ie7+, firefox 3.6+, chrome and safari</li>
+			<li>Works with jQuery UI 1.8 or 1.9 beta</li>
+		</ul>
+		<p>
+			The project is <a href="https://github.com/mbraak/jqTree">hosted on github</a>,
+			has a <a href="test/test.html">test suite</a> and a <a href="demo.html">demo</a>.
+		</p>
+	</div>
+	<div class="grid_6 alpha code">
+<pre class="brush: js; class-name: dark">
 var data = [
 	{
 		label: 'node1',
@@ -37,7 +52,7 @@ var data = [
 	{
 		label: 'node2',
 		children: [
-			{label: 'child3'}
+			{ label: 'child3' }
 		]
 	}
 ];
@@ -48,8 +63,95 @@ $('#tree1').tree({
 });
 </pre>
 	</div>
-	<div class="grid_6">
+	<div class="grid_6 omega">
 		<div id="tree1"></div>
+	</div>
+	<div class="grid_12 alpha omega">
+		<h4>Requirements</h4>
+		<ul>
+			<li><a href=""><a href="http://jquery.com">jQuery</a> 1.5+</li>
+			<li><a href="http://jqueryui.com/">jQuery UI</a> 1.8 or 1.9 beta</li>
+		</ul>
+	</div>
+	<div class="grid_12 alpha omega">
+	<h4>Downloads</h4>
+	<ul>
+		<li>All: <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+		<li>Javascript: <a href="https://raw.github.com/mbraak/jqTree/master/tree.jquery.js">tree.jquery.js</a></li>
+		<li>Css: <a href="https://raw.github.com/mbraak/jqTree/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/jqtree.css">jqtree.css</a></li>
+		<li>Images:
+			<ul>
+				<li>
+					<a href="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeDownTriangleBlack.png">
+						treeDownTriangleBlack.png
+						<img src="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeDownTriangleBlack.png" />
+					</a>
+				</li>
+				<li>
+					<a href="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeRightTriangleBlack.png">
+						treeRightTriangleBlack.png
+						<img src="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeRightTriangleBlack.png" />
+					</a>
+				</li>
+			</ul>
+		</li>
+	</ul>
+	</div>
+	<div class="grid_12 alpha omega">
+		<h4>Tutorial</h4>
+		<ul>
+			<li>
+				Include <a href="http://code.jquery.com/jquery-1.6.2.min.js">jQuery</a>.
+				<pre class="brush: js; toolbar: false"><script src="jquery-1.6.2.min.js"></script></pre>
+			</li>
+			<li>
+				Include <a href="http://jqueryui.com/download">jQuery UI 1.8</a>. You need the components Core, Widget, and Mouse.
+				You can also include <a href="http://jquery-ui.googlecode.com/files/jquery-ui-1.9m5.zip">jQuery UI 1.9 beta</a>.
+				<pre class="brush: js; toolbar: false"><script src="jquery-ui.min.js"></script></pre>
+			</li>
+			<li>
+				Include tree.jquery.js:
+				<pre class="brush: js; toolbar: false"><script src="tree.jquery.js"></script></pre>
+			</li>
+			<li>
+				Include jqtree.css:
+				<pre class="brush: js; toolbar: false"><link rel="stylesheet" href="jqtree.css"></pre>
+			</li>
+			<li>
+				Create a div.
+				<pre class="brush: js; toolbar: false"><div id="tree1"></div></pre>
+			</li>
+			<li>
+				Create tree data.
+<pre class="brush: js; toolbar: false">
+var data = [
+	{
+		label: 'node1',
+		children: [
+			{ label: 'child1' },
+			{ label: 'child2' }
+		]
+	},
+	{
+		label: 'node2',
+		children: [
+			{ label: 'child3' }
+		]
+	}
+];
+</pre>
+			</li>
+			<li>
+				Create tree widget.
+<pre class="brush: js; toolbar: false">
+$(function() {
+	$('#tree1').tree({
+		data: data
+	});
+});
+</pre>
+			</li>
+		</ul>
 	</div>
 </div>
 <script>
@@ -72,9 +174,11 @@ $('#tree1').tree({
 		$('#tree1').tree({
 			data: data,
 			autoOpen: true,
-			dragAndDrop: true,
-			displayTestNodes: true
+			dragAndDrop: true
 		});
+
+		SyntaxHighlighter.defaults['gutter'] = false;
+		SyntaxHighlighter.all();
 	});
 </script>
 </body>
