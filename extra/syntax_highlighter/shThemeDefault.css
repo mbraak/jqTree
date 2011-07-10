@@ -71,7 +71,7 @@
   color: black !important;
 }
 .syntaxhighlighter .plain, .syntaxhighlighter .plain a {
-  color: black !important;
+  color: #666 !important;
 }
 .syntaxhighlighter .comments, .syntaxhighlighter .comments a {
   color: #008200 !important;
