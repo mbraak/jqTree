@@ -27,12 +27,18 @@ a {
 }
 
 h4 {
-	font-size: 12px;
+	font-size: 1.1em;
+	margin-bottom: 0.5em;
+}
+
+h5 {
+	font-size: 1em;
 	margin-bottom: 0.5em;
 }
 
 .syntaxhighlighter {
 	padding-bottom: 0.2em;
+	margin: 1em 0;
 }
 
 div.code .syntaxhighlighter.dark {

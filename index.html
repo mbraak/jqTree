@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="extra/css_960/text.css">
 	<link rel="stylesheet" href="extra/css_960/960.css">
 	<link rel="stylesheet" href="extra/syntax_highlighter/shCore.css">
-	<link rel="stylesheet" href="extra/syntax_highlighter/shCoreDefault.css">
+	<link rel="stylesheet" href="extra/syntax_highlighter/shThemeDefault.css">
 	<link rel="stylesheet" href="extra/syntax_highlighter/shThemeRDark.css">
 	<link rel="stylesheet" href="jqtree.css">
 	<link rel="stylesheet" href="extra/css/documentation.css">
@@ -150,6 +150,31 @@ $(function() {
 	});
 });
 </pre>
+			</li>
+			<li>
+				Alternatively, get the data from the server.
+<pre class="brush: js; toolbar: false">
+$.getJSON(
+	'/some_url/',
+	function(data) {
+		$('#tree1').tree({
+			data: data
+		});
+	}
+);
+</pre>
+			</li>
+		</ul>
+	</div>
+	<div class="grid_12 alpha omega">
+		<h4>Api</h4>
+		<h5>tree</h5>
+		Create a tree.
+<pre class="brush: js; toolbar: false">$element.tree(options);</pre>
+		Parameters:
+		<ul>
+			<li>
+				<strong>data:</strong> tree data
 			</li>
 		</ul>
 	</div>
