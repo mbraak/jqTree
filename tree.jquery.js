@@ -22,7 +22,6 @@ limitations under the License.
 // todo: documentation
 // todo: scroll while moving a node?
 // todo: smooth animation while moving node
-// todo: test on different browsers
 // todo: plugins (also for dnd and state)?
 // todo: rename to jquery.tree.js? also css-file?
 // todo: move a node to root position
@@ -835,7 +834,13 @@ _TestClasses = {};
             var self = this;
 
             function getHitAreaForNode(node) {
-                var $span = $(node.element).find('span:first');
+                var $element = $(node.element);
+
+                if (! $element.is(':visible')) {
+                    return null;
+                }
+
+                var $span = $element.find('span:first');
                 var offset = $span.offset();
 
                 var area = new Area(
@@ -873,6 +878,9 @@ _TestClasses = {};
             function addHitAreasForNode(node, parent_area) {
                 // after node
                 var node_area = getHitAreaForNode(node);
+                if (! node_area) {
+                    return;
+                }
 
                 var area = node_area.duplicate();
                 area.node = node;
@@ -882,7 +890,6 @@ _TestClasses = {};
                 area.left += 12;
                 area.right = area.left + 24;
                 area.color = 'blue';
-
                 parent_area.addArea(area);
 
                 // inside node
@@ -899,6 +906,10 @@ _TestClasses = {};
             function addHitAreasForOpenFolder(folder, parent_area) {
                 // after folder
                 var area = getHitAreaForFolder(folder);
+                if (! area) {
+                    return;
+                }
+
                 area.node = folder;
                 area.name = folder.name;
                 area.move_to = Position.AFTER;
@@ -914,6 +925,10 @@ _TestClasses = {};
 
             function addHitAreasForClosedFolder(folder, parent_area) {
                 var area = getHitAreaForNode(folder);
+                if (! area) {
+                    return;
+                }
+
                 area.node = folder;
                 area.name = folder.name;
                 area.move_to = Position.INSIDE;
