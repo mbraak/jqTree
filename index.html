@@ -14,6 +14,7 @@
 	<link href='http://fonts.googleapis.com/css?family=Corben:bold&v1' rel='stylesheet' type='text/css'>
 	<script src="extra/js/jquery-1.6.2.min.js"></script>
 	<script src="extra/js/jquery-ui1.9m5.min.js"></script>
+	<script src="extra/js/jquery.lettering.js"></script>
 	<script src="extra/syntax_highlighter/shCore.js"></script>
 	<script src="extra/syntax_highlighter/shBrushJScript.js"></script>
 	<script src="tree.jquery.js"></script>
@@ -204,6 +205,8 @@ $.getJSON(
 
 		SyntaxHighlighter.defaults['gutter'] = false;
 		SyntaxHighlighter.all();
+
+		$('h1').lettering();
 	});
 </script>
 </body>
