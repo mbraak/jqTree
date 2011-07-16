@@ -6,18 +6,37 @@ pre {
 }
 
 div#tree1 {
-	border: solid 1px #333;
+	border: solid 1px #666;
 	padding: 1em;
 }
 
 h1 {
 	color: #C7518C;
-	background-color: #F35EA1;
-	padding: 0.2em 2em;
 	font-family: 'Corben', arial, serif;
 	font-size: 36px;
 	margin-top: 0.5em;
-	text-align: center;
+}
+
+h1 span {
+	background-color: #F35EA1;
+}
+
+h1 span.char1,
+h1 span.char2 {
+	color: #75CBC6;
+	background-color: #fff;
+}
+
+h1 span.char2 {
+	padding-right: 0.1em;
+}
+
+h1 span.char3 {
+	padding-left: 0.1em;
+}
+
+h1 span.char6 {
+	padding-right: 0.1em;
 }
 
 a {
@@ -27,8 +46,9 @@ a {
 }
 
 h4 {
-	font-size: 1.1em;
+	font-size: 1.2em;
 	margin-bottom: 0.5em;
+	color: #666;
 }
 
 h5 {
@@ -37,12 +57,15 @@ h5 {
 }
 
 .syntaxhighlighter {
-	padding-bottom: 0.2em;
+	padding: 0.5em 1em;
 	margin: 1em 0;
+	border: solid 2px #ccc;
+	width: 50%;
 }
 
 div.code .syntaxhighlighter.dark {
 	padding: 1em 0 1em 1em;
+	border: none;
 }
 
 .syntaxhighlighter.dark {
