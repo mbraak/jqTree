@@ -396,12 +396,12 @@ _TestClasses = {};
             this.hint_nodes = [];
         },
 
-        _destroy: function() {
+        destroy: function() {
             this.element.empty();
             this.tree = null;
 
             this._mouseDestroy();
-            return this;
+            $.Widget.prototype.destroy.call(this);
         },
 
         _getState: function() {

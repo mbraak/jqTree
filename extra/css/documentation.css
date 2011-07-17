@@ -40,27 +40,26 @@ h1 span.char6 {
 }
 
 a {
-	color: #C7518C;
+	color: #b2497e;
 	font-weight: bold;
 	text-decoration: none;
 }
 
 h4 {
 	font-size: 1.2em;
-	margin-bottom: 0.5em;
-	color: #666;
+	margin: 0.5em 0 0.2em 0;
+	color: #67b2ae;
 }
 
 h5 {
 	font-size: 1em;
-	margin-bottom: 0.5em;
+	margin: 1em 0 0.5em 0;
 }
 
 .syntaxhighlighter {
-	padding: 0.5em 1em;
-	margin: 1em 0;
-	border: solid 2px #ccc;
-	width: 50%;
+	padding: 0.2em 1em 0.2em 1em;
+	margin: 0.5em 0 1em 0;
+	border-left: solid 6px #aaa;
 }
 
 div.code .syntaxhighlighter.dark {
@@ -74,4 +73,12 @@ div.code .syntaxhighlighter.dark {
 
 div.code {
 	margin-bottom: 1.5em;
+}
+
+ul {
+	list-style: circle;
+}
+
+p {
+	margin: 0.5em 0;
 }
