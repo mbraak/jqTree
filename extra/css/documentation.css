@@ -1,20 +1,29 @@
-pre {
-	background-color: #333;
-	color: #fff;
-	padding: 1em;
-	font-size: 0.9em;
+/* main layout */
+#page {
+	width: 960px;
+	margin: 0 auto;
 }
 
-div#tree1 {
-	border: solid 1px #666;
-	padding: 1em;
+.container-left,
+.container-right {
+	float: left;
+	width: 50%;
 }
 
+.container-left .inner {
+	margin-right: 0.5em;
+}
+
+.container-right .inner {
+	margin-left: 0.5em;
+}
+
+/* header */
 h1 {
 	color: #C7518C;
 	font-family: 'Corben', arial, serif;
 	font-size: 36px;
-	margin-top: 0.5em;
+	margin: 0.5em 0;
 }
 
 h1 span {
@@ -39,46 +48,58 @@ h1 span.char6 {
 	padding-right: 0.1em;
 }
 
-a {
-	color: #b2497e;
-	font-weight: bold;
-	text-decoration: none;
-}
-
+/* general style */
 h4 {
 	font-size: 1.2em;
 	margin: 0.5em 0 0.2em 0;
-	color: #67b2ae;
+	color: #777;
+	font-family: 'Helvetica', Arial, sans-serif;
 }
 
 h5 {
-	font-size: 1em;
+	font-size: 0.9em;
 	margin: 1em 0 0.5em 0;
+	background-color: #333;
+	color: #fff;
+	display: inline;
+	padding: 0.2em 0.5em 0.1em 0.5em;
+	font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+}
+
+a,
+a:visited {
+	color: #b2497e;
+}
+
+img {
+	margin: 0 0.5em;
+}
+
+/* tree */
+.tree a:hover {
+	border-bottom: none;
+}
+
+#tree1 {
+	border: solid 1px #666;
+	padding: 1em;
+}
+
+/* code */
+.syntaxhighlighter {
+	padding-bottom: 0.2em;
+}
+
+.syntaxhighlighter .container {
+	padding: 1em;
 }
 
 .syntaxhighlighter {
-	padding: 0.2em 1em 0.2em 1em;
 	margin: 0.5em 0 1em 0;
 	border-left: solid 6px #aaa;
 }
 
-div.code .syntaxhighlighter.dark {
-	padding: 1em 0 1em 1em;
-	border: none;
-}
-
 .syntaxhighlighter.dark {
-	margin: 0;
-}
-
-div.code {
-	margin-bottom: 1.5em;
-}
-
-ul {
-	list-style: circle;
-}
-
-p {
-	margin: 0.5em 0;
+	border-left: none;
+	margin: 0 0 1em 0;
 }

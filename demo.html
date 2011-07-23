@@ -3,22 +3,30 @@
 <head>
 	<meta charset="utf-8">
 	<title>jqTree</title>
-	<link rel="stylesheet" href="extra/css_960/reset.css">
-	<link rel="stylesheet" href="extra/css_960/text.css">
-	<link rel="stylesheet" href="extra/css_960/960.css">
+	<link rel="stylesheet" href="extra/css/gridless.css">
 	<link rel="stylesheet" href="jqtree.css">
 	<script src="extra/js/jquery-1.6.2.min.js"></script>
 	<script src="extra/js/jquery-ui1.9m5.min.js"></script>
 	<script src="tree.jquery.js"></script>
 	<style>
-		div#tree1 {
+		#page {
+			width: 960px;
+			margin: 0 auto;
+		}
+		#tree1 {
 			width: 300px;
 			margin-bottom: 8px;
+		}
+		#tree1 a:hover {
+			border-bottom: none;
+		}
+		h1 {
+			font-size: 1.625em;
 		}
 	</style>
 </head>
 <body>
-<div class="container_12">
+<div id="page">
 	<h1>Dinosaur family tree</h1>
 	<div id="tree1"></div>
 	<script>
