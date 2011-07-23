@@ -3,9 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>jqTree</title>
-	<link rel="stylesheet" href="extra/css_960/reset.css">
-	<link rel="stylesheet" href="extra/css_960/text.css">
-	<link rel="stylesheet" href="extra/css_960/960.css">
+	<link rel="stylesheet" href="extra/css/gridless.css">
 	<link rel="stylesheet" href="extra/syntax_highlighter/shCore.css">
 	<link rel="stylesheet" href="extra/syntax_highlighter/shThemeDefault.css">
 	<link rel="stylesheet" href="extra/syntax_highlighter/shThemeRDark.css">
@@ -20,28 +18,26 @@
 	<script src="tree.jquery.js"></script>
 </head>
 <body>
-<div class="container_12">
-	<div class="grid_12 alpha omega">
-		<h1>jqTree</h1>
-	</div>
-	<div class="grid_12 alpha omega">
-		<p>
-			JqTree is a tree widget written in jQuery UI.
-		</p>
-		<h4>Features</h4>
-		<ul>
-			<li>Create a tree from JSON data</li>
-			<li>Drag and drop</li>
-			<li>Works on ie7+, firefox 3.6+, chrome and safari</li>
-			<li>Works with jQuery UI 1.8 or 1.9 beta</li>
-		</ul>
-		<p>
-			The project is <a href="https://github.com/mbraak/jqTree">hosted on github</a>,
-			has a <a href="test/test.html">test suite</a> and a <a href="demo.html">demo</a>.
-		</p>
-	</div>
-	<div class="grid_6 alpha code">
-<pre>
+<div id="page">
+	<h1>jqTree</h1>
+	<p>
+		JqTree is a tree widget written in jQuery UI.
+	</p>
+	<h4>Features</h4>
+	<ul>
+		<li>Create a tree from JSON data</li>
+		<li>Drag and drop</li>
+		<li>Works on ie7+, firefox 3.6+, chrome and safari</li>
+		<li>Works with jQuery UI 1.8 or 1.9 beta</li>
+	</ul>
+	<p>
+		The project is <a href="https://github.com/mbraak/jqTree">hosted on github</a>,
+		has a <a href="test/test.html">test suite</a> and a <a href="demo.html">demo</a>.
+	</p>
+	<div class="group">
+		<div class="container-left">
+			<div class="inner">
+<pre class="dark">
 var data = [
 	{
 		label: 'node1',
@@ -63,18 +59,19 @@ $('#tree1').tree({
 	dragAndDrop: true
 });
 </pre>
+		</div>
+			</div>
+		<div class="container-right">
+			<div class="inner">
+				<div id="tree1"></div>
+			</div>
+		</div>
 	</div>
-	<div class="grid_6 omega">
-		<div id="tree1"></div>
-	</div>
-	<div class="grid_12 alpha omega">
-		<h4>Requirements</h4>
-		<ul>
-			<li><a href=""><a href="http://jquery.com">jQuery</a> 1.5+</li>
-			<li><a href="http://jqueryui.com/">jQuery UI</a> 1.8 or 1.9 beta</li>
-		</ul>
-	</div>
-	<div class="grid_12 alpha omega">
+	<h4>Requirements</h4>
+	<ul>
+		<li><a href=""><a href="http://jquery.com">jQuery</a> 1.5+</li>
+		<li><a href="http://jqueryui.com/">jQuery UI</a> 1.8 or 1.9 beta</li>
+	</ul>
 	<h4>Downloads</h4>
 	<ul>
 		<li>All: <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
@@ -97,33 +94,31 @@ $('#tree1').tree({
 			</ul>
 		</li>
 	</ul>
-	</div>
-	<div class="grid_12 alpha omega">
-		<h4>Tutorial</h4>
-		<ul>
-			<li>
-				Include <a href="http://code.jquery.com/jquery-1.6.2.min.js">jQuery</a>.
-				<pre><script src="jquery-1.6.2.min.js"></script></pre>
-			</li>
-			<li>
-				Include <a href="http://jqueryui.com/download">jQuery UI 1.8</a>. You need the components Core, Widget, and Mouse.
-				You can also include <a href="http://jquery-ui.googlecode.com/files/jquery-ui-1.9m5.zip">jQuery UI 1.9 beta</a>.
-				<pre><script src="jquery-ui.min.js"></script></pre>
-			</li>
-			<li>
-				Include tree.jquery.js:
-				<pre><script src="tree.jquery.js"></script></pre>
-			</li>
-			<li>
-				Include jqtree.css:
-				<pre><link rel="stylesheet" href="jqtree.css"></pre>
-			</li>
-			<li>
-				Create a div.
-				<pre><div id="tree1"></div></pre>
-			</li>
-			<li>
-				Create tree data.
+	<h4>Tutorial</h4>
+	<ul>
+		<li>
+			Include <a href="http://code.jquery.com/jquery-1.6.2.min.js">jQuery</a>.
+			<pre><script src="jquery-1.6.2.min.js"></script></pre>
+		</li>
+		<li>
+			Include <a href="http://jqueryui.com/download">jQuery UI 1.8</a>. You need the components Core, Widget, and Mouse.
+			You can also include <a href="http://jquery-ui.googlecode.com/files/jquery-ui-1.9m5.zip">jQuery UI 1.9 beta</a>.
+			<pre><script src="jquery-ui.min.js"></script></pre>
+		</li>
+		<li>
+			Include tree.jquery.js:
+			<pre><script src="tree.jquery.js"></script></pre>
+		</li>
+		<li>
+			Include jqtree.css:
+			<pre><link rel="stylesheet" href="jqtree.css"></pre>
+		</li>
+		<li>
+			Create a div.
+			<pre><div id="tree1"></div></pre>
+		</li>
+		<li>
+			Create tree data.
 <pre>
 var data = [
 	{
@@ -164,17 +159,15 @@ $.getJSON(
 	}
 );
 </pre>
-			</li>
-		</ul>
-	</div>
-	<div class="grid_12 alpha omega">
-		<h4>Tree options</h4>
-		<h5>data</h5>
-		<p>
-			Define the contents of the tree. The data is a nested array of objects. This option is required.
-			<br>
-			It looks like this:
-		</p>
+		</li>
+	</ul>
+	<h4>Tree options</h4>
+	<h5>data</h5>
+	<p>
+		Define the contents of the tree. The data is a nested array of objects. This option is required.
+		<br>
+		It looks like this:
+	</p>
 <pre>
 var data = [
 	{
@@ -193,110 +186,115 @@ var data = [
 ];
 $element.tree({data: data});
 </pre>
-		<ul>
-			<li>label: label of a node (required)</li>
-			<li>children: array of child nodes (optional)</li>
-		</ul>
-		<p>
-			You can also include other data in the objects. You can later access this data.
-			<br>
-			For example, to add an id:
-		</p>
+	<ul>
+		<li>label: label of a node (required)</li>
+		<li>children: array of child nodes (optional)</li>
+	</ul>
+	<p>
+		You can also include other data in the objects. You can later access this data.
+		<br>
+		For example, to add an id:
+	</p>
 <pre>
 {
 	label: 'node1',
 	id: 1
 }
 </pre>
-		<h5>autoOpen</h5>
-		<p>
-			Open nodes initially.
-		</p>
-		<ul>
-			<li>
-				<strong>true</strong>: open all nodes.
-			</li>
-			<li>
-				<strong>false (default)</strong>: do nothing
-			</li>
-			<li><strong>n</strong>: open n levels</li>
-		</ul>
-		<p>
-			Open all nodes initially:
-		</p>
+	<h5>autoOpen</h5>
+	<p>
+		Open nodes initially.
+	</p>
+	<ul>
+		<li>
+			<strong>true</strong>: open all nodes.
+		</li>
+		<li>
+			<strong>false (default)</strong>: do nothing
+		</li>
+		<li><strong>n</strong>: open n levels</li>
+	</ul>
+	<p>
+		Open all nodes initially:
+	</p>
 <pre>
 $element.tree({
 	data: data,
 	autoOpen: true
 });
 </pre>
-		<p>
-			Open first level nodes:
-		</p>
-		<h5>saveState</h5>
-		<p>
-			Save and restore the state of the tree automatically.
-			<br>
-			Saves in a cookie which nodes are opened and selected.
-		</p>
-		<ul>
-			<li><strong>true</strong>: save and restore state in a cookie</li>
-			<li><strong>false (default)</strong>: do nothing</li>
-			<li><strong>string</strong>: save state and use this name to store in a cookie</li>
-		</ul>
-		<p>
-			Save state:
-		</p>
+	<p>
+		Open first level nodes:
+	</p>
+<pre>
+$element.tree({
+	data: data,
+	autoOpen: 0
+});
+</pre>
+	<h5>saveState</h5>
+	<p>
+		Save and restore the state of the tree automatically.
+		<br>
+		Saves in a cookie which nodes are opened and selected.
+	</p>
+	<ul>
+		<li><strong>true</strong>: save and restore state in a cookie</li>
+		<li><strong>false (default)</strong>: do nothing</li>
+		<li><strong>string</strong>: save state and use this name to store in a cookie</li>
+	</ul>
+	<p>
+		Save state:
+	</p>
 <pre>
 $element.tree({
 	data: data,
 	saveState: true
 });
 </pre>
-		<p>
-			Example: save state in cookie 'tree1':
-		</p>
+	<p>
+		Example: save state in cookie 'tree1':
+	</p>
 <pre>
 $element.tree({
 	data: data,
 	saveState: 'tree1'
 });
 </pre>
-		<h5>dragAndDrop</h5>
-		<p>
-			Turn on dragging and dropping of nodes.
-		</p>
-		<ul>
-			<li><strong>true</strong>: turn on drag and drop</li>
-			<li><strong>false (default)</strong>: do not allow drag and drop</li>
-		</ul>
-		<p>
-			Example: turn on drag and drop.
-		</p>
+	<h5>dragAndDrop</h5>
+	<p>
+		Turn on dragging and dropping of nodes.
+	</p>
+	<ul>
+		<li><strong>true</strong>: turn on drag and drop</li>
+		<li><strong>false (default)</strong>: do not allow drag and drop</li>
+	</ul>
+	<p>
+		Example: turn on drag and drop.
+	</p>
 <pre>
 $element.tree({
 	data: data,
 	dragAndDrop: true
 });
 </pre>
-		<h5>selectable</h5>
-		<p>
-			Turn on selection of nodes.
-		</p>
-		<ul>
-			<li><strong>true</strong>: turn on selection of nodes</li>
-			<li><strong>false (default)</strong>: turn off selection of nodes</li>
-		</ul>
-		<p>
-			Example: turn on selection of nodes.
-		</p>
+	<h5>selectable</h5>
+	<p>
+		Turn on selection of nodes.
+	</p>
+	<ul>
+		<li><strong>true</strong>: turn on selection of nodes</li>
+		<li><strong>false (default)</strong>: turn off selection of nodes</li>
+	</ul>
+	<p>
+		Example: turn on selection of nodes.
+	</p>
 <pre>
 $element.tree({
 	data: data,
 	selectable: true
 });
 </pre>
-	</div>
 </div>
 <script>
 	$(function() {
@@ -322,7 +320,9 @@ $element.tree({
 		});
 
 		$('pre').addClass('brush: js; toolbar: false');
-		$('.code pre').addClass('brush: js; class-name: dark');
+		$('pre.dark')
+			.removeClass()
+			.addClass('brush: js; class-name: dark');
 
 		SyntaxHighlighter.defaults['gutter'] = false;
 		SyntaxHighlighter.all();
