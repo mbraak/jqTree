@@ -398,6 +398,7 @@ _TestClasses = {};
 
         destroy: function() {
             this.element.empty();
+            this.element.unbind();
             this.tree = null;
 
             this._mouseDestroy();
