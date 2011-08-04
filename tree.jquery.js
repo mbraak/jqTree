@@ -335,6 +335,7 @@ _TestClasses = {};
             onGetStateFromStorage: null,
             onCreateLi: null,
             onMustAddHitArea: null,
+            onIsMoveHandle: null,
             displayTestNodes: false
         },
 
@@ -632,6 +633,10 @@ _TestClasses = {};
         },
 
         _getNodeElement: function($element) {
+            if (this.options.onIsMoveHandle && !this.options.onIsMoveHandle($element)) {
+                return null;
+            }
+
             var node = this._getNode($element);
             if (node) {
                 return this._getNodeElementForNode(node);
