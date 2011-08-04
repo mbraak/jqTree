@@ -918,6 +918,10 @@ _TestClasses = {};
 
                 // before first child in folder
                 area = getHitAreaForNode(folder);
+                if (! area) {
+                    return;
+                }
+
                 area.node = folder.children[0];
                 area.move_to = Position.BEFORE;
                 area.name = folder.children[0].name;
