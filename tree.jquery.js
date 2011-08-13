@@ -618,23 +618,27 @@ _TestClasses = {};
                 if (this.hovered_area != area) {
                     this.hovered_area = area;
 
-                    var $ghost = this._getGhost();
-                    $ghost.detach();
-
-                    this._stopOpenFolderTimer();
-                    var node = this.hovered_area.node;
-
-                    if (node.hasChildren() && !node.is_open) {
-                        this._startOpenFolderTimer(node);
-                    }
-                    else {
-                        this._getNodeElementForNode(area.node)
-                            .appendGhost($ghost, area.position);
-                    }
+                    this._updateGhost();
                 }
             }
 
             return true;
+        },
+
+        _updateGhost: function() {
+            var $ghost = this._getGhost();
+            $ghost.detach();
+
+            this._stopOpenFolderTimer();
+            var node = this.hovered_area.node;
+
+            if (node.hasChildren() && !node.is_open) {
+                this._startOpenFolderTimer(node);
+            }
+            else {
+                this._getNodeElementForNode(this.hovered_area.node)
+                    .appendGhost($ghost, this.hovered_area.position);
+            }
         },
 
         _mouseStop: function() {
@@ -654,7 +658,7 @@ _TestClasses = {};
 
         _getGhost: function() {
              if (! this.$ghost) {
-                this.$ghost = this.current_item.createGhost();
+                this.$ghost = $('<li><span class="circle"></span><span class="line"></span></li>');
                 this.element.append(this.$ghost);
             }
             return this.$ghost;
@@ -704,6 +708,8 @@ _TestClasses = {};
 
         _generateHitAreas: function() {
             var self = this;
+            var colors = ['#000', '#ff0000', '#00ff00', '#0000ff'];
+            var color_index = 0;
 
             function addHintNode(node, area, position) {
                 var $span = $('<span class="tree-hit"></span>');
@@ -716,9 +722,13 @@ _TestClasses = {};
 
                 if (self.options.displayHitAreas) {
                     $span.css({
-                        background: '#000',
+                        background: colors[color_index],
                         opacity: 0.2
                     });
+                    color_index += 1;
+                    if (color_index >= colors.length) {
+                        color_index = 0;
+                    }
                 }
 
                 $span.data('area', {
@@ -737,7 +747,7 @@ _TestClasses = {};
                 return {
                     left: offset.left,
                     top: offset.top,
-                    width: $span.outerWidth(),
+                    width: $element.width(),
                     height: $span.outerHeight() - 1
                 };
             }
@@ -886,16 +896,17 @@ _TestClasses = {};
 
         _startOpenFolderTimer: function(folder) {
             var self = this;
-            this.open_folder_timer = setTimeout(
-                function() {
-                    self._getNodeElementForNode(folder).open(
-                        function() {
-                            self._refreshHitAreas();
-                        }
-                    );
-                },
-                500
-            );
+
+            function openFolder() {
+                self._getNodeElementForNode(folder).open(
+                    function() {
+                        self._refreshHitAreas();
+                        self._updateGhost();
+                    }
+                );
+            }
+
+            this.open_folder_timer = setTimeout(openFolder, 500);
         },
 
         _stopOpenFolderTimer: function() {
@@ -959,10 +970,6 @@ _TestClasses = {};
 
             $ghost.attr('class', classes.join(' '));
             $ghost.css({width: this.$element.width()});
-        },
-
-        createGhost: function() {
-            return $('<li><span class="circle"></span><span class="line"></span></li>');
         },
 
         select: function() {
