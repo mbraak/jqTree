@@ -43,7 +43,7 @@ ul.tree a.toggler.closed {
 }
 
 /* todo: in ul.tree? */
-span.dragging {
+span.tree-dragging {
 	color: #fff;
 	background: #000;
 	opacity: 0.6;
@@ -51,25 +51,42 @@ span.dragging {
 	padding: 2px 8px;
 }
 
-ul.tree span.ghost {
-	border: dashed 2px #aaa;
-	margin-left: 12px;
-	width: auto;
-	color: #fff;
-	float: none;
-	display: inline;
+ul.tree li.ghost {
+	position: absolute;
 }
 
-ul.tree span.ghost.folder {
-	margin-left: 0;
-	background-image: none;
+ul.tree li.ghost span {
+	display: block;
 }
 
-ul.tree span.ghost.inside {
-	margin-left: 36px;
+ul.tree li.ghost span.circle {
+	background: url(circle.png) no-repeat;
+	height: 8px;
+	width: 8px;
+	position: absolute;
+	top: -4px;
+	left: -8px;
+}
+
+ul.tree li.ghost span.line {
+	background-color: #0000ff;
+	height: 2px;
+	padding: 0;
+	position: absolute;
+	top: -1px;
+	width: 100%;
+}
+
+ul.tree li.ghost.inside {
+	margin-left: 48px;
 }
 
 ul.tree span.selected {
 	background: #000;
 	color: #fff;
+}
+
+span.tree-hit {
+	position: absolute;
+	display: block;
 }

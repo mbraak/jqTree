@@ -417,6 +417,14 @@ test('tree iterate', function() {
 test('tree moveNode', function() {
     var tree = Tree.createFromData(example_data);
 
+    /*
+      node1
+      ---child1
+      ---child2
+      node2
+      ---child3
+    */
+
     var node1 = tree.children[0];
     var node2 = tree.children[1];
     var child1 = node1.children[0];
@@ -426,6 +434,14 @@ test('tree moveNode', function() {
 
     // move child2 after node2
     tree.moveNode(child2, node2, Position.AFTER);
+
+    /*
+      node1
+      ---child1
+      node2
+      ---child3
+      child2
+    */
     equal(
         format_nodes(tree.children),
         'node1 node2 child2',
@@ -438,23 +454,40 @@ test('tree moveNode', function() {
     );
 
     // move child1 inside node2
+    // this means it's the first child
     tree.moveNode(child1, node2, Position.INSIDE);
+
+    /*
+      node1
+      node2
+      ---child1
+      ---child3
+      child2
+    */
     equal(
         format_nodes(node2.children),
-        'child3 child1',
+        'child1 child3',
         'node2 children'
     );
     equal(
         format_nodes(node1.children),
         '',
-        'node2 children'
+        'node1 has no children'
     );
 
     // move child2 before child1
     tree.moveNode(child2, child1, Position.BEFORE);
+
+    /*
+      node1
+      node2
+      ---child2
+      ---child1
+      ---child3
+    */
     equal(
         format_nodes(node2.children),
-        'child3 child2 child1',
+        'child2 child1 child3',
         'node2 children'
     );
     equal(

@@ -141,7 +141,7 @@ _TestClasses = {};
         Remove child.
 
         tree.removeChile(tree.children[0]);
-         */
+        */
         removeChild: function(node) {
             this.children.splice(
                 this.getChildIndex(node),
@@ -225,7 +225,8 @@ _TestClasses = {};
                 );
             }
             else if (position == Position.INSIDE) {
-                target_node.addChild(moved_node);
+                // move inside as first child
+                target_node.addChildAtPosition(moved_node, 0);
             }
         }
     });
@@ -254,7 +255,8 @@ _TestClasses = {};
             onGetStateFromStorage: null,
             onCreateLi: null,
             onMustAddHitArea: null,
-            onIsMoveHandle: null
+            onIsMoveHandle: null,
+            displayHitAreas: false
         },
 
         getTree: function() {
@@ -325,6 +327,7 @@ _TestClasses = {};
         },
 
         _getState: function() {
+            // todo: json
             var open_nodes = [];
 
             this.tree.iterate(function(node) {
@@ -703,15 +706,20 @@ _TestClasses = {};
             var self = this;
 
             function addHintNode(node, area, position) {
-                var $span = $('<span class="hit"></span>');
+                var $span = $('<span class="tree-hit"></span>');
                 $span.css({
-                    position: 'absolute',
                     left: area.left,
                     top: area.top,
-                    display: 'block',
                     width: area.width,
                     height: area.height
                 });
+
+                if (self.options.displayHitAreas) {
+                    $span.css({
+                        background: '#000',
+                        opacity: 0.2
+                    });
+                }
 
                 $span.data('area', {
                     node: node,
@@ -777,7 +785,7 @@ _TestClasses = {};
                 addHintNode(
                     node,
                     getAreaForNode($element),
-                    Position.BEFORE
+                    Position.INSIDE
                 );
             }
 
@@ -922,7 +930,7 @@ _TestClasses = {};
 
         createHelper: function() {
             var $helper = this.getSpan().clone();
-            $helper.addClass('dragging');
+            $helper.addClass('tree-dragging');
             return $helper;
         },
 
@@ -940,16 +948,21 @@ _TestClasses = {};
                 this.$element.before($ghost);
             }
             else if (move_to == Position.INSIDE) {
-                this.$element.after($ghost);
-                classes.push('inside');
+                if (this.node.hasChildren()) {
+                    $(this.node.children[0].element).before($ghost);
+                }
+                else {
+                    this.$element.append($ghost);
+                    classes.push('inside');
+                }
             }
 
-            var $span = $ghost.children('span:first');
-            $span.attr('class', classes.join(' '));
+            $ghost.attr('class', classes.join(' '));
+            $ghost.css({width: this.$element.width()});
         },
 
         createGhost: function() {
-           return $('<li><span class="ghost">'+ this.node.name +'</span></li>');
+            return $('<li><span class="circle"></span><span class="line"></span></li>');
         },
 
         select: function() {
