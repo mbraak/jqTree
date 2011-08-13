@@ -635,10 +635,9 @@ _TestClasses = {};
             if (node.hasChildren() && !node.is_open) {
                 this._startOpenFolderTimer(node);
             }
-            else {
-                this._getNodeElementForNode(this.hovered_area.node)
-                    .appendGhost($ghost, this.hovered_area.position);
-            }
+
+            this._getNodeElementForNode(this.hovered_area.node)
+                .appendGhost($ghost, this.hovered_area.position);
         },
 
         _mouseStop: function() {
@@ -716,8 +715,8 @@ _TestClasses = {};
                 $span.css({
                     left: area.left,
                     top: area.top,
-                    width: area.width,
-                    height: area.height
+                    width: area.right - area.left,
+                    height: area.bottom - area.top
                 });
 
                 if (self.options.displayHitAreas) {
@@ -747,8 +746,8 @@ _TestClasses = {};
                 return {
                     left: offset.left,
                     top: offset.top,
-                    width: $element.width(),
-                    height: $span.outerHeight() - 1
+                    right: offset.left + $element.width(),
+                    bottom: offset.top + $span.outerHeight() - 1
                 };
             }
 
@@ -759,9 +758,9 @@ _TestClasses = {};
 
                 return {
                     left: offset.left,
-                    top: $element.offset().top + span_height,
-                    width: 8,
-                    height: $element.height() - span_height
+                    top: offset.top + span_height,
+                    right: offset.left + 8,
+                    bottom: offset.top + $element.height()
                 };
             }
 
@@ -770,17 +769,13 @@ _TestClasses = {};
 
                 // after node
                 var a = $.extend({}, area);
-                a.width = 36;
+                a.right = a.left + 36;
 
                 addHintNode(node, a, Position.AFTER);
 
                 // inside node
                 a = $.extend({}, area);
                 a.left += 36;
-                a.width -= 36;
-                if (a.width < 36) {
-                    a.width = 36;
-                }
 
                 addHintNode(node, a, Position.INSIDE);
             }
@@ -800,11 +795,19 @@ _TestClasses = {};
             }
 
             function addForClosedFolder(node, $element) {
-                addHintNode(
-                    node,
-                    getAreaForNode($element),
-                    Position.INSIDE
-                );
+                var area = getAreaForNode($element);
+
+                // inside folder
+                var a = $.extend({}, area);
+                a.right = a.left + 36;
+
+                addHintNode(node, a, Position.INSIDE);
+
+                // after folder
+                a = $.extend({}, area);
+                a.left += 36;
+
+                addHintNode(node, a, Position.AFTER);
             }
 
             this._iterateVisibleNodes(function(node, $element) {
