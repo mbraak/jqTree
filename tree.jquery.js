@@ -27,10 +27,13 @@ limitations under the License.
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
 // todo: improve BorderDropHint: no white border on ul.tree li
+// todo: improve positions of hit areas; only vertical?
 
+// todo: do not use _TestClasses, but global namespace
 _TestClasses = {};
 
 (function($) {
+    // todo: add to Array if it does not exist
     var indexOf = function(elem, array) {
         for (var i = 0, length = array.length; i < length; i++) {
             if (array[i] == elem) {
