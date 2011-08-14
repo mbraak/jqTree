@@ -26,6 +26,7 @@ limitations under the License.
 // todo: rename to jquery.tree.js? also css-file?
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
+// todo: improve BorderDropHint: no white border on ul.tree li
 
 _TestClasses = {};
 
@@ -610,7 +611,7 @@ _TestClasses = {};
 
             var area = $(event.target).data('area');
             if (! area) {
-                this._removeGhost();
+                this._removeDropHint();
                 this._removeHover();
                 this._stopOpenFolderTimer();
             }
@@ -618,26 +619,29 @@ _TestClasses = {};
                 if (this.hovered_area != area) {
                     this.hovered_area = area;
 
-                    this._updateGhost();
+                    this._updateDropHint();
                 }
             }
 
             return true;
         },
 
-        _updateGhost: function() {
-            var $ghost = this._getGhost();
-            $ghost.detach();
-
+        _updateDropHint: function() {
+            // stop open folder times
             this._stopOpenFolderTimer();
-            var node = this.hovered_area.node;
 
+            // if this is a closed folder, start timer to open it
+            var node = this.hovered_area.node;
             if (node.hasChildren() && !node.is_open) {
                 this._startOpenFolderTimer(node);
             }
 
-            this._getNodeElementForNode(this.hovered_area.node)
-                .appendGhost($ghost, this.hovered_area.position);
+            // remove previous drop hint
+            this._removeDropHint();
+
+            // add new drop hint
+            var node_element = this._getNodeElementForNode(this.hovered_area.node);
+            this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
         },
 
         _mouseStop: function() {
@@ -648,19 +652,11 @@ _TestClasses = {};
             this._moveItem();
             this._clear();
             this._removeHover();
-            this._removeGhost();
+            this._removeDropHint();
             this._removeHitAreas();
 
             this.current_item.$element.show();
             return false;
-        },
-
-        _getGhost: function() {
-             if (! this.$ghost) {
-                this.$ghost = $('<li><span class="circle"></span><span class="line"></span></li>');
-                this.element.append(this.$ghost);
-            }
-            return this.$ghost;
         },
 
         _moveItem: function() {
@@ -857,10 +853,9 @@ _TestClasses = {};
             this.hovered_area = null;
         },
 
-        _removeGhost: function() {
-            if (this.$ghost) {
-                this.$ghost.remove();
-                this.$ghost = null;
+        _removeDropHint: function() {
+            if (this.previous_ghost) {
+                this.previous_ghost.remove();
             }
         },
 
@@ -904,7 +899,7 @@ _TestClasses = {};
                 self._getNodeElementForNode(folder).open(
                     function() {
                         self._refreshHitAreas();
-                        self._updateGhost();
+                        self._updateDropHint();
                     }
                 );
             }
@@ -917,6 +912,47 @@ _TestClasses = {};
                 clearTimeout(this.open_folder_timer);
                 this.open_folder_timer = null;
             }
+        }
+    });
+
+    var GhostDropHint = function(node, $element, position) {
+        this.$ghost = $('<li class="ghost"><span class="circle"></span><span class="line"></span></li>');
+        this.$ghost.css({
+            width: $element.width()
+        });
+
+        if (position == Position.AFTER) {
+            $element.after(this.$ghost);
+        }
+        else if (position == Position.BEFORE) {
+            $element.before(this.$ghost);
+        }
+        else if (position == Position.INSIDE) {
+            if (node.hasChildren()) {
+                $(node.children[0].element).before(this.$ghost);
+            }
+            else {
+                $element.after(this.$ghost);
+                this.$ghost.addClass('inside');
+            }
+        }
+    };
+
+    $.extend(GhostDropHint.prototype, {
+        remove: function() {
+            this.$ghost.remove();
+        }
+    });
+
+    var BorderDropHint = function($element) {
+        $element.addClass('ghost-inside');
+
+        this.$element = $element;
+    };
+
+    $.extend( BorderDropHint.prototype, {
+        remove: function() {
+            this.$element.removeClass('ghost-inside');
         }
     });
 
@@ -948,31 +984,13 @@ _TestClasses = {};
             return $helper;
         },
 
-        appendGhost: function($ghost, move_to) {
-            var classes = ['ghost'];
-
-            if (move_to == Position.AFTER) {
-                this.$element.after($ghost);
-
-                if (this.node.hasChildren()) {
-                    classes.push('folder');
-                }
+        addDropHint: function(position) {
+            if (position == Position.INSIDE) {
+                return new BorderDropHint(this.$element);
             }
-            else if (move_to == Position.BEFORE) {
-                this.$element.before($ghost);
+            else {
+                return new GhostDropHint(this.node, this.$element, position);
             }
-            else if (move_to == Position.INSIDE) {
-                if (this.node.hasChildren()) {
-                    $(this.node.children[0].element).before($ghost);
-                }
-                else {
-                    this.$element.append($ghost);
-                    classes.push('inside');
-                }
-            }
-
-            $ghost.attr('class', classes.join(' '));
-            $ghost.css({width: this.$element.width()});
         },
 
         select: function() {
@@ -1036,6 +1054,15 @@ _TestClasses = {};
 
         getButton: function() {
             return this.$element.children('a.toggler');
-        }
+        },
+
+        addDropHint: function(position) {
+            if (! this.node.is_open && position == Position.INSIDE) {
+                return new BorderDropHint(this.$element);
+            }
+            else {
+                return new GhostDropHint(this.node, this.$element, position);
+            }
+        },
     });
 })(jQuery);

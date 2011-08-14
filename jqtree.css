@@ -14,6 +14,7 @@ ul.tree li.closed > ul {
 
 ul.tree li {
 	margin-left: 0;
+	border: solid 2px #fff;
 }
 
 ul.tree a.toggler {
@@ -31,7 +32,6 @@ ul.tree a {
 
 ul.tree li > span {
 	margin-left: 12px;
-	padding: 2px;
 }
 
 ul.tree li.folder > span {
@@ -89,4 +89,11 @@ ul.tree span.selected {
 span.tree-hit {
 	position: absolute;
 	display: block;
+}
+
+ul.tree li.ghost-inside {
+	border: solid 2px #0000ff;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
 }
