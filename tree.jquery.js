@@ -1066,6 +1066,6 @@ _TestClasses = {};
             else {
                 return new GhostDropHint(this.node, this.$element, position);
             }
-        },
+        }
     });
 })(jQuery);
