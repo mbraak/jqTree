@@ -28,6 +28,7 @@ limitations under the License.
 // todo: prevent accidental move on touchpad
 // todo: improve BorderDropHint: no white border on ul.tree li
 // todo: change position for open folder AFTER
+// todo: display icon if position is invalid for dropping
 
 // todo: do not use _TestClasses, but global namespace
 _TestClasses = {};
@@ -779,7 +780,7 @@ _TestClasses = {};
             var color_index = 0;
             var colors = ['#000', '#ff0000', '#00ff00', '#0000ff'];
 
-            function addHintNode(node, area, position) {
+            function addHitArea(node, area, position) {
                 var $span = $('<span class="tree-hit"></span>');
                 $span.css({
                     left: area.left,
@@ -816,7 +817,7 @@ _TestClasses = {};
                 var area_top = top;
 
                 $.each(positions_in_group, function() {
-                    addHintNode(
+                    addHitArea(
                         this.node,
                         {
                             left: tree_left,
