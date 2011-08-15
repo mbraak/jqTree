@@ -27,7 +27,6 @@ limitations under the License.
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
 // todo: improve BorderDropHint: no white border on ul.tree li
-// todo: only open closed folder for Position.INSIDE
 // todo: change position for open folder AFTER
 
 // todo: do not use _TestClasses, but global namespace
@@ -636,7 +635,11 @@ _TestClasses = {};
 
             // if this is a closed folder, start timer to open it
             var node = this.hovered_area.node;
-            if (node.hasChildren() && !node.is_open) {
+            if (
+                node.hasChildren() &&
+                !node.is_open &&
+                this.hovered_area.position == Position.INSIDE
+            ) {
                 this._startOpenFolderTimer(node);
             }
 
