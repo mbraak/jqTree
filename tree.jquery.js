@@ -27,7 +27,8 @@ limitations under the License.
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
 // todo: improve BorderDropHint: no white border on ul.tree li
-// todo: improve positions of hit areas; only vertical?
+// todo: only open closed folder for Position.INSIDE
+// todo: change position for open folder AFTER
 
 // todo: do not use _TestClasses, but global namespace
 _TestClasses = {};
@@ -71,7 +72,7 @@ _TestClasses = {};
 
     _TestClasses.Node = Node;
 
-    $.extend(Node.prototype, {
+    Node.prototype = {
         init: function(name) {
             this.name = name;
             this.children = [];
@@ -233,7 +234,7 @@ _TestClasses = {};
                 target_node.addChildAtPosition(moved_node, 0);
             }
         }
-    });
+    };
 
     Node.createFromData = function(data) {
         var tree = new Tree();
@@ -704,7 +705,7 @@ _TestClasses = {};
             this._generateHitAreas();
         },
 
-        _generateHitAreas: function() {
+        __generateHitAreas: function() {
             var self = this;
             var colors = ['#000', '#ff0000', '#00ff00', '#0000ff'];
             var color_index = 0;
@@ -822,7 +823,133 @@ _TestClasses = {};
             });
         },
 
-        _iterateVisibleNodes: function(handle_node) {
+        _generateHitAreas: function() {
+            var self = this;
+            var positions = [];
+
+            function getTop($element) {
+                return $element.offset().top;
+            }
+
+            function addPosition(node, position, top) {
+                positions.push({
+                    top: top,
+                    node: node,
+                    position: position
+                });
+            }
+
+            function groupPositions(handle_group) {
+                var previous_top = -1;
+                var group = [];
+
+                $.each(positions, function() {
+                    if (this.top != previous_top) {
+                        if (group.length) {
+                            handle_group(group, previous_top, this.top);
+                        }
+
+                        previous_top = this.top;
+                        group = [];
+                    }
+
+                    group.push(this);
+                });
+
+                handle_group(
+                    group,
+                    previous_top,
+                    self.element.offset().top + self.element.height()
+                );
+            }
+
+            function handleNode(node, $element) {
+                var top = getTop($element);
+                addPosition(node, Position.INSIDE, top);
+                addPosition(node, Position.AFTER, top);
+            }
+
+            function handleOpenFolder(node, $element) {
+                addPosition(node, Position.INSIDE, getTop($element));
+            }
+
+            function handleClosedFolder(node, $element) {
+                var top = getTop($element);
+                addPosition(node, Position.INSIDE, top);
+                addPosition(node, Position.AFTER, top);
+            }
+
+            function handleAfterOpenFolder(node, $element) {
+                addPosition(
+                    node,
+                    Position.AFTER,
+                    $element.offset().top + $element.height()
+                );
+            }
+
+            this._iterateVisibleNodes(
+                handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder
+            );
+
+            var color_index = 0;
+            var colors = ['#000', '#ff0000', '#00ff00', '#0000ff'];
+
+            function addHintNode(node, area, position) {
+                var $span = $('<span class="tree-hit"></span>');
+                $span.css({
+                    left: area.left,
+                    top: area.top,
+                    width: area.width,
+                    height: area.height
+                });
+
+                if (self.options.displayHitAreas) {
+                    $span.css({
+                        background: colors[color_index],
+                        opacity: 0.2
+                    });
+                    color_index += 1;
+                    if (color_index >= colors.length) {
+                        color_index = 0;
+                    }
+                }
+
+                $span.data('area', {
+                    node: node,
+                    position: position
+                });
+
+                self.element.append($span);
+                self.hit_areas.push($span);
+            }
+
+            var tree_left = self.element.offset().left;
+            var tree_width = self.element.width();
+
+            groupPositions(function(positions_in_group, top, bottom) {
+                var area_height = (bottom - top) / positions_in_group.length;
+                var area_top = top;
+
+                $.each(positions_in_group, function() {
+                    addHintNode(
+                        this.node,
+                        {
+                            left: tree_left,
+                            top: area_top,
+                            width: tree_width,
+                            height: area_height
+                        },
+                        this.position
+                    );
+
+                    area_top += area_height;
+                });
+            });
+        },
+
+        _iterateVisibleNodes: function(
+            handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder
+        ) {
             var self = this;
 
             function iterate(node) {
@@ -839,13 +966,25 @@ _TestClasses = {};
                         }
                     }
 
-                    handle_node(node, $element);
+                    if (! node.hasChildren()) {
+                        handle_node(node, $element);
+                    }
+                    else if (node.is_open) {
+                        handle_open_folder(node, $element);
+                    }
+                    else {
+                        handle_closed_folder(node, $element);
+                    }
                 }
 
-                if (node.hasChildren()) {
+                if ((node.element || !node.is_open) && node.hasChildren()) {
                     $.each(node.children, function() {
                         iterate(this);
                     });
+
+                    if (node.element && node.is_open) {
+                        handle_after_open_folder(node, $element);
+                    }
                 }
             }
 
@@ -953,7 +1092,7 @@ _TestClasses = {};
         this.$element = $element;
     };
 
-    $.extend( BorderDropHint.prototype, {
+    $.extend(BorderDropHint.prototype, {
         remove: function() {
             this.$element.removeClass('ghost-inside');
         }
