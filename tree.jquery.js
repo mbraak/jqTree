@@ -29,6 +29,7 @@ limitations under the License.
 // todo: improve BorderDropHint: no white border on ul.tree li
 // todo: change position for open folder AFTER
 // todo: display icon if position is invalid for dropping
+// todo: test on ie
 
 // todo: do not use _TestClasses, but global namespace
 _TestClasses = {};
