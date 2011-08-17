@@ -30,8 +30,7 @@ limitations under the License.
 // todo: display icon if position is invalid for dropping
 // todo: test on ie
 
-// todo: do not use _TestClasses, but global namespace
-_TestClasses = {};
+window.Tree = {};
 
 (function($) {
     // todo: add to Array if it does not exist
@@ -64,13 +63,13 @@ _TestClasses = {};
         }
     };
 
-    _TestClasses.Position = Position;
+    window.Tree.Position = Position;
 
     var Node = function(name) {
         this.init(name);
     };
 
-    _TestClasses.Node = Node;
+    window.Tree.Node = Node;
 
     Node.prototype = {
         init: function(name) {
@@ -237,14 +236,12 @@ _TestClasses = {};
     };
 
     Node.createFromData = function(data) {
-        var tree = new Tree();
+        var tree = new Node();
         tree.loadFromData(data);
         return tree;
     };
 
-    var Tree = Node;
-
-    _TestClasses.Tree = Tree;
+    window.Tree.Tree = Node;
 
     $.widget("ui.tree", $.ui.mouse, {
         widgetEventPrefix: "tree",
@@ -299,7 +296,7 @@ _TestClasses = {};
         },
 
         _create: function() {
-            this.tree = Tree.createFromData(this.options.data);
+            this.tree = Node.createFromData(this.options.data);
             this.selected_node = null;
             this._openNodes();
 
