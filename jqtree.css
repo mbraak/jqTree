@@ -81,6 +81,10 @@ ul.tree li.ghost.inside {
 	margin-left: 48px;
 }
 
+ul.tree li.ghost.after {
+	margin-left: -16px;
+}
+
 ul.tree span.selected {
 	background: #000;
 	color: #fff;

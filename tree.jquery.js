@@ -27,7 +27,6 @@ limitations under the License.
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
 // todo: improve BorderDropHint: no white border on ul.tree li
-// todo: change position for open folder AFTER
 // todo: display icon if position is invalid for dropping
 // todo: test on ie
 
@@ -757,7 +756,9 @@ _TestClasses = {};
             }
 
             function handleOpenFolder(node, $element) {
-                addPosition(node, Position.INSIDE, getTop($element));
+                var top = getTop($element);
+                addPosition(node, Position.INSIDE, top);
+                addPosition(node, Position.AFTER, top);
             }
 
             function handleClosedFolder(node, $element) {
@@ -766,20 +767,12 @@ _TestClasses = {};
                 addPosition(node, Position.AFTER, top);
             }
 
-            function handleAfterOpenFolder(node, $element) {
-                addPosition(
-                    node,
-                    Position.AFTER,
-                    $element.offset().top + $element.height()
-                );
-            }
-
             this._iterateVisibleNodes(
-                handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder
+                handleNode, handleOpenFolder, handleClosedFolder
             );
 
             var color_index = 0;
-            var colors = ['#000', '#ff0000', '#00ff00', '#0000ff'];
+            var colors = ['#ff0000', '#00ff00', '#0000ff'];
 
             function addHitArea(node, area, position) {
                 var $span = $('<span class="tree-hit"></span>');
@@ -835,7 +828,7 @@ _TestClasses = {};
         },
 
         _iterateVisibleNodes: function(
-            handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder
+            handle_node, handle_open_folder, handle_closed_folder
         ) {
             var self = this;
 
@@ -868,10 +861,6 @@ _TestClasses = {};
                     $.each(node.children, function() {
                         iterate(this);
                     });
-
-                    if (node.element && node.is_open) {
-                        handle_after_open_folder(node, $element);
-                    }
                 }
             }
 
@@ -945,24 +934,31 @@ _TestClasses = {};
     });
 
     var GhostDropHint = function(node, $element, position) {
+        this.$element = $element;
+        this.node = node;
+
         this.$ghost = $('<li class="ghost"><span class="circle"></span><span class="line"></span></li>');
         this.$ghost.css({
             width: $element.width()
         });
 
         if (position == Position.AFTER) {
-            $element.after(this.$ghost);
-        }
-        else if (position == Position.BEFORE) {
-            $element.before(this.$ghost);
-        }
-        else if (position == Position.INSIDE) {
-            if (node.hasChildren()) {
-                $(node.children[0].element).before(this.$ghost);
+            if (node.hasChildren() && node.is_open) {
+                this.moveAfterOpenFolder();
             }
             else {
-                $element.after(this.$ghost);
-                this.$ghost.addClass('inside');
+                this.moveAfter();
+            }
+        }
+        else if (position == Position.BEFORE) {
+            this.moveBefore();
+        }
+        else if (position == Position.INSIDE) {
+            if (node.hasChildren() && node.is_open) {
+                this.moveInsideOpenFolder();
+            }
+            else {
+                this.moveInside();
             }
         }
     };
@@ -970,6 +966,28 @@ _TestClasses = {};
     $.extend(GhostDropHint.prototype, {
         remove: function() {
             this.$ghost.remove();
+        },
+
+        moveAfter: function() {
+            this.$element.after(this.$ghost);
+        },
+
+        moveBefore: function() {
+            this.$element.before(this.$ghost);
+        },
+
+        moveInsideOpenFolder: function() {
+            $(this.node.children[0].element).before(this.$ghost);
+        },
+
+        moveInside: function() {
+            this.$element.after(this.$ghost);
+            this.$ghost.addClass('inside');
+        },
+
+        moveAfterOpenFolder: function() {
+            this.moveInsideOpenFolder();
+            this.$ghost.addClass('after');
         }
     });
 
