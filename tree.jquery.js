@@ -33,16 +33,18 @@ limitations under the License.
 window.Tree = {};
 
 (function($) {
-    // todo: add to Array if it does not exist
-    var indexOf = function(elem, array) {
-        for (var i = 0, length = array.length; i < length; i++) {
-            if (array[i] == elem) {
-                return i;
+    if (!Array.prototype.indexOf) {
+        // Incomplete implementation of Array.indexOf.
+        Array.prototype.indexOf = function(searchElement) {
+            for (var i = 0, length = this.length; i < length; i++) {
+                if (this[i] === searchElement) {
+                    return i;
+                }
             }
-        }
 
-        return -1;
-    };
+            return -1;
+        }
+    }
 
     var Position = {
         BEFORE: 1,
@@ -361,7 +363,7 @@ window.Tree = {};
                 if (
                     node.id &&
                     node.hasChildren() &&
-                    (indexOf(node.id, open_nodes) != -1)
+                    (open_nodes.indexOf(node.id.toString()) >= 0)
                 ) {
                     node.is_open = true;
                 }
