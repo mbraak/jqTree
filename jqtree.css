@@ -13,8 +13,7 @@ ul.tree li.closed > ul {
 }
 
 ul.tree li {
-	margin-left: 0;
-	border: solid 2px #fff;
+	margin: 1px 0;
 }
 
 ul.tree a.toggler {
@@ -95,9 +94,12 @@ span.tree-hit {
 	display: block;
 }
 
-ul.tree li.ghost-inside {
+ul.tree span.border {
+	position: absolute;
+	display: block;
 	border: solid 2px #0000ff;
 	-webkit-border-radius: 6px;
 	-moz-border-radius: 6px;
 	border-radius: 6px;
+	margin: 0;
 }

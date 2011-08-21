@@ -26,7 +26,6 @@ limitations under the License.
 // todo: rename to jquery.tree.js? also css-file?
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
-// todo: improve BorderDropHint: no white border on ul.tree li
 // todo: display icon if position is invalid for dropping
 // todo: test on ie
 // todo: change onMustAddHitArea event to function that tests if move is legal
@@ -1002,14 +1001,23 @@ window.Tree = {};
     });
 
     var BorderDropHint = function($element) {
-        $element.addClass('ghost-inside');
+        var $span = $element.find('span:first');
+        var offset = $span.offset();
 
-        this.$element = $element;
+        this.$hint = $('<span class="border"></span>');
+        $element.append(this.$hint);
+
+        this.$hint.css({
+            left: offset.left - 4,
+            top: offset.top - 4,
+            width: $span.width() + 8,
+            height: $span.height() + 4
+        });
     };
 
     $.extend(BorderDropHint.prototype, {
         remove: function() {
-            this.$element.removeClass('ghost-inside');
+            this.$hint.remove();
         }
     });
 
