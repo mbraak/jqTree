@@ -944,11 +944,13 @@ window.Tree = {};
 
     var GhostDropHint = function(node, $element, position) {
         this.$element = $element;
+        var $span = $element.find('span:first');
+
         this.node = node;
 
         this.$ghost = $('<li class="ghost"><span class="circle"></span><span class="line"></span></li>');
         this.$ghost.css({
-            width: $element.width()
+            width: $span.width() + 8
         });
 
         if (position == Position.AFTER) {
