@@ -34,15 +34,17 @@ limitations under the License.
 window.Tree = {};
 
 (function($) {
-    if (!Array.prototype.indexOf) {
-        // Incomplete implementation of Array.indexOf.
-        Array.prototype.indexOf = function(searchElement) {
-            for (var i = 0, length = this.length; i < length; i++) {
-                if (this[i] === searchElement) {
+    function indexOf(array, item) {
+        if (array.indexOf) {
+            return array.indexOf(item);
+        }
+        else {
+            var i, l;
+            for (i = 0, l = array.length; i < l; i++) {
+                if (array[i] === item) {
                     return i;
                 }
             }
-
             return -1;
         }
     }
@@ -364,7 +366,7 @@ window.Tree = {};
                 if (
                     node.id &&
                     node.hasChildren() &&
-                    (open_nodes.indexOf(node.id.toString()) >= 0)
+                    (indexOf(open_nodes, node.id.toString()) >= 0)
                 ) {
                     node.is_open = true;
                 }
