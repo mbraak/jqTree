@@ -49,6 +49,12 @@ window.Tree = {};
         }
     }
 
+    // toJson function; copied from jsons2
+    var escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,meta={"\u0008":"\\b","\t":"\\t","\n":"\\n","\u000c":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"};
+    function toJson(p,g,h){function m(a){escapable.lastIndex=0;return escapable.test(a)?'"'+a.replace(escapable,function(a){var c=meta[a];return typeof c==="string"?c:"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4)})+'"':'"'+a+'"'}function j(g,h){var c,i,e,k,l=a,d,b=h[g];typeof f==="function"&&(b=f.call(h,g,b));switch(typeof b){case "string":return m(b);case "number":return isFinite(b)?String(b):"null";case "boolean":case "null":return String(b);case "object":if(!b)return"null";a+=n;d=[];if(Object.prototype.toString.apply(b)===
+    "[object Array]"){k=b.length;for(c=0;c<k;c+=1)d[c]=j(c,b)||"null";e=d.length===0?"[]":a?"[\n"+a+d.join(",\n"+a)+"\n"+l+"]":"["+d.join(",")+"]";a=l;return e}if(f&&typeof f==="object"){k=f.length;for(c=0;c<k;c+=1)typeof f[c]==="string"&&(i=f[c],(e=j(i,b))&&d.push(m(i)+(a?": ":":")+e))}else for(i in b)Object.prototype.hasOwnProperty.call(b,i)&&(e=j(i,b))&&d.push(m(i)+(a?": ":":")+e);e=d.length===0?"{}":a?"{\n"+a+d.join(",\n"+a)+"\n"+l+"}":"{"+d.join(",")+"}";a=l;return e}}var o,f,a="",n="";if(typeof h===
+    "number")for(o=0;o<h;o+=1)n+=" ";else typeof h==="string"&&(n=h);if((f=g)&&typeof g!=="function"&&(typeof g!=="object"||typeof g.length!=="number"))throw Error("JSON.stringify");return j("",{"":p})};
+
     var Position = {
         BEFORE: 1,
         AFTER: 2,
@@ -334,7 +340,6 @@ window.Tree = {};
         },
 
         _getState: function() {
-            // todo: json
             var open_nodes = [];
 
             this.tree.iterate(function(node) {
@@ -353,20 +358,23 @@ window.Tree = {};
                 selected_node = this.selected_node.id;
             }
 
-            return open_nodes.join(',') + ':' + selected_node;
+            return toJson({
+                open_nodes: open_nodes,
+                selected_node: selected_node
+            });
         },
 
         _setState: function(state) {
-            var strings = state.split(':');
-            var open_nodes = strings[0].split(',');
-            var selected_node_id = strings[1];
+            var data = $.parseJSON(state);
+            var open_nodes = data.open_nodes;
+            var selected_node_id = data.selected_node;
 
             var self = this;
             this.tree.iterate(function(node) {
                 if (
                     node.id &&
                     node.hasChildren() &&
-                    (indexOf(open_nodes, node.id.toString()) >= 0)
+                    (indexOf(open_nodes, node.id) >= 0)
                 ) {
                     node.is_open = true;
                 }
