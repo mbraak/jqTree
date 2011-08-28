@@ -643,6 +643,10 @@ window.Tree = {};
             // stop open folder times
             this._stopOpenFolderTimer();
 
+            if (! this.hovered_area) {
+                return;
+            }
+
             // if this is a closed folder, start timer to open it
             var node = this.hovered_area.node;
             if (
