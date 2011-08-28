@@ -794,11 +794,15 @@ window.Tree = {};
 
             function addHitArea(node, area, position) {
                 var $span = $('<span class="tree-hit"></span>');
+
+                // Set background and opacity to make sure element can be hovered in ie7 and ie8.
                 $span.css({
                     left: area.left,
                     top: area.top,
                     width: area.width,
-                    height: area.height
+                    height: area.height,
+                    'background-color': '#fff',
+                    opacity: 0.01
                 });
 
                 if (self.options.displayHitAreas) {
