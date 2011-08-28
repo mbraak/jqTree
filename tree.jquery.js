@@ -721,6 +721,7 @@ window.Tree = {};
         _generateHitAreas: function() {
             var self = this;
             var positions = [];
+            var last_top = 0;
 
             function getTop($element) {
                 return $element.offset().top;
@@ -732,6 +733,8 @@ window.Tree = {};
                     node: node,
                     position: position
                 });
+
+                last_top = top;
             }
 
             function groupPositions(handle_group) {
@@ -765,9 +768,15 @@ window.Tree = {};
             }
 
             function handleOpenFolder(node, $element) {
-                var top = getTop($element);
-                addPosition(node, Position.INSIDE, top);
-                addPosition(node, Position.AFTER, top);
+                addPosition(
+                    node,
+                    Position.INSIDE,
+                    getTop($element)
+                );
+            }
+
+            function handleAfterOpenFolder(node, $element) {
+                addPosition(node, Position.AFTER, last_top);
             }
 
             function handleClosedFolder(node, $element) {
@@ -777,7 +786,7 @@ window.Tree = {};
             }
 
             this._iterateVisibleNodes(
-                handleNode, handleOpenFolder, handleClosedFolder
+                handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder
             );
 
             var color_index = 0;
@@ -837,7 +846,7 @@ window.Tree = {};
         },
 
         _iterateVisibleNodes: function(
-            handle_node, handle_open_folder, handle_closed_folder
+            handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder
         ) {
             var self = this;
 
@@ -866,10 +875,14 @@ window.Tree = {};
                     }
                 }
 
-                if ((node.element || !node.is_open) && node.hasChildren()) {
+                if ((node.is_open || !node.element) && node.hasChildren()) {
                     $.each(node.children, function() {
                         iterate(this);
                     });
+
+                    if (node.is_open) {
+                        handle_after_open_folder(node, $element);
+                    }
                 }
             }
 
@@ -954,12 +967,7 @@ window.Tree = {};
         });
 
         if (position == Position.AFTER) {
-            if (node.hasChildren() && node.is_open) {
-                this.moveAfterOpenFolder();
-            }
-            else {
-                this.moveAfter();
-            }
+            this.moveAfter();
         }
         else if (position == Position.BEFORE) {
             this.moveBefore();
@@ -994,11 +1002,6 @@ window.Tree = {};
         moveInside: function() {
             this.$element.after(this.$ghost);
             this.$ghost.addClass('inside');
-        },
-
-        moveAfterOpenFolder: function() {
-            this.moveInsideOpenFolder();
-            this.$ghost.addClass('after');
         }
     });
 

@@ -33,6 +33,14 @@ ul.tree li > span {
 	margin-left: 12px;
 }
 
+ul.tree li.folder {
+	margin-bottom: 4px;
+}
+
+ul.tree li.folder.closed {
+	margin-bottom: 1px;
+}
+
 ul.tree li.folder > span {
 	margin-left: 0;
 }
@@ -78,10 +86,6 @@ ul.tree li.ghost span.line {
 
 ul.tree li.ghost.inside {
 	margin-left: 48px;
-}
-
-ul.tree li.ghost.after {
-	margin-left: -16px;
 }
 
 ul.tree span.selected {
