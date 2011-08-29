@@ -633,10 +633,6 @@ _TestClasses = {};
         },
 
         _getNodeElement: function($element) {
-            if (this.options.onIsMoveHandle && !this.options.onIsMoveHandle($element)) {
-                return null;
-            }
-
             var node = this._getNode($element);
             if (node) {
                 return this._getNodeElementForNode(node);
@@ -660,7 +656,12 @@ _TestClasses = {};
                 return;
             }
 
-            this.current_item = this._getNodeElement($(event.target));
+            var $element = $(event.target);
+            if (this.options.onIsMoveHandle && !this.options.onIsMoveHandle($element)) {
+                return null;
+            }
+
+            this.current_item = this._getNodeElement($element);
 
             return (this.current_item != null);
         },
