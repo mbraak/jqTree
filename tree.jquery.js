@@ -267,8 +267,7 @@ window.Tree = {};
             onGetStateFromStorage: null,
             onCreateLi: null,
             onMustAddHitArea: null,
-            onIsMoveHandle: null,
-            displayHitAreas: false
+            onIsMoveHandle: null
         },
 
         getTree: function() {
@@ -622,7 +621,7 @@ window.Tree = {};
                 top: event.pageY
             });
 
-            var area = $(event.target).data('area');
+            var area = this.findHoveredArea(event.pageX, event.pageY);
             if (! area) {
                 this._removeDropHint();
                 this._removeHover();
@@ -793,64 +792,56 @@ window.Tree = {};
                 handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder
             );
 
-            var color_index = 0;
-            var colors = ['#ff0000', '#00ff00', '#0000ff'];
-
-            function addHitArea(node, area, position) {
-                var $span = $('<span class="tree-hit"></span>');
-
-                // Set background and opacity to make sure element can be hovered in ie7 and ie8.
-                $span.css({
-                    left: area.left,
-                    top: area.top,
-                    width: area.width,
-                    height: area.height,
-                    'background-color': '#fff',
-                    opacity: 0.01
-                });
-
-                if (self.options.displayHitAreas) {
-                    $span.css({
-                        background: colors[color_index],
-                        opacity: 0.2
-                    });
-                    color_index += 1;
-                    if (color_index >= colors.length) {
-                        color_index = 0;
-                    }
-                }
-
-                $span.data('area', {
-                    node: node,
-                    position: position
-                });
-
-                self.element.append($span);
-                self.hit_areas.push($span);
-            }
-
-            var tree_left = self.element.offset().left;
-            var tree_width = self.element.width();
+            var hit_areas = [];
 
             groupPositions(function(positions_in_group, top, bottom) {
                 var area_height = (bottom - top) / positions_in_group.length;
                 var area_top = top;
 
                 $.each(positions_in_group, function() {
-                    addHitArea(
-                        this.node,
-                        {
-                            left: tree_left,
-                            top: area_top,
-                            width: tree_width,
-                            height: area_height
-                        },
-                        this.position
-                    );
+                    hit_areas.push({
+                        top: area_top,
+                        bottom: area_top + area_height,
+                        node: this.node,
+                        position: this.position
+                    });
 
                     area_top += area_height;
                 });
             });
+
+            this.hit_areas = hit_areas;
+        },
+
+        findHoveredArea: function(x, y) {
+            var tree_offset = this.element.offset();
+            if (
+                x < tree_offset.left ||
+                y < tree_offset.top ||
+                x > (tree_offset.left + this.element.width()) ||
+                y > (tree_offset.top + this.element.height())
+            ) {
+                return null;
+            }
+
+            var low = 0;
+            var high = this.hit_areas.length;
+            var area, mid;
+            while (low < high) {
+                mid = (low + high) >> 1;
+                area = this.hit_areas[mid];
+
+                if (y < area.top) {
+                    high = mid;
+                }
+                else if (y > area.bottom) {
+                    low = mid + 1;
+                }
+                else {
+                    return area;
+                }
+            }
+            return null;
         },
 
         _iterateVisibleNodes: function(
@@ -908,10 +899,6 @@ window.Tree = {};
         },
 
         _removeHitAreas: function() {
-            $.each(this.hit_areas, function() {
-                this.detach();
-            });
-
             this.hit_areas = [];
         },
 
