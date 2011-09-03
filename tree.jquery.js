@@ -679,6 +679,15 @@ window.Tree = {};
             return false;
         },
 
+        _mouseMove: function(event) {
+            // Prevent jqueryui from triggering mouseup in ie8.
+            if ($.browser.msie && document.documentMode == 8 && !event.button) {
+                event.button = 1;
+            }
+
+            return $.ui.mouse.prototype._mouseMove.call(this, event);
+        },
+
         _moveItem: function() {
             if (this.hovered_area) {
                 this.tree.moveNode(
