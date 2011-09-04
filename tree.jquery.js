@@ -26,19 +26,33 @@ limitations under the License.
 // todo: rename to jquery.tree.js? also css-file?
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
+// todo: display icon if position is invalid for dropping
+// todo: test on ie
+// todo: change onMustAddHitArea event to function that tests if move is legal
 
-_TestClasses = {};
+window.Tree = {};
 
 (function($) {
-    var indexOf = function(elem, array) {
-        for (var i = 0, length = array.length; i < length; i++) {
-            if (array[i] == elem) {
-                return i;
-            }
+    function indexOf(array, item) {
+        if (array.indexOf) {
+            return array.indexOf(item);
         }
+        else {
+            var i, l;
+            for (i = 0, l = array.length; i < l; i++) {
+                if (array[i] === item) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+    }
 
-        return -1;
-    };
+    // toJson function; copied from jsons2
+    var escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,meta={"\u0008":"\\b","\t":"\\t","\n":"\\n","\u000c":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"};
+    function toJson(p,g,h){function m(a){escapable.lastIndex=0;return escapable.test(a)?'"'+a.replace(escapable,function(a){var c=meta[a];return typeof c==="string"?c:"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4)})+'"':'"'+a+'"'}function j(g,h){var c,i,e,k,l=a,d,b=h[g];typeof f==="function"&&(b=f.call(h,g,b));switch(typeof b){case "string":return m(b);case "number":return isFinite(b)?String(b):"null";case "boolean":case "null":return String(b);case "object":if(!b)return"null";a+=n;d=[];if(Object.prototype.toString.apply(b)===
+    "[object Array]"){k=b.length;for(c=0;c<k;c+=1)d[c]=j(c,b)||"null";e=d.length===0?"[]":a?"[\n"+a+d.join(",\n"+a)+"\n"+l+"]":"["+d.join(",")+"]";a=l;return e}if(f&&typeof f==="object"){k=f.length;for(c=0;c<k;c+=1)typeof f[c]==="string"&&(i=f[c],(e=j(i,b))&&d.push(m(i)+(a?": ":":")+e))}else for(i in b)Object.prototype.hasOwnProperty.call(b,i)&&(e=j(i,b))&&d.push(m(i)+(a?": ":":")+e);e=d.length===0?"{}":a?"{\n"+a+d.join(",\n"+a)+"\n"+l+"}":"{"+d.join(",")+"}";a=l;return e}}var o,f,a="",n="";if(typeof h===
+    "number")for(o=0;o<h;o+=1)n+=" ";else typeof h==="string"&&(n=h);if((f=g)&&typeof g!=="function"&&(typeof g!=="object"||typeof g.length!=="number"))throw Error("JSON.stringify");return j("",{"":p})};
 
     var Position = {
         BEFORE: 1,
@@ -59,15 +73,15 @@ _TestClasses = {};
         }
     };
 
-    _TestClasses.Position = Position;
+    window.Tree.Position = Position;
 
     var Node = function(name) {
         this.init(name);
     };
 
-    _TestClasses.Node = Node;
+    window.Tree.Node = Node;
 
-    $.extend(Node.prototype, {
+    Node.prototype = {
         init: function(name) {
             this.name = name;
             this.children = [];
@@ -141,7 +155,7 @@ _TestClasses = {};
         Remove child.
 
         tree.removeChile(tree.children[0]);
-         */
+        */
         removeChild: function(node) {
             this.children.splice(
                 this.getChildIndex(node),
@@ -225,101 +239,19 @@ _TestClasses = {};
                 );
             }
             else if (position == Position.INSIDE) {
-                target_node.addChild(moved_node);
+                // move inside as first child
+                target_node.addChildAtPosition(moved_node, 0);
             }
         }
-    });
+    };
 
     Node.createFromData = function(data) {
-        var tree = new Tree();
+        var tree = new Node();
         tree.loadFromData(data);
         return tree;
     };
 
-    var Tree = Node;
-
-    _TestClasses.Tree = Tree;
-
-    var Area = function(left, top, right, bottom) {
-        this.init(left, top, right, bottom);
-    };
-
-    _TestClasses.Area = Area;
-
-    $.extend(Area.prototype, {
-         init: function(left, top, right, bottom) {
-             this.left = left;
-             this.top = top;
-             this.right = right;
-             this.bottom = bottom;
-
-             this.children = [];
-         },
-
-        addArea: function(area) {
-            this.children.push(area);
-        },
-
-        findIntersectingArea: function(area) {
-            if (! this.intersects(area)) {
-                return null;
-            }
-            else {
-                for (var i=0; i < this.children.length; i++) {
-                    var result = this.children[i].findIntersectingArea(area);
-                    if (result) {
-                        return result;
-                    }
-                }
-
-                return this;
-            }
-        },
-
-        intersects: function(area) {
-            return (
-                (this.bottom >= area.top) &&
-                (this.top <= area.bottom) &&
-                (this.right >= area.left) &&
-                (this.left <= area.right)
-            );
-        },
-
-        duplicate: function() {
-            return new Area(
-                this.left,
-                this.top,
-                this.right,
-                this.bottom
-            );
-        },
-
-        iterate: function(callback) {
-            callback(this);
-
-            $.each(this.children, function(i, area) {
-                area.iterate(callback);
-            });
-        },
-
-        setMinimumWidth: function(minimum_width) {
-            var width = this.right - this.left;
-            if (width < minimum_width) {
-                this.right = this.left + minimum_width;
-            }
-        }
-    });
-
-    Area.createFromElement = function($element) {
-        var offset = $element.offset();
-
-        return new Area(
-            offset.left,
-            offset.top,
-            offset.left + $element.outerWidth(),
-            offset.top + $element.outerHeight()
-        );
-    };
+    window.Tree.Tree = Node;
 
     $.widget("ui.tree", $.ui.mouse, {
         widgetEventPrefix: "tree",
@@ -335,8 +267,7 @@ _TestClasses = {};
             onGetStateFromStorage: null,
             onCreateLi: null,
             onMustAddHitArea: null,
-            onIsMoveHandle: null,
-            displayTestNodes: false
+            onIsMoveHandle: null
         },
 
         getTree: function() {
@@ -374,7 +305,7 @@ _TestClasses = {};
         },
 
         _create: function() {
-            this.tree = Tree.createFromData(this.options.data);
+            this.tree = Node.createFromData(this.options.data);
             this.selected_node = null;
             this._openNodes();
 
@@ -392,9 +323,9 @@ _TestClasses = {};
 
             this._mouseInit();
 
-            this.hovered_rectangle = null;
+            this.hovered_area = null;
             this.$ghost = null;
-            this.hint_nodes = [];
+            this.hit_areas = [];
         },
 
         destroy: function() {
@@ -425,20 +356,23 @@ _TestClasses = {};
                 selected_node = this.selected_node.id;
             }
 
-            return open_nodes.join(',') + ':' + selected_node;
+            return toJson({
+                open_nodes: open_nodes,
+                selected_node: selected_node
+            });
         },
 
         _setState: function(state) {
-            var strings = state.split(':');
-            var open_nodes = strings[0].split(',');
-            var selected_node_id = strings[1];
+            var data = $.parseJSON(state);
+            var open_nodes = data.open_nodes;
+            var selected_node_id = data.selected_node;
 
             var self = this;
             this.tree.iterate(function(node) {
                 if (
                     node.id &&
                     node.hasChildren() &&
-                    (indexOf(node.id, open_nodes) != -1)
+                    (indexOf(open_nodes, node.id) >= 0)
                 ) {
                     node.is_open = true;
                 }
@@ -660,8 +594,7 @@ _TestClasses = {};
             if (this.options.onIsMoveHandle && !this.options.onIsMoveHandle($element)) {
                 return null;
             }
-
-            this.current_item = this._getNodeElement($element);
+            this.current_item = this._getNodeElement($(event.target));
 
             return (this.current_item != null);
         },
@@ -671,30 +604,10 @@ _TestClasses = {};
                 return;
             }
 
-            var $element = this.current_item.$element;
-
-            //The element's absolute position on the page minus margins
-            var offset = $element.offset();
-
-            this.offset = {
-                top: offset.top - (parseInt($element.css("marginTop"), 10) || 0),
-                left: offset.left - (parseInt($element.css("marginLeft"), 10) || 0)
-            };
-
-            $.extend(this.offset, {
-                //Where the click happened, relative to the element
-                click: {
-                    left: event.pageX - this.offset.left,
-                    top: event.pageY - this.offset.top
-                }
-            });
-
-            $element.hide();
-
+            this.current_item.$element.hide();
             this._refreshHitAreas();
-
-            //Create and append the visible helper
             this.helper = this._createHelper();
+
             return true;
         },
 
@@ -703,45 +616,52 @@ _TestClasses = {};
                 return;
             }
 
-            //Compute the helpers position
-            this.position = this._generatePosition(event);
-            this.positionAbs = this.position;
-            this.helper.offset(this.position);
+            this.helper.offset({
+                left: event.pageX + 16,
+                top: event.pageY
+            });
 
-            var hovered_rectangle = this._findHoveredRectangle();
-
-            var cursor = this.helper.offset();
-            cursor.right = cursor.left + this.current_item.$element.outerWidth();
-            cursor.bottom = cursor.top + this.current_item.$element.outerHeight();
-
-            if (
-                ! ((hovered_rectangle) && hovered_rectangle.node)
-            ) {
-                this._removeGhost();
+            var area = this.findHoveredArea(event.pageX, event.pageY);
+            if (! area) {
+                this._removeDropHint();
                 this._removeHover();
                 this._stopOpenFolderTimer();
             }
             else {
-                if (this.hovered_rectangle != hovered_rectangle) {
-                    this.hovered_rectangle = hovered_rectangle;
+                if (this.hovered_area != area) {
+                    this.hovered_area = area;
 
-                    var $ghost = this._getGhost();
-                    $ghost.detach();
-
-                    this._stopOpenFolderTimer();
-                    var node = this.hovered_rectangle.node;
-
-                    if (node.hasChildren() && !node.is_open) {
-                        this._startOpenFolderTimer(node);
-                    }
-                    else {
-                        this._getNodeElementForNode(hovered_rectangle.node)
-                            .appendGhost($ghost, hovered_rectangle.move_to);
-                    }
+                    this._updateDropHint();
                 }
             }
 
             return true;
+        },
+
+        _updateDropHint: function() {
+            // stop open folder times
+            this._stopOpenFolderTimer();
+
+            if (! this.hovered_area) {
+                return;
+            }
+
+            // if this is a closed folder, start timer to open it
+            var node = this.hovered_area.node;
+            if (
+                node.hasChildren() &&
+                !node.is_open &&
+                this.hovered_area.position == Position.INSIDE
+            ) {
+                this._startOpenFolderTimer(node);
+            }
+
+            // remove previous drop hint
+            this._removeDropHint();
+
+            // add new drop hint
+            var node_element = this._getNodeElementForNode(this.hovered_area.node);
+            this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
         },
 
         _mouseStop: function() {
@@ -752,55 +672,39 @@ _TestClasses = {};
             this._moveItem();
             this._clear();
             this._removeHover();
-            this._removeGhost();
-            this._removeHintNodes();
+            this._removeDropHint();
+            this._removeHitAreas();
 
             this.current_item.$element.show();
             return false;
         },
 
-        _getPointerRectangle: function() {
-            var offset = this.helper.offset();
-
-            return {
-                left: offset.left,
-                top: offset.top,
-                right: offset.left + this.current_item.$element.outerWidth(),
-                bottom: offset.top + this.current_item.$element.outerHeight()
-            };
-        },
-
-        _findHoveredRectangle: function() {
-            return this.area.findIntersectingArea(
-                this._getPointerRectangle()
-            );
-        },
-
-        _getGhost: function() {
-             if (! this.$ghost) {
-                this.$ghost = this.current_item.createGhost();
-                this.element.append(this.$ghost);
+        _mouseMove: function(event) {
+            // Prevent jqueryui from triggering mouseup in ie8.
+            if ($.browser.msie && document.documentMode == 8 && !event.button) {
+                event.button = 1;
             }
-            return this.$ghost;
+
+            return $.ui.mouse.prototype._mouseMove.call(this, event);
         },
 
         _moveItem: function() {
-            if (this.hovered_rectangle) {
+            if (this.hovered_area) {
                 this.tree.moveNode(
                     this.current_item.node,
-                    this.hovered_rectangle.node,
-                    this.hovered_rectangle.move_to
+                    this.hovered_area.node,
+                    this.hovered_area.position
                 );
 
-                if (this.hovered_rectangle.move_to == Position.INSIDE) {
-                    this.hovered_rectangle.node.is_open = true;
+                if (this.hovered_area.position == Position.INSIDE) {
+                    this.hovered_area.node.is_open = true;
                 }
 
                 if (this.options.onMoveNode) {
                     this.options.onMoveNode(
                         this.current_item.node,
-                        this.hovered_rectangle.node,
-                        Position.getName(this.hovered_rectangle.move_to)
+                        this.hovered_area.node,
+                        Position.getName(this.hovered_area.position)
                     );
                 }
             }
@@ -821,211 +725,190 @@ _TestClasses = {};
             this.helper = null;
         },
 
-        _generatePosition: function(event) {
-            return {
-                left: event.pageX - this.offset.click.left,
-                top: event.pageY - this.offset.click.top
-            };
-        },
-
         _refreshHitAreas: function() {
-            this.area = this._generateAreaAndChildren();
-            this._removeHintNodes();
-
-            if (this.options.displayTestNodes) {
-                this.hint_nodes = this._createHintNodes(this.area);
-            }
+            this._removeHitAreas();
+            this._generateHitAreas();
         },
 
-        _generateAreaAndChildren: function() {
+        _generateHitAreas: function() {
             var self = this;
+            var positions = [];
+            var last_top = 0;
 
-            function getHitAreaForNode(node) {
-                var $element = $(node.element);
-
-                if (! $element.is(':visible')) {
-                    return null;
-                }
-
-                var $span = $element.find('span:first');
-                var offset = $span.offset();
-
-                var area = new Area(
-                    offset.left,
-                    offset.top,
-                    offset.left + $span.outerWidth(),
-                    offset.top + $span.outerHeight()
-                );
-
-                var height = area.bottom - area.top;
-                area.top += (height / 2) - 1;
-                area.bottom = area.top + 2;
-
-                area.name = node.name;
-                return area;
+            function getTop($element) {
+                return $element.offset().top;
             }
 
-            function getHitAreaForFolder(folder) {
-                var $li = $(folder.element);
-                var $span = $(folder.element).find('span:first');
-                var offset = $li.offset();
-                var span_height = $span.outerHeight();
-                var top = $li.offset().top + span_height;
-
-                var area = new Area(
-                    offset.left + 6,
-                    top,
-                    offset.left + 8,
-                    top + $li.height() - span_height
-                );
-                area.name = folder.name;
-                return area;
-            }
-
-            function addHitAreasForNode(node, parent_area) {
-                // after node
-                var node_area = getHitAreaForNode(node);
-                if (! node_area) {
-                    return;
-                }
-
-                var area = node_area.duplicate();
-                area.node = node;
-                area.name = node.name;
-                area.move_to = Position.AFTER;
-
-                area.left += 12;
-                area.right = area.left + 24;
-                area.color = 'blue';
-                parent_area.addArea(area);
-
-                // inside node
-                area = node_area.duplicate();
-                area.left += 36;
-                area.setMinimumWidth(24);
-
-                area.move_to = Position.INSIDE;
-                area.name = node.name;
-                area.node = node;
-                parent_area.addArea(area);
-            }
-
-            function addHitAreasForOpenFolder(folder, parent_area) {
-                // after folder
-                var area = getHitAreaForFolder(folder);
-                if (! area) {
-                    return;
-                }
-
-                area.node = folder;
-                area.name = folder.name;
-                area.move_to = Position.AFTER;
-                parent_area.addArea(area);
-
-                // before first child in folder
-                area = getHitAreaForNode(folder);
-                if (! area) {
-                    return;
-                }
-
-                area.node = folder.children[0];
-                area.move_to = Position.BEFORE;
-                area.name = folder.children[0].name;
-                parent_area.addArea(area);
-            }
-
-            function addHitAreasForClosedFolder(folder, parent_area) {
-                var area = getHitAreaForNode(folder);
-                if (! area) {
-                    return;
-                }
-
-                area.node = folder;
-                area.name = folder.name;
-                area.move_to = Position.INSIDE;
-                parent_area.addArea(area);
-            }
-
-            function addNodes(children, parent_area) {
-                $.each(children, function(i, node) {
-                    var area = Area.createFromElement($(node.element));
-                    area.name = node.name;
-                    parent_area.addArea(area);
-
-                    var must_add_hit_areas = true;
-                    if (self.options.onMustAddHitArea) {
-                        must_add_hit_areas = self.options.onMustAddHitArea(node);
-                    }
-
-                    if (must_add_hit_areas) {
-                        if (! node.hasChildren()) {
-                            addHitAreasForNode(node, area);
-                        }
-                        else {
-                            if (node.is_open) {
-                                addHitAreasForOpenFolder(node, area);
-                            }
-                            else {
-                                addHitAreasForClosedFolder(node, area);
-                            }
-                        }
-                    }
-
-                    if (node.hasChildren() && node.is_open) {
-                        addNodes(node.children, area);
-                    }
+            function addPosition(node, position, top) {
+                positions.push({
+                    top: top,
+                    node: node,
+                    position: position
                 });
+
+                last_top = top;
             }
 
-            var main_area = Area.createFromElement(this.element);
-            main_area.name = 'tree';
-            addNodes(this.tree.children, main_area);
-            return main_area;
-        },
+            function groupPositions(handle_group) {
+                var previous_top = -1;
+                var group = [];
 
-        _createHintNodes: function(main_area) {
-            var hint_nodes = [];
+                $.each(positions, function() {
+                    if (this.top != previous_top) {
+                        if (group.length) {
+                            handle_group(group, previous_top, this.top);
+                        }
 
-            var self = this;
-            main_area.iterate(function(area) {
-                if (area.node) {
-                    var color = area.color || '#000';
-                    var $span = $('<span class="hit"></span>');
-                    $span.css({
-                        position: 'absolute',
-                        left: area.left,
-                        top: area.top,
-                        display: 'block',
-                        width: area.right - area.left,
-                        height: area.bottom - area.top,
-                        opacity: '0.5',
-                        border: 'solid 1px ' + color
-                     });
-                    self.element.append($span);
-                    hint_nodes.push($span);
-                }
+                        previous_top = this.top;
+                        group = [];
+                    }
+
+                    group.push(this);
+                });
+
+                handle_group(
+                    group,
+                    previous_top,
+                    self.element.offset().top + self.element.height()
+                );
+            }
+
+            function handleNode(node, $element) {
+                var top = getTop($element);
+                addPosition(node, Position.INSIDE, top);
+                addPosition(node, Position.AFTER, top);
+            }
+
+            function handleOpenFolder(node, $element) {
+                addPosition(
+                    node,
+                    Position.INSIDE,
+                    getTop($element)
+                );
+            }
+
+            function handleAfterOpenFolder(node, $element) {
+                addPosition(node, Position.AFTER, last_top);
+            }
+
+            function handleClosedFolder(node, $element) {
+                var top = getTop($element);
+                addPosition(node, Position.INSIDE, top);
+                addPosition(node, Position.AFTER, top);
+            }
+
+            this._iterateVisibleNodes(
+                handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder
+            );
+
+            var hit_areas = [];
+
+            groupPositions(function(positions_in_group, top, bottom) {
+                var area_height = (bottom - top) / positions_in_group.length;
+                var area_top = top;
+
+                $.each(positions_in_group, function() {
+                    hit_areas.push({
+                        top: area_top,
+                        bottom: area_top + area_height,
+                        node: this.node,
+                        position: this.position
+                    });
+
+                    area_top += area_height;
+                });
             });
 
-            return hint_nodes;
+            this.hit_areas = hit_areas;
+        },
+
+        findHoveredArea: function(x, y) {
+            var tree_offset = this.element.offset();
+            if (
+                x < tree_offset.left ||
+                y < tree_offset.top ||
+                x > (tree_offset.left + this.element.width()) ||
+                y > (tree_offset.top + this.element.height())
+            ) {
+                return null;
+            }
+
+            var low = 0;
+            var high = this.hit_areas.length;
+            var area, mid;
+            while (low < high) {
+                mid = (low + high) >> 1;
+                area = this.hit_areas[mid];
+
+                if (y < area.top) {
+                    high = mid;
+                }
+                else if (y > area.bottom) {
+                    low = mid + 1;
+                }
+                else {
+                    return area;
+                }
+            }
+            return null;
+        },
+
+        _iterateVisibleNodes: function(
+            handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder
+        ) {
+            var self = this;
+
+            function iterate(node) {
+                if (node.element) {
+                    var $element = $(node.element);
+
+                    if (! $element.is(':visible')) {
+                        return;
+                    }
+
+                    if (self.options.onMustAddHitArea) {
+                        if (! self.options.onMustAddHitArea(node)) {
+                            return;
+                        }
+                    }
+
+                    if (! node.hasChildren()) {
+                        handle_node(node, $element);
+                    }
+                    else if (node.is_open) {
+                        handle_open_folder(node, $element);
+                    }
+                    else {
+                        handle_closed_folder(node, $element);
+                    }
+                }
+
+                if ((node.is_open || !node.element) && node.hasChildren()) {
+                    $.each(node.children, function() {
+                        iterate(this);
+                    });
+
+                    if (node.is_open) {
+                        handle_after_open_folder(node, $element);
+                    }
+                }
+            }
+
+            iterate(this.tree);
         },
 
         _removeHover: function() {
-            this.hovered_rectangle = null;
+            this.hovered_area = null;
         },
 
-        _removeGhost: function() {
-            if (this.$ghost) {
-                this.$ghost.remove();
-                this.$ghost = null;
+        _removeDropHint: function() {
+            if (this.previous_ghost) {
+                this.previous_ghost.remove();
             }
         },
 
-        _removeHintNodes: function() {
-            $.each(this.hint_nodes, function() {
-                this.detach();
-            });
-
-            this.hint_nodes = [];
+        _removeHitAreas: function() {
+            this.hit_areas = [];
         },
 
         _openNodes: function() {
@@ -1055,16 +938,17 @@ _TestClasses = {};
 
         _startOpenFolderTimer: function(folder) {
             var self = this;
-            this.open_folder_timer = setTimeout(
-                function() {
-                    self._getNodeElementForNode(folder).open(
-                        function() {
-                            self._refreshHitAreas();
-                        }
-                    );
-                },
-                500
-            );
+
+            function openFolder() {
+                self._getNodeElementForNode(folder).open(
+                    function() {
+                        self._refreshHitAreas();
+                        self._updateDropHint();
+                    }
+                );
+            }
+
+            this.open_folder_timer = setTimeout(openFolder, 500);
         },
 
         _stopOpenFolderTimer: function() {
@@ -1072,6 +956,77 @@ _TestClasses = {};
                 clearTimeout(this.open_folder_timer);
                 this.open_folder_timer = null;
             }
+        }
+    });
+
+    var GhostDropHint = function(node, $element, position) {
+        this.$element = $element;
+        var $span = $element.find('span:first');
+
+        this.node = node;
+
+        this.$ghost = $('<li class="ghost"><span class="circle"></span><span class="line"></span></li>');
+        this.$ghost.css({
+            width: $span.width() + 8
+        });
+
+        if (position == Position.AFTER) {
+            this.moveAfter();
+        }
+        else if (position == Position.BEFORE) {
+            this.moveBefore();
+        }
+        else if (position == Position.INSIDE) {
+            if (node.hasChildren() && node.is_open) {
+                this.moveInsideOpenFolder();
+            }
+            else {
+                this.moveInside();
+            }
+        }
+    };
+
+    $.extend(GhostDropHint.prototype, {
+        remove: function() {
+            this.$ghost.remove();
+        },
+
+        moveAfter: function() {
+            this.$element.after(this.$ghost);
+        },
+
+        moveBefore: function() {
+            this.$element.before(this.$ghost);
+        },
+
+        moveInsideOpenFolder: function() {
+            $(this.node.children[0].element).before(this.$ghost);
+        },
+
+        moveInside: function() {
+            this.$element.after(this.$ghost);
+            this.$ghost.addClass('inside');
+        }
+    });
+
+    var BorderDropHint = function($element) {
+        var $span = $element.find('span:first');
+        var offset = $span.offset();
+
+        this.$hint = $('<span class="border"></span>');
+        $element.append(this.$hint);
+
+        this.$hint.css({
+            left: offset.left - 4,
+            top: offset.top - 4,
+            width: $span.width() + 8,
+            height: $span.height() + 4
+        });
+    };
+
+    $.extend(BorderDropHint.prototype, {
+        remove: function() {
+            this.$hint.remove();
         }
     });
 
@@ -1099,34 +1054,17 @@ _TestClasses = {};
 
         createHelper: function() {
             var $helper = this.getSpan().clone();
-            $helper.addClass('dragging');
+            $helper.addClass('tree-dragging');
             return $helper;
         },
 
-        appendGhost: function($ghost, move_to) {
-            var classes = ['ghost'];
-
-            if (move_to == Position.AFTER) {
-                this.$element.after($ghost);
-
-                if (this.node.hasChildren()) {
-                    classes.push('folder');
-                }
+        addDropHint: function(position) {
+            if (position == Position.INSIDE) {
+                return new BorderDropHint(this.$element);
             }
-            else if (move_to == Position.BEFORE) {
-                this.$element.before($ghost);
+            else {
+                return new GhostDropHint(this.node, this.$element, position);
             }
-            else if (move_to == Position.INSIDE) {
-                this.$element.after($ghost);
-                classes.push('inside');
-            }
-
-            var $span = $ghost.children('span:first');
-            $span.attr('class', classes.join(' '));
-        },
-
-        createGhost: function() {
-           return $('<li><span class="ghost">'+ this.node.name +'</span></li>');
         },
 
         select: function() {
@@ -1190,6 +1128,15 @@ _TestClasses = {};
 
         getButton: function() {
             return this.$element.children('a.toggler');
+        },
+
+        addDropHint: function(position) {
+            if (! this.node.is_open && position == Position.INSIDE) {
+                return new BorderDropHint(this.$element);
+            }
+            else {
+                return new GhostDropHint(this.node, this.$element, position);
+            }
         }
     });
 })(jQuery);

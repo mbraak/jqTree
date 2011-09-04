@@ -1,9 +1,5 @@
 $(function() {
 
-var Tree = _TestClasses.Tree;
-var Node = _TestClasses.Node;
-var Position = _TestClasses.Position;
-
 var example_data = [
     {
         label: 'node1',
@@ -243,7 +239,7 @@ test('getSelectedNode', function() {
 
 module("Tree");
 test("create tree from data", function() {
-    var tree = new Tree();
+    var tree = new Tree.Tree();
     tree.loadFromData(example_data);
 
     equal(
@@ -269,12 +265,12 @@ test("create tree from data", function() {
 });
 
 test("tree addChild", function() {
-    var tree = new Tree('tree1');
+    var tree = new Tree.Tree('tree1');
     tree.addChild(
-        new Node('abc')
+        new Tree.Node('abc')
     );
     tree.addChild(
-        new Node('def')
+        new Tree.Node('def')
     );
 
     equal(
@@ -292,11 +288,11 @@ test("tree addChild", function() {
 });
 
 test('tree addChildAtPosition', function() {
-    var tree = new Tree();
-    tree.addChildAtPosition(new Node('abc'), 0);  // first
-    tree.addChildAtPosition(new Node('ghi'), 2);  // index 2 does not exist
-    tree.addChildAtPosition(new Node('def'), 1);
-    tree.addChildAtPosition(new Node('123'), 0);
+    var tree = new Tree.Tree();
+    tree.addChildAtPosition(new Tree.Node('abc'), 0);  // first
+    tree.addChildAtPosition(new Tree.Node('ghi'), 2);  // index 2 does not exist
+    tree.addChildAtPosition(new Tree.Node('def'), 1);
+    tree.addChildAtPosition(new Tree.Node('123'), 0);
 
     equal(
         format_nodes(tree.children),
@@ -306,11 +302,11 @@ test('tree addChildAtPosition', function() {
 });
 
 test('tree removeChild', function() {
-    var tree = new Tree();
+    var tree = new Tree.Tree();
 
-    var abc = new Node('abc');
-    var def = new Node('def');
-    var ghi = new Node('ghi');
+    var abc = new Tree.Node('abc');
+    var def = new Tree.Node('def');
+    var ghi = new Tree.Node('ghi');
     tree.addChild(abc);
     tree.addChild(def);
     tree.addChild(ghi);
@@ -347,11 +343,11 @@ test('tree removeChild', function() {
 });
 
 test('tree getChildIndex', function() {
-    var tree = new Tree();
+    var tree = new Tree.Tree();
 
-    var abc = new Node('abc');
-    var def = new Node('def');
-    var ghi = new Node('ghi');
+    var abc = new Tree.Node('abc');
+    var def = new Tree.Node('def');
+    var ghi = new Tree.Node('ghi');
     tree.addChild(abc);
     tree.addChild(def);
     tree.addChild(ghi);
@@ -364,14 +360,14 @@ test('tree getChildIndex', function() {
 });
 
 test('tree hasChildren', function() {
-    var tree = new Tree();
+    var tree = new Tree.Tree();
     equal(
         tree.hasChildren(),
         false,
         'tree without children'
     );
 
-    tree.addChild(new Node('abc'));
+    tree.addChild(new Tree.Node('abc'));
     equal(
         tree.hasChildren(),
         true,
@@ -380,7 +376,7 @@ test('tree hasChildren', function() {
 });
 
 test('tree iterate', function() {
-    var tree = new Tree();
+    var tree = new Tree.Tree();
     tree.loadFromData(example_data);
 
     // iterate over all the nodes
@@ -415,7 +411,15 @@ test('tree iterate', function() {
 });
 
 test('tree moveNode', function() {
-    var tree = Tree.createFromData(example_data);
+    var tree = Tree.Tree.createFromData(example_data);
+
+    /*
+      node1
+      ---child1
+      ---child2
+      node2
+      ---child3
+    */
 
     var node1 = tree.children[0];
     var node2 = tree.children[1];
@@ -425,7 +429,15 @@ test('tree moveNode', function() {
     equal(child2.name, 'child2', 'child2 name');
 
     // move child2 after node2
-    tree.moveNode(child2, node2, Position.AFTER);
+    tree.moveNode(child2, node2, Tree.Position.AFTER);
+
+    /*
+      node1
+      ---child1
+      node2
+      ---child3
+      child2
+    */
     equal(
         format_nodes(tree.children),
         'node1 node2 child2',
@@ -438,23 +450,40 @@ test('tree moveNode', function() {
     );
 
     // move child1 inside node2
-    tree.moveNode(child1, node2, Position.INSIDE);
+    // this means it's the first child
+    tree.moveNode(child1, node2, Tree.Position.INSIDE);
+
+    /*
+      node1
+      node2
+      ---child1
+      ---child3
+      child2
+    */
     equal(
         format_nodes(node2.children),
-        'child3 child1',
+        'child1 child3',
         'node2 children'
     );
     equal(
         format_nodes(node1.children),
         '',
-        'node2 children'
+        'node1 has no children'
     );
 
     // move child2 before child1
-    tree.moveNode(child2, child1, Position.BEFORE);
+    tree.moveNode(child2, child1, Tree.Position.BEFORE);
+
+    /*
+      node1
+      node2
+      ---child2
+      ---child1
+      ---child3
+    */
     equal(
         format_nodes(node2.children),
-        'child3 child2 child1',
+        'child2 child1 child3',
         'node2 children'
     );
     equal(
