@@ -71,11 +71,11 @@ test("create jqtree from data", function() {
         'first child is li.folder.closed'
     );
     ok(
-        $('#tree1 ul.tree li:eq(0) > a:first').is('a.toggler.closed'),
+        $('#tree1 ul.tree li:eq(0) > div > a.toggler').is('a.toggler.closed'),
         'button in first folder'
     );
     equal(
-        $('#tree1 ul.tree li:eq(0) > span').text(),
+        $('#tree1 ul.tree li:eq(0) > div span.title').text(),
         'node1'
     );
 });

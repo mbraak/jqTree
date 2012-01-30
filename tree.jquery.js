@@ -15,11 +15,9 @@ limitations under the License.
 */
 // todo: check for invalid move
 // todo: drag handle
-// todo: display move hint
 // todo: change cursor for moving / over node that can be moved
 // todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
 // todo: use jqueryui icons for folder triangles
-// todo: documentation
 // todo: scroll while moving a node?
 // todo: smooth animation while moving node
 // todo: plugins (also for dnd and state)?
@@ -27,7 +25,6 @@ limitations under the License.
 // todo: move a node to root position
 // todo: prevent accidental move on touchpad
 // todo: display icon if position is invalid for dropping
-// todo: test on ie
 // todo: change onMustAddHitArea event to function that tests if move is legal
 
 window.Tree = {};
@@ -460,7 +457,7 @@ window.Tree = {};
             }
 
             function createNodeLi(node) {
-                return $('<li><span>'+ node.name +'</span></li>');
+                return $('<li><div><span class="title">'+ node.name +'</span></div></li>');
             }
 
             function createFolderLi(node) {
@@ -470,7 +467,7 @@ window.Tree = {};
                     button_classes.push('closed');
                 }
 
-                var $li = $('<li><a class="'+ button_classes.join(' ') +'">&raquo;</a><span>'+ node.name +'</span></li>');
+                var $li = $('<li><div><a class="'+ button_classes.join(' ') +'">&raquo;</a><span class="title">'+ node.name +'</span></div></li>');
 
                 // todo: add li class in text
                 var folder_classes = ['folder'];
@@ -509,7 +506,7 @@ window.Tree = {};
 
             var $target = $(e.target);
 
-            if ($target.is('a.toggler')) {
+            if ($target.is('.toggler')) {
                 var node_element = this._getNodeElement($target);
                 if (node_element && (node_element.node.hasChildren())) {
                     node_element.toggle();
@@ -522,13 +519,17 @@ window.Tree = {};
                     e.stopPropagation();
                 }
             }
-            else if ($target.is('span')) {
+            else if ($target.is('div') || $target.is('span')) {
                 var node = this._getNode($target);
                 if (node) {
-                    this.selectNode(node);
+                    var must_select = true;
 
                     if (this.options.onClick) {
-                        this.options.onClick(node);
+                        must_select = this.options.onClick(node);
+                    }
+
+                    if (must_select) {
+                        this.selectNode(node);
                     }
                 }
             }
@@ -539,13 +540,9 @@ window.Tree = {};
                 return;
             }
 
-            var $target = $(e.target);
-
-            if (
-                ($target.is('span')) &&
-                (! $target.is('span.folder'))
-            ) {
-                var node = this._getNode($target);
+            var $div = $(e.target).closest('ul.tree div');
+            if ($div.length) {
+                var node = this._getNode($div);
                 if (node) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -961,14 +958,9 @@ window.Tree = {};
 
     var GhostDropHint = function(node, $element, position) {
         this.$element = $element;
-        var $span = $element.find('span:first');
 
         this.node = node;
-
         this.$ghost = $('<li class="ghost"><span class="circle"></span><span class="line"></span></li>');
-        this.$ghost.css({
-            width: $span.width() + 8
-        });
 
         if (position == Position.AFTER) {
             this.moveAfter();
@@ -1010,17 +1002,15 @@ window.Tree = {};
     });
 
     var BorderDropHint = function($element) {
-        var $span = $element.find('span:first');
-        var offset = $span.offset();
+        var $div = $element.children('div');
+        var width = $element.width() - 4;
 
         this.$hint = $('<span class="border"></span>');
-        $element.append(this.$hint);
+        $div.append(this.$hint);
 
         this.$hint.css({
-            left: offset.left - 4,
-            top: offset.top - 4,
-            width: $span.width() + 8,
-            height: $span.height() + 4
+            width: width,
+            height: $div.height() - 4
         });
     };
 
@@ -1045,7 +1035,7 @@ window.Tree = {};
         },
 
         getSpan: function() {
-            return this.$element.children('span:first');
+            return this.$element.children('div').find('span.title');
         },
 
         getLi: function() {
@@ -1068,11 +1058,11 @@ window.Tree = {};
         },
 
         select: function() {
-            this.getSpan().addClass('selected');
+            this.getLi().addClass('selected');
         },
 
         deselect: function() {
-            this.getSpan().removeClass('selected');
+            this.getLi().removeClass('selected');
         }
     });
 
@@ -1127,7 +1117,7 @@ window.Tree = {};
         },
 
         getButton: function() {
-            return this.$element.children('a.toggler');
+            return this.$element.children('div').find('a.toggler');
         },
 
         addDropHint: function(position) {
