@@ -29,6 +29,7 @@ ul.tree .toggler {
 	position: absolute;
 	left: -12px;
 	text-indent: -9999px;
+	border-bottom: none;
 }
 
 ul.tree div {
