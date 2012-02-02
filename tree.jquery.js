@@ -270,32 +270,32 @@ window.Tree = {};
         getTree: function() {
             return this.tree;
         },
-		
-		toJson: function () {
-			return toJson(this._prepareForJson(this.getTree().children));
-		},
-				
-		_prepareForJson: function (tree) {
-			var t = [];
-			var self = this;
-			
-			$.each(tree, function () {
-				delete this.parent; // We remove the parent property to avoid JSON.stringify error with circular references.
-				delete this.element; // The element is not really needed in the json representation.
-				
-				if (this.hasChildren()) {
-					var children = this.children;
-					delete this.children;
-					
-					this.children = self._prepareForJson(children);
-				}
-				
-				t.push(this);
-			});
-			
-			return t;
-		},
-		
+        
+        toJson: function () {
+            return toJson(this._prepareForJson(this.getTree().children));
+        },
+        
+        _prepareForJson: function (tree) {
+            var t = [];
+            var self = this;
+            
+            $.each(tree, function () {
+                delete this.parent; // We remove the parent property to avoid JSON.stringify error with circular references.
+                delete this.element; // The element is not really needed in the json representation.
+                
+                if (this.hasChildren()) {
+                    var children = this.children;
+                    delete this.children;
+                    
+                    this.children = self._prepareForJson(children);
+                }
+            
+                t.push(this);
+            });
+            
+            return t;
+        },
+
         // todo: is toggle really used?
         toggle: function(node, on_finished) {
             if (node.hasChildren()) {
