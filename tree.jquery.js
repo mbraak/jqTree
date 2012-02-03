@@ -90,7 +90,6 @@ window.Tree = {};
             this.children = [];
             var self = this;
             $.each(data, function (key, value) {
-                console.log(key, value);
                 if (key != 'label') {
                     if (key == 'children') {
                         var c = new Node();
