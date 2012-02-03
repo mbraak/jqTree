@@ -280,17 +280,15 @@ window.Tree = {};
             var self = this;
             
             $.each(tree, function () {
-                delete this.parent; // We remove the parent property to avoid JSON.stringify error with circular references.
-                delete this.element; // The element is not really needed in the json representation.
+            	var tmp_node = $.extend({}, this);
+                delete tmp_node.parent; // We remove the parent property to avoid JSON.stringify error with circular references.
+                delete tmp_node.element; // The element is not really needed in the json representation.
                 
                 if (this.hasChildren()) {
-                    var children = this.children;
-                    delete this.children;
-                    
-                    this.children = self._prepareForJson(children);
+                    tmp_node.children = self._prepareForJson(this.children);
                 }
             
-                t.push(this);
+                t.push(tmp_node);
             });
             
             return t;
