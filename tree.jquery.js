@@ -85,6 +85,24 @@ window.Tree = {};
             this.parent = null;
         },
 
+        /* Init Node from data without making it the root of the tree */
+        initFromData: function (data) {
+            this.children = [];
+            var self = this;
+            $.each(data, function (key, value) {
+                console.log(key, value);
+                if (key != 'label') {
+                    if (key == 'children') {
+                        var c = new Node();
+                        c.initFromData(value)
+                        self.addChild(c);
+                    } else {
+                        self[key] = value;
+                    }
+                }
+            });
+        },
+
         /* Create tree from data.
 
           Structure of data is:
@@ -122,7 +140,7 @@ window.Tree = {};
                 }
             });
         },
-
+        
         /*
         Add child.
 
@@ -134,7 +152,7 @@ window.Tree = {};
             this.children.push(node);
             node.parent = this;
         },
-
+        
         /*
         Add child at position. Index starts at 0.
 
@@ -293,7 +311,16 @@ window.Tree = {};
             
             return t;
         },
-
+        
+        addNode: function (data) {
+            var n = new Node(data.label);
+            
+            n.initFromData(data);
+            this.getTree().addChild(n);
+            this.element.empty();
+            this._createDomElements(this.getTree());
+        },
+        
         // todo: is toggle really used?
         toggle: function(node, on_finished) {
             if (node.hasChildren()) {
