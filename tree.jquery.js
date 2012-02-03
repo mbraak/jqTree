@@ -85,6 +85,23 @@ window.Tree = {};
             this.parent = null;
         },
 
+        /* Init Node from data without making it the root of the tree */
+        initFromData: function (data) {
+            this.children = [];
+            var self = this;
+            $.each(data, function (key, value) {
+                if (key != 'label') {
+                    if (key == 'children') {
+                        var c = new Node();
+                        c.initFromData(value)
+                        self.addChild(c);
+                    } else {
+                        self[key] = value;
+                    }
+                }
+            });
+        },
+
         /* Create tree from data.
 
           Structure of data is:
@@ -122,7 +139,7 @@ window.Tree = {};
                 }
             });
         },
-
+        
         /*
         Add child.
 
@@ -134,7 +151,7 @@ window.Tree = {};
             this.children.push(node);
             node.parent = this;
         },
-
+        
         /*
         Add child at position. Index starts at 0.
 
@@ -270,7 +287,39 @@ window.Tree = {};
         getTree: function() {
             return this.tree;
         },
-
+        
+        toJson: function () {
+            return toJson(this._prepareForJson(this.getTree().children));
+        },
+        
+        _prepareForJson: function (tree) {
+            var t = [];
+            var self = this;
+            
+            $.each(tree, function () {
+            	var tmp_node = $.extend({}, this);
+                delete tmp_node.parent; // We remove the parent property to avoid JSON.stringify error with circular references.
+                delete tmp_node.element; // The element is not really needed in the json representation.
+                
+                if (this.hasChildren()) {
+                    tmp_node.children = self._prepareForJson(this.children);
+                }
+            
+                t.push(tmp_node);
+            });
+            
+            return t;
+        },
+        
+        addNode: function (data) {
+            var n = new Node(data.label);
+            
+            n.initFromData(data);
+            this.getTree().addChild(n);
+            this.element.empty();
+            this._createDomElements(this.getTree());
+        },
+        
         // todo: is toggle really used?
         toggle: function(node, on_finished) {
             if (node.hasChildren()) {
