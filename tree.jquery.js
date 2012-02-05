@@ -86,20 +86,32 @@ window.Tree = {};
         },
 
         /* Init Node from data without making it the root of the tree */
-        initFromData: function (data) {
-            this.children = [];
+        initFromData: function(data) {
             var self = this;
-            $.each(data, function (key, value) {
-                if (key != 'label') {
+
+            function addNode(node_data) {
+                $.each(node_data, function(key, value) {
                     if (key == 'children') {
-                        var c = new Node();
-                        c.initFromData(value)
-                        self.addChild(c);
-                    } else {
+                        addChildren(value);
+                    }
+                    else if (key == 'label') {
+                        self['name'] = value;
+                    }
+                    else {
                         self[key] = value;
                     }
+                });
+
+                function addChildren(children_data) {
+                    $.each(children_data, function() {
+                        var node = new Node();
+                        node.initFromData(this);
+                        self.addChild(node);
+                    });
                 }
-            });
+            }
+
+            addNode(data);
         },
 
         /* Create tree from data.
@@ -151,7 +163,7 @@ window.Tree = {};
             this.children.push(node);
             node.parent = this;
         },
-        
+
         /*
         Add child at position. Index starts at 0.
 
@@ -323,15 +335,14 @@ window.Tree = {};
             );
         },
 
-        addNode: function (data) {
-            var n = new Node(data.label);
-            
+        addNode: function(data) {
+            var n = new Node();
             n.initFromData(data);
             this.getTree().addChild(n);
             this.element.empty();
             this._createDomElements(this.getTree());
         },
-        
+
         // todo: is toggle really used?
         toggle: function(node, on_finished) {
             if (node.hasChildren()) {
