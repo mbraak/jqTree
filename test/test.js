@@ -491,6 +491,28 @@ test('tree moveNode', function() {
         'node1 node2',
         'tree nodes at first level'
     );
+
+    test("tree toJson", function() {
+        // setup
+        var $tree = $('#tree1');
+        $tree.tree({
+            data: example_data
+        });
+
+        // 1. call toJson
+        equal(
+            $tree.tree('toJson'),
+            '[{"name":"node1","children":'+
+            '[{"name":"child1"},{"name":"child2"}],"id":123},'+
+            '{"name":"node2","children":[{"name":"child3"}],"id":124}]'
+        );
+
+        // Check that properties 'children', 'parent' and 'element' still exist.
+        var tree = $tree.tree('getTree');
+        equal(tree.children.length, 2);
+        ok(tree.children[0].parent != undefined, 'parent');
+        ok($(tree.children[0].element).is('li'), 'element');
+    });
 })
 
 });
