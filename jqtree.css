@@ -69,6 +69,7 @@ span.tree-dragging {
 ul.tree li.ghost {
 	position: relative;
 	z-index: 10;
+	margin-right: 10px;
 }
 
 ul.tree li.ghost span {

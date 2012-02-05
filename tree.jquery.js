@@ -85,6 +85,35 @@ window.Tree = {};
             this.parent = null;
         },
 
+        /* Init Node from data without making it the root of the tree */
+        initFromData: function(data) {
+            var self = this;
+
+            function addNode(node_data) {
+                $.each(node_data, function(key, value) {
+                    if (key == 'children') {
+                        addChildren(value);
+                    }
+                    else if (key == 'label') {
+                        self['name'] = value;
+                    }
+                    else {
+                        self[key] = value;
+                    }
+                });
+
+                function addChildren(children_data) {
+                    $.each(children_data, function() {
+                        var node = new Node();
+                        node.initFromData(this);
+                        self.addChild(node);
+                    });
+                }
+            }
+
+            addNode(data);
+        },
+
         /* Create tree from data.
 
           Structure of data is:
@@ -122,7 +151,7 @@ window.Tree = {};
                 }
             });
         },
-
+        
         /*
         Add child.
 
@@ -239,6 +268,35 @@ window.Tree = {};
                 // move inside as first child
                 target_node.addChildAtPosition(moved_node, 0);
             }
+        },
+
+        /*
+        Get the tree as data.
+        */
+        getData: function() {
+            function getDataFromNodes(nodes) {
+                var data = [];
+
+                $.each(nodes, function () {
+                    var tmp_node = $.extend({}, this);
+                    delete tmp_node.parent;  // We remove the parent property to avoid JSON.stringify error with circular references.
+                    delete tmp_node.element;  // The element is not really needed in the json representation.
+
+                    if (this.hasChildren()) {
+                        tmp_node.children = getDataFromNodes(this.children);
+                    }
+                    else {
+                        // This element has no children.
+                        delete tmp_node.children;
+                    }
+
+                    data.push(tmp_node);
+                });
+
+                return data;
+            }
+
+            return getDataFromNodes(this.children);
         }
     };
 
@@ -269,6 +327,20 @@ window.Tree = {};
 
         getTree: function() {
             return this.tree;
+        },
+
+        toJson: function() {
+            return toJson(
+                this.tree.getData()
+            );
+        },
+
+        addNode: function(data) {
+            var n = new Node();
+            n.initFromData(data);
+            this.getTree().addChild(n);
+            this.element.empty();
+            this._createDomElements(this.getTree());
         },
 
         // todo: is toggle really used?
