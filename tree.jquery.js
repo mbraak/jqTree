@@ -708,7 +708,7 @@ window.Tree = {};
         },
 
         _updateDropHint: function() {
-            // stop open folder times
+            // stop open folder timer
             this._stopOpenFolderTimer();
 
             if (! this.hovered_area) {
