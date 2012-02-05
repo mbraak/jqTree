@@ -866,6 +866,17 @@ window.Tree = {};
                 addPosition(node, Position.AFTER, top);
             }
 
+            // Before first node
+            if (this.tree.hasChildren()) {
+                var node = this.tree.children[0];
+
+                addPosition(
+                    node,
+                    Position.BEFORE,
+                    getTop($(node.element))
+                );
+            }
+
             this._iterateVisibleNodes(
                 handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder
             );
