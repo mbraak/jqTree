@@ -256,6 +256,35 @@ window.Tree = {};
                 // move inside as first child
                 target_node.addChildAtPosition(moved_node, 0);
             }
+        },
+
+        /*
+        Get the tree as data.
+        */
+        getData: function() {
+            function getDataFromNodes(nodes) {
+                var data = [];
+
+                $.each(nodes, function () {
+                    var tmp_node = $.extend({}, this);
+                    delete tmp_node.parent;  // We remove the parent property to avoid JSON.stringify error with circular references.
+                    delete tmp_node.element;  // The element is not really needed in the json representation.
+
+                    if (this.hasChildren()) {
+                        tmp_node.children = getDataFromNodes(this.children);
+                    }
+                    else {
+                        // This element has no children.
+                        delete tmp_node.children;
+                    }
+
+                    data.push(tmp_node);
+                });
+
+                return data;
+            }
+
+            return getDataFromNodes(this.children);
         }
     };
 
@@ -287,30 +316,13 @@ window.Tree = {};
         getTree: function() {
             return this.tree;
         },
-        
-        toJson: function () {
-            return toJson(this._prepareForJson(this.getTree().children));
+
+        toJson: function() {
+            return toJson(
+                this.tree.getData()
+            );
         },
-        
-        _prepareForJson: function (tree) {
-            var t = [];
-            var self = this;
-            
-            $.each(tree, function () {
-            	var tmp_node = $.extend({}, this);
-                delete tmp_node.parent; // We remove the parent property to avoid JSON.stringify error with circular references.
-                delete tmp_node.element; // The element is not really needed in the json representation.
-                
-                if (this.hasChildren()) {
-                    tmp_node.children = self._prepareForJson(this.children);
-                }
-            
-                t.push(tmp_node);
-            });
-            
-            return t;
-        },
-        
+
         addNode: function (data) {
             var n = new Node(data.label);
             
