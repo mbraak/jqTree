@@ -151,7 +151,7 @@ window.Tree = {};
                 }
             });
         },
-        
+
         /*
         Add child.
 
@@ -928,17 +928,16 @@ window.Tree = {};
             var self = this;
 
             function iterate(node) {
-                if (node.element) {
+                var must_add = (
+                    (! self.options.onMustAddHitArea) ||
+                    (self.options.onMustAddHitArea(node))
+                );
+
+                if (must_add && node.element) {
                     var $element = $(node.element);
 
                     if (! $element.is(':visible')) {
                         return;
-                    }
-
-                    if (self.options.onMustAddHitArea) {
-                        if (! self.options.onMustAddHitArea(node)) {
-                            return;
-                        }
                     }
 
                     if (! node.hasChildren()) {
@@ -957,7 +956,7 @@ window.Tree = {};
                         iterate(this);
                     });
 
-                    if (node.is_open) {
+                    if (must_add && node.is_open) {
                         handle_after_open_folder(node, $element);
                     }
                 }
