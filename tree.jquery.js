@@ -315,14 +315,14 @@ window.Tree = {};
             saveState: false,  // true / false / string (cookie name)
             dragAndDrop: false,
             selectable: false,
-            onClick: null,  // todo: renamed to onClickNode?
-            onContextMenu: null,
+            onCanSelectNode: null,
             onMoveNode: null,
             onSetStateFromStorage: null,
             onGetStateFromStorage: null,
             onCreateLi: null,
             onMustAddHitArea: null,
-            onIsMoveHandle: null
+            onIsMoveHandle: null,
+            onCanMove: null
         },
 
         getTree: function() {
@@ -594,24 +594,21 @@ window.Tree = {};
             else if ($target.is('div') || $target.is('span')) {
                 var node = this._getNode($target);
                 if (node) {
-                    var must_select = true;
-
-                    if (this.options.onClick) {
-                        must_select = this.options.onClick(node);
-                    }
-
-                    if (must_select) {
+                    if (
+                        (! this.options.onCanSelectNode) ||
+                        (this.options.onCanSelectNode(node))
+                    ) {
                         this.selectNode(node);
+
+                        var event = jQuery.Event('tree.click');
+                        event.node = node;
+                        this.element.trigger(event);
                     }
                 }
             }
         },
 
         _contextmenu: function(e) {
-            if (! this.options.onContextMenu) {
-                return;
-            }
-
             var $div = $(e.target).closest('ul.tree div');
             if ($div.length) {
                 var node = this._getNode($div);
@@ -619,7 +616,9 @@ window.Tree = {};
                     e.preventDefault();
                     e.stopPropagation();
 
-                    this.options.onContextMenu(e, node);
+                    var event = jQuery.Event('tree.contextmenu');
+                    event.node = node;
+                    this.element.trigger(event);
                     return false;
                 }
             }
@@ -691,6 +690,15 @@ window.Tree = {};
             });
 
             var area = this.findHoveredArea(event.pageX, event.pageY);
+
+            if (area && this.options.onCanMove) {
+                var position_name = Position.getName(area.position);
+
+                if (! this.options.onCanMove(area.node, position_name)) {
+                    area = null;
+                }
+            }
+
             if (! area) {
                 this._removeDropHint();
                 this._removeHover();
@@ -864,6 +872,17 @@ window.Tree = {};
                 var top = getTop($element);
                 addPosition(node, Position.INSIDE, top);
                 addPosition(node, Position.AFTER, top);
+            }
+
+            // Before first node
+            if (this.tree.hasChildren()) {
+                var node = this.tree.children[0];
+
+                addPosition(
+                    node,
+                    Position.BEFORE,
+                    getTop($(node.element))
+                );
             }
 
             this._iterateVisibleNodes(
