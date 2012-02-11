@@ -128,13 +128,13 @@ test("click event", function() {
 
     // create tree
     var $tree = $('#tree1');
-
     $tree.tree({
-        data: example_data,
-        onClick: function(node) {
-            start();
-            equal(node.name, 'node1');
-        }
+        data: example_data
+    });
+
+    $tree.bind('tree.click', function(e) {
+        start();
+        equal(e.node.name, 'node1');
     });
 
     // click on node1
