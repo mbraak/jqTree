@@ -618,6 +618,7 @@ window.Tree = {};
 
                     var event = jQuery.Event('tree.contextmenu');
                     event.node = node;
+                    event.click_event = e;
                     this.element.trigger(event);
                     return false;
                 }
@@ -662,8 +663,16 @@ window.Tree = {};
             if (this.options.onIsMoveHandle && !this.options.onIsMoveHandle($element)) {
                 return null;
             }
-            this.current_item = this._getNodeElement($(event.target));
 
+            var node_element = this._getNodeElement($(event.target));
+
+            if (node_element && this.options.onCanMove) {
+                if (! this.options.onCanMove(node_element.node)) {
+                    node_element = null;
+                }
+            }
+
+            this.current_item = node_element;
             return (this.current_item != null);
         },
 
@@ -694,7 +703,7 @@ window.Tree = {};
             if (area && this.options.onCanMove) {
                 var position_name = Position.getName(area.position);
 
-                if (! this.options.onCanMove(area.node, position_name)) {
+                if (! this.options.onCanMove(this.current_item.node, area.node, position_name)) {
                     area = null;
                 }
             }
@@ -947,16 +956,17 @@ window.Tree = {};
             var self = this;
 
             function iterate(node) {
-                var must_add = (
-                    (! self.options.onMustAddHitArea) ||
-                    (self.options.onMustAddHitArea(node))
-                );
-
-                if (must_add && node.element) {
+                if (node.element) {
                     var $element = $(node.element);
 
                     if (! $element.is(':visible')) {
                         return;
+                    }
+
+                    if (self.options.onMustAddHitArea) {
+                        if (! self.options.onMustAddHitArea(node)) {
+                            return;
+                        }
                     }
 
                     if (! node.hasChildren()) {
@@ -975,7 +985,7 @@ window.Tree = {};
                         iterate(this);
                     });
 
-                    if (must_add && node.is_open) {
+                    if (node.is_open) {
                         handle_after_open_folder(node, $element);
                     }
                 }
