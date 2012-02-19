@@ -684,6 +684,8 @@ window.Tree = {};
             this._refreshHitAreas();
             this.helper = this._createHelper();
 
+            this.current_item.$element.addClass('moving');
+
             return true;
         },
 
@@ -760,7 +762,8 @@ window.Tree = {};
             this._removeDropHint();
             this._removeHitAreas();
 
-            this.current_item.$element.show();
+            this.current_item.$element.removeClass('moving');
+
             return false;
         },
 

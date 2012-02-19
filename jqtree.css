@@ -127,3 +127,7 @@ ul.tree li.selected > div:hover {
 	background: -moz-linear-gradient(top, #BEE0F5, #89AFCA);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
+
+ul.tree .moving > div .title {
+	border: dashed 1px #0000ff;
+}
