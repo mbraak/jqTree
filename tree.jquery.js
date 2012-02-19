@@ -55,6 +55,7 @@ window.Tree = {};
         BEFORE: 1,
         AFTER: 2,
         INSIDE: 3,
+        NONE: 4,
 
         getName: function(position) {
             return this._getNames()[position];
@@ -66,6 +67,7 @@ window.Tree = {};
             names[Position.BEFORE] = 'before';
             names[Position.AFTER] = 'after';
             names[Position.INSIDE] = 'inside';
+            names[Position.NONE] = 'none';
             return names;
         }
     };
@@ -777,7 +779,10 @@ window.Tree = {};
         },
 
         _moveItem: function() {
-            if (this.hovered_area) {
+            if (
+                (this.hovered_area) &&
+                (this.hovered_area.position != Position.NONE)
+            ) {
                 this.tree.moveNode(
                     this.current_item.node,
                     this.hovered_area.node,
@@ -795,10 +800,10 @@ window.Tree = {};
                         Position.getName(this.hovered_area.position)
                     );
                 }
-            }
 
-            this.element.empty();
-            this._createDomElements(this.tree);
+                this.element.empty();
+                this._createDomElements(this.tree);
+            }
         },
 
         _createHelper: function() {
@@ -862,20 +867,24 @@ window.Tree = {};
             }
 
             function handleNode(node, next_node, $element) {
-                // Cannot move inside, after or before current item
+                var top = getTop($element);
+
                 if (
-                    (node != self.current_item.node) &&
-                    (next_node != self.current_item.node)
+                    (node == self.current_item.node) ||
+                    (next_node == self.current_item.node)
                 ) {
-                    var top = getTop($element);
+                    // Cannot move inside, after or before current item
+                    addPosition(node, Position.NONE, top);
+                }
+                else {
                     addPosition(node, Position.INSIDE, top);
                     addPosition(node, Position.AFTER, top);
                 }
             }
 
             function handleOpenFolder(node, $element) {
-                // Cannot move inside current item
                 if (node == self.current_item.node) {
+                    // Cannot move inside current item
                     // Stop iterating
                     return false;
                 }
@@ -890,19 +899,26 @@ window.Tree = {};
             }
 
             function handleAfterOpenFolder(node, next_node, $element) {
-                // Cannot move before or after current item
                 if (
-                    (node != self.current_item.node) &&
-                    (next_node != self.current_item.node)
+                    (node == self.current_item.node) ||
+                    (next_node == self.current_item.node)
                 ) {
+                    // Cannot move before or after current item
+                    addPosition(node, Position.NONE, last_top);
+                }
+                else {
                     addPosition(node, Position.AFTER, last_top);
                 }
             }
 
             function handleClosedFolder(node, next_node, $element) {
-                // Cannot move after current item
-                if (node != self.current_item.node) {
-                    var top = getTop($element);
+                var top = getTop($element);
+
+                if (node == self.current_item.node) {
+                    // Cannot move after current item
+                    addPosition(node, Position.NONE, top);
+                }
+                else {
                     addPosition(node, Position.INSIDE, top);
 
                     // Cannot move before current item
