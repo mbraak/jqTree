@@ -618,6 +618,7 @@ window.Tree = {};
 
                     var event = jQuery.Event('tree.contextmenu');
                     event.node = node;
+                    event.click_event = e;
                     this.element.trigger(event);
                     return false;
                 }
@@ -662,8 +663,16 @@ window.Tree = {};
             if (this.options.onIsMoveHandle && !this.options.onIsMoveHandle($element)) {
                 return null;
             }
-            this.current_item = this._getNodeElement($(event.target));
 
+            var node_element = this._getNodeElement($(event.target));
+
+            if (node_element && this.options.onCanMove) {
+                if (! this.options.onCanMove(node_element.node)) {
+                    node_element = null;
+                }
+            }
+
+            this.current_item = node_element;
             return (this.current_item != null);
         },
 
@@ -672,7 +681,6 @@ window.Tree = {};
                 return;
             }
 
-            this.current_item.$element.hide();
             this._refreshHitAreas();
             this.helper = this._createHelper();
 
@@ -694,7 +702,7 @@ window.Tree = {};
             if (area && this.options.onCanMove) {
                 var position_name = Position.getName(area.position);
 
-                if (! this.options.onCanMove(area.node, position_name)) {
+                if (! this.options.onCanMove(this.current_item.node, area.node, position_name)) {
                     area = null;
                 }
             }
@@ -850,31 +858,59 @@ window.Tree = {};
                 );
             }
 
-            function handleNode(node, $element) {
-                var top = getTop($element);
-                addPosition(node, Position.INSIDE, top);
-                addPosition(node, Position.AFTER, top);
+            function handleNode(node, next_node, $element) {
+                // Cannot move inside, after or before current item
+                if (
+                    (node != self.current_item.node) &&
+                    (next_node != self.current_item.node)
+                ) {
+                    var top = getTop($element);
+                    addPosition(node, Position.INSIDE, top);
+                    addPosition(node, Position.AFTER, top);
+                }
             }
 
             function handleOpenFolder(node, $element) {
-                addPosition(
-                    node,
-                    Position.INSIDE,
-                    getTop($element)
-                );
+                // Cannot move inside current item
+                if (node == self.current_item.node) {
+                    // Stop iterating
+                    return false;
+                }
+
+                // Cannot move before current item
+                if (node.children[0] != self.current_item.node) {
+                    addPosition(node, Position.INSIDE, getTop($element));
+                }
+
+                // Continue iterating
+                return true;
             }
 
-            function handleAfterOpenFolder(node, $element) {
-                addPosition(node, Position.AFTER, last_top);
+            function handleAfterOpenFolder(node, next_node, $element) {
+                // Cannot move before or after current item
+                if (
+                    (node != self.current_item.node) &&
+                    (next_node != self.current_item.node)
+                ) {
+                    addPosition(node, Position.AFTER, last_top);
+                }
             }
 
-            function handleClosedFolder(node, $element) {
-                var top = getTop($element);
-                addPosition(node, Position.INSIDE, top);
-                addPosition(node, Position.AFTER, top);
+            function handleClosedFolder(node, next_node, $element) {
+                // Cannot move after current item
+                if (node != self.current_item.node) {
+                    var top = getTop($element);
+                    addPosition(node, Position.INSIDE, top);
+
+                    // Cannot move before current item
+                    if (next_node != self.current_item.node) {
+                        addPosition(node, Position.AFTER, top);
+                    }
+                }
             }
 
             // Before first node
+            // todo: handle first node in iterate
             if (this.tree.hasChildren()) {
                 var node = this.tree.children[0];
 
@@ -946,37 +982,50 @@ window.Tree = {};
         ) {
             var self = this;
 
-            function iterate(node) {
-                var must_add = (
-                    (! self.options.onMustAddHitArea) ||
-                    (self.options.onMustAddHitArea(node))
+            function iterate(node, next_node) {
+                var must_iterate_inside = (
+                    (node.is_open || !node.element) && node.hasChildren()
                 );
 
-                if (must_add && node.element) {
+                if (node.element) {
                     var $element = $(node.element);
 
                     if (! $element.is(':visible')) {
                         return;
                     }
 
+                    if (self.options.onMustAddHitArea) {
+                        if (! self.options.onMustAddHitArea(node)) {
+                            return;
+                        }
+                    }
+
                     if (! node.hasChildren()) {
-                        handle_node(node, $element);
+                        handle_node(node, next_node, $element);
                     }
                     else if (node.is_open) {
-                        handle_open_folder(node, $element);
+                        if (! handle_open_folder(node, $element)) {
+                            must_iterate_inside = false;
+                        }
                     }
                     else {
-                        handle_closed_folder(node, $element);
+                        handle_closed_folder(node, next_node, $element);
                     }
                 }
 
-                if ((node.is_open || !node.element) && node.hasChildren()) {
-                    $.each(node.children, function() {
-                        iterate(this);
-                    });
+                if (must_iterate_inside) {
+                    var children_length = node.children.length;
+                    for (var i=0; i<children_length; i++) {
+                        if (i == (children_length-1)) {
+                            iterate(node.children[i], null);
+                        }
+                        else {
+                            iterate(node.children[i], node.children[i+1]);
+                        }
+                    }
 
-                    if (must_add && node.is_open) {
-                        handle_after_open_folder(node, $element);
+                    if (node.is_open) {
+                        handle_after_open_folder(node, next_node, $element);
                     }
                 }
             }
