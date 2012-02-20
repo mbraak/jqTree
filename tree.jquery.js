@@ -928,20 +928,14 @@ window.Tree = {};
                 }
             }
 
-            // Before first node
-            // todo: handle first node in iterate
-            if (this.tree.hasChildren()) {
-                var node = this.tree.children[0];
-
-                addPosition(
-                    node,
-                    Position.BEFORE,
-                    getTop($(node.element))
-                );
+            function handleFirstNode(node, $element) {
+                if (node != self.current_item.node) {
+                    addPosition(node, Position.BEFORE, getTop($(node.element)));
+                }
             }
 
             this._iterateVisibleNodes(
-                handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder
+                handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder, handleFirstNode
             );
 
             var hit_areas = [];
@@ -997,9 +991,10 @@ window.Tree = {};
         },
 
         _iterateVisibleNodes: function(
-            handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder
+            handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node
         ) {
             var self = this;
+            var is_first_node = true;
 
             function iterate(node, next_node) {
                 var must_iterate_inside = (
@@ -1017,6 +1012,11 @@ window.Tree = {};
                         if (! self.options.onMustAddHitArea(node)) {
                             return;
                         }
+                    }
+
+                    if (is_first_node) {
+                        handle_first_node(node, $element);
+                        is_first_node = false;
                     }
 
                     if (! node.hasChildren()) {
