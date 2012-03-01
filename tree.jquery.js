@@ -928,8 +928,8 @@ limitations under the License.
         _this = this;
       openFolder = function() {
         return _this._getNodeElementForNode(folder).open(function() {
-          this._refreshHitAreas();
-          return this._updateDropHint();
+          _this._refreshHitAreas();
+          return _this._updateDropHint();
         });
       };
       return this.open_folder_timer = setTimeout(openFolder, 500);

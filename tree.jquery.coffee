@@ -984,7 +984,7 @@ $.widget("ui.tree", $.ui.mouse, {
     _startOpenFolderTimer: (folder) ->
         openFolder = =>
             @_getNodeElementForNode(folder).open(
-                ->
+                =>
                     @_refreshHitAreas()
                     @_updateDropHint()
             )
