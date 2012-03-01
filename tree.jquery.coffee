@@ -585,7 +585,7 @@ $.widget("ui.tree", $.ui.mouse, {
 
         if $target.is('.toggler')
             node_element = @_getNodeElement($target)
-            if node_element and ånode_element.node.hasChildren()
+            if node_element and node_element.node.hasChildren()
                 node_element.toggle()
 
                 if @options.saveState
@@ -657,15 +657,14 @@ $.widget("ui.tree", $.ui.mouse, {
         @current_item = node_element
         return (@current_item != null)
 
-
     _mouseStart: (event) ->
         if not @options.dragAndDrop
             return
 
-        @_refreshHitAreas();
+        @_refreshHitAreas()
         @helper = @_createHelper();
 
-        @current_item.$element.addClass('moving');
+        @current_item.$element.addClass('moving')
 
         return true
 
@@ -687,8 +686,8 @@ $.widget("ui.tree", $.ui.mouse, {
                 area = null
 
         if not area
-            @_removeDropHint();
-            @_removeHover();
+            @_removeDropHint()
+            @_removeHover()
             @_stopOpenFolderTimer()
         else
             if @hovered_area != area
@@ -731,7 +730,7 @@ $.widget("ui.tree", $.ui.mouse, {
         @_removeDropHint()
         @_removeHitAreas()
 
-        @current_item.$element.removeClass('moving');
+        @current_item.$element.removeClass('moving')
 
         return false
 
@@ -763,8 +762,8 @@ $.widget("ui.tree", $.ui.mouse, {
                     Position.getName(@hovered_area.position)
                 )
 
-            @element.empty();
-            @_createDomElements(@tree);
+            @element.empty()
+            @_createDomElements(@tree)
 
     _createHelper: ->
         $helper = @current_item.createHelper()
@@ -1112,8 +1111,8 @@ class FolderElement extends NodeElement
         )
 
     close: (on_finished) ->
-        @node.is_open = false;
-        @getButton().addClass('closed');
+        @node.is_open = false
+        @getButton().addClass('closed')
 
         @getUl().slideUp(
             'fast',
@@ -1131,7 +1130,7 @@ class FolderElement extends NodeElement
 
     addDropHint: (position) ->
         if not this.node.is_open and position == Position.INSIDE
-            return new BorderDropHint(@$element);
+            return new BorderDropHint(@$element)
         else
             return new GhostDropHint(@node, @$element, position)
 

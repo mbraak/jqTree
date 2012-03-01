@@ -590,7 +590,7 @@ limitations under the License.
       $target = $(e.target);
       if ($target.is('.toggler')) {
         node_element = this._getNodeElement($target);
-        if (node_element && ånode_element.node.hasChildren()) {
+        if (node_element && node_element.node.hasChildren()) {
           node_element.toggle();
           if (this.options.saveState) this["this"]._saveState();
           e.preventDefault();
