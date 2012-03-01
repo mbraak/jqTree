@@ -19,13 +19,9 @@ limitations under the License.
 # todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
 # todo: use jqueryui icons for folder triangles
 # todo: scroll while moving a node?
-# todo: smooth animation while moving node
 # todo: plugins (also for dnd and state)?
 # todo: rename to jquery.tree.js? also css-file?
 # todo: move a node to root position
-# todo: prevent accidental move on touchpad
-# todo: display icon if position is invalid for dropping
-# todo: change onMustAddHitArea event to function that tests if move is legal
 
 @Tree = {}
 $ = @jQuery
@@ -40,9 +36,9 @@ indexOf = (array, item) ->
         return -1
 
 # toJson function; copied from jsons2
-cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
-escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
-meta = {
+Json = {}
+Json.escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
+Json.meta = {
     '\b': '\\b',
     '\t': '\\t',
     '\n': '\\n',
@@ -52,12 +48,12 @@ meta = {
     '\\': '\\\\'
 }
 
-quote = (string) ->
-    escapable.lastIndex = 0
+Json.quote = (string) ->
+    Json.escapable.lastIndex = 0
 
-    if escapable.test(string)
-        return '"' + string.replace(escapable, (a) ->
-            c = meta[a]
+    if Json.escapable.test(string)
+        return '"' + string.replace(Json.escapable, (a) ->
+            c = Json.meta[a]
             return (
                 if type c is 'string' then c
                 else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
@@ -66,7 +62,7 @@ quote = (string) ->
     else
         return '"' + string + '"'
 
-str = (key, holder, gap, rep, indent) ->
+Json.str = (key, holder, gap, rep, indent) ->
     value = holder[key]
 
     if value and typeof value is 'object' and value.toJSON is 'function'
@@ -77,7 +73,7 @@ str = (key, holder, gap, rep, indent) ->
 
     switch typeof value
         when 'string'
-            return quote(value)
+            return Json.quote(value)
 
         when 'number'
             return if isFinite(value) then String(value) else 'null'
@@ -92,7 +88,7 @@ str = (key, holder, gap, rep, indent) ->
             partial = []
             if Object.prototype.toString.apply(value) is '[object Array]'
                 for _v, i in value
-                    partial[i] = str(i, value, gap + indent, rep, indent) or 'null'
+                    partial[i] = Json.str(i, value, gap + indent, rep, indent) or 'null'
 
                 return (
                     if partial.length is 0 then '[]'
@@ -103,17 +99,17 @@ str = (key, holder, gap, rep, indent) ->
             if rep and typeof rep is 'object'
                 for k, i in value
                     if typeof k is 'string'
-                        v = str(k, value, gap, rep, indent)
+                        v = Json.str(k, value, gap, rep, indent)
                         if v
                             _gap = if gap then ': ' else ':'
-                            partial.push(quote(k) + _gap + v)
+                            partial.push(Json.quote(k) + _gap + v)
             else
                 for k of value
                     if Object.prototype.hasOwnProperty.call(value, k)
-                        v = str(k, value, gap, rep, indent)
+                        v = Json.str(k, value, gap, rep, indent)
                         if v
                             _gap = if gap then ': ' else ':'
-                            partial.push(quote(k) + _gap + v)
+                            partial.push(Json.quote(k) + _gap + v)
 
             return (
                 if partial.length is 0 then '{}'
@@ -141,7 +137,7 @@ toJson = (value, replacer, space) ->
     )
         throw new Error('JSON.stringify')
 
-    return str(
+    return Json.str(
         '',
         {'': value},
         gap,
@@ -384,6 +380,37 @@ $.widget("ui.tree", $.ui.mouse, {
         onCanMove: null
     },
 
+    _create: ->
+        @tree = new Node()
+        @tree.loadFromData(@options.data)
+
+        @selected_node = null
+        @_openNodes()
+
+        @_createDomElements(@tree)
+
+        if @selected_node
+            node_element = @_getNodeElementForNode(@selected_node)
+            if node_element
+                node_element.select()
+
+        @element.click($.proxy(@_click, this))
+        @element.bind('contextmenu', $.proxy(@_contextmenu, this))
+
+        @_mouseInit()
+
+        @hovered_area = null
+        @$ghost = null
+        @hit_areas = []
+
+    destroy: ->
+        @element.empty()
+        @element.unbind()
+        @tree = null
+
+        @_mouseDestroy()
+        $.Widget.prototype.destroy.call(this)
+
     getTree: ->
         return @tree
 
@@ -420,37 +447,6 @@ $.widget("ui.tree", $.ui.mouse, {
 
     getSelectedNode: ->
         return @selected_node or false
-
-    _create: ->
-        @tree = new Node()
-        @tree.loadFromData(@options.data)
-
-        @selected_node = null
-        @_openNodes()
-
-        @_createDomElements(@tree)
-
-        if @selected_node
-            node_element = @_getNodeElementForNode(@selected_node)
-            if node_element
-                node_element.select()
-
-        @element.click($.proxy(@_click, this))
-        @element.bind('contextmenu', $.proxy(@_contextmenu, this))
-
-        @_mouseInit()
-
-        @hovered_area = null
-        @$ghost = null
-        @hit_areas = []
-
-    destroy: ->
-        @element.empty()
-        @element.unbind()
-        @tree = null
-
-        @_mouseDestroy()
-        $.Widget.prototype.destroy.call(this)
 
     _getState: ->
         open_nodes = []
@@ -589,7 +585,7 @@ $.widget("ui.tree", $.ui.mouse, {
 
         if $target.is('.toggler')
             node_element = @_getNodeElement($target)
-            if node_element and (node_element.node.hasChildren())
+            if node_element and ånode_element.node.hasChildren()
                 node_element.toggle()
 
                 if @options.saveState
@@ -601,8 +597,8 @@ $.widget("ui.tree", $.ui.mouse, {
             node = @_getNode($target)
             if node
                 if (
-                    (not @options.onCanSelectNode) ||
-                    (@options.onCanSelectNode(node))
+                    (not @options.onCanSelectNode) or
+                    @options.onCanSelectNode(node)
                 )
                     @selectNode(node)
 
@@ -612,7 +608,7 @@ $.widget("ui.tree", $.ui.mouse, {
 
     _contextmenu: (e) ->
         $div = $(e.target).closest('ul.tree div')
-        if ($div.length)
+        if $div.length
             node = @_getNode($div)
             if node
                 e.preventDefault()
@@ -899,7 +895,7 @@ $.widget("ui.tree", $.ui.mouse, {
         tree_offset = @element.offset()
         if (
             x < tree_offset.left or
-            y < tree_offset.top ||
+            y < tree_offset.top or
             x > (tree_offset.left + @element.width()) or
             y > (tree_offset.top + @element.height())
         )

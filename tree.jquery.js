@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 (function() {
-  var $, BorderDropHint, FolderElement, GhostDropHint, Node, NodeElement, Position, cx, escapable, indexOf, meta, quote, str, toJson,
+  var $, BorderDropHint, FolderElement, GhostDropHint, Json, Node, NodeElement, Position, indexOf, toJson,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -37,11 +37,11 @@ limitations under the License.
     }
   };
 
-  cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+  Json = {};
 
-  escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+  Json.escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
 
-  meta = {
+  Json.meta = {
     '\b': '\\b',
     '\t': '\\t',
     '\n': '\\n',
@@ -51,12 +51,12 @@ limitations under the License.
     '\\': '\\\\'
   };
 
-  quote = function(string) {
-    escapable.lastIndex = 0;
-    if (escapable.test(string)) {
-      return '"' + string.replace(escapable, function(a) {
+  Json.quote = function(string) {
+    Json.escapable.lastIndex = 0;
+    if (Json.escapable.test(string)) {
+      return '"' + string.replace(Json.escapable, function(a) {
         var c;
-        c = meta[a];
+        c = Json.meta[a];
         return (type(c === 'string') ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4));
       }) + '"';
     } else {
@@ -64,7 +64,7 @@ limitations under the License.
     }
   };
 
-  str = function(key, holder, gap, rep, indent) {
+  Json.str = function(key, holder, gap, rep, indent) {
     var i, k, partial, v, value, _gap, _len, _len2, _v;
     value = holder[key];
     if (value && typeof value === 'object' && value.toJSON === 'function') {
@@ -73,7 +73,7 @@ limitations under the License.
     if (typeof rep === 'function') value = rep.call(holder, key, value);
     switch (typeof value) {
       case 'string':
-        return quote(value);
+        return Json.quote(value);
       case 'number':
         if (isFinite(value)) {
           return String(value);
@@ -89,7 +89,7 @@ limitations under the License.
         if (Object.prototype.toString.apply(value) === '[object Array]') {
           for (i = 0, _len = value.length; i < _len; i++) {
             _v = value[i];
-            partial[i] = str(i, value, gap + indent, rep, indent) || 'null';
+            partial[i] = Json.str(i, value, gap + indent, rep, indent) || 'null';
           }
           return (partial.length === 0 ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']');
         }
@@ -97,20 +97,20 @@ limitations under the License.
           for (i = 0, _len2 = value.length; i < _len2; i++) {
             k = value[i];
             if (typeof k === 'string') {
-              v = str(k, value, gap, rep, indent);
+              v = Json.str(k, value, gap, rep, indent);
               if (v) {
                 _gap = gap ? ': ' : ':';
-                partial.push(quote(k) + _gap + v);
+                partial.push(Json.quote(k) + _gap + v);
               }
             }
           }
         } else {
           for (k in value) {
             if (Object.prototype.hasOwnProperty.call(value, k)) {
-              v = str(k, value, gap, rep, indent);
+              v = Json.str(k, value, gap, rep, indent);
               if (v) {
                 _gap = gap ? ': ' : ':';
-                partial.push(quote(k) + _gap + v);
+                partial.push(Json.quote(k) + _gap + v);
               }
             }
           }
@@ -134,7 +134,7 @@ limitations under the License.
     if (replacer && typeof replacer !== 'function' && typeof replacer !== 'object' && typeof replacer !== 'number') {
       throw new Error('JSON.stringify');
     }
-    return str('', {
+    return Json.str('', {
       '': value
     }, gap, rep, indent);
   };
@@ -407,6 +407,31 @@ limitations under the License.
       onIsMoveHandle: null,
       onCanMove: null
     },
+    _create: function() {
+      var node_element;
+      this.tree = new Node();
+      this.tree.loadFromData(this.options.data);
+      this.selected_node = null;
+      this._openNodes();
+      this._createDomElements(this.tree);
+      if (this.selected_node) {
+        node_element = this._getNodeElementForNode(this.selected_node);
+        if (node_element) node_element.select();
+      }
+      this.element.click($.proxy(this._click, this));
+      this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
+      this._mouseInit();
+      this.hovered_area = null;
+      this.$ghost = null;
+      return this.hit_areas = [];
+    },
+    destroy: function() {
+      this.element.empty();
+      this.element.unbind();
+      this.tree = null;
+      this._mouseDestroy();
+      return $.Widget.prototype.destroy.call(this);
+    },
     getTree: function() {
       return this.tree;
     },
@@ -437,31 +462,6 @@ limitations under the License.
     },
     getSelectedNode: function() {
       return this.selected_node || false;
-    },
-    _create: function() {
-      var node_element;
-      this.tree = new Node();
-      this.tree.loadFromData(this.options.data);
-      this.selected_node = null;
-      this._openNodes();
-      this._createDomElements(this.tree);
-      if (this.selected_node) {
-        node_element = this._getNodeElementForNode(this.selected_node);
-        if (node_element) node_element.select();
-      }
-      this.element.click($.proxy(this._click, this));
-      this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
-      this._mouseInit();
-      this.hovered_area = null;
-      this.$ghost = null;
-      return this.hit_areas = [];
-    },
-    destroy: function() {
-      this.element.empty();
-      this.element.unbind();
-      this.tree = null;
-      this._mouseDestroy();
-      return $.Widget.prototype.destroy.call(this);
     },
     _getState: function() {
       var open_nodes, selected_node,
@@ -590,7 +590,7 @@ limitations under the License.
       $target = $(e.target);
       if ($target.is('.toggler')) {
         node_element = this._getNodeElement($target);
-        if (node_element && (node_element.node.hasChildren())) {
+        if (node_element && ånode_element.node.hasChildren()) {
           node_element.toggle();
           if (this.options.saveState) this["this"]._saveState();
           e.preventDefault();
@@ -599,7 +599,7 @@ limitations under the License.
       } else if ($target.is('div') || $target.is('span')) {
         node = this._getNode($target);
         if (node) {
-          if ((!this.options.onCanSelectNode) || (this.options.onCanSelectNode(node))) {
+          if ((!this.options.onCanSelectNode) || this.options.onCanSelectNode(node)) {
             this.selectNode(node);
             event = jQuery.Event('tree.click');
             event.node = node;
