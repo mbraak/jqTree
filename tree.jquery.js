@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 (function() {
-  var $, BorderDropHint, FolderElement, GhostDropHint, Json, Node, NodeElement, Position, indexOf, toJson,
+  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, Json, Node, NodeElement, Position, indexOf, toJson,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -666,19 +666,14 @@ limitations under the License.
     _mouseStart: function(event) {
       if (!this.options.dragAndDrop) return;
       this._refreshHitAreas();
-      this.helper_offset_x = event.offsetX;
-      this.helper_offset_y = event.offsetY;
-      this.helper = this._createHelper();
+      this.drag_element = new DragElement(this.current_item.node, event.offsetX, event.offsetY, this.element);
       this.current_item.$element.addClass('moving');
       return true;
     },
     _mouseDrag: function(event) {
       var area, position_name;
       if (!this.options.dragAndDrop) return;
-      this.helper.offset({
-        left: event.pageX - this.helper_offset_x,
-        top: event.pageY - this.helper_offset_y
-      });
+      this.drag_element.move(event.pageX, event.pageY);
       area = this.findHoveredArea(event.pageX, event.pageY);
       if (area && this.options.onCanMove) {
         position_name = Position.getName(area.position);
@@ -739,16 +734,9 @@ limitations under the License.
         return this._createDomElements(this.tree);
       }
     },
-    _createHelper: function() {
-      var $helper;
-      $helper = this.current_item.createHelper();
-      $helper.css("position", "absolute");
-      this.element.append($helper);
-      return $helper;
-    },
     _clear: function() {
-      this.helper.remove();
-      return this.helper = null;
+      this.drag_element.remove();
+      return this.drag_element = null;
     },
     _refreshHitAreas: function() {
       this._removeHitAreas();
@@ -1043,13 +1031,6 @@ limitations under the License.
       return this.$element;
     };
 
-    NodeElement.prototype.createHelper = function() {
-      var $helper;
-      $helper = this.getSpan().clone();
-      $helper.addClass('tree-dragging');
-      return $helper;
-    };
-
     NodeElement.prototype.addDropHint = function(position) {
       if (position === Position.INSIDE) {
         return new BorderDropHint(this.$element);
@@ -1119,6 +1100,31 @@ limitations under the License.
     return FolderElement;
 
   })(NodeElement);
+
+  DragElement = (function() {
+
+    function DragElement(node, offset_x, offset_y, $tree) {
+      this.offset_x = offset_x;
+      this.offset_y = offset_y;
+      this.$element = $("<span class=\"title tree-dragging\">" + node.name + "</span>");
+      this.$element.css("position", "absolute");
+      $tree.append(this.$element);
+    }
+
+    DragElement.prototype.move = function(page_x, page_y) {
+      return this.$element.offset({
+        left: page_x - this.offset_x,
+        top: page_y - this.offset_y
+      });
+    };
+
+    DragElement.prototype.remove = function() {
+      return this.$element.remove();
+    };
+
+    return DragElement;
+
+  })();
 
   this.Tree.Node = Node;
 

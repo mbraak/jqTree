@@ -662,22 +662,22 @@ $.widget("ui.tree", $.ui.mouse, {
             return
 
         @_refreshHitAreas()
-        @helper_offset_x = event.offsetX
-        @helper_offset_y = event.offsetY
-        @helper = @_createHelper()
+        
+        @drag_element = new DragElement(
+            @current_item.node
+            event.offsetX,
+            event.offsetY,
+            @element
+        )
 
         @current_item.$element.addClass('moving')
-
         return true
 
     _mouseDrag: (event) ->
         if not @options.dragAndDrop
             return
 
-        @helper.offset(
-            left: event.pageX - @helper_offset_x,
-            top: event.pageY - @helper_offset_y
-        )
+        @drag_element.move(event.pageX, event.pageY)
 
         area = @findHoveredArea(event.pageX, event.pageY)
 
@@ -767,15 +767,9 @@ $.widget("ui.tree", $.ui.mouse, {
             @element.empty()
             @_createDomElements(@tree)
 
-    _createHelper: ->
-        $helper = @current_item.createHelper()
-        $helper.css("position", "absolute")
-        @element.append($helper)
-        return $helper
-
     _clear: ->
-        @helper.remove()
-        @helper = null
+        @drag_element.remove()
+        @drag_element = null
 
     _refreshHitAreas: ->
         @_removeHitAreas()
@@ -1072,11 +1066,6 @@ class NodeElement
     getLi: ->
         return @$element
 
-    createHelper: ->
-        $helper = @getSpan().clone()
-        $helper.addClass('tree-dragging')
-        return $helper
-
     addDropHint: (position) ->
         if position == Position.INSIDE
             return new BorderDropHint(@$element)
@@ -1135,5 +1124,25 @@ class FolderElement extends NodeElement
             return new BorderDropHint(@$element)
         else
             return new GhostDropHint(@node, @$element, position)
+
+
+class DragElement
+    constructor: (node, offset_x, offset_y, $tree) ->
+        @offset_x = offset_x
+        @offset_y = offset_y
+
+        @$element = $("<span class=\"title tree-dragging\">#{ node.name #}</span>")
+        @$element.css("position", "absolute")
+        $tree.append(@$element)
+
+    move: (page_x, page_y) ->
+        @$element.offset(
+            left: page_x - @offset_x,
+            top: page_y - @offset_y
+        )
+
+    remove: ->
+        @$element.remove()
+
 
 @Tree.Node = Node
