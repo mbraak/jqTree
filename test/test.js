@@ -149,6 +149,7 @@ test('saveState', function() {
     var saved_state;
 
     function setState(state) {
+        console.log(state);
         saved_state = state;
     }
 
@@ -454,7 +455,8 @@ test('tree iterate', function() {
 });
 
 test('tree moveNode', function() {
-    var tree = Tree.Tree.createFromData(example_data);
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
 
     /*
       node1
