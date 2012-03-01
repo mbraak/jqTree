@@ -666,6 +666,8 @@ limitations under the License.
     _mouseStart: function(event) {
       if (!this.options.dragAndDrop) return;
       this._refreshHitAreas();
+      this.helper_offset_x = event.offsetX;
+      this.helper_offset_y = event.offsetY;
       this.helper = this._createHelper();
       this.current_item.$element.addClass('moving');
       return true;
@@ -674,8 +676,8 @@ limitations under the License.
       var area, position_name;
       if (!this.options.dragAndDrop) return;
       this.helper.offset({
-        left: event.pageX + 16,
-        top: event.pageY
+        left: event.pageX - this.helper_offset_x,
+        top: event.pageY - this.helper_offset_y
       });
       area = this.findHoveredArea(event.pageX, event.pageY);
       if (area && this.options.onCanMove) {

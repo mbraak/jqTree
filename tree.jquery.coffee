@@ -662,7 +662,9 @@ $.widget("ui.tree", $.ui.mouse, {
             return
 
         @_refreshHitAreas()
-        @helper = @_createHelper();
+        @helper_offset_x = event.offsetX
+        @helper_offset_y = event.offsetY
+        @helper = @_createHelper()
 
         @current_item.$element.addClass('moving')
 
@@ -673,8 +675,8 @@ $.widget("ui.tree", $.ui.mouse, {
             return
 
         @helper.offset(
-            left: event.pageX + 16,
-            top: event.pageY
+            left: event.pageX - @helper_offset_x,
+            top: event.pageY - @helper_offset_y
         )
 
         area = @findHoveredArea(event.pageX, event.pageY)
