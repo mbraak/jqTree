@@ -405,7 +405,8 @@ limitations under the License.
       onCreateLi: null,
       onMustAddHitArea: null,
       onIsMoveHandle: null,
-      onCanMove: null
+      onCanMove: null,
+      onCanMoveTo: null
     },
     _create: function() {
       var node_element;
@@ -681,9 +682,9 @@ limitations under the License.
       if (!this.options.dragAndDrop) return;
       this.drag_element.move(event.pageX, event.pageY);
       area = this.findHoveredArea(event.pageX, event.pageY);
-      if (area && this.options.onCanMove) {
+      if (area && this.options.onCanMoveTo) {
         position_name = Position.getName(area.position);
-        if (!this.options.onCanMove(this.current_item.node, area.node, position_name)) {
+        if (!this.options.onCanMoveTo(this.current_item.node, area.node, position_name)) {
           area = null;
         }
       }

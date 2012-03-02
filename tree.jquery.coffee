@@ -365,20 +365,20 @@ class Node
 
 $.widget("ui.tree", $.ui.mouse, {
     widgetEventPrefix: "tree",
-    options: {
-        autoOpen: false,  # true / false / int (open n levels starting at 0)
-        saveState: false,  # true / false / string (cookie name)
-        dragAndDrop: false,
-        selectable: false,
-        onCanSelectNode: null,
-        onMoveNode: null,
-        onSetStateFromStorage: null,
-        onGetStateFromStorage: null,
-        onCreateLi: null,
-        onMustAddHitArea: null,
-        onIsMoveHandle: null,
-        onCanMove: null
-    },
+    options:
+        autoOpen: false  # true / false / int (open n levels starting at 0)
+        saveState: false  # true / false / string (cookie name)
+        dragAndDrop: false
+        selectable: false
+        onCanSelectNode: null
+        onMoveNode: null
+        onSetStateFromStorage: null
+        onGetStateFromStorage: null
+        onCreateLi: null
+        onMustAddHitArea: null
+        onIsMoveHandle: null
+        onCanMove: null  # Can this node be moved? function(node)
+        onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
 
     _create: ->
         @tree = new Node()
@@ -484,7 +484,7 @@ $.widget("ui.tree", $.ui.mouse, {
                 node.is_open = true
 
             if selected_node_id and (node.id == selected_node_id)
-                this.selected_node = node
+                @selected_node = node
 
             return true
         )
@@ -685,10 +685,10 @@ $.widget("ui.tree", $.ui.mouse, {
 
         area = @findHoveredArea(event.pageX, event.pageY)
 
-        if area and @options.onCanMove
+        if area and @options.onCanMoveTo
             position_name = Position.getName(area.position)
 
-            if not @options.onCanMove(@current_item.node, area.node, position_name)
+            if not @options.onCanMoveTo(@current_item.node, area.node, position_name)
                 area = null
 
         if not area
