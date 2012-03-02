@@ -18,12 +18,37 @@
 	<script src="tree.jquery.js"></script>
 </head>
 <body>
+<div id="sidebar">
+	<ul class="first">
+		<li>
+			<a href="#">jqTree</a>
+			<ul>
+				<li><a href="#introduction">Introduction</a></li>
+				<li><a href="#features">Features</a></li>
+				<li><a href="#demo">Demo</a></li>
+				<li><a href="#requirements">Requirements</a></li>
+				<li><a href="#downloads">Downloads</a></li>
+				<li><a href="#tutorial">Tutorial</a></li>
+			</ul>
+		</li>
+		<li>
+			<a href="#tree-options">Tree options</a>
+			<ul>
+				<li><a href="#tree-options-data">data</a></li>
+				<li><a href="#tree-options-autoopen">autoOpen</a></li>
+				<li><a href="#tree-options-savestate">saveState</a></li>
+				<li><a href="#tree-options-draganddrop">dragAndDrop</a></li>
+				<li><a href="#tree-options-selectable">selectable</a></li>
+			</ul>
+		</li>
+	</ul>
+</div>
 <div id="page">
 	<h1>jqTree</h1>
-	<p>
+	<p id="introduction">
 		JqTree is a tree widget written in jQuery UI.
 	</p>
-	<h4>Features</h4>
+	<h4 id="features">Features</h4>
 	<ul>
 		<li>Create a tree from JSON data</li>
 		<li>Drag and drop</li>
@@ -35,7 +60,7 @@
 		The project is <a href="https://github.com/mbraak/jqTree">hosted on github</a>,
 		has a <a href="test/test.html">test suite</a> and a <a href="demo.html">demo</a>.
 	</p>
-	<div class="group">
+	<div class="group" id="demo">
 		<div class="container-left">
 			<div class="inner">
 <pre class="dark">
@@ -68,12 +93,12 @@ $('#tree1').tree({
 			</div>
 		</div>
 	</div>
-	<h4>Requirements</h4>
+	<h4 id="requirements">Requirements</h4>
 	<ul>
 		<li><a href=""><a href="http://jquery.com">jQuery</a> 1.5+</li>
 		<li><a href="http://jqueryui.com/">jQuery UI</a> 1.8 or 1.9 beta</li>
 	</ul>
-	<h4>Downloads</h4>
+	<h4 id="downloads">Downloads</h4>
 	<ul>
 		<li>All: <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
 		<li>Javascript: <a href="https://raw.github.com/mbraak/jqTree/master/tree.jquery.js">tree.jquery.js</a></li>
@@ -95,7 +120,7 @@ $('#tree1').tree({
 			</ul>
 		</li>
 	</ul>
-	<h4>Tutorial</h4>
+	<h4 id="tutorial">Tutorial</h4>
 	<ul>
 		<li>
 			Include <a href="http://code.jquery.com/jquery-1.6.2.min.js">jQuery</a>.
@@ -166,8 +191,8 @@ $.getJSON(
 </pre>
 		</li>
 	</ul>
-	<h4>Tree options</h4>
-	<h5>data</h5>
+	<h4 id="tree-options">Tree options</h4>
+	<h5 id="tree-options-data">data</h5>
 	<p>
 		Define the contents of the tree. The data is a nested array of objects. This option is required.
 		<br>
@@ -206,7 +231,7 @@ $element.tree({data: data});
 	id: 1
 }
 </pre>
-	<h5>autoOpen</h5>
+	<h5 id="tree-options-autoopen">autoOpen</h5>
 	<p>
 		Open nodes initially.
 	</p>
@@ -237,7 +262,7 @@ $element.tree({
 	autoOpen: 0
 });
 </pre>
-	<h5>saveState</h5>
+	<h5 id="tree-options-savestate">saveState</h5>
 	<p>
 		Save and restore the state of the tree automatically. Saves in a cookie which nodes are opened and selected.
 		<br>
@@ -266,7 +291,7 @@ $element.tree({
 	saveState: 'tree1'
 });
 </pre>
-	<h5>dragAndDrop</h5>
+	<h5 id="tree-options-draganddrop">dragAndDrop</h5>
 	<p>
 		Turn on dragging and dropping of nodes.
 	</p>
@@ -283,7 +308,7 @@ $element.tree({
 	dragAndDrop: true
 });
 </pre>
-	<h5>selectable</h5>
+	<h5 id="tree-options-selectable">selectable</h5>
 	<p>
 		Turn on selection of nodes.
 	</p>
