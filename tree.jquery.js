@@ -500,9 +500,11 @@ limitations under the License.
       if (this.options.onSetStateFromStorage) {
         return this.options.onSetStateFromStorage(this._getState());
       } else {
-        return $.cookie(this._getCookieName(), this._getState(), {
-          path: '/'
-        });
+        if ($.cookie) {
+          return $.cookie(this._getCookieName(), this._getState(), {
+            path: '/'
+          });
+        }
       }
     },
     _restoreState: function() {
@@ -510,9 +512,13 @@ limitations under the License.
       if (this.options.onGetStateFromStorage) {
         state = this.options.onGetStateFromStorage();
       } else {
-        state = $.cookie(this._getCookieName(), {
-          path: '/'
-        });
+        if ($.cookie) {
+          state = $.cookie(this._getCookieName(), {
+            path: '/'
+          });
+        } else {
+          state = null;
+        }
       }
       if (!state) {
         return false;
@@ -592,7 +598,7 @@ limitations under the License.
         node_element = this._getNodeElement($target);
         if (node_element && node_element.node.hasChildren()) {
           node_element.toggle();
-          if (this.options.saveState) this["this"]._saveState();
+          if (this.options.saveState) this._saveState();
           e.preventDefault();
           return e.stopPropagation();
         }

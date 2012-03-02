@@ -493,20 +493,24 @@ $.widget("ui.tree", $.ui.mouse, {
         if @options.onSetStateFromStorage
             @options.onSetStateFromStorage(@_getState())
         else
-            $.cookie(
-                @_getCookieName(),
-                @_getState(),
-                {path: '/'}
-            )
+            if $.cookie
+                $.cookie(
+                    @_getCookieName(),
+                    @_getState(),
+                    {path: '/'}
+                )
 
     _restoreState: ->
         if @options.onGetStateFromStorage
             state = @options.onGetStateFromStorage()
         else
-            state = $.cookie(
-                @_getCookieName(),
-                {path: '/'}
-            )
+            if $.cookie
+                state = $.cookie(
+                    @_getCookieName(),
+                    {path: '/'}
+                )
+            else
+                state = null
 
         if not state
             return false
@@ -589,7 +593,7 @@ $.widget("ui.tree", $.ui.mouse, {
                 node_element.toggle()
 
                 if @options.saveState
-                    @this._saveState()
+                    @_saveState()
 
                 e.preventDefault()
                 e.stopPropagation()
