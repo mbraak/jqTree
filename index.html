@@ -115,6 +115,10 @@ $('#tree1').tree({
 			<pre><link rel="stylesheet" href="jqtree.css"></pre>
 		</li>
 		<li>
+			Optionally, for saveState include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>:
+			<pre><script src="jquery.cookie.js"></script></pre>
+		</li>
+		<li>
 			Create a div.
 			<pre><div id="tree1"></div></pre>
 		</li>
@@ -235,9 +239,9 @@ $element.tree({
 </pre>
 	<h5>saveState</h5>
 	<p>
-		Save and restore the state of the tree automatically.
+		Save and restore the state of the tree automatically. Saves in a cookie which nodes are opened and selected.
 		<br>
-		Saves in a cookie which nodes are opened and selected.
+		For this to work, please include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>.
 	</p>
 	<ul>
 		<li><strong>true</strong>: save and restore state in a cookie</li>
