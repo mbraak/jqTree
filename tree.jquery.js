@@ -673,11 +673,18 @@ limitations under the License.
       return this.current_item !== null;
     },
     _mouseStart: function(event) {
+      var offsetX, offsetY, _ref;
       if (!this.options.dragAndDrop) return;
       this._refreshHitAreas();
-      this.drag_element = new DragElement(this.current_item.node, event.offsetX, event.offsetY, this.element);
+      _ref = this._getOffsetFromEvent(event), offsetX = _ref[0], offsetY = _ref[1];
+      this.drag_element = new DragElement(this.current_item.node, offsetX, offsetY, this.element);
       this.current_item.$element.addClass('moving');
       return true;
+    },
+    _getOffsetFromEvent: function(event) {
+      var element_offset;
+      element_offset = $(event.target).offset();
+      return [event.pageX - element_offset.left, event.pageY - element_offset.top];
     },
     _mouseDrag: function(event) {
       var area, position_name;

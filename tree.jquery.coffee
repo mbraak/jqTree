@@ -669,16 +669,25 @@ $.widget("ui.tree", $.ui.mouse, {
             return
 
         @_refreshHitAreas()
-        
+
+        [offsetX, offsetY] = @_getOffsetFromEvent(event)
+
         @drag_element = new DragElement(
             @current_item.node
-            event.offsetX,
-            event.offsetY,
+            offsetX,
+            offsetY,
             @element
         )
 
         @current_item.$element.addClass('moving')
         return true
+
+    _getOffsetFromEvent: (event) ->
+        element_offset = $(event.target).offset()
+        return [
+            event.pageX - element_offset.left,
+            event.pageY - element_offset.top
+        ]
 
     _mouseDrag: (event) ->
         if not @options.dragAndDrop
