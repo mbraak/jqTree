@@ -184,6 +184,8 @@ class Node
                     @['name'] = value
                 else
                     @[key] = value
+
+                return true
             )
 
         addChildren = (children_data) =>
@@ -221,6 +223,7 @@ class Node
             $.each(o, (key, value) =>
                 if key != 'label'
                     node[key] = value
+                return true
             )
 
             @addChild(node)

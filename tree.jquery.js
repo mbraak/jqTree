@@ -182,12 +182,13 @@ limitations under the License.
       addNode = function(node_data) {
         return $.each(node_data, function(key, value) {
           if (key === 'children') {
-            return addChildren(value);
+            addChildren(value);
           } else if (key === 'label') {
-            return _this['name'] = value;
+            _this['name'] = value;
           } else {
-            return _this[key] = value;
+            _this[key] = value;
           }
+          return true;
         });
       };
       addChildren = function(children_data) {
@@ -231,7 +232,8 @@ limitations under the License.
         o = data[_i];
         node = new Node(o.label);
         $.each(o, function(key, value) {
-          if (key !== 'label') return node[key] = value;
+          if (key !== 'label') node[key] = value;
+          return true;
         });
         this.addChild(node);
         if (o.children) {
