@@ -41,6 +41,13 @@
 				<li><a href="#tree-options-selectable">selectable</a></li>
 			</ul>
 		</li>
+		<li>
+			<a href="#events">Events</a>
+			<ul>
+				<li><a href="#event-tree-click">tree.click</a></li>
+				<li><a href="#event-tree-contextmenu">tree.contextmenu</a></li>
+			</ul>
+		</li>
 	</ul>
 </div>
 <div id="page">
@@ -324,6 +331,49 @@ $element.tree({
 	data: data,
 	selectable: true
 });
+</pre>
+
+	<h4 id="events">Events</h4>
+	<h5 id="event-tree-click">tree.click</h5>
+	<p>
+		Triggered when a tree node is clicked.
+	</p>
+<pre>
+// create tree
+$('#tree1').tree({
+	data: data
+});
+
+// bind 'tree.click' event
+$('#tree1').bind(
+	'tree.click',
+	function(event) {
+		// The clicked node is 'event.node'
+		var node = event.node;
+		alert(node.name);
+	}
+);
+</pre>
+
+	<h4 id="event-tree-contextmenu">tree.contextmenu</h4>
+	<p>
+		Triggered when user right-clicks a tree node.
+	</p>
+<pre>
+// create tree
+$('#tree1').tree({
+	data: data
+});
+
+// bind 'tree.contextmenu' event
+$('#tree1').bind(
+	'tree.contextmenu',
+	function(event) {
+		// The clicked node is 'event.node'
+		var node = event.node;
+		alert(node.name);
+	}
+);
 </pre>
 </div>
 <script>
