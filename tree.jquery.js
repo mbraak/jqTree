@@ -405,7 +405,6 @@ limitations under the License.
       onSetStateFromStorage: null,
       onGetStateFromStorage: null,
       onCreateLi: null,
-      onMustAddHitArea: null,
       onIsMoveHandle: null,
       onCanMove: null,
       onCanMoveTo: null
@@ -882,9 +881,6 @@ limitations under the License.
         if (node.element) {
           $element = $(node.element);
           if (!$element.is(':visible')) return;
-          if (_this.options.onMustAddHitArea) {
-            if (!_this.options.onMustAddHitArea(node)) return;
-          }
           if (is_first_node) {
             handle_first_node(node, $element);
             is_first_node = false;

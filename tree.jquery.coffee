@@ -378,7 +378,6 @@ $.widget("ui.tree", $.ui.mouse, {
         onSetStateFromStorage: null
         onGetStateFromStorage: null
         onCreateLi: null
-        onMustAddHitArea: null
         onIsMoveHandle: null
         onCanMove: null  # Can this node be moved? function(node)
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
@@ -940,10 +939,6 @@ $.widget("ui.tree", $.ui.mouse, {
 
                 if not $element.is(':visible')
                     return
-
-                if @options.onMustAddHitArea
-                    if not @options.onMustAddHitArea(node)
-                        return
 
                 if is_first_node
                     handle_first_node(node, $element)
