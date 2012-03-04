@@ -537,4 +537,24 @@ test('tree moveNode', function() {
     );
 });
 
+test('tree initFromData', function() {
+    var data = 
+        {
+            label: 'main',
+            children: [
+                { label: 'c1' },
+                { label: 'c2' }
+            ]
+        };
+    var node = new Tree.Node();
+    node.initFromData(data);
+
+    equal(node.name, 'main')
+    equal(
+        format_nodes(node.children),
+        'c1 c2',
+        'children'
+    );
+});
+
 });
