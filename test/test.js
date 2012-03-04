@@ -124,7 +124,7 @@ test('jqtree toggle', function() {
 // todo: test jqtree.getTree()
 
 test("click event", function() {
-    stop(2000);
+    stop();
 
     // create tree
     var $tree = $('#tree1');
