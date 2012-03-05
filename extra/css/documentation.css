@@ -1,9 +1,45 @@
 /* main layout */
-#page {
-	width: 960px;
-	margin: 0 auto;
+#sidebar {
+    width: 200px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 20px 0 30px 30px;
+    border-right: 1px solid #bbb;
+    box-shadow: 0 0 20px #ccc;
+    -webkit-box-shadow: 0 0 20px #ccc;
+    -moz-box-shadow: 0 0 20px #ccc;
 }
 
+#page {
+    width: 700px;
+    margin: 0 0 50px 260px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* sidebar */
+#sidebar a {
+    color: #000;
+}
+
+#sidebar ul.first  {
+    list-style: none;
+}
+
+#sidebar ul  {
+    margin-left: 0;
+}
+
+#sidebar ul.first > li {
+    margin-bottom: 1em;
+}
+
+#sidebar ul.first > li > a {
+    font-weight: bold;
+}
+
+/* page */
 .container-left,
 .container-right {
 	float: left;

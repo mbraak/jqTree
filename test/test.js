@@ -124,7 +124,7 @@ test('jqtree toggle', function() {
 // todo: test jqtree.getTree()
 
 test("click event", function() {
-    stop(2000);
+    stop();
 
     // create tree
     var $tree = $('#tree1');
@@ -454,7 +454,8 @@ test('tree iterate', function() {
 });
 
 test('tree moveNode', function() {
-    var tree = Tree.Tree.createFromData(example_data);
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
 
     /*
       node1
@@ -533,6 +534,26 @@ test('tree moveNode', function() {
         format_nodes(tree.children),
         'node1 node2',
         'tree nodes at first level'
+    );
+});
+
+test('tree initFromData', function() {
+    var data = 
+        {
+            label: 'main',
+            children: [
+                { label: 'c1' },
+                { label: 'c2' }
+            ]
+        };
+    var node = new Tree.Node();
+    node.initFromData(data);
+
+    equal(node.name, 'main')
+    equal(
+        format_nodes(node.children),
+        'c1 c2',
+        'children'
     );
 });
 
