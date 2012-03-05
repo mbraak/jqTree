@@ -39,6 +39,12 @@
 				<li><a href="#tree-options-savestate">saveState</a></li>
 				<li><a href="#tree-options-draganddrop">dragAndDrop</a></li>
 				<li><a href="#tree-options-selectable">selectable</a></li>
+				<li><a href="#tree-options-oncanselectnode">onCanSelectNode</a></li>
+				<li><a href="#tree-options-onmovenode">onMoveNode</a></li>
+				<li><a href="#tree-options-oncreateli">onCreateLi</a></li>
+				<li><a href="#tree-options-onismovehandle">onIsMoveHandle</a></li>
+				<li><a href="#tree-options-oncanmove">onCanMove</a></li>
+				<li><a href="#tree-options-oncanmoveto">onCanMoveTo</a></li>
 			</ul>
 		</li>
 		<li>
@@ -221,7 +227,7 @@ var data = [
 		]
 	}
 ];
-$element.tree({data: data});
+$('#tree1').tree({data: data});
 </pre>
 	<ul>
 		<li>label: label of a node (required)</li>
@@ -255,7 +261,7 @@ $element.tree({data: data});
 		Open all nodes initially:
 	</p>
 <pre>
-$element.tree({
+$('#tree1').tree({
 	data: data,
 	autoOpen: true
 });
@@ -264,7 +270,7 @@ $element.tree({
 		Open first level nodes:
 	</p>
 <pre>
-$element.tree({
+$('#tree1').tree({
 	data: data,
 	autoOpen: 0
 });
@@ -284,7 +290,7 @@ $element.tree({
 		Save state:
 	</p>
 <pre>
-$element.tree({
+$('#tree1').tree({
 	data: data,
 	saveState: true
 });
@@ -293,7 +299,7 @@ $element.tree({
 		Example: save state in cookie 'tree1':
 	</p>
 <pre>
-$element.tree({
+$('#tree1').tree({
 	data: data,
 	saveState: 'tree1'
 });
@@ -310,7 +316,7 @@ $element.tree({
 		Example: turn on drag and drop.
 	</p>
 <pre>
-$element.tree({
+$('#tree1').tree({
 	data: data,
 	dragAndDrop: true
 });
@@ -327,9 +333,125 @@ $element.tree({
 		Example: turn on selection of nodes.
 	</p>
 <pre>
-$element.tree({
+$('#tree1').tree({
 	data: data,
 	selectable: true
+});
+</pre>
+
+	<h5 id="tree-options-oncanselectnode">onCanSelectNode</h5>
+	<p>
+		You can set a function to override if a node can be selected. The function gets a node as parameter, and must return true or false.
+		<br />
+		For this to work, the option 'selectable' must be 'true'.
+	</p>
+<pre>
+// Example: nodes with children cannot be selected
+$('#tree1').tree({
+	data: data,
+	selectable: true
+	onCanSelectNode: function(node) {
+		if (node.children.length == 0) {
+			// Nodes without children can be selected
+			return true;
+		}
+		else {
+			// Nodes with children cannot be selected
+			return false;
+		}
+	}
+});
+</pre>
+
+	<h5 id="tree-options-onmovenode">onMoveNode</h5>
+	<p>
+		This function is called when a node is moved in the tree. The called functions look like this: function(moved_node, target_node, position).
+		Position is 'before', 'after' or 'inside'.
+	</p>
+	<p>
+		NB. We should replace this with an 'event' in the next version.
+	</p>
+<pre>
+$('#tree1').tree({
+	data: data,
+	dragAndDrop: true,
+	onMoveNode: function(moved_node, target_node, position) {
+		// Example: inform the backend about the move using xhr call.
+		$.post(
+			'move_node' + moved_node.id +
+			'/' + target_node_id: target_node.id +
+			'/' + position + '/'
+		);
+	}
+});
+</pre>
+
+	<h5 id="tree-options-oncreateli">onCreateLi</h5>
+	<p>
+		The function is called for each created node. You can use this to define extra html.
+	</p>
+<pre>
+$('#tree1).tree({
+	data: data,
+	onCreateLi: function(node, $li) {
+		// Add 'icon' span before title
+		$li.find('.title').before('<span class="icon"></span>');
+	}
+});
+</pre>
+
+	<h5 id="tree-options-onismovehandle">onIsMoveHandle</h5>
+	<p>
+		You can override this function to determine if a dom element can be used to move a node.
+	</p>
+<pre>
+$('#tree1').tree({
+	data: data,
+	onIsMoveHandle: function($element) {
+		// Only dom elements with 'title' class can be used
+		// as move handle.
+		return ($element.is('.title'));
+	}
+});
+</pre>
+
+	<h5 id="tree-options-oncanmove">onCanMove</h5>
+	<p>
+		You can override this function to determine if a node can be moved.
+	</p>
+<pre>
+$('#tree1').tree({
+	data: data,
+	dragAndDrop: true,
+	onCanMove: function(node) {
+		if (! moved_node.parent.parent) {
+			// Example: Cannot move root node
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+});
+</pre>
+
+	<h5 id="tree-options-oncanmoveto">onCanMoveTo</h5>
+	<p>
+		You can override this function to determine if a node can be moved to a certain position.
+	</p>
+<pre>
+$('#tree1').tree({
+	data: data,
+	dragAndDrop: true,
+	onCanMoveTo: function(moved_node, target_node, position) {
+		if (target_node.is_menu) {
+			// Example: can move inside menu, not before or after
+			return (position == 'inside');
+		}
+		else {
+			return true;
+		}
+	}
 });
 </pre>
 
