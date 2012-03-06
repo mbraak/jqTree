@@ -764,12 +764,18 @@ limitations under the License.
       handleNode = function(node, next_node, $element) {
         var top;
         top = getTop($element);
-        if (node === _this.current_item.node || next_node === _this.current_item.node) {
-          return addPosition(node, Position.NONE, top);
-        } else {
-          addPosition(node, Position.INSIDE, top);
-          return addPosition(node, Position.AFTER, top);
+        if (node === _this.current_item.node) {
+          addPosition(node, Position.NONE, top);
         }
+        ({
+          "else": addPosition(node, Position.INSIDE, top)
+        });
+        if (next_node === _this.current_item.node) {
+          addPosition(node, Position.NONE, top);
+        }
+        return {
+          "else": addPosition(node, Position.AFTER, top)
+        };
       };
       handleOpenFolder = function(node, $element) {
         if (node === _this.current_item.node) return false;
