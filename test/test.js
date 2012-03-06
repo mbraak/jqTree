@@ -557,7 +557,7 @@ test('tree initFromData', function() {
     );
 });
 
-module('json');
+module('util');
 
 test('toJson', function() {
     equal(Tree.toJson('abc'), '"abc"');
@@ -567,6 +567,18 @@ test('toJson', function() {
     equal(Tree.toJson({}), '{}');
     equal(Tree.toJson([1, 2, 3]), '[1,2,3]');
     equal(Tree.toJson(null), 'null');
+});
+
+test('indexOf', function() {
+    equal(Tree.indexOf([3, 2, 1], 1), 2);
+    equal(Tree.indexOf([4, 5, 6], 1), -1);
+});
+
+test('Position.getName', function() {
+    equal(
+        Tree.Position.getName(Tree.Position.BEFORE),
+        'before'
+    );
 });
 
 });

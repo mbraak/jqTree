@@ -26,14 +26,19 @@ limitations under the License.
 @Tree = {}
 $ = @jQuery
 
+# Standard javascript indexOf. Implemented here because not all browsers support it.
 indexOf = (array, item) ->
     if array.indexOf
+        # The browser supports indexOf
         return array.indexOf(item)
     else
+        # Do our own indexOf
         for value, i in array
             if value == item
                 return i
         return -1
+
+@Tree.indexOf = indexOf
 
 # toJson function; copied from jsons2
 Json = {}
@@ -109,7 +114,7 @@ toJson = (value) ->
         {'': value}
     )
 
-Tree.toJson = toJson
+@Tree.toJson = toJson
 
 Position =
     getName: (position) ->
