@@ -64,13 +64,12 @@ limitations under the License.
     }
   };
 
-  Json.str = function(key, holder, gap, rep, indent) {
-    var i, k, partial, v, value, _gap, _len, _len2, _v;
+  Json.str = function(key, holder) {
+    var i, k, partial, v, value, _len;
     value = holder[key];
     if (value && typeof value === 'object' && value.toJSON === 'function') {
       value = value.toJSON(key);
     }
-    if (typeof rep === 'function') value = rep.call(holder, key, value);
     switch (typeof value) {
       case 'string':
         return Json.quote(value);
@@ -88,56 +87,28 @@ limitations under the License.
         partial = [];
         if (Object.prototype.toString.apply(value) === '[object Array]') {
           for (i = 0, _len = value.length; i < _len; i++) {
-            _v = value[i];
-            partial[i] = Json.str(i, value, gap + indent, rep, indent) || 'null';
+            v = value[i];
+            partial[i] = Json.str(i, value) || 'null';
           }
-          return (partial.length === 0 ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']');
+          return (partial.length === 0 ? '[]' : '[' + partial.join(',') + ']');
         }
-        if (rep && typeof rep === 'object') {
-          for (i = 0, _len2 = value.length; i < _len2; i++) {
-            k = value[i];
-            if (typeof k === 'string') {
-              v = Json.str(k, value, gap, rep, indent);
-              if (v) {
-                _gap = gap ? ': ' : ':';
-                partial.push(Json.quote(k) + _gap + v);
-              }
-            }
-          }
-        } else {
-          for (k in value) {
-            if (Object.prototype.hasOwnProperty.call(value, k)) {
-              v = Json.str(k, value, gap, rep, indent);
-              if (v) {
-                _gap = gap ? ': ' : ':';
-                partial.push(Json.quote(k) + _gap + v);
-              }
-            }
+        for (k in value) {
+          if (Object.prototype.hasOwnProperty.call(value, k)) {
+            v = Json.str(k, value);
+            if (v) partial.push(Json.quote(k) + ':' + v);
           }
         }
-        return (partial.length === 0 ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}');
+        return (partial.length === 0 ? '{}' : '{' + partial.join(',') + '}');
     }
   };
 
-  toJson = function(value, replacer, space) {
-    var gap, i, indent, rep;
-    gap = '';
-    indent = '';
-    if (typeof space === 'number') {
-      for (i = 1; 1 <= space ? i <= space : i >= space; 1 <= space ? i++ : i--) {
-        indent += ' ';
-      }
-    } else if (typeof space === 'string') {
-      indent = space;
-    }
-    rep = replacer;
-    if (replacer && typeof replacer !== 'function' && typeof replacer !== 'object' && typeof replacer !== 'number') {
-      throw new Error('JSON.stringify');
-    }
+  toJson = function(value) {
     return Json.str('', {
       '': value
-    }, gap, rep, indent);
+    });
   };
+
+  Tree.toJson = toJson;
 
   Position = {
     getName: function(position) {

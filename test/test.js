@@ -557,4 +557,16 @@ test('tree initFromData', function() {
     );
 });
 
+module('json');
+
+test('toJson', function() {
+    equal(Tree.toJson('abc'), '"abc"');
+    equal(Tree.toJson(123), '123');
+    equal(Tree.toJson(true), 'true');
+    equal(Tree.toJson({abc: 'def'}), '{"abc":"def"}');
+    equal(Tree.toJson({}), '{}');
+    equal(Tree.toJson([1, 2, 3]), '[1,2,3]');
+    equal(Tree.toJson(null), 'null');
+});
+
 });

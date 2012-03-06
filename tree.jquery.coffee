@@ -62,14 +62,11 @@ Json.quote = (string) ->
     else
         return '"' + string + '"'
 
-Json.str = (key, holder, gap, rep, indent) ->
+Json.str = (key, holder) ->
     value = holder[key]
 
     if value and typeof value is 'object' and value.toJSON is 'function'
         value = value.toJSON(key)
-
-    if typeof rep == 'function'
-        value = rep.call(holder, key, value)
 
     switch typeof value
         when 'string'
@@ -87,63 +84,32 @@ Json.str = (key, holder, gap, rep, indent) ->
 
             partial = []
             if Object.prototype.toString.apply(value) is '[object Array]'
-                for _v, i in value
-                    partial[i] = Json.str(i, value, gap + indent, rep, indent) or 'null'
+                for v, i in value
+                    partial[i] = Json.str(i, value) or 'null'
 
                 return (
                     if partial.length is 0 then '[]'
-                    else if gap then '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
                     else '[' + partial.join(',') + ']'
                 )
 
-            if rep and typeof rep is 'object'
-                for k, i in value
-                    if typeof k is 'string'
-                        v = Json.str(k, value, gap, rep, indent)
-                        if v
-                            _gap = if gap then ': ' else ':'
-                            partial.push(Json.quote(k) + _gap + v)
-            else
-                for k of value
-                    if Object.prototype.hasOwnProperty.call(value, k)
-                        v = Json.str(k, value, gap, rep, indent)
-                        if v
-                            _gap = if gap then ': ' else ':'
-                            partial.push(Json.quote(k) + _gap + v)
+            for k of value
+                if Object.prototype.hasOwnProperty.call(value, k)
+                    v = Json.str(k, value)
+                    if v
+                        partial.push(Json.quote(k) + ':' + v)
 
             return (
                 if partial.length is 0 then '{}'
-                else if gap then '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
                 else '{' + partial.join(',') + '}'
             )
 
-toJson = (value, replacer, space) ->
-    gap = ''
-    indent = ''
-
-    if typeof space is 'number'
-        for i in [1..space]
-            indent += ' '
-    else if typeof space is 'string'
-        indent = space
-
-    rep = replacer
-
-    if (
-        replacer and
-        typeof replacer isnt 'function' and
-        typeof replacer isnt 'object' and
-        typeof replacer isnt 'number'
-    )
-        throw new Error('JSON.stringify')
-
+toJson = (value) ->
     return Json.str(
         '',
-        {'': value},
-        gap,
-        rep,
-        indent
+        {'': value}
     )
+
+Tree.toJson = toJson
 
 Position =
     getName: (position) ->
