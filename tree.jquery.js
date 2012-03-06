@@ -341,17 +341,19 @@ limitations under the License.
       var getDataFromNodes,
         _this = this;
       getDataFromNodes = function(nodes) {
-        var data, node, tmp_node, _i, _len;
+        var data, k, node, tmp_node, v, _i, _len;
         data = [];
         for (_i = 0, _len = nodes.length; _i < _len; _i++) {
           node = nodes[_i];
-          tmp_node = $.extend({}, node);
-          delete tmp_node.parent;
-          delete tmp_node.element;
+          tmp_node = {};
+          for (k in node) {
+            v = node[k];
+            if ((k !== 'parent' && k !== 'children' && k !== 'element') && Object.prototype.hasOwnProperty.call(node, k)) {
+              tmp_node[k] = v;
+            }
+          }
           if (node.hasChildren()) {
             tmp_node.children = getDataFromNodes(node.children);
-          } else {
-            delete tmp_node.children;
           }
           data.push(tmp_node);
         }

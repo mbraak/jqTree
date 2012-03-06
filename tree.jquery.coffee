@@ -315,19 +315,17 @@ class Node
             data = []
 
             for node in nodes
-                tmp_node = $.extend({}, node)
+                tmp_node = {}
 
-                # We remove the parent property to avoid JSON.stringify error with circular references.
-                delete tmp_node.parent
-
-                # The element is not really needed in the json representation.
-                delete tmp_node.element
+                for k, v of node
+                    if (
+                        k not in ['parent', 'children', 'element'] and
+                        Object.prototype.hasOwnProperty.call(node, k)
+                    )
+                        tmp_node[k] = v
 
                 if node.hasChildren()
                     tmp_node.children = getDataFromNodes(node.children)
-                else
-                    # This element has no children.
-                    delete tmp_node.children
 
                 data.push(tmp_node)
 
