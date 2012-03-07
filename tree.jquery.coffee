@@ -794,13 +794,16 @@ $.widget("ui.tree", $.ui.mouse, {
             if node == @current_item.node
                 # Cannot move inside current item
                 addPosition(node, Position.NONE, top)
-            else:
+            else
                 addPosition(node, Position.INSIDE, top)
 
-            if next_node == @current_item.node
-                # Cannot move before current item
+            if (
+                next_node == @current_item.node or
+                node == @current_item.node
+            )
+                # Cannot move before or after current item
                 addPosition(node, Position.NONE, top)
-            else:
+            else
                 addPosition(node, Position.AFTER, top)
 
         handleOpenFolder = (node, $element) =>
