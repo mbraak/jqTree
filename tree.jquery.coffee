@@ -13,15 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
-# todo: check for invalid move
-# todo: drag handle
-# todo: change cursor for moving / over node that can be moved
-# todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
-# todo: use jqueryui icons for folder triangles
-# todo: scroll while moving a node?
-# todo: plugins (also for dnd and state)?
-# todo: rename to jquery.tree.js? also css-file?
-# todo: move a node to root position
 
 @Tree = {}
 $ = @jQuery
