@@ -292,25 +292,27 @@ limitations under the License.
                return (level <= 2);
             }
         );
-    
-        Todo: remove level parameter, use different function for recursion (_iterate).
     */
 
     Node.prototype.iterate = function(callback, level) {
-      var child, result, _i, _len, _ref, _results;
-      if (!level) level = 0;
-      _ref = this.children;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        child = _ref[_i];
-        result = callback(child, level);
-        if (this.hasChildren() && result) {
-          _results.push(child.iterate(callback, level + 1));
-        } else {
-          _results.push(void 0);
+      var _iterate,
+        _this = this;
+      _iterate = function(level) {
+        var child, result, _i, _len, _ref, _results;
+        _ref = _this.children;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          result = callback(child, level);
+          if (_this.hasChildren() && result) {
+            _results.push(child.iterate(callback, level + 1));
+          } else {
+            _results.push(void 0);
+          }
         }
-      }
-      return _results;
+        return _results;
+      };
+      return _iterate(0);
     };
 
     /*

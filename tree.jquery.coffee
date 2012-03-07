@@ -261,17 +261,16 @@ class Node
         }
     );
 
-    Todo: remove level parameter, use different function for recursion (_iterate).
     ###
     iterate: (callback, level) ->
-        if not level
-            level = 0
+        _iterate = (level) =>
+            for child in @children
+                result = callback(child, level)
 
-        for child in @children
-            result = callback(child, level)
+                if @hasChildren() and result
+                     child.iterate(callback, level + 1)
 
-            if @hasChildren() and result
-                 child.iterate(callback, level + 1)
+        _iterate(0)
 
     ###
     Move node relative to another node.
