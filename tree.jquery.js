@@ -114,16 +114,15 @@ limitations under the License.
 
   Position = {
     getName: function(position) {
-      return this._getNames()[position];
-    },
-    _getNames: function() {
-      var names;
-      names = {};
-      names[Position.BEFORE] = 'before';
-      names[Position.AFTER] = 'after';
-      names[Position.INSIDE] = 'inside';
-      names[Position.NONE] = 'none';
-      return names;
+      if (position === Position.BEFORE) {
+        return 'before';
+      } else if (position === Position.AFTER) {
+        return 'after';
+      } else if (position === Position.INSIDE) {
+        return 'inside';
+      } else {
+        return 'none';
+      }
     }
   };
 

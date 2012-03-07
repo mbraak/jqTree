@@ -109,16 +109,14 @@ toJson = (value) ->
 
 Position =
     getName: (position) ->
-        return this._getNames()[position]
-
-    _getNames: ->
-        # todo: cache
-        names = {}
-        names[Position.BEFORE] = 'before'
-        names[Position.AFTER] = 'after'
-        names[Position.INSIDE] = 'inside'
-        names[Position.NONE] = 'none'
-        return names
+        if position == Position.BEFORE
+            return 'before'
+        else if position == Position.AFTER
+            return 'after'
+        else if position == Position.INSIDE
+            return 'inside'
+        else
+            return 'none'
 
 Position.BEFORE = 1
 Position.AFTER = 2
