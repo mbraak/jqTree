@@ -40,7 +40,6 @@
 				<li><a href="#tree-options-draganddrop">dragAndDrop</a></li>
 				<li><a href="#tree-options-selectable">selectable</a></li>
 				<li><a href="#tree-options-oncanselectnode">onCanSelectNode</a></li>
-				<li><a href="#tree-options-onmovenode">onMoveNode</a></li>
 				<li><a href="#tree-options-oncreateli">onCreateLi</a></li>
 				<li><a href="#tree-options-onismovehandle">onIsMoveHandle</a></li>
 				<li><a href="#tree-options-oncanmove">onCanMove</a></li>
@@ -52,6 +51,7 @@
 			<ul>
 				<li><a href="#event-tree-click">tree.click</a></li>
 				<li><a href="#event-tree-contextmenu">tree.contextmenu</a></li>
+				<li><a href="#event-tree-move">tree.move</a></li>
 			</ul>
 		</li>
 	</ul>
@@ -363,29 +363,6 @@ $('#tree1').tree({
 });
 </pre>
 
-	<h5 id="tree-options-onmovenode">onMoveNode</h5>
-	<p>
-		This function is called when a node is moved in the tree. The called functions look like this: function(moved_node, target_node, position).
-		Position is 'before', 'after' or 'inside'.
-	</p>
-	<p>
-		NB. We should replace this with an 'event' in the next version.
-	</p>
-<pre>
-$('#tree1').tree({
-	data: data,
-	dragAndDrop: true,
-	onMoveNode: function(moved_node, target_node, position) {
-		// Example: inform the backend about the move using xhr call.
-		$.post(
-			'move_node' + moved_node.id +
-			'/' + target_node_id: target_node.id +
-			'/' + position + '/'
-		);
-	}
-});
-</pre>
-
 	<h5 id="tree-options-oncreateli">onCreateLi</h5>
 	<p>
 		The function is called for each created node. You can use this to define extra html.
@@ -477,9 +454,9 @@ $('#tree1').bind(
 );
 </pre>
 
-	<h4 id="event-tree-contextmenu">tree.contextmenu</h4>
+	<h5 id="event-tree-contextmenu">tree.contextmenu</h5>
 	<p>
-		Triggered when user right-clicks a tree node.
+		Triggered when the user right-clicks a tree node.
 	</p>
 <pre>
 // create tree
@@ -497,6 +474,36 @@ $('#tree1').bind(
 	}
 );
 </pre>
+
+	<h5 id="event-tree-move">tree.move</h5>
+	<p>
+		Triggered when the user moves a node.
+	</p>
+	<p>
+		 Event.move_info contains:
+	<p>
+	<ul>
+		<li>moved_node</li>
+		<li>target_node</li>
+		<li>position: (before, after or inside)</li>
+	</ul>
+
+<pre>
+$('#tree1').tree({
+	data: data,
+	dragAndDrop: true
+});
+
+$('#tree1).bind(
+	'tree.move',
+	function(event) {
+		console.log('moved_node', e.move_info.moved_node);
+		console.log('target_node', e.move_info.target_node);
+		console.log('position', e.move_info.position);
+	}
+);
+</pre>
+
 </div>
 <script>
 	$(function() {

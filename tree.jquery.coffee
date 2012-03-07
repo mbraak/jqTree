@@ -333,7 +333,6 @@ $.widget("ui.tree", $.ui.mouse, {
         dragAndDrop: false
         selectable: false
         onCanSelectNode: null
-        onMoveNode: null
         onSetStateFromStorage: null
         onGetStateFromStorage: null
         onCreateLi: null
@@ -736,12 +735,12 @@ $.widget("ui.tree", $.ui.mouse, {
             if @hovered_area.position == Position.INSIDE
                 @hovered_area.node.is_open = true
 
-            if @options.onMoveNode
-                @options.onMoveNode(
-                    @current_item.node,
-                    @hovered_area.node,
-                    Position.getName(@hovered_area.position)
-                )
+            event = jQuery.Event('tree.move')
+            event.move_info = 
+                moved_node: @current_item.node
+                target_node: @hovered_area.node
+                position: Position.getName(@hovered_area.position)
+            @element.trigger(event)
 
             @element.empty()
             @_createDomElements(@tree)
