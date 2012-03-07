@@ -387,7 +387,6 @@ $.widget("ui.tree", $.ui.mouse, {
         @element.empty()
         @_createDomElements(@getTree())
 
-    # todo: is toggle really used?
     toggle: (node, on_finished) ->
         if node.hasChildren()
             new FolderElement(node).toggle(on_finished)
@@ -487,13 +486,12 @@ $.widget("ui.tree", $.ui.mouse, {
 
     _createDomElements: (tree) ->
         createUl = (depth, is_open) =>
-            classes = []
-            if not depth
-                classes.push('tree')
+            if depth
+                class_string = ''
+            else
+                class_string = ' class="tree"'
 
-            $element = $('<ul />')
-            $element.addClass(classes.join(' '))
-            return $element
+            return $("<ul#{ class_string }></ul>")
 
         createLi = (node) =>
             if node.hasChildren()
@@ -510,29 +508,36 @@ $.widget("ui.tree", $.ui.mouse, {
             return $("<li><div><span class=\"title\">#{ node.name #}</span></div></li>")
 
         createFolderLi = (node) =>
-            button_classes = ['toggler']
+            getButtonClass = ->
+                classes = ['toggler']
 
-            if not node.is_open
-                button_classes.push('closed')
+                if not node.is_open
+                    classes.push('closed')
 
-            class_string = button_classes.join(' ')
-            $li = $("<li><div><a class=\"#{ class_string }\">&raquo;</a><span class=\"title\">#{ node.name #}</span></div></li>")
+                return classes.join(' ')
 
-            # todo: add li class in text
-            folder_classes = ['folder']
-            if not node.is_open
-                folder_classes.push('closed')
+            getFolderClass = ->
+                classes = ['folder']
 
-            $li.addClass(folder_classes.join(' '))
-            return $li
+                if not node.is_open
+                    classes.push('closed')
+
+                return classes.join(' ')
+
+            button_class = getButtonClass()
+            folder_class = getFolderClass()
+
+            return $(
+                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ node.name #}</span></div></li>"
+            )
 
         doCreateDomElements = ($element, children, depth, is_open) ->
-            ul = createUl(depth, is_open)
-            $element.append(ul)
+            $ul = createUl(depth, is_open)
+            $element.append($ul)
 
             for child in children
                 $li = createLi(child)
-                ul.append($li)
+                $ul.append($li)
 
                 child.element = $li[0]
                 $li.data('node', child)

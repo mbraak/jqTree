@@ -538,25 +538,32 @@ limitations under the License.
         return $("<li><div><span class=\"title\">" + node.name + "</span></div></li>");
       };
       createFolderLi = function(node) {
-        var $li, button_classes, class_string, folder_classes;
-        button_classes = ['toggler'];
-        if (!node.is_open) button_classes.push('closed');
-        class_string = button_classes.join(' ');
-        $li = $("<li><div><a class=\"" + class_string + "\">&raquo;</a><span class=\"title\">" + node.name + "</span></div></li>");
-        folder_classes = ['folder'];
-        if (!node.is_open) folder_classes.push('closed');
-        $li.addClass(folder_classes.join(' '));
-        return $li;
+        var button_class, folder_class, getButtonClass, getFolderClass;
+        getButtonClass = function() {
+          var classes;
+          classes = ['toggler'];
+          if (!node.is_open) classes.push('closed');
+          return classes.join(' ');
+        };
+        getFolderClass = function() {
+          var classes;
+          classes = ['folder'];
+          if (!node.is_open) classes.push('closed');
+          return classes.join(' ');
+        };
+        button_class = getButtonClass();
+        folder_class = getFolderClass();
+        return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"title\">" + node.name + "</span></div></li>");
       };
       doCreateDomElements = function($element, children, depth, is_open) {
-        var $li, child, ul, _i, _len, _results;
-        ul = createUl(depth, is_open);
-        $element.append(ul);
+        var $li, $ul, child, _i, _len, _results;
+        $ul = createUl(depth, is_open);
+        $element.append($ul);
         _results = [];
         for (_i = 0, _len = children.length; _i < _len; _i++) {
           child = children[_i];
           $li = createLi(child);
-          ul.append($li);
+          $ul.append($li);
           child.element = $li[0];
           $li.data('node', child);
           if (child.hasChildren()) {
