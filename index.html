@@ -50,6 +50,7 @@
 			<a href="#functions">Functions</a>
 			<ul>
 				<li><a href="#functions-loadData">loadData</a></li>
+				<li><a href="#functions-tojson">toJson</a></li>
 			</ul>
 		</li>
 		<li>
@@ -461,6 +462,15 @@ var new_data = [
 	}
 ];
 $('#tree1').tree('loadData', new_data);
+</pre>
+
+	<h5 id="functions-tojson">toJson</h5>
+	<p>
+		Get the tree data as json.
+	</p>
+<pre>
+// Assuming the tree exists
+$('#tree1').tree('toJson');
 </pre>
 
 	<h4 id="events">Events</h4>
