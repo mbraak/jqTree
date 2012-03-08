@@ -247,9 +247,9 @@ test("tree toJson", function() {
     // 1. call toJson
     equal(
         $tree.tree('toJson'),
-        '[{"name":"node1","children":'+
-        '[{"name":"child1"},{"name":"child2"}],"id":123},'+
-        '{"name":"node2","children":[{"name":"child3"}],"id":124}]'
+        '[{"name":"node1","id":123,"children":'+
+        '[{"name":"child1"},{"name":"child2"}]},'+
+        '{"name":"node2","id":124,"children":[{"name":"child3"}]}]'
     );
 
     // Check that properties 'children', 'parent' and 'element' still exist.
@@ -554,6 +554,63 @@ test('tree initFromData', function() {
         format_nodes(node.children),
         'c1 c2',
         'children'
+    );
+});
+
+test('tree getData', function() {
+	// 1. empty node
+	var node = new Tree.Node();
+	deepEqual(node.getData(), []);
+
+	// 2.node with data
+	node.loadFromData(
+		[
+			{
+				label: 'n1',
+				children: [
+					{
+						label: 'c1'
+					}
+				]
+			}
+		]
+	);
+	deepEqual(
+		node.getData(),
+		[
+			{
+				name: 'n1',
+				children: [
+					{
+						name: 'c1'
+					}
+				]
+			}
+		]
+	);
+});
+
+module('util');
+
+test('toJson', function() {
+    equal(Tree.toJson('abc'), '"abc"');
+    equal(Tree.toJson(123), '123');
+    equal(Tree.toJson(true), 'true');
+    equal(Tree.toJson({abc: 'def'}), '{"abc":"def"}');
+    equal(Tree.toJson({}), '{}');
+    equal(Tree.toJson([1, 2, 3]), '[1,2,3]');
+    equal(Tree.toJson(null), 'null');
+});
+
+test('indexOf', function() {
+    equal(Tree.indexOf([3, 2, 1], 1), 2);
+    equal(Tree.indexOf([4, 5, 6], 1), -1);
+});
+
+test('Position.getName', function() {
+    equal(
+        Tree.Position.getName(Tree.Position.BEFORE),
+        'before'
     );
 });
 

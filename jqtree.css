@@ -129,5 +129,5 @@ ul.tree li.selected > div:hover {
 }
 
 ul.tree .moving > div .title {
-	border: dashed 1px #0000ff;
+	outline: dashed 1px #0000ff;
 }

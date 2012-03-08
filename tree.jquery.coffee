@@ -1,5 +1,5 @@
 ###
-Copyright 2011 Marco Braak
+Copyright 2012 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,27 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
-# todo: check for invalid move
-# todo: drag handle
-# todo: change cursor for moving / over node that can be moved
-# todo: easier (alternative) syntax for input json data (string instead of 'label', array instead of 'children')
-# todo: use jqueryui icons for folder triangles
-# todo: scroll while moving a node?
-# todo: plugins (also for dnd and state)?
-# todo: rename to jquery.tree.js? also css-file?
-# todo: move a node to root position
 
 @Tree = {}
 $ = @jQuery
 
+# Standard javascript indexOf. Implemented here because not all browsers support it.
 indexOf = (array, item) ->
     if array.indexOf
+        # The browser supports indexOf
         return array.indexOf(item)
     else
+        # Do our own indexOf
         for value, i in array
             if value == item
                 return i
         return -1
+
+@Tree.indexOf = indexOf
 
 # toJson function; copied from jsons2
 Json = {}
@@ -62,14 +58,11 @@ Json.quote = (string) ->
     else
         return '"' + string + '"'
 
-Json.str = (key, holder, gap, rep, indent) ->
+Json.str = (key, holder) ->
     value = holder[key]
 
     if value and typeof value is 'object' and value.toJSON is 'function'
         value = value.toJSON(key)
-
-    if typeof rep == 'function'
-        value = rep.call(holder, key, value)
 
     switch typeof value
         when 'string'
@@ -87,76 +80,43 @@ Json.str = (key, holder, gap, rep, indent) ->
 
             partial = []
             if Object.prototype.toString.apply(value) is '[object Array]'
-                for _v, i in value
-                    partial[i] = Json.str(i, value, gap + indent, rep, indent) or 'null'
+                for v, i in value
+                    partial[i] = Json.str(i, value) or 'null'
 
                 return (
                     if partial.length is 0 then '[]'
-                    else if gap then '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
                     else '[' + partial.join(',') + ']'
                 )
 
-            if rep and typeof rep is 'object'
-                for k, i in value
-                    if typeof k is 'string'
-                        v = Json.str(k, value, gap, rep, indent)
-                        if v
-                            _gap = if gap then ': ' else ':'
-                            partial.push(Json.quote(k) + _gap + v)
-            else
-                for k of value
-                    if Object.prototype.hasOwnProperty.call(value, k)
-                        v = Json.str(k, value, gap, rep, indent)
-                        if v
-                            _gap = if gap then ': ' else ':'
-                            partial.push(Json.quote(k) + _gap + v)
+            for k of value
+                if Object.prototype.hasOwnProperty.call(value, k)
+                    v = Json.str(k, value)
+                    if v
+                        partial.push(Json.quote(k) + ':' + v)
 
             return (
                 if partial.length is 0 then '{}'
-                else if gap then '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
                 else '{' + partial.join(',') + '}'
             )
 
-toJson = (value, replacer, space) ->
-    gap = ''
-    indent = ''
-
-    if typeof space is 'number'
-        for i in [1..space]
-            indent += ' '
-    else if typeof space is 'string'
-        indent = space
-
-    rep = replacer
-
-    if (
-        replacer and
-        typeof replacer isnt 'function' and
-        typeof replacer isnt 'object' and
-        typeof replacer isnt 'number'
-    )
-        throw new Error('JSON.stringify')
-
+toJson = (value) ->
     return Json.str(
         '',
-        {'': value},
-        gap,
-        rep,
-        indent
+        {'': value}
     )
+
+@Tree.toJson = toJson
 
 Position =
     getName: (position) ->
-        return this._getNames()[position]
-
-    _getNames: ->
-        # todo: cache
-        names = {}
-        names[Position.BEFORE] = 'before'
-        names[Position.AFTER] = 'after'
-        names[Position.INSIDE] = 'inside'
-        names[Position.NONE] = 'none'
-        return names
+        if position == Position.BEFORE
+            return 'before'
+        else if position == Position.AFTER
+            return 'after'
+        else if position == Position.INSIDE
+            return 'inside'
+        else
+            return 'none'
 
 Position.BEFORE = 1
 Position.AFTER = 2
@@ -299,17 +259,16 @@ class Node
         }
     );
 
-    Todo: remove level parameter, use different function for recursion (_iterate).
     ###
     iterate: (callback, level) ->
-        if not level
-            level = 0
+        _iterate = (level) =>
+            for child in @children
+                result = callback(child, level)
 
-        for child in @children
-            result = callback(child, level)
+                if @hasChildren() and result
+                     child.iterate(callback, level + 1)
 
-            if @hasChildren() and result
-                 child.iterate(callback, level + 1)
+        _iterate(0)
 
     ###
     Move node relative to another node.
@@ -344,19 +303,17 @@ class Node
             data = []
 
             for node in nodes
-                tmp_node = $.extend({}, node)
+                tmp_node = {}
 
-                # We remove the parent property to avoid JSON.stringify error with circular references.
-                delete tmp_node.parent
-
-                # The element is not really needed in the json representation.
-                delete tmp_node.element
+                for k, v of node
+                    if (
+                        k not in ['parent', 'children', 'element'] and
+                        Object.prototype.hasOwnProperty.call(node, k)
+                    )
+                        tmp_node[k] = v
 
                 if node.hasChildren()
                     tmp_node.children = getDataFromNodes(node.children)
-                else
-                    # This element has no children.
-                    delete tmp_node.children
 
                 data.push(tmp_node)
 
@@ -374,7 +331,6 @@ $.widget("ui.tree", $.ui.mouse, {
         dragAndDrop: false
         selectable: false
         onCanSelectNode: null
-        onMoveNode: null
         onSetStateFromStorage: null
         onGetStateFromStorage: null
         onCreateLi: null
@@ -428,7 +384,6 @@ $.widget("ui.tree", $.ui.mouse, {
         @element.empty()
         @_createDomElements(@getTree())
 
-    # todo: is toggle really used?
     toggle: (node, on_finished) ->
         if node.hasChildren()
             new FolderElement(node).toggle(on_finished)
@@ -528,13 +483,12 @@ $.widget("ui.tree", $.ui.mouse, {
 
     _createDomElements: (tree) ->
         createUl = (depth, is_open) =>
-            classes = []
-            if not depth
-                classes.push('tree')
+            if depth
+                class_string = ''
+            else
+                class_string = ' class="tree"'
 
-            $element = $('<ul />')
-            $element.addClass(classes.join(' '))
-            return $element
+            return $("<ul#{ class_string }></ul>")
 
         createLi = (node) =>
             if node.hasChildren()
@@ -551,29 +505,36 @@ $.widget("ui.tree", $.ui.mouse, {
             return $("<li><div><span class=\"title\">#{ node.name #}</span></div></li>")
 
         createFolderLi = (node) =>
-            button_classes = ['toggler']
+            getButtonClass = ->
+                classes = ['toggler']
 
-            if not node.is_open
-                button_classes.push('closed')
+                if not node.is_open
+                    classes.push('closed')
 
-            class_string = button_classes.join(' ')
-            $li = $("<li><div><a class=\"#{ class_string }\">&raquo;</a><span class=\"title\">#{ node.name #}</span></div></li>")
+                return classes.join(' ')
 
-            # todo: add li class in text
-            folder_classes = ['folder']
-            if not node.is_open
-                folder_classes.push('closed')
+            getFolderClass = ->
+                classes = ['folder']
 
-            $li.addClass(folder_classes.join(' '))
-            return $li
+                if not node.is_open
+                    classes.push('closed')
+
+                return classes.join(' ')
+
+            button_class = getButtonClass()
+            folder_class = getFolderClass()
+
+            return $(
+                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ node.name #}</span></div></li>"
+            )
 
         doCreateDomElements = ($element, children, depth, is_open) ->
-            ul = createUl(depth, is_open)
-            $element.append(ul)
+            $ul = createUl(depth, is_open)
+            $element.append($ul)
 
             for child in children
                 $li = createLi(child)
-                ul.append($li)
+                $ul.append($li)
 
                 child.element = $li[0]
                 $li.data('node', child)
@@ -772,12 +733,12 @@ $.widget("ui.tree", $.ui.mouse, {
             if @hovered_area.position == Position.INSIDE
                 @hovered_area.node.is_open = true
 
-            if @options.onMoveNode
-                @options.onMoveNode(
-                    @current_item.node,
-                    @hovered_area.node,
-                    Position.getName(@hovered_area.position)
-                )
+            event = jQuery.Event('tree.move')
+            event.move_info = 
+                moved_node: @current_item.node
+                target_node: @hovered_area.node
+                position: Position.getName(@hovered_area.position)
+            @element.trigger(event)
 
             @element.empty()
             @_createDomElements(@tree)
@@ -831,13 +792,16 @@ $.widget("ui.tree", $.ui.mouse, {
             if node == @current_item.node
                 # Cannot move inside current item
                 addPosition(node, Position.NONE, top)
-            else:
+            else
                 addPosition(node, Position.INSIDE, top)
 
-            if next_node == @current_item.node
-                # Cannot move before current item
+            if (
+                next_node == @current_item.node or
+                node == @current_item.node
+            )
+                # Cannot move before or after current item
                 addPosition(node, Position.NONE, top)
-            else:
+            else
                 addPosition(node, Position.AFTER, top)
 
         handleOpenFolder = (node, $element) =>
