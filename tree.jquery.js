@@ -1,6 +1,6 @@
 
 /*
-Copyright 2011 Marco Braak
+Copyright 2012 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ limitations under the License.
     }
   };
 
+  this.Tree.indexOf = indexOf;
+
   Json = {};
 
   Json.escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
@@ -64,13 +66,12 @@ limitations under the License.
     }
   };
 
-  Json.str = function(key, holder, gap, rep, indent) {
-    var i, k, partial, v, value, _gap, _len, _len2, _v;
+  Json.str = function(key, holder) {
+    var i, k, partial, v, value, _len;
     value = holder[key];
     if (value && typeof value === 'object' && value.toJSON === 'function') {
       value = value.toJSON(key);
     }
-    if (typeof rep === 'function') value = rep.call(holder, key, value);
     switch (typeof value) {
       case 'string':
         return Json.quote(value);
@@ -88,69 +89,40 @@ limitations under the License.
         partial = [];
         if (Object.prototype.toString.apply(value) === '[object Array]') {
           for (i = 0, _len = value.length; i < _len; i++) {
-            _v = value[i];
-            partial[i] = Json.str(i, value, gap + indent, rep, indent) || 'null';
+            v = value[i];
+            partial[i] = Json.str(i, value) || 'null';
           }
-          return (partial.length === 0 ? '[]' : gap ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' : '[' + partial.join(',') + ']');
+          return (partial.length === 0 ? '[]' : '[' + partial.join(',') + ']');
         }
-        if (rep && typeof rep === 'object') {
-          for (i = 0, _len2 = value.length; i < _len2; i++) {
-            k = value[i];
-            if (typeof k === 'string') {
-              v = Json.str(k, value, gap, rep, indent);
-              if (v) {
-                _gap = gap ? ': ' : ':';
-                partial.push(Json.quote(k) + _gap + v);
-              }
-            }
-          }
-        } else {
-          for (k in value) {
-            if (Object.prototype.hasOwnProperty.call(value, k)) {
-              v = Json.str(k, value, gap, rep, indent);
-              if (v) {
-                _gap = gap ? ': ' : ':';
-                partial.push(Json.quote(k) + _gap + v);
-              }
-            }
+        for (k in value) {
+          if (Object.prototype.hasOwnProperty.call(value, k)) {
+            v = Json.str(k, value);
+            if (v) partial.push(Json.quote(k) + ':' + v);
           }
         }
-        return (partial.length === 0 ? '{}' : gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' : '{' + partial.join(',') + '}');
+        return (partial.length === 0 ? '{}' : '{' + partial.join(',') + '}');
     }
   };
 
-  toJson = function(value, replacer, space) {
-    var gap, i, indent, rep;
-    gap = '';
-    indent = '';
-    if (typeof space === 'number') {
-      for (i = 1; 1 <= space ? i <= space : i >= space; 1 <= space ? i++ : i--) {
-        indent += ' ';
-      }
-    } else if (typeof space === 'string') {
-      indent = space;
-    }
-    rep = replacer;
-    if (replacer && typeof replacer !== 'function' && typeof replacer !== 'object' && typeof replacer !== 'number') {
-      throw new Error('JSON.stringify');
-    }
+  toJson = function(value) {
     return Json.str('', {
       '': value
-    }, gap, rep, indent);
+    });
   };
+
+  this.Tree.toJson = toJson;
 
   Position = {
     getName: function(position) {
-      return this._getNames()[position];
-    },
-    _getNames: function() {
-      var names;
-      names = {};
-      names[Position.BEFORE] = 'before';
-      names[Position.AFTER] = 'after';
-      names[Position.INSIDE] = 'inside';
-      names[Position.NONE] = 'none';
-      return names;
+      if (position === Position.BEFORE) {
+        return 'before';
+      } else if (position === Position.AFTER) {
+        return 'after';
+      } else if (position === Position.INSIDE) {
+        return 'inside';
+      } else {
+        return 'none';
+      }
     }
   };
 
@@ -319,25 +291,27 @@ limitations under the License.
                return (level <= 2);
             }
         );
-    
-        Todo: remove level parameter, use different function for recursion (_iterate).
     */
 
     Node.prototype.iterate = function(callback, level) {
-      var child, result, _i, _len, _ref, _results;
-      if (!level) level = 0;
-      _ref = this.children;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        child = _ref[_i];
-        result = callback(child, level);
-        if (this.hasChildren() && result) {
-          _results.push(child.iterate(callback, level + 1));
-        } else {
-          _results.push(void 0);
+      var _iterate,
+        _this = this;
+      _iterate = function(level) {
+        var child, result, _i, _len, _ref, _results;
+        _ref = _this.children;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          result = callback(child, level);
+          if (_this.hasChildren() && result) {
+            _results.push(child.iterate(callback, level + 1));
+          } else {
+            _results.push(void 0);
+          }
         }
-      }
-      return _results;
+        return _results;
+      };
+      return _iterate(0);
     };
 
     /*
@@ -368,17 +342,19 @@ limitations under the License.
       var getDataFromNodes,
         _this = this;
       getDataFromNodes = function(nodes) {
-        var data, node, tmp_node, _i, _len;
+        var data, k, node, tmp_node, v, _i, _len;
         data = [];
         for (_i = 0, _len = nodes.length; _i < _len; _i++) {
           node = nodes[_i];
-          tmp_node = $.extend({}, node);
-          delete tmp_node.parent;
-          delete tmp_node.element;
+          tmp_node = {};
+          for (k in node) {
+            v = node[k];
+            if ((k !== 'parent' && k !== 'children' && k !== 'element') && Object.prototype.hasOwnProperty.call(node, k)) {
+              tmp_node[k] = v;
+            }
+          }
           if (node.hasChildren()) {
             tmp_node.children = getDataFromNodes(node.children);
-          } else {
-            delete tmp_node.children;
           }
           data.push(tmp_node);
         }
@@ -401,7 +377,6 @@ limitations under the License.
       dragAndDrop: false,
       selectable: false,
       onCanSelectNode: null,
-      onMoveNode: null,
       onSetStateFromStorage: null,
       onGetStateFromStorage: null,
       onCreateLi: null,
@@ -540,12 +515,13 @@ limitations under the License.
       var createFolderLi, createLi, createNodeLi, createUl, doCreateDomElements,
         _this = this;
       createUl = function(depth, is_open) {
-        var $element, classes;
-        classes = [];
-        if (!depth) classes.push('tree');
-        $element = $('<ul />');
-        $element.addClass(classes.join(' '));
-        return $element;
+        var class_string;
+        if (depth) {
+          class_string = '';
+        } else {
+          class_string = ' class="tree"';
+        }
+        return $("<ul" + class_string + "></ul>");
       };
       createLi = function(node) {
         var $li;
@@ -561,25 +537,32 @@ limitations under the License.
         return $("<li><div><span class=\"title\">" + node.name + "</span></div></li>");
       };
       createFolderLi = function(node) {
-        var $li, button_classes, class_string, folder_classes;
-        button_classes = ['toggler'];
-        if (!node.is_open) button_classes.push('closed');
-        class_string = button_classes.join(' ');
-        $li = $("<li><div><a class=\"" + class_string + "\">&raquo;</a><span class=\"title\">" + node.name + "</span></div></li>");
-        folder_classes = ['folder'];
-        if (!node.is_open) folder_classes.push('closed');
-        $li.addClass(folder_classes.join(' '));
-        return $li;
+        var button_class, folder_class, getButtonClass, getFolderClass;
+        getButtonClass = function() {
+          var classes;
+          classes = ['toggler'];
+          if (!node.is_open) classes.push('closed');
+          return classes.join(' ');
+        };
+        getFolderClass = function() {
+          var classes;
+          classes = ['folder'];
+          if (!node.is_open) classes.push('closed');
+          return classes.join(' ');
+        };
+        button_class = getButtonClass();
+        folder_class = getFolderClass();
+        return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"title\">" + node.name + "</span></div></li>");
       };
       doCreateDomElements = function($element, children, depth, is_open) {
-        var $li, child, ul, _i, _len, _results;
-        ul = createUl(depth, is_open);
-        $element.append(ul);
+        var $li, $ul, child, _i, _len, _results;
+        $ul = createUl(depth, is_open);
+        $element.append($ul);
         _results = [];
         for (_i = 0, _len = children.length; _i < _len; _i++) {
           child = children[_i];
           $li = createLi(child);
-          ul.append($li);
+          $ul.append($li);
           child.element = $li[0];
           $li.data('node', child);
           if (child.hasChildren()) {
@@ -737,14 +720,19 @@ limitations under the License.
       return $.ui.mouse.prototype._mouseMove.call(this, event);
     },
     _moveItem: function() {
+      var event;
       if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
         this.tree.moveNode(this.current_item.node, this.hovered_area.node, this.hovered_area.position);
         if (this.hovered_area.position === Position.INSIDE) {
           this.hovered_area.node.is_open = true;
         }
-        if (this.options.onMoveNode) {
-          this.options.onMoveNode(this.current_item.node, this.hovered_area.node, Position.getName(this.hovered_area.position));
-        }
+        event = jQuery.Event('tree.move');
+        event.move_info = {
+          moved_node: this.current_item.node,
+          target_node: this.hovered_area.node,
+          position: Position.getName(this.hovered_area.position)
+        };
+        this.element.trigger(event);
         this.element.empty();
         return this._createDomElements(this.tree);
       }
@@ -793,16 +781,14 @@ limitations under the License.
         top = getTop($element);
         if (node === _this.current_item.node) {
           addPosition(node, Position.NONE, top);
+        } else {
+          addPosition(node, Position.INSIDE, top);
         }
-        ({
-          "else": addPosition(node, Position.INSIDE, top)
-        });
-        if (next_node === _this.current_item.node) {
-          addPosition(node, Position.NONE, top);
+        if (next_node === _this.current_item.node || node === _this.current_item.node) {
+          return addPosition(node, Position.NONE, top);
+        } else {
+          return addPosition(node, Position.AFTER, top);
         }
-        return {
-          "else": addPosition(node, Position.AFTER, top)
-        };
       };
       handleOpenFolder = function(node, $element) {
         if (node === _this.current_item.node) return false;
