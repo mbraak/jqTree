@@ -26,6 +26,7 @@
 <body>
 <div id="page">
 	<h1>Dinosaur family tree</h1>
+	<a href="#" id="button1">load data</a>
 	<div id="tree1"></div>
 	<script>
 		$(function() {
@@ -105,6 +106,28 @@
 				dragAndDrop: true,
 				selectable: true
 			});
+		});
+		$('#button1').click(function() {
+			var example_data = [
+			    {
+			        label: 'node1',
+			        id: 123,  // extra data
+			        children: [
+			            { label: 'child1' },
+			            { label: 'child2' }
+			        ]
+			    },
+			    {
+			        label: 'node2',
+			        id: 124,
+			        children: [
+			            { label: 'child3' }
+			        ]
+			    }
+			];
+
+			$('#tree1').tree('loadData', example_data);
+			return false;
 		});
 	</script>
 </div>

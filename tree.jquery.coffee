@@ -339,18 +339,7 @@ $.widget("ui.tree", $.ui.mouse, {
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
 
     _create: ->
-        @tree = new Node()
-        @tree.loadFromData(@options.data)
-
-        @selected_node = null
-        @_openNodes()
-
-        @_createDomElements(@tree)
-
-        if @selected_node
-            node_element = @_getNodeElementForNode(@selected_node)
-            if node_element
-                node_element.select()
+        @_initTree(@options.data)
 
         @element.click($.proxy(@_click, this))
         @element.bind('contextmenu', $.proxy(@_contextmenu, this))
@@ -404,6 +393,23 @@ $.widget("ui.tree", $.ui.mouse, {
 
     getSelectedNode: ->
         return @selected_node or false
+
+    loadData: (data) ->
+         @_initTree(data)
+
+    _initTree: (data) ->
+        @tree = new Node()
+        @tree.loadFromData(data)
+
+        @selected_node = null
+        @_openNodes()
+
+        @_createDomElements(@tree)
+
+        if @selected_node
+            node_element = @_getNodeElementForNode(@selected_node)
+            if node_element
+                node_element.select()
 
     _getState: ->
         open_nodes = []
@@ -542,6 +548,7 @@ $.widget("ui.tree", $.ui.mouse, {
                 if child.hasChildren()
                     doCreateDomElements($li, child.children, depth + 1, child.is_open)
 
+        @element.empty()
         doCreateDomElements(@element, tree.children, 0, true)
 
     _click: (e) ->

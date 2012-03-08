@@ -385,16 +385,7 @@ limitations under the License.
       onCanMoveTo: null
     },
     _create: function() {
-      var node_element;
-      this.tree = new Node();
-      this.tree.loadFromData(this.options.data);
-      this.selected_node = null;
-      this._openNodes();
-      this._createDomElements(this.tree);
-      if (this.selected_node) {
-        node_element = this._getNodeElementForNode(this.selected_node);
-        if (node_element) node_element.select();
-      }
+      this._initTree(this.options.data);
       this.element.click($.proxy(this._click, this));
       this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
       this._mouseInit();
@@ -439,6 +430,21 @@ limitations under the License.
     },
     getSelectedNode: function() {
       return this.selected_node || false;
+    },
+    loadData: function(data) {
+      return this._initTree(data);
+    },
+    _initTree: function(data) {
+      var node_element;
+      this.tree = new Node();
+      this.tree.loadFromData(data);
+      this.selected_node = null;
+      this._openNodes();
+      this._createDomElements(this.tree);
+      if (this.selected_node) {
+        node_element = this._getNodeElementForNode(this.selected_node);
+        if (node_element) return node_element.select();
+      }
     },
     _getState: function() {
       var open_nodes, selected_node,
@@ -573,6 +579,7 @@ limitations under the License.
         }
         return _results;
       };
+      this.element.empty();
       return doCreateDomElements(this.element, tree.children, 0, true);
     },
     _click: function(e) {

@@ -47,6 +47,12 @@
 			</ul>
 		</li>
 		<li>
+			<a href="#functions">Functions</a>
+			<ul>
+				<li><a href="#functions-loadData">loadData</a></li>
+			</ul>
+		</li>
+		<li>
 			<a href="#events">Events</a>
 			<ul>
 				<li><a href="#event-tree-click">tree.click</a></li>
@@ -430,6 +436,31 @@ $('#tree1').tree({
 		}
 	}
 });
+</pre>
+
+	<h4 id="functions">Functions</h4>
+	<h5 id="functions-loadData">loadData</h5>
+	<p>
+		Load the tree with new data.
+	</p>
+<pre>
+// Assuming the tree exists
+var new_data = [
+	{
+		label: 'node1',
+		children: [
+			{ label: 'child1' },
+			{ label: 'child2' }
+		]
+	},
+	{
+		label: 'node2',
+		children: [
+			{ label: 'child3' }
+		]
+	}
+];
+$('#tree1').tree('loadData', new_data);
 </pre>
 
 	<h4 id="events">Events</h4>
