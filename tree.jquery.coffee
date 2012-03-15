@@ -576,7 +576,7 @@ $.widget("ui.tree", $.ui.mouse, {
                 )
                     @selectNode(node)
 
-                    event = jQuery.Event('tree.click')
+                    event = $.Event('tree.click')
                     event.node = node
                     @element.trigger(event)
 
@@ -588,7 +588,7 @@ $.widget("ui.tree", $.ui.mouse, {
                 e.preventDefault()
                 e.stopPropagation()
 
-                event = jQuery.Event('tree.contextmenu')
+                event = $.Event('tree.contextmenu')
                 event.node = node
                 event.click_event = e
                 @element.trigger(event)
@@ -740,7 +740,7 @@ $.widget("ui.tree", $.ui.mouse, {
             if @hovered_area.position == Position.INSIDE
                 @hovered_area.node.is_open = true
 
-            event = jQuery.Event('tree.move')
+            event = $.Event('tree.move')
             event.move_info = 
                 moved_node: @current_item.node
                 target_node: @hovered_area.node

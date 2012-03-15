@@ -599,7 +599,7 @@ limitations under the License.
         if (node) {
           if ((!this.options.onCanSelectNode) || this.options.onCanSelectNode(node)) {
             this.selectNode(node);
-            event = jQuery.Event('tree.click');
+            event = $.Event('tree.click');
             event.node = node;
             return this.element.trigger(event);
           }
@@ -614,7 +614,7 @@ limitations under the License.
         if (node) {
           e.preventDefault();
           e.stopPropagation();
-          event = jQuery.Event('tree.contextmenu');
+          event = $.Event('tree.contextmenu');
           event.node = node;
           event.click_event = e;
           this.element.trigger(event);
@@ -733,7 +733,7 @@ limitations under the License.
         if (this.hovered_area.position === Position.INSIDE) {
           this.hovered_area.node.is_open = true;
         }
-        event = jQuery.Event('tree.move');
+        event = $.Event('tree.move');
         event.move_info = {
           moved_node: this.current_item.node,
           target_node: this.hovered_area.node,
