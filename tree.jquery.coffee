@@ -380,13 +380,26 @@ $.widget("ui.tree", $.ui.mouse, {
         if @options.saveState
             @_saveState()
 
-    selectNode: (node) ->
+    openNode: (node, on_finished, skip_slide) ->
+        if node.hasChildren()
+            new FolderElement(node).open(on_finished, skip_slide)
+
+    selectNode: (node, must_open_parents) ->
         if @options.selectable
             if @selected_node
                 @_getNodeElementForNode(@selected_node).deselect()
 
             @_getNodeElementForNode(node).select()
             @selected_node = node
+
+            if must_open_parents
+                parent = @selected_node.parent
+
+                while parent
+                    if not parent.is_open
+                        this.openNode(parent, null, true)
+
+                    parent = parent.parent
 
             if @options.saveState
                 @_saveState()
@@ -1070,20 +1083,20 @@ class FolderElement extends NodeElement
         else
             @open(on_finished)
 
-    open: (on_finished) ->
+    open: (on_finished, skip_slide) ->
         @node.is_open = true
         @getButton().removeClass('closed')
 
-        @getUl().slideDown(
-            'fast',
-            $.proxy(
-                ->
-                    @getLi().removeClass('closed')
-                    if on_finished
-                        on_finished()
-                , this
-            )
-        )
+        doOpen = =>
+            @getLi().removeClass('closed')
+            if on_finished
+                on_finished()
+
+        if skip_slide
+            @getUl().show()
+            doOpen()
+        else
+            @getUl().slideDown('fast', doOpen)
 
     close: (on_finished) ->
         @node.is_open = false
@@ -1091,13 +1104,10 @@ class FolderElement extends NodeElement
 
         @getUl().slideUp(
             'fast',
-            $.proxy(
-                ->
-                    @getLi().addClass('closed')
-                    if on_finished
-                        on_finished()
-                , this
-            )
+            =>
+                @getLi().addClass('closed')
+                if on_finished
+                    on_finished()
         )
 
     getButton: ->

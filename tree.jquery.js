@@ -418,13 +418,26 @@ limitations under the License.
       if (node.hasChildren()) new FolderElement(node).toggle(on_finished);
       if (this.options.saveState) return this._saveState();
     },
-    selectNode: function(node) {
+    openNode: function(node, on_finished, skip_slide) {
+      if (node.hasChildren()) {
+        return new FolderElement(node).open(on_finished, skip_slide);
+      }
+    },
+    selectNode: function(node, must_open_parents) {
+      var parent;
       if (this.options.selectable) {
         if (this.selected_node) {
           this._getNodeElementForNode(this.selected_node).deselect();
         }
         this._getNodeElementForNode(node).select();
         this.selected_node = node;
+        if (must_open_parents) {
+          parent = this.selected_node.parent;
+          while (parent) {
+            if (!parent.is_open) this.openNode(parent, null, true);
+            parent = parent.parent;
+          }
+        }
         if (this.options.saveState) return this._saveState();
       }
     },
@@ -1078,22 +1091,31 @@ limitations under the License.
       }
     };
 
-    FolderElement.prototype.open = function(on_finished) {
+    FolderElement.prototype.open = function(on_finished, skip_slide) {
+      var doOpen,
+        _this = this;
       this.node.is_open = true;
       this.getButton().removeClass('closed');
-      return this.getUl().slideDown('fast', $.proxy(function() {
-        this.getLi().removeClass('closed');
+      doOpen = function() {
+        _this.getLi().removeClass('closed');
         if (on_finished) return on_finished();
-      }, this));
+      };
+      if (skip_slide) {
+        this.getUl().show();
+        return doOpen();
+      } else {
+        return this.getUl().slideDown('fast', doOpen);
+      }
     };
 
     FolderElement.prototype.close = function(on_finished) {
+      var _this = this;
       this.node.is_open = false;
       this.getButton().addClass('closed');
-      return this.getUl().slideUp('fast', $.proxy(function() {
-        this.getLi().addClass('closed');
+      return this.getUl().slideUp('fast', function() {
+        _this.getLi().addClass('closed');
         if (on_finished) return on_finished();
-      }, this));
+      });
     };
 
     FolderElement.prototype.getButton = function() {
