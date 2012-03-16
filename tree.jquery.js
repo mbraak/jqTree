@@ -293,7 +293,7 @@ limitations under the License.
         );
     */
 
-    Node.prototype.iterate = function(callback, level) {
+    Node.prototype.iterate = function(callback) {
       var _iterate,
         _this = this;
       _iterate = function(level) {

@@ -260,7 +260,7 @@ class Node
     );
 
     ###
-    iterate: (callback, level) ->
+    iterate: (callback) ->
         _iterate = (level) =>
             for child in @children
                 result = callback(child, level)
