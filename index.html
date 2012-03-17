@@ -9,7 +9,7 @@
 	<link rel="stylesheet" href="extra/syntax_highlighter/shThemeRDark.css">
 	<link rel="stylesheet" href="jqtree.css">
 	<link rel="stylesheet" href="extra/css/documentation.css">
-	<link href='http://fonts.googleapis.com/css?family=Corben:bold&v1' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
 	<script src="extra/js/jquery-1.7.1.min.js"></script>
 	<script src="extra/js/jquery-ui1.9m6.min.js"></script>
 	<script src="extra/js/jquery.lettering.js"></script>
@@ -21,7 +21,7 @@
 <div id="sidebar">
 	<ul class="first">
 		<li>
-			<a href="#">jqTree</a>
+			<a href="#jqtree">jqTree</a>
 			<ul>
 				<li><a href="#introduction">Introduction</a></li>
 				<li><a href="#features">Features</a></li>
@@ -64,7 +64,7 @@
 	</ul>
 </div>
 <div id="page">
-	<h1>jqTree</h1>
+	<h1 id="jqtree">jqTree</h1>
 	<p id="introduction">
 		JqTree is a tree widget written in jQuery UI.
 	</p>
@@ -115,7 +115,7 @@ $('#tree1').tree({
 	</div>
 	<h4 id="requirements">Requirements</h4>
 	<ul>
-		<li><a href=""><a href="http://jquery.com">jQuery</a> 1.5+</li>
+		<li><a href="http://jquery.com">jQuery</a> 1.5+</li>
 		<li><a href="http://jqueryui.com/">jQuery UI</a> 1.8 or 1.9 beta</li>
 	</ul>
 	<h4 id="downloads">Downloads</h4>
@@ -128,13 +128,13 @@ $('#tree1').tree({
 				<li>
 					<a href="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeDownTriangleBlack.png">
 						treeDownTriangleBlack.png
-						<img src="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeDownTriangleBlack.png" />
+						<img src="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeDownTriangleBlack.png" alt="tree down triangle" />
 					</a>
 				</li>
 				<li>
 					<a href="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeRightTriangleBlack.png">
 						treeRightTriangleBlack.png
-						<img src="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeRightTriangleBlack.png" />
+						<img src="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeRightTriangleBlack.png" alt="tree right triangle" />
 					</a>
 				</li>
 			</ul>
@@ -165,7 +165,7 @@ $('#tree1').tree({
 		</li>
 		<li>
 			Create a div.
-			<pre><div id="tree1"></div></pre>
+			<pre>&lt;div id="tree1"&gt;&lt;/div&gt;</pre>
 		</li>
 		<li>
 			Create tree data.
