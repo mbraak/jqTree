@@ -260,7 +260,7 @@ class Node
     );
 
     ###
-    iterate: (callback, level) ->
+    iterate: (callback) ->
         _iterate = (level) =>
             for child in @children
                 result = callback(child, level)
@@ -339,18 +339,7 @@ $.widget("ui.tree", $.ui.mouse, {
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
 
     _create: ->
-        @tree = new Node()
-        @tree.loadFromData(@options.data)
-
-        @selected_node = null
-        @_openNodes()
-
-        @_createDomElements(@tree)
-
-        if @selected_node
-            node_element = @_getNodeElementForNode(@selected_node)
-            if node_element
-                node_element.select()
+        @_initTree(@options.data)
 
         @element.click($.proxy(@_click, this))
         @element.bind('contextmenu', $.proxy(@_contextmenu, this))
@@ -391,7 +380,11 @@ $.widget("ui.tree", $.ui.mouse, {
         if @options.saveState
             @_saveState()
 
-    selectNode: (node) ->
+    openNode: (node, on_finished, skip_slide) ->
+        if node.hasChildren()
+            new FolderElement(node).open(on_finished, skip_slide)
+
+    selectNode: (node, must_open_parents) ->
         if @options.selectable
             if @selected_node
                 @_getNodeElementForNode(@selected_node).deselect()
@@ -399,11 +392,37 @@ $.widget("ui.tree", $.ui.mouse, {
             @_getNodeElementForNode(node).select()
             @selected_node = node
 
+            if must_open_parents
+                parent = @selected_node.parent
+
+                while parent
+                    if not parent.is_open
+                        this.openNode(parent, null, true)
+
+                    parent = parent.parent
+
             if @options.saveState
                 @_saveState()
 
     getSelectedNode: ->
         return @selected_node or false
+
+    loadData: (data) ->
+         @_initTree(data)
+
+    _initTree: (data) ->
+        @tree = new Node()
+        @tree.loadFromData(data)
+
+        @selected_node = null
+        @_openNodes()
+
+        @_createDomElements(@tree)
+
+        if @selected_node
+            node_element = @_getNodeElementForNode(@selected_node)
+            if node_element
+                node_element.select()
 
     _getState: ->
         open_nodes = []
@@ -542,6 +561,7 @@ $.widget("ui.tree", $.ui.mouse, {
                 if child.hasChildren()
                     doCreateDomElements($li, child.children, depth + 1, child.is_open)
 
+        @element.empty()
         doCreateDomElements(@element, tree.children, 0, true)
 
     _click: (e) ->
@@ -569,7 +589,7 @@ $.widget("ui.tree", $.ui.mouse, {
                 )
                     @selectNode(node)
 
-                    event = jQuery.Event('tree.click')
+                    event = $.Event('tree.click')
                     event.node = node
                     @element.trigger(event)
 
@@ -581,7 +601,7 @@ $.widget("ui.tree", $.ui.mouse, {
                 e.preventDefault()
                 e.stopPropagation()
 
-                event = jQuery.Event('tree.contextmenu')
+                event = $.Event('tree.contextmenu')
                 event.node = node
                 event.click_event = e
                 @element.trigger(event)
@@ -733,7 +753,7 @@ $.widget("ui.tree", $.ui.mouse, {
             if @hovered_area.position == Position.INSIDE
                 @hovered_area.node.is_open = true
 
-            event = jQuery.Event('tree.move')
+            event = $.Event('tree.move')
             event.move_info = 
                 moved_node: @current_item.node
                 target_node: @hovered_area.node
@@ -1063,20 +1083,20 @@ class FolderElement extends NodeElement
         else
             @open(on_finished)
 
-    open: (on_finished) ->
+    open: (on_finished, skip_slide) ->
         @node.is_open = true
         @getButton().removeClass('closed')
 
-        @getUl().slideDown(
-            'fast',
-            $.proxy(
-                ->
-                    @getLi().removeClass('closed')
-                    if on_finished
-                        on_finished()
-                , this
-            )
-        )
+        doOpen = =>
+            @getLi().removeClass('closed')
+            if on_finished
+                on_finished()
+
+        if skip_slide
+            @getUl().show()
+            doOpen()
+        else
+            @getUl().slideDown('fast', doOpen)
 
     close: (on_finished) ->
         @node.is_open = false
@@ -1084,13 +1104,10 @@ class FolderElement extends NodeElement
 
         @getUl().slideUp(
             'fast',
-            $.proxy(
-                ->
-                    @getLi().addClass('closed')
-                    if on_finished
-                        on_finished()
-                , this
-            )
+            =>
+                @getLi().addClass('closed')
+                if on_finished
+                    on_finished()
         )
 
     getButton: ->
