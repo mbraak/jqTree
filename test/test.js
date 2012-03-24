@@ -18,6 +18,16 @@ var example_data = [
     }
 ];
 
+var example_data2 = [
+    {
+        label: 'main',
+        children: [
+            { label: 'c1' },
+            { label: 'c2' }
+        ]
+    }
+];
+
 var format_nodes = function(nodes) {
     var strings = $.map(nodes, function(node) {
         return node.name;
@@ -120,8 +130,6 @@ test('jqtree toggle', function() {
         }
     );
 });
-
-// todo: test jqtree.getTree()
 
 test("click event", function() {
     stop();
@@ -278,6 +286,29 @@ test("tree addNode", function() {
             ]
         }
     );
+});
+
+test('loadData', function() {
+	// setup
+	var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+	// first node is 'node1'
+	equal(
+		$tree.find('> ul > li:first div:first > span').text(),
+		'node1'
+	);
+
+	// 1. load new data
+	$tree.tree('loadData', example_data2);
+
+	// first node is 'main'
+	equal(
+		$tree.find('> ul > li:first div:first > span').text(),
+		'main'
+	);
 });
 
 module("Tree");

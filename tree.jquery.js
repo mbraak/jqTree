@@ -293,7 +293,7 @@ limitations under the License.
         );
     */
 
-    Node.prototype.iterate = function(callback, level) {
+    Node.prototype.iterate = function(callback) {
       var _iterate,
         _this = this;
       _iterate = function(level) {
@@ -385,16 +385,7 @@ limitations under the License.
       onCanMoveTo: null
     },
     _create: function() {
-      var node_element;
-      this.tree = new Node();
-      this.tree.loadFromData(this.options.data);
-      this.selected_node = null;
-      this._openNodes();
-      this._createDomElements(this.tree);
-      if (this.selected_node) {
-        node_element = this._getNodeElementForNode(this.selected_node);
-        if (node_element) node_element.select();
-      }
+      this._initTree(this.options.data);
       this.element.click($.proxy(this._click, this));
       this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
       this._mouseInit();
@@ -427,18 +418,46 @@ limitations under the License.
       if (node.hasChildren()) new FolderElement(node).toggle(on_finished);
       if (this.options.saveState) return this._saveState();
     },
-    selectNode: function(node) {
+    openNode: function(node, on_finished, skip_slide) {
+      if (node.hasChildren()) {
+        return new FolderElement(node).open(on_finished, skip_slide);
+      }
+    },
+    selectNode: function(node, must_open_parents) {
+      var parent;
       if (this.options.selectable) {
         if (this.selected_node) {
           this._getNodeElementForNode(this.selected_node).deselect();
         }
         this._getNodeElementForNode(node).select();
         this.selected_node = node;
+        if (must_open_parents) {
+          parent = this.selected_node.parent;
+          while (parent) {
+            if (!parent.is_open) this.openNode(parent, null, true);
+            parent = parent.parent;
+          }
+        }
         if (this.options.saveState) return this._saveState();
       }
     },
     getSelectedNode: function() {
       return this.selected_node || false;
+    },
+    loadData: function(data) {
+      return this._initTree(data);
+    },
+    _initTree: function(data) {
+      var node_element;
+      this.tree = new Node();
+      this.tree.loadFromData(data);
+      this.selected_node = null;
+      this._openNodes();
+      this._createDomElements(this.tree);
+      if (this.selected_node) {
+        node_element = this._getNodeElementForNode(this.selected_node);
+        if (node_element) return node_element.select();
+      }
     },
     _getState: function() {
       var open_nodes, selected_node,
@@ -573,6 +592,7 @@ limitations under the License.
         }
         return _results;
       };
+      this.element.empty();
       return doCreateDomElements(this.element, tree.children, 0, true);
     },
     _click: function(e) {
@@ -592,7 +612,7 @@ limitations under the License.
         if (node) {
           if ((!this.options.onCanSelectNode) || this.options.onCanSelectNode(node)) {
             this.selectNode(node);
-            event = jQuery.Event('tree.click');
+            event = $.Event('tree.click');
             event.node = node;
             return this.element.trigger(event);
           }
@@ -607,7 +627,7 @@ limitations under the License.
         if (node) {
           e.preventDefault();
           e.stopPropagation();
-          event = jQuery.Event('tree.contextmenu');
+          event = $.Event('tree.contextmenu');
           event.node = node;
           event.click_event = e;
           this.element.trigger(event);
@@ -726,7 +746,7 @@ limitations under the License.
         if (this.hovered_area.position === Position.INSIDE) {
           this.hovered_area.node.is_open = true;
         }
-        event = jQuery.Event('tree.move');
+        event = $.Event('tree.move');
         event.move_info = {
           moved_node: this.current_item.node,
           target_node: this.hovered_area.node,
@@ -1071,22 +1091,31 @@ limitations under the License.
       }
     };
 
-    FolderElement.prototype.open = function(on_finished) {
+    FolderElement.prototype.open = function(on_finished, skip_slide) {
+      var doOpen,
+        _this = this;
       this.node.is_open = true;
       this.getButton().removeClass('closed');
-      return this.getUl().slideDown('fast', $.proxy(function() {
-        this.getLi().removeClass('closed');
+      doOpen = function() {
+        _this.getLi().removeClass('closed');
         if (on_finished) return on_finished();
-      }, this));
+      };
+      if (skip_slide) {
+        this.getUl().show();
+        return doOpen();
+      } else {
+        return this.getUl().slideDown('fast', doOpen);
+      }
     };
 
     FolderElement.prototype.close = function(on_finished) {
+      var _this = this;
       this.node.is_open = false;
       this.getButton().addClass('closed');
-      return this.getUl().slideUp('fast', $.proxy(function() {
-        this.getLi().addClass('closed');
+      return this.getUl().slideUp('fast', function() {
+        _this.getLi().addClass('closed');
         if (on_finished) return on_finished();
-      }, this));
+      });
     };
 
     FolderElement.prototype.getButton = function() {
