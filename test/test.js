@@ -318,14 +318,69 @@ test('openNode', function() {
         data: example_data
     });
 
-    var node2 = $tree.tree('getTree').children[1]
-    equal(node2.is_open, undefined)
+    var node2 = $tree.tree('getTree').children[1];
+    equal(node2.is_open, undefined);
 
     // 1. open node
-    equal(node2.name, 'node2')
-    $tree.tree('openNode', node2, null, true)
+    equal(node2.name, 'node2');
+    $tree.tree('openNode', node2, null, true);
 
     equal(node2.is_open, true)
+});
+
+test('selectNode', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        selectable: true
+    });
+
+    var node1 = $tree.tree('getTree').children[0];
+    var node2 = $tree.tree('getTree').children[1];
+    var child3 = node2.children[0];
+
+    equal(child3.name, 'child3');
+    equal(node1.is_open, undefined);
+    equal(node2.is_open, undefined);
+    equal(child3.is_open, undefined);
+
+    // 1. select node 'child3', which is a child of 'node2'; must_open_parents = true
+    $tree.tree('selectNode', child3, true);
+    equal($tree.tree('getSelectedNode').name, 'child3');
+
+    equal(node1.is_open, undefined);
+    equal(node2.is_open, true);
+    equal(child3.is_open, undefined);
+
+    // 2. select node 'node1'
+    $tree.tree('selectNode', node1);
+    equal($tree.tree('getSelectedNode').name, 'node1');
+});
+
+test('click toggler', function() {
+    stop();
+
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        selectable: true
+    });
+
+    var $title = $tree.find('li:eq(0)').find('> div > span.title');
+    equal($title.text(), 'node1');
+    var $toggler = $title.prev();
+    ok($toggler.is('a.toggler.closed'));
+
+    $tree.bind('tree.open', function(e) {
+        // 2. handle 'open' event
+        start();
+        equal(e.node.name, 'node1');
+    });
+
+    // 1. click toggler of 'node1'
+    $toggler.click();
 });
 
 module("Tree");
