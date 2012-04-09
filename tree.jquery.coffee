@@ -51,7 +51,7 @@ Json.quote = (string) ->
         return '"' + string.replace(Json.escapable, (a) ->
             c = Json.meta[a]
             return (
-                if type c is 'string' then c
+                if typeof c is 'string' then c
                 else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
             )
         ) + '"'
@@ -61,7 +61,7 @@ Json.quote = (string) ->
 Json.str = (key, holder) ->
     value = holder[key]
 
-    if value and typeof value is 'object' and value.toJSON is 'function'
+    if value and typeof value is 'object' and typeof value.toJSON is 'function'
         value = value.toJSON(key)
 
     switch typeof value
@@ -573,7 +573,19 @@ $.widget("ui.tree", $.ui.mouse, {
         if $target.is('.toggler')
             node_element = @_getNodeElement($target)
             if node_element and node_element.node.hasChildren()
-                node_element.toggle()
+                node_element.toggle(
+                    =>
+                        node = node_element.node
+
+                        if node.is_open
+                            event_name = 'tree.open'
+                        else
+                            event_name = 'tree.close'
+
+                        event = $.Event(event_name)
+                        event.node = node
+                        @element.trigger(event)
+                )
 
                 if @options.saveState
                     @_saveState()

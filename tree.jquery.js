@@ -59,7 +59,7 @@ limitations under the License.
       return '"' + string.replace(Json.escapable, function(a) {
         var c;
         c = Json.meta[a];
-        return (type(c === 'string') ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4));
+        return (typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4));
       }) + '"';
     } else {
       return '"' + string + '"';
@@ -69,7 +69,7 @@ limitations under the License.
   Json.str = function(key, holder) {
     var i, k, partial, v, value, _len;
     value = holder[key];
-    if (value && typeof value === 'object' && value.toJSON === 'function') {
+    if (value && typeof value === 'object' && typeof value.toJSON === 'function') {
       value = value.toJSON(key);
     }
     switch (typeof value) {
@@ -596,13 +596,25 @@ limitations under the License.
       return doCreateDomElements(this.element, tree.children, 0, true);
     },
     _click: function(e) {
-      var $target, event, node, node_element;
+      var $target, event, node, node_element,
+        _this = this;
       if (e.ctrlKey) return;
       $target = $(e.target);
       if ($target.is('.toggler')) {
         node_element = this._getNodeElement($target);
         if (node_element && node_element.node.hasChildren()) {
-          node_element.toggle();
+          node_element.toggle(function() {
+            var event, event_name, node;
+            node = node_element.node;
+            if (node.is_open) {
+              event_name = 'tree.open';
+            } else {
+              event_name = 'tree.close';
+            }
+            event = $.Event(event_name);
+            event.node = node;
+            return _this.element.trigger(event);
+          });
           if (this.options.saveState) this._saveState();
           e.preventDefault();
           return e.stopPropagation();
