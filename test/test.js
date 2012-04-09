@@ -90,7 +90,7 @@ test("create jqtree from data", function() {
     );
 });
 
-test('jqtree toggle', function() {
+test('toggle', function() {
     // create tree
     var $tree = $('#tree1');
     $tree.tree({
@@ -245,7 +245,7 @@ test('getSelectedNode', function() {
     );
 });
 
-test("tree toJson", function() {
+test("toJson", function() {
     // setup
     var $tree = $('#tree1');
     $tree.tree({
@@ -267,7 +267,7 @@ test("tree toJson", function() {
     ok($(tree.children[0].element).is('li'), 'element');
 });
 
-test("tree addNode", function() {
+test("addNode", function() {
     // setup
     var $tree = $('#tree1');
     $tree.tree({
@@ -338,7 +338,7 @@ test("create tree from data", function() {
     );
 });
 
-test("tree addChild", function() {
+test("addChild", function() {
     var tree = new Tree.Tree('tree1');
     tree.addChild(
         new Tree.Node('abc')
@@ -361,7 +361,7 @@ test("tree addChild", function() {
     );
 });
 
-test('tree addChildAtPosition', function() {
+test('addChildAtPosition', function() {
     var tree = new Tree.Tree();
     tree.addChildAtPosition(new Tree.Node('abc'), 0);  // first
     tree.addChildAtPosition(new Tree.Node('ghi'), 2);  // index 2 does not exist
@@ -375,7 +375,7 @@ test('tree addChildAtPosition', function() {
     );
 });
 
-test('tree removeChild', function() {
+test('removeChild', function() {
     var tree = new Tree.Tree();
 
     var abc = new Tree.Node('abc');
@@ -416,7 +416,7 @@ test('tree removeChild', function() {
     );
 });
 
-test('tree getChildIndex', function() {
+test('getChildIndex', function() {
     var tree = new Tree.Tree();
 
     var abc = new Tree.Node('abc');
@@ -433,7 +433,7 @@ test('tree getChildIndex', function() {
     );
 });
 
-test('tree hasChildren', function() {
+test('hasChildren', function() {
     var tree = new Tree.Tree();
     equal(
         tree.hasChildren(),
@@ -449,7 +449,7 @@ test('tree hasChildren', function() {
     );
 });
 
-test('tree iterate', function() {
+test('iterate', function() {
     var tree = new Tree.Tree();
     tree.loadFromData(example_data);
 
@@ -484,7 +484,7 @@ test('tree iterate', function() {
     );
 });
 
-test('tree moveNode', function() {
+test('moveNode', function() {
     var tree = new Tree.Tree()
     tree.loadFromData(example_data);
 
@@ -568,7 +568,7 @@ test('tree moveNode', function() {
     );
 });
 
-test('tree initFromData', function() {
+test('initFromData', function() {
     var data = 
         {
             label: 'main',
@@ -588,7 +588,7 @@ test('tree initFromData', function() {
     );
 });
 
-test('tree getData', function() {
+test('getData', function() {
     // 1. empty node
     var node = new Tree.Node();
     deepEqual(node.getData(), []);
