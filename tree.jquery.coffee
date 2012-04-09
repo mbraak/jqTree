@@ -573,7 +573,19 @@ $.widget("ui.tree", $.ui.mouse, {
         if $target.is('.toggler')
             node_element = @_getNodeElement($target)
             if node_element and node_element.node.hasChildren()
-                node_element.toggle()
+                node_element.toggle(
+                    =>
+                        node = node_element.node
+
+                        if node.is_open
+                            event_name = 'tree.open'
+                        else
+                            event_name = 'tree.close'
+
+                        event = $.Event(event_name)
+                        event.node = node
+                        @element.trigger(event)
+                )
 
                 if @options.saveState
                     @_saveState()
