@@ -311,6 +311,23 @@ test('loadData', function() {
     );
 });
 
+test('openNode', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var node2 = $tree.tree('getTree').children[1]
+    equal(node2.is_open, undefined)
+
+    // 1. open node
+    equal(node2.name, 'node2')
+    $tree.tree('openNode', node2, null, true)
+
+    equal(node2.is_open, true)
+});
+
 module("Tree");
 test("create tree from data", function() {
     var tree = new Tree.Tree();
