@@ -289,26 +289,26 @@ test("tree addNode", function() {
 });
 
 test('loadData', function() {
-	// setup
-	var $tree = $('#tree1');
+    // setup
+    var $tree = $('#tree1');
     $tree.tree({
         data: example_data
     });
 
-	// first node is 'node1'
-	equal(
-		$tree.find('> ul > li:first div:first > span').text(),
-		'node1'
-	);
+    // first node is 'node1'
+    equal(
+        $tree.find('> ul > li:first div:first > span').text(),
+        'node1'
+    );
 
-	// 1. load new data
-	$tree.tree('loadData', example_data2);
+    // 1. load new data
+    $tree.tree('loadData', example_data2);
 
-	// first node is 'main'
-	equal(
-		$tree.find('> ul > li:first div:first > span').text(),
-		'main'
-	);
+    // first node is 'main'
+    equal(
+        $tree.find('> ul > li:first div:first > span').text(),
+        'main'
+    );
 });
 
 module("Tree");
@@ -589,36 +589,36 @@ test('tree initFromData', function() {
 });
 
 test('tree getData', function() {
-	// 1. empty node
-	var node = new Tree.Node();
-	deepEqual(node.getData(), []);
+    // 1. empty node
+    var node = new Tree.Node();
+    deepEqual(node.getData(), []);
 
-	// 2.node with data
-	node.loadFromData(
-		[
-			{
-				label: 'n1',
-				children: [
-					{
-						label: 'c1'
-					}
-				]
-			}
-		]
-	);
-	deepEqual(
-		node.getData(),
-		[
-			{
-				name: 'n1',
-				children: [
-					{
-						name: 'c1'
-					}
-				]
-			}
-		]
-	);
+    // 2.node with data
+    node.loadFromData(
+        [
+            {
+                label: 'n1',
+                children: [
+                    {
+                        label: 'c1'
+                    }
+                ]
+            }
+        ]
+    );
+    deepEqual(
+        node.getData(),
+        [
+            {
+                name: 'n1',
+                children: [
+                    {
+                        name: 'c1'
+                    }
+                ]
+            }
+        ]
+    );
 });
 
 module('util');
@@ -631,6 +631,10 @@ test('toJson', function() {
     equal(Tree.toJson({}), '{}');
     equal(Tree.toJson([1, 2, 3]), '[1,2,3]');
     equal(Tree.toJson(null), 'null');
+    equal(Tree.toJson(Number.NEGATIVE_INFINITY), 'null');
+
+    // test escapable
+    Tree.toJson("\u200c");
 });
 
 test('indexOf', function() {
@@ -639,10 +643,10 @@ test('indexOf', function() {
 });
 
 test('Position.getName', function() {
-    equal(
-        Tree.Position.getName(Tree.Position.BEFORE),
-        'before'
-    );
+    equal(Tree.Position.getName(Tree.Position.BEFORE), 'before');
+    equal(Tree.Position.getName(Tree.Position.AFTER), 'after');
+    equal(Tree.Position.getName(Tree.Position.INSIDE), 'inside');
+    equal(Tree.Position.getName(Tree.Position.NONE), 'none');
 });
 
 });

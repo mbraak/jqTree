@@ -51,7 +51,7 @@ Json.quote = (string) ->
         return '"' + string.replace(Json.escapable, (a) ->
             c = Json.meta[a]
             return (
-                if type c is 'string' then c
+                if typeof c is 'string' then c
                 else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
             )
         ) + '"'
@@ -61,7 +61,7 @@ Json.quote = (string) ->
 Json.str = (key, holder) ->
     value = holder[key]
 
-    if value and typeof value is 'object' and value.toJSON is 'function'
+    if value and typeof value is 'object' and typeof value.toJSON is 'function'
         value = value.toJSON(key)
 
     switch typeof value

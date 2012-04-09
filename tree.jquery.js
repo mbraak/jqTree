@@ -59,7 +59,7 @@ limitations under the License.
       return '"' + string.replace(Json.escapable, function(a) {
         var c;
         c = Json.meta[a];
-        return (type(c === 'string') ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4));
+        return (typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4));
       }) + '"';
     } else {
       return '"' + string + '"';
@@ -69,7 +69,7 @@ limitations under the License.
   Json.str = function(key, holder) {
     var i, k, partial, v, value, _len;
     value = holder[key];
-    if (value && typeof value === 'object' && value.toJSON === 'function') {
+    if (value && typeof value === 'object' && typeof value.toJSON === 'function') {
       value = value.toJSON(key);
     }
     switch (typeof value) {
