@@ -407,8 +407,35 @@ $.widget("ui.tree", $.ui.mouse, {
     getSelectedNode: ->
         return @selected_node or false
 
-    loadData: (data) ->
-         @_initTree(data)
+    loadData: (data, parent_node) ->
+        if not parent_node
+            @_initTree(data)
+        else
+            subtree = new Node()
+            subtree.loadFromData(data)
+
+            for child in subtree.children
+                parent_node.addChild(child)
+
+            $element = $(parent_node.element)
+            $element.children('ul').detach()
+            @_createDomElements(parent_node, $element)
+
+            $element.children('div').prepend('<a class="toggler">&raquo;</a>')
+
+    getNodeById: (node_id) ->
+        result = null
+
+        @tree.iterate(
+            (node) ->
+                if node.id == node_id
+                    result = node
+                    return false  # stop iterating
+                else
+                    return true
+        )
+
+        return result
 
     _initTree: (data) ->
         @tree = new Node()
@@ -500,7 +527,7 @@ $.widget("ui.tree", $.ui.mouse, {
         else
             return 'tree'
 
-    _createDomElements: (tree) ->
+    _createDomElements: (tree, $element) ->
         createUl = (depth, is_open) =>
             if depth
                 class_string = ''
@@ -561,8 +588,14 @@ $.widget("ui.tree", $.ui.mouse, {
                 if child.hasChildren()
                     doCreateDomElements($li, child.children, depth + 1, child.is_open)
 
-        @element.empty()
-        doCreateDomElements(@element, tree.children, 0, true)
+        if $element
+            depth = 1
+        else
+            $element = @element
+            $element.empty()
+            depth = 0
+
+        doCreateDomElements($element, tree.children, depth, true)
 
     _click: (e) ->
         if e.ctrlKey

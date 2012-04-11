@@ -473,8 +473,36 @@ limitations under the License.
     getSelectedNode: function() {
       return this.selected_node || false;
     },
-    loadData: function(data) {
-      return this._initTree(data);
+    loadData: function(data, parent_node) {
+      var $element, child, subtree, _i, _len, _ref;
+      if (!parent_node) {
+        return this._initTree(data);
+      } else {
+        subtree = new Node();
+        subtree.loadFromData(data);
+        _ref = subtree.children;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          parent_node.addChild(child);
+        }
+        $element = $(parent_node.element);
+        $element.children('ul').detach();
+        this._createDomElements(parent_node, $element);
+        return $element.children('div').prepend('<a class="toggler">&raquo;</a>');
+      }
+    },
+    getNodeById: function(node_id) {
+      var result;
+      result = null;
+      this.tree.iterate(function(node) {
+        if (node.id === node_id) {
+          result = node;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return result;
     },
     _initTree: function(data) {
       var node_element;
@@ -563,8 +591,8 @@ limitations under the License.
         return 'tree';
       }
     },
-    _createDomElements: function(tree) {
-      var createFolderLi, createLi, createNodeLi, createUl, doCreateDomElements,
+    _createDomElements: function(tree, $element) {
+      var createFolderLi, createLi, createNodeLi, createUl, depth, doCreateDomElements,
         _this = this;
       createUl = function(depth, is_open) {
         var class_string;
@@ -631,8 +659,14 @@ limitations under the License.
         }
         return _results;
       };
-      this.element.empty();
-      return doCreateDomElements(this.element, tree.children, 0, true);
+      if ($element) {
+        depth = 1;
+      } else {
+        $element = this.element;
+        $element.empty();
+        depth = 0;
+      }
+      return doCreateDomElements($element, tree.children, depth, true);
     },
     _click: function(e) {
       var $target, event, node, node_element,

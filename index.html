@@ -52,6 +52,7 @@
 			<ul>
 				<li><a href="#functions-loadData">loadData</a></li>
 				<li><a href="#functions-tojson">toJson</a></li>
+				<li><a href="#functions-getnodebyid">getNodeById</a></li>
 			</ul>
 		</li>
 		<li>
@@ -465,6 +466,22 @@ var new_data = [
 $('#tree1').tree('loadData', new_data);
 </pre>
 
+	<p>
+		It's also possible to add the nodes to an existing node in the tree.
+	</p>
+
+<pre>
+// Get node by id (this assumes that the nodes have an id)
+var node = $('#tree1').tree('getNodeById', 100);
+
+// Add new nodes
+var data = [
+	{ label: 'new node' },
+	{ label: 'another new node' }
+];
+$('#tree1').tree('loadData', data, node);
+</pre>
+
 	<h5 id="functions-tojson">toJson</h5>
 	<p>
 		Get the tree data as json.
@@ -472,6 +489,24 @@ $('#tree1').tree('loadData', new_data);
 <pre>
 // Assuming the tree exists
 $('#tree1').tree('toJson');
+</pre>
+
+	<h5 id="functions-getnodebyid">getNodeById</h5>
+	<p>
+		Get a tree node by node-id. This assumes that you have given the nodes in the data a unique id.
+	</p>
+
+<pre>
+var $tree = $('#tree1);
+var data = [
+	{ id: 10, name: 'n1' },
+	{ id: 11, name: 'n2' }
+];
+
+$tree.tree({
+	data: data
+});
+var node = $tree.tree('getNodeById', 10);
 </pre>
 
 	<h4 id="events">Events</h4>
