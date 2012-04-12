@@ -474,7 +474,7 @@ limitations under the License.
       return this.selected_node || false;
     },
     loadData: function(data, parent_node) {
-      var $element, child, subtree, _i, _len, _ref;
+      var $div, $element, child, subtree, _i, _len, _ref;
       if (!parent_node) {
         return this._initTree(data);
       } else {
@@ -488,7 +488,10 @@ limitations under the License.
         $element = $(parent_node.element);
         $element.children('ul').detach();
         this._createDomElements(parent_node, $element);
-        return $element.children('div').prepend('<a class="toggler">&raquo;</a>');
+        $div = $element.children('div');
+        if (!$div.find('.toggler').length) {
+          return $div.prepend('<a class="toggler">&raquo;</a>');
+        }
       }
     },
     getNodeById: function(node_id) {

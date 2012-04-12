@@ -421,7 +421,10 @@ $.widget("ui.tree", $.ui.mouse, {
             $element.children('ul').detach()
             @_createDomElements(parent_node, $element)
 
-            $element.children('div').prepend('<a class="toggler">&raquo;</a>')
+            $div = $element.children('div')
+
+            if not $div.find('.toggler').length
+                $div.prepend('<a class="toggler">&raquo;</a>')
 
     getNodeById: (node_id) ->
         result = null
