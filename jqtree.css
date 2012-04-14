@@ -125,6 +125,8 @@ ul.tree li.selected > div:hover {
 	background-color: #97BDD6;
 	background: -webkit-gradient(linear, left top, left bottom, from(#BEE0F5), to(#89AFCA));
 	background: -moz-linear-gradient(top, #BEE0F5, #89AFCA);
+	background: -ms-linear-gradient(top, #BEE0F5, #89AFCA);
+	background: -o-linear-gradient(top, #BEE0F5, #89AFCA);
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
