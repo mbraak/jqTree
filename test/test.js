@@ -54,8 +54,14 @@ var isNodeOpen = function($node) {
 }
 
 module("jqtree", {
+    setup: function() {
+        $('body').append('<div id="tree1"></div>');
+    },
+
     teardown: function() {
-        $('#tree1').tree('destroy');
+        var $tree = $('#tree1');
+        $tree.tree('destroy');
+        $tree.remove();
     }
 });
 

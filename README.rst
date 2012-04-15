@@ -15,3 +15,8 @@ Features
 The project is hosted on github (https://github.com/mbraak/jqTree), has a test suite (test/test.html) and a demo (demo.html).
 
 See also index.html for the full documentation.
+
+Thanks
+------
+
+The code for the mouse widget is heavily inspired by the mouse widget from jquery ui.

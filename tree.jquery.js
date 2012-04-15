@@ -18,9 +18,220 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, Json, Node, NodeElement, Position, indexOf, toJson,
+  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, JqueryWidget, Json, MouseWidget, Node, NodeElement, Position, SimpleWidget, indexOf, toJson,
+    __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  $ = this.jQuery;
+
+  SimpleWidget = (function() {
+
+    SimpleWidget.name = 'SimpleWidget';
+
+    SimpleWidget.prototype.defaults = {};
+
+    function SimpleWidget(el, options) {
+      this.$el = $(el);
+      this.options = $.extend({}, this.defaults, options);
+      this._init();
+    }
+
+    SimpleWidget.prototype.destroy = function() {
+      return this._deinit();
+    };
+
+    SimpleWidget.prototype._init = function() {
+      return null;
+    };
+
+    SimpleWidget.prototype._deinit = function() {
+      return null;
+    };
+
+    return SimpleWidget;
+
+  })();
+
+  SimpleWidget.register = function(widget_class, widget_name) {
+    var callFunction, createWidget, destroyWidget, getDataKey;
+    getDataKey = function() {
+      return "simple_widget_" + widget_name;
+    };
+    createWidget = function($el, options) {
+      var data_key;
+      data_key = getDataKey();
+      $el.each(function() {
+        var widget;
+        widget = new widget_class(this, options);
+        if (!$.data(this, data_key)) {
+          return $.data(this, data_key, widget);
+        }
+      });
+      return $el;
+    };
+    destroyWidget = function($el) {
+      var data_key;
+      data_key = getDataKey();
+      return $el.each(function() {
+        var widget;
+        widget = $.data(this, data_key);
+        if (widget && (widget instanceof SimpleWidget)) {
+          widget.destroy();
+        }
+        return $.removeData(this, data_key);
+      });
+    };
+    callFunction = function($el, function_name, args) {
+      var result;
+      result = null;
+      $el.each(function() {
+        var widget, widget_function;
+        widget = $.data(this, getDataKey());
+        if (widget && (widget instanceof SimpleWidget)) {
+          widget_function = widget[function_name];
+          if (widget_function && (typeof widget_function === 'function')) {
+            return result = widget_function.apply(widget, args);
+          }
+        }
+      });
+      return result;
+    };
+    return $.fn[widget_name] = function() {
+      var $el, args, argument1, function_name, options;
+      argument1 = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      $el = this;
+      if (argument1 === void 0 || typeof argument1 === 'object') {
+        options = argument1;
+        return createWidget($el, options);
+      } else if (typeof argument1 === 'string' && argument1[0] !== '_') {
+        function_name = argument1;
+        if (function_name === 'destroy') {
+          return destroyWidget($el);
+        } else {
+          return callFunction($el, function_name, args);
+        }
+      }
+    };
+  };
+
+  this.SimpleWidget = SimpleWidget;
+
+  /*
+  This widget does the same a the mouse widget in jqueryui.
+  */
+
+
+  MouseWidget = (function(_super) {
+
+    __extends(MouseWidget, _super);
+
+    MouseWidget.name = 'MouseWidget';
+
+    function MouseWidget() {
+      return MouseWidget.__super__.constructor.apply(this, arguments);
+    }
+
+    MouseWidget.is_mouse_handled = false;
+
+    MouseWidget.prototype._init = function() {
+      this.$el.bind('mousedown', $.proxy(this._mouseDown, this));
+      return this.is_mouse_started = false;
+    };
+
+    MouseWidget.prototype._deinit = function() {
+      var $document;
+      this.$el.unbind('mousedown');
+      $document = $(document);
+      $document.unbind('mousemove');
+      return $document.unbind('mouseup');
+    };
+
+    MouseWidget.prototype._mouseDown = function(e) {
+      var $document;
+      if (MouseWidget.is_mouse_handled) {
+        return;
+      }
+      if (!this.is_mouse_started) {
+        this._mouseUp(e);
+      }
+      if (e.which !== 1) {
+        return;
+      }
+      if (!this._mouseCapture(e)) {
+        return;
+      }
+      this.mouse_down_event = e;
+      $document = $(document);
+      $document.bind('mousemove', $.proxy(this._mouseMove, this));
+      $document.bind('mouseup', $.proxy(this._mouseUp, this));
+      e.preventDefault();
+      this.is_mouse_handled = true;
+      return true;
+    };
+
+    MouseWidget.prototype._mouseMove = function(e) {
+      if (this.is_mouse_started) {
+        this._mouseDrag(e);
+        return e.preventDefault();
+      }
+      this.is_mouse_started = this._mouseStart(this.mouse_down_event) !== false;
+      if (this.is_mouse_started) {
+        this._mouseDrag(e);
+      } else {
+        this._mouseUp(e);
+      }
+      return !this.is_mouse_started;
+    };
+
+    MouseWidget.prototype._mouseUp = function(e) {
+      var $document;
+      $document = $(document);
+      $document.unbind('mousemove');
+      $document.unbind('mouseup');
+      if (this.is_mouse_started) {
+        this.is_mouse_started = false;
+        this._mouseStop(e);
+      }
+      return false;
+    };
+
+    MouseWidget.prototype._mouseCapture = function(e) {
+      return true;
+    };
+
+    MouseWidget.prototype._mouseStart = function(e) {
+      return null;
+    };
+
+    MouseWidget.prototype._mouseDrag = function(e) {
+      return null;
+    };
+
+    MouseWidget.prototype._mouseStop = function(e) {
+      return null;
+    };
+
+    return MouseWidget;
+
+  })(SimpleWidget);
+
+  /*
+  Copyright 2012 Marco Braak
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+      http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  */
+
 
   this.Tree = {};
 
@@ -390,9 +601,17 @@ limitations under the License.
 
   this.Tree.Tree = Node;
 
-  $.widget("ui.tree", $.ui.mouse, {
-    widgetEventPrefix: "tree",
-    options: {
+  JqueryWidget = (function(_super) {
+
+    __extends(JqueryWidget, _super);
+
+    JqueryWidget.name = 'JqueryWidget';
+
+    function JqueryWidget() {
+      return JqueryWidget.__super__.constructor.apply(this, arguments);
+    }
+
+    JqueryWidget.prototype.defaults = {
       autoOpen: false,
       saveState: false,
       dragAndDrop: false,
@@ -404,51 +623,22 @@ limitations under the License.
       onIsMoveHandle: null,
       onCanMove: null,
       onCanMoveTo: null
-    },
-    _create: function() {
-      this._initTree(this.options.data);
-      this.element.click($.proxy(this._click, this));
-      this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
-      this._mouseInit();
-      this.hovered_area = null;
-      this.$ghost = null;
-      return this.hit_areas = [];
-    },
-    destroy: function() {
-      this.element.empty();
-      this.element.unbind();
-      this.tree = null;
-      this._mouseDestroy();
-      return $.Widget.prototype.destroy.call(this);
-    },
-    getTree: function() {
-      return this.tree;
-    },
-    toJson: function() {
-      return toJson(this.tree.getData());
-    },
-    addNode: function(data) {
-      var n;
-      n = new Node();
-      n.initFromData(data);
-      this.getTree().addChild(n);
-      this.element.empty();
-      return this._createDomElements(this.getTree());
-    },
-    toggle: function(node, on_finished) {
+    };
+
+    JqueryWidget.prototype.toggle = function(node, on_finished) {
       if (node.hasChildren()) {
         new FolderElement(node).toggle(on_finished);
       }
       if (this.options.saveState) {
         return this._saveState();
       }
-    },
-    openNode: function(node, on_finished, skip_slide) {
-      if (node.hasChildren()) {
-        return new FolderElement(node).open(on_finished, skip_slide);
-      }
-    },
-    selectNode: function(node, must_open_parents) {
+    };
+
+    JqueryWidget.prototype.getTree = function() {
+      return this.tree;
+    };
+
+    JqueryWidget.prototype.selectNode = function(node, must_open_parents) {
       var parent;
       if (this.options.selectable) {
         if (this.selected_node) {
@@ -469,11 +659,17 @@ limitations under the License.
           return this._saveState();
         }
       }
-    },
-    getSelectedNode: function() {
+    };
+
+    JqueryWidget.prototype.getSelectedNode = function() {
       return this.selected_node || false;
-    },
-    loadData: function(data, parent_node) {
+    };
+
+    JqueryWidget.prototype.toJson = function() {
+      return toJson(this.tree.getData());
+    };
+
+    JqueryWidget.prototype.loadData = function(data, parent_node) {
       var $div, $element, child, subtree, _i, _len, _ref;
       if (!parent_node) {
         return this._initTree(data);
@@ -493,8 +689,9 @@ limitations under the License.
           return $div.prepend('<a class="toggler">&raquo;</a>');
         }
       }
-    },
-    getNodeById: function(node_id) {
+    };
+
+    JqueryWidget.prototype.getNodeById = function(node_id) {
       var result;
       result = null;
       this.tree.iterate(function(node) {
@@ -506,8 +703,33 @@ limitations under the License.
         }
       });
       return result;
-    },
-    _initTree: function(data) {
+    };
+
+    JqueryWidget.prototype.openNode = function(node, on_finished, skip_slide) {
+      if (node.hasChildren()) {
+        return new FolderElement(node).open(on_finished, skip_slide);
+      }
+    };
+
+    JqueryWidget.prototype._init = function() {
+      JqueryWidget.__super__._init.apply(this, arguments);
+      this.element = this.$el;
+      this._initTree(this.options.data);
+      this.element.click($.proxy(this._click, this));
+      this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
+      this.hovered_area = null;
+      this.$ghost = null;
+      return this.hit_areas = [];
+    };
+
+    JqueryWidget.prototype._deinit = function() {
+      this.element.empty();
+      this.element.unbind();
+      this.tree = null;
+      return JqueryWidget.__super__._deinit.apply(this, arguments);
+    };
+
+    JqueryWidget.prototype._initTree = function(data) {
       var node_element;
       this.tree = new Node();
       this.tree.loadFromData(data);
@@ -520,81 +742,29 @@ limitations under the License.
           return node_element.select();
         }
       }
-    },
-    _getState: function() {
-      var open_nodes, selected_node,
-        _this = this;
-      open_nodes = [];
-      this.tree.iterate(function(node) {
-        if (node.is_open && node.id && node.hasChildren()) {
-          open_nodes.push(node.id);
+    };
+
+    JqueryWidget.prototype._openNodes = function() {
+      var max_level;
+      if (this.options.saveState) {
+        if (this._restoreState()) {
+          return;
         }
-        return true;
+      }
+      if (this.options.autoOpen === false) {
+        return;
+      } else if (this.options.autoOpen === true) {
+        max_level = -1;
+      } else {
+        max_level = parseInt(this.options.autoOpen);
+      }
+      return this.tree.iterate(function(node, level) {
+        node.is_open = true;
+        return level !== max_level;
       });
-      selected_node = '';
-      if (this.selected_node) {
-        selected_node = this.selected_node.id;
-      }
-      return toJson({
-        open_nodes: open_nodes,
-        selected_node: selected_node
-      });
-    },
-    _setState: function(state) {
-      var data, open_nodes, selected_node_id,
-        _this = this;
-      data = $.parseJSON(state);
-      open_nodes = data.open_nodes;
-      selected_node_id = data.selected_node;
-      return this.tree.iterate(function(node) {
-        if (node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0)) {
-          node.is_open = true;
-        }
-        if (selected_node_id && (node.id === selected_node_id)) {
-          _this.selected_node = node;
-        }
-        return true;
-      });
-    },
-    _saveState: function() {
-      if (this.options.onSetStateFromStorage) {
-        return this.options.onSetStateFromStorage(this._getState());
-      } else {
-        if ($.cookie) {
-          return $.cookie(this._getCookieName(), this._getState(), {
-            path: '/'
-          });
-        }
-      }
-    },
-    _restoreState: function() {
-      var state;
-      if (this.options.onGetStateFromStorage) {
-        state = this.options.onGetStateFromStorage();
-      } else {
-        if ($.cookie) {
-          state = $.cookie(this._getCookieName(), {
-            path: '/'
-          });
-        } else {
-          state = null;
-        }
-      }
-      if (!state) {
-        return false;
-      } else {
-        this._setState(state);
-        return true;
-      }
-    },
-    _getCookieName: function() {
-      if (typeof this.options.saveState === 'string') {
-        return this.options.saveState;
-      } else {
-        return 'tree';
-      }
-    },
-    _createDomElements: function(tree, $element) {
+    };
+
+    JqueryWidget.prototype._createDomElements = function(tree, $element) {
       var createFolderLi, createLi, createNodeLi, createUl, depth, doCreateDomElements,
         _this = this;
       createUl = function(depth, is_open) {
@@ -670,8 +840,9 @@ limitations under the License.
         depth = 0;
       }
       return doCreateDomElements($element, tree.children, depth, true);
-    },
-    _click: function(e) {
+    };
+
+    JqueryWidget.prototype._click = function(e) {
       var $target, event, node, node_element,
         _this = this;
       if (e.ctrlKey) {
@@ -710,8 +881,107 @@ limitations under the License.
           }
         }
       }
-    },
-    _contextmenu: function(e) {
+    };
+
+    JqueryWidget.prototype._getNode = function($element) {
+      var $li;
+      $li = $element.closest('li');
+      if ($li.length === 0) {
+        return null;
+      } else {
+        return $li.data('node');
+      }
+    };
+
+    JqueryWidget.prototype._restoreState = function() {
+      var state;
+      if (this.options.onGetStateFromStorage) {
+        state = this.options.onGetStateFromStorage();
+      } else {
+        if ($.cookie) {
+          state = $.cookie(this._getCookieName(), {
+            path: '/'
+          });
+        } else {
+          state = null;
+        }
+      }
+      if (!state) {
+        return false;
+      } else {
+        this._setState(state);
+        return true;
+      }
+    };
+
+    JqueryWidget.prototype._saveState = function() {
+      if (this.options.onSetStateFromStorage) {
+        return this.options.onSetStateFromStorage(this._getState());
+      } else {
+        if ($.cookie) {
+          return $.cookie(this._getCookieName(), this._getState(), {
+            path: '/'
+          });
+        }
+      }
+    };
+
+    JqueryWidget.prototype._getState = function() {
+      var open_nodes, selected_node,
+        _this = this;
+      open_nodes = [];
+      this.tree.iterate(function(node) {
+        if (node.is_open && node.id && node.hasChildren()) {
+          open_nodes.push(node.id);
+        }
+        return true;
+      });
+      selected_node = '';
+      if (this.selected_node) {
+        selected_node = this.selected_node.id;
+      }
+      return toJson({
+        open_nodes: open_nodes,
+        selected_node: selected_node
+      });
+    };
+
+    JqueryWidget.prototype._setState = function(state) {
+      var data, open_nodes, selected_node_id,
+        _this = this;
+      data = $.parseJSON(state);
+      open_nodes = data.open_nodes;
+      selected_node_id = data.selected_node;
+      return this.tree.iterate(function(node) {
+        if (node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0)) {
+          node.is_open = true;
+        }
+        if (selected_node_id && (node.id === selected_node_id)) {
+          _this.selected_node = node;
+        }
+        return true;
+      });
+    };
+
+    JqueryWidget.prototype._getNodeElementForNode = function(node) {
+      if (node.hasChildren()) {
+        return new FolderElement(node);
+      } else {
+        return new NodeElement(node);
+      }
+    };
+
+    JqueryWidget.prototype._getNodeElement = function($element) {
+      var node;
+      node = this._getNode($element);
+      if (node) {
+        return this._getNodeElementForNode(node);
+      } else {
+        return null;
+      }
+    };
+
+    JqueryWidget.prototype._contextmenu = function(e) {
       var $div, event, node;
       $div = $(e.target).closest('ul.tree div');
       if ($div.length) {
@@ -726,33 +996,9 @@ limitations under the License.
           return false;
         }
       }
-    },
-    _getNode: function($element) {
-      var $li;
-      $li = $element.closest('li');
-      if ($li.length === 0) {
-        return null;
-      } else {
-        return $li.data('node');
-      }
-    },
-    _getNodeElement: function($element) {
-      var node;
-      node = this._getNode($element);
-      if (node) {
-        return this._getNodeElementForNode(node);
-      } else {
-        return null;
-      }
-    },
-    _getNodeElementForNode: function(node) {
-      if (node.hasChildren()) {
-        return new FolderElement(node);
-      } else {
-        return new NodeElement(node);
-      }
-    },
-    _mouseCapture: function(event) {
+    };
+
+    JqueryWidget.prototype._mouseCapture = function(event) {
       var $element, node_element;
       if (!this.options.dragAndDrop) {
         return;
@@ -769,8 +1015,9 @@ limitations under the License.
       }
       this.current_item = node_element;
       return this.current_item !== null;
-    },
-    _mouseStart: function(event) {
+    };
+
+    JqueryWidget.prototype._mouseStart = function(event) {
       var offsetX, offsetY, _ref;
       if (!this.options.dragAndDrop) {
         return;
@@ -780,19 +1027,15 @@ limitations under the License.
       this.drag_element = new DragElement(this.current_item.node, offsetX, offsetY, this.element);
       this.current_item.$element.addClass('moving');
       return true;
-    },
-    _getOffsetFromEvent: function(event) {
-      var element_offset;
-      element_offset = $(event.target).offset();
-      return [event.pageX - element_offset.left, event.pageY - element_offset.top];
-    },
-    _mouseDrag: function(event) {
+    };
+
+    JqueryWidget.prototype._mouseDrag = function(event) {
       var area, position_name;
       if (!this.options.dragAndDrop) {
         return;
       }
       this.drag_element.move(event.pageX, event.pageY);
-      area = this.findHoveredArea(event.pageX, event.pageY);
+      area = this._findHoveredArea(event.pageX, event.pageY);
       if (area && this.options.onCanMoveTo) {
         position_name = Position.getName(area.position);
         if (!this.options.onCanMoveTo(this.current_item.node, area.node, position_name)) {
@@ -810,22 +1053,9 @@ limitations under the License.
         }
       }
       return true;
-    },
-    _updateDropHint: function() {
-      var node, node_element;
-      this._stopOpenFolderTimer();
-      if (!this.hovered_area) {
-        return;
-      }
-      node = this.hovered_area.node;
-      if (node.hasChildren() && !node.is_open && this.hovered_area.position === Position.INSIDE) {
-        this._startOpenFolderTimer(node);
-      }
-      this._removeDropHint();
-      node_element = this._getNodeElementForNode(this.hovered_area.node);
-      return this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
-    },
-    _mouseStop: function() {
+    };
+
+    JqueryWidget.prototype._mouseStop = function() {
       if (!this.options.dragAndDrop) {
         return;
       }
@@ -836,40 +1066,14 @@ limitations under the License.
       this._removeHitAreas();
       this.current_item.$element.removeClass('moving');
       return false;
-    },
-    _mouseMove: function(event) {
-      if ($.browser.msie && document.documentMode === 8 && !event.button) {
-        event.button = 1;
-      }
-      return $.ui.mouse.prototype._mouseMove.call(this, event);
-    },
-    _moveItem: function() {
-      var event;
-      if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
-        this.tree.moveNode(this.current_item.node, this.hovered_area.node, this.hovered_area.position);
-        if (this.hovered_area.position === Position.INSIDE) {
-          this.hovered_area.node.is_open = true;
-        }
-        event = $.Event('tree.move');
-        event.move_info = {
-          moved_node: this.current_item.node,
-          target_node: this.hovered_area.node,
-          position: Position.getName(this.hovered_area.position)
-        };
-        this.element.trigger(event);
-        this.element.empty();
-        return this._createDomElements(this.tree);
-      }
-    },
-    _clear: function() {
-      this.drag_element.remove();
-      return this.drag_element = null;
-    },
-    _refreshHitAreas: function() {
+    };
+
+    JqueryWidget.prototype._refreshHitAreas = function() {
       this._removeHitAreas();
       return this._generateHitAreas();
-    },
-    _generateHitAreas: function() {
+    };
+
+    JqueryWidget.prototype._generateHitAreas = function() {
       var addPosition, getTop, groupPositions, handleAfterOpenFolder, handleClosedFolder, handleFirstNode, handleNode, handleOpenFolder, hit_areas, last_top, positions,
         _this = this;
       positions = [];
@@ -969,29 +1173,13 @@ limitations under the License.
         return _results;
       });
       return this.hit_areas = hit_areas;
-    },
-    findHoveredArea: function(x, y) {
-      var area, high, low, mid, tree_offset;
-      tree_offset = this.element.offset();
-      if (x < tree_offset.left || y < tree_offset.top || x > (tree_offset.left + this.element.width()) || y > (tree_offset.top + this.element.height())) {
-        return null;
-      }
-      low = 0;
-      high = this.hit_areas.length;
-      while (low < high) {
-        mid = (low + high) >> 1;
-        area = this.hit_areas[mid];
-        if (y < area.top) {
-          high = mid;
-        } else if (y > area.bottom) {
-          low = mid + 1;
-        } else {
-          return area;
-        }
-      }
-      return null;
-    },
-    _iterateVisibleNodes: function(handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) {
+    };
+
+    JqueryWidget.prototype._removeHitAreas = function() {
+      return this.hit_areas = [];
+    };
+
+    JqueryWidget.prototype._iterateVisibleNodes = function(handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) {
       var is_first_node, iterate,
         _this = this;
       is_first_node = true;
@@ -1034,38 +1222,52 @@ limitations under the License.
         }
       };
       return iterate(this.tree);
-    },
-    _removeHover: function() {
-      return this.hovered_area = null;
-    },
-    _removeDropHint: function() {
-      if (this.previous_ghost) {
-        return this.previous_ghost.remove();
+    };
+
+    JqueryWidget.prototype._getOffsetFromEvent = function(event) {
+      var element_offset;
+      element_offset = $(event.target).offset();
+      return [event.pageX - element_offset.left, event.pageY - element_offset.top];
+    };
+
+    JqueryWidget.prototype._findHoveredArea = function(x, y) {
+      var area, high, low, mid, tree_offset;
+      tree_offset = this.element.offset();
+      if (x < tree_offset.left || y < tree_offset.top || x > (tree_offset.left + this.element.width()) || y > (tree_offset.top + this.element.height())) {
+        return null;
       }
-    },
-    _removeHitAreas: function() {
-      return this.hit_areas = [];
-    },
-    _openNodes: function() {
-      var max_level;
-      if (this.options.saveState) {
-        if (this._restoreState()) {
-          return;
+      low = 0;
+      high = this.hit_areas.length;
+      while (low < high) {
+        mid = (low + high) >> 1;
+        area = this.hit_areas[mid];
+        if (y < area.top) {
+          high = mid;
+        } else if (y > area.bottom) {
+          low = mid + 1;
+        } else {
+          return area;
         }
       }
-      if (this.options.autoOpen === false) {
+      return null;
+    };
+
+    JqueryWidget.prototype._updateDropHint = function() {
+      var node, node_element;
+      this._stopOpenFolderTimer();
+      if (!this.hovered_area) {
         return;
-      } else if (this.options.autoOpen === true) {
-        max_level = -1;
-      } else {
-        max_level = parseInt(this.options.autoOpen);
       }
-      return this.tree.iterate(function(node, level) {
-        node.is_open = true;
-        return level !== max_level;
-      });
-    },
-    _startOpenFolderTimer: function(folder) {
+      node = this.hovered_area.node;
+      if (node.hasChildren() && !node.is_open && this.hovered_area.position === Position.INSIDE) {
+        this._startOpenFolderTimer(node);
+      }
+      this._removeDropHint();
+      node_element = this._getNodeElementForNode(this.hovered_area.node);
+      return this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
+    };
+
+    JqueryWidget.prototype._startOpenFolderTimer = function(folder) {
       var openFolder,
         _this = this;
       openFolder = function() {
@@ -1075,14 +1277,54 @@ limitations under the License.
         });
       };
       return this.open_folder_timer = setTimeout(openFolder, 500);
-    },
-    _stopOpenFolderTimer: function() {
+    };
+
+    JqueryWidget.prototype._stopOpenFolderTimer = function() {
       if (this.open_folder_timer) {
         clearTimeout(this.open_folder_timer);
         return this.open_folder_timer = null;
       }
-    }
-  });
+    };
+
+    JqueryWidget.prototype._removeDropHint = function() {
+      if (this.previous_ghost) {
+        return this.previous_ghost.remove();
+      }
+    };
+
+    JqueryWidget.prototype._removeHover = function() {
+      return this.hovered_area = null;
+    };
+
+    JqueryWidget.prototype._moveItem = function() {
+      var event;
+      if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
+        this.tree.moveNode(this.current_item.node, this.hovered_area.node, this.hovered_area.position);
+        if (this.hovered_area.position === Position.INSIDE) {
+          this.hovered_area.node.is_open = true;
+        }
+        event = $.Event('tree.move');
+        event.move_info = {
+          moved_node: this.current_item.node,
+          target_node: this.hovered_area.node,
+          position: Position.getName(this.hovered_area.position)
+        };
+        this.element.trigger(event);
+        this.element.empty();
+        return this._createDomElements(this.tree);
+      }
+    };
+
+    JqueryWidget.prototype._clear = function() {
+      this.drag_element.remove();
+      return this.drag_element = null;
+    };
+
+    return JqueryWidget;
+
+  })(MouseWidget);
+
+  SimpleWidget.register(JqueryWidget, 'tree');
 
   GhostDropHint = (function() {
 
