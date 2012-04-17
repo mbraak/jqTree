@@ -11,7 +11,6 @@
 	<link rel="stylesheet" href="extra/css/documentation.css">
 	<link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
 	<script src="extra/js/jquery-1.7.2.min.js"></script>
-	<script src="extra/js/jquery-ui1.9m6.min.js"></script>
 	<script src="extra/js/jquery.lettering.js"></script>
 	<script src="extra/syntax_highlighter/XRegExp.js"></script>
 	<script src="extra/syntax_highlighter/shCore.js"></script>
@@ -52,6 +51,7 @@
 			<ul>
 				<li><a href="#functions-loadData">loadData</a></li>
 				<li><a href="#functions-tojson">toJson</a></li>
+				<li><a href="#functions-getnodebyid">getNodeById</a></li>
 			</ul>
 		</li>
 		<li>
@@ -67,14 +67,13 @@
 <div id="page">
 	<h1 id="jqtree">jqTree</h1>
 	<p id="introduction">
-		JqTree is a tree widget written in jQuery UI.
+		JqTree is a tree widget.
 	</p>
 	<h4 id="features">Features</h4>
 	<ul>
 		<li>Create a tree from JSON data</li>
 		<li>Drag and drop</li>
 		<li>Works on ie7+, firefox 3.6+, chrome and safari</li>
-		<li>Works with jQuery UI 1.8 or 1.9 beta</li>
 		<li>Written in Coffeescript</li>
 	</ul>
 	<p>
@@ -117,7 +116,6 @@ $('#tree1').tree({
 	<h4 id="requirements">Requirements</h4>
 	<ul>
 		<li><a href="http://jquery.com">jQuery</a> 1.5+</li>
-		<li><a href="http://jqueryui.com/">jQuery UI</a> 1.8 or 1.9 beta</li>
 	</ul>
 	<h4 id="downloads">Downloads</h4>
 	<ul>
@@ -144,17 +142,12 @@ $('#tree1').tree({
 	<h4 id="tutorial">Tutorial</h4>
 	<ul>
 		<li>
-			Include <a href="http://code.jquery.com/jquery-1.6.2.min.js">jQuery</a>.
-			<pre><script src="jquery-1.6.2.min.js"></script></pre>
-		</li>
-		<li>
-			Include <a href="http://jqueryui.com/download">jQuery UI 1.8</a>. You need the components Core, Widget, and Mouse.
-			You can also include <a href="http://jquery-ui.googlecode.com/files/jquery-ui-1.9m6.zip">jQuery UI 1.9 beta</a>.
-			<pre><script src="jquery-ui.min.js"></script></pre>
+			Include <a href="http://code.jquery.com/jquery-1.7.2.min.js">jQuery</a>.
+			<pre>&lt;script src="jquery-1.7.2.min.js"&gt;&lt;/script&gt;</pre>
 		</li>
 		<li>
 			Include tree.jquery.js:
-			<pre><script src="tree.jquery.js"></script></pre>
+			<pre>&lt;script src="tree.jquery.js"&gt;&lt;/script&gt;</pre>
 		</li>
 		<li>
 			Include jqtree.css:
@@ -162,7 +155,7 @@ $('#tree1').tree({
 		</li>
 		<li>
 			Optionally, for saveState include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>:
-			<pre><script src="jquery.cookie.js"></script></pre>
+			<pre>&lt;script src="jquery.cookie.js"t&gt;&lt;/scriptt&gt;</pre>
 		</li>
 		<li>
 			Create a div.
@@ -465,6 +458,22 @@ var new_data = [
 $('#tree1').tree('loadData', new_data);
 </pre>
 
+	<p>
+		It's also possible to add the nodes to an existing node in the tree.
+	</p>
+
+<pre>
+// Get node by id (this assumes that the nodes have an id)
+var node = $('#tree1').tree('getNodeById', 100);
+
+// Add new nodes
+var data = [
+	{ label: 'new node' },
+	{ label: 'another new node' }
+];
+$('#tree1').tree('loadData', data, node);
+</pre>
+
 	<h5 id="functions-tojson">toJson</h5>
 	<p>
 		Get the tree data as json.
@@ -472,6 +481,24 @@ $('#tree1').tree('loadData', new_data);
 <pre>
 // Assuming the tree exists
 $('#tree1').tree('toJson');
+</pre>
+
+	<h5 id="functions-getnodebyid">getNodeById</h5>
+	<p>
+		Get a tree node by node-id. This assumes that you have given the nodes in the data a unique id.
+	</p>
+
+<pre>
+var $tree = $('#tree1);
+var data = [
+	{ id: 10, name: 'n1' },
+	{ id: 11, name: 'n2' }
+];
+
+$tree.tree({
+	data: data
+});
+var node = $tree.tree('getNodeById', 10);
 </pre>
 
 	<h4 id="events">Events</h4>
@@ -528,6 +555,7 @@ $('#tree1').bind(
 		<li>moved_node</li>
 		<li>target_node</li>
 		<li>position: (before, after or inside)</li>
+		<li>previous_parent</li>
 	</ul>
 
 <pre>
@@ -542,6 +570,7 @@ $('#tree1).bind(
 		console.log('moved_node', e.move_info.moved_node);
 		console.log('target_node', e.move_info.target_node);
 		console.log('position', e.move_info.position);
+		console.log('previous_parent', e.move_info.previous_parent);
 	}
 );
 </pre>

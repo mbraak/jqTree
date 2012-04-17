@@ -54,8 +54,14 @@ var isNodeOpen = function($node) {
 }
 
 module("jqtree", {
+    setup: function() {
+        $('body').append('<div id="tree1"></div>');
+    },
+
     teardown: function() {
-        $('#tree1').tree('destroy');
+        var $tree = $('#tree1');
+        $tree.tree('destroy');
+        $tree.remove();
     }
 });
 
@@ -292,7 +298,8 @@ test('loadData', function() {
     // setup
     var $tree = $('#tree1');
     $tree.tree({
-        data: example_data
+        data: example_data,
+        autoOpen: true
     });
 
     // first node is 'node1'
@@ -309,6 +316,41 @@ test('loadData', function() {
         $tree.find('> ul > li:first div:first > span').text(),
         'main'
     );
+
+    // 2. add new nodes to child3
+    $tree.tree('loadData', example_data);
+
+    var node2 = $tree.tree('getNodeById', 124);
+    var child3 = node2.children[0];
+    equal(child3.name, 'child3');
+
+    var data = [
+        { label: 'c4' },
+        {
+            label: 'c5',
+            children: [
+                { label: 'c6' }
+            ]
+        }
+    ];
+    $tree.tree('loadData', data, child3);
+
+    // first node in html is still 'node1'
+    equal(
+        $tree.find('li:eq(0)').find('div:eq(0) span.title').text(),
+        'node1'
+    );
+
+    // Node 'child3' now has a children 'c4' and 'c5'
+    var $child3 = $tree.find('span:contains(child3)');
+    var $li = $child3.closest('li');
+    equal(
+        $li.children('ul').children('li:eq(0)').find('div span.title').text(),
+        'c4'
+    );
+
+    // Node 'child3' must have toggler button
+    ok($child3.prev().is('a.toggler'));
 });
 
 test('openNode', function() {
@@ -325,7 +367,7 @@ test('openNode', function() {
     equal(node2.name, 'node2');
     $tree.tree('openNode', node2, null, true);
 
-    equal(node2.is_open, true)
+    equal(node2.is_open, true);
 });
 
 test('selectNode', function() {
@@ -359,9 +401,9 @@ test('selectNode', function() {
 });
 
 test('click toggler', function() {
+    // setup
     stop();
 
-    // setup
     var $tree = $('#tree1');
     $tree.tree({
         data: example_data,
@@ -381,6 +423,23 @@ test('click toggler', function() {
 
     // 1. click toggler of 'node1'
     $toggler.click();
+});
+
+test('getNodeById', function() {
+	// setup
+	var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    // 1. get 'node2' by id
+    equal(
+        $tree.tree('getNodeById', 124).name,
+        'node2'
+    );
+
+    // 2. get id that does not exist
+    equal($tree.tree('getNodeById', 333), null);
 });
 
 module("Tree");

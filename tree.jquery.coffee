@@ -323,9 +323,9 @@ class Node
 
 @Tree.Tree = Node
 
-$.widget("ui.tree", $.ui.mouse, {
-    widgetEventPrefix: "tree",
-    options:
+
+class JqueryWidget extends MouseWidget
+    defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
         saveState: false  # true / false / string (cookie name)
         dragAndDrop: false
@@ -338,41 +338,6 @@ $.widget("ui.tree", $.ui.mouse, {
         onCanMove: null  # Can this node be moved? function(node)
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
 
-    _create: ->
-        @_initTree(@options.data)
-
-        @element.click($.proxy(@_click, this))
-        @element.bind('contextmenu', $.proxy(@_contextmenu, this))
-
-        @_mouseInit()
-
-        @hovered_area = null
-        @$ghost = null
-        @hit_areas = []
-
-    destroy: ->
-        @element.empty()
-        @element.unbind()
-        @tree = null
-
-        @_mouseDestroy()
-        $.Widget.prototype.destroy.call(this)
-
-    getTree: ->
-        return @tree
-
-    toJson: ->
-        return toJson(
-            @tree.getData()
-        )
-
-    addNode: (data) ->
-        n = new Node()
-        n.initFromData(data)
-        @getTree().addChild(n)
-        @element.empty()
-        @_createDomElements(@getTree())
-
     toggle: (node, on_finished) ->
         if node.hasChildren()
             new FolderElement(node).toggle(on_finished)
@@ -380,9 +345,8 @@ $.widget("ui.tree", $.ui.mouse, {
         if @options.saveState
             @_saveState()
 
-    openNode: (node, on_finished, skip_slide) ->
-        if node.hasChildren()
-            new FolderElement(node).open(on_finished, skip_slide)
+    getTree: ->
+        return @tree
 
     selectNode: (node, must_open_parents) ->
         if @options.selectable
@@ -407,8 +371,67 @@ $.widget("ui.tree", $.ui.mouse, {
     getSelectedNode: ->
         return @selected_node or false
 
-    loadData: (data) ->
-         @_initTree(data)
+    toJson: ->
+        return toJson(
+            @tree.getData()
+        )
+
+    loadData: (data, parent_node) ->
+        if not parent_node
+            @_initTree(data)
+        else
+            subtree = new Node()
+            subtree.loadFromData(data)
+
+            for child in subtree.children
+                parent_node.addChild(child)
+
+            $element = $(parent_node.element)
+            $element.children('ul').detach()
+            @_createDomElements(parent_node, $element)
+
+            $div = $element.children('div')
+
+            if not $div.find('.toggler').length
+                $div.prepend('<a class="toggler">&raquo;</a>')
+
+    getNodeById: (node_id) ->
+        result = null
+
+        @tree.iterate(
+            (node) ->
+                if node.id == node_id
+                    result = node
+                    return false  # stop iterating
+                else
+                    return true
+        )
+
+        return result
+
+    openNode: (node, on_finished, skip_slide) ->
+        if node.hasChildren()
+            new FolderElement(node).open(on_finished, skip_slide)
+
+    _init: ->
+        super
+
+        @element = @$el
+        @_initTree(@options.data)
+
+        @element.click($.proxy(@_click, this))
+        @element.bind('contextmenu', $.proxy(@_contextmenu, this))
+
+        @hovered_area = null
+        @$ghost = null
+        @hit_areas = []
+
+    _deinit: ->
+        @element.empty()
+        @element.unbind()
+        @tree = null
+
+        super
 
     _initTree: (data) ->
         @tree = new Node()
@@ -424,83 +447,24 @@ $.widget("ui.tree", $.ui.mouse, {
             if node_element
                 node_element.select()
 
-    _getState: ->
-        open_nodes = []
+    _openNodes: ->
+        if @options.saveState
+            if @_restoreState()
+                return
 
-        @tree.iterate((node) =>
-            if (
-                node.is_open and
-                node.id and
-                node.hasChildren()
-            )
-                open_nodes.push(node.id)
-            return true
+        if @options.autoOpen is false
+            return
+        else if @options.autoOpen is true
+            max_level = -1
+        else
+            max_level = parseInt(@options.autoOpen)
+
+        @tree.iterate((node, level) ->
+            node.is_open = true
+            return (level != max_level)
         )
 
-        selected_node = ''
-        if @selected_node
-            selected_node = @selected_node.id
-
-        return toJson(
-            open_nodes: open_nodes,
-            selected_node: selected_node
-        )
-
-    _setState: (state) ->
-        data = $.parseJSON(state)
-        open_nodes = data.open_nodes
-        selected_node_id = data.selected_node
-
-        @tree.iterate((node) =>
-            if (
-                node.id and
-                node.hasChildren() and
-                (indexOf(open_nodes, node.id) >= 0)
-            )
-                node.is_open = true
-
-            if selected_node_id and (node.id == selected_node_id)
-                @selected_node = node
-
-            return true
-        )
-
-    _saveState: ->
-        if @options.onSetStateFromStorage
-            @options.onSetStateFromStorage(@_getState())
-        else
-            if $.cookie
-                $.cookie(
-                    @_getCookieName(),
-                    @_getState(),
-                    {path: '/'}
-                )
-
-    _restoreState: ->
-        if @options.onGetStateFromStorage
-            state = @options.onGetStateFromStorage()
-        else
-            if $.cookie
-                state = $.cookie(
-                    @_getCookieName(),
-                    {path: '/'}
-                )
-            else
-                state = null
-
-        if not state
-            return false
-        else
-            @_setState(state)
-            return true
-
-    _getCookieName: ->
-        if typeof @options.saveState is 'string'
-            return @options.saveState
-        else
-            return 'tree'
-
-    _createDomElements: (tree) ->
+    _createDomElements: (tree, $element) ->
         createUl = (depth, is_open) =>
             if depth
                 class_string = ''
@@ -561,8 +525,14 @@ $.widget("ui.tree", $.ui.mouse, {
                 if child.hasChildren()
                     doCreateDomElements($li, child.children, depth + 1, child.is_open)
 
-        @element.empty()
-        doCreateDomElements(@element, tree.children, 0, true)
+        if $element
+            depth = 1
+        else
+            $element = @element
+            $element.empty()
+            depth = 0
+
+        doCreateDomElements($element, tree.children, depth, true)
 
     _click: (e) ->
         if e.ctrlKey
@@ -605,6 +575,96 @@ $.widget("ui.tree", $.ui.mouse, {
                     event.node = node
                     @element.trigger(event)
 
+    _getNode: ($element) ->
+        $li = $element.closest('li')
+        if $li.length == 0
+            return null
+        else
+            return $li.data('node')
+
+    _restoreState: ->
+        if @options.onGetStateFromStorage
+            state = @options.onGetStateFromStorage()
+        else
+            if $.cookie
+                state = $.cookie(
+                    @_getCookieName(),
+                    {path: '/'}
+                )
+            else
+                state = null
+
+        if not state
+            return false
+        else
+            @_setState(state)
+            return true
+
+    _saveState: ->
+        if @options.onSetStateFromStorage
+            @options.onSetStateFromStorage(@_getState())
+        else
+            if $.cookie
+                $.cookie(
+                    @_getCookieName(),
+                    @_getState(),
+                    {path: '/'}
+                )
+
+    _getState: ->
+        open_nodes = []
+
+        @tree.iterate((node) =>
+            if (
+                node.is_open and
+                node.id and
+                node.hasChildren()
+            )
+                open_nodes.push(node.id)
+            return true
+        )
+
+        selected_node = ''
+        if @selected_node
+            selected_node = @selected_node.id
+
+        return toJson(
+            open_nodes: open_nodes,
+            selected_node: selected_node
+        )
+
+    _setState: (state) ->
+        data = $.parseJSON(state)
+        open_nodes = data.open_nodes
+        selected_node_id = data.selected_node
+
+        @tree.iterate((node) =>
+            if (
+                node.id and
+                node.hasChildren() and
+                (indexOf(open_nodes, node.id) >= 0)
+            )
+                node.is_open = true
+
+            if selected_node_id and (node.id == selected_node_id)
+                @selected_node = node
+
+            return true
+        )
+
+    _getNodeElementForNode: (node) ->
+        if node.hasChildren()
+            return new FolderElement(node)
+        else
+            return new NodeElement(node)
+
+    _getNodeElement: ($element) ->
+        node = @_getNode($element)
+        if node
+            return @_getNodeElementForNode(node)
+        else
+            return null
+
     _contextmenu: (e) ->
         $div = $(e.target).closest('ul.tree div')
         if $div.length
@@ -618,26 +678,6 @@ $.widget("ui.tree", $.ui.mouse, {
                 event.click_event = e
                 @element.trigger(event)
                 return false
-
-    _getNode: ($element) ->
-        $li = $element.closest('li')
-        if $li.length == 0
-            return null
-        else
-            return $li.data('node')
-
-    _getNodeElement: ($element) ->
-        node = @_getNode($element)
-        if node
-            return @_getNodeElementForNode(node)
-        else
-            return null
-
-    _getNodeElementForNode: (node) ->
-        if node.hasChildren()
-            return new FolderElement(node)
-        else
-            return new NodeElement(node)
 
     _mouseCapture: (event) ->
         if not @options.dragAndDrop
@@ -674,20 +714,13 @@ $.widget("ui.tree", $.ui.mouse, {
         @current_item.$element.addClass('moving')
         return true
 
-    _getOffsetFromEvent: (event) ->
-        element_offset = $(event.target).offset()
-        return [
-            event.pageX - element_offset.left,
-            event.pageY - element_offset.top
-        ]
-
     _mouseDrag: (event) ->
         if not @options.dragAndDrop
             return
 
         @drag_element.move(event.pageX, event.pageY)
 
-        area = @findHoveredArea(event.pageX, event.pageY)
+        area = @_findHoveredArea(event.pageX, event.pageY)
 
         if area and @options.onCanMoveTo
             position_name = Position.getName(area.position)
@@ -707,29 +740,6 @@ $.widget("ui.tree", $.ui.mouse, {
 
         return true
 
-    _updateDropHint: ->
-        # stop open folder timer
-        @_stopOpenFolderTimer()
-
-        if not @hovered_area
-            return
-
-        # if this is a closed folder, start timer to open it
-        node = @hovered_area.node
-        if (
-            node.hasChildren() and
-            not node.is_open and
-            @hovered_area.position == Position.INSIDE
-        )
-            @_startOpenFolderTimer(node)
-
-        # remove previous drop hint
-        @_removeDropHint()
-
-        # add new drop hint
-        node_element = @_getNodeElementForNode(@hovered_area.node)
-        @previous_ghost = node_element.addDropHint(@hovered_area.position)
-
     _mouseStop: ->
         if not @options.dragAndDrop
             return
@@ -743,41 +753,6 @@ $.widget("ui.tree", $.ui.mouse, {
         @current_item.$element.removeClass('moving')
 
         return false
-
-    _mouseMove: (event) ->
-        # Prevent jqueryui from triggering mouseup in ie8.
-        if $.browser.msie and document.documentMode == 8 and not event.button
-            event.button = 1
-
-        return $.ui.mouse.prototype._mouseMove.call(this, event)
-
-    _moveItem: ->
-        if (
-            @hovered_area and
-            @hovered_area.position != Position.NONE
-        )
-            @tree.moveNode(
-                @current_item.node,
-                @hovered_area.node,
-                @hovered_area.position
-            )
-
-            if @hovered_area.position == Position.INSIDE
-                @hovered_area.node.is_open = true
-
-            event = $.Event('tree.move')
-            event.move_info = 
-                moved_node: @current_item.node
-                target_node: @hovered_area.node
-                position: Position.getName(@hovered_area.position)
-            @element.trigger(event)
-
-            @element.empty()
-            @_createDomElements(@tree)
-
-    _clear: ->
-        @drag_element.remove()
-        @drag_element = null
 
     _refreshHitAreas: ->
         @_removeHitAreas()
@@ -899,30 +874,8 @@ $.widget("ui.tree", $.ui.mouse, {
 
         @hit_areas = hit_areas
 
-    findHoveredArea: (x, y) ->
-        tree_offset = @element.offset()
-        if (
-            x < tree_offset.left or
-            y < tree_offset.top or
-            x > (tree_offset.left + @element.width()) or
-            y > (tree_offset.top + @element.height())
-        )
-            return null
-
-        low = 0
-        high = @hit_areas.length
-        while (low < high)
-            mid = (low + high) >> 1
-            area = @hit_areas[mid]
-
-            if y < area.top
-                high = mid
-            else if y > area.bottom
-                low = mid + 1
-            else
-                return area
-
-        return null
+    _removeHitAreas: ->
+        @hit_areas = []
 
     _iterateVisibleNodes: (handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) ->
         is_first_node = true
@@ -963,32 +916,60 @@ $.widget("ui.tree", $.ui.mouse, {
 
         iterate(@tree)
 
-    _removeHover: ->
-        @hovered_area = null
+    _getOffsetFromEvent: (event) ->
+        element_offset = $(event.target).offset()
+        return [
+            event.pageX - element_offset.left,
+            event.pageY - element_offset.top
+        ]
 
-    _removeDropHint: ->
-        if @previous_ghost
-            @previous_ghost.remove()
-
-    _removeHitAreas: ->
-        @hit_areas = []
-
-    _openNodes: ->
-        if @options.saveState
-            if @_restoreState()
-                return
-
-        if @options.autoOpen is false
-            return
-        else if @options.autoOpen is true
-            max_level = -1
-        else
-            max_level = parseInt(@options.autoOpen)
-
-        @tree.iterate((node, level) ->
-            node.is_open = true
-            return (level != max_level)
+    _findHoveredArea: (x, y) ->
+        tree_offset = @element.offset()
+        if (
+            x < tree_offset.left or
+            y < tree_offset.top or
+            x > (tree_offset.left + @element.width()) or
+            y > (tree_offset.top + @element.height())
         )
+            return null
+
+        low = 0
+        high = @hit_areas.length
+        while (low < high)
+            mid = (low + high) >> 1
+            area = @hit_areas[mid]
+
+            if y < area.top
+                high = mid
+            else if y > area.bottom
+                low = mid + 1
+            else
+                return area
+
+        return null
+
+    _updateDropHint: ->
+        # stop open folder timer
+        @_stopOpenFolderTimer()
+
+        if not @hovered_area
+            return
+
+        # if this is a closed folder, start timer to open it
+        node = @hovered_area.node
+        if (
+            node.hasChildren() and
+            not node.is_open and
+            @hovered_area.position == Position.INSIDE
+        )
+            @_startOpenFolderTimer(node)
+
+        # remove previous drop hint
+        @_removeDropHint()
+
+        # add new drop hint
+        node_element = @_getNodeElementForNode(@hovered_area.node)
+        @previous_ghost = node_element.addDropHint(@hovered_area.position)
 
     _startOpenFolderTimer: (folder) ->
         openFolder = =>
@@ -1004,7 +985,45 @@ $.widget("ui.tree", $.ui.mouse, {
         if @open_folder_timer
             clearTimeout(@open_folder_timer)
             @open_folder_timer = null
-})
+
+    _removeDropHint: ->
+        if @previous_ghost
+            @previous_ghost.remove()
+
+    _removeHover: ->
+        @hovered_area = null
+
+    _moveItem: ->
+        if (
+            @hovered_area and
+            @hovered_area.position != Position.NONE
+        )
+            moved_node = @current_item.node
+            target_node = @hovered_area.node
+            position = @hovered_area.position
+            previous_parent = moved_node.parent
+
+            @tree.moveNode(moved_node, target_node, position)
+
+            if position == Position.INSIDE
+                @hovered_area.node.is_open = true
+
+            event = $.Event('tree.move')
+            event.move_info = 
+                moved_node: moved_node
+                target_node: target_node
+                position: Position.getName(position)
+                previous_parent: previous_parent
+            @element.trigger(event)
+
+            @element.empty()
+            @_createDomElements(@tree)
+
+    _clear: ->
+        @drag_element.remove()
+        @drag_element = null
+
+SimpleWidget.register(JqueryWidget, 'tree')
 
 
 class GhostDropHint
