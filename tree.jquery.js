@@ -1297,17 +1297,22 @@ limitations under the License.
     };
 
     JqueryWidget.prototype._moveItem = function() {
-      var event;
+      var event, moved_node, position, previous_parent, target_node;
       if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
-        this.tree.moveNode(this.current_item.node, this.hovered_area.node, this.hovered_area.position);
-        if (this.hovered_area.position === Position.INSIDE) {
+        moved_node = this.current_item.node;
+        target_node = this.hovered_area.node;
+        position = this.hovered_area.position;
+        previous_parent = moved_node.parent;
+        this.tree.moveNode(moved_node, target_node, position);
+        if (position === Position.INSIDE) {
           this.hovered_area.node.is_open = true;
         }
         event = $.Event('tree.move');
         event.move_info = {
-          moved_node: this.current_item.node,
-          target_node: this.hovered_area.node,
-          position: Position.getName(this.hovered_area.position)
+          moved_node: moved_node,
+          target_node: target_node,
+          position: Position.getName(position),
+          previous_parent: previous_parent
         };
         this.element.trigger(event);
         this.element.empty();

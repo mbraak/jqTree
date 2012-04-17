@@ -998,20 +998,22 @@ class JqueryWidget extends MouseWidget
             @hovered_area and
             @hovered_area.position != Position.NONE
         )
-            @tree.moveNode(
-                @current_item.node,
-                @hovered_area.node,
-                @hovered_area.position
-            )
+            moved_node = @current_item.node
+            target_node = @hovered_area.node
+            position = @hovered_area.position
+            previous_parent = moved_node.parent
 
-            if @hovered_area.position == Position.INSIDE
+            @tree.moveNode(moved_node, target_node, position)
+
+            if position == Position.INSIDE
                 @hovered_area.node.is_open = true
 
             event = $.Event('tree.move')
             event.move_info = 
-                moved_node: @current_item.node
-                target_node: @hovered_area.node
-                position: Position.getName(@hovered_area.position)
+                moved_node: moved_node
+                target_node: target_node
+                position: Position.getName(position)
+                previous_parent: previous_parent
             @element.trigger(event)
 
             @element.empty()

@@ -555,6 +555,7 @@ $('#tree1').bind(
 		<li>moved_node</li>
 		<li>target_node</li>
 		<li>position: (before, after or inside)</li>
+		<li>previous_parent</li>
 	</ul>
 
 <pre>
@@ -569,6 +570,7 @@ $('#tree1).bind(
 		console.log('moved_node', e.move_info.moved_node);
 		console.log('target_node', e.move_info.target_node);
 		console.log('position', e.move_info.position);
+		console.log('previous_parent', e.move_info.previous_parent);
 	}
 );
 </pre>
