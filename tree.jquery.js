@@ -963,6 +963,14 @@ limitations under the License.
       });
     };
 
+    JqueryWidget.prototype._getCookieName = function() {
+      if (typeof this.options.saveState === 'string') {
+        return this.options.saveState;
+      } else {
+        return 'tree';
+      }
+    };
+
     JqueryWidget.prototype._getNodeElementForNode = function(node) {
       if (node.hasChildren()) {
         return new FolderElement(node);
