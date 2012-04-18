@@ -652,6 +652,12 @@ class JqueryWidget extends MouseWidget
             return true
         )
 
+    _getCookieName: ->
+        if typeof @options.saveState is 'string'
+            return @options.saveState
+        else
+            return 'tree'
+
     _getNodeElementForNode: (node) ->
         if node.hasChildren()
             return new FolderElement(node)
