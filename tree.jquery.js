@@ -18,7 +18,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, JqueryWidget, Json, MouseWidget, Node, NodeElement, Position, SimpleWidget, indexOf, toJson,
+  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, JqTreeWidget, Json, MouseWidget, Node, NodeElement, Position, SimpleWidget, indexOf, toJson,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -596,17 +596,17 @@ limitations under the License.
 
   this.Tree.Tree = Node;
 
-  JqueryWidget = (function(_super) {
+  JqTreeWidget = (function(_super) {
 
-    __extends(JqueryWidget, _super);
+    __extends(JqTreeWidget, _super);
 
-    JqueryWidget.name = 'JqueryWidget';
+    JqTreeWidget.name = 'JqTreeWidget';
 
-    function JqueryWidget() {
-      return JqueryWidget.__super__.constructor.apply(this, arguments);
+    function JqTreeWidget() {
+      return JqTreeWidget.__super__.constructor.apply(this, arguments);
     }
 
-    JqueryWidget.prototype.defaults = {
+    JqTreeWidget.prototype.defaults = {
       autoOpen: false,
       saveState: false,
       dragAndDrop: false,
@@ -620,7 +620,7 @@ limitations under the License.
       onCanMoveTo: null
     };
 
-    JqueryWidget.prototype.toggle = function(node, on_finished) {
+    JqTreeWidget.prototype.toggle = function(node, on_finished) {
       if (node.hasChildren()) {
         new FolderElement(node).toggle(on_finished);
       }
@@ -629,11 +629,11 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype.getTree = function() {
+    JqTreeWidget.prototype.getTree = function() {
       return this.tree;
     };
 
-    JqueryWidget.prototype.selectNode = function(node, must_open_parents) {
+    JqTreeWidget.prototype.selectNode = function(node, must_open_parents) {
       var parent;
       if (this.options.selectable) {
         if (this.selected_node) {
@@ -656,15 +656,15 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype.getSelectedNode = function() {
+    JqTreeWidget.prototype.getSelectedNode = function() {
       return this.selected_node || false;
     };
 
-    JqueryWidget.prototype.toJson = function() {
+    JqTreeWidget.prototype.toJson = function() {
       return toJson(this.tree.getData());
     };
 
-    JqueryWidget.prototype.loadData = function(data, parent_node) {
+    JqTreeWidget.prototype.loadData = function(data, parent_node) {
       var $div, $element, child, subtree, _i, _len, _ref;
       if (!parent_node) {
         return this._initTree(data);
@@ -686,7 +686,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype.getNodeById = function(node_id) {
+    JqTreeWidget.prototype.getNodeById = function(node_id) {
       var result;
       result = null;
       this.tree.iterate(function(node) {
@@ -700,14 +700,14 @@ limitations under the License.
       return result;
     };
 
-    JqueryWidget.prototype.openNode = function(node, on_finished, skip_slide) {
+    JqTreeWidget.prototype.openNode = function(node, on_finished, skip_slide) {
       if (node.hasChildren()) {
         return new FolderElement(node).open(on_finished, skip_slide);
       }
     };
 
-    JqueryWidget.prototype._init = function() {
-      JqueryWidget.__super__._init.apply(this, arguments);
+    JqTreeWidget.prototype._init = function() {
+      JqTreeWidget.__super__._init.apply(this, arguments);
       this.element = this.$el;
       this._initTree(this.options.data);
       this.element.click($.proxy(this._click, this));
@@ -717,14 +717,14 @@ limitations under the License.
       return this.hit_areas = [];
     };
 
-    JqueryWidget.prototype._deinit = function() {
+    JqTreeWidget.prototype._deinit = function() {
       this.element.empty();
       this.element.unbind();
       this.tree = null;
-      return JqueryWidget.__super__._deinit.apply(this, arguments);
+      return JqTreeWidget.__super__._deinit.apply(this, arguments);
     };
 
-    JqueryWidget.prototype._initTree = function(data) {
+    JqTreeWidget.prototype._initTree = function(data) {
       var node_element;
       this.tree = new Node();
       this.tree.loadFromData(data);
@@ -739,7 +739,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._openNodes = function() {
+    JqTreeWidget.prototype._openNodes = function() {
       var max_level;
       if (this.options.saveState) {
         if (this._restoreState()) {
@@ -759,7 +759,7 @@ limitations under the License.
       });
     };
 
-    JqueryWidget.prototype._createDomElements = function(tree, $element) {
+    JqTreeWidget.prototype._createDomElements = function(tree, $element) {
       var createFolderLi, createLi, createNodeLi, createUl, depth, doCreateDomElements,
         _this = this;
       createUl = function(depth, is_open) {
@@ -834,7 +834,7 @@ limitations under the License.
       return doCreateDomElements($element, tree.children, depth, true);
     };
 
-    JqueryWidget.prototype._click = function(e) {
+    JqTreeWidget.prototype._click = function(e) {
       var $target, event, node, node_element,
         _this = this;
       if (e.ctrlKey) {
@@ -875,7 +875,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._getNode = function($element) {
+    JqTreeWidget.prototype._getNode = function($element) {
       var $li;
       $li = $element.closest('li');
       if ($li.length === 0) {
@@ -885,7 +885,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._restoreState = function() {
+    JqTreeWidget.prototype._restoreState = function() {
       var state;
       if (this.options.onGetStateFromStorage) {
         state = this.options.onGetStateFromStorage();
@@ -906,7 +906,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._saveState = function() {
+    JqTreeWidget.prototype._saveState = function() {
       if (this.options.onSetStateFromStorage) {
         return this.options.onSetStateFromStorage(this._getState());
       } else {
@@ -918,7 +918,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._getState = function() {
+    JqTreeWidget.prototype._getState = function() {
       var open_nodes, selected_node,
         _this = this;
       open_nodes = [];
@@ -938,7 +938,7 @@ limitations under the License.
       });
     };
 
-    JqueryWidget.prototype._setState = function(state) {
+    JqTreeWidget.prototype._setState = function(state) {
       var data, open_nodes, selected_node_id,
         _this = this;
       data = $.parseJSON(state);
@@ -955,7 +955,7 @@ limitations under the License.
       });
     };
 
-    JqueryWidget.prototype._getCookieName = function() {
+    JqTreeWidget.prototype._getCookieName = function() {
       if (typeof this.options.saveState === 'string') {
         return this.options.saveState;
       } else {
@@ -963,7 +963,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._getNodeElementForNode = function(node) {
+    JqTreeWidget.prototype._getNodeElementForNode = function(node) {
       if (node.hasChildren()) {
         return new FolderElement(node);
       } else {
@@ -971,7 +971,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._getNodeElement = function($element) {
+    JqTreeWidget.prototype._getNodeElement = function($element) {
       var node;
       node = this._getNode($element);
       if (node) {
@@ -981,7 +981,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._contextmenu = function(e) {
+    JqTreeWidget.prototype._contextmenu = function(e) {
       var $div, event, node;
       $div = $(e.target).closest('ul.tree div');
       if ($div.length) {
@@ -998,7 +998,7 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._mouseCapture = function(event) {
+    JqTreeWidget.prototype._mouseCapture = function(event) {
       var $element, node_element;
       if (!this.options.dragAndDrop) {
         return;
@@ -1017,7 +1017,7 @@ limitations under the License.
       return this.current_item !== null;
     };
 
-    JqueryWidget.prototype._mouseStart = function(event) {
+    JqTreeWidget.prototype._mouseStart = function(event) {
       var offsetX, offsetY, _ref;
       if (!this.options.dragAndDrop) {
         return;
@@ -1029,7 +1029,7 @@ limitations under the License.
       return true;
     };
 
-    JqueryWidget.prototype._mouseDrag = function(event) {
+    JqTreeWidget.prototype._mouseDrag = function(event) {
       var area, position_name;
       if (!this.options.dragAndDrop) {
         return;
@@ -1055,7 +1055,7 @@ limitations under the License.
       return true;
     };
 
-    JqueryWidget.prototype._mouseStop = function() {
+    JqTreeWidget.prototype._mouseStop = function() {
       if (!this.options.dragAndDrop) {
         return;
       }
@@ -1068,12 +1068,12 @@ limitations under the License.
       return false;
     };
 
-    JqueryWidget.prototype._refreshHitAreas = function() {
+    JqTreeWidget.prototype._refreshHitAreas = function() {
       this._removeHitAreas();
       return this._generateHitAreas();
     };
 
-    JqueryWidget.prototype._generateHitAreas = function() {
+    JqTreeWidget.prototype._generateHitAreas = function() {
       var addPosition, getTop, groupPositions, handleAfterOpenFolder, handleClosedFolder, handleFirstNode, handleNode, handleOpenFolder, hit_areas, last_top, positions,
         _this = this;
       positions = [];
@@ -1174,11 +1174,11 @@ limitations under the License.
       return this.hit_areas = hit_areas;
     };
 
-    JqueryWidget.prototype._removeHitAreas = function() {
+    JqTreeWidget.prototype._removeHitAreas = function() {
       return this.hit_areas = [];
     };
 
-    JqueryWidget.prototype._iterateVisibleNodes = function(handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) {
+    JqTreeWidget.prototype._iterateVisibleNodes = function(handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) {
       var is_first_node, iterate,
         _this = this;
       is_first_node = true;
@@ -1223,13 +1223,13 @@ limitations under the License.
       return iterate(this.tree);
     };
 
-    JqueryWidget.prototype._getOffsetFromEvent = function(event) {
+    JqTreeWidget.prototype._getOffsetFromEvent = function(event) {
       var element_offset;
       element_offset = $(event.target).offset();
       return [event.pageX - element_offset.left, event.pageY - element_offset.top];
     };
 
-    JqueryWidget.prototype._findHoveredArea = function(x, y) {
+    JqTreeWidget.prototype._findHoveredArea = function(x, y) {
       var area, high, low, mid, tree_offset;
       tree_offset = this.element.offset();
       if (x < tree_offset.left || y < tree_offset.top || x > (tree_offset.left + this.element.width()) || y > (tree_offset.top + this.element.height())) {
@@ -1251,7 +1251,7 @@ limitations under the License.
       return null;
     };
 
-    JqueryWidget.prototype._updateDropHint = function() {
+    JqTreeWidget.prototype._updateDropHint = function() {
       var node, node_element;
       this._stopOpenFolderTimer();
       if (!this.hovered_area) {
@@ -1266,7 +1266,7 @@ limitations under the License.
       return this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
     };
 
-    JqueryWidget.prototype._startOpenFolderTimer = function(folder) {
+    JqTreeWidget.prototype._startOpenFolderTimer = function(folder) {
       var openFolder,
         _this = this;
       openFolder = function() {
@@ -1278,24 +1278,24 @@ limitations under the License.
       return this.open_folder_timer = setTimeout(openFolder, 500);
     };
 
-    JqueryWidget.prototype._stopOpenFolderTimer = function() {
+    JqTreeWidget.prototype._stopOpenFolderTimer = function() {
       if (this.open_folder_timer) {
         clearTimeout(this.open_folder_timer);
         return this.open_folder_timer = null;
       }
     };
 
-    JqueryWidget.prototype._removeDropHint = function() {
+    JqTreeWidget.prototype._removeDropHint = function() {
       if (this.previous_ghost) {
         return this.previous_ghost.remove();
       }
     };
 
-    JqueryWidget.prototype._removeHover = function() {
+    JqTreeWidget.prototype._removeHover = function() {
       return this.hovered_area = null;
     };
 
-    JqueryWidget.prototype._moveItem = function() {
+    JqTreeWidget.prototype._moveItem = function() {
       var event, moved_node, position, previous_parent, target_node;
       if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
         moved_node = this.current_item.node;
@@ -1319,16 +1319,16 @@ limitations under the License.
       }
     };
 
-    JqueryWidget.prototype._clear = function() {
+    JqTreeWidget.prototype._clear = function() {
       this.drag_element.remove();
       return this.drag_element = null;
     };
 
-    return JqueryWidget;
+    return JqTreeWidget;
 
   })(MouseWidget);
 
-  SimpleWidget.register(JqueryWidget, 'tree');
+  SimpleWidget.register(JqTreeWidget, 'tree');
 
   GhostDropHint = (function() {
 

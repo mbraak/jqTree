@@ -330,7 +330,7 @@ class Node
 @Tree.Tree = Node
 
 
-class JqueryWidget extends MouseWidget
+class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
         saveState: false  # true / false / string (cookie name)
@@ -1037,7 +1037,7 @@ class JqueryWidget extends MouseWidget
         @drag_element.remove()
         @drag_element = null
 
-SimpleWidget.register(JqueryWidget, 'tree')
+SimpleWidget.register(JqTreeWidget, 'tree')
 
 
 class GhostDropHint
