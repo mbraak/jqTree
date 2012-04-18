@@ -385,17 +385,17 @@ limitations under the License.
         });
       };
       addChildren = function(children_data) {
-        var child, node, _i, _len, _results;
-        _results = [];
+        var child, node, _i, _len;
         for (_i = 0, _len = children_data.length; _i < _len; _i++) {
           child = children_data[_i];
           node = new Node();
           node.initFromData(child);
-          _results.push(_this.addChild(node));
+          _this.addChild(node);
         }
-        return _results;
+        return null;
       };
-      return addNode(data);
+      addNode(data);
+      return null;
     };
 
     /*
@@ -418,10 +418,9 @@ limitations under the License.
 
 
     Node.prototype.loadFromData = function(data) {
-      var node, o, _i, _len, _results,
+      var node, o, _i, _len,
         _this = this;
       this.children = [];
-      _results = [];
       for (_i = 0, _len = data.length; _i < _len; _i++) {
         o = data[_i];
         node = new Node(o.label);
@@ -433,12 +432,10 @@ limitations under the License.
         });
         this.addChild(node);
         if (o.children) {
-          _results.push(node.loadFromData(o.children));
-        } else {
-          _results.push(void 0);
+          node.loadFromData(o.children);
         }
       }
-      return _results;
+      return null;
     };
 
     /*
@@ -527,21 +524,19 @@ limitations under the License.
       var _iterate,
         _this = this;
       _iterate = function(level) {
-        var child, result, _i, _len, _ref, _results;
+        var child, result, _i, _len, _ref;
         _ref = _this.children;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
           result = callback(child, level);
           if (_this.hasChildren() && result) {
-            _results.push(child.iterate(callback, level + 1));
-          } else {
-            _results.push(void 0);
+            child.iterate(callback, level + 1);
           }
         }
-        return _results;
+        return null;
       };
-      return _iterate(0);
+      _iterate(0);
+      return null;
     };
 
     /*
@@ -814,10 +809,9 @@ limitations under the License.
         return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"title\">" + node.name + "</span></div></li>");
       };
       doCreateDomElements = function($element, children, depth, is_open) {
-        var $li, $ul, child, _i, _len, _results;
+        var $li, $ul, child, _i, _len;
         $ul = createUl(depth, is_open);
         $element.append($ul);
-        _results = [];
         for (_i = 0, _len = children.length; _i < _len; _i++) {
           child = children[_i];
           $li = createLi(child);
@@ -825,12 +819,10 @@ limitations under the License.
           child.element = $li[0];
           $li.data('node', child);
           if (child.hasChildren()) {
-            _results.push(doCreateDomElements($li, child.children, depth + 1, child.is_open));
-          } else {
-            _results.push(void 0);
+            doCreateDomElements($li, child.children, depth + 1, child.is_open);
           }
         }
-        return _results;
+        return null;
       };
       if ($element) {
         depth = 1;
@@ -1164,10 +1156,9 @@ limitations under the License.
       this._iterateVisibleNodes(handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder, handleFirstNode);
       hit_areas = [];
       groupPositions(function(positions_in_group, top, bottom) {
-        var area_height, area_top, position, _i, _len, _results;
+        var area_height, area_top, position, _i, _len;
         area_height = (bottom - top) / positions_in_group.length;
         area_top = top;
-        _results = [];
         for (_i = 0, _len = positions_in_group.length; _i < _len; _i++) {
           position = positions_in_group[_i];
           hit_areas.push({
@@ -1176,9 +1167,9 @@ limitations under the License.
             node: position.node,
             position: position.position
           });
-          _results.push(area_top += area_height);
+          area_top += area_height;
         }
-        return _results;
+        return null;
       });
       return this.hit_areas = hit_areas;
     };

@@ -153,8 +153,10 @@ class Node
                 node = new Node()
                 node.initFromData(child)
                 @addChild(node)
+            return null
 
         addNode(data)
+        return null
 
     ###
     Create tree from data.
@@ -190,6 +192,8 @@ class Node
 
             if o.children
                 node.loadFromData(o.children)
+
+        return null
 
     ###
     Add child.
@@ -267,8 +271,10 @@ class Node
 
                 if @hasChildren() and result
                      child.iterate(callback, level + 1)
+            return null
 
         _iterate(0)
+        return null
 
     ###
     Move node relative to another node.
@@ -524,6 +530,7 @@ class JqueryWidget extends MouseWidget
 
                 if child.hasChildren()
                     doCreateDomElements($li, child.children, depth + 1, child.is_open)
+            return null
 
         if $element
             depth = 1
@@ -876,6 +883,7 @@ class JqueryWidget extends MouseWidget
                 )
 
                 area_top += area_height
+            return null
         )
 
         @hit_areas = hit_areas
