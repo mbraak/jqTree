@@ -419,6 +419,15 @@ test('click toggler', function() {
         // 2. handle 'open' event
         start();
         equal(e.node.name, 'node1');
+        stop();
+
+        // 3. click toggler again
+        $toggler.click();
+    });
+
+    $tree.bind('tree.close', function(e) {
+        start();
+        equal(e.node.name, 'node1');
     });
 
     // 1. click toggler of 'node1'
@@ -440,6 +449,128 @@ test('getNodeById', function() {
 
     // 2. get id that does not exist
     equal($tree.tree('getNodeById', 333), null);
+});
+
+test('autoOpen', function() {
+    var $tree = $('#tree1');
+
+    function formatOpenFolders() {
+        var open_nodes = [];
+        $tree.find('li').each(function() {
+            var $li = $(this);
+            if ($li.is('.folder') && ! $li.is('.closed')) {
+                var label = $li.children('div').find('span').text();
+                open_nodes.push(label);
+            };
+        });
+
+        return open_nodes.join(';');
+    }
+
+    var data = [
+        {
+            label: 'l1n1',
+            children: [
+                { label: 'l2n1' },
+                {
+                    label: 'l2n2',
+                    children: [
+                        { label: 'l3n1' }
+                    ]
+                }
+            ]
+        },
+        {
+            label: 'l1n2'
+        }
+    ];
+
+    // 1. autoOpen is false
+    $tree.tree({
+        data: data,
+        autoOpen: false
+    });
+    equal(formatOpenFolders(), '');
+
+    $tree.tree('destroy');
+
+    // 2. autoOpen is true
+    $tree.tree({
+        data: data,
+        autoOpen: true
+    });
+    equal(formatOpenFolders(), 'l1n1;l2n2');
+
+    $tree.tree('destroy');
+
+    // 3. autoOpen level 0
+    $tree.tree({
+        data: data,
+        autoOpen: 0
+    });
+    equal(formatOpenFolders(), 'l1n1');
+});
+
+test('onCreateLi', function() {
+    // 1. init tree with onCreateLi
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        onCreateLi: function(node, $li) {
+            var $span = $li.children('div').find('span');
+            $span.html('_' + node.name + '_');
+        }
+    });
+
+    equal(
+        $tree.find('span:eq(0)').text(),
+        '_node1_'
+    );
+});
+
+test('save state in cookie', function() {
+    // setup
+    var state = null;
+
+    // fake $.cookie plugin
+    $.cookie = function(key, param2, param3) {
+        if (typeof param3 == 'object') {
+            // set
+            state = param2;
+        }
+        else {
+            // get
+            return state;
+        }
+    }
+
+    // 1. init tree
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        selectable: true,
+        saveState: 'my_cookie_name'
+    });
+    var tree = $tree.tree('getTree');
+
+    equal($tree.tree('getSelectedNode'), false);
+
+    // 2. select node -> state is saved
+    $tree.tree('selectNode', tree.children[0]);
+    equal($tree.tree('getSelectedNode').name, 'node1');
+
+    // 3. init tree again
+    $tree.tree('destroy');
+
+    $tree.tree({
+        data: example_data,
+        selectable: true,
+        saveState: 'my_cookie_name'
+    });
+
+    equal($tree.tree('getSelectedNode').name, 'node1');
+
+    $.cookie = null;
 });
 
 module("Tree");
@@ -705,7 +836,10 @@ test('initFromData', function() {
             label: 'main',
             children: [
                 { label: 'c1' },
-                { label: 'c2' }
+                {
+                    label: 'c2',
+                    id: 201
+                }
             ]
         };
     var node = new Tree.Node();
@@ -717,6 +851,7 @@ test('initFromData', function() {
         'c1 c2',
         'children'
     );
+    equal(node.children[1].id, 201);
 });
 
 test('getData', function() {
