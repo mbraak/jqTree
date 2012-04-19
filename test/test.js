@@ -573,6 +573,23 @@ test('save state in cookie', function() {
     $.cookie = null;
 });
 
+test('generate hit areas', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    // 1. get hit areas
+	var node = $tree.tree('getNodeById', 123);
+    var hit_areas = $tree.tree('testGenerateHitAreas', node);
+
+    var strings = $.map(hit_areas, function(hit_area) {
+        return hit_area.node.name + ' ' + Tree.Position.getName(hit_area.position);
+    });
+    equal(strings.join(';'), 'node1 none;node2 inside;node2 after');
+});
+
 module("Tree");
 test("create tree from data", function() {
     var tree = new Tree.Tree();

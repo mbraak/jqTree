@@ -1174,6 +1174,12 @@ limitations under the License.
       return this.hit_areas = hit_areas;
     };
 
+    JqTreeWidget.prototype.testGenerateHitAreas = function(moving_node) {
+      this.current_item = this._getNodeElementForNode(moving_node);
+      this._generateHitAreas();
+      return this.hit_areas;
+    };
+
     JqTreeWidget.prototype._removeHitAreas = function() {
       return this.hit_areas = [];
     };

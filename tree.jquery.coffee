@@ -888,6 +888,11 @@ class JqTreeWidget extends MouseWidget
 
         @hit_areas = hit_areas
 
+    testGenerateHitAreas: (moving_node) ->
+        @current_item = @_getNodeElementForNode(moving_node)
+        @_generateHitAreas()
+        return @hit_areas
+
     _removeHitAreas: ->
         @hit_areas = []
 
