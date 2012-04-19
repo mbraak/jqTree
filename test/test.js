@@ -592,29 +592,50 @@ test('generate hit areas', function() {
 
 module("Tree");
 test("create tree from data", function() {
+    function checkData(tree) {
+        equal(
+            format_nodes(tree.children),
+            'node1 node2',
+            'nodes on level 1'
+        );
+        equal(
+            format_nodes(tree.children[0].children),
+            'child1 child2',
+            'children of node1'
+        );
+        equal(
+            format_nodes(tree.children[1].children),
+            'child3',
+            'children of node2'
+        );
+        equal(
+            tree.children[0].id,
+            123,
+            'id'
+        );
+    }
+
+    // 1. create tree from example data
     var tree = new Tree.Tree();
     tree.loadFromData(example_data);
+    checkData(tree);
 
-    equal(
-        format_nodes(tree.children),
-        'node1 node2',
-        'nodes on level 1'
-    );
-    equal(
-        format_nodes(tree.children[0].children),
-        'child1 child2',
-        'children of node1'
-    );
-    equal(
-        format_nodes(tree.children[1].children),
-        'child3',
-        'children of node2'
-    );
-    equal(
-        tree.children[0].id,
-        123,
-        'id'
-    );
+    // 2. create tree from new data format
+    var data = [
+        {
+            label: 'node1',
+            id: 123,  // extra data
+            children: ['child1', 'child2']
+        },
+        {
+            label: 'node2',
+            id: 124,
+            children: ['child3']
+        }
+    ];
+    var tree = new Tree.Tree();
+    tree.loadFromData(data);
+    checkData(tree);
 });
 
 test("addChild", function() {
@@ -852,7 +873,7 @@ test('initFromData', function() {
         {
             label: 'main',
             children: [
-                { label: 'c1' },
+                'c1',
                 {
                     label: 'c2',
                     id: 201

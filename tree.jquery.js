@@ -373,16 +373,20 @@ limitations under the License.
       var addChildren, addNode,
         _this = this;
       addNode = function(node_data) {
-        return $.each(node_data, function(key, value) {
-          if (key === 'children') {
-            addChildren(value);
-          } else if (key === 'label') {
-            _this['name'] = value;
-          } else {
-            _this[key] = value;
-          }
-          return true;
-        });
+        if (typeof node_data !== 'object') {
+          return _this['name'] = node_data;
+        } else {
+          return $.each(node_data, function(key, value) {
+            if (key === 'children') {
+              addChildren(value);
+            } else if (key === 'label') {
+              _this['name'] = value;
+            } else {
+              _this[key] = value;
+            }
+            return true;
+          });
+        }
       };
       addChildren = function(children_data) {
         var child, node, _i, _len;
@@ -423,16 +427,21 @@ limitations under the License.
       this.children = [];
       for (_i = 0, _len = data.length; _i < _len; _i++) {
         o = data[_i];
-        node = new Node(o.label);
-        $.each(o, function(key, value) {
-          if (key !== 'label') {
-            node[key] = value;
+        if (typeof o !== 'object') {
+          node = new Node(o);
+          this.addChild(node);
+        } else {
+          node = new Node(o.label);
+          $.each(o, function(key, value) {
+            if (key !== 'label') {
+              node[key] = value;
+            }
+            return true;
+          });
+          this.addChild(node);
+          if (o.children) {
+            node.loadFromData(o.children);
           }
-          return true;
-        });
-        this.addChild(node);
-        if (o.children) {
-          node.loadFromData(o.children);
         }
       }
       return null;

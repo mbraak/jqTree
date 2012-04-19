@@ -137,16 +137,19 @@ class Node
     # Init Node from data without making it the root of the tree
     initFromData: (data) ->
         addNode = (node_data) =>
-            $.each(node_data, (key, value) =>
-                if key == 'children'
-                    addChildren(value)
-                else if key == 'label'
-                    @['name'] = value
-                else
-                    @[key] = value
+            if typeof node_data != 'object'
+                @['name'] = node_data
+            else
+                $.each(node_data, (key, value) =>
+                    if key == 'children'
+                        addChildren(value)
+                    else if key == 'label'
+                        @['name'] = value
+                    else
+                        @[key] = value
 
-                return true
-            )
+                    return true
+                )
 
         addChildren = (children_data) =>
             for child in children_data
@@ -179,19 +182,23 @@ class Node
         @children = []
 
         for o in data
-            # todo: node property is 'name', but we use 'label' here
-            node = new Node(o.label)
+            if typeof o != 'object'
+                node = new Node(o)
+                @addChild(node)
+            else
+                # todo: node property is 'name', but we use 'label' here
+                node = new Node(o.label)
 
-            $.each(o, (key, value) =>
-                if key != 'label'
-                    node[key] = value
-                return true
-            )
+                $.each(o, (key, value) =>
+                    if key != 'label'
+                        node[key] = value
+                    return true
+                )
 
-            @addChild(node)
+                @addChild(node)
 
-            if o.children
-                node.loadFromData(o.children)
+                if o.children
+                    node.loadFromData(o.children)
 
         return null
 
