@@ -52,6 +52,7 @@
 				<li><a href="#functions-loadData">loadData</a></li>
 				<li><a href="#functions-tojson">toJson</a></li>
 				<li><a href="#functions-getnodebyid">getNodeById</a></li>
+				<li><a href="#functions-selectnode">selectNode</a></li>
 			</ul>
 		</li>
 		<li>
@@ -436,6 +437,11 @@ $('#tree1').tree({
 	<h4 id="functions">Functions</h4>
 	<h5 id="functions-loadData">loadData</h5>
 	<p>
+		<strong>function loadData(data);</strong>
+		<br>
+		<strong>function loadData(data, parent_node);</strong>
+	</p>
+	<p>
 		Load the tree with new data.
 	</p>
 <pre>
@@ -476,6 +482,8 @@ $('#tree1').tree('loadData', data, node);
 
 	<h5 id="functions-tojson">toJson</h5>
 	<p>
+		<strong>function toJson();</strong>
+		<br>
 		Get the tree data as json.
 	</p>
 <pre>
@@ -485,6 +493,8 @@ $('#tree1').tree('toJson');
 
 	<h5 id="functions-getnodebyid">getNodeById</h5>
 	<p>
+		<strong>function getNodeById(id);</strong>
+		<br>
 		Get a tree node by node-id. This assumes that you have given the nodes in the data a unique id.
 	</p>
 
@@ -499,6 +509,27 @@ $tree.tree({
 	data: data
 });
 var node = $tree.tree('getNodeById', 10);
+</pre>
+
+	<h5 id="functions-selectnode">selectNode</h5>
+	<p>
+		<strong>function selectNode(node);</strong>
+		<br>
+		<strong>function selectNode(node, must_open_parents);</strong>
+	</p>
+	<p>
+		Select this node. If <strong>must_open_parents</strong> is true, then open all parents, so the node is visible.
+	</p>
+<pre>
+// create tree
+var $tree = $('#tree1');
+$tree.tree({
+	data: data,
+	selectable: true
+});
+
+var node = $tree.tree('getNodeById', 123);
+$tree.tree('selectNode', node, true);
 </pre>
 
 	<h4 id="events">Events</h4>
