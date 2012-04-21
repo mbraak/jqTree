@@ -284,9 +284,6 @@ limitations under the License.
   Json.str = function(key, holder) {
     var i, k, partial, v, value, _i, _len;
     value = holder[key];
-    if (value && typeof value === 'object' && typeof value.toJSON === 'function') {
-      value = value.toJSON(key);
-    }
     switch (typeof value) {
       case 'string':
         return Json.quote(value);

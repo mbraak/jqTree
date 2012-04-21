@@ -61,9 +61,6 @@ Json.quote = (string) ->
 Json.str = (key, holder) ->
     value = holder[key]
 
-    if value and typeof value is 'object' and typeof value.toJSON is 'function'
-        value = value.toJSON(key)
-
     switch typeof value
         when 'string'
             return Json.quote(value)
