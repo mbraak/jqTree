@@ -49,71 +49,71 @@ limitations under the License.
       return null;
     };
 
+    SimpleWidget.register = function(widget_class, widget_name) {
+      var callFunction, createWidget, destroyWidget, getDataKey;
+      getDataKey = function() {
+        return "simple_widget_" + widget_name;
+      };
+      createWidget = function($el, options) {
+        var data_key;
+        data_key = getDataKey();
+        $el.each(function() {
+          var widget;
+          widget = new widget_class(this, options);
+          if (!$.data(this, data_key)) {
+            return $.data(this, data_key, widget);
+          }
+        });
+        return $el;
+      };
+      destroyWidget = function($el) {
+        var data_key;
+        data_key = getDataKey();
+        return $el.each(function() {
+          var widget;
+          widget = $.data(this, data_key);
+          if (widget && (widget instanceof SimpleWidget)) {
+            widget.destroy();
+          }
+          return $.removeData(this, data_key);
+        });
+      };
+      callFunction = function($el, function_name, args) {
+        var result;
+        result = null;
+        $el.each(function() {
+          var widget, widget_function;
+          widget = $.data(this, getDataKey());
+          if (widget && (widget instanceof SimpleWidget)) {
+            widget_function = widget[function_name];
+            if (widget_function && (typeof widget_function === 'function')) {
+              return result = widget_function.apply(widget, args);
+            }
+          }
+        });
+        return result;
+      };
+      return $.fn[widget_name] = function() {
+        var $el, args, argument1, function_name, options;
+        argument1 = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+        $el = this;
+        if (argument1 === void 0 || typeof argument1 === 'object') {
+          options = argument1;
+          return createWidget($el, options);
+        } else if (typeof argument1 === 'string' && argument1[0] !== '_') {
+          function_name = argument1;
+          if (function_name === 'destroy') {
+            return destroyWidget($el);
+          } else {
+            return callFunction($el, function_name, args);
+          }
+        }
+      };
+    };
+
     return SimpleWidget;
 
   })();
-
-  SimpleWidget.register = function(widget_class, widget_name) {
-    var callFunction, createWidget, destroyWidget, getDataKey;
-    getDataKey = function() {
-      return "simple_widget_" + widget_name;
-    };
-    createWidget = function($el, options) {
-      var data_key;
-      data_key = getDataKey();
-      $el.each(function() {
-        var widget;
-        widget = new widget_class(this, options);
-        if (!$.data(this, data_key)) {
-          return $.data(this, data_key, widget);
-        }
-      });
-      return $el;
-    };
-    destroyWidget = function($el) {
-      var data_key;
-      data_key = getDataKey();
-      return $el.each(function() {
-        var widget;
-        widget = $.data(this, data_key);
-        if (widget && (widget instanceof SimpleWidget)) {
-          widget.destroy();
-        }
-        return $.removeData(this, data_key);
-      });
-    };
-    callFunction = function($el, function_name, args) {
-      var result;
-      result = null;
-      $el.each(function() {
-        var widget, widget_function;
-        widget = $.data(this, getDataKey());
-        if (widget && (widget instanceof SimpleWidget)) {
-          widget_function = widget[function_name];
-          if (widget_function && (typeof widget_function === 'function')) {
-            return result = widget_function.apply(widget, args);
-          }
-        }
-      });
-      return result;
-    };
-    return $.fn[widget_name] = function() {
-      var $el, args, argument1, function_name, options;
-      argument1 = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      $el = this;
-      if (argument1 === void 0 || typeof argument1 === 'object') {
-        options = argument1;
-        return createWidget($el, options);
-      } else if (typeof argument1 === 'string' && argument1[0] !== '_') {
-        function_name = argument1;
-        if (function_name === 'destroy') {
-          return destroyWidget($el);
-        } else {
-          return callFunction($el, function_name, args);
-        }
-      }
-    };
-  };
 
   this.SimpleWidget = SimpleWidget;
 
