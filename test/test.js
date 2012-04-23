@@ -273,27 +273,6 @@ test("toJson", function() {
     ok($(tree.children[0].element).is('li'), 'element');
 });
 
-test("addNode", function() {
-    // setup
-    var $tree = $('#tree1');
-    $tree.tree({
-        data: {}
-    });
-
-    // 1. add node with children
-    $tree.tree(
-        'addNode',
-        {
-            label: 'abc',
-            id: 1,
-            children: [
-                { label: 'c1' },
-                { label: 'c2' }
-            ]
-        }
-    );
-});
-
 test('loadData', function() {
     // setup
     var $tree = $('#tree1');
@@ -528,7 +507,7 @@ test('onCreateLi', function() {
     );
 });
 
-test('save state in cookie', function() {
+test('save state', function() {
     // setup
     var state = null;
 
@@ -546,7 +525,7 @@ test('save state in cookie', function() {
 
     // Remove state from localstorage
     if (localStorage) {
-        localStorage.setItem('my_cookie_name', null);
+        localStorage.setItem('my_tree', null);
     }
 
     // 1. init tree
@@ -556,8 +535,8 @@ test('save state in cookie', function() {
         selectable: true,
         saveState: 'my_tree'
     });
-    var tree = $tree.tree('getTree');
 
+    var tree = $tree.tree('getTree');
     equal($tree.tree('getSelectedNode'), false);
 
     // 2. select node -> state is saved
