@@ -532,7 +532,7 @@ test('save state in cookie', function() {
     // setup
     var state = null;
 
-    // fake $.cookie plugin
+    // Fake $.cookie plugin for browsers that do not support localstorage
     $.cookie = function(key, param2, param3) {
         if (typeof param3 == 'object') {
             // set
@@ -544,12 +544,17 @@ test('save state in cookie', function() {
         }
     }
 
+    // Remove state from localstorage
+    if (localStorage) {
+        localStorage.setItem('my_cookie_name', null);
+    }
+
     // 1. init tree
     var $tree = $('#tree1');
     $tree.tree({
         data: example_data,
         selectable: true,
-        saveState: 'my_cookie_name'
+        saveState: 'my_tree'
     });
     var tree = $tree.tree('getTree');
 
@@ -565,7 +570,7 @@ test('save state in cookie', function() {
     $tree.tree({
         data: example_data,
         selectable: true,
-        saveState: 'my_cookie_name'
+        saveState: 'my_tree'
     });
 
     equal($tree.tree('getSelectedNode').name, 'node1');

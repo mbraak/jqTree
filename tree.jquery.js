@@ -895,14 +895,14 @@ limitations under the License.
       var state;
       if (this.options.onGetStateFromStorage) {
         state = this.options.onGetStateFromStorage();
+      } else if (localStorage) {
+        state = localStorage.getItem(this._getCookieName());
+      } else if ($.cookie) {
+        state = $.cookie(this._getCookieName(), {
+          path: '/'
+        });
       } else {
-        if ($.cookie) {
-          state = $.cookie(this._getCookieName(), {
-            path: '/'
-          });
-        } else {
-          state = null;
-        }
+        state = null;
       }
       if (!state) {
         return false;
@@ -915,12 +915,12 @@ limitations under the License.
     JqTreeWidget.prototype._saveState = function() {
       if (this.options.onSetStateFromStorage) {
         return this.options.onSetStateFromStorage(this._getState());
-      } else {
-        if ($.cookie) {
-          return $.cookie(this._getCookieName(), this._getState(), {
-            path: '/'
-          });
-        }
+      } else if (localStorage) {
+        return localStorage.setItem(this._getCookieName(), this._getState());
+      } else if ($.cookie) {
+        return $.cookie(this._getCookieName(), this._getState(), {
+          path: '/'
+        });
       }
     };
 
@@ -948,17 +948,19 @@ limitations under the License.
       var data, open_nodes, selected_node_id,
         _this = this;
       data = $.parseJSON(state);
-      open_nodes = data.open_nodes;
-      selected_node_id = data.selected_node;
-      return this.tree.iterate(function(node) {
-        if (node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0)) {
-          node.is_open = true;
-        }
-        if (selected_node_id && (node.id === selected_node_id)) {
-          _this.selected_node = node;
-        }
-        return true;
-      });
+      if (data) {
+        open_nodes = data.open_nodes;
+        selected_node_id = data.selected_node;
+        return this.tree.iterate(function(node) {
+          if (node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0)) {
+            node.is_open = true;
+          }
+          if (selected_node_id && (node.id === selected_node_id)) {
+            _this.selected_node = node;
+          }
+          return true;
+        });
+      }
     };
 
     JqTreeWidget.prototype._getCookieName = function() {

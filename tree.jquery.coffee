@@ -596,14 +596,17 @@ class JqTreeWidget extends MouseWidget
     _restoreState: ->
         if @options.onGetStateFromStorage
             state = @options.onGetStateFromStorage()
+        else if localStorage
+            state = localStorage.getItem(
+                @_getCookieName()
+            )
+        else if $.cookie
+            state = $.cookie(
+                @_getCookieName(),
+                {path: '/'}
+            )
         else
-            if $.cookie
-                state = $.cookie(
-                    @_getCookieName(),
-                    {path: '/'}
-                )
-            else
-                state = null
+            state = null
 
         if not state
             return false
@@ -614,13 +617,17 @@ class JqTreeWidget extends MouseWidget
     _saveState: ->
         if @options.onSetStateFromStorage
             @options.onSetStateFromStorage(@_getState())
-        else
-            if $.cookie
-                $.cookie(
-                    @_getCookieName(),
-                    @_getState(),
-                    {path: '/'}
-                )
+        else if localStorage
+            localStorage.setItem(
+                @_getCookieName(),
+                @_getState()
+            )
+        else if $.cookie
+            $.cookie(
+                @_getCookieName(),
+                @_getState(),
+                {path: '/'}
+            )
 
     _getState: ->
         open_nodes = []
@@ -646,22 +653,23 @@ class JqTreeWidget extends MouseWidget
 
     _setState: (state) ->
         data = $.parseJSON(state)
-        open_nodes = data.open_nodes
-        selected_node_id = data.selected_node
+        if data
+            open_nodes = data.open_nodes
+            selected_node_id = data.selected_node
 
-        @tree.iterate((node) =>
-            if (
-                node.id and
-                node.hasChildren() and
-                (indexOf(open_nodes, node.id) >= 0)
+            @tree.iterate((node) =>
+                if (
+                    node.id and
+                    node.hasChildren() and
+                    (indexOf(open_nodes, node.id) >= 0)
+                )
+                    node.is_open = true
+
+                if selected_node_id and (node.id == selected_node_id)
+                    @selected_node = node
+
+                return true
             )
-                node.is_open = true
-
-            if selected_node_id and (node.id == selected_node_id)
-                @selected_node = node
-
-            return true
-        )
 
     _getCookieName: ->
         if typeof @options.saveState is 'string'
