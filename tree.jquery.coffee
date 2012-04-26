@@ -423,6 +423,12 @@ class JqTreeWidget extends MouseWidget
         if node.hasChildren()
             new FolderElement(node).open(on_finished, skip_slide)
 
+    isDragging: ->
+        return @is_dragging
+
+    refreshHitAreas: ->
+        @_refreshHitAreas()
+
     _init: ->
         super
 
@@ -435,6 +441,7 @@ class JqTreeWidget extends MouseWidget
         @hovered_area = null
         @$ghost = null
         @hit_areas = []
+        @is_dragging = false
 
     _deinit: ->
         @element.empty()
@@ -736,6 +743,7 @@ class JqTreeWidget extends MouseWidget
             @element
         )
 
+        @is_dragging = true
         @current_item.$element.addClass('moving')
         return true
 
@@ -776,6 +784,7 @@ class JqTreeWidget extends MouseWidget
         @_removeHitAreas()
 
         @current_item.$element.removeClass('moving')
+        @is_dragging = false
 
         return false
 

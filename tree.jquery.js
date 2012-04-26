@@ -712,6 +712,14 @@ limitations under the License.
       }
     };
 
+    JqTreeWidget.prototype.isDragging = function() {
+      return this.is_dragging;
+    };
+
+    JqTreeWidget.prototype.refreshHitAreas = function() {
+      return this._refreshHitAreas();
+    };
+
     JqTreeWidget.prototype._init = function() {
       JqTreeWidget.__super__._init.apply(this, arguments);
       this.element = this.$el;
@@ -720,7 +728,8 @@ limitations under the License.
       this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
       this.hovered_area = null;
       this.$ghost = null;
-      return this.hit_areas = [];
+      this.hit_areas = [];
+      return this.is_dragging = false;
     };
 
     JqTreeWidget.prototype._deinit = function() {
@@ -1033,6 +1042,7 @@ limitations under the License.
       this._refreshHitAreas();
       _ref = this._getOffsetFromEvent(event), offsetX = _ref[0], offsetY = _ref[1];
       this.drag_element = new DragElement(this.current_item.node, offsetX, offsetY, this.element);
+      this.is_dragging = true;
       this.current_item.$element.addClass('moving');
       return true;
     };
@@ -1073,6 +1083,7 @@ limitations under the License.
       this._removeDropHint();
       this._removeHitAreas();
       this.current_item.$element.removeClass('moving');
+      this.is_dragging = false;
       return false;
     };
 
