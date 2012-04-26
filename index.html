@@ -121,24 +121,9 @@ $('#tree1').tree({
 	<h4 id="downloads">Downloads</h4>
 	<ul>
 		<li>All: <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
-		<li>Javascript: <a href="https://raw.github.com/mbraak/jqTree/master/tree.jquery.js">tree.jquery.js</a></li>
-		<li>Css: <a href="https://raw.github.com/mbraak/jqTree/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/jqtree.css">jqtree.css</a></li>
-		<li>Images:
-			<ul>
-				<li>
-					<a href="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeDownTriangleBlack.png">
-						treeDownTriangleBlack.png
-						<img src="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeDownTriangleBlack.png" alt="tree down triangle" />
-					</a>
-				</li>
-				<li>
-					<a href="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeRightTriangleBlack.png">
-						treeRightTriangleBlack.png
-						<img src="https://github.com/mbraak/jqTree/raw/acb87f61e6eaecabfdaf1d6990aac03e6a44dcf2/treeRightTriangleBlack.png" alt="tree right triangle" />
-					</a>
-				</li>
-			</ul>
-		</li>
+		<li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
+		<li>Css: <a href="jqtree.css">jqtree.css</a></li>
+		<li>Image: <a href="icons.png">icons.png</a></li>
 	</ul>
 	<h4 id="tutorial">Tutorial</h4>
 	<ul>
@@ -281,6 +266,7 @@ $('#tree1').tree({
 	<p>
 		Save and restore the state of the tree automatically. Saves in a cookie which nodes are opened and selected.
 		<br>
+		The state is saved in localstorage. In browsers that do not support localstorage, the state is saved in a cookie.
 		For this to work, please include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>.
 	</p>
 	<ul>
@@ -298,7 +284,7 @@ $('#tree1').tree({
 });
 </pre>
 	<p>
-		Example: save state in cookie 'tree1':
+		Example: save state in key 'tree1':
 	</p>
 <pre>
 $('#tree1').tree({
