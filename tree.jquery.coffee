@@ -1008,6 +1008,10 @@ class JqTreeWidget extends MouseWidget
                 =>
                     @_refreshHitAreas()
                     @_updateDropHint()
+
+                    event = $.Event('tree.open')
+                    event.node = folder
+                    @element.trigger(event)
             )
 
         @open_folder_timer = setTimeout(openFolder, 500)

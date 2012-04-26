@@ -1285,8 +1285,12 @@ limitations under the License.
         _this = this;
       openFolder = function() {
         return _this._getNodeElementForNode(folder).open(function() {
+          var event;
           _this._refreshHitAreas();
-          return _this._updateDropHint();
+          _this._updateDropHint();
+          event = $.Event('tree.open');
+          event.node = folder;
+          return _this.element.trigger(event);
         });
       };
       return this.open_folder_timer = setTimeout(openFolder, 500);
