@@ -1047,21 +1047,24 @@ class JqTreeWidget extends MouseWidget
             position = @hovered_area.position
             previous_parent = moved_node.parent
 
-            @tree.moveNode(moved_node, target_node, position)
-
             if position == Position.INSIDE
                 @hovered_area.node.is_open = true
 
+            doMove = =>
+              @tree.moveNode(moved_node, target_node, position)
+              @element.empty()
+              @_createDomElements(@tree)
+
             event = $.Event('tree.move')
-            event.move_info = 
+            event.move_info =
                 moved_node: moved_node
                 target_node: target_node
                 position: Position.getName(position)
                 previous_parent: previous_parent
-            @element.trigger(event)
+                do_move: doMove
 
-            @element.empty()
-            @_createDomElements(@tree)
+            @element.trigger(event)
+            doMove() unless event.isDefaultPrevented()
 
     _clear: ->
         @drag_element.remove()
