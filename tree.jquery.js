@@ -1325,26 +1325,33 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._moveItem = function() {
-      var event, moved_node, position, previous_parent, target_node;
+      var doMove, event, moved_node, position, previous_parent, target_node,
+        _this = this;
       if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
         moved_node = this.current_item.node;
         target_node = this.hovered_area.node;
         position = this.hovered_area.position;
         previous_parent = moved_node.parent;
-        this.tree.moveNode(moved_node, target_node, position);
         if (position === Position.INSIDE) {
           this.hovered_area.node.is_open = true;
         }
+        doMove = function() {
+          _this.tree.moveNode(moved_node, target_node, position);
+          _this.element.empty();
+          return _this._createDomElements(_this.tree);
+        };
         event = $.Event('tree.move');
         event.move_info = {
           moved_node: moved_node,
           target_node: target_node,
           position: Position.getName(position),
-          previous_parent: previous_parent
+          previous_parent: previous_parent,
+          do_move: doMove
         };
         this.element.trigger(event);
-        this.element.empty();
-        return this._createDomElements(this.tree);
+        if (!event.isDefaultPrevented()) {
+          return doMove();
+        }
       }
     };
 
