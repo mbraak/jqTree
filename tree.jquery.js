@@ -628,7 +628,7 @@ limitations under the License.
 
     JqTreeWidget.prototype.toggle = function(node, on_finished) {
       if (node.hasChildren()) {
-        new FolderElement(node).toggle(on_finished);
+        new FolderElement(node, this.element).toggle(on_finished);
       }
       if (this.options.saveState) {
         return this._saveState();
@@ -708,7 +708,7 @@ limitations under the License.
 
     JqTreeWidget.prototype.openNode = function(node, on_finished, skip_slide) {
       if (node.hasChildren()) {
-        return new FolderElement(node).open(on_finished, skip_slide);
+        return new FolderElement(node, this.element).open(on_finished, skip_slide);
       }
     };
 
@@ -850,8 +850,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._click = function(e) {
-      var $target, event, node, node_element,
-        _this = this;
+      var $target, event, node, node_element;
       if (e.ctrlKey) {
         return;
       }
@@ -859,18 +858,7 @@ limitations under the License.
       if ($target.is('.toggler')) {
         node_element = this._getNodeElement($target);
         if (node_element && node_element.node.hasChildren()) {
-          node_element.toggle(function() {
-            var event, event_name, node;
-            node = node_element.node;
-            if (node.is_open) {
-              event_name = 'tree.open';
-            } else {
-              event_name = 'tree.close';
-            }
-            event = $.Event(event_name);
-            event.node = node;
-            return _this.element.trigger(event);
-          });
+          node_element.toggle();
           if (this.options.saveState) {
             this._saveState();
           }
@@ -982,9 +970,9 @@ limitations under the License.
 
     JqTreeWidget.prototype._getNodeElementForNode = function(node) {
       if (node.hasChildren()) {
-        return new FolderElement(node);
+        return new FolderElement(node, this.element);
       } else {
-        return new NodeElement(node);
+        return new NodeElement(node, this.element);
       }
     };
 
@@ -1296,12 +1284,8 @@ limitations under the License.
         _this = this;
       openFolder = function() {
         return _this._getNodeElementForNode(folder).open(function() {
-          var event;
           _this._refreshHitAreas();
-          _this._updateDropHint();
-          event = $.Event('tree.open');
-          event.node = folder;
-          return _this.element.trigger(event);
+          return _this._updateDropHint();
         });
       };
       return this.open_folder_timer = setTimeout(openFolder, 500);
@@ -1440,12 +1424,13 @@ limitations under the License.
 
     NodeElement.name = 'NodeElement';
 
-    function NodeElement(node) {
-      this.init(node);
+    function NodeElement(node, tree_element) {
+      this.init(node, tree_element);
     }
 
-    NodeElement.prototype.init = function(node) {
+    NodeElement.prototype.init = function(node, tree_element) {
       this.node = node;
+      this.tree_element = tree_element;
       return this.$element = $(node.element);
     };
 
@@ -1505,10 +1490,14 @@ limitations under the License.
       this.node.is_open = true;
       this.getButton().removeClass('closed');
       doOpen = function() {
+        var event;
         _this.getLi().removeClass('closed');
         if (on_finished) {
-          return on_finished();
+          on_finished();
         }
+        event = $.Event('tree.open');
+        event.node = _this.node;
+        return _this.tree_element.trigger(event);
       };
       if (skip_slide) {
         this.getUl().show();
@@ -1523,10 +1512,14 @@ limitations under the License.
       this.node.is_open = false;
       this.getButton().addClass('closed');
       return this.getUl().slideUp('fast', function() {
+        var event;
         _this.getLi().addClass('closed');
         if (on_finished) {
-          return on_finished();
+          on_finished();
         }
+        event = $.Event('tree.close');
+        event.node = _this.node;
+        return _this.tree_element.trigger(event);
       });
     };
 

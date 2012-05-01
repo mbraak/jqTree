@@ -1,5 +1,7 @@
 $(function() {
 
+QUnit.config.testTimeout = 5000;
+
 var example_data = [
     {
         label: 'node1',
@@ -103,6 +105,29 @@ test('toggle', function() {
         data: example_data
     });
 
+    $tree.bind(
+        'tree.open',
+        function(e) {
+            start();
+
+            ok(! isNodeClosed($node1), 'node1 is open');
+
+            // 2. close node1
+            $tree.tree('toggle', node1);
+
+            stop();
+        }
+    );
+
+    $tree.bind(
+        'tree.close',
+        function(e) {
+            start();
+
+            ok(isNodeClosed($node1), 'node1 is closed');
+        }
+    );
+
     var tree = $tree.tree('getTree');
     var node1 = tree.children[0];
     var $node1 = $tree.find('ul.tree li:eq(0)');
@@ -110,31 +135,10 @@ test('toggle', function() {
     // node1 is initially closed
     ok(isNodeClosed($node1), 'node1 is open');
 
+    // 1. open node1
+    $tree.tree('toggle', node1);
+
     stop();
-
-    // open node1
-    $tree.tree(
-        'toggle',
-        node1,
-        function() {
-            start();
-
-            ok(isNodeOpen($node1), 'node1 is open');
-
-            stop();
-
-            // close node1
-            $tree.tree(
-                'toggle',
-                node1,
-                function() {
-                    start();
-
-                    ok(isNodeClosed($node1), 'node1 is closed');
-                }
-            );
-        }
-    );
 });
 
 test("click event", function() {

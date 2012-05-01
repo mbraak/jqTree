@@ -350,7 +350,7 @@ class JqTreeWidget extends MouseWidget
 
     toggle: (node, on_finished) ->
         if node.hasChildren()
-            new FolderElement(node).toggle(on_finished)
+            new FolderElement(node, @element).toggle(on_finished)
 
         if @options.saveState
             @_saveState()
@@ -421,7 +421,7 @@ class JqTreeWidget extends MouseWidget
 
     openNode: (node, on_finished, skip_slide) ->
         if node.hasChildren()
-            new FolderElement(node).open(on_finished, skip_slide)
+            new FolderElement(node, @element).open(on_finished, skip_slide)
 
     isDragging: ->
         return @is_dragging
@@ -561,19 +561,7 @@ class JqTreeWidget extends MouseWidget
         if $target.is('.toggler')
             node_element = @_getNodeElement($target)
             if node_element and node_element.node.hasChildren()
-                node_element.toggle(
-                    =>
-                        node = node_element.node
-
-                        if node.is_open
-                            event_name = 'tree.open'
-                        else
-                            event_name = 'tree.close'
-
-                        event = $.Event(event_name)
-                        event.node = node
-                        @element.trigger(event)
-                )
+                node_element.toggle()
 
                 if @options.saveState
                     @_saveState()
@@ -686,9 +674,9 @@ class JqTreeWidget extends MouseWidget
 
     _getNodeElementForNode: (node) ->
         if node.hasChildren()
-            return new FolderElement(node)
+            return new FolderElement(node, @element)
         else
-            return new NodeElement(node)
+            return new NodeElement(node, @element)
 
     _getNodeElement: ($element) ->
         node = @_getNode($element)
@@ -1017,10 +1005,6 @@ class JqTreeWidget extends MouseWidget
                 =>
                     @_refreshHitAreas()
                     @_updateDropHint()
-
-                    event = $.Event('tree.open')
-                    event.node = folder
-                    @element.trigger(event)
             )
 
         @open_folder_timer = setTimeout(openFolder, 500)
@@ -1125,11 +1109,12 @@ class BorderDropHint
 
 
 class NodeElement
-    constructor: (node) ->
-        @init(node)
+    constructor: (node, tree_element) ->
+        @init(node, tree_element)
 
-    init: (node) ->
+    init: (node, tree_element) ->
         @node = node
+        @tree_element = tree_element
         @$element = $(node.element)
 
     getUl: ->
@@ -1170,6 +1155,10 @@ class FolderElement extends NodeElement
             if on_finished
                 on_finished()
 
+            event = $.Event('tree.open')
+            event.node = @node
+            @tree_element.trigger(event)
+
         if skip_slide
             @getUl().show()
             doOpen()
@@ -1186,6 +1175,10 @@ class FolderElement extends NodeElement
                 @getLi().addClass('closed')
                 if on_finished
                     on_finished()
+
+                event = $.Event('tree.close')
+                event.node = @node
+                @tree_element.trigger(event)
         )
 
     getButton: ->
