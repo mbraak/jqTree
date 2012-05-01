@@ -502,7 +502,7 @@ class JqTreeWidget extends MouseWidget
             return $li
 
         createNodeLi = (node) =>
-            return $("<li><div><span class=\"title\">#{ node.name #}</span></div></li>")
+            return $("<li><div><span class=\"title\">#{ node.name }</span></div></li>")
 
         createFolderLi = (node) =>
             getButtonClass = ->
@@ -525,7 +525,7 @@ class JqTreeWidget extends MouseWidget
             folder_class = getFolderClass()
 
             return $(
-                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ node.name #}</span></div></li>"
+                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ node.name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, depth, is_open) ->
@@ -1203,7 +1203,7 @@ class DragElement
         @offset_x = offset_x
         @offset_y = offset_y
 
-        @$element = $("<span class=\"title tree-dragging\">#{ node.name #}</span>")
+        @$element = $("<span class=\"title tree-dragging\">#{ node.name }</span>")
         @$element.css("position", "absolute")
         $tree.append(@$element)
 
