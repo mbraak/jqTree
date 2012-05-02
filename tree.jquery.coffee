@@ -405,6 +405,9 @@ class JqTreeWidget extends MouseWidget
             if not $div.find('.toggler').length
                 $div.prepend('<a class="toggler">&raquo;</a>')
 
+        if @is_dragging
+            @_refreshHitAreas()
+
     getNodeById: (node_id) ->
         result = null
 

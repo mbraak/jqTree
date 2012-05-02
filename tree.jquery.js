@@ -673,7 +673,7 @@ limitations under the License.
     JqTreeWidget.prototype.loadData = function(data, parent_node) {
       var $div, $element, child, subtree, _i, _len, _ref;
       if (!parent_node) {
-        return this._initTree(data);
+        this._initTree(data);
       } else {
         subtree = new Node();
         subtree.loadFromData(data);
@@ -687,8 +687,11 @@ limitations under the License.
         this._createDomElements(parent_node, $element);
         $div = $element.children('div');
         if (!$div.find('.toggler').length) {
-          return $div.prepend('<a class="toggler">&raquo;</a>');
+          $div.prepend('<a class="toggler">&raquo;</a>');
         }
+      }
+      if (this.is_dragging) {
+        return this._refreshHitAreas();
       }
     };
 
