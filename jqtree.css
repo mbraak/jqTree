@@ -23,11 +23,15 @@ ul.tree li {
 }
 
 ul.tree .toggler {
-	background: url(treeDownTriangleBlack.png) no-repeat 0 50%;
-	width: 12px;
+	background-image: url(icons.png);
+	background-repeat: no-repeat;
+	background-position: -8px 0;
+	width: 8px;
+	height: 8px;
 	display: block;
 	position: absolute;
 	left: -12px;
+	top: 30%;
 	text-indent: -9999px;
 	border-bottom: none;
 }
@@ -54,7 +58,7 @@ ul.tree li.folder .title {
 }
 
 ul.tree .toggler.closed {
-	background-image: url(treeRightTriangleBlack.png);
+	background-position: 0 0;
 }
 
 span.tree-dragging {
@@ -76,7 +80,9 @@ ul.tree li.ghost span {
 }
 
 ul.tree li.ghost span.circle {
-	background: url(circle.png) no-repeat;
+	background-image: url(icons.png);
+	background-repeat: no-repeat;
+	background-position: 0 -8px;
 	height: 8px;
 	width: 8px;
 	position: absolute;

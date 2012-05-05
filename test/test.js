@@ -1,5 +1,7 @@
 $(function() {
 
+QUnit.config.testTimeout = 5000;
+
 var example_data = [
     {
         label: 'node1',
@@ -103,6 +105,29 @@ test('toggle', function() {
         data: example_data
     });
 
+    $tree.bind(
+        'tree.open',
+        function(e) {
+            start();
+
+            ok(! isNodeClosed($node1), 'node1 is open');
+
+            // 2. close node1
+            $tree.tree('toggle', node1);
+
+            stop();
+        }
+    );
+
+    $tree.bind(
+        'tree.close',
+        function(e) {
+            start();
+
+            ok(isNodeClosed($node1), 'node1 is closed');
+        }
+    );
+
     var tree = $tree.tree('getTree');
     var node1 = tree.children[0];
     var $node1 = $tree.find('ul.tree li:eq(0)');
@@ -110,31 +135,10 @@ test('toggle', function() {
     // node1 is initially closed
     ok(isNodeClosed($node1), 'node1 is open');
 
+    // 1. open node1
+    $tree.tree('toggle', node1);
+
     stop();
-
-    // open node1
-    $tree.tree(
-        'toggle',
-        node1,
-        function() {
-            start();
-
-            ok(isNodeOpen($node1), 'node1 is open');
-
-            stop();
-
-            // close node1
-            $tree.tree(
-                'toggle',
-                node1,
-                function() {
-                    start();
-
-                    ok(isNodeClosed($node1), 'node1 is closed');
-                }
-            );
-        }
-    );
 });
 
 test("click event", function() {
@@ -273,27 +277,6 @@ test("toJson", function() {
     ok($(tree.children[0].element).is('li'), 'element');
 });
 
-test("addNode", function() {
-    // setup
-    var $tree = $('#tree1');
-    $tree.tree({
-        data: {}
-    });
-
-    // 1. add node with children
-    $tree.tree(
-        'addNode',
-        {
-            label: 'abc',
-            id: 1,
-            children: [
-                { label: 'c1' },
-                { label: 'c2' }
-            ]
-        }
-    );
-});
-
 test('loadData', function() {
     // setup
     var $tree = $('#tree1');
@@ -419,6 +402,15 @@ test('click toggler', function() {
         // 2. handle 'open' event
         start();
         equal(e.node.name, 'node1');
+        stop();
+
+        // 3. click toggler again
+        $toggler.click();
+    });
+
+    $tree.bind('tree.close', function(e) {
+        start();
+        equal(e.node.name, 'node1');
     });
 
     // 1. click toggler of 'node1'
@@ -442,31 +434,196 @@ test('getNodeById', function() {
     equal($tree.tree('getNodeById', 333), null);
 });
 
-module("Tree");
-test("create tree from data", function() {
-    var tree = new Tree.Tree();
-    tree.loadFromData(example_data);
+test('autoOpen', function() {
+    var $tree = $('#tree1');
+
+    function formatOpenFolders() {
+        var open_nodes = [];
+        $tree.find('li').each(function() {
+            var $li = $(this);
+            if ($li.is('.folder') && ! $li.is('.closed')) {
+                var label = $li.children('div').find('span').text();
+                open_nodes.push(label);
+            };
+        });
+
+        return open_nodes.join(';');
+    }
+
+    var data = [
+        {
+            label: 'l1n1',
+            children: [
+                { label: 'l2n1' },
+                {
+                    label: 'l2n2',
+                    children: [
+                        { label: 'l3n1' }
+                    ]
+                }
+            ]
+        },
+        {
+            label: 'l1n2'
+        }
+    ];
+
+    // 1. autoOpen is false
+    $tree.tree({
+        data: data,
+        autoOpen: false
+    });
+    equal(formatOpenFolders(), '');
+
+    $tree.tree('destroy');
+
+    // 2. autoOpen is true
+    $tree.tree({
+        data: data,
+        autoOpen: true
+    });
+    equal(formatOpenFolders(), 'l1n1;l2n2');
+
+    $tree.tree('destroy');
+
+    // 3. autoOpen level 0
+    $tree.tree({
+        data: data,
+        autoOpen: 0
+    });
+    equal(formatOpenFolders(), 'l1n1');
+});
+
+test('onCreateLi', function() {
+    // 1. init tree with onCreateLi
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        onCreateLi: function(node, $li) {
+            var $span = $li.children('div').find('span');
+            $span.html('_' + node.name + '_');
+        }
+    });
 
     equal(
-        format_nodes(tree.children),
-        'node1 node2',
-        'nodes on level 1'
+        $tree.find('span:eq(0)').text(),
+        '_node1_'
     );
-    equal(
-        format_nodes(tree.children[0].children),
-        'child1 child2',
-        'children of node1'
-    );
-    equal(
-        format_nodes(tree.children[1].children),
-        'child3',
-        'children of node2'
-    );
-    equal(
-        tree.children[0].id,
-        123,
-        'id'
-    );
+});
+
+test('save state', function() {
+    // setup
+    var state = null;
+
+    // Fake $.cookie plugin for browsers that do not support localstorage
+    $.cookie = function(key, param2, param3) {
+        if (typeof param3 == 'object') {
+            // set
+            state = param2;
+        }
+        else {
+            // get
+            return state;
+        }
+    }
+
+    // Remove state from localstorage
+    if (localStorage) {
+        localStorage.setItem('my_tree', null);
+    }
+
+    // 1. init tree
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        selectable: true,
+        saveState: 'my_tree'
+    });
+
+    var tree = $tree.tree('getTree');
+    equal($tree.tree('getSelectedNode'), false);
+
+    // 2. select node -> state is saved
+    $tree.tree('selectNode', tree.children[0]);
+    equal($tree.tree('getSelectedNode').name, 'node1');
+
+    // 3. init tree again
+    $tree.tree('destroy');
+
+    $tree.tree({
+        data: example_data,
+        selectable: true,
+        saveState: 'my_tree'
+    });
+
+    equal($tree.tree('getSelectedNode').name, 'node1');
+
+    $.cookie = null;
+});
+
+test('generate hit areas', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    // 1. get hit areas
+	var node = $tree.tree('getNodeById', 123);
+    var hit_areas = $tree.tree('testGenerateHitAreas', node);
+
+    var strings = $.map(hit_areas, function(hit_area) {
+        return hit_area.node.name + ' ' + Tree.Position.getName(hit_area.position);
+    });
+    equal(strings.join(';'), 'node1 none;node2 inside;node2 after');
+});
+
+module("Tree");
+test("create tree from data", function() {
+    function checkData(tree) {
+        equal(
+            format_nodes(tree.children),
+            'node1 node2',
+            'nodes on level 1'
+        );
+        equal(
+            format_nodes(tree.children[0].children),
+            'child1 child2',
+            'children of node1'
+        );
+        equal(
+            format_nodes(tree.children[1].children),
+            'child3',
+            'children of node2'
+        );
+        equal(
+            tree.children[0].id,
+            123,
+            'id'
+        );
+    }
+
+    // 1. create tree from example data
+    var tree = new Tree.Tree();
+    tree.loadFromData(example_data);
+    checkData(tree);
+
+    // 2. create tree from new data format
+    var data = [
+        {
+            label: 'node1',
+            id: 123,  // extra data
+            children: ['child1', 'child2']
+        },
+        {
+            label: 'node2',
+            id: 124,
+            children: ['child3']
+        }
+    ];
+    var tree = new Tree.Tree();
+    tree.loadFromData(data);
+    checkData(tree);
 });
 
 test("addChild", function() {
@@ -704,8 +861,11 @@ test('initFromData', function() {
         {
             label: 'main',
             children: [
-                { label: 'c1' },
-                { label: 'c2' }
+                'c1',
+                {
+                    label: 'c2',
+                    id: 201
+                }
             ]
         };
     var node = new Tree.Node();
@@ -717,6 +877,7 @@ test('initFromData', function() {
         'c1 c2',
         'children'
     );
+    equal(node.children[1].id, 201);
 });
 
 test('getData', function() {

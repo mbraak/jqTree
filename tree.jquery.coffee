@@ -61,9 +61,6 @@ Json.quote = (string) ->
 Json.str = (key, holder) ->
     value = holder[key]
 
-    if value and typeof value is 'object' and typeof value.toJSON is 'function'
-        value = value.toJSON(key)
-
     switch typeof value
         when 'string'
             return Json.quote(value)
@@ -137,24 +134,29 @@ class Node
     # Init Node from data without making it the root of the tree
     initFromData: (data) ->
         addNode = (node_data) =>
-            $.each(node_data, (key, value) =>
-                if key == 'children'
-                    addChildren(value)
-                else if key == 'label'
-                    @['name'] = value
-                else
-                    @[key] = value
+            if typeof node_data != 'object'
+                @['name'] = node_data
+            else
+                $.each(node_data, (key, value) =>
+                    if key == 'children'
+                        addChildren(value)
+                    else if key == 'label'
+                        @['name'] = value
+                    else
+                        @[key] = value
 
-                return true
-            )
+                    return true
+                )
 
         addChildren = (children_data) =>
             for child in children_data
                 node = new Node()
                 node.initFromData(child)
                 @addChild(node)
+            return null
 
         addNode(data)
+        return null
 
     ###
     Create tree from data.
@@ -177,19 +179,25 @@ class Node
         @children = []
 
         for o in data
-            # todo: node property is 'name', but we use 'label' here
-            node = new Node(o.label)
+            if typeof o != 'object'
+                node = new Node(o)
+                @addChild(node)
+            else
+                # todo: node property is 'name', but we use 'label' here
+                node = new Node(o.label)
 
-            $.each(o, (key, value) =>
-                if key != 'label'
-                    node[key] = value
-                return true
-            )
+                $.each(o, (key, value) =>
+                    if key != 'label'
+                        node[key] = value
+                    return true
+                )
 
-            @addChild(node)
+                @addChild(node)
 
-            if o.children
-                node.loadFromData(o.children)
+                if o.children
+                    node.loadFromData(o.children)
+
+        return null
 
     ###
     Add child.
@@ -267,8 +275,10 @@ class Node
 
                 if @hasChildren() and result
                      child.iterate(callback, level + 1)
+            return null
 
         _iterate(0)
+        return null
 
     ###
     Move node relative to another node.
@@ -324,7 +334,7 @@ class Node
 @Tree.Tree = Node
 
 
-class JqueryWidget extends MouseWidget
+class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
         saveState: false  # true / false / string (cookie name)
@@ -340,7 +350,7 @@ class JqueryWidget extends MouseWidget
 
     toggle: (node, on_finished) ->
         if node.hasChildren()
-            new FolderElement(node).toggle(on_finished)
+            new FolderElement(node, @element).toggle(on_finished)
 
         if @options.saveState
             @_saveState()
@@ -395,6 +405,9 @@ class JqueryWidget extends MouseWidget
             if not $div.find('.toggler').length
                 $div.prepend('<a class="toggler">&raquo;</a>')
 
+        if @is_dragging
+            @_refreshHitAreas()
+
     getNodeById: (node_id) ->
         result = null
 
@@ -411,7 +424,13 @@ class JqueryWidget extends MouseWidget
 
     openNode: (node, on_finished, skip_slide) ->
         if node.hasChildren()
-            new FolderElement(node).open(on_finished, skip_slide)
+            new FolderElement(node, @element).open(on_finished, skip_slide)
+
+    isDragging: ->
+        return @is_dragging
+
+    refreshHitAreas: ->
+        @_refreshHitAreas()
 
     _init: ->
         super
@@ -425,6 +444,7 @@ class JqueryWidget extends MouseWidget
         @hovered_area = null
         @$ghost = null
         @hit_areas = []
+        @is_dragging = false
 
     _deinit: ->
         @element.empty()
@@ -485,7 +505,7 @@ class JqueryWidget extends MouseWidget
             return $li
 
         createNodeLi = (node) =>
-            return $("<li><div><span class=\"title\">#{ node.name #}</span></div></li>")
+            return $("<li><div><span class=\"title\">#{ node.name }</span></div></li>")
 
         createFolderLi = (node) =>
             getButtonClass = ->
@@ -508,7 +528,7 @@ class JqueryWidget extends MouseWidget
             folder_class = getFolderClass()
 
             return $(
-                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ node.name #}</span></div></li>"
+                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ node.name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, depth, is_open) ->
@@ -524,6 +544,7 @@ class JqueryWidget extends MouseWidget
 
                 if child.hasChildren()
                     doCreateDomElements($li, child.children, depth + 1, child.is_open)
+            return null
 
         if $element
             depth = 1
@@ -543,19 +564,7 @@ class JqueryWidget extends MouseWidget
         if $target.is('.toggler')
             node_element = @_getNodeElement($target)
             if node_element and node_element.node.hasChildren()
-                node_element.toggle(
-                    =>
-                        node = node_element.node
-
-                        if node.is_open
-                            event_name = 'tree.open'
-                        else
-                            event_name = 'tree.close'
-
-                        event = $.Event(event_name)
-                        event.node = node
-                        @element.trigger(event)
-                )
+                node_element.toggle()
 
                 if @options.saveState
                     @_saveState()
@@ -585,14 +594,17 @@ class JqueryWidget extends MouseWidget
     _restoreState: ->
         if @options.onGetStateFromStorage
             state = @options.onGetStateFromStorage()
+        else if localStorage
+            state = localStorage.getItem(
+                @_getCookieName()
+            )
+        else if $.cookie
+            state = $.cookie(
+                @_getCookieName(),
+                {path: '/'}
+            )
         else
-            if $.cookie
-                state = $.cookie(
-                    @_getCookieName(),
-                    {path: '/'}
-                )
-            else
-                state = null
+            state = null
 
         if not state
             return false
@@ -603,13 +615,17 @@ class JqueryWidget extends MouseWidget
     _saveState: ->
         if @options.onSetStateFromStorage
             @options.onSetStateFromStorage(@_getState())
-        else
-            if $.cookie
-                $.cookie(
-                    @_getCookieName(),
-                    @_getState(),
-                    {path: '/'}
-                )
+        else if localStorage
+            localStorage.setItem(
+                @_getCookieName(),
+                @_getState()
+            )
+        else if $.cookie
+            $.cookie(
+                @_getCookieName(),
+                @_getState(),
+                {path: '/'}
+            )
 
     _getState: ->
         open_nodes = []
@@ -635,22 +651,23 @@ class JqueryWidget extends MouseWidget
 
     _setState: (state) ->
         data = $.parseJSON(state)
-        open_nodes = data.open_nodes
-        selected_node_id = data.selected_node
+        if data
+            open_nodes = data.open_nodes
+            selected_node_id = data.selected_node
 
-        @tree.iterate((node) =>
-            if (
-                node.id and
-                node.hasChildren() and
-                (indexOf(open_nodes, node.id) >= 0)
+            @tree.iterate((node) =>
+                if (
+                    node.id and
+                    node.hasChildren() and
+                    (indexOf(open_nodes, node.id) >= 0)
+                )
+                    node.is_open = true
+
+                if selected_node_id and (node.id == selected_node_id)
+                    @selected_node = node
+
+                return true
             )
-                node.is_open = true
-
-            if selected_node_id and (node.id == selected_node_id)
-                @selected_node = node
-
-            return true
-        )
 
     _getCookieName: ->
         if typeof @options.saveState is 'string'
@@ -660,9 +677,9 @@ class JqueryWidget extends MouseWidget
 
     _getNodeElementForNode: (node) ->
         if node.hasChildren()
-            return new FolderElement(node)
+            return new FolderElement(node, @element)
         else
-            return new NodeElement(node)
+            return new NodeElement(node, @element)
 
     _getNodeElement: ($element) ->
         node = @_getNode($element)
@@ -717,6 +734,7 @@ class JqueryWidget extends MouseWidget
             @element
         )
 
+        @is_dragging = true
         @current_item.$element.addClass('moving')
         return true
 
@@ -757,6 +775,7 @@ class JqueryWidget extends MouseWidget
         @_removeHitAreas()
 
         @current_item.$element.removeClass('moving')
+        @is_dragging = false
 
         return false
 
@@ -876,9 +895,15 @@ class JqueryWidget extends MouseWidget
                 )
 
                 area_top += area_height
+            return null
         )
 
         @hit_areas = hit_areas
+
+    testGenerateHitAreas: (moving_node) ->
+        @current_item = @_getNodeElementForNode(moving_node)
+        @_generateHitAreas()
+        return @hit_areas
 
     _removeHitAreas: ->
         @hit_areas = []
@@ -1009,27 +1034,30 @@ class JqueryWidget extends MouseWidget
             position = @hovered_area.position
             previous_parent = moved_node.parent
 
-            @tree.moveNode(moved_node, target_node, position)
-
             if position == Position.INSIDE
                 @hovered_area.node.is_open = true
 
+            doMove = =>
+              @tree.moveNode(moved_node, target_node, position)
+              @element.empty()
+              @_createDomElements(@tree)
+
             event = $.Event('tree.move')
-            event.move_info = 
+            event.move_info =
                 moved_node: moved_node
                 target_node: target_node
                 position: Position.getName(position)
                 previous_parent: previous_parent
-            @element.trigger(event)
+                do_move: doMove
 
-            @element.empty()
-            @_createDomElements(@tree)
+            @element.trigger(event)
+            doMove() unless event.isDefaultPrevented()
 
     _clear: ->
         @drag_element.remove()
         @drag_element = null
 
-SimpleWidget.register(JqueryWidget, 'tree')
+SimpleWidget.register(JqTreeWidget, 'tree')
 
 
 class GhostDropHint
@@ -1084,11 +1112,12 @@ class BorderDropHint
 
 
 class NodeElement
-    constructor: (node) ->
-        @init(node)
+    constructor: (node, tree_element) ->
+        @init(node, tree_element)
 
-    init: (node) ->
+    init: (node, tree_element) ->
         @node = node
+        @tree_element = tree_element
         @$element = $(node.element)
 
     getUl: ->
@@ -1129,6 +1158,10 @@ class FolderElement extends NodeElement
             if on_finished
                 on_finished()
 
+            event = $.Event('tree.open')
+            event.node = @node
+            @tree_element.trigger(event)
+
         if skip_slide
             @getUl().show()
             doOpen()
@@ -1145,6 +1178,10 @@ class FolderElement extends NodeElement
                 @getLi().addClass('closed')
                 if on_finished
                     on_finished()
+
+                event = $.Event('tree.close')
+                event.node = @node
+                @tree_element.trigger(event)
         )
 
     getButton: ->
@@ -1162,7 +1199,7 @@ class DragElement
         @offset_x = offset_x
         @offset_y = offset_y
 
-        @$element = $("<span class=\"title tree-dragging\">#{ node.name #}</span>")
+        @$element = $("<span class=\"title tree-dragging\">#{ node.name }</span>")
         @$element.css("position", "absolute")
         $tree.append(@$element)
 
