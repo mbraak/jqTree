@@ -4,11 +4,14 @@
     position: fixed;
     left: 0;
     top: 0;
+    bottom: 0;
     padding: 20px 0 30px 30px;
     border-right: 1px solid #bbb;
     box-shadow: 0 0 20px #ccc;
     -webkit-box-shadow: 0 0 20px #ccc;
     -moz-box-shadow: 0 0 20px #ccc;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 #page {
