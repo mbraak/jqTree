@@ -53,6 +53,8 @@
 				<li><a href="#functions-tojson">toJson</a></li>
 				<li><a href="#functions-getnodebyid">getNodeById</a></li>
 				<li><a href="#functions-selectnode">selectNode</a></li>
+				<li><a href="#functions-opennode">openNode</a></li>
+				<li><a href="#functions-closenode">closeNode</a></li>
 			</ul>
 		</li>
 		<li>
@@ -389,7 +391,7 @@ $('#tree1').tree({
 	data: data,
 	dragAndDrop: true,
 	onCanMove: function(node) {
-		if (! moved_node.parent.parent) {
+		if (! node.parent.parent) {
 			// Example: Cannot move root node
 			return false;
 		}
@@ -516,6 +518,54 @@ $tree.tree({
 
 var node = $tree.tree('getNodeById', 123);
 $tree.tree('selectNode', node, true);
+</pre>
+
+	<h5 id="functions-opennode">openNode</h5>
+	<p>
+		<strong>function openNode(node);</strong>
+		<br>
+		<strong>function openNode(node, skip_slide);</strong>
+	</p>
+	<p>
+		Open this node with a slide animation. The node must have child nodes.
+	</p>
+<pre>
+// create tree
+var $tree = $('#tree1');
+$tree.tree({
+	data: data
+});
+
+var node = $tree.tree('getNodeById', 123);
+$tree.tree('openNode', node);
+</pre>
+
+	<p>
+		To open the node without the slide animation, call with <strong>skip_slide</strong> parameter is true.
+	</p>
+<pre>
+$tree.tree('openNode', node, true);
+</pre>
+
+	<h5 id="functions-closenode">closeNode</h5>
+	<p>
+		<strong>function closeNode(node);</strong>
+		<br>
+		<strong>function closeNode(node, skip_slide);</strong>
+	</p>
+	<p>
+		Close this node with a slide animation. The node must have child nodes.
+	</p>
+<pre>
+var node = $tree.tree('getNodeById', 123);
+$tree.tree('closeNode', node);
+</pre>
+
+	<p>
+		To close the node without the slide animation, call with <strong>skip_slide</strong> parameter is true.
+	</p>
+<pre>
+$tree.tree('closeNode', node, true);
 </pre>
 
 	<h4 id="events">Events</h4>
