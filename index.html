@@ -642,6 +642,36 @@ $('#tree1).bind(
 );
 </pre>
 
+	<p>
+		You can prevent the move by calling <strong>event.preventDefault()</strong>
+	</p>
+
+<pre>
+$('#tree1).bind(
+	'tree.move',
+	function(event) {
+		event.preventDefault();
+	}
+);
+</pre>
+
+	<p>
+		You can later call <strong>event.doMove()</strong> to move the node. This way you could ask the user before moving the node:
+	</p>
+
+<pre>
+$('#tree1).bind(
+	'tree.move',
+	function(event) {
+		event.preventDefault();
+
+		if (confirm('Really move?')) {
+			event.doMove();
+		}
+	}
+);
+</pre>
+
 </div>
 <script>
 	$(function() {
