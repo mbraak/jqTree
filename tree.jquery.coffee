@@ -348,9 +348,9 @@ class JqTreeWidget extends MouseWidget
         onCanMove: null  # Can this node be moved? function(node)
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
 
-    toggle: (node, on_finished) ->
+    toggle: (node) ->
         if node.hasChildren()
-            new FolderElement(node, @element).toggle(on_finished)
+            new FolderElement(node, @element).toggle()
 
         if @options.saveState
             @_saveState()
@@ -371,7 +371,7 @@ class JqTreeWidget extends MouseWidget
 
                 while parent
                     if not parent.is_open
-                        this.openNode(parent, null, true)
+                        this.openNode(parent, true)
 
                     parent = parent.parent
 
@@ -422,9 +422,19 @@ class JqTreeWidget extends MouseWidget
 
         return result
 
-    openNode: (node, on_finished, skip_slide) ->
+    openNode: (node, skip_slide) ->
         if node.hasChildren()
-            new FolderElement(node, @element).open(on_finished, skip_slide)
+            new FolderElement(node, @element).open(null, skip_slide)
+
+            if @options.saveState
+                @_saveState()
+
+    closeNode: (node, skip_slide) ->
+        if node.hasChildren()
+            new FolderElement(node, @element).close(skip_slide)
+
+            if @options.saveState
+                @_saveState()
 
     isDragging: ->
         return @is_dragging
@@ -1143,46 +1153,49 @@ class NodeElement
 
 
 class FolderElement extends NodeElement
-    toggle: (on_finished) ->
+    toggle: ->
         if @node.is_open
-            @close(on_finished)
+            @close()
         else
-            @open(on_finished)
+            @open()
 
     open: (on_finished, skip_slide) ->
-        @node.is_open = true
-        @getButton().removeClass('closed')
+        if not @node.is_open
+            @node.is_open = true
+            @getButton().removeClass('closed')
 
-        doOpen = =>
-            @getLi().removeClass('closed')
-            if on_finished
-                on_finished()
-
-            event = $.Event('tree.open')
-            event.node = @node
-            @tree_element.trigger(event)
-
-        if skip_slide
-            @getUl().show()
-            doOpen()
-        else
-            @getUl().slideDown('fast', doOpen)
-
-    close: (on_finished) ->
-        @node.is_open = false
-        @getButton().addClass('closed')
-
-        @getUl().slideUp(
-            'fast',
-            =>
-                @getLi().addClass('closed')
+            doOpen = =>
+                @getLi().removeClass('closed')
                 if on_finished
                     on_finished()
+
+                event = $.Event('tree.open')
+                event.node = @node
+                @tree_element.trigger(event)
+
+            if skip_slide
+                @getUl().show()
+                doOpen()
+            else
+                @getUl().slideDown('fast', doOpen)
+
+    close: (skip_slide) ->
+        if @node.is_open
+            @node.is_open = false
+            @getButton().addClass('closed')
+
+            doClose = =>
+                @getLi().addClass('closed')
 
                 event = $.Event('tree.close')
                 event.node = @node
                 @tree_element.trigger(event)
-        )
+
+            if skip_slide
+                @getUl().hide()
+                doClose()
+            else
+                @getUl().slideUp('fast', doClose)
 
     getButton: ->
         return @$element.children('div').find('a.toggler')

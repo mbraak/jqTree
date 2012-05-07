@@ -626,9 +626,9 @@ limitations under the License.
       onCanMoveTo: null
     };
 
-    JqTreeWidget.prototype.toggle = function(node, on_finished) {
+    JqTreeWidget.prototype.toggle = function(node) {
       if (node.hasChildren()) {
-        new FolderElement(node, this.element).toggle(on_finished);
+        new FolderElement(node, this.element).toggle();
       }
       if (this.options.saveState) {
         return this._saveState();
@@ -651,7 +651,7 @@ limitations under the License.
           parent = this.selected_node.parent;
           while (parent) {
             if (!parent.is_open) {
-              this.openNode(parent, null, true);
+              this.openNode(parent, true);
             }
             parent = parent.parent;
           }
@@ -709,9 +709,21 @@ limitations under the License.
       return result;
     };
 
-    JqTreeWidget.prototype.openNode = function(node, on_finished, skip_slide) {
+    JqTreeWidget.prototype.openNode = function(node, skip_slide) {
       if (node.hasChildren()) {
-        return new FolderElement(node, this.element).open(on_finished, skip_slide);
+        new FolderElement(node, this.element).open(null, skip_slide);
+        if (this.options.saveState) {
+          return this._saveState();
+        }
+      }
+    };
+
+    JqTreeWidget.prototype.closeNode = function(node, skip_slide) {
+      if (node.hasChildren()) {
+        new FolderElement(node, this.element).close(skip_slide);
+        if (this.options.saveState) {
+          return this._saveState();
+        }
       }
     };
 
@@ -1479,51 +1491,59 @@ limitations under the License.
       return FolderElement.__super__.constructor.apply(this, arguments);
     }
 
-    FolderElement.prototype.toggle = function(on_finished) {
+    FolderElement.prototype.toggle = function() {
       if (this.node.is_open) {
-        return this.close(on_finished);
+        return this.close();
       } else {
-        return this.open(on_finished);
+        return this.open();
       }
     };
 
     FolderElement.prototype.open = function(on_finished, skip_slide) {
       var doOpen,
         _this = this;
-      this.node.is_open = true;
-      this.getButton().removeClass('closed');
-      doOpen = function() {
-        var event;
-        _this.getLi().removeClass('closed');
-        if (on_finished) {
-          on_finished();
+      if (!this.node.is_open) {
+        this.node.is_open = true;
+        this.getButton().removeClass('closed');
+        doOpen = function() {
+          var event;
+          _this.getLi().removeClass('closed');
+          if (on_finished) {
+            on_finished();
+          }
+          event = $.Event('tree.open');
+          event.node = _this.node;
+          return _this.tree_element.trigger(event);
+        };
+        if (skip_slide) {
+          this.getUl().show();
+          return doOpen();
+        } else {
+          return this.getUl().slideDown('fast', doOpen);
         }
-        event = $.Event('tree.open');
-        event.node = _this.node;
-        return _this.tree_element.trigger(event);
-      };
-      if (skip_slide) {
-        this.getUl().show();
-        return doOpen();
-      } else {
-        return this.getUl().slideDown('fast', doOpen);
       }
     };
 
-    FolderElement.prototype.close = function(on_finished) {
-      var _this = this;
-      this.node.is_open = false;
-      this.getButton().addClass('closed');
-      return this.getUl().slideUp('fast', function() {
-        var event;
-        _this.getLi().addClass('closed');
-        if (on_finished) {
-          on_finished();
+    FolderElement.prototype.close = function(skip_slide) {
+      var doClose,
+        _this = this;
+      if (this.node.is_open) {
+        this.node.is_open = false;
+        this.getButton().addClass('closed');
+        doClose = function() {
+          var event;
+          _this.getLi().addClass('closed');
+          event = $.Event('tree.close');
+          event.node = _this.node;
+          return _this.tree_element.trigger(event);
+        };
+        if (skip_slide) {
+          this.getUl().hide();
+          return doClose();
+        } else {
+          return this.getUl().slideUp('fast', doClose);
         }
-        event = $.Event('tree.close');
-        event.node = _this.node;
-        return _this.tree_element.trigger(event);
-      });
+      }
     };
 
     FolderElement.prototype.getButton = function() {
