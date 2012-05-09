@@ -490,7 +490,6 @@ class JqTreeWidget extends MouseWidget
             max_level = parseInt(@options.autoOpen)
 
         @tree.iterate((node, level) ->
-            console.log(node, level)
             node.is_open = true
             return (level != max_level)
         )
