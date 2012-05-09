@@ -55,6 +55,7 @@
 				<li><a href="#functions-selectnode">selectNode</a></li>
 				<li><a href="#functions-opennode">openNode</a></li>
 				<li><a href="#functions-closenode">closeNode</a></li>
+				<li><a href="#functions-getselectednode">getSelectedNode</a></li>
 			</ul>
 		</li>
 		<li>
@@ -566,6 +567,15 @@ $tree.tree('closeNode', node);
 	</p>
 <pre>
 $tree.tree('closeNode', node, true);
+</pre>
+
+	<h5 id="functions-getselectednode">getSelectedNode</h5>
+	<p>
+		Get the selected node. Returns the row data or false.
+	</p>
+
+<pre>
+var node = $tree.tree('getselectednode');
 </pre>
 
 	<h4 id="events">Events</h4>
