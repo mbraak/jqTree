@@ -363,17 +363,18 @@ class JqTreeWidget extends MouseWidget
             if @selected_node
                 @_getNodeElementForNode(@selected_node).deselect()
 
-            @_getNodeElementForNode(node).select()
-            @selected_node = node
+            if node
+                @_getNodeElementForNode(node).select()
+                @selected_node = node
 
-            if must_open_parents
-                parent = @selected_node.parent
+                if must_open_parents
+                    parent = @selected_node.parent
 
-                while parent
-                    if not parent.is_open
-                        this.openNode(parent, true)
+                    while parent
+                        if not parent.is_open
+                            this.openNode(parent, true)
 
-                    parent = parent.parent
+                        parent = parent.parent
 
             if @options.saveState
                 @_saveState()

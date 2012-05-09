@@ -645,15 +645,17 @@ limitations under the License.
         if (this.selected_node) {
           this._getNodeElementForNode(this.selected_node).deselect();
         }
-        this._getNodeElementForNode(node).select();
-        this.selected_node = node;
-        if (must_open_parents) {
-          parent = this.selected_node.parent;
-          while (parent) {
-            if (!parent.is_open) {
-              this.openNode(parent, true);
+        if (node) {
+          this._getNodeElementForNode(node).select();
+          this.selected_node = node;
+          if (must_open_parents) {
+            parent = this.selected_node.parent;
+            while (parent) {
+              if (!parent.is_open) {
+                this.openNode(parent, true);
+              }
+              parent = parent.parent;
             }
-            parent = parent.parent;
           }
         }
         if (this.options.saveState) {
