@@ -450,22 +450,33 @@ test('autoOpen', function() {
         return open_nodes.join(';');
     }
 
+    /*
+    -l1n1 (level 0)
+    ----l2n1 (1)
+    ----l2n2 (1)
+    -------l3n1 (2)
+    ----------l4n1 (3)
+    -l1n2
+    */
     var data = [
         {
             label: 'l1n1',
             children: [
-                { label: 'l2n1' },
+                'l2n1',
                 {
                     label: 'l2n2',
                     children: [
-                        { label: 'l3n1' }
+                        {
+                            label: 'l3n1',
+                            children: [
+                                'l4n1'
+                            ]
+                        }
                     ]
                 }
             ]
         },
-        {
-            label: 'l1n2'
-        }
+        'l1n2'
     ];
 
     // 1. autoOpen is false
@@ -482,16 +493,16 @@ test('autoOpen', function() {
         data: data,
         autoOpen: true
     });
-    equal(formatOpenFolders(), 'l1n1;l2n2');
+    equal(formatOpenFolders(), 'l1n1;l2n2;l3n1');
 
     $tree.tree('destroy');
 
-    // 3. autoOpen level 0
+    // 3. autoOpen level 1
     $tree.tree({
         data: data,
-        autoOpen: 0
+        autoOpen: 1
     });
-    equal(formatOpenFolders(), 'l1n1');
+    equal(formatOpenFolders(), 'l1n1;l2n2');
 });
 
 test('onCreateLi', function() {
