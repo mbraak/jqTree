@@ -529,19 +529,19 @@ limitations under the License.
     Node.prototype.iterate = function(callback) {
       var _iterate,
         _this = this;
-      _iterate = function(level) {
+      _iterate = function(node, level) {
         var child, result, _i, _len, _ref;
-        _ref = _this.children;
+        _ref = node.children;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
           result = callback(child, level);
           if (_this.hasChildren() && result) {
-            child.iterate(callback, level + 1);
+            _iterate(child, level + 1);
           }
         }
         return null;
       };
-      _iterate(0);
+      _iterate(this, 0);
       return null;
     };
 
@@ -784,6 +784,7 @@ limitations under the License.
         max_level = parseInt(this.options.autoOpen);
       }
       return this.tree.iterate(function(node, level) {
+        console.log(node, level);
         node.is_open = true;
         return level !== max_level;
       });

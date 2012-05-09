@@ -269,15 +269,15 @@ class Node
 
     ###
     iterate: (callback) ->
-        _iterate = (level) =>
-            for child in @children
+        _iterate = (node, level) =>
+            for child in node.children
                 result = callback(child, level)
 
                 if @hasChildren() and result
-                     child.iterate(callback, level + 1)
+                    _iterate(child, level + 1)
             return null
 
-        _iterate(0)
+        _iterate(this, 0)
         return null
 
     ###
@@ -490,6 +490,7 @@ class JqTreeWidget extends MouseWidget
             max_level = parseInt(@options.autoOpen)
 
         @tree.iterate((node, level) ->
+            console.log(node, level)
             node.is_open = true
             return (level != max_level)
         )
