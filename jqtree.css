@@ -23,7 +23,7 @@ ul.tree li {
 }
 
 ul.tree .toggler {
-    background-image: url(icons.png);
+    background-image: url(jqtree-icons.png);
     background-repeat: no-repeat;
     background-position: -8px 0;
     width: 8px;
@@ -80,7 +80,7 @@ ul.tree li.ghost span {
 }
 
 ul.tree li.ghost span.circle {
-    background-image: url(icons.png);
+    background-image: url(jqtree-icons.png);
     background-repeat: no-repeat;
     background-position: 0 -8px;
     height: 8px;
