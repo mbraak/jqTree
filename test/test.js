@@ -781,6 +781,26 @@ test('iterate', function() {
         'node1 node2',
         'nodes on first level'
     );
+
+    // add child 4
+    var node3 = tree.getNodeById(124).children[0];
+    node3.addChild(
+        new Tree.Node('child4')
+    );
+
+    // test level parameter
+    nodes = [];
+    tree.iterate(
+        function(node, level) {
+            nodes.push(node.name + ' ' + level);
+            return true;
+        }
+    );
+
+    equal(
+        nodes.join(','),
+        'node1 0,child1 1,child2 1,node2 0,child3 1,child4 2'
+    );
 });
 
 test('moveNode', function() {
