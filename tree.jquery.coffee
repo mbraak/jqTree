@@ -331,6 +331,20 @@ class Node
 
         return getDataFromNodes(@children)
 
+    getNodeById: (node_id) ->
+        result = null
+
+        @iterate(
+            (node) ->
+                if node.id == node_id
+                    result = node
+                    return false  # stop iterating
+                else
+                    return true
+        )
+
+        return result
+
 @Tree.Tree = Node
 
 
@@ -410,18 +424,7 @@ class JqTreeWidget extends MouseWidget
             @_refreshHitAreas()
 
     getNodeById: (node_id) ->
-        result = null
-
-        @tree.iterate(
-            (node) ->
-                if node.id == node_id
-                    result = node
-                    return false  # stop iterating
-                else
-                    return true
-        )
-
-        return result
+        return @tree.getNodeById(node_id)
 
     openNode: (node, skip_slide) ->
         if node.hasChildren()

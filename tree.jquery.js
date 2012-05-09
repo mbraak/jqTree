@@ -596,6 +596,20 @@ limitations under the License.
       return getDataFromNodes(this.children);
     };
 
+    Node.prototype.getNodeById = function(node_id) {
+      var result;
+      result = null;
+      this.iterate(function(node) {
+        if (node.id === node_id) {
+          result = node;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return result;
+    };
+
     return Node;
 
   })();
@@ -698,17 +712,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.getNodeById = function(node_id) {
-      var result;
-      result = null;
-      this.tree.iterate(function(node) {
-        if (node.id === node_id) {
-          result = node;
-          return false;
-        } else {
-          return true;
-        }
-      });
-      return result;
+      return this.tree.getNodeById(node_id);
     };
 
     JqTreeWidget.prototype.openNode = function(node, skip_slide) {
