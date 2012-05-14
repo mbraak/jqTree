@@ -272,14 +272,24 @@ $('#tree1').tree({
         The state is saved in localstorage. In browsers that do not support localstorage, the state is saved in a cookie.
         For this to work, please include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>.
     </p>
+    <p>
+        For this to work, you should give each node in the tree data an id field:
+    </p>
+<pre>
+{
+    label: 'node1',
+    id: 123,
+    childen: [
+        label: 'child1',
+        id: 124
+    ]
+}
+</pre>
     <ul>
         <li><strong>true</strong>: save and restore state in a cookie</li>
         <li><strong>false (default)</strong>: do nothing</li>
         <li><strong>string</strong>: save state and use this name to store in a cookie</li>
     </ul>
-    <p>
-        Save state:
-    </p>
 <pre>
 $('#tree1').tree({
     data: data,
