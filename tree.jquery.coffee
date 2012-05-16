@@ -123,30 +123,30 @@ Position.NONE = 4
 @Tree.Position = Position
 
 class Node
-    constructor: (name) ->
-        @init(name)
+    constructor: (o) ->
+        @setData(o)
 
-    init: (name) ->
-        @name = name
+    setData: (o) ->
+        if typeof o != 'object'
+            @name = o
+        else
+            for key, value of o
+                if key == 'label'
+                    # todo: node property is 'name', but we use 'label' here
+                    @name = value
+                else
+                    @[key] = value
+
         @children = []
         @parent = null
 
     # Init Node from data without making it the root of the tree
     initFromData: (data) ->
         addNode = (node_data) =>
-            if typeof node_data != 'object'
-                @['name'] = node_data
-            else
-                $.each(node_data, (key, value) =>
-                    if key == 'children'
-                        addChildren(value)
-                    else if key == 'label'
-                        @['name'] = value
-                    else
-                        @[key] = value
+            @setData(node_data)
 
-                    return true
-                )
+            if node_data.children
+                addChildren(node_data.children)
 
         addChildren = (children_data) =>
             for child in children_data
@@ -179,23 +179,11 @@ class Node
         @children = []
 
         for o in data
-            if typeof o != 'object'
-                node = new Node(o)
-                @addChild(node)
-            else
-                # todo: node property is 'name', but we use 'label' here
-                node = new Node(o.label)
+            node = new Node(o)
+            @addChild(node)
 
-                $.each(o, (key, value) =>
-                    if key != 'label'
-                        node[key] = value
-                    return true
-                )
-
-                @addChild(node)
-
-                if o.children
-                    node.loadFromData(o.children)
+            if typeof o == 'object' and o.children
+                node.loadFromData(o.children)
 
         return null
 
@@ -270,12 +258,13 @@ class Node
     ###
     iterate: (callback) ->
         _iterate = (node, level) =>
-            for child in node.children
-                result = callback(child, level)
+            if node.children
+                for child in node.children
+                    result = callback(child, level)
 
-                if @hasChildren() and result
-                    _iterate(child, level + 1)
-            return null
+                    if @hasChildren() and result
+                        _iterate(child, level + 1)
+                return null
 
         _iterate(this, 0)
         return null
@@ -344,6 +333,47 @@ class Node
         )
 
         return result
+
+    getNodeByName: (name) ->
+        result = null
+
+        @iterate(
+            (node) ->
+                if node.name == name
+                    result = node
+                    return false
+                else
+                    return true
+        )
+
+        return result
+
+    addAfter: (node_info) ->
+        node = new Node(node_info)
+
+        if @parent
+            child_index = @parent.getChildIndex(this)
+            @parent.addChildAtPosition(node, child_index + 1)
+
+    addBefore: (node_info) ->
+        node = new Node(node_info)
+
+        if @parent
+            child_index = @parent.getChildIndex(this)
+            @parent.addChildAtPosition(node, child_index)
+
+    addParent: (node_info) ->
+        new_parent = new Node(node_info)
+
+        if @parent
+            original_parent = @parent
+
+            for child in original_parent.children
+                new_parent.addChild(child)
+
+            original_parent.children = []
+
+            original_parent.addChild(new_parent)
 
 @Tree.Tree = Node
 
@@ -445,6 +475,18 @@ class JqTreeWidget extends MouseWidget
 
     refreshHitAreas: ->
         @_refreshHitAreas()
+
+    addNodeAfter: (existing_node, new_node_info) ->
+        existing_node.addAfter(new_node_info)
+        @_createDomElements(@tree)
+
+    addNodeBefore: (existing_node, new_node_info) ->
+        existing_node.addBefore(new_node_info)
+        @_createDomElements(@tree)
+
+    addParentNode: (existing_node, new_node_info) ->
+        existing_node.addParent(new_node_info)
+        @_createDomElements(@tree)        
 
     _init: ->
         super

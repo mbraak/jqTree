@@ -356,12 +356,24 @@ limitations under the License.
 
     Node.name = 'Node';
 
-    function Node(name) {
-      this.init(name);
+    function Node(o) {
+      this.setData(o);
     }
 
-    Node.prototype.init = function(name) {
-      this.name = name;
+    Node.prototype.setData = function(o) {
+      var key, value;
+      if (typeof o !== 'object') {
+        this.name = o;
+      } else {
+        for (key in o) {
+          value = o[key];
+          if (key === 'label') {
+            this.name = value;
+          } else {
+            this[key] = value;
+          }
+        }
+      }
       this.children = [];
       return this.parent = null;
     };
@@ -370,19 +382,9 @@ limitations under the License.
       var addChildren, addNode,
         _this = this;
       addNode = function(node_data) {
-        if (typeof node_data !== 'object') {
-          return _this['name'] = node_data;
-        } else {
-          return $.each(node_data, function(key, value) {
-            if (key === 'children') {
-              addChildren(value);
-            } else if (key === 'label') {
-              _this['name'] = value;
-            } else {
-              _this[key] = value;
-            }
-            return true;
-          });
+        _this.setData(node_data);
+        if (node_data.children) {
+          return addChildren(node_data.children);
         }
       };
       addChildren = function(children_data) {
@@ -419,26 +421,14 @@ limitations under the License.
 
 
     Node.prototype.loadFromData = function(data) {
-      var node, o, _i, _len,
-        _this = this;
+      var node, o, _i, _len;
       this.children = [];
       for (_i = 0, _len = data.length; _i < _len; _i++) {
         o = data[_i];
-        if (typeof o !== 'object') {
-          node = new Node(o);
-          this.addChild(node);
-        } else {
-          node = new Node(o.label);
-          $.each(o, function(key, value) {
-            if (key !== 'label') {
-              node[key] = value;
-            }
-            return true;
-          });
-          this.addChild(node);
-          if (o.children) {
-            node.loadFromData(o.children);
-          }
+        node = new Node(o);
+        this.addChild(node);
+        if (typeof o === 'object' && o.children) {
+          node.loadFromData(o.children);
         }
       }
       return null;
@@ -531,15 +521,17 @@ limitations under the License.
         _this = this;
       _iterate = function(node, level) {
         var child, result, _i, _len, _ref;
-        _ref = node.children;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          child = _ref[_i];
-          result = callback(child, level);
-          if (_this.hasChildren() && result) {
-            _iterate(child, level + 1);
+        if (node.children) {
+          _ref = node.children;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            child = _ref[_i];
+            result = callback(child, level);
+            if (_this.hasChildren() && result) {
+              _iterate(child, level + 1);
+            }
           }
+          return null;
         }
-        return null;
       };
       _iterate(this, 0);
       return null;
@@ -608,6 +600,53 @@ limitations under the License.
         }
       });
       return result;
+    };
+
+    Node.prototype.getNodeByName = function(name) {
+      var result;
+      result = null;
+      this.iterate(function(node) {
+        if (node.name === name) {
+          result = node;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return result;
+    };
+
+    Node.prototype.addAfter = function(node_info) {
+      var child_index, node;
+      node = new Node(node_info);
+      if (this.parent) {
+        child_index = this.parent.getChildIndex(this);
+        return this.parent.addChildAtPosition(node, child_index + 1);
+      }
+    };
+
+    Node.prototype.addBefore = function(node_info) {
+      var child_index, node;
+      node = new Node(node_info);
+      if (this.parent) {
+        child_index = this.parent.getChildIndex(this);
+        return this.parent.addChildAtPosition(node, child_index);
+      }
+    };
+
+    Node.prototype.addParent = function(node_info) {
+      var child, new_parent, original_parent, _i, _len, _ref;
+      new_parent = new Node(node_info);
+      if (this.parent) {
+        original_parent = this.parent;
+        _ref = original_parent.children;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          new_parent.addChild(child);
+        }
+        original_parent.children = [];
+        return original_parent.addChild(new_parent);
+      }
     };
 
     return Node;
@@ -739,6 +778,21 @@ limitations under the License.
 
     JqTreeWidget.prototype.refreshHitAreas = function() {
       return this._refreshHitAreas();
+    };
+
+    JqTreeWidget.prototype.addNodeAfter = function(existing_node, new_node_info) {
+      existing_node.addAfter(new_node_info);
+      return this._createDomElements(this.tree);
+    };
+
+    JqTreeWidget.prototype.addNodeBefore = function(existing_node, new_node_info) {
+      existing_node.addBefore(new_node_info);
+      return this._createDomElements(this.tree);
+    };
+
+    JqTreeWidget.prototype.addParentNode = function(existing_node, new_node_info) {
+      existing_node.addParent(new_node_info);
+      return this._createDomElements(this.tree);
     };
 
     JqTreeWidget.prototype._init = function() {

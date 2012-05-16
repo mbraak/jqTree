@@ -56,6 +56,8 @@
                 <li><a href="#functions-opennode">openNode</a></li>
                 <li><a href="#functions-closenode">closeNode</a></li>
                 <li><a href="#functions-getselectednode">getSelectedNode</a></li>
+                <li><a href="#functions-addnodeafter">addNodeAfter</a></li>
+                <li><a href="#functions-addnodebefore">addNodeBefore</a></li>
             </ul>
         </li>
         <li>
@@ -587,6 +589,53 @@ $tree.tree('closeNode', node, true);
 <pre>
 var node = $tree.tree('getselectednode');
 </pre>
+
+    <h5 id="functions-addnodeafter">addNodeAfter</h5>
+    <p>
+        <strong>function addNodeAfter(existing_node, new_node_info);</strong>
+    </p>
+    <p>
+        Add a new node after this existing node.
+    </p>
+
+<pre>
+var node1 = $('#tree1').getNodeByName('node1');
+$('#tree1').addNodeAfter(
+    node1,
+    {
+        label: 'new_node',
+        id: 456
+    }
+);
+</pre>
+
+    <h5 id="functions-addnodebefore">addNodeBefore</h5>
+    <p>
+        <strong>function addNodeBefore(existing_node, new_node_info);</strong>
+    </p>
+    <p>
+        Add a new node before this existing node.
+    </p>
+
+    <h5 id="functions-addparentnode">addParentNode</h5>
+    <p>
+        <strong>function addParentNode(existing_node, new_node_info);</strong>
+    </p>
+    <p>
+        Add a new node as parent of this existing node.
+    </p>
+
+<pre>
+var node1 = $('#tree1').getNodeByName('node1');
+$('#tree1').addParentNode(
+    node1,
+    {
+        label: 'new_parent',
+        id: 456
+    }
+);
+</pre>
+
 
     <h4 id="events">Events</h4>
     <h5 id="event-tree-click">tree.click</h5>

@@ -590,6 +590,31 @@ test('generate hit areas', function() {
 });
 
 module("Tree");
+test('constructor', function() {
+    // 1. Create node from string
+    var node = new Tree.Node('n1');
+
+    equal(node.name, 'n1');
+    equal(node.children.length, 0);
+    equal(node.parent, null);
+
+    // 2. Create node from object
+    node = new Tree.Node({
+        label: 'n2',
+        id: 123,
+        parent: 'abc',  // parent must be ignored
+        children: ['c'], // children must be ignored
+        url: '/'
+    });
+
+    equal(node.name, 'n2');
+    equal(node.id, 123);
+    equal(node.url, '/');
+    equal(node.label, undefined);
+    equal(node.children.length, 0);
+    equal(node.parent, null);
+}); 
+
 test("create tree from data", function() {
     function checkData(tree) {
         equal(
@@ -716,6 +741,7 @@ test('removeChild', function() {
 });
 
 test('getChildIndex', function() {
+    // setup
     var tree = new Tree.Tree();
 
     var abc = new Tree.Node('abc');
@@ -725,11 +751,11 @@ test('getChildIndex', function() {
     tree.addChild(def);
     tree.addChild(ghi);
 
-    equal(
-        tree.getChildIndex(def),
-        1,
-        'indef of def'
-    );
+    // 1. Get child index of 'def'
+    equal(tree.getChildIndex(def), 1);
+
+    // 2. Get child index of non-existing node
+    equal(tree.getChildIndex(new Tree.Node('xyz')), -1);
 });
 
 test('hasChildren', function() {
@@ -942,6 +968,73 @@ test('getData', function() {
             }
         ]
     );
+});
+
+test('addAfter', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    /*
+    -node1
+    ---c1
+    ---c2
+    -node2
+    ---c3
+    */
+
+    equal(format_nodes(tree.children), 'node1 node2');
+
+    // 1. Add 'node_b' after node2
+    var node2 = tree.getNodeByName('node2');
+    node2.addAfter('node_b');
+
+    equal(format_nodes(tree.children), 'node1 node2 node_b');
+
+    var node_b = tree.getNodeByName('node_b');
+    equal(node_b.name, 'node_b');
+
+    // 2. Add 'node_a' after node1
+    var node1 = tree.getNodeByName('node1');
+    node1.addAfter('node_a');
+
+    equal(format_nodes(tree.children), 'node1 node_a node2 node_b');
+
+    // 3. Add 'node_c' after node_b; new node is an object
+    node_b.addAfter({
+        label: 'node_c',
+        id: 789
+    });
+
+    var node_c = tree.getNodeByName('node_c');
+    equal(node_c.id, 789);
+
+    equal(format_nodes(tree.children), 'node1 node_a node2 node_b node_c');
+});
+
+test('addBefore', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    // 1. Add 'node_0' before node1
+    var node1 = tree.getNodeByName('node1');
+    node1.addBefore('node0');
+    equal(format_nodes(tree.children), 'node0 node1 node2');
+});
+
+test('addParent', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    // 1. Add node 'root' as parent of node1
+    // Note that node also becomes a child of 'root'
+    var node1 = tree.getNodeByName('node1');
+    node1.addParent('root');
+
+    var root = tree.getNodeByName('root');
+    equal(format_nodes(root.children), 'node1 node2');
 });
 
 module('util');
