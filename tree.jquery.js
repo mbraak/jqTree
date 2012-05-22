@@ -618,17 +618,22 @@ limitations under the License.
 
     Node.prototype.addAfter = function(node_info) {
       var child_index, node;
-      node = new Node(node_info);
-      if (this.parent) {
+      if (!this.parent) {
+        return null;
+      } else {
+        node = new Node(node_info);
         child_index = this.parent.getChildIndex(this);
-        return this.parent.addChildAtPosition(node, child_index + 1);
+        this.parent.addChildAtPosition(node, child_index + 1);
+        return node;
       }
     };
 
     Node.prototype.addBefore = function(node_info) {
       var child_index, node;
-      node = new Node(node_info);
-      if (this.parent) {
+      if (!this.parent) {
+        return null;
+      } else {
+        node = new Node(node_info);
         child_index = this.parent.getChildIndex(this);
         return this.parent.addChildAtPosition(node, child_index);
       }
@@ -636,8 +641,10 @@ limitations under the License.
 
     Node.prototype.addParent = function(node_info) {
       var child, new_parent, original_parent, _i, _len, _ref;
-      new_parent = new Node(node_info);
-      if (this.parent) {
+      if (!this.parent) {
+        return null;
+      } else {
+        new_parent = new Node(node_info);
         original_parent = this.parent;
         _ref = original_parent.children;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -645,7 +652,8 @@ limitations under the License.
           new_parent.addChild(child);
         }
         original_parent.children = [];
-        return original_parent.addChild(new_parent);
+        original_parent.addChild(new_parent);
+        return new_parent;
       }
     };
 
@@ -726,7 +734,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.loadData = function(data, parent_node) {
-      var $div, $element, child, subtree, _i, _len, _ref;
+      var child, subtree, _i, _len, _ref;
       if (!parent_node) {
         this._initTree(data);
       } else {
@@ -737,13 +745,7 @@ limitations under the License.
           child = _ref[_i];
           parent_node.addChild(child);
         }
-        $element = $(parent_node.element);
-        $element.children('ul').detach();
-        this._createDomElements(parent_node, $element);
-        $div = $element.children('div');
-        if (!$div.find('.toggler').length) {
-          $div.prepend('<a class="toggler">&raquo;</a>');
-        }
+        this._refreshElements(parent_node.parent);
       }
       if (this.is_dragging) {
         return this._refreshHitAreas();
@@ -781,18 +783,24 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.addNodeAfter = function(existing_node, new_node_info) {
-      existing_node.addAfter(new_node_info);
-      return this._createDomElements(this.tree);
+      var new_node;
+      new_node = existing_node.addAfter(new_node_info);
+      this._refreshElements(existing_node.parent);
+      return new_node;
     };
 
     JqTreeWidget.prototype.addNodeBefore = function(existing_node, new_node_info) {
-      existing_node.addBefore(new_node_info);
-      return this._createDomElements(this.tree);
+      var new_node;
+      new_node = existing_node.addBefore(new_node_info);
+      this._refreshElements(existing_node.parent);
+      return new_node;
     };
 
     JqTreeWidget.prototype.addParentNode = function(existing_node, new_node_info) {
-      existing_node.addParent(new_node_info);
-      return this._createDomElements(this.tree);
+      var new_node;
+      new_node = existing_node.addParent(new_node_info);
+      this._refreshElements(new_node.parent);
+      return new_node;
     };
 
     JqTreeWidget.prototype._init = function() {
@@ -820,7 +828,7 @@ limitations under the License.
       this.tree.loadFromData(data);
       this.selected_node = null;
       this._openNodes();
-      this._createDomElements(this.tree);
+      this._refreshElements();
       if (this.selected_node) {
         node_element = this._getNodeElementForNode(this.selected_node);
         if (node_element) {
@@ -849,9 +857,12 @@ limitations under the License.
       });
     };
 
-    JqTreeWidget.prototype._createDomElements = function(tree, $element) {
-      var createFolderLi, createLi, createNodeLi, createUl, depth, doCreateDomElements,
+    JqTreeWidget.prototype._refreshElements = function(from_node) {
+      var $element, createFolderLi, createLi, createNodeLi, createUl, depth, doCreateDomElements, node_element,
         _this = this;
+      if (from_node == null) {
+        from_node = null;
+      }
       createUl = function(depth, is_open) {
         var class_string;
         if (depth) {
@@ -914,14 +925,18 @@ limitations under the License.
         }
         return null;
       };
-      if ($element) {
+      if (from_node && from_node.parent) {
         depth = 1;
+        node_element = this._getNodeElementForNode(from_node);
+        node_element.getUl().remove();
+        $element = node_element.$element;
       } else {
+        from_node = this.tree;
         $element = this.element;
         $element.empty();
         depth = 0;
       }
-      return doCreateDomElements($element, tree.children, depth, true);
+      return doCreateDomElements($element, from_node.children, depth, true);
     };
 
     JqTreeWidget.prototype._click = function(e) {
@@ -1397,7 +1412,7 @@ limitations under the License.
         doMove = function() {
           _this.tree.moveNode(moved_node, target_node, position);
           _this.element.empty();
-          return _this._createDomElements(_this.tree);
+          return _this._refreshElements();
         };
         event = $.Event('tree.move');
         event.move_info = {

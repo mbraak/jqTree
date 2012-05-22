@@ -349,31 +349,38 @@ class Node
         return result
 
     addAfter: (node_info) ->
-        node = new Node(node_info)
+        if not @parent
+            return null
+        else
+            node = new Node(node_info)
 
-        if @parent
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index + 1)
+            return node
+
 
     addBefore: (node_info) ->
-        node = new Node(node_info)
+        if not @parent
+            return null
+        else
+            node = new Node(node_info)
 
-        if @parent
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index)
 
     addParent: (node_info) ->
-        new_parent = new Node(node_info)
-
-        if @parent
+        if not @parent
+            return null
+        else
+            new_parent = new Node(node_info)
             original_parent = @parent
 
             for child in original_parent.children
                 new_parent.addChild(child)
 
             original_parent.children = []
-
             original_parent.addChild(new_parent)
+            return new_parent
 
 @Tree.Tree = Node
 
@@ -441,14 +448,7 @@ class JqTreeWidget extends MouseWidget
             for child in subtree.children
                 parent_node.addChild(child)
 
-            $element = $(parent_node.element)
-            $element.children('ul').detach()
-            @_createDomElements(parent_node, $element)
-
-            $div = $element.children('div')
-
-            if not $div.find('.toggler').length
-                $div.prepend('<a class="toggler">&raquo;</a>')
+            @_refreshElements(parent_node.parent)
 
         if @is_dragging
             @_refreshHitAreas()
@@ -477,16 +477,19 @@ class JqTreeWidget extends MouseWidget
         @_refreshHitAreas()
 
     addNodeAfter: (existing_node, new_node_info) ->
-        existing_node.addAfter(new_node_info)
-        @_createDomElements(@tree)
+        new_node = existing_node.addAfter(new_node_info)
+        @_refreshElements(existing_node.parent)
+        return new_node
 
     addNodeBefore: (existing_node, new_node_info) ->
-        existing_node.addBefore(new_node_info)
-        @_createDomElements(@tree)
+        new_node = existing_node.addBefore(new_node_info)
+        @_refreshElements(existing_node.parent)
+        return new_node
 
     addParentNode: (existing_node, new_node_info) ->
-        existing_node.addParent(new_node_info)
-        @_createDomElements(@tree)        
+        new_node = existing_node.addParent(new_node_info)
+        @_refreshElements(new_node.parent)  
+        return new_node    
 
     _init: ->
         super
@@ -516,7 +519,7 @@ class JqTreeWidget extends MouseWidget
         @selected_node = null
         @_openNodes()
 
-        @_createDomElements(@tree)
+        @_refreshElements()
 
         if @selected_node
             node_element = @_getNodeElementForNode(@selected_node)
@@ -540,7 +543,7 @@ class JqTreeWidget extends MouseWidget
             return (level != max_level)
         )
 
-    _createDomElements: (tree, $element) ->
+    _refreshElements: (from_node=null) ->
         createUl = (depth, is_open) =>
             if depth
                 class_string = ''
@@ -602,14 +605,18 @@ class JqTreeWidget extends MouseWidget
                     doCreateDomElements($li, child.children, depth + 1, child.is_open)
             return null
 
-        if $element
+        if from_node and from_node.parent
             depth = 1
+            node_element = @_getNodeElementForNode(from_node)
+            node_element.getUl().remove()
+            $element = node_element.$element
         else
+            from_node = @tree
             $element = @element
             $element.empty()
             depth = 0
 
-        doCreateDomElements($element, tree.children, depth, true)
+        doCreateDomElements($element, from_node.children, depth, true)
 
     _click: (e) ->
         if e.ctrlKey
@@ -1096,7 +1103,7 @@ class JqTreeWidget extends MouseWidget
             doMove = =>
               @tree.moveNode(moved_node, target_node, position)
               @element.empty()
-              @_createDomElements(@tree)
+              @_refreshElements()
 
             event = $.Event('tree.move')
             event.move_info =
