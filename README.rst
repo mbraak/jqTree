@@ -1,3 +1,6 @@
+.. image:: https://secure.travis-ci.org/mbraak/jqTree.png?branch=dev
+  :target: http://travis-ci.org/mbraak/jqTree
+
 jqTree
 ======
 
