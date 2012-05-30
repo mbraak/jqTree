@@ -58,6 +58,8 @@
                 <li><a href="#functions-getselectednode">getSelectedNode</a></li>
                 <li><a href="#functions-addnodeafter">addNodeAfter</a></li>
                 <li><a href="#functions-addnodebefore">addNodeBefore</a></li>
+                <li><a href="#functions-addparentnode">addParentNode</a></li>
+                <li><a href="#functions-removenode">removeNode</a></li>
             </ul>
         </li>
         <li>
@@ -636,6 +638,17 @@ $('#tree1').addParentNode(
 );
 </pre>
 
+    <h5 id="functions-removenode">removeNode</h5>
+    <p>
+        <strong>function removeNode(node);</strong>
+    </p>
+    <p>
+        Remove node from the tree.
+    </p>
+
+<pre>
+$('#tree1').tree('removeNode', node);
+</pre>
 
     <h4 id="events">Events</h4>
     <h5 id="event-tree-click">tree.click</h5>

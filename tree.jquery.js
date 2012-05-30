@@ -466,7 +466,7 @@ limitations under the License.
     /*
         Remove child.
     
-        tree.removeChile(tree.children[0]);
+        tree.removeChild(tree.children[0]);
     */
 
 
@@ -657,6 +657,13 @@ limitations under the License.
       }
     };
 
+    Node.prototype.remove = function() {
+      if (this.parent) {
+        this.parent.removeChild(this);
+        return this.parent = null;
+      }
+    };
+
     return Node;
 
   })();
@@ -756,6 +763,10 @@ limitations under the License.
       return this.tree.getNodeById(node_id);
     };
 
+    JqTreeWidget.prototype.getNodeByName = function(name) {
+      return this.tree.getNodeByName(name);
+    };
+
     JqTreeWidget.prototype.openNode = function(node, skip_slide) {
       if (node.hasChildren()) {
         new FolderElement(node, this.element).open(null, skip_slide);
@@ -801,6 +812,15 @@ limitations under the License.
       new_node = existing_node.addParent(new_node_info);
       this._refreshElements(new_node.parent);
       return new_node;
+    };
+
+    JqTreeWidget.prototype.removeNode = function(node) {
+      var parent;
+      parent = node.parent;
+      if (parent) {
+        node.remove();
+        return this._refreshElements(parent);
+      }
     };
 
     JqTreeWidget.prototype._init = function() {

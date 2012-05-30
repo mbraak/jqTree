@@ -213,7 +213,7 @@ class Node
     ###
     Remove child.
 
-    tree.removeChile(tree.children[0]);
+    tree.removeChild(tree.children[0]);
     ###
     removeChild: (node) ->
         @children.splice(
@@ -382,6 +382,12 @@ class Node
             original_parent.addChild(new_parent)
             return new_parent
 
+    remove: ->
+        if @parent
+            @parent.removeChild(this)
+            @parent = null
+
+
 @Tree.Tree = Node
 
 
@@ -456,6 +462,9 @@ class JqTreeWidget extends MouseWidget
     getNodeById: (node_id) ->
         return @tree.getNodeById(node_id)
 
+    getNodeByName: (name) ->
+        return @tree.getNodeByName(name)
+
     openNode: (node, skip_slide) ->
         if node.hasChildren()
             new FolderElement(node, @element).open(null, skip_slide)
@@ -490,6 +499,12 @@ class JqTreeWidget extends MouseWidget
         new_node = existing_node.addParent(new_node_info)
         @_refreshElements(new_node.parent)  
         return new_node    
+
+    removeNode: (node) ->
+        parent = node.parent
+        if parent
+            node.remove()
+            @_refreshElements(parent)
 
     _init: ->
         super

@@ -589,6 +589,30 @@ test('generate hit areas', function() {
     equal(strings.join(';'), 'node1 none;node2 inside;node2 after');
 });
 
+test('removeNode', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var child1 = $tree.tree('getNodeByName', 'child1');
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    equal(
+        $(node1.element).find('.title').text(),
+        'node1child1child2'
+    );
+
+    // 1. Remove child1
+    $tree.tree('removeNode', child1);
+
+    equal(
+        $(node1.element).find('.title').text(),
+        'node1child2'
+    );
+});
+
 module("Tree");
 test('constructor', function() {
     // 1. Create node from string
@@ -1035,6 +1059,24 @@ test('addParent', function() {
 
     var root = tree.getNodeByName('root');
     equal(format_nodes(root.children), 'node1 node2');
+});
+
+test('remove', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    var child1 = tree.getNodeByName('child1');
+    var node1 = tree.getNodeByName('node1');
+
+    equal(format_nodes(node1.children), 'child1 child2');
+    equal(child1.parent, node1);
+
+    // 1. Remove child1
+    child1.remove();
+
+    equal(format_nodes(node1.children), 'child2');
+    equal(child1.parent, null);
 });
 
 module('util');
