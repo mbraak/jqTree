@@ -7,7 +7,6 @@ var example_data = [
             {
                 label: 'Theropods',
                 id: 3,
-                appendClass: 'project',
                 children: [
                     {label: 'Coelophysoids', id: 4},
                     {label: 'Ceratosaurians', id: 5},
