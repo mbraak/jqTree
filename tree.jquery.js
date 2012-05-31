@@ -826,7 +826,7 @@ limitations under the License.
     JqTreeWidget.prototype._init = function() {
       JqTreeWidget.__super__._init.apply(this, arguments);
       this.element = this.$el;
-      this._initTree(this.options.data);
+      this._initData();
       this.element.click($.proxy(this._click, this));
       this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
       this.hovered_area = null;
@@ -840,6 +840,31 @@ limitations under the License.
       this.element.unbind();
       this.tree = null;
       return JqTreeWidget.__super__._deinit.apply(this, arguments);
+    };
+
+    JqTreeWidget.prototype._initData = function() {
+      var data_url,
+        _this = this;
+      if (this.options.data) {
+        return this._initTree(this.options.data);
+      } else {
+        data_url = this.options.dataUrl || this.element.data('url');
+        if (data_url) {
+          return $.ajax({
+            url: data_url,
+            cache: false,
+            success: function(response) {
+              var data;
+              if ($.isArray(response) || typeof response === 'object') {
+                data = response;
+              } else {
+                data = $.parseJSON(response);
+              }
+              return _this._initTree(data);
+            }
+          });
+        }
+      }
     };
 
     JqTreeWidget.prototype._initTree = function(data) {

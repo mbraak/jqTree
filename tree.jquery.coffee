@@ -510,7 +510,7 @@ class JqTreeWidget extends MouseWidget
         super
 
         @element = @$el
-        @_initTree(@options.data)
+        @_initData()
 
         @element.click($.proxy(@_click, this))
         @element.bind('contextmenu', $.proxy(@_contextmenu, this))
@@ -526,6 +526,24 @@ class JqTreeWidget extends MouseWidget
         @tree = null
 
         super
+
+    _initData: ->
+        if @options.data
+            @_initTree(@options.data)
+        else
+            data_url = @options.dataUrl or @element.data('url')
+            if data_url
+                $.ajax(
+                    url: data_url
+                    cache: false
+                    success: (response) =>
+                        if $.isArray(response) or typeof response == 'object'
+                            data = response
+                        else
+                            data = $.parseJSON(response)
+
+                        @_initTree(data)
+                )
 
     _initTree: (data) ->
         @tree = new Node()
