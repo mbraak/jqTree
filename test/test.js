@@ -613,6 +613,24 @@ test('removeNode', function() {
     );
 });
 
+test('appendNode', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // 1. Add child3 to node1
+    $tree.tree('appendNode', 'child3', node1);
+
+    equal(
+        $(node1.element).find('.title').text(),
+        'node1child1child2child3'
+    );
+});
+
 module("Tree");
 test('constructor', function() {
     // 1. Create node from string
@@ -1077,6 +1095,19 @@ test('remove', function() {
 
     equal(format_nodes(node1.children), 'child2');
     equal(child1.parent, null);
+});
+
+test('append', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    var node1 = tree.getNodeByName('node1');
+
+    // 1. Add child3 to node1
+    node1.append('child3');
+
+    equal(format_nodes(node1.children), 'child1 child2 child3');
 });
 
 module('util');

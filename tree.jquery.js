@@ -664,6 +664,13 @@ limitations under the License.
       }
     };
 
+    Node.prototype.append = function(node_info) {
+      var node;
+      node = new Node(node_info);
+      this.addChild(node);
+      return node;
+    };
+
     return Node;
 
   })();
@@ -793,21 +800,21 @@ limitations under the License.
       return this._refreshHitAreas();
     };
 
-    JqTreeWidget.prototype.addNodeAfter = function(existing_node, new_node_info) {
+    JqTreeWidget.prototype.addNodeAfter = function(new_node_info, existing_node) {
       var new_node;
       new_node = existing_node.addAfter(new_node_info);
       this._refreshElements(existing_node.parent);
       return new_node;
     };
 
-    JqTreeWidget.prototype.addNodeBefore = function(existing_node, new_node_info) {
+    JqTreeWidget.prototype.addNodeBefore = function(new_node_info, existing_node) {
       var new_node;
       new_node = existing_node.addBefore(new_node_info);
       this._refreshElements(existing_node.parent);
       return new_node;
     };
 
-    JqTreeWidget.prototype.addParentNode = function(existing_node, new_node_info) {
+    JqTreeWidget.prototype.addParentNode = function(new_node_info, existing_node) {
       var new_node;
       new_node = existing_node.addParent(new_node_info);
       this._refreshElements(new_node.parent);
@@ -821,6 +828,16 @@ limitations under the License.
         node.remove();
         return this._refreshElements(parent);
       }
+    };
+
+    JqTreeWidget.prototype.appendNode = function(new_node_info, parent_node) {
+      var node;
+      if (!parent_node) {
+        parent_node = this.tree;
+      }
+      node = parent_node.append(new_node_info);
+      this._refreshElements(parent_node);
+      return node;
     };
 
     JqTreeWidget.prototype._init = function() {

@@ -60,6 +60,7 @@
                 <li><a href="#functions-addnodebefore">addNodeBefore</a></li>
                 <li><a href="#functions-addparentnode">addParentNode</a></li>
                 <li><a href="#functions-removenode">removeNode</a></li>
+                <li><a href="#functions-appendnode">appendNode</a></li>
             </ul>
         </li>
         <li>
@@ -594,7 +595,7 @@ var node = $tree.tree('getselectednode');
 
     <h5 id="functions-addnodeafter">addNodeAfter</h5>
     <p>
-        <strong>function addNodeAfter(existing_node, new_node_info);</strong>
+        <strong>function addNodeAfter(new_node_info, existing_node);</strong>
     </p>
     <p>
         Add a new node after this existing node.
@@ -603,17 +604,17 @@ var node = $tree.tree('getselectednode');
 <pre>
 var node1 = $('#tree1').getNodeByName('node1');
 $('#tree1').addNodeAfter(
-    node1,
     {
         label: 'new_node',
         id: 456
-    }
+    },
+    node1
 );
 </pre>
 
     <h5 id="functions-addnodebefore">addNodeBefore</h5>
     <p>
-        <strong>function addNodeBefore(existing_node, new_node_info);</strong>
+        <strong>function addNodeBefore(new_node_info, existing_node);</strong>
     </p>
     <p>
         Add a new node before this existing node.
@@ -621,7 +622,7 @@ $('#tree1').addNodeAfter(
 
     <h5 id="functions-addparentnode">addParentNode</h5>
     <p>
-        <strong>function addParentNode(existing_node, new_node_info);</strong>
+        <strong>function addParentNode(new_node_info, existing_node);</strong>
     </p>
     <p>
         Add a new node as parent of this existing node.
@@ -630,11 +631,11 @@ $('#tree1').addNodeAfter(
 <pre>
 var node1 = $('#tree1').getNodeByName('node1');
 $('#tree1').addParentNode(
-    node1,
     {
         label: 'new_parent',
         id: 456
-    }
+    },
+    node1
 );
 </pre>
 
@@ -648,6 +649,39 @@ $('#tree1').addParentNode(
 
 <pre>
 $('#tree1').tree('removeNode', node);
+</pre>
+
+    <h5 id="functions-appendnode">appendNode</h5>
+    <p>
+        <strong>function appendNode(new_node_info, parent_node);</strong>
+    </p>
+    <p>
+        Add a node to this parent node. If *parent_node* is empty, then the new node becomes a root node.
+    </p>
+
+<pre>
+var parent_node = $tree.getNodeById(123);
+
+$tree.appendNode(
+    {
+        label: 'new_node',
+        id: 456
+    },
+    parent_node
+);
+</pre>
+
+    <p>
+        To add a root node, leave *parent_node* empty:
+    </p>
+
+<pre>
+$tree.appendNode(
+    {
+        label: 'new_node',
+        id: 456
+    }
+);
 </pre>
 
     <h4 id="events">Events</h4>

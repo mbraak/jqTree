@@ -387,6 +387,11 @@ class Node
             @parent.removeChild(this)
             @parent = null
 
+    append: (node_info) ->
+        node = new Node(node_info)
+        @addChild(node)
+        return node
+
 
 @Tree.Tree = Node
 
@@ -485,17 +490,17 @@ class JqTreeWidget extends MouseWidget
     refreshHitAreas: ->
         @_refreshHitAreas()
 
-    addNodeAfter: (existing_node, new_node_info) ->
+    addNodeAfter: (new_node_info, existing_node) ->
         new_node = existing_node.addAfter(new_node_info)
         @_refreshElements(existing_node.parent)
         return new_node
 
-    addNodeBefore: (existing_node, new_node_info) ->
+    addNodeBefore: (new_node_info, existing_node) ->
         new_node = existing_node.addBefore(new_node_info)
         @_refreshElements(existing_node.parent)
         return new_node
 
-    addParentNode: (existing_node, new_node_info) ->
+    addParentNode: (new_node_info, existing_node) ->
         new_node = existing_node.addParent(new_node_info)
         @_refreshElements(new_node.parent)  
         return new_node    
@@ -506,6 +511,15 @@ class JqTreeWidget extends MouseWidget
             node.remove()
             @_refreshElements(parent)
 
+    appendNode: (new_node_info, parent_node) ->
+        if not parent_node
+            parent_node = @tree
+
+        node = parent_node.append(new_node_info)
+
+        @_refreshElements(parent_node)
+        return node
+ 
     _init: ->
         super
 
