@@ -671,6 +671,13 @@ limitations under the License.
       return node;
     };
 
+    Node.prototype.prepend = function(node_info) {
+      var node;
+      node = new Node(node_info);
+      this.addChildAtPosition(node, 0);
+      return node;
+    };
+
     return Node;
 
   })();
@@ -836,6 +843,16 @@ limitations under the License.
         parent_node = this.tree;
       }
       node = parent_node.append(new_node_info);
+      this._refreshElements(parent_node);
+      return node;
+    };
+
+    JqTreeWidget.prototype.prependNode = function(new_node_info, parent_node) {
+      var node;
+      if (!parent_node) {
+        parent_node = this.tree;
+      }
+      node = parent_node.prepend(new_node_info);
       this._refreshElements(parent_node);
       return node;
     };

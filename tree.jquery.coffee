@@ -392,6 +392,11 @@ class Node
         @addChild(node)
         return node
 
+    prepend: (node_info) ->
+        node = new Node(node_info)
+        @addChildAtPosition(node, 0)
+        return node
+
 
 @Tree.Tree = Node
 
@@ -520,6 +525,15 @@ class JqTreeWidget extends MouseWidget
         @_refreshElements(parent_node)
         return node
  
+    prependNode: (new_node_info, parent_node) ->
+        if not parent_node
+            parent_node = @tree
+
+        node = parent_node.prepend(new_node_info)
+
+        @_refreshElements(parent_node)
+        return node
+
     _init: ->
         super
 

@@ -641,6 +641,24 @@ test('appendNode', function() {
     );
 });
 
+test('prependNode', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // 1. Prepend child0 to node1
+    $tree.tree('prependNode', 'child0', node1);
+
+    equal(
+        formatTitles($(node1.element)),
+        'node1 child0 child1 child2'
+    );
+});
+
 module("Tree");
 test('constructor', function() {
     // 1. Create node from string
@@ -1118,6 +1136,19 @@ test('append', function() {
     node1.append('child3');
 
     equal(formatNodes(node1.children), 'child1 child2 child3');
+});
+
+test('prepend', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    var node1 = tree.getNodeByName('node1');
+
+    // 1. Prepend child0 to node1
+    node1.prepend('child0');
+
+    equal(formatNodes(node1.children), 'child0 child1 child2');
 });
 
 module('util');
