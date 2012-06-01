@@ -30,14 +30,14 @@ var example_data2 = [
     }
 ];
 
-var format_nodes = function(nodes) {
+function formatNodes(nodes) {
     var strings = $.map(nodes, function(node) {
         return node.name;
     });
     return strings.join(' ');
 };
 
-var isNodeClosed = function($node) {
+function isNodeClosed($node) {
     return (
         ($node.is('li.folder.closed')) &&
         ($node.find('a:eq(0)').is('a.toggler.closed')) &&
@@ -45,7 +45,7 @@ var isNodeClosed = function($node) {
     );
 }
 
-var isNodeOpen = function($node) {
+function isNodeOpen($node) {
     return (
         ($node.is('li.folder')) &&
         ($node.find('a:eq(0)').is('a.toggler')) &&
@@ -54,6 +54,16 @@ var isNodeOpen = function($node) {
         (! $node.find('span:eq(0)').is('a.toggler.closed'))
     );
 }
+
+function formatTitles($node) {
+    var titles = $node.find('.title').map(
+        function(i, el) {
+            return $(el).text();
+        }
+    );
+    return titles.toArray().join(' ');
+}
+
 
 module("jqtree", {
     setup: function() {
@@ -600,16 +610,16 @@ test('removeNode', function() {
     var node1 = $tree.tree('getNodeByName', 'node1');
 
     equal(
-        $(node1.element).find('.title').text(),
-        'node1child1child2'
+        formatTitles($(node1.element)),
+        'node1 child1 child2'
     );
 
     // 1. Remove child1
     $tree.tree('removeNode', child1);
 
     equal(
-        $(node1.element).find('.title').text(),
-        'node1child2'
+        formatTitles($(node1.element)),
+        'node1 child2'
     );
 });
 
@@ -626,8 +636,8 @@ test('appendNode', function() {
     $tree.tree('appendNode', 'child3', node1);
 
     equal(
-        $(node1.element).find('.title').text(),
-        'node1child1child2child3'
+        formatTitles($(node1.element)),
+        'node1 child1 child2 child3'
     );
 });
 
@@ -660,17 +670,17 @@ test('constructor', function() {
 test("create tree from data", function() {
     function checkData(tree) {
         equal(
-            format_nodes(tree.children),
+            formatNodes(tree.children),
             'node1 node2',
             'nodes on level 1'
         );
         equal(
-            format_nodes(tree.children[0].children),
+            formatNodes(tree.children[0].children),
             'child1 child2',
             'children of node1'
         );
         equal(
-            format_nodes(tree.children[1].children),
+            formatNodes(tree.children[1].children),
             'child3',
             'children of node2'
         );
@@ -714,7 +724,7 @@ test("addChild", function() {
     );
 
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'abc def',
         'children'
     );
@@ -735,7 +745,7 @@ test('addChildAtPosition', function() {
     tree.addChildAtPosition(new Tree.Node('123'), 0);
 
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         '123 abc def ghi',
         'children'
     );
@@ -752,7 +762,7 @@ test('removeChild', function() {
     tree.addChild(ghi);
 
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'abc def ghi',
         'children'
     );
@@ -760,7 +770,7 @@ test('removeChild', function() {
     // remove 'def'
     tree.removeChild(def);
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'abc ghi',
         'children'
     );
@@ -768,7 +778,7 @@ test('removeChild', function() {
     // remove 'ghi'
     tree.removeChild(ghi);
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'abc',
         'children'
     );
@@ -776,7 +786,7 @@ test('removeChild', function() {
     // remove 'abc'
     tree.removeChild(abc);
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         '',
         'children'
     );
@@ -830,7 +840,7 @@ test('iterate', function() {
     );
 
     equal(
-        format_nodes(nodes),
+        formatNodes(nodes),
         'node1 child1 child2 node2 child3',
         'all nodes'
     );
@@ -845,7 +855,7 @@ test('iterate', function() {
     );
 
     equal(
-        format_nodes(nodes),
+        formatNodes(nodes),
         'node1 node2',
         'nodes on first level'
     );
@@ -901,12 +911,12 @@ test('moveNode', function() {
       child2
     */
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'node1 node2 child2',
         'tree nodes at first level'
     );
     equal(
-        format_nodes(node1.children),
+        formatNodes(node1.children),
         'child1',
         'node1 children'
     );
@@ -923,12 +933,12 @@ test('moveNode', function() {
       child2
     */
     equal(
-        format_nodes(node2.children),
+        formatNodes(node2.children),
         'child1 child3',
         'node2 children'
     );
     equal(
-        format_nodes(node1.children),
+        formatNodes(node1.children),
         '',
         'node1 has no children'
     );
@@ -944,12 +954,12 @@ test('moveNode', function() {
       ---child3
     */
     equal(
-        format_nodes(node2.children),
+        formatNodes(node2.children),
         'child2 child1 child3',
         'node2 children'
     );
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'node1 node2',
         'tree nodes at first level'
     );
@@ -972,7 +982,7 @@ test('initFromData', function() {
 
     equal(node.name, 'main')
     equal(
-        format_nodes(node.children),
+        formatNodes(node.children),
         'c1 c2',
         'children'
     );
@@ -1025,13 +1035,13 @@ test('addAfter', function() {
     ---c3
     */
 
-    equal(format_nodes(tree.children), 'node1 node2');
+    equal(formatNodes(tree.children), 'node1 node2');
 
     // 1. Add 'node_b' after node2
     var node2 = tree.getNodeByName('node2');
     node2.addAfter('node_b');
 
-    equal(format_nodes(tree.children), 'node1 node2 node_b');
+    equal(formatNodes(tree.children), 'node1 node2 node_b');
 
     var node_b = tree.getNodeByName('node_b');
     equal(node_b.name, 'node_b');
@@ -1040,7 +1050,7 @@ test('addAfter', function() {
     var node1 = tree.getNodeByName('node1');
     node1.addAfter('node_a');
 
-    equal(format_nodes(tree.children), 'node1 node_a node2 node_b');
+    equal(formatNodes(tree.children), 'node1 node_a node2 node_b');
 
     // 3. Add 'node_c' after node_b; new node is an object
     node_b.addAfter({
@@ -1051,7 +1061,7 @@ test('addAfter', function() {
     var node_c = tree.getNodeByName('node_c');
     equal(node_c.id, 789);
 
-    equal(format_nodes(tree.children), 'node1 node_a node2 node_b node_c');
+    equal(formatNodes(tree.children), 'node1 node_a node2 node_b node_c');
 });
 
 test('addBefore', function() {
@@ -1062,7 +1072,7 @@ test('addBefore', function() {
     // 1. Add 'node_0' before node1
     var node1 = tree.getNodeByName('node1');
     node1.addBefore('node0');
-    equal(format_nodes(tree.children), 'node0 node1 node2');
+    equal(formatNodes(tree.children), 'node0 node1 node2');
 });
 
 test('addParent', function() {
@@ -1076,7 +1086,7 @@ test('addParent', function() {
     node1.addParent('root');
 
     var root = tree.getNodeByName('root');
-    equal(format_nodes(root.children), 'node1 node2');
+    equal(formatNodes(root.children), 'node1 node2');
 });
 
 test('remove', function() {
@@ -1087,13 +1097,13 @@ test('remove', function() {
     var child1 = tree.getNodeByName('child1');
     var node1 = tree.getNodeByName('node1');
 
-    equal(format_nodes(node1.children), 'child1 child2');
+    equal(formatNodes(node1.children), 'child1 child2');
     equal(child1.parent, node1);
 
     // 1. Remove child1
     child1.remove();
 
-    equal(format_nodes(node1.children), 'child2');
+    equal(formatNodes(node1.children), 'child2');
     equal(child1.parent, null);
 });
 
@@ -1107,7 +1117,7 @@ test('append', function() {
     // 1. Add child3 to node1
     node1.append('child3');
 
-    equal(format_nodes(node1.children), 'child1 child2 child3');
+    equal(formatNodes(node1.children), 'child1 child2 child3');
 });
 
 module('util');
