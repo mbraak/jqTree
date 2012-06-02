@@ -589,18 +589,10 @@ limitations under the License.
     };
 
     Node.prototype.getNodeById = function(node_id) {
-      var id_str, result, stringifyId;
-      stringifyId = function(value) {
-        if (typeof value === 'number') {
-          return String(value);
-        } else {
-          return value;
-        }
-      };
-      id_str = stringifyId(node_id);
+      var result;
       result = null;
       this.iterate(function(node) {
-        if (stringifyId(node.id) === id_str) {
+        if (node.id == node_id) {
           result = node;
           return false;
         } else {

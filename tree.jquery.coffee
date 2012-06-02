@@ -321,18 +321,12 @@ class Node
         return getDataFromNodes(@children)
 
     getNodeById: (node_id) ->
-        stringifyId = (value) ->
-            if typeof value == 'number'
-                return String(value)
-            else
-                return value
-
-        id_str = stringifyId(node_id)
         result = null
 
         @iterate(
             (node) ->
-                if stringifyId(node.id) == id_str
+                # Fallback to javascript for less strict comparison function
+                if `node.id == node_id`
                     result = node
                     return false  # stop iterating
                 else
