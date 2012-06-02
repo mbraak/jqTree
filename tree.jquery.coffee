@@ -150,7 +150,7 @@ class Node
 
         addChildren = (children_data) =>
             for child in children_data
-                node = new Node()
+                node = new Node('')
                 node.initFromData(child)
                 @addChild(node)
             return null
@@ -196,7 +196,7 @@ class Node
     ###
     addChild: (node) ->
         @children.push(node)
-        node.parent = this
+        node._setParent(this)
 
     ###
     Add child at position. Index starts at 0.
@@ -208,7 +208,12 @@ class Node
     ###
     addChildAtPosition: (node, index) ->
         @children.splice(index, 0, node)
-        node.parent = this
+        node._setParent(this)
+
+    _setParent: (parent) ->
+        @parent = parent
+        @tree = parent.tree
+        @tree.addNodeToIndex(this)
 
     ###
     Remove child.
@@ -220,6 +225,7 @@ class Node
             @getChildIndex(node),
             1
         )
+        @tree.removeNodeFromIndex(node)
 
     ###
     Get child index.
@@ -306,7 +312,7 @@ class Node
 
                 for k, v of node
                     if (
-                        k not in ['parent', 'children', 'element'] and
+                        k not in ['parent', 'children', 'element', 'tree'] and
                         Object.prototype.hasOwnProperty.call(node, k)
                     )
                         tmp_node[k] = v
@@ -319,20 +325,6 @@ class Node
             return data
 
         return getDataFromNodes(@children)
-
-    getNodeById: (node_id) ->
-        result = null
-
-        @iterate(
-            (node) ->
-                if node.id == node_id
-                    result = node
-                    return false  # stop iterating
-                else
-                    return true
-        )
-
-        return result
 
     getNodeByName: (name) ->
         result = null
@@ -373,6 +365,7 @@ class Node
             return null
         else
             new_parent = new Node(node_info)
+            new_parent._setParent(@tree)
             original_parent = @parent
 
             for child in original_parent.children
@@ -398,7 +391,25 @@ class Node
         return node
 
 
-@Tree.Tree = Node
+class Tree extends Node
+    constructor: (o) ->
+        super(o, null, true)
+
+        @id_mapping = {}
+        @tree = this
+
+    getNodeById: (node_id) ->
+        return @id_mapping[node_id]
+
+    addNodeToIndex: (node) ->
+        if node.id
+            @id_mapping[node.id] = node
+
+    removeNodeFromIndex: (node) ->
+        if node.id
+            delete @id_mapping[node.id]
+
+@Tree.Tree = Tree
 
 
 class JqTreeWidget extends MouseWidget
@@ -458,7 +469,8 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data)
         else
-            subtree = new Node()
+            subtree = new Node('')
+            subtree._setParent(parent_node.tree)
             subtree.loadFromData(data)
 
             for child in subtree.children
@@ -574,7 +586,7 @@ class JqTreeWidget extends MouseWidget
                 )
 
     _initTree: (data) ->
-        @tree = new Node()
+        @tree = new Tree()
         @tree.loadFromData(data)
 
         @selected_node = null
