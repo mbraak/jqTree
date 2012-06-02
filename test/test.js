@@ -442,6 +442,30 @@ test('getNodeById', function() {
 
     // 2. get id that does not exist
     equal($tree.tree('getNodeById', 333), null);
+
+    // 3. get id by string
+    equal(
+        $tree.tree('getNodeById', '124').name,
+        'node2'
+    );
+
+    // 4. add node with string id; search by int
+    $tree.tree(
+        'appendNode',
+        {
+            label: 'abc',
+            id: '234'
+        }
+    );
+
+    equal(
+        $tree.tree('getNodeById', 234).name,
+        'abc'
+    );
+    equal(
+        $tree.tree('getNodeById', '234').name,
+        'abc'
+    );
 });
 
 test('autoOpen', function() {
