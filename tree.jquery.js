@@ -135,16 +135,16 @@ limitations under the License.
     MouseWidget.is_mouse_handled = false;
 
     MouseWidget.prototype._init = function() {
-      this.$el.bind('mousewidget.mousedown', $.proxy(this._mouseDown, this));
+      this.$el.bind('mousedown.mousewidget', $.proxy(this._mouseDown, this));
       return this.is_mouse_started = false;
     };
 
     MouseWidget.prototype._deinit = function() {
       var $document;
-      this.$el.unbind('mousewidget.mousedown');
+      this.$el.unbind('mousedown.mousewidget');
       $document = $(document);
-      $document.unbind('mousewidget.mousemove');
-      return $document.unbind('mousewidget.mouseup');
+      $document.unbind('mousemove.mousewidget');
+      return $document.unbind('mouseup.mousewidget');
     };
 
     MouseWidget.prototype._mouseDown = function(e) {
@@ -163,8 +163,8 @@ limitations under the License.
       }
       this.mouse_down_event = e;
       $document = $(document);
-      $document.bind('mousewidget.mousemove', $.proxy(this._mouseMove, this));
-      $document.bind('mousewidget.mouseup', $.proxy(this._mouseUp, this));
+      $document.bind('mousemove.mousewidget', $.proxy(this._mouseMove, this));
+      $document.bind('mouseup.mousewidget', $.proxy(this._mouseUp, this));
       e.preventDefault();
       this.is_mouse_handled = true;
       return true;
@@ -187,8 +187,8 @@ limitations under the License.
     MouseWidget.prototype._mouseUp = function(e) {
       var $document;
       $document = $(document);
-      $document.unbind('mousewidget.mousemove');
-      $document.unbind('mousewidget.mouseup');
+      $document.unbind('mousemove.mousewidget');
+      $document.unbind('mouseup.mousewidget');
       if (this.is_mouse_started) {
         this.is_mouse_started = false;
         this._mouseStop(e);
