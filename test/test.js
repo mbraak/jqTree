@@ -346,21 +346,26 @@ test('loadData', function() {
     ok($child3.prev().is('a.toggler'));
 });
 
-test('openNode', function() {
+test('openNode and closeNode', function() {
     // setup
     var $tree = $('#tree1');
     $tree.tree({
         data: example_data
     });
 
-    var node2 = $tree.tree('getTree').children[1];
+    var node2 = $tree.tree('getNodeByName', 'node2');
+    equal(node2.name, 'node2');
     equal(node2.is_open, undefined);
 
-    // 1. open node
-    equal(node2.name, 'node2');
-    $tree.tree('openNode', node2, null, true);
-
+    // 1. open node2
+    $tree.tree('openNode', node2, true);
     equal(node2.is_open, true);
+    equal(isNodeOpen($(node2.element)), true);
+
+    // 2. close node2
+    $tree.tree('closeNode', node2, true);
+    equal(node2.is_open, false);
+    equal(isNodeClosed($(node2.element)), true);
 });
 
 test('selectNode', function() {
