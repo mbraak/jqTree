@@ -1181,7 +1181,7 @@ limitations under the License.
       if (this.options.onIsMoveHandle && !this.options.onIsMoveHandle($element)) {
         return null;
       }
-      node_element = this._getNodeElement($(event.target));
+      node_element = this._getNodeElement($element);
       if (node_element && this.options.onCanMove) {
         if (!this.options.onCanMove(node_element.node)) {
           node_element = null;

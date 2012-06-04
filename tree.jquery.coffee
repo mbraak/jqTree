@@ -835,7 +835,7 @@ class JqTreeWidget extends MouseWidget
         if @options.onIsMoveHandle and not @options.onIsMoveHandle($element)
             return null
 
-        node_element = @_getNodeElement($(event.target))
+        node_element = @_getNodeElement($element)
 
         if node_element and @options.onCanMove
             if not @options.onCanMove(node_element.node)
