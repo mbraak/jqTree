@@ -708,14 +708,13 @@ $('#tree1').bind(
 
     <h5 id="event-tree-contextmenu">tree.contextmenu</h5>
     <p>
-        Triggered when the user right-clicks a tree node.
+        Triggered when the user right-clicks a tree node. The event contains the following properties:
     </p>
+    <ul>
+        <li><strong>node</strong>: the node that is clicked on</li>
+        <li><strong>click_event</strong>: the original click event</li>
+    </ul>
 <pre>
-// create tree
-$('#tree1').tree({
-    data: data
-});
-
 // bind 'tree.contextmenu' event
 $('#tree1').bind(
     'tree.contextmenu',
