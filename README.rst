@@ -16,7 +16,7 @@ Features
 
 The project is hosted on github (https://github.com/mbraak/jqTree), has a test suite (test/test.html) and a demo (demo.html).
 
-See also index.html for the full documentation.
+See index.html for the full documentation. The documentation is also on http://mbraak.github.com/jqTree/
 
 Thanks
 ------

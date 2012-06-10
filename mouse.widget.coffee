@@ -6,16 +6,16 @@ class MouseWidget extends SimpleWidget
     @is_mouse_handled = false
 
     _init: ->
-        @$el.bind('mousedown', $.proxy(this._mouseDown, this))
+        @$el.bind('mousedown.mousewidget', $.proxy(@_mouseDown, this))
 
         @is_mouse_started = false
 
     _deinit: ->
-        @$el.unbind('mousedown')
+        @$el.unbind('mousedown.mousewidget')
 
         $document = $(document)
-        $document.unbind('mousemove')
-        $document.unbind('mouseup')
+        $document.unbind('mousemove.mousewidget')
+        $document.unbind('mouseup.mousewidget')
 
     _mouseDown: (e) ->
         # Don't let more than one widget handle mouseStart
@@ -36,8 +36,8 @@ class MouseWidget extends SimpleWidget
         @mouse_down_event = e
 
         $document = $(document)
-        $document.bind('mousemove', $.proxy(this._mouseMove, this))
-        $document.bind('mouseup', $.proxy(this._mouseUp, this))
+        $document.bind('mousemove.mousewidget', $.proxy(@_mouseMove, this))
+        $document.bind('mouseup.mousewidget', $.proxy(@_mouseUp, this))
 
         e.preventDefault();
         @is_mouse_handled = true
@@ -59,8 +59,8 @@ class MouseWidget extends SimpleWidget
 
     _mouseUp: (e) ->
         $document = $(document)
-        $document.unbind('mousemove')
-        $document.unbind('mouseup')
+        $document.unbind('mousemove.mousewidget')
+        $document.unbind('mouseup.mousewidget')
 
         if @is_mouse_started
             @is_mouse_started = false
