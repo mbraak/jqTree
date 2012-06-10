@@ -6,7 +6,7 @@ class MouseWidget extends SimpleWidget
     @is_mouse_handled = false
 
     _init: ->
-        @$el.bind('mousedown.mousewidget', $.proxy(this._mouseDown, this))
+        @$el.bind('mousedown.mousewidget', $.proxy(@_mouseDown, this))
 
         @is_mouse_started = false
 
@@ -36,8 +36,8 @@ class MouseWidget extends SimpleWidget
         @mouse_down_event = e
 
         $document = $(document)
-        $document.bind('mousemove.mousewidget', $.proxy(this._mouseMove, this))
-        $document.bind('mouseup.mousewidget', $.proxy(this._mouseUp, this))
+        $document.bind('mousemove.mousewidget', $.proxy(@_mouseMove, this))
+        $document.bind('mouseup.mousewidget', $.proxy(@_mouseUp, this))
 
         e.preventDefault();
         @is_mouse_handled = true
