@@ -31,7 +31,7 @@ indexOf = (array, item) ->
 
 @Tree.indexOf = indexOf
 
-# toJson function; copied from jsons2
+# toJson function; copied from json2
 Json = {}
 Json.escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
 Json.meta = {
@@ -123,34 +123,34 @@ Position.NONE = 4
 @Tree.Position = Position
 
 class Node
-    constructor: (name) ->
-        @init(name)
+    constructor: (o) ->
+        @setData(o)
 
-    init: (name) ->
-        @name = name
+    setData: (o) ->
+        if typeof o != 'object'
+            @name = o
+        else
+            for key, value of o
+                if key == 'label'
+                    # todo: node property is 'name', but we use 'label' here
+                    @name = value
+                else
+                    @[key] = value
+
         @children = []
         @parent = null
 
     # Init Node from data without making it the root of the tree
     initFromData: (data) ->
         addNode = (node_data) =>
-            if typeof node_data != 'object'
-                @['name'] = node_data
-            else
-                $.each(node_data, (key, value) =>
-                    if key == 'children'
-                        addChildren(value)
-                    else if key == 'label'
-                        @['name'] = value
-                    else
-                        @[key] = value
+            @setData(node_data)
 
-                    return true
-                )
+            if node_data.children
+                addChildren(node_data.children)
 
         addChildren = (children_data) =>
             for child in children_data
-                node = new Node()
+                node = new Node('')
                 node.initFromData(child)
                 @addChild(node)
             return null
@@ -179,23 +179,11 @@ class Node
         @children = []
 
         for o in data
-            if typeof o != 'object'
-                node = new Node(o)
-                @addChild(node)
-            else
-                # todo: node property is 'name', but we use 'label' here
-                node = new Node(o.label)
+            node = new Node(o)
+            @addChild(node)
 
-                $.each(o, (key, value) =>
-                    if key != 'label'
-                        node[key] = value
-                    return true
-                )
-
-                @addChild(node)
-
-                if o.children
-                    node.loadFromData(o.children)
+            if typeof o == 'object' and o.children
+                node.loadFromData(o.children)
 
         return null
 
@@ -208,7 +196,7 @@ class Node
     ###
     addChild: (node) ->
         @children.push(node)
-        node.parent = this
+        node._setParent(this)
 
     ###
     Add child at position. Index starts at 0.
@@ -220,18 +208,24 @@ class Node
     ###
     addChildAtPosition: (node, index) ->
         @children.splice(index, 0, node)
-        node.parent = this
+        node._setParent(this)
+
+    _setParent: (parent) ->
+        @parent = parent
+        @tree = parent.tree
+        @tree.addNodeToIndex(this)
 
     ###
     Remove child.
 
-    tree.removeChile(tree.children[0]);
+    tree.removeChild(tree.children[0]);
     ###
     removeChild: (node) ->
         @children.splice(
             @getChildIndex(node),
             1
         )
+        @tree.removeNodeFromIndex(node)
 
     ###
     Get child index.
@@ -270,12 +264,13 @@ class Node
     ###
     iterate: (callback) ->
         _iterate = (node, level) =>
-            for child in node.children
-                result = callback(child, level)
+            if node.children
+                for child in node.children
+                    result = callback(child, level)
 
-                if @hasChildren() and result
-                    _iterate(child, level + 1)
-            return null
+                    if @hasChildren() and result
+                        _iterate(child, level + 1)
+                return null
 
         _iterate(this, 0)
         return null
@@ -317,7 +312,7 @@ class Node
 
                 for k, v of node
                     if (
-                        k not in ['parent', 'children', 'element'] and
+                        k not in ['parent', 'children', 'element', 'tree'] and
                         Object.prototype.hasOwnProperty.call(node, k)
                     )
                         tmp_node[k] = v
@@ -331,7 +326,89 @@ class Node
 
         return getDataFromNodes(@children)
 
-@Tree.Tree = Node
+    getNodeByName: (name) ->
+        result = null
+
+        @iterate(
+            (node) ->
+                if node.name == name
+                    result = node
+                    return false
+                else
+                    return true
+        )
+
+        return result
+
+    addAfter: (node_info) ->
+        if not @parent
+            return null
+        else
+            node = new Node(node_info)
+
+            child_index = @parent.getChildIndex(this)
+            @parent.addChildAtPosition(node, child_index + 1)
+            return node
+
+    addBefore: (node_info) ->
+        if not @parent
+            return null
+        else
+            node = new Node(node_info)
+
+            child_index = @parent.getChildIndex(this)
+            @parent.addChildAtPosition(node, child_index)
+
+    addParent: (node_info) ->
+        if not @parent
+            return null
+        else
+            new_parent = new Node(node_info)
+            new_parent._setParent(@tree)
+            original_parent = @parent
+
+            for child in original_parent.children
+                new_parent.addChild(child)
+
+            original_parent.children = []
+            original_parent.addChild(new_parent)
+            return new_parent
+
+    remove: ->
+        if @parent
+            @parent.removeChild(this)
+            @parent = null
+
+    append: (node_info) ->
+        node = new Node(node_info)
+        @addChild(node)
+        return node
+
+    prepend: (node_info) ->
+        node = new Node(node_info)
+        @addChildAtPosition(node, 0)
+        return node
+
+
+class Tree extends Node
+    constructor: (o) ->
+        super(o, null, true)
+
+        @id_mapping = {}
+        @tree = this
+
+    getNodeById: (node_id) ->
+        return @id_mapping[node_id]
+
+    addNodeToIndex: (node) ->
+        if node.id
+            @id_mapping[node.id] = node
+
+    removeNodeFromIndex: (node) ->
+        if node.id
+            delete @id_mapping[node.id]
+
+@Tree.Tree = Tree
 
 
 class JqTreeWidget extends MouseWidget
@@ -363,17 +440,18 @@ class JqTreeWidget extends MouseWidget
             if @selected_node
                 @_getNodeElementForNode(@selected_node).deselect()
 
-            @_getNodeElementForNode(node).select()
-            @selected_node = node
+            if node
+                @_getNodeElementForNode(node).select()
+                @selected_node = node
 
-            if must_open_parents
-                parent = @selected_node.parent
+                if must_open_parents
+                    parent = @selected_node.parent
 
-                while parent
-                    if not parent.is_open
-                        this.openNode(parent, true)
+                    while parent
+                        if not parent.is_open
+                            this.openNode(parent, true)
 
-                    parent = parent.parent
+                        parent = parent.parent
 
             if @options.saveState
                 @_saveState()
@@ -390,37 +468,23 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data)
         else
-            subtree = new Node()
+            subtree = new Node('')
+            subtree._setParent(parent_node.tree)
             subtree.loadFromData(data)
 
             for child in subtree.children
                 parent_node.addChild(child)
 
-            $element = $(parent_node.element)
-            $element.children('ul').detach()
-            @_createDomElements(parent_node, $element)
-
-            $div = $element.children('div')
-
-            if not $div.find('.toggler').length
-                $div.prepend('<a class="toggler">&raquo;</a>')
+            @_refreshElements(parent_node.parent)
 
         if @is_dragging
             @_refreshHitAreas()
 
     getNodeById: (node_id) ->
-        result = null
+        return @tree.getNodeById(node_id)
 
-        @tree.iterate(
-            (node) ->
-                if node.id == node_id
-                    result = node
-                    return false  # stop iterating
-                else
-                    return true
-        )
-
-        return result
+    getNodeByName: (name) ->
+        return @tree.getNodeByName(name)
 
     openNode: (node, skip_slide) ->
         if node.hasChildren()
@@ -442,11 +506,50 @@ class JqTreeWidget extends MouseWidget
     refreshHitAreas: ->
         @_refreshHitAreas()
 
+    addNodeAfter: (new_node_info, existing_node) ->
+        new_node = existing_node.addAfter(new_node_info)
+        @_refreshElements(existing_node.parent)
+        return new_node
+
+    addNodeBefore: (new_node_info, existing_node) ->
+        new_node = existing_node.addBefore(new_node_info)
+        @_refreshElements(existing_node.parent)
+        return new_node
+
+    addParentNode: (new_node_info, existing_node) ->
+        new_node = existing_node.addParent(new_node_info)
+        @_refreshElements(new_node.parent)  
+        return new_node    
+
+    removeNode: (node) ->
+        parent = node.parent
+        if parent
+            node.remove()
+            @_refreshElements(parent)
+
+    appendNode: (new_node_info, parent_node) ->
+        if not parent_node
+            parent_node = @tree
+
+        node = parent_node.append(new_node_info)
+
+        @_refreshElements(parent_node)
+        return node
+ 
+    prependNode: (new_node_info, parent_node) ->
+        if not parent_node
+            parent_node = @tree
+
+        node = parent_node.prepend(new_node_info)
+
+        @_refreshElements(parent_node)
+        return node
+
     _init: ->
         super
 
         @element = @$el
-        @_initTree(@options.data)
+        @_initData()
 
         @element.click($.proxy(@_click, this))
         @element.bind('contextmenu', $.proxy(@_contextmenu, this))
@@ -463,14 +566,32 @@ class JqTreeWidget extends MouseWidget
 
         super
 
+    _initData: ->
+        if @options.data
+            @_initTree(@options.data)
+        else
+            data_url = @options.dataUrl or @element.data('url')
+            if data_url
+                $.ajax(
+                    url: data_url
+                    cache: false
+                    success: (response) =>
+                        if $.isArray(response) or typeof response == 'object'
+                            data = response
+                        else
+                            data = $.parseJSON(response)
+
+                        @_initTree(data)
+                )
+
     _initTree: (data) ->
-        @tree = new Node()
+        @tree = new Tree()
         @tree.loadFromData(data)
 
         @selected_node = null
         @_openNodes()
 
-        @_createDomElements(@tree)
+        @_refreshElements()
 
         if @selected_node
             node_element = @_getNodeElementForNode(@selected_node)
@@ -494,7 +615,7 @@ class JqTreeWidget extends MouseWidget
             return (level != max_level)
         )
 
-    _createDomElements: (tree, $element) ->
+    _refreshElements: (from_node=null) ->
         createUl = (depth, is_open) =>
             if depth
                 class_string = ''
@@ -556,14 +677,18 @@ class JqTreeWidget extends MouseWidget
                     doCreateDomElements($li, child.children, depth + 1, child.is_open)
             return null
 
-        if $element
+        if from_node and from_node.parent
             depth = 1
+            node_element = @_getNodeElementForNode(from_node)
+            node_element.getUl().remove()
+            $element = node_element.$element
         else
+            from_node = @tree
             $element = @element
             $element.empty()
             depth = 0
 
-        doCreateDomElements($element, tree.children, depth, true)
+        doCreateDomElements($element, from_node.children, depth, true)
 
     _click: (e) ->
         if e.ctrlKey
@@ -720,7 +845,7 @@ class JqTreeWidget extends MouseWidget
         if @options.onIsMoveHandle and not @options.onIsMoveHandle($element)
             return null
 
-        node_element = @_getNodeElement($(event.target))
+        node_element = @_getNodeElement($element)
 
         if node_element and @options.onCanMove
             if not @options.onCanMove(node_element.node)
@@ -1050,7 +1175,7 @@ class JqTreeWidget extends MouseWidget
             doMove = =>
               @tree.moveNode(moved_node, target_node, position)
               @element.empty()
-              @_createDomElements(@tree)
+              @_refreshElements()
 
             event = $.Event('tree.move')
             event.move_info =

@@ -30,14 +30,14 @@ var example_data2 = [
     }
 ];
 
-var format_nodes = function(nodes) {
+function formatNodes(nodes) {
     var strings = $.map(nodes, function(node) {
         return node.name;
     });
     return strings.join(' ');
 };
 
-var isNodeClosed = function($node) {
+function isNodeClosed($node) {
     return (
         ($node.is('li.folder.closed')) &&
         ($node.find('a:eq(0)').is('a.toggler.closed')) &&
@@ -45,7 +45,7 @@ var isNodeClosed = function($node) {
     );
 }
 
-var isNodeOpen = function($node) {
+function isNodeOpen($node) {
     return (
         ($node.is('li.folder')) &&
         ($node.find('a:eq(0)').is('a.toggler')) &&
@@ -54,6 +54,16 @@ var isNodeOpen = function($node) {
         (! $node.find('span:eq(0)').is('a.toggler.closed'))
     );
 }
+
+function formatTitles($node) {
+    var titles = $node.find('.title').map(
+        function(i, el) {
+            return $(el).text();
+        }
+    );
+    return titles.toArray().join(' ');
+}
+
 
 module("jqtree", {
     setup: function() {
@@ -336,21 +346,26 @@ test('loadData', function() {
     ok($child3.prev().is('a.toggler'));
 });
 
-test('openNode', function() {
+test('openNode and closeNode', function() {
     // setup
     var $tree = $('#tree1');
     $tree.tree({
         data: example_data
     });
 
-    var node2 = $tree.tree('getTree').children[1];
+    var node2 = $tree.tree('getNodeByName', 'node2');
+    equal(node2.name, 'node2');
     equal(node2.is_open, undefined);
 
-    // 1. open node
-    equal(node2.name, 'node2');
-    $tree.tree('openNode', node2, null, true);
-
+    // 1. open node2
+    $tree.tree('openNode', node2, true);
     equal(node2.is_open, true);
+    equal(isNodeOpen($(node2.element)), true);
+
+    // 2. close node2
+    $tree.tree('closeNode', node2, true);
+    equal(node2.is_open, false);
+    equal(isNodeClosed($(node2.element)), true);
 });
 
 test('selectNode', function() {
@@ -423,6 +438,7 @@ test('getNodeById', function() {
     $tree.tree({
         data: example_data
     });
+    var node2 = $tree.tree('getNodeByName', 'node2');
 
     // 1. get 'node2' by id
     equal(
@@ -432,6 +448,52 @@ test('getNodeById', function() {
 
     // 2. get id that does not exist
     equal($tree.tree('getNodeById', 333), null);
+
+    // 3. get id by string
+    equal(
+        $tree.tree('getNodeById', '124').name,
+        'node2'
+    );
+
+    // 4. add node with string id; search by int
+    $tree.tree(
+        'appendNode',
+        {
+            label: 'abc',
+            id: '234'
+        }
+    );
+
+    equal(
+        $tree.tree('getNodeById', 234).name,
+        'abc'
+    );
+    equal(
+        $tree.tree('getNodeById', '234').name,
+        'abc'
+    );
+
+    // 5. load subtree in node2
+    var subtree_data = [
+        {
+            label: 'sub1',
+            id: 200,
+            children: [
+                {label: 'sub2', id: 201}
+            ]
+        }
+    ];
+    $tree.tree('loadData',  subtree_data, node2);
+    var t = $tree.tree('getTree');
+
+    equal(
+        $tree.tree('getNodeById', 200).name,
+        'sub1'
+    );
+    equal(
+        $tree.tree('getNodeById', 201).name,
+        'sub2'
+    );
 });
 
 test('autoOpen', function() {
@@ -589,21 +651,106 @@ test('generate hit areas', function() {
     equal(strings.join(';'), 'node1 none;node2 inside;node2 after');
 });
 
+test('removeNode', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var child1 = $tree.tree('getNodeByName', 'child1');
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    equal(
+        formatTitles($(node1.element)),
+        'node1 child1 child2'
+    );
+
+    // 1. Remove child1
+    $tree.tree('removeNode', child1);
+
+    equal(
+        formatTitles($(node1.element)),
+        'node1 child2'
+    );
+});
+
+test('appendNode', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // 1. Add child3 to node1
+    $tree.tree('appendNode', 'child3', node1);
+
+    equal(
+        formatTitles($(node1.element)),
+        'node1 child1 child2 child3'
+    );
+});
+
+test('prependNode', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // 1. Prepend child0 to node1
+    $tree.tree('prependNode', 'child0', node1);
+
+    equal(
+        formatTitles($(node1.element)),
+        'node1 child0 child1 child2'
+    );
+});
+
 module("Tree");
+test('constructor', function() {
+    // 1. Create node from string
+    var node = new Tree.Node('n1');
+
+    equal(node.name, 'n1');
+    equal(node.children.length, 0);
+    equal(node.parent, null);
+
+    // 2. Create node from object
+    node = new Tree.Node({
+        label: 'n2',
+        id: 123,
+        parent: 'abc',  // parent must be ignored
+        children: ['c'], // children must be ignored
+        url: '/'
+    });
+
+    equal(node.name, 'n2');
+    equal(node.id, 123);
+    equal(node.url, '/');
+    equal(node.label, undefined);
+    equal(node.children.length, 0);
+    equal(node.parent, null);
+}); 
+
 test("create tree from data", function() {
     function checkData(tree) {
         equal(
-            format_nodes(tree.children),
+            formatNodes(tree.children),
             'node1 node2',
             'nodes on level 1'
         );
         equal(
-            format_nodes(tree.children[0].children),
+            formatNodes(tree.children[0].children),
             'child1 child2',
             'children of node1'
         );
         equal(
-            format_nodes(tree.children[1].children),
+            formatNodes(tree.children[1].children),
             'child3',
             'children of node2'
         );
@@ -647,7 +794,7 @@ test("addChild", function() {
     );
 
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'abc def',
         'children'
     );
@@ -668,7 +815,7 @@ test('addChildAtPosition', function() {
     tree.addChildAtPosition(new Tree.Node('123'), 0);
 
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         '123 abc def ghi',
         'children'
     );
@@ -685,7 +832,7 @@ test('removeChild', function() {
     tree.addChild(ghi);
 
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'abc def ghi',
         'children'
     );
@@ -693,7 +840,7 @@ test('removeChild', function() {
     // remove 'def'
     tree.removeChild(def);
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'abc ghi',
         'children'
     );
@@ -701,7 +848,7 @@ test('removeChild', function() {
     // remove 'ghi'
     tree.removeChild(ghi);
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'abc',
         'children'
     );
@@ -709,13 +856,14 @@ test('removeChild', function() {
     // remove 'abc'
     tree.removeChild(abc);
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         '',
         'children'
     );
 });
 
 test('getChildIndex', function() {
+    // setup
     var tree = new Tree.Tree();
 
     var abc = new Tree.Node('abc');
@@ -725,11 +873,11 @@ test('getChildIndex', function() {
     tree.addChild(def);
     tree.addChild(ghi);
 
-    equal(
-        tree.getChildIndex(def),
-        1,
-        'indef of def'
-    );
+    // 1. Get child index of 'def'
+    equal(tree.getChildIndex(def), 1);
+
+    // 2. Get child index of non-existing node
+    equal(tree.getChildIndex(new Tree.Node('xyz')), -1);
 });
 
 test('hasChildren', function() {
@@ -762,7 +910,7 @@ test('iterate', function() {
     );
 
     equal(
-        format_nodes(nodes),
+        formatNodes(nodes),
         'node1 child1 child2 node2 child3',
         'all nodes'
     );
@@ -777,9 +925,29 @@ test('iterate', function() {
     );
 
     equal(
-        format_nodes(nodes),
+        formatNodes(nodes),
         'node1 node2',
         'nodes on first level'
+    );
+
+    // add child 4
+    var node3 = tree.getNodeById(124).children[0];
+    node3.addChild(
+        new Tree.Node('child4')
+    );
+
+    // test level parameter
+    nodes = [];
+    tree.iterate(
+        function(node, level) {
+            nodes.push(node.name + ' ' + level);
+            return true;
+        }
+    );
+
+    equal(
+        nodes.join(','),
+        'node1 0,child1 1,child2 1,node2 0,child3 1,child4 2'
     );
 });
 
@@ -813,12 +981,12 @@ test('moveNode', function() {
       child2
     */
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'node1 node2 child2',
         'tree nodes at first level'
     );
     equal(
-        format_nodes(node1.children),
+        formatNodes(node1.children),
         'child1',
         'node1 children'
     );
@@ -835,12 +1003,12 @@ test('moveNode', function() {
       child2
     */
     equal(
-        format_nodes(node2.children),
+        formatNodes(node2.children),
         'child1 child3',
         'node2 children'
     );
     equal(
-        format_nodes(node1.children),
+        formatNodes(node1.children),
         '',
         'node1 has no children'
     );
@@ -856,12 +1024,12 @@ test('moveNode', function() {
       ---child3
     */
     equal(
-        format_nodes(node2.children),
+        formatNodes(node2.children),
         'child2 child1 child3',
         'node2 children'
     );
     equal(
-        format_nodes(tree.children),
+        formatNodes(tree.children),
         'node1 node2',
         'tree nodes at first level'
     );
@@ -879,12 +1047,12 @@ test('initFromData', function() {
                 }
             ]
         };
-    var node = new Tree.Node();
+    var node = new Tree.Tree();
     node.initFromData(data);
 
     equal(node.name, 'main')
     equal(
-        format_nodes(node.children),
+        formatNodes(node.children),
         'c1 c2',
         'children'
     );
@@ -893,7 +1061,7 @@ test('initFromData', function() {
 
 test('getData', function() {
     // 1. empty node
-    var node = new Tree.Node();
+    var node = new Tree.Tree();
     deepEqual(node.getData(), []);
 
     // 2.node with data
@@ -922,6 +1090,142 @@ test('getData', function() {
             }
         ]
     );
+});
+
+test('addAfter', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    /*
+    -node1
+    ---c1
+    ---c2
+    -node2
+    ---c3
+    */
+
+    equal(formatNodes(tree.children), 'node1 node2');
+
+    // 1. Add 'node_b' after node2
+    var node2 = tree.getNodeByName('node2');
+    node2.addAfter('node_b');
+
+    equal(formatNodes(tree.children), 'node1 node2 node_b');
+
+    var node_b = tree.getNodeByName('node_b');
+    equal(node_b.name, 'node_b');
+
+    // 2. Add 'node_a' after node1
+    var node1 = tree.getNodeByName('node1');
+    node1.addAfter('node_a');
+
+    equal(formatNodes(tree.children), 'node1 node_a node2 node_b');
+
+    // 3. Add 'node_c' after node_b; new node is an object
+    node_b.addAfter({
+        label: 'node_c',
+        id: 789
+    });
+
+    var node_c = tree.getNodeByName('node_c');
+    equal(node_c.id, 789);
+
+    equal(formatNodes(tree.children), 'node1 node_a node2 node_b node_c');
+});
+
+test('addBefore', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    // 1. Add 'node_0' before node1
+    var node1 = tree.getNodeByName('node1');
+    node1.addBefore('node0');
+    equal(formatNodes(tree.children), 'node0 node1 node2');
+});
+
+test('addParent', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    // 1. Add node 'root' as parent of node1
+    // Note that node also becomes a child of 'root'
+    var node1 = tree.getNodeByName('node1');
+    node1.addParent('root');
+
+    var root = tree.getNodeByName('root');
+    equal(formatNodes(root.children), 'node1 node2');
+});
+
+test('remove', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    var child1 = tree.getNodeByName('child1');
+    var node1 = tree.getNodeByName('node1');
+
+    equal(formatNodes(node1.children), 'child1 child2');
+    equal(child1.parent, node1);
+
+    // 1. Remove child1
+    child1.remove();
+
+    equal(formatNodes(node1.children), 'child2');
+    equal(child1.parent, null);
+});
+
+test('append', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    var node1 = tree.getNodeByName('node1');
+
+    // 1. Add child3 to node1
+    node1.append('child3');
+
+    equal(formatNodes(node1.children), 'child1 child2 child3');
+});
+
+test('prepend', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    var node1 = tree.getNodeByName('node1');
+
+    // 1. Prepend child0 to node1
+    node1.prepend('child0');
+
+    equal(formatNodes(node1.children), 'child0 child1 child2');
+});
+
+test('getNodeById', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    // 1. Get node with id 124
+    var node = tree.getNodeById(124);
+    equal(node.name, 'node2');
+
+    // 2. Delete node with id 124 and search again
+    node.remove();
+
+    equal(tree.getNodeById(124), null);
+
+    // 3. Add node with id 456 and search for it
+    var child3 = tree.getNodeByName('child2');
+    child3.append({
+        id: 456,
+        label: 'new node'
+    });
+
+    node = tree.getNodeById(456);
+    equal(node.name, 'new node');
 });
 
 module('util');

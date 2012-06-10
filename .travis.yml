@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - 0.6
+before_script:
+  - npm install connect
+  - node phantomjs/server.js &
+  - sleep 5
+script: phantomjs phantomjs/run-qunit.js http://localhost:8000/test/test.html
