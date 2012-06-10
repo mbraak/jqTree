@@ -438,6 +438,7 @@ test('getNodeById', function() {
     $tree.tree({
         data: example_data
     });
+    var node2 = $tree.tree('getNodeByName', 'node2');
 
     // 1. get 'node2' by id
     equal(
@@ -470,6 +471,28 @@ test('getNodeById', function() {
     equal(
         $tree.tree('getNodeById', '234').name,
         'abc'
+    );
+
+    // 5. load subtree in node2
+    var subtree_data = [
+        {
+            label: 'sub1',
+            id: 200,
+            children: [
+                {label: 'sub2', id: 201}
+            ]
+        }
+    ];
+    $tree.tree('loadData',  subtree_data, node2);
+    var t = $tree.tree('getTree');
+
+    equal(
+        $tree.tree('getNodeById', 200).name,
+        'sub1'
+    );
+    equal(
+        $tree.tree('getNodeById', 201).name,
+        'sub2'
     );
 });
 
@@ -1024,7 +1047,7 @@ test('initFromData', function() {
                 }
             ]
         };
-    var node = new Tree.Node();
+    var node = new Tree.Tree();
     node.initFromData(data);
 
     equal(node.name, 'main')
@@ -1038,7 +1061,7 @@ test('initFromData', function() {
 
 test('getData', function() {
     // 1. empty node
-    var node = new Tree.Node();
+    var node = new Tree.Tree();
     deepEqual(node.getData(), []);
 
     // 2.node with data
@@ -1178,6 +1201,31 @@ test('prepend', function() {
     node1.prepend('child0');
 
     equal(formatNodes(node1.children), 'child0 child1 child2');
+});
+
+test('getNodeById', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    // 1. Get node with id 124
+    var node = tree.getNodeById(124);
+    equal(node.name, 'node2');
+
+    // 2. Delete node with id 124 and search again
+    node.remove();
+
+    equal(tree.getNodeById(124), null);
+
+    // 3. Add node with id 456 and search for it
+    var child3 = tree.getNodeByName('child2');
+    child3.append({
+        id: 456,
+        label: 'new node'
+    });
+
+    node = tree.getNodeById(456);
+    equal(node.name, 'new node');
 });
 
 module('util');
