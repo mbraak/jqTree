@@ -29,6 +29,7 @@
                 <li><a href="#requirements">Requirements</a></li>
                 <li><a href="#downloads">Downloads</a></li>
                 <li><a href="#tutorial">Tutorial</a></li>
+                <li><a href="#changelog">Changelog</a></li>
             </ul>
         </li>
         <li>
@@ -199,6 +200,40 @@ $.getJSON(
 </pre>
         </li>
     </ul>
+
+    <h4 id="changelog">Changelog</h4>
+    <h5>0.10</h5>
+    <ul>
+        <li>Optimized getNodeById</li>
+        <li>Issue #18 and #26: Made comparison in getNodeById less strict</li>
+        <li>Added function prependNode</li>
+        <li>Added 'data-url' option</li>
+        <li>Added removeNode function</li>
+        <li>Issue #24: Tree with jquery ui Dialog: expand causes resize and move problem</li>
+        <li>Added Travis ci support</li>
+        <li>Added addNodeAfter, addNodeBefore and addParentNode</li>
+        <li>Renamed icons.png to jqtree-icons.png</li>
+        <li>selectNode with empty node deselects the current node</li>
+    </ul>
+
+    <h5>0.9 (may 9 2012)</h5>
+    <ul>
+        <li>Issue #15: 'tree.open' event is not triggered when dragging nodes</li>
+        <li>Issue #18: Allow moveNode to be canceled through ev.preventDefault()</li>
+        <li>Use sprite for images</li>
+        <li>Added function closeNode</li>
+        <li>Added support for localstorage</li>
+        <li>Implemented alternative data format</li>
+    </ul>
+
+    <h5>0.8 (april 18 2012)</h5>
+    <ul>
+        <li>Replace jquery.ui widget with SimpleWidget</li>
+        <li>Added 'previous_parent' to 'tree.move' event</li>
+        <li>Add posibility to load subtree</li>
+        <li>Added 'tree.open' and 'tree.close' events</li>
+    </ul>
+
     <h4 id="tree-options">Tree options</h4>
     <h5 id="tree-options-data">data</h5>
     <p>
