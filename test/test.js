@@ -433,6 +433,7 @@ test('getNodeById', function() {
     $tree.tree({
         data: example_data
     });
+    var node2 = $tree.tree('getNodeByName', 'node2');
 
     // 1. get 'node2' by id
     equal(
@@ -442,6 +443,28 @@ test('getNodeById', function() {
 
     // 2. get id that does not exist
     equal($tree.tree('getNodeById', 333), null);
+
+    // 3. load subtree in node2
+    var subtree_data = [
+        {
+            label: 'sub1',
+            id: 200,
+            children: [
+                {label: 'sub2', id: 201}
+            ]
+        }
+    ];
+    $tree.tree('loadData',  subtree_data, node2);
+    var t = $tree.tree('getTree');
+
+    equal(
+        $tree.tree('getNodeById', 200).name,
+        'sub1'
+    );
+    equal(
+        $tree.tree('getNodeById', 201).name,
+        'sub2'
+    );
 });
 
 test('autoOpen', function() {

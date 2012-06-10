@@ -350,7 +350,6 @@ class Node
             @parent.addChildAtPosition(node, child_index + 1)
             return node
 
-
     addBefore: (node_info) ->
         if not @parent
             return null
