@@ -6,6 +6,7 @@ ul.tree,
 ul.tree ul {
     list-style: none outside;
     margin-bottom: 0;
+    padding: 0;
 }
 
 ul.tree ul {
