@@ -424,6 +424,7 @@ class JqTreeWidget extends MouseWidget
         onIsMoveHandle: null
         onCanMove: null  # Can this node be moved? function(node)
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
+        autoEscape: true
 
     toggle: (node) ->
         if node.hasChildren()
@@ -616,6 +617,12 @@ class JqTreeWidget extends MouseWidget
         )
 
     _refreshElements: (from_node=null) ->
+        escapeIfNecessary = (value) =>
+            if @options.autoEscape
+                return escape(value)
+            else
+                return value
+
         createUl = (depth, is_open) =>
             if depth
                 class_string = ''
@@ -636,7 +643,8 @@ class JqTreeWidget extends MouseWidget
             return $li
 
         createNodeLi = (node) =>
-            return $("<li><div><span class=\"title\">#{ node.name }</span></div></li>")
+            escaped_name = escapeIfNecessary(node.name)
+            return $("<li><div><span class=\"title\">#{ escaped_name }</span></div></li>")
 
         createFolderLi = (node) =>
             getButtonClass = ->
@@ -658,8 +666,10 @@ class JqTreeWidget extends MouseWidget
             button_class = getButtonClass()
             folder_class = getFolderClass()
 
+            escaped_name = escapeIfNecessary(node.name)
+
             return $(
-                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ node.name }</span></div></li>"
+                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, depth, is_open) ->

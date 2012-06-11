@@ -731,7 +731,8 @@ limitations under the License.
       onCreateLi: null,
       onIsMoveHandle: null,
       onCanMove: null,
-      onCanMoveTo: null
+      onCanMoveTo: null,
+      autoEscape: true
     };
 
     JqTreeWidget.prototype.toggle = function(node) {
@@ -964,11 +965,18 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._refreshElements = function(from_node) {
-      var $element, createFolderLi, createLi, createNodeLi, createUl, depth, doCreateDomElements, node_element,
+      var $element, createFolderLi, createLi, createNodeLi, createUl, depth, doCreateDomElements, escapeIfNecessary, node_element,
         _this = this;
       if (from_node == null) {
         from_node = null;
       }
+      escapeIfNecessary = function(value) {
+        if (_this.options.autoEscape) {
+          return escape(value);
+        } else {
+          return value;
+        }
+      };
       createUl = function(depth, is_open) {
         var class_string;
         if (depth) {
@@ -991,10 +999,12 @@ limitations under the License.
         return $li;
       };
       createNodeLi = function(node) {
-        return $("<li><div><span class=\"title\">" + node.name + "</span></div></li>");
+        var escaped_name;
+        escaped_name = escapeIfNecessary(node.name);
+        return $("<li><div><span class=\"title\">" + escaped_name + "</span></div></li>");
       };
       createFolderLi = function(node) {
-        var button_class, folder_class, getButtonClass, getFolderClass;
+        var button_class, escaped_name, folder_class, getButtonClass, getFolderClass;
         getButtonClass = function() {
           var classes;
           classes = ['toggler'];
@@ -1013,7 +1023,8 @@ limitations under the License.
         };
         button_class = getButtonClass();
         folder_class = getFolderClass();
-        return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"title\">" + node.name + "</span></div></li>");
+        escaped_name = escapeIfNecessary(node.name);
+        return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"title\">" + escaped_name + "</span></div></li>");
       };
       doCreateDomElements = function($element, children, depth, is_open) {
         var $li, $ul, child, _i, _len;
