@@ -36,6 +36,7 @@
             <a href="#tree-options">Tree options</a>
             <ul>
                 <li><a href="#tree-options-data">data</a></li>
+                <li><a href="#tree-options-data-url">dataUrl</a></li>
                 <li><a href="#tree-options-autoopen">autoOpen</a></li>
                 <li><a href="#tree-options-savestate">saveState</a></li>
                 <li><a href="#tree-options-draganddrop">dragAndDrop</a></li>
@@ -243,6 +244,7 @@ $.getJSON(
     </ul>
 
     <h4 id="tree-options">Tree options</h4>
+
     <h5 id="tree-options-data">data</h5>
     <p>
         Define the contents of the tree. The data is a nested array of objects. This option is required.
@@ -282,6 +284,29 @@ $('#tree1').tree({data: data});
     id: 1
 }
 </pre>
+
+    <h5 id="tree-options-data-url">dataUrl</h5>
+    <p>
+        Load the node data from this url.
+    </p>
+
+<pre>
+$('#tree1').tree({
+   dataUrl: '/example_data.json' 
+});
+</pre>
+
+    <p>
+        You can also set the <strong>data-url</strong> attribute on the dom element:
+    </p>
+
+<pre>
+&lt;div id="tree1" data-url="/example_data.json"&gt;&lt;/div&gt;
+&lt;script&gt;
+    $('#tree1').tree();
+&lt;/script&gt;
+</pre>
+
     <h5 id="tree-options-autoopen">autoOpen</h5>
     <p>
         Open nodes initially.
