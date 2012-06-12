@@ -425,6 +425,7 @@ class JqTreeWidget extends MouseWidget
         onCanMove: null  # Can this node be moved? function(node)
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
         autoEscape: true
+        dataUrl: null
 
     toggle: (node) ->
         if node.hasChildren()

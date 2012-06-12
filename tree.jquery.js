@@ -732,7 +732,8 @@ limitations under the License.
       onIsMoveHandle: null,
       onCanMove: null,
       onCanMoveTo: null,
-      autoEscape: true
+      autoEscape: true,
+      dataUrl: null
     };
 
     JqTreeWidget.prototype.toggle = function(node) {
