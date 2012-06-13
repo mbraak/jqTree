@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Example 1</title>
+    <link rel="stylesheet" href="../extra/css/gridless.css">
+    <link rel="stylesheet" href="example.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shCore.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeDefault.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeRDark.css">
+    <link rel="stylesheet" href="../jqtree.css">
+    <script src="../extra/js/jquery-1.7.2.min.js"></script>
+    <script src="../tree.jquery.js"></script>
+    <script src="../extra/syntax_highlighter/XRegExp.js"></script>
+    <script src="../extra/syntax_highlighter/shCore.js"></script>
+    <script src="../extra/syntax_highlighter/shBrushJScript.js"></script>
+    <script src="example.js"></script>
+</head>
+<body>
+    <p id="nav">
+        <a href="../index.html">Documentation</a>
+        <a href="example2.html" class="next">Example 2</a>
+    </p>
+
+    <h1>Example 1 - the data option</h1>
+
+    <div id="tree1"></div>
+
+    <p>
+        In this example we load the data using the <strong>data</strong> option.
+        As you can see, the data is an array of objects.
+    </p>
+    <ul>
+        <li>The <strong>label</strong> property defines the label of the node.</li>
+        <li>The <strong>children</strong> property is an array of nodes.
+    </ul>
+
+    <h3>html<h3>
+
+<pre>
+&lt;div id="tree1"&gt;&lt;/div&gt;
+</pre>
+
+    <h3>javascript</h3>
+
+<pre>
+var data = [
+    {
+        label: 'node1',
+        children: [
+            { label: 'child1' },
+            { label: 'child2' }
+        ]
+    },
+    {
+        label: 'node2',
+        children: [
+            { label: 'child3' }
+        ]
+    }
+];
+
+$('#tree1').tree({
+    data: data
+});
+</pre>
+
+    <script>
+        $(function() {
+            var data = [
+                {
+                    label: 'node1',
+                    children: [
+                        { label: 'child1' },
+                        { label: 'child2' }
+                    ]
+                },
+                {
+                    label: 'node2',
+                    children: [
+                        { label: 'child3' }
+                    ]
+                }
+            ];
+
+            $('#tree1').tree({
+                data: data
+            });
+        });
+    </script>
+</body>
+</html>

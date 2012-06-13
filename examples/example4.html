@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Example 4</title>
+    <link rel="stylesheet" href="../extra/css/gridless.css">
+    <link rel="stylesheet" href="example.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shCore.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeDefault.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeRDark.css">
+    <link rel="stylesheet" href="../jqtree.css">
+    <script src="../extra/js/jquery-1.7.2.min.js"></script>
+    <script src="../tree.jquery.js"></script>
+    <script src="../extra/syntax_highlighter/XRegExp.js"></script>
+    <script src="../extra/syntax_highlighter/shCore.js"></script>
+    <script src="../extra/syntax_highlighter/shBrushJScript.js"></script>
+    <script src="example.js"></script>
+</head>
+<body>
+    <p id="nav">
+        <a href="example3.html">Example 3</a>
+    </p>
+
+    <h1>Example 4 - Save the state</h1>
+
+    <div id="tree1" data-url="../extra/example_data.json"></div>
+
+    <p>
+       If you set the option <strong>saveState</strong> to true, then jqtree remembers the tree state after a page reload.
+    </p>
+    <ul>
+        <li>
+            JqTree save the state into localStorage.
+            If the browser does not support localStorage, then jqTree saves the state in a cookie.
+        </li>
+        <li>
+            You must include the <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a> plugin for cookie support.
+        </li>
+    </ul>
+
+    <h3>html</h3>
+<pre>
+&lt;div id="tree1" data-url="../extra/example_data.json"&gt;&lt;/div&gt;
+</pre>
+
+    <h3>javascript</h3>
+<pre>
+$('#tree1').tree({
+    saveState: true
+});
+</pre>
+
+    <p>
+        Giving the <strong>saveState</strong> a string value sets the storage key. The default key is 'tree'.
+    </p>
+
+<pre>
+$('#tree1').tree({
+    saveState: 'my-tree'
+});    
+</pre>
+
+    <script>
+        $(function() {
+            $('#tree1').tree({
+                saveState: true
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Example 2</title>
+    <link rel="stylesheet" href="../extra/css/gridless.css">
+    <link rel="stylesheet" href="example.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shCore.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeDefault.css">
+    <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeRDark.css">
+    <link rel="stylesheet" href="../jqtree.css">
+    <script src="../extra/js/jquery-1.7.2.min.js"></script>
+    <script src="../tree.jquery.js"></script>
+    <script src="../extra/syntax_highlighter/XRegExp.js"></script>
+    <script src="../extra/syntax_highlighter/shCore.js"></script>
+    <script src="../extra/syntax_highlighter/shBrushJScript.js"></script>
+    <script src="example.js"></script>
+</head>
+<body>
+    <p id="nav">
+        <a href="example1.html">Example 1</a>
+        <a href="example3.html" class="next">Example 3</a>
+    </p>
+
+    <h1>Example 2 - load the data from the server</h1>
+
+    <div id="tree1" data-url="../extra/example_data.json"></div>
+
+    <p>
+        In this example we load the data from the server using the <strong>data-url</strong> property on the dom element.
+    </p>
+
+    <h3>html</h3>
+<pre>
+&lt;div id="tree1" data-url="../extra/example_data.json"&gt;&lt;/div&gt;
+</pre>
+
+    <h3>javascript</h3>
+<pre>
+    $('#tree1').tree();
+</pre>
+    <script>
+        $(function() {
+            $('#tree1').tree();
+        });
+    </script>
+</body>
+</html>
