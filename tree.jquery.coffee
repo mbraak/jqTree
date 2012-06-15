@@ -622,7 +622,12 @@ class JqTreeWidget extends MouseWidget
             else
                 class_string = ' class="tree"'
 
-            return $("<ul#{ class_string }></ul>")
+            ul = $("<ul#{ class_string }></ul>")
+
+            if !is_open
+                ul.hide()
+
+            return ul
 
         createLi = (node) =>
             if node.hasChildren()
