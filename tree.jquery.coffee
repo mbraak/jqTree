@@ -535,7 +535,7 @@ class JqTreeWidget extends MouseWidget
 
         node = parent_node.append(new_node_info)
 
-        @_refreshElements(parent_node)
+        @_refreshElements(parent_node.parent)
         return node
  
     prependNode: (new_node_info, parent_node) ->

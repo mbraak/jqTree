@@ -872,7 +872,7 @@ limitations under the License.
         parent_node = this.tree;
       }
       node = parent_node.append(new_node_info);
-      this._refreshElements(parent_node);
+      this._refreshElements(parent_node.parent);
       return node;
     };
 
