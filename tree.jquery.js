@@ -754,6 +754,7 @@ limitations under the License.
       if (this.options.selectable) {
         if (this.selected_node) {
           this._getNodeElementForNode(this.selected_node).deselect();
+          this.selected_node = null;
         }
         if (node) {
           this._getNodeElementForNode(node).select();
