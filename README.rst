@@ -1,4 +1,4 @@
-.. image:: https://secure.travis-ci.org/mbraak/jqTree.png?branch=dev
+.. image:: https://secure.travis-ci.org/mbraak/jqTree.png?branch=master
   :target: http://travis-ci.org/mbraak/jqTree
 
 jqTree

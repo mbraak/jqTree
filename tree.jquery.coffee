@@ -441,6 +441,7 @@ class JqTreeWidget extends MouseWidget
         if @options.selectable
             if @selected_node
                 @_getNodeElementForNode(@selected_node).deselect()
+                @selected_node = null
 
             if node
                 @_getNodeElementForNode(node).select()
