@@ -979,7 +979,7 @@ limitations under the License.
           return value;
         }
       };
-      createUl = function(depth, is_open) {
+      createUl = function(depth) {
         var class_string;
         if (depth) {
           class_string = '';
@@ -1030,7 +1030,7 @@ limitations under the License.
       };
       doCreateDomElements = function($element, children, depth, is_open) {
         var $li, $ul, child, _i, _len;
-        $ul = createUl(depth, is_open);
+        $ul = createUl(depth);
         $element.append($ul);
         for (_i = 0, _len = children.length; _i < _len; _i++) {
           child = children[_i];

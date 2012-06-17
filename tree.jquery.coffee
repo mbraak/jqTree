@@ -625,7 +625,7 @@ class JqTreeWidget extends MouseWidget
             else
                 return value
 
-        createUl = (depth, is_open) =>
+        createUl = (depth) =>
             if depth
                 class_string = ''
             else
@@ -675,7 +675,7 @@ class JqTreeWidget extends MouseWidget
             )
 
         doCreateDomElements = ($element, children, depth, is_open) ->
-            $ul = createUl(depth, is_open)
+            $ul = createUl(depth)
             $element.append($ul)
 
             for child in children
