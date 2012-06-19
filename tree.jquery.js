@@ -863,7 +863,7 @@ limitations under the License.
       parent = node.parent;
       if (parent) {
         node.remove();
-        return this._refreshElements(parent);
+        return this._refreshElements(parent.parent);
       }
     };
 
