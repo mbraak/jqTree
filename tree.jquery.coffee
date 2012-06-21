@@ -741,7 +741,7 @@ class JqTreeWidget extends MouseWidget
     _restoreState: ->
         if @options.onGetStateFromStorage
             state = @options.onGetStateFromStorage()
-        else if localStorage
+        else if localStorage?
             state = localStorage.getItem(
                 @_getCookieName()
             )
@@ -762,7 +762,7 @@ class JqTreeWidget extends MouseWidget
     _saveState: ->
         if @options.onSetStateFromStorage
             @options.onSetStateFromStorage(@_getState())
-        else if localStorage
+        else if localStorage?
             localStorage.setItem(
                 @_getCookieName(),
                 @_getState()

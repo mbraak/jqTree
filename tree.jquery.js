@@ -1101,7 +1101,7 @@ limitations under the License.
       var state;
       if (this.options.onGetStateFromStorage) {
         state = this.options.onGetStateFromStorage();
-      } else if (localStorage) {
+      } else if (typeof localStorage !== "undefined" && localStorage !== null) {
         state = localStorage.getItem(this._getCookieName());
       } else if ($.cookie) {
         state = $.cookie(this._getCookieName(), {
@@ -1121,7 +1121,7 @@ limitations under the License.
     JqTreeWidget.prototype._saveState = function() {
       if (this.options.onSetStateFromStorage) {
         return this.options.onSetStateFromStorage(this._getState());
-      } else if (localStorage) {
+      } else if (typeof localStorage !== "undefined" && localStorage !== null) {
         return localStorage.setItem(this._getCookieName(), this._getState());
       } else if ($.cookie) {
         return $.cookie(this._getCookieName(), this._getState(), {
