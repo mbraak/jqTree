@@ -932,7 +932,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._initTree = function(data) {
-      var node_element;
+      var event, node_element;
       this.tree = new Tree();
       this.tree.loadFromData(data);
       this.selected_node = null;
@@ -941,9 +941,11 @@ limitations under the License.
       if (this.selected_node) {
         node_element = this._getNodeElementForNode(this.selected_node);
         if (node_element) {
-          return node_element.select();
+          node_element.select();
         }
       }
+      event = $.Event('tree.init');
+      return this.element.trigger(event);
     };
 
     JqTreeWidget.prototype._openNodes = function() {

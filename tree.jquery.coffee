@@ -601,6 +601,9 @@ class JqTreeWidget extends MouseWidget
             if node_element
                 node_element.select()
 
+        event = $.Event('tree.init')
+        @element.trigger(event)
+
     _openNodes: ->
         if @options.saveState
             if @_restoreState()
