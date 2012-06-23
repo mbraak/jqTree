@@ -123,7 +123,8 @@ ul.tree span.border {
 }
 
 ul.tree div {
-    width: 100%;
+    width: 100%; /* todo: why is this in here? */
+    *width: auto; /* ie7 fix; issue 41 */
     position: relative;
 }
 
