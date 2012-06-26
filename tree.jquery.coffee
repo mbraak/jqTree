@@ -104,6 +104,16 @@ toJson = (value) ->
 
 @Tree.toJson = toJson
 
+# Escape a string for HTML interpolation; copied from underscore js
+html_escape = (string) ->
+    return (''+string)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g,'&#x2F;')
+
 Position =
     getName: (position) ->
         if position == Position.BEFORE
@@ -624,7 +634,7 @@ class JqTreeWidget extends MouseWidget
     _refreshElements: (from_node=null) ->
         escapeIfNecessary = (value) =>
             if @options.autoEscape
-                return escape(value)
+                return html_escape(value)
             else
                 return value
 

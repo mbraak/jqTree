@@ -18,7 +18,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, JqTreeWidget, Json, MouseWidget, Node, NodeElement, Position, SimpleWidget, Tree, indexOf, toJson,
+  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, JqTreeWidget, Json, MouseWidget, Node, NodeElement, Position, SimpleWidget, Tree, html_escape, indexOf, toJson,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -327,6 +327,10 @@ limitations under the License.
   };
 
   this.Tree.toJson = toJson;
+
+  html_escape = function(string) {
+    return ('' + string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g, '&#x2F;');
+  };
 
   Position = {
     getName: function(position) {
@@ -976,7 +980,7 @@ limitations under the License.
       }
       escapeIfNecessary = function(value) {
         if (_this.options.autoEscape) {
-          return escape(value);
+          return html_escape(value);
         } else {
           return value;
         }
