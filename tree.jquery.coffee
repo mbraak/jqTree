@@ -442,8 +442,8 @@ class JqTreeWidget extends MouseWidget
             new FolderElement(node, @element).toggle()
 
         if @options.saveState
-            @_saveState()
-
+            @save_state_handler.saveState()
+    
     getTree: ->
         return @tree
 
@@ -467,7 +467,7 @@ class JqTreeWidget extends MouseWidget
                         parent = parent.parent
 
             if @options.saveState
-                @_saveState()
+                @save_state_handler.saveState()
 
     getSelectedNode: ->
         return @selected_node or false
@@ -504,14 +504,14 @@ class JqTreeWidget extends MouseWidget
             new FolderElement(node, @element).open(null, skip_slide)
 
             if @options.saveState
-                @_saveState()
+                @save_state_handler.saveState()
 
     closeNode: (node, skip_slide) ->
         if node.hasChildren()
             new FolderElement(node, @element).close(skip_slide)
 
             if @options.saveState
-                @_saveState()
+                @save_state_handler.saveState()
 
     isDragging: ->
         return @is_dragging
@@ -559,9 +559,10 @@ class JqTreeWidget extends MouseWidget
         return node
 
     _init: ->
-        super
+        super()
 
         @element = @$el
+
         @_initData()
 
         @element.click($.proxy(@_click, this))
@@ -577,7 +578,7 @@ class JqTreeWidget extends MouseWidget
         @element.unbind()
         @tree = null
 
-        super
+        super()
 
     _initData: ->
         if @options.data
@@ -601,6 +602,8 @@ class JqTreeWidget extends MouseWidget
         @tree = new Tree()
         @tree.loadFromData(data)
 
+        @save_state_handler = new SaveStateHandler(this)
+
         @selected_node = null
         @_openNodes()
 
@@ -616,7 +619,7 @@ class JqTreeWidget extends MouseWidget
 
     _openNodes: ->
         if @options.saveState
-            if @_restoreState()
+            if @save_state_handler.restoreState()
                 return
 
         if @options.autoOpen is false
@@ -727,7 +730,7 @@ class JqTreeWidget extends MouseWidget
                 node_element.toggle()
 
                 if @options.saveState
-                    @_saveState()
+                    @save_state_handler.saveState()
 
                 e.preventDefault()
                 e.stopPropagation()
@@ -750,90 +753,6 @@ class JqTreeWidget extends MouseWidget
             return null
         else
             return $li.data('node')
-
-    _restoreState: ->
-        if @options.onGetStateFromStorage
-            state = @options.onGetStateFromStorage()
-        else if localStorage?
-            state = localStorage.getItem(
-                @_getCookieName()
-            )
-        else if $.cookie
-            state = $.cookie(
-                @_getCookieName(),
-                {path: '/'}
-            )
-        else
-            state = null
-
-        if not state
-            return false
-        else
-            @_setState(state)
-            return true
-
-    _saveState: ->
-        if @options.onSetStateFromStorage
-            @options.onSetStateFromStorage(@_getState())
-        else if localStorage?
-            localStorage.setItem(
-                @_getCookieName(),
-                @_getState()
-            )
-        else if $.cookie
-            $.cookie(
-                @_getCookieName(),
-                @_getState(),
-                {path: '/'}
-            )
-
-    _getState: ->
-        open_nodes = []
-
-        @tree.iterate((node) =>
-            if (
-                node.is_open and
-                node.id and
-                node.hasChildren()
-            )
-                open_nodes.push(node.id)
-            return true
-        )
-
-        selected_node = ''
-        if @selected_node
-            selected_node = @selected_node.id
-
-        return toJson(
-            open_nodes: open_nodes,
-            selected_node: selected_node
-        )
-
-    _setState: (state) ->
-        data = $.parseJSON(state)
-        if data
-            open_nodes = data.open_nodes
-            selected_node_id = data.selected_node
-
-            @tree.iterate((node) =>
-                if (
-                    node.id and
-                    node.hasChildren() and
-                    (indexOf(open_nodes, node.id) >= 0)
-                )
-                    node.is_open = true
-
-                if selected_node_id and (node.id == selected_node_id)
-                    @selected_node = node
-
-                return true
-            )
-
-    _getCookieName: ->
-        if typeof @options.saveState is 'string'
-            return @options.saveState
-        else
-            return 'tree'
 
     _getNodeElementForNode: (node) ->
         if node.hasChildren()
@@ -1372,6 +1291,95 @@ class DragElement
 
     remove: ->
         @$element.remove()
+
+
+class SaveStateHandler
+    constructor: (tree_widget) ->
+        @tree_widget = tree_widget
+
+    saveState: ->
+        if @tree_widget.options.onSetStateFromStorage
+            @tree_widget.options.onSetStateFromStorage(@getState())
+        else if localStorage?
+            localStorage.setItem(
+                @getCookieName(),
+                @getState()
+            )
+        else if $.cookie
+            $.cookie(
+                @getCookieName(),
+                @getState(),
+                {path: '/'}
+            )
+
+    restoreState: ->
+        if @tree_widget.options.onGetStateFromStorage
+            state = @tree_widget.options.onGetStateFromStorage()
+        else if localStorage?
+            state = localStorage.getItem(
+                @getCookieName()
+            )
+        else if $.cookie
+            state = $.cookie(
+                @getCookieName(),
+                {path: '/'}
+            )
+        else
+            state = null
+
+        if not state
+            return false
+        else
+            @setState(state)
+            return true
+
+    getState: ->
+        open_nodes = []
+
+        @tree_widget.tree.iterate((node) =>
+            if (
+                node.is_open and
+                node.id and
+                node.hasChildren()
+            )
+                open_nodes.push(node.id)
+            return true
+        )
+
+        selected_node = ''
+        if @tree_widget.selected_node
+            selected_node = @tree_widget.selected_node.id
+
+        return toJson(
+            open_nodes: open_nodes,
+            selected_node: selected_node
+        )
+
+    setState: (state) ->
+        data = $.parseJSON(state)
+        if data
+            open_nodes = data.open_nodes
+            selected_node_id = data.selected_node
+
+            @tree_widget.tree.iterate((node) =>
+                if (
+                    node.id and
+                    node.hasChildren() and
+                    (indexOf(open_nodes, node.id) >= 0)
+                )
+                    node.is_open = true
+
+                if selected_node_id and (node.id == selected_node_id)
+                    @tree_widget.selected_node = node
+
+                return true
+            )
+
+    getCookieName: ->
+        if typeof @tree_widget.options.saveState is 'string'
+            return @tree_widget.options.saveState
+        else
+            return 'tree'
 
 
 @Tree.Node = Node
