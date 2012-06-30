@@ -18,7 +18,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, JqTreeWidget, Json, MouseWidget, Node, NodeElement, Position, SaveStateHandler, SimpleWidget, Tree, html_escape, indexOf, toJson,
+  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, JqTreeWidget, Json, MouseWidget, Node, NodeElement, Position, SaveStateHandler, SelectNodeHandler, SimpleWidget, Tree, html_escape, indexOf, toJson,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -744,29 +744,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.selectNode = function(node, must_open_parents) {
-      var parent;
-      if (this.options.selectable) {
-        if (this.selected_node) {
-          this._getNodeElementForNode(this.selected_node).deselect();
-          this.selected_node = null;
-        }
-        if (node) {
-          this._getNodeElementForNode(node).select();
-          this.selected_node = node;
-          if (must_open_parents) {
-            parent = this.selected_node.parent;
-            while (parent) {
-              if (!parent.is_open) {
-                this.openNode(parent, true);
-              }
-              parent = parent.parent;
-            }
-          }
-        }
-        if (this.options.saveState) {
-          return this.save_state_handler.saveState();
-        }
-      }
+      return this.select_node_handler.selectNode(node, must_open_parents);
     };
 
     JqTreeWidget.prototype.getSelectedNode = function() {
@@ -926,19 +904,15 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._initTree = function(data) {
-      var event, node_element;
+      var event;
       this.tree = new Tree();
       this.tree.loadFromData(data);
-      this.save_state_handler = new SaveStateHandler(this);
       this.selected_node = null;
+      this.save_state_handler = new SaveStateHandler(this);
+      this.select_node_handler = new SelectNodeHandler(this);
       this._openNodes();
       this._refreshElements();
-      if (this.selected_node) {
-        node_element = this._getNodeElementForNode(this.selected_node);
-        if (node_element) {
-          node_element.select();
-        }
-      }
+      this.select_node_handler.selectCurrentNode();
       event = $.Event('tree.init');
       return this.element.trigger(event);
     };
@@ -1775,6 +1749,52 @@ limitations under the License.
     };
 
     return SaveStateHandler;
+
+  })();
+
+  SelectNodeHandler = (function() {
+
+    function SelectNodeHandler(tree_widget) {
+      this.tree_widget = tree_widget;
+    }
+
+    SelectNodeHandler.prototype.selectNode = function(node, must_open_parents) {
+      var parent;
+      if (this.tree_widget.options.selectable) {
+        if (this.tree_widget.selected_node) {
+          this.tree_widget._getNodeElementForNode(this.tree_widget.selected_node).deselect();
+          this.tree_widget.selected_node = null;
+        }
+        if (node) {
+          this.tree_widget._getNodeElementForNode(node).select();
+          this.tree_widget.selected_node = node;
+          if (must_open_parents) {
+            parent = this.tree_widget.selected_node.parent;
+            while (parent) {
+              if (!parent.is_open) {
+                this.tree_widget.openNode(parent, true);
+              }
+              parent = parent.parent;
+            }
+          }
+        }
+        if (this.tree_widget.options.saveState) {
+          return this.tree_widget.save_state_handler.saveState();
+        }
+      }
+    };
+
+    SelectNodeHandler.prototype.selectCurrentNode = function() {
+      var node_element;
+      if (this.tree_widget.selected_node) {
+        node_element = this.tree_widget._getNodeElementForNode(this.tree_widget.selected_node);
+        if (node_element) {
+          return node_element.select();
+        }
+      }
+    };
+
+    return SelectNodeHandler;
 
   })();
 

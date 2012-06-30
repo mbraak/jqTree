@@ -448,26 +448,7 @@ class JqTreeWidget extends MouseWidget
         return @tree
 
     selectNode: (node, must_open_parents) ->
-        if @options.selectable
-            if @selected_node
-                @_getNodeElementForNode(@selected_node).deselect()
-                @selected_node = null
-
-            if node
-                @_getNodeElementForNode(node).select()
-                @selected_node = node
-
-                if must_open_parents
-                    parent = @selected_node.parent
-
-                    while parent
-                        if not parent.is_open
-                            this.openNode(parent, true)
-
-                        parent = parent.parent
-
-            if @options.saveState
-                @save_state_handler.saveState()
+        @select_node_handler.selectNode(node, must_open_parents)
 
     getSelectedNode: ->
         return @selected_node or false
@@ -602,17 +583,15 @@ class JqTreeWidget extends MouseWidget
         @tree = new Tree()
         @tree.loadFromData(data)
 
-        @save_state_handler = new SaveStateHandler(this)
-
         @selected_node = null
-        @_openNodes()
 
+        @save_state_handler = new SaveStateHandler(this)
+        @select_node_handler = new SelectNodeHandler(this)
+
+        @_openNodes()
         @_refreshElements()
 
-        if @selected_node
-            node_element = @_getNodeElementForNode(@selected_node)
-            if node_element
-                node_element.select()
+        @select_node_handler.selectCurrentNode()
 
         event = $.Event('tree.init')
         @element.trigger(event)
@@ -1380,6 +1359,39 @@ class SaveStateHandler
             return @tree_widget.options.saveState
         else
             return 'tree'
+
+
+class SelectNodeHandler
+    constructor: (tree_widget) ->
+        @tree_widget = tree_widget
+
+    selectNode:  (node, must_open_parents) ->
+        if @tree_widget.options.selectable
+            if @tree_widget.selected_node
+                @tree_widget._getNodeElementForNode(@tree_widget.selected_node).deselect()
+                @tree_widget.selected_node = null
+
+            if node
+                @tree_widget._getNodeElementForNode(node).select()
+                @tree_widget.selected_node = node
+
+                if must_open_parents
+                    parent = @tree_widget.selected_node.parent
+
+                    while parent
+                        if not parent.is_open
+                            @tree_widget.openNode(parent, true)
+
+                        parent = parent.parent
+
+            if @tree_widget.options.saveState
+                @tree_widget.save_state_handler.saveState()
+
+    selectCurrentNode: ->
+        if @tree_widget.selected_node
+            node_element = @tree_widget._getNodeElementForNode(@tree_widget.selected_node)
+            if node_element
+                node_element.select()
 
 
 @Tree.Node = Node
