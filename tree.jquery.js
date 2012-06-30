@@ -18,7 +18,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragElement, FolderElement, GhostDropHint, JqTreeWidget, Json, MouseWidget, Node, NodeElement, Position, SaveStateHandler, SelectNodeHandler, SimpleWidget, Tree, html_escape, indexOf, toJson,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, Json, MouseWidget, Node, NodeElement, Position, SaveStateHandler, SelectNodeHandler, SimpleWidget, Tree, html_escape, indexOf, toJson,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -769,7 +769,7 @@ limitations under the License.
         this._refreshElements(parent_node.parent);
       }
       if (this.is_dragging) {
-        return this._refreshHitAreas();
+        return this.dnd_handler.refreshHitAreas();
       }
     };
 
@@ -800,7 +800,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.refreshHitAreas = function() {
-      return this._refreshHitAreas();
+      return this.dnd_handler.refreshHitAreas();
     };
 
     JqTreeWidget.prototype.addNodeAfter = function(new_node_info, existing_node) {
@@ -858,11 +858,7 @@ limitations under the License.
       this.element = this.$el;
       this._initData();
       this.element.click($.proxy(this._click, this));
-      this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
-      this.hovered_area = null;
-      this.$ghost = null;
-      this.hit_areas = [];
-      return this.is_dragging = false;
+      return this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
     };
 
     JqTreeWidget.prototype._deinit = function() {
@@ -904,6 +900,7 @@ limitations under the License.
       this.selected_node = null;
       this.save_state_handler = new SaveStateHandler(this);
       this.select_node_handler = new SelectNodeHandler(this);
+      this.dnd_handler = new DragAndDropHandler(this);
       this._openNodes();
       this._refreshElements();
       this.select_node_handler.selectCurrentNode();
@@ -1102,344 +1099,41 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._mouseCapture = function(event) {
-      var $element, node_element;
-      if (!this.options.dragAndDrop) {
-        return;
+      if (this.options.dragAndDrop) {
+        return this.dnd_handler.mouseCapture(event);
+      } else {
+        return false;
       }
-      $element = $(event.target);
-      if (this.options.onIsMoveHandle && !this.options.onIsMoveHandle($element)) {
-        return null;
-      }
-      node_element = this._getNodeElement($element);
-      if (node_element && this.options.onCanMove) {
-        if (!this.options.onCanMove(node_element.node)) {
-          node_element = null;
-        }
-      }
-      this.current_item = node_element;
-      return this.current_item !== null;
     };
 
     JqTreeWidget.prototype._mouseStart = function(event) {
-      var offsetX, offsetY, _ref;
-      if (!this.options.dragAndDrop) {
-        return;
+      if (this.options.dragAndDrop) {
+        return this.dnd_handler.mouseStart(event);
+      } else {
+        return false;
       }
-      this._refreshHitAreas();
-      _ref = this._getOffsetFromEvent(event), offsetX = _ref[0], offsetY = _ref[1];
-      this.drag_element = new DragElement(this.current_item.node, offsetX, offsetY, this.element);
-      this.is_dragging = true;
-      this.current_item.$element.addClass('moving');
-      return true;
     };
 
     JqTreeWidget.prototype._mouseDrag = function(event) {
-      var area, position_name;
-      if (!this.options.dragAndDrop) {
-        return;
-      }
-      this.drag_element.move(event.pageX, event.pageY);
-      area = this._findHoveredArea(event.pageX, event.pageY);
-      if (area && this.options.onCanMoveTo) {
-        position_name = Position.getName(area.position);
-        if (!this.options.onCanMoveTo(this.current_item.node, area.node, position_name)) {
-          area = null;
-        }
-      }
-      if (!area) {
-        this._removeDropHint();
-        this._removeHover();
-        this._stopOpenFolderTimer();
+      if (this.options.dragAndDrop) {
+        return this.dnd_handler.mouseDrag(event);
       } else {
-        if (this.hovered_area !== area) {
-          this.hovered_area = area;
-          this._updateDropHint();
-        }
+        return false;
       }
-      return true;
     };
 
     JqTreeWidget.prototype._mouseStop = function() {
-      if (!this.options.dragAndDrop) {
-        return;
+      if (this.options.dragAndDrop) {
+        return this.dnd_handler.mouseStop();
+      } else {
+        return false;
       }
-      this._moveItem();
-      this._clear();
-      this._removeHover();
-      this._removeDropHint();
-      this._removeHitAreas();
-      this.current_item.$element.removeClass('moving');
-      this.is_dragging = false;
-      return false;
-    };
-
-    JqTreeWidget.prototype._refreshHitAreas = function() {
-      this._removeHitAreas();
-      return this._generateHitAreas();
-    };
-
-    JqTreeWidget.prototype._generateHitAreas = function() {
-      var addPosition, getTop, groupPositions, handleAfterOpenFolder, handleClosedFolder, handleFirstNode, handleNode, handleOpenFolder, hit_areas, last_top, positions,
-        _this = this;
-      positions = [];
-      last_top = 0;
-      getTop = function($element) {
-        return $element.offset().top;
-      };
-      addPosition = function(node, position, top) {
-        positions.push({
-          top: top,
-          node: node,
-          position: position
-        });
-        return last_top = top;
-      };
-      groupPositions = function(handle_group) {
-        var group, position, previous_top, _i, _len;
-        previous_top = -1;
-        group = [];
-        for (_i = 0, _len = positions.length; _i < _len; _i++) {
-          position = positions[_i];
-          if (position.top !== previous_top) {
-            if (group.length) {
-              handle_group(group, previous_top, position.top);
-            }
-            previous_top = position.top;
-            group = [];
-          }
-          group.push(position);
-        }
-        return handle_group(group, previous_top, _this.element.offset().top + _this.element.height());
-      };
-      handleNode = function(node, next_node, $element) {
-        var top;
-        top = getTop($element);
-        if (node === _this.current_item.node) {
-          addPosition(node, Position.NONE, top);
-        } else {
-          addPosition(node, Position.INSIDE, top);
-        }
-        if (next_node === _this.current_item.node || node === _this.current_item.node) {
-          return addPosition(node, Position.NONE, top);
-        } else {
-          return addPosition(node, Position.AFTER, top);
-        }
-      };
-      handleOpenFolder = function(node, $element) {
-        if (node === _this.current_item.node) {
-          return false;
-        }
-        if (node.children[0] !== _this.current_item.node) {
-          addPosition(node, Position.INSIDE, getTop($element));
-        }
-        return true;
-      };
-      handleAfterOpenFolder = function(node, next_node, $element) {
-        if (node === _this.current_item.node || next_node === _this.current_item.node) {
-          return addPosition(node, Position.NONE, last_top);
-        } else {
-          return addPosition(node, Position.AFTER, last_top);
-        }
-      };
-      handleClosedFolder = function(node, next_node, $element) {
-        var top;
-        top = getTop($element);
-        if (node === _this.current_item.node) {
-          return addPosition(node, Position.NONE, top);
-        } else {
-          addPosition(node, Position.INSIDE, top);
-          if (next_node !== _this.current_item.node) {
-            return addPosition(node, Position.AFTER, top);
-          }
-        }
-      };
-      handleFirstNode = function(node, $element) {
-        if (node !== _this.current_item.node) {
-          return addPosition(node, Position.BEFORE, getTop($(node.element)));
-        }
-      };
-      this._iterateVisibleNodes(handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder, handleFirstNode);
-      hit_areas = [];
-      groupPositions(function(positions_in_group, top, bottom) {
-        var area_height, area_top, position, _i, _len;
-        area_height = (bottom - top) / positions_in_group.length;
-        area_top = top;
-        for (_i = 0, _len = positions_in_group.length; _i < _len; _i++) {
-          position = positions_in_group[_i];
-          hit_areas.push({
-            top: area_top,
-            bottom: area_top + area_height,
-            node: position.node,
-            position: position.position
-          });
-          area_top += area_height;
-        }
-        return null;
-      });
-      return this.hit_areas = hit_areas;
     };
 
     JqTreeWidget.prototype.testGenerateHitAreas = function(moving_node) {
-      this.current_item = this._getNodeElementForNode(moving_node);
-      this._generateHitAreas();
-      return this.hit_areas;
-    };
-
-    JqTreeWidget.prototype._removeHitAreas = function() {
-      return this.hit_areas = [];
-    };
-
-    JqTreeWidget.prototype._iterateVisibleNodes = function(handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) {
-      var is_first_node, iterate,
-        _this = this;
-      is_first_node = true;
-      iterate = function(node, next_node) {
-        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref;
-        must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
-        if (node.element) {
-          $element = $(node.element);
-          if (!$element.is(':visible')) {
-            return;
-          }
-          if (is_first_node) {
-            handle_first_node(node, $element);
-            is_first_node = false;
-          }
-          if (!node.hasChildren()) {
-            handle_node(node, next_node, $element);
-          } else if (node.is_open) {
-            if (!handle_open_folder(node, $element)) {
-              must_iterate_inside = false;
-            }
-          } else {
-            handle_closed_folder(node, next_node, $element);
-          }
-        }
-        if (must_iterate_inside) {
-          children_length = node.children.length;
-          _ref = node.children;
-          for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-            child = _ref[i];
-            if (i === (children_length - 1)) {
-              iterate(node.children[i], null);
-            } else {
-              iterate(node.children[i], node.children[i + 1]);
-            }
-          }
-          if (node.is_open) {
-            return handle_after_open_folder(node, next_node, $element);
-          }
-        }
-      };
-      return iterate(this.tree);
-    };
-
-    JqTreeWidget.prototype._getOffsetFromEvent = function(event) {
-      var element_offset;
-      element_offset = $(event.target).offset();
-      return [event.pageX - element_offset.left, event.pageY - element_offset.top];
-    };
-
-    JqTreeWidget.prototype._findHoveredArea = function(x, y) {
-      var area, high, low, mid, tree_offset;
-      tree_offset = this.element.offset();
-      if (x < tree_offset.left || y < tree_offset.top || x > (tree_offset.left + this.element.width()) || y > (tree_offset.top + this.element.height())) {
-        return null;
-      }
-      low = 0;
-      high = this.hit_areas.length;
-      while (low < high) {
-        mid = (low + high) >> 1;
-        area = this.hit_areas[mid];
-        if (y < area.top) {
-          high = mid;
-        } else if (y > area.bottom) {
-          low = mid + 1;
-        } else {
-          return area;
-        }
-      }
-      return null;
-    };
-
-    JqTreeWidget.prototype._updateDropHint = function() {
-      var node, node_element;
-      this._stopOpenFolderTimer();
-      if (!this.hovered_area) {
-        return;
-      }
-      node = this.hovered_area.node;
-      if (node.hasChildren() && !node.is_open && this.hovered_area.position === Position.INSIDE) {
-        this._startOpenFolderTimer(node);
-      }
-      this._removeDropHint();
-      node_element = this._getNodeElementForNode(this.hovered_area.node);
-      return this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
-    };
-
-    JqTreeWidget.prototype._startOpenFolderTimer = function(folder) {
-      var openFolder,
-        _this = this;
-      openFolder = function() {
-        return _this._getNodeElementForNode(folder).open(function() {
-          _this._refreshHitAreas();
-          return _this._updateDropHint();
-        });
-      };
-      return this.open_folder_timer = setTimeout(openFolder, 500);
-    };
-
-    JqTreeWidget.prototype._stopOpenFolderTimer = function() {
-      if (this.open_folder_timer) {
-        clearTimeout(this.open_folder_timer);
-        return this.open_folder_timer = null;
-      }
-    };
-
-    JqTreeWidget.prototype._removeDropHint = function() {
-      if (this.previous_ghost) {
-        return this.previous_ghost.remove();
-      }
-    };
-
-    JqTreeWidget.prototype._removeHover = function() {
-      return this.hovered_area = null;
-    };
-
-    JqTreeWidget.prototype._moveItem = function() {
-      var doMove, event, moved_node, position, previous_parent, target_node,
-        _this = this;
-      if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
-        moved_node = this.current_item.node;
-        target_node = this.hovered_area.node;
-        position = this.hovered_area.position;
-        previous_parent = moved_node.parent;
-        if (position === Position.INSIDE) {
-          this.hovered_area.node.is_open = true;
-        }
-        doMove = function() {
-          _this.tree.moveNode(moved_node, target_node, position);
-          _this.element.empty();
-          return _this._refreshElements();
-        };
-        event = $.Event('tree.move');
-        event.move_info = {
-          moved_node: moved_node,
-          target_node: target_node,
-          position: Position.getName(position),
-          previous_parent: previous_parent,
-          do_move: doMove
-        };
-        this.element.trigger(event);
-        if (!event.isDefaultPrevented()) {
-          return doMove();
-        }
-      }
-    };
-
-    JqTreeWidget.prototype._clear = function() {
-      this.drag_element.remove();
-      return this.drag_element = null;
+      this.dnd_handler.current_item = this._getNodeElementForNode(moving_node);
+      this.dnd_handler.generateHitAreas();
+      return this.dnd_handler.hit_areas;
     };
 
     return JqTreeWidget;
@@ -1793,6 +1487,343 @@ limitations under the License.
     };
 
     return SelectNodeHandler;
+
+  })();
+
+  DragAndDropHandler = (function() {
+
+    function DragAndDropHandler(tree_widget) {
+      this.tree_widget = tree_widget;
+      this.hovered_area = null;
+      this.$ghost = null;
+      this.hit_areas = [];
+      this.is_dragging = false;
+    }
+
+    DragAndDropHandler.prototype.mouseCapture = function(event) {
+      var $element, node_element;
+      $element = $(event.target);
+      if (this.tree_widget.options.onIsMoveHandle && !this.tree_widget.options.onIsMoveHandle($element)) {
+        return null;
+      }
+      node_element = this.tree_widget._getNodeElement($element);
+      if (node_element && this.tree_widget.options.onCanMove) {
+        if (!this.tree_widget.options.onCanMove(node_element.node)) {
+          node_element = null;
+        }
+      }
+      this.current_item = node_element;
+      return this.current_item !== null;
+    };
+
+    DragAndDropHandler.prototype.mouseStart = function(event) {
+      var offsetX, offsetY, _ref;
+      this.refreshHitAreas();
+      _ref = this.getOffsetFromEvent(event), offsetX = _ref[0], offsetY = _ref[1];
+      this.drag_element = new DragElement(this.current_item.node, offsetX, offsetY, this.tree_widget.element);
+      this.is_dragging = true;
+      this.current_item.$element.addClass('moving');
+      return true;
+    };
+
+    DragAndDropHandler.prototype.mouseDrag = function(event) {
+      var area, position_name;
+      this.drag_element.move(event.pageX, event.pageY);
+      area = this.findHoveredArea(event.pageX, event.pageY);
+      if (area && this.tree_widget.options.onCanMoveTo) {
+        position_name = Position.getName(area.position);
+        if (!this.tree_widget.options.onCanMoveTo(this.current_item.node, area.node, position_name)) {
+          area = null;
+        }
+      }
+      if (!area) {
+        this.removeDropHint();
+        this.removeHover();
+        this.stopOpenFolderTimer();
+      } else {
+        if (this.hovered_area !== area) {
+          this.hovered_area = area;
+          this.updateDropHint();
+        }
+      }
+      return true;
+    };
+
+    DragAndDropHandler.prototype.mouseStop = function() {
+      this.moveItem();
+      this.clear();
+      this.removeHover();
+      this.removeDropHint();
+      this.removeHitAreas();
+      this.current_item.$element.removeClass('moving');
+      this.is_dragging = false;
+      return false;
+    };
+
+    DragAndDropHandler.prototype.getOffsetFromEvent = function(event) {
+      var element_offset;
+      element_offset = $(event.target).offset();
+      return [event.pageX - element_offset.left, event.pageY - element_offset.top];
+    };
+
+    DragAndDropHandler.prototype.refreshHitAreas = function() {
+      this.removeHitAreas();
+      return this.generateHitAreas();
+    };
+
+    DragAndDropHandler.prototype.removeHitAreas = function() {
+      return this.hit_areas = [];
+    };
+
+    DragAndDropHandler.prototype.clear = function() {
+      this.drag_element.remove();
+      return this.drag_element = null;
+    };
+
+    DragAndDropHandler.prototype.removeDropHint = function() {
+      if (this.previous_ghost) {
+        return this.previous_ghost.remove();
+      }
+    };
+
+    DragAndDropHandler.prototype.removeHover = function() {
+      return this.hovered_area = null;
+    };
+
+    DragAndDropHandler.prototype.generateHitAreas = function() {
+      var addPosition, getTop, groupPositions, handleAfterOpenFolder, handleClosedFolder, handleFirstNode, handleNode, handleOpenFolder, hit_areas, last_top, positions,
+        _this = this;
+      positions = [];
+      last_top = 0;
+      getTop = function($element) {
+        return $element.offset().top;
+      };
+      addPosition = function(node, position, top) {
+        positions.push({
+          top: top,
+          node: node,
+          position: position
+        });
+        return last_top = top;
+      };
+      groupPositions = function(handle_group) {
+        var group, position, previous_top, _i, _len;
+        previous_top = -1;
+        group = [];
+        for (_i = 0, _len = positions.length; _i < _len; _i++) {
+          position = positions[_i];
+          if (position.top !== previous_top) {
+            if (group.length) {
+              handle_group(group, previous_top, position.top);
+            }
+            previous_top = position.top;
+            group = [];
+          }
+          group.push(position);
+        }
+        return handle_group(group, previous_top, _this.tree_widget.element.offset().top + _this.tree_widget.element.height());
+      };
+      handleNode = function(node, next_node, $element) {
+        var top;
+        top = getTop($element);
+        if (node === _this.current_item.node) {
+          addPosition(node, Position.NONE, top);
+        } else {
+          addPosition(node, Position.INSIDE, top);
+        }
+        if (next_node === _this.current_item.node || node === _this.current_item.node) {
+          return addPosition(node, Position.NONE, top);
+        } else {
+          return addPosition(node, Position.AFTER, top);
+        }
+      };
+      handleOpenFolder = function(node, $element) {
+        if (node === _this.current_item.node) {
+          return false;
+        }
+        if (node.children[0] !== _this.current_item.node) {
+          addPosition(node, Position.INSIDE, getTop($element));
+        }
+        return true;
+      };
+      handleAfterOpenFolder = function(node, next_node, $element) {
+        if (node === _this.current_item.node || next_node === _this.current_item.node) {
+          return addPosition(node, Position.NONE, last_top);
+        } else {
+          return addPosition(node, Position.AFTER, last_top);
+        }
+      };
+      handleClosedFolder = function(node, next_node, $element) {
+        var top;
+        top = getTop($element);
+        if (node === _this.current_item.node) {
+          return addPosition(node, Position.NONE, top);
+        } else {
+          addPosition(node, Position.INSIDE, top);
+          if (next_node !== _this.current_item.node) {
+            return addPosition(node, Position.AFTER, top);
+          }
+        }
+      };
+      handleFirstNode = function(node, $element) {
+        if (node !== _this.current_item.node) {
+          return addPosition(node, Position.BEFORE, getTop($(node.element)));
+        }
+      };
+      this.iterateVisibleNodes(handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder, handleFirstNode);
+      hit_areas = [];
+      groupPositions(function(positions_in_group, top, bottom) {
+        var area_height, area_top, position, _i, _len;
+        area_height = (bottom - top) / positions_in_group.length;
+        area_top = top;
+        for (_i = 0, _len = positions_in_group.length; _i < _len; _i++) {
+          position = positions_in_group[_i];
+          hit_areas.push({
+            top: area_top,
+            bottom: area_top + area_height,
+            node: position.node,
+            position: position.position
+          });
+          area_top += area_height;
+        }
+        return null;
+      });
+      return this.hit_areas = hit_areas;
+    };
+
+    DragAndDropHandler.prototype.iterateVisibleNodes = function(handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) {
+      var is_first_node, iterate,
+        _this = this;
+      is_first_node = true;
+      iterate = function(node, next_node) {
+        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref;
+        must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
+        if (node.element) {
+          $element = $(node.element);
+          if (!$element.is(':visible')) {
+            return;
+          }
+          if (is_first_node) {
+            handle_first_node(node, $element);
+            is_first_node = false;
+          }
+          if (!node.hasChildren()) {
+            handle_node(node, next_node, $element);
+          } else if (node.is_open) {
+            if (!handle_open_folder(node, $element)) {
+              must_iterate_inside = false;
+            }
+          } else {
+            handle_closed_folder(node, next_node, $element);
+          }
+        }
+        if (must_iterate_inside) {
+          children_length = node.children.length;
+          _ref = node.children;
+          for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+            child = _ref[i];
+            if (i === (children_length - 1)) {
+              iterate(node.children[i], null);
+            } else {
+              iterate(node.children[i], node.children[i + 1]);
+            }
+          }
+          if (node.is_open) {
+            return handle_after_open_folder(node, next_node, $element);
+          }
+        }
+      };
+      return iterate(this.tree_widget.tree);
+    };
+
+    DragAndDropHandler.prototype.findHoveredArea = function(x, y) {
+      var area, high, low, mid, tree_offset;
+      tree_offset = this.tree_widget.element.offset();
+      if (x < tree_offset.left || y < tree_offset.top || x > (tree_offset.left + this.tree_widget.element.width()) || y > (tree_offset.top + this.tree_widget.element.height())) {
+        return null;
+      }
+      low = 0;
+      high = this.hit_areas.length;
+      while (low < high) {
+        mid = (low + high) >> 1;
+        area = this.hit_areas[mid];
+        if (y < area.top) {
+          high = mid;
+        } else if (y > area.bottom) {
+          low = mid + 1;
+        } else {
+          return area;
+        }
+      }
+      return null;
+    };
+
+    DragAndDropHandler.prototype.updateDropHint = function() {
+      var node, node_element;
+      this.stopOpenFolderTimer();
+      if (!this.hovered_area) {
+        return;
+      }
+      node = this.hovered_area.node;
+      if (node.hasChildren() && !node.is_open && this.hovered_area.position === Position.INSIDE) {
+        this.startOpenFolderTimer(node);
+      }
+      this.removeDropHint();
+      node_element = this.tree_widget._getNodeElementForNode(this.hovered_area.node);
+      return this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
+    };
+
+    DragAndDropHandler.prototype.startOpenFolderTimer = function(folder) {
+      var openFolder,
+        _this = this;
+      openFolder = function() {
+        return _this.tree_widget._getNodeElementForNode(folder).open(function() {
+          _this.refreshHitAreas();
+          return _this.updateDropHint();
+        });
+      };
+      return this.open_folder_timer = setTimeout(openFolder, 500);
+    };
+
+    DragAndDropHandler.prototype.stopOpenFolderTimer = function() {
+      if (this.open_folder_timer) {
+        clearTimeout(this.open_folder_timer);
+        return this.open_folder_timer = null;
+      }
+    };
+
+    DragAndDropHandler.prototype.moveItem = function() {
+      var doMove, event, moved_node, position, previous_parent, target_node,
+        _this = this;
+      if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
+        moved_node = this.current_item.node;
+        target_node = this.hovered_area.node;
+        position = this.hovered_area.position;
+        previous_parent = moved_node.parent;
+        if (position === Position.INSIDE) {
+          this.hovered_area.node.is_open = true;
+        }
+        doMove = function() {
+          _this.tree_widget.tree.moveNode(moved_node, target_node, position);
+          _this.tree_widget.element.empty();
+          return _this.tree_widget._refreshElements();
+        };
+        event = $.Event('tree.move');
+        event.move_info = {
+          moved_node: moved_node,
+          target_node: target_node,
+          position: Position.getName(position),
+          previous_parent: previous_parent,
+          do_move: doMove
+        };
+        this.tree_widget.element.trigger(event);
+        if (!event.isDefaultPrevented()) {
+          return doMove();
+        }
+      }
+    };
+
+    return DragAndDropHandler;
 
   })();
 

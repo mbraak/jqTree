@@ -471,7 +471,7 @@ class JqTreeWidget extends MouseWidget
             @_refreshElements(parent_node.parent)
 
         if @is_dragging
-            @_refreshHitAreas()
+            @dnd_handler.refreshHitAreas()
 
     getNodeById: (node_id) ->
         return @tree.getNodeById(node_id)
@@ -495,7 +495,7 @@ class JqTreeWidget extends MouseWidget
         return @is_dragging
 
     refreshHitAreas: ->
-        @_refreshHitAreas()
+        @dnd_handler.refreshHitAreas()
 
     addNodeAfter: (new_node_info, existing_node) ->
         new_node = existing_node.addAfter(new_node_info)
@@ -546,11 +546,6 @@ class JqTreeWidget extends MouseWidget
         @element.click($.proxy(@_click, this))
         @element.bind('contextmenu', $.proxy(@_contextmenu, this))
 
-        @hovered_area = null
-        @$ghost = null
-        @hit_areas = []
-        @is_dragging = false
-
     _deinit: ->
         @element.empty()
         @element.unbind()
@@ -584,6 +579,7 @@ class JqTreeWidget extends MouseWidget
 
         @save_state_handler = new SaveStateHandler(this)
         @select_node_handler = new SelectNodeHandler(this)
+        @dnd_handler = new DragAndDropHandler(this)
 
         @_openNodes()
         @_refreshElements()
@@ -761,359 +757,33 @@ class JqTreeWidget extends MouseWidget
             @save_state_handler.saveState()
 
     _mouseCapture: (event) ->
-        if not @options.dragAndDrop
-            return
-
-        $element = $(event.target)
-        if @options.onIsMoveHandle and not @options.onIsMoveHandle($element)
-            return null
-
-        node_element = @_getNodeElement($element)
-
-        if node_element and @options.onCanMove
-            if not @options.onCanMove(node_element.node)
-                node_element = null
-
-        @current_item = node_element
-        return (@current_item != null)
+        if @options.dragAndDrop
+            return @dnd_handler.mouseCapture(event)
+        else
+            return false
 
     _mouseStart: (event) ->
-        if not @options.dragAndDrop
-            return
-
-        @_refreshHitAreas()
-
-        [offsetX, offsetY] = @_getOffsetFromEvent(event)
-
-        @drag_element = new DragElement(
-            @current_item.node
-            offsetX,
-            offsetY,
-            @element
-        )
-
-        @is_dragging = true
-        @current_item.$element.addClass('moving')
-        return true
+        if @options.dragAndDrop
+            return @dnd_handler.mouseStart(event)
+        else
+            return false
 
     _mouseDrag: (event) ->
-        if not @options.dragAndDrop
-            return
-
-        @drag_element.move(event.pageX, event.pageY)
-
-        area = @_findHoveredArea(event.pageX, event.pageY)
-
-        if area and @options.onCanMoveTo
-            position_name = Position.getName(area.position)
-
-            if not @options.onCanMoveTo(@current_item.node, area.node, position_name)
-                area = null
-
-        if not area
-            @_removeDropHint()
-            @_removeHover()
-            @_stopOpenFolderTimer()
+        if @options.dragAndDrop
+            return @dnd_handler.mouseDrag(event)
         else
-            if @hovered_area != area
-                @hovered_area = area
-
-                @_updateDropHint()
-
-        return true
+            return false
 
     _mouseStop: ->
-        if not @options.dragAndDrop
-            return
-
-        @_moveItem()
-        @_clear()
-        @_removeHover()
-        @_removeDropHint()
-        @_removeHitAreas()
-
-        @current_item.$element.removeClass('moving')
-        @is_dragging = false
-
-        return false
-
-    _refreshHitAreas: ->
-        @_removeHitAreas()
-        @_generateHitAreas()
-
-    _generateHitAreas: ->
-        positions = []
-        last_top = 0
-
-        getTop = ($element) =>
-            return $element.offset().top
-
-        addPosition = (node, position, top) =>
-            positions.push(
-                top: top,
-                node: node,
-                position: position
-            )
-            last_top = top
-
-        groupPositions = (handle_group) =>
-            previous_top = -1
-            group = []
-
-            for position in positions
-                if position.top != previous_top
-                    if group.length
-                        handle_group(group, previous_top, position.top)
-
-                    previous_top = position.top
-                    group = []
-
-                group.push(position)
-
-            handle_group(
-                group,
-                previous_top,
-                @element.offset().top + @element.height()
-            )
-
-        handleNode = (node, next_node, $element) =>
-            top = getTop($element)
-
-            if node == @current_item.node
-                # Cannot move inside current item
-                addPosition(node, Position.NONE, top)
-            else
-                addPosition(node, Position.INSIDE, top)
-
-            if (
-                next_node == @current_item.node or
-                node == @current_item.node
-            )
-                # Cannot move before or after current item
-                addPosition(node, Position.NONE, top)
-            else
-                addPosition(node, Position.AFTER, top)
-
-        handleOpenFolder = (node, $element) =>
-            if node == @current_item.node
-                # Cannot move inside current item
-                # Stop iterating
-                return false
-
-            # Cannot move before current item
-            if node.children[0] != @current_item.node
-                addPosition(node, Position.INSIDE, getTop($element))
-
-            # Continue iterating
-            return true
-
-        handleAfterOpenFolder = (node, next_node, $element) =>
-            if (
-                node == @current_item.node or
-                next_node == @current_item.node
-            )
-                # Cannot move before or after current item
-                addPosition(node, Position.NONE, last_top)
-            else
-                addPosition(node, Position.AFTER, last_top)
-
-        handleClosedFolder = (node, next_node, $element) =>
-            top = getTop($element)
-
-            if node == @current_item.node
-                # Cannot move after current item
-                addPosition(node, Position.NONE, top)
-            else
-                addPosition(node, Position.INSIDE, top)
-
-                # Cannot move before current item
-                if next_node != @current_item.node
-                    addPosition(node, Position.AFTER, top)
-
-        handleFirstNode = (node, $element) =>
-            if node != @current_item.node
-                addPosition(node, Position.BEFORE, getTop($(node.element)))
-
-        @_iterateVisibleNodes(
-            handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder, handleFirstNode
-        )
-
-        hit_areas = []
-
-        groupPositions((positions_in_group, top, bottom) ->
-            area_height = (bottom - top) / positions_in_group.length
-            area_top = top
-
-            for position in positions_in_group
-                hit_areas.push(
-                    top: area_top,
-                    bottom: area_top + area_height,
-                    node: position.node,
-                    position: position.position
-                )
-
-                area_top += area_height
-            return null
-        )
-
-        @hit_areas = hit_areas
+        if @options.dragAndDrop
+            return @dnd_handler.mouseStop()
+        else
+            return false
 
     testGenerateHitAreas: (moving_node) ->
-        @current_item = @_getNodeElementForNode(moving_node)
-        @_generateHitAreas()
-        return @hit_areas
-
-    _removeHitAreas: ->
-        @hit_areas = []
-
-    _iterateVisibleNodes: (handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) ->
-        is_first_node = true
-
-        iterate = (node, next_node) =>
-            must_iterate_inside = (
-                (node.is_open or  not node.element) and node.hasChildren()
-            )
-
-            if node.element
-                $element = $(node.element)
-
-                if not $element.is(':visible')
-                    return
-
-                if is_first_node
-                    handle_first_node(node, $element)
-                    is_first_node = false
-
-                if not node.hasChildren()
-                    handle_node(node, next_node, $element)
-                else if node.is_open
-                    if not handle_open_folder(node, $element)
-                        must_iterate_inside = false
-                else
-                    handle_closed_folder(node, next_node, $element)
-
-            if must_iterate_inside
-                children_length = node.children.length
-                for child, i in node.children
-                    if i == (children_length-1)
-                        iterate(node.children[i], null)
-                    else
-                        iterate(node.children[i], node.children[i+1])
-
-                if node.is_open
-                    handle_after_open_folder(node, next_node, $element)
-
-        iterate(@tree)
-
-    _getOffsetFromEvent: (event) ->
-        element_offset = $(event.target).offset()
-        return [
-            event.pageX - element_offset.left,
-            event.pageY - element_offset.top
-        ]
-
-    _findHoveredArea: (x, y) ->
-        tree_offset = @element.offset()
-        if (
-            x < tree_offset.left or
-            y < tree_offset.top or
-            x > (tree_offset.left + @element.width()) or
-            y > (tree_offset.top + @element.height())
-        )
-            return null
-
-        low = 0
-        high = @hit_areas.length
-        while (low < high)
-            mid = (low + high) >> 1
-            area = @hit_areas[mid]
-
-            if y < area.top
-                high = mid
-            else if y > area.bottom
-                low = mid + 1
-            else
-                return area
-
-        return null
-
-    _updateDropHint: ->
-        # stop open folder timer
-        @_stopOpenFolderTimer()
-
-        if not @hovered_area
-            return
-
-        # if this is a closed folder, start timer to open it
-        node = @hovered_area.node
-        if (
-            node.hasChildren() and
-            not node.is_open and
-            @hovered_area.position == Position.INSIDE
-        )
-            @_startOpenFolderTimer(node)
-
-        # remove previous drop hint
-        @_removeDropHint()
-
-        # add new drop hint
-        node_element = @_getNodeElementForNode(@hovered_area.node)
-        @previous_ghost = node_element.addDropHint(@hovered_area.position)
-
-    _startOpenFolderTimer: (folder) ->
-        openFolder = =>
-            @_getNodeElementForNode(folder).open(
-                =>
-                    @_refreshHitAreas()
-                    @_updateDropHint()
-            )
-
-        @open_folder_timer = setTimeout(openFolder, 500)
-
-    _stopOpenFolderTimer: ->
-        if @open_folder_timer
-            clearTimeout(@open_folder_timer)
-            @open_folder_timer = null
-
-    _removeDropHint: ->
-        if @previous_ghost
-            @previous_ghost.remove()
-
-    _removeHover: ->
-        @hovered_area = null
-
-    _moveItem: ->
-        if (
-            @hovered_area and
-            @hovered_area.position != Position.NONE
-        )
-            moved_node = @current_item.node
-            target_node = @hovered_area.node
-            position = @hovered_area.position
-            previous_parent = moved_node.parent
-
-            if position == Position.INSIDE
-                @hovered_area.node.is_open = true
-
-            doMove = =>
-              @tree.moveNode(moved_node, target_node, position)
-              @element.empty()
-              @_refreshElements()
-
-            event = $.Event('tree.move')
-            event.move_info =
-                moved_node: moved_node
-                target_node: target_node
-                position: Position.getName(position)
-                previous_parent: previous_parent
-                do_move: doMove
-
-            @element.trigger(event)
-            doMove() unless event.isDefaultPrevented()
-
-    _clear: ->
-        @drag_element.remove()
-        @drag_element = null
+        @dnd_handler.current_item = @_getNodeElementForNode(moving_node)
+        @dnd_handler.generateHitAreas()
+        return @dnd_handler.hit_areas
 
 SimpleWidget.register(JqTreeWidget, 'tree')
 
@@ -1393,5 +1063,353 @@ class SelectNodeHandler
             if node_element
                 node_element.select()
 
+
+class DragAndDropHandler
+    constructor: (tree_widget) ->
+        @tree_widget = tree_widget
+
+        @hovered_area = null
+        @$ghost = null
+        @hit_areas = []
+        @is_dragging = false
+
+    mouseCapture: (event) ->
+        $element = $(event.target)
+
+        if @tree_widget.options.onIsMoveHandle and not @tree_widget.options.onIsMoveHandle($element)
+            return null
+
+        node_element = @tree_widget._getNodeElement($element)
+
+        if node_element and @tree_widget.options.onCanMove
+            if not @tree_widget.options.onCanMove(node_element.node)
+                node_element = null
+
+        @current_item = node_element
+        return (@current_item != null)
+
+    mouseStart: (event) ->
+        @refreshHitAreas()
+
+        [offsetX, offsetY] = @getOffsetFromEvent(event)
+
+        @drag_element = new DragElement(
+            @current_item.node
+            offsetX,
+            offsetY,
+            @tree_widget.element
+        )
+
+        @is_dragging = true
+        @current_item.$element.addClass('moving')
+        return true
+
+    mouseDrag: (event) ->
+        @drag_element.move(event.pageX, event.pageY)
+
+        area = @findHoveredArea(event.pageX, event.pageY)
+
+        if area and @tree_widget.options.onCanMoveTo
+            position_name = Position.getName(area.position)
+
+            if not @tree_widget.options.onCanMoveTo(@current_item.node, area.node, position_name)
+                area = null
+
+        if not area
+            @removeDropHint()
+            @removeHover()
+            @stopOpenFolderTimer()
+        else
+            if @hovered_area != area
+                @hovered_area = area
+
+                @updateDropHint()
+
+        return true
+
+    mouseStop: ->
+        @moveItem()
+        @clear()
+        @removeHover()
+        @removeDropHint()
+        @removeHitAreas()
+
+        @current_item.$element.removeClass('moving')
+        @is_dragging = false
+
+        return false
+
+    getOffsetFromEvent: (event) ->
+        element_offset = $(event.target).offset()
+        return [
+            event.pageX - element_offset.left,
+            event.pageY - element_offset.top
+        ]
+
+    refreshHitAreas: ->
+        @removeHitAreas()
+        @generateHitAreas()
+
+    removeHitAreas: ->
+        @hit_areas = []
+
+    clear: ->
+        @drag_element.remove()
+        @drag_element = null
+
+    removeDropHint: ->
+        if @previous_ghost
+            @previous_ghost.remove()
+
+    removeHover: ->
+        @hovered_area = null
+
+    generateHitAreas: ->
+        positions = []
+        last_top = 0
+
+        getTop = ($element) =>
+            return $element.offset().top
+
+        addPosition = (node, position, top) =>
+            positions.push(
+                top: top,
+                node: node,
+                position: position
+            )
+            last_top = top
+
+        groupPositions = (handle_group) =>
+            previous_top = -1
+            group = []
+
+            for position in positions
+                if position.top != previous_top
+                    if group.length
+                        handle_group(group, previous_top, position.top)
+
+                    previous_top = position.top
+                    group = []
+
+                group.push(position)
+
+            handle_group(
+                group,
+                previous_top,
+                @tree_widget.element.offset().top + @tree_widget.element.height()
+            )
+
+        handleNode = (node, next_node, $element) =>
+            top = getTop($element)
+
+            if node == @current_item.node
+                # Cannot move inside current item
+                addPosition(node, Position.NONE, top)
+            else
+                addPosition(node, Position.INSIDE, top)
+
+            if (
+                next_node == @current_item.node or
+                node == @current_item.node
+            )
+                # Cannot move before or after current item
+                addPosition(node, Position.NONE, top)
+            else
+                addPosition(node, Position.AFTER, top)
+
+        handleOpenFolder = (node, $element) =>
+            if node == @current_item.node
+                # Cannot move inside current item
+                # Stop iterating
+                return false
+
+            # Cannot move before current item
+            if node.children[0] != @current_item.node
+                addPosition(node, Position.INSIDE, getTop($element))
+
+            # Continue iterating
+            return true
+
+        handleAfterOpenFolder = (node, next_node, $element) =>
+            if (
+                node == @current_item.node or
+                next_node == @current_item.node
+            )
+                # Cannot move before or after current item
+                addPosition(node, Position.NONE, last_top)
+            else
+                addPosition(node, Position.AFTER, last_top)
+
+        handleClosedFolder = (node, next_node, $element) =>
+            top = getTop($element)
+
+            if node == @current_item.node
+                # Cannot move after current item
+                addPosition(node, Position.NONE, top)
+            else
+                addPosition(node, Position.INSIDE, top)
+
+                # Cannot move before current item
+                if next_node != @current_item.node
+                    addPosition(node, Position.AFTER, top)
+
+        handleFirstNode = (node, $element) =>
+            if node != @current_item.node
+                addPosition(node, Position.BEFORE, getTop($(node.element)))
+
+        @iterateVisibleNodes(
+            handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder, handleFirstNode
+        )
+
+        hit_areas = []
+
+        groupPositions((positions_in_group, top, bottom) ->
+            area_height = (bottom - top) / positions_in_group.length
+            area_top = top
+
+            for position in positions_in_group
+                hit_areas.push(
+                    top: area_top,
+                    bottom: area_top + area_height,
+                    node: position.node,
+                    position: position.position
+                )
+
+                area_top += area_height
+            return null
+        )
+
+        @hit_areas = hit_areas
+
+    iterateVisibleNodes: (handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) ->
+        is_first_node = true
+
+        iterate = (node, next_node) =>
+            must_iterate_inside = (
+                (node.is_open or  not node.element) and node.hasChildren()
+            )
+
+            if node.element
+                $element = $(node.element)
+
+                if not $element.is(':visible')
+                    return
+
+                if is_first_node
+                    handle_first_node(node, $element)
+                    is_first_node = false
+
+                if not node.hasChildren()
+                    handle_node(node, next_node, $element)
+                else if node.is_open
+                    if not handle_open_folder(node, $element)
+                        must_iterate_inside = false
+                else
+                    handle_closed_folder(node, next_node, $element)
+
+            if must_iterate_inside
+                children_length = node.children.length
+                for child, i in node.children
+                    if i == (children_length-1)
+                        iterate(node.children[i], null)
+                    else
+                        iterate(node.children[i], node.children[i+1])
+
+                if node.is_open
+                    handle_after_open_folder(node, next_node, $element)
+
+        iterate(@tree_widget.tree)
+
+    findHoveredArea: (x, y) ->
+        tree_offset = @tree_widget.element.offset()
+        if (
+            x < tree_offset.left or
+            y < tree_offset.top or
+            x > (tree_offset.left + @tree_widget.element.width()) or
+            y > (tree_offset.top + @tree_widget.element.height())
+        )
+            return null
+
+        low = 0
+        high = @hit_areas.length
+        while (low < high)
+            mid = (low + high) >> 1
+            area = @hit_areas[mid]
+
+            if y < area.top
+                high = mid
+            else if y > area.bottom
+                low = mid + 1
+            else
+                return area
+
+        return null
+
+    updateDropHint: ->
+        # stop open folder timer
+        @stopOpenFolderTimer()
+
+        if not @hovered_area
+            return
+
+        # if this is a closed folder, start timer to open it
+        node = @hovered_area.node
+        if (
+            node.hasChildren() and
+            not node.is_open and
+            @hovered_area.position == Position.INSIDE
+        )
+            @startOpenFolderTimer(node)
+
+        # remove previous drop hint
+        @removeDropHint()
+
+        # add new drop hint
+        node_element = @tree_widget._getNodeElementForNode(@hovered_area.node)
+        @previous_ghost = node_element.addDropHint(@hovered_area.position)
+
+    startOpenFolderTimer: (folder) ->
+        openFolder = =>
+            @tree_widget._getNodeElementForNode(folder).open(
+                =>
+                    @refreshHitAreas()
+                    @updateDropHint()
+            )
+
+        @open_folder_timer = setTimeout(openFolder, 500)
+
+    stopOpenFolderTimer: ->
+        if @open_folder_timer
+            clearTimeout(@open_folder_timer)
+            @open_folder_timer = null
+
+    moveItem: ->
+        if (
+            @hovered_area and
+            @hovered_area.position != Position.NONE
+        )
+            moved_node = @current_item.node
+            target_node = @hovered_area.node
+            position = @hovered_area.position
+            previous_parent = moved_node.parent
+
+            if position == Position.INSIDE
+                @hovered_area.node.is_open = true
+
+            doMove = =>
+              @tree_widget.tree.moveNode(moved_node, target_node, position)
+              @tree_widget.element.empty()
+              @tree_widget._refreshElements()
+
+            event = $.Event('tree.move')
+            event.move_info =
+                moved_node: moved_node
+                target_node: target_node
+                position: Position.getName(position)
+                previous_parent: previous_parent
+                do_move: doMove
+
+            @tree_widget.element.trigger(event)
+            doMove() unless event.isDefaultPrevented()
 
 @Tree.Node = Node
