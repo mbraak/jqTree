@@ -734,9 +734,7 @@ limitations under the License.
       if (node.hasChildren()) {
         new FolderElement(node, this.element).toggle();
       }
-      if (this.options.saveState) {
-        return this.save_state_handler.saveState();
-      }
+      return this._saveState();
     };
 
     JqTreeWidget.prototype.getTree = function() {
@@ -786,18 +784,14 @@ limitations under the License.
     JqTreeWidget.prototype.openNode = function(node, skip_slide) {
       if (node.hasChildren()) {
         new FolderElement(node, this.element).open(null, skip_slide);
-        if (this.options.saveState) {
-          return this.save_state_handler.saveState();
-        }
+        return this._saveState();
       }
     };
 
     JqTreeWidget.prototype.closeNode = function(node, skip_slide) {
       if (node.hasChildren()) {
         new FolderElement(node, this.element).close(skip_slide);
-        if (this.options.saveState) {
-          return this.save_state_handler.saveState();
-        }
+        return this._saveState();
       }
     };
 
@@ -1039,9 +1033,7 @@ limitations under the License.
         node_element = this._getNodeElement($target);
         if (node_element && node_element.node.hasChildren()) {
           node_element.toggle();
-          if (this.options.saveState) {
-            this.save_state_handler.saveState();
-          }
+          this._saveState();
           e.preventDefault();
           return e.stopPropagation();
         }
@@ -1100,6 +1092,12 @@ limitations under the License.
           this.element.trigger(event);
           return false;
         }
+      }
+    };
+
+    JqTreeWidget.prototype._saveState = function() {
+      if (this.options.saveState) {
+        return this.save_state_handler.saveState();
       }
     };
 

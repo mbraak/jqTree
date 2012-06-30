@@ -441,8 +441,7 @@ class JqTreeWidget extends MouseWidget
         if node.hasChildren()
             new FolderElement(node, @element).toggle()
 
-        if @options.saveState
-            @save_state_handler.saveState()
+        @_saveState()
     
     getTree: ->
         return @tree
@@ -484,15 +483,13 @@ class JqTreeWidget extends MouseWidget
         if node.hasChildren()
             new FolderElement(node, @element).open(null, skip_slide)
 
-            if @options.saveState
-                @save_state_handler.saveState()
+            @_saveState()
 
     closeNode: (node, skip_slide) ->
         if node.hasChildren()
             new FolderElement(node, @element).close(skip_slide)
 
-            if @options.saveState
-                @save_state_handler.saveState()
+            @_saveState()
 
     isDragging: ->
         return @is_dragging
@@ -708,8 +705,7 @@ class JqTreeWidget extends MouseWidget
             if node_element and node_element.node.hasChildren()
                 node_element.toggle()
 
-                if @options.saveState
-                    @save_state_handler.saveState()
+                @_saveState()
 
                 e.preventDefault()
                 e.stopPropagation()
@@ -759,6 +755,10 @@ class JqTreeWidget extends MouseWidget
                 event.click_event = e
                 @element.trigger(event)
                 return false
+
+    _saveState: ->
+        if @options.saveState
+            @save_state_handler.saveState()
 
     _mouseCapture: (event) ->
         if not @options.dragAndDrop
