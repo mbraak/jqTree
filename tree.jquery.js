@@ -834,12 +834,17 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.appendNode = function(new_node_info, parent_node) {
-      var node;
+      var is_already_root_node, node;
       if (!parent_node) {
         parent_node = this.tree;
       }
+      is_already_root_node = parent_node.hasChildren();
       node = parent_node.append(new_node_info);
-      this._refreshElements(parent_node.parent);
+      if (is_already_root_node) {
+        this._refreshElements(parent_node);
+      } else {
+        this._refreshElements(parent_node.parent);
+      }
       return node;
     };
 

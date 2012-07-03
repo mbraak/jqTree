@@ -522,9 +522,18 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             parent_node = @tree
 
+        # Is the parent already a root node?
+        is_already_root_node = parent_node.hasChildren()
+
         node = parent_node.append(new_node_info)
 
-        @_refreshElements(parent_node.parent)
+        if is_already_root_node
+            # Refresh the parent
+            @_refreshElements(parent_node)
+        else
+            # Refresh the parent of the parent. This must be done so the parent gets a toggler button
+            @_refreshElements(parent_node.parent)
+
         return node
  
     prependNode: (new_node_info, parent_node) ->
