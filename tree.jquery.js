@@ -934,7 +934,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._refreshElements = function(from_node) {
-      var $element, createFolderLi, createLi, createNodeLi, createUl, depth, doCreateDomElements, escapeIfNecessary, node_element,
+      var $element, createFolderLi, createLi, createNodeLi, createUl, doCreateDomElements, escapeIfNecessary, is_root_node, node_element,
         _this = this;
       if (from_node == null) {
         from_node = null;
@@ -946,12 +946,12 @@ limitations under the License.
           return value;
         }
       };
-      createUl = function(depth) {
+      createUl = function(is_root_node) {
         var class_string;
-        if (depth) {
-          class_string = '';
-        } else {
+        if (is_root_node) {
           class_string = ' class="tree"';
+        } else {
+          class_string = '';
         }
         return $("<ul" + class_string + "></ul>");
       };
@@ -995,9 +995,9 @@ limitations under the License.
         escaped_name = escapeIfNecessary(node.name);
         return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"title\">" + escaped_name + "</span></div></li>");
       };
-      doCreateDomElements = function($element, children, depth, is_open) {
+      doCreateDomElements = function($element, children, is_root_node, is_open) {
         var $li, $ul, child, _i, _len;
-        $ul = createUl(depth);
+        $ul = createUl(is_root_node);
         $element.append($ul);
         for (_i = 0, _len = children.length; _i < _len; _i++) {
           child = children[_i];
@@ -1006,13 +1006,13 @@ limitations under the License.
           child.element = $li[0];
           $li.data('node', child);
           if (child.hasChildren()) {
-            doCreateDomElements($li, child.children, depth + 1, child.is_open);
+            doCreateDomElements($li, child.children, false, child.is_open);
           }
         }
         return null;
       };
       if (from_node && from_node.parent) {
-        depth = 1;
+        is_root_node = false;
         node_element = this._getNodeElementForNode(from_node);
         node_element.getUl().remove();
         $element = node_element.$element;
@@ -1020,9 +1020,9 @@ limitations under the License.
         from_node = this.tree;
         $element = this.element;
         $element.empty();
-        depth = 0;
+        is_root_node = true;
       }
-      return doCreateDomElements($element, from_node.children, depth, true);
+      return doCreateDomElements($element, from_node.children, is_root_node, is_root_node);
     };
 
     JqTreeWidget.prototype._click = function(e) {

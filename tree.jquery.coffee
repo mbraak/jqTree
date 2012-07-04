@@ -622,11 +622,11 @@ class JqTreeWidget extends MouseWidget
             else
                 return value
 
-        createUl = (depth) =>
-            if depth
-                class_string = ''
-            else
+        createUl = (is_root_node) =>
+            if is_root_node
                 class_string = ' class="tree"'
+            else
+                class_string = ''
 
             return $("<ul#{ class_string }></ul>")
 
@@ -671,8 +671,8 @@ class JqTreeWidget extends MouseWidget
                 "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ escaped_name }</span></div></li>"
             )
 
-        doCreateDomElements = ($element, children, depth, is_open) ->
-            $ul = createUl(depth)
+        doCreateDomElements = ($element, children, is_root_node, is_open) ->
+            $ul = createUl(is_root_node)
             $element.append($ul)
 
             for child in children
@@ -683,11 +683,11 @@ class JqTreeWidget extends MouseWidget
                 $li.data('node', child)
 
                 if child.hasChildren()
-                    doCreateDomElements($li, child.children, depth + 1, child.is_open)
+                    doCreateDomElements($li, child.children, false, child.is_open)
             return null
 
         if from_node and from_node.parent
-            depth = 1
+            is_root_node = false
             node_element = @_getNodeElementForNode(from_node)
             node_element.getUl().remove()
             $element = node_element.$element
@@ -695,9 +695,9 @@ class JqTreeWidget extends MouseWidget
             from_node = @tree
             $element = @element
             $element.empty()
-            depth = 0
+            is_root_node = true
 
-        doCreateDomElements($element, from_node.children, depth, true)
+        doCreateDomElements($element, from_node.children, is_root_node, is_root_node)
 
     _click: (e) ->
         if e.ctrlKey
