@@ -1,0 +1,43 @@
+body {
+    width: 960px;
+    margin: 1em auto;
+}
+
+h1 {
+    font-size: 1.625em;
+}
+
+h3 {
+    font-size: 1em;
+    font-weight: bold;
+    margin-top: 2em;
+}
+
+
+p {
+    margin-top: 1em;
+}
+
+.syntaxhighlighter .container {
+    padding: 1em;
+}
+
+.syntaxhighlighter {
+    margin: 0;
+    border-left: solid 6px #aaa;
+    padding-bottom: 0.2em;
+}
+
+.syntaxhighlighter.dark {
+    border-left: none;
+}
+
+#tree1 {
+    margin-bottom: 1em;
+    background-color: #ccc;
+    padding: 1em;
+}
+
+#nav .next {
+    float: right;
+}

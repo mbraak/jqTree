@@ -691,6 +691,25 @@ test('appendNode', function() {
         formatTitles($(node1.element)),
         'node1 child1 child2 child3'
     );
+
+    // 2. Add child4 to child1
+    var child1 = $tree.tree('getNodeByName', 'child1');
+
+    // Node 'child1' does not have a toggler button
+    equal(
+        $(child1.element).find('> div > .toggler').length,
+        0
+    );
+
+    $tree.tree('appendNode', 'child4', child1);
+
+    equal(formatTitles($(child1.element)), 'child1 child4');
+
+    // Node 'child1' must get a toggler button
+    equal(
+        $(child1.element).find('> div > .toggler').length,
+        1
+    );
 });
 
 test('prependNode', function() {

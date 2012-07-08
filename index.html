@@ -36,6 +36,7 @@
             <a href="#tree-options">Tree options</a>
             <ul>
                 <li><a href="#tree-options-data">data</a></li>
+                <li><a href="#tree-options-data-url">dataUrl</a></li>
                 <li><a href="#tree-options-autoopen">autoOpen</a></li>
                 <li><a href="#tree-options-savestate">saveState</a></li>
                 <li><a href="#tree-options-draganddrop">dragAndDrop</a></li>
@@ -45,6 +46,7 @@
                 <li><a href="#tree-options-onismovehandle">onIsMoveHandle</a></li>
                 <li><a href="#tree-options-oncanmove">onCanMove</a></li>
                 <li><a href="#tree-options-oncanmoveto">onCanMoveTo</a></li>
+                <li><a href="#tree-options-autoescape">autoEscape</a></li>
             </ul>
         </li>
         <li>
@@ -88,7 +90,7 @@
     </ul>
     <p>
         The project is <a href="https://github.com/mbraak/jqTree">hosted on github</a>,
-        has a <a href="test/test.html">test suite</a> and a <a href="demo.html">demo</a>.
+        has a <a href="test/test.html">test suite</a> and some <a href="examples/example1.html">examples</a>.
     </p>
     <div class="group" id="demo">
         <div class="container-left">
@@ -123,6 +125,7 @@ $('#tree1').tree({
             </div>
         </div>
     </div>
+
     <h4 id="requirements">Requirements</h4>
     <ul>
         <li><a href="http://jquery.com">jQuery</a> 1.5+</li>
@@ -202,6 +205,17 @@ $.getJSON(
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.11 (july 8 2012)</h5>
+    <ul>
+        <li>Autoescape text</li>
+        <li>Added autoEscape option</li>
+        <li>Issue 33: appendNode does not correctly refresh the tree</li>
+        <li>Issue 34: unset internal pointer to previously selected node on DOM deselect</li>
+        <li>Issue 38: Correctly check if browser has support for localstorage</li>
+        <li>Issue 41: Open nodes are not displayed correctly in ie7</li>
+    </ul>
+
     <h5>0.10 (june 10 2012)</h5>
     <ul>
         <li>Optimized getNodeById</li>
@@ -235,6 +249,7 @@ $.getJSON(
     </ul>
 
     <h4 id="tree-options">Tree options</h4>
+
     <h5 id="tree-options-data">data</h5>
     <p>
         Define the contents of the tree. The data is a nested array of objects. This option is required.
@@ -274,6 +289,29 @@ $('#tree1').tree({data: data});
     id: 1
 }
 </pre>
+
+    <h5 id="tree-options-data-url">dataUrl</h5>
+    <p>
+        Load the node data from this url.
+    </p>
+
+<pre>
+$('#tree1').tree({
+   dataUrl: '/example_data.json' 
+});
+</pre>
+
+    <p>
+        You can also set the <strong>data-url</strong> attribute on the dom element:
+    </p>
+
+<pre>
+&lt;div id="tree1" data-url="/example_data.json"&gt;&lt;/div&gt;
+&lt;script&gt;
+    $('#tree1').tree();
+&lt;/script&gt;
+</pre>
+
     <h5 id="tree-options-autoopen">autoOpen</h5>
     <p>
         Open nodes initially.
@@ -472,6 +510,11 @@ $('#tree1').tree({
     }
 });
 </pre>
+
+    <h5 id="tree-options-autoescape">autoEscape</h5>
+    <p>
+        Determine if text is autoescaped. The default is true.
+    </p>
 
     <h4 id="functions">Functions</h4>
     <h5 id="functions-loadData">loadData</h5>
