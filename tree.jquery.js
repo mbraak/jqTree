@@ -972,6 +972,16 @@ limitations under the License.
         escaped_name = escapeIfNecessary(node.name);
         return $("<li><div><span class=\"title\">" + escaped_name + "</span></div></li>");
       };
+      liAppended = function(node, $li) {
+        if (_this.options.onLiAppended) {
+          _this.options.onLiAppended(node, $li);
+        }
+      };
+      treeReady = function($ul) {
+        if (_this.options.onTreeReady) {
+          _this.options.onTreeReady($ul);
+        }
+      };
       createFolderLi = function(node) {
         var button_class, escaped_name, folder_class, getButtonClass, getFolderClass;
         getButtonClass = function() {
@@ -1003,12 +1013,18 @@ limitations under the License.
           child = children[_i];
           $li = createLi(child);
           $ul.append($li);
+          liAppended(child, $li);
           child.element = $li[0];
           $li.data('node', child);
           if (child.hasChildren()) {
             doCreateDomElements($li, child.children, false, child.is_open);
           }
         }
+        
+        if (is_root_node) {
+          treeReady($ul);
+        }
+        
         return null;
       };
       if (from_node && from_node.parent) {
