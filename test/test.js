@@ -729,6 +729,22 @@ test('prependNode', function() {
         'node1 child0 child1 child2'
     );
 });
+test('init event', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.bind('tree.init', function() {
+        start();
+
+        // Check that we can call functions in 'tree.init' event
+        equal($tree.tree('getNodeByName', 'node2').name, 'node2');
+    });
+    stop();
+
+    $tree.tree({
+        data: example_data
+    });
+});
 
 module("Tree");
 test('constructor', function() {

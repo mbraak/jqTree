@@ -24,8 +24,6 @@ class SimpleWidget
         @$el = $(el)
         @options = $.extend({}, @defaults, options)
 
-        @_init()
-
     destroy: ->
         @_deinit();
 
@@ -42,39 +40,39 @@ class SimpleWidget
         createWidget = ($el, options) ->
             data_key = getDataKey()
 
-            $el.each(->
-                widget = new widget_class(this, options)
+            for el in $el
+                widget = new widget_class(el, options)
 
-                if not $.data(this, data_key)
-                    $.data(this, data_key, widget)
-            )
+                if not $.data(el, data_key)
+                    $.data(el, data_key, widget)
+
+                # Call init after setting data, so we can call methods
+                widget._init()
 
             return $el
 
         destroyWidget = ($el) ->
             data_key = getDataKey()
 
-            $el.each(->
-                widget = $.data(this, data_key)
+            for el in $el
+                widget = $.data(el, data_key)
 
                 if widget and (widget instanceof SimpleWidget)
                     widget.destroy()
 
-                $.removeData(this, data_key)
-            )
+                $.removeData(el, data_key)
 
         callFunction = ($el, function_name, args) ->
             result = null
 
-            $el.each(->
-                widget = $.data(this, getDataKey())
+            for el in $el
+                widget = $.data(el, getDataKey())
 
                 if widget and (widget instanceof SimpleWidget)
                     widget_function = widget[function_name]
 
                     if widget_function and (typeof widget_function == 'function')
                         result = widget_function.apply(widget, args)
-            )
 
             return result
 

@@ -32,7 +32,6 @@ limitations under the License.
     function SimpleWidget(el, options) {
       this.$el = $(el);
       this.options = $.extend({}, this.defaults, options);
-      this._init();
     }
 
     SimpleWidget.prototype.destroy = function() {
@@ -53,42 +52,45 @@ limitations under the License.
         return "simple_widget_" + widget_name;
       };
       createWidget = function($el, options) {
-        var data_key;
+        var data_key, el, widget, _i, _len;
         data_key = getDataKey();
-        $el.each(function() {
-          var widget;
-          widget = new widget_class(this, options);
-          if (!$.data(this, data_key)) {
-            return $.data(this, data_key, widget);
+        for (_i = 0, _len = $el.length; _i < _len; _i++) {
+          el = $el[_i];
+          widget = new widget_class(el, options);
+          if (!$.data(el, data_key)) {
+            $.data(el, data_key, widget);
           }
-        });
+          widget._init();
+        }
         return $el;
       };
       destroyWidget = function($el) {
-        var data_key;
+        var data_key, el, widget, _i, _len, _results;
         data_key = getDataKey();
-        return $el.each(function() {
-          var widget;
-          widget = $.data(this, data_key);
+        _results = [];
+        for (_i = 0, _len = $el.length; _i < _len; _i++) {
+          el = $el[_i];
+          widget = $.data(el, data_key);
           if (widget && (widget instanceof SimpleWidget)) {
             widget.destroy();
           }
-          return $.removeData(this, data_key);
-        });
+          _results.push($.removeData(el, data_key));
+        }
+        return _results;
       };
       callFunction = function($el, function_name, args) {
-        var result;
+        var el, result, widget, widget_function, _i, _len;
         result = null;
-        $el.each(function() {
-          var widget, widget_function;
-          widget = $.data(this, getDataKey());
+        for (_i = 0, _len = $el.length; _i < _len; _i++) {
+          el = $el[_i];
+          widget = $.data(el, getDataKey());
           if (widget && (widget instanceof SimpleWidget)) {
             widget_function = widget[function_name];
             if (widget_function && (typeof widget_function === 'function')) {
-              return result = widget_function.apply(widget, args);
+              result = widget_function.apply(widget, args);
             }
           }
-        });
+        }
         return result;
       };
       return $.fn[widget_name] = function() {
