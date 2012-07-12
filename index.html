@@ -72,6 +72,7 @@
                 <li><a href="#event-tree-click">tree.click</a></li>
                 <li><a href="#event-tree-contextmenu">tree.contextmenu</a></li>
                 <li><a href="#event-tree-move">tree.move</a></li>
+                <li><a href="#event-tree-init">tree.init</a></li>
             </ul>
         </li>
     </ul>
@@ -867,6 +868,21 @@ $('#tree1).bind(
         if (confirm('Really move?')) {
             event.doMove();
         }
+    }
+);
+</pre>
+
+    <h5 id="event-tree-init">tree.init</h5>
+    <p>
+        Called when the tree data is loaded. This particularly useful if the data is loaded using the
+        <a href="#tree-options-data-url">dataUrl</a> option.
+    </p>
+
+<pre>
+$('#tree1).bind(
+    'tree.init',
+    function() {
+        // initializing code
     }
 );
 </pre>
