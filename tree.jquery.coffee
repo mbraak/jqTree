@@ -901,6 +901,7 @@ class FolderElement extends NodeElement
                 @tree_element.trigger(event)
 
             if skip_slide
+                @getUl().show()
                 doOpen()
             else
                 @getUl().slideDown('fast', doOpen)
