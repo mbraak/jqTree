@@ -949,7 +949,7 @@ limitations under the License.
       createUl = function(is_root_node) {
         var class_string;
         if (is_root_node) {
-          class_string = ' class="tree"';
+          class_string = ' class="jqtree-tree"';
         } else {
           class_string = '';
         }
@@ -970,30 +970,30 @@ limitations under the License.
       createNodeLi = function(node) {
         var escaped_name;
         escaped_name = escapeIfNecessary(node.name);
-        return $("<li><div><span class=\"title\">" + escaped_name + "</span></div></li>");
+        return $("<li><div><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
       };
       createFolderLi = function(node) {
         var button_class, escaped_name, folder_class, getButtonClass, getFolderClass;
         getButtonClass = function() {
           var classes;
-          classes = ['toggler'];
+          classes = ['jqtree-toggler'];
           if (!node.is_open) {
-            classes.push('closed');
+            classes.push('jqtree-closed');
           }
           return classes.join(' ');
         };
         getFolderClass = function() {
           var classes;
-          classes = ['folder'];
+          classes = ['jqtree-folder'];
           if (!node.is_open) {
-            classes.push('closed');
+            classes.push('jqtree-closed');
           }
           return classes.join(' ');
         };
         button_class = getButtonClass();
         folder_class = getFolderClass();
         escaped_name = escapeIfNecessary(node.name);
-        return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"title\">" + escaped_name + "</span></div></li>");
+        return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
       };
       doCreateDomElements = function($element, children, is_root_node, is_open) {
         var $li, $ul, child, _i, _len;
@@ -1032,7 +1032,7 @@ limitations under the License.
         return;
       }
       $target = $(e.target);
-      if ($target.is('.toggler')) {
+      if ($target.is('.jqtree-toggler')) {
         node_element = this._getNodeElement($target);
         if (node_element && node_element.node.hasChildren()) {
           node_element.toggle();
@@ -1166,7 +1166,7 @@ limitations under the License.
     function GhostDropHint(node, $element, position) {
       this.$element = $element;
       this.node = node;
-      this.$ghost = $('<li class="ghost"><span class="circle"></span><span class="line"></span></li>');
+      this.$ghost = $('<li class="jqtree-ghost"><span class="jqtree-circle"></span><span class="jqtree-line"></span></li>');
       if (position === Position.AFTER) {
         this.moveAfter();
       } else if (position === Position.BEFORE) {
@@ -1198,7 +1198,7 @@ limitations under the License.
 
     GhostDropHint.prototype.moveInside = function() {
       this.$element.after(this.$ghost);
-      return this.$ghost.addClass('inside');
+      return this.$ghost.addClass('jqtree-inside');
     };
 
     return GhostDropHint;
@@ -1211,7 +1211,7 @@ limitations under the License.
       var $div, width;
       $div = $element.children('div');
       width = $element.width() - 4;
-      this.$hint = $('<span class="border"></span>');
+      this.$hint = $('<span class="jqtree-border"></span>');
       $div.append(this.$hint);
       this.$hint.css({
         width: width,
@@ -1244,7 +1244,7 @@ limitations under the License.
     };
 
     NodeElement.prototype.getSpan = function() {
-      return this.$element.children('div').find('span.title');
+      return this.$element.children('div').find('span.jqtree-title');
     };
 
     NodeElement.prototype.getLi = function() {
@@ -1260,11 +1260,11 @@ limitations under the License.
     };
 
     NodeElement.prototype.select = function() {
-      return this.getLi().addClass('selected');
+      return this.getLi().addClass('jqtree-selected');
     };
 
     NodeElement.prototype.deselect = function() {
-      return this.getLi().removeClass('selected');
+      return this.getLi().removeClass('jqtree-selected');
     };
 
     return NodeElement;
@@ -1292,9 +1292,9 @@ limitations under the License.
         _this = this;
       if (!this.node.is_open) {
         this.node.is_open = true;
-        this.getButton().removeClass('closed');
+        this.getButton().removeClass('jqtree-closed');
         doOpen = function() {
-          _this.getLi().removeClass('closed');
+          _this.getLi().removeClass('jqtree-closed');
           if (on_finished) {
             on_finished();
           }
@@ -1316,9 +1316,9 @@ limitations under the License.
         _this = this;
       if (this.node.is_open) {
         this.node.is_open = false;
-        this.getButton().addClass('closed');
+        this.getButton().addClass('jqtree-closed');
         doClose = function() {
-          _this.getLi().addClass('closed');
+          _this.getLi().addClass('jqtree-closed');
           return _this.tree_widget._triggerEvent('tree.close', {
             node: _this.node
           });
@@ -1332,7 +1332,7 @@ limitations under the License.
     };
 
     FolderElement.prototype.getButton = function() {
-      return this.$element.children('div').find('a.toggler');
+      return this.$element.children('div').find('a.jqtree-toggler');
     };
 
     FolderElement.prototype.addDropHint = function(position) {
@@ -1352,7 +1352,7 @@ limitations under the License.
     function DragElement(node, offset_x, offset_y, $tree) {
       this.offset_x = offset_x;
       this.offset_y = offset_y;
-      this.$element = $("<span class=\"title tree-dragging\">" + node.name + "</span>");
+      this.$element = $("<span class=\"jqtree-title jqtree-dragging\">" + node.name + "</span>");
       this.$element.css("position", "absolute");
       $tree.append(this.$element);
     }
@@ -1540,7 +1540,7 @@ limitations under the License.
       _ref = this.getOffsetFromEvent(event), offsetX = _ref[0], offsetY = _ref[1];
       this.drag_element = new DragElement(this.current_item.node, offsetX, offsetY, this.tree_widget.element);
       this.is_dragging = true;
-      this.current_item.$element.addClass('moving');
+      this.current_item.$element.addClass('jqtree-moving');
       return true;
     };
 
@@ -1573,7 +1573,7 @@ limitations under the License.
       this.removeHover();
       this.removeDropHint();
       this.removeHitAreas();
-      this.current_item.$element.removeClass('moving');
+      this.current_item.$element.removeClass('jqtree-moving');
       this.is_dragging = false;
       return false;
     };

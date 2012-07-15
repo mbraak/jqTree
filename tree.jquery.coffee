@@ -623,7 +623,7 @@ class JqTreeWidget extends MouseWidget
 
         createUl = (is_root_node) =>
             if is_root_node
-                class_string = ' class="tree"'
+                class_string = ' class="jqtree-tree"'
             else
                 class_string = ''
 
@@ -642,22 +642,22 @@ class JqTreeWidget extends MouseWidget
 
         createNodeLi = (node) =>
             escaped_name = escapeIfNecessary(node.name)
-            return $("<li><div><span class=\"title\">#{ escaped_name }</span></div></li>")
+            return $("<li><div><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>")
 
         createFolderLi = (node) =>
             getButtonClass = ->
-                classes = ['toggler']
+                classes = ['jqtree-toggler']
 
                 if not node.is_open
-                    classes.push('closed')
+                    classes.push('jqtree-closed')
 
                 return classes.join(' ')
 
             getFolderClass = ->
-                classes = ['folder']
+                classes = ['jqtree-folder']
 
                 if not node.is_open
-                    classes.push('closed')
+                    classes.push('jqtree-closed')
 
                 return classes.join(' ')
 
@@ -667,7 +667,7 @@ class JqTreeWidget extends MouseWidget
             escaped_name = escapeIfNecessary(node.name)
 
             return $(
-                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ escaped_name }</span></div></li>"
+                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->
@@ -706,7 +706,7 @@ class JqTreeWidget extends MouseWidget
 
         $target = $(e.target)
 
-        if $target.is('.toggler')
+        if $target.is('.jqtree-toggler')
             node_element = @_getNodeElement($target)
             if node_element and node_element.node.hasChildren()
                 node_element.toggle()
@@ -812,7 +812,7 @@ class GhostDropHint
         @$element = $element
 
         @node = node
-        @$ghost = $('<li class="ghost"><span class="circle"></span><span class="line"></span></li>')
+        @$ghost = $('<li class="jqtree-ghost"><span class="jqtree-circle"></span><span class="jqtree-line"></span></li>')
 
         if position == Position.AFTER
             @moveAfter()
@@ -838,7 +838,7 @@ class GhostDropHint
 
     moveInside: ->
         @$element.after(@$ghost)
-        @$ghost.addClass('inside')
+        @$ghost.addClass('jqtree-inside')
 
 
 class BorderDropHint
@@ -846,7 +846,7 @@ class BorderDropHint
         $div = $element.children('div')
         width = $element.width() - 4
 
-        @$hint = $('<span class="border"></span>')
+        @$hint = $('<span class="jqtree-border"></span>')
         $div.append(@$hint)
 
         @$hint.css({
@@ -871,7 +871,7 @@ class NodeElement
         return @$element.children('ul:first')
 
     getSpan: ->
-        return @$element.children('div').find('span.title')
+        return @$element.children('div').find('span.jqtree-title')
 
     getLi: ->
         return @$element
@@ -883,10 +883,10 @@ class NodeElement
             return new GhostDropHint(@node, @$element, position)
 
     select: ->
-        @getLi().addClass('selected')
+        @getLi().addClass('jqtree-selected')
 
     deselect: ->
-        @getLi().removeClass('selected')
+        @getLi().removeClass('jqtree-selected')
 
 
 class FolderElement extends NodeElement
@@ -899,10 +899,10 @@ class FolderElement extends NodeElement
     open: (on_finished, skip_slide) ->
         if not @node.is_open
             @node.is_open = true
-            @getButton().removeClass('closed')
+            @getButton().removeClass('jqtree-closed')
 
             doOpen = =>
-                @getLi().removeClass('closed')
+                @getLi().removeClass('jqtree-closed')
                 if on_finished
                     on_finished()
 
@@ -917,10 +917,10 @@ class FolderElement extends NodeElement
     close: (skip_slide) ->
         if @node.is_open
             @node.is_open = false
-            @getButton().addClass('closed')
+            @getButton().addClass('jqtree-closed')
 
             doClose = =>
-                @getLi().addClass('closed')
+                @getLi().addClass('jqtree-closed')
 
                 @tree_widget._triggerEvent('tree.close', node: @node)
 
@@ -930,7 +930,7 @@ class FolderElement extends NodeElement
                 @getUl().slideUp('fast', doClose)
 
     getButton: ->
-        return @$element.children('div').find('a.toggler')
+        return @$element.children('div').find('a.jqtree-toggler')
 
     addDropHint: (position) ->
         if not this.node.is_open and position == Position.INSIDE
@@ -944,7 +944,7 @@ class DragElement
         @offset_x = offset_x
         @offset_y = offset_y
 
-        @$element = $("<span class=\"title tree-dragging\">#{ node.name }</span>")
+        @$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node.name }</span>")
         @$element.css("position", "absolute")
         $tree.append(@$element)
 
@@ -1117,7 +1117,7 @@ class DragAndDropHandler
         )
 
         @is_dragging = true
-        @current_item.$element.addClass('moving')
+        @current_item.$element.addClass('jqtree-moving')
         return true
 
     mouseDrag: (event) ->
@@ -1150,7 +1150,7 @@ class DragAndDropHandler
         @removeDropHint()
         @removeHitAreas()
 
-        @current_item.$element.removeClass('moving')
+        @current_item.$element.removeClass('jqtree-moving')
         @is_dragging = false
 
         return false
