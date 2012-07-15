@@ -698,6 +698,8 @@ class JqTreeWidget extends MouseWidget
 
         doCreateDomElements($element, from_node.children, is_root_node, is_root_node)
 
+        @_triggerEvent('tree.refresh')
+
     _click: (e) ->
         if e.ctrlKey
             return

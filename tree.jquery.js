@@ -1022,7 +1022,8 @@ limitations under the License.
         $element.empty();
         is_root_node = true;
       }
-      return doCreateDomElements($element, from_node.children, is_root_node, is_root_node);
+      doCreateDomElements($element, from_node.children, is_root_node, is_root_node);
+      return this._triggerEvent('tree.refresh');
     };
 
     JqTreeWidget.prototype._click = function(e) {
