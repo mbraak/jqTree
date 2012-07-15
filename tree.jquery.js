@@ -734,7 +734,7 @@ limitations under the License.
 
     JqTreeWidget.prototype.toggle = function(node) {
       if (node.hasChildren()) {
-        new FolderElement(node, this.element).toggle();
+        new FolderElement(node, this).toggle();
       }
       return this._saveState();
     };
@@ -785,14 +785,14 @@ limitations under the License.
 
     JqTreeWidget.prototype.openNode = function(node, skip_slide) {
       if (node.hasChildren()) {
-        new FolderElement(node, this.element).open(null, skip_slide);
+        new FolderElement(node, this).open(null, skip_slide);
         return this._saveState();
       }
     };
 
     JqTreeWidget.prototype.closeNode = function(node, skip_slide) {
       if (node.hasChildren()) {
-        new FolderElement(node, this.element).close(skip_slide);
+        new FolderElement(node, this).close(skip_slide);
         return this._saveState();
       }
     };
@@ -901,7 +901,6 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._initTree = function(data) {
-      var event;
       this.tree = new Tree();
       this.tree.loadFromData(data);
       this.selected_node = null;
@@ -911,8 +910,7 @@ limitations under the License.
       this._openNodes();
       this._refreshElements();
       this.select_node_handler.selectCurrentNode();
-      event = $.Event('tree.init');
-      return this.element.trigger(event);
+      return this._triggerEvent('tree.init');
     };
 
     JqTreeWidget.prototype._openNodes = function() {
@@ -1028,7 +1026,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._click = function(e) {
-      var $target, event, node, node_element;
+      var $target, node, node_element;
       if (e.ctrlKey) {
         return;
       }
@@ -1046,9 +1044,9 @@ limitations under the License.
         if (node) {
           if ((!this.options.onCanSelectNode) || this.options.onCanSelectNode(node)) {
             this.selectNode(node);
-            event = $.Event('tree.click');
-            event.node = node;
-            return this.element.trigger(event);
+            return this._triggerEvent('tree.click', {
+              node: node
+            });
           }
         }
       }
@@ -1066,9 +1064,9 @@ limitations under the License.
 
     JqTreeWidget.prototype._getNodeElementForNode = function(node) {
       if (node.hasChildren()) {
-        return new FolderElement(node, this.element);
+        return new FolderElement(node, this);
       } else {
-        return new NodeElement(node, this.element);
+        return new NodeElement(node, this);
       }
     };
 
@@ -1083,17 +1081,17 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._contextmenu = function(e) {
-      var $div, event, node;
+      var $div, node;
       $div = $(e.target).closest('ul.tree div');
       if ($div.length) {
         node = this._getNode($div);
         if (node) {
           e.preventDefault();
           e.stopPropagation();
-          event = $.Event('tree.contextmenu');
-          event.node = node;
-          event.click_event = e;
-          this.element.trigger(event);
+          this._triggerEvent('tree.contextmenu', {
+            node: node,
+            click_event: e
+          });
           return false;
         }
       }
@@ -1135,6 +1133,19 @@ limitations under the License.
       } else {
         return false;
       }
+    };
+
+    JqTreeWidget.prototype._triggerEvent = function(event_name, values) {
+      var event, key, value;
+      event = $.Event(event_name);
+      if (values) {
+        for (key in values) {
+          value = values[key];
+          event[key] = value;
+        }
+      }
+      this.element.trigger(event);
+      return event;
     };
 
     JqTreeWidget.prototype.testGenerateHitAreas = function(moving_node) {
@@ -1217,13 +1228,13 @@ limitations under the License.
 
   NodeElement = (function() {
 
-    function NodeElement(node, tree_element) {
-      this.init(node, tree_element);
+    function NodeElement(node, tree_widget) {
+      this.init(node, tree_widget);
     }
 
-    NodeElement.prototype.init = function(node, tree_element) {
+    NodeElement.prototype.init = function(node, tree_widget) {
       this.node = node;
-      this.tree_element = tree_element;
+      this.tree_widget = tree_widget;
       return this.$element = $(node.element);
     };
 
@@ -1282,14 +1293,13 @@ limitations under the License.
         this.node.is_open = true;
         this.getButton().removeClass('closed');
         doOpen = function() {
-          var event;
           _this.getLi().removeClass('closed');
           if (on_finished) {
             on_finished();
           }
-          event = $.Event('tree.open');
-          event.node = _this.node;
-          return _this.tree_element.trigger(event);
+          return _this.tree_widget._triggerEvent('tree.open', {
+            node: _this.node
+          });
         };
         if (skip_slide) {
           this.getUl().show();
@@ -1307,11 +1317,10 @@ limitations under the License.
         this.node.is_open = false;
         this.getButton().addClass('closed');
         doClose = function() {
-          var event;
           _this.getLi().addClass('closed');
-          event = $.Event('tree.close');
-          event.node = _this.node;
-          return _this.tree_element.trigger(event);
+          return _this.tree_widget._triggerEvent('tree.close', {
+            node: _this.node
+          });
         };
         if (skip_slide) {
           return doClose();
@@ -1816,15 +1825,15 @@ limitations under the License.
           _this.tree_widget.element.empty();
           return _this.tree_widget._refreshElements();
         };
-        event = $.Event('tree.move');
-        event.move_info = {
-          moved_node: moved_node,
-          target_node: target_node,
-          position: Position.getName(position),
-          previous_parent: previous_parent,
-          do_move: doMove
-        };
-        this.tree_widget.element.trigger(event);
+        event = this.tree_widget._triggerEvent('tree.move', {
+          move_info: {
+            moved_node: moved_node,
+            target_node: target_node,
+            position: Position.getName(position),
+            previous_parent: previous_parent,
+            do_move: doMove
+          }
+        });
         if (!event.isDefaultPrevented()) {
           return doMove();
         }

@@ -439,7 +439,7 @@ class JqTreeWidget extends MouseWidget
 
     toggle: (node) ->
         if node.hasChildren()
-            new FolderElement(node, @element).toggle()
+            new FolderElement(node, this).toggle()
 
         @_saveState()
     
@@ -481,13 +481,13 @@ class JqTreeWidget extends MouseWidget
 
     openNode: (node, skip_slide) ->
         if node.hasChildren()
-            new FolderElement(node, @element).open(null, skip_slide)
+            new FolderElement(node, this).open(null, skip_slide)
 
             @_saveState()
 
     closeNode: (node, skip_slide) ->
         if node.hasChildren()
-            new FolderElement(node, @element).close(skip_slide)
+            new FolderElement(node, this).close(skip_slide)
 
             @_saveState()
 
@@ -595,8 +595,7 @@ class JqTreeWidget extends MouseWidget
 
         @select_node_handler.selectCurrentNode()
 
-        event = $.Event('tree.init')
-        @element.trigger(event)
+        @_triggerEvent('tree.init')
 
     _openNodes: ->
         if @options.saveState
@@ -722,10 +721,7 @@ class JqTreeWidget extends MouseWidget
                     @options.onCanSelectNode(node)
                 )
                     @selectNode(node)
-
-                    event = $.Event('tree.click')
-                    event.node = node
-                    @element.trigger(event)
+                    @_triggerEvent('tree.click', node: node)
 
     _getNode: ($element) ->
         $li = $element.closest('li')
@@ -736,9 +732,9 @@ class JqTreeWidget extends MouseWidget
 
     _getNodeElementForNode: (node) ->
         if node.hasChildren()
-            return new FolderElement(node, @element)
+            return new FolderElement(node, this)
         else
-            return new NodeElement(node, @element)
+            return new NodeElement(node, this)
 
     _getNodeElement: ($element) ->
         node = @_getNode($element)
@@ -755,10 +751,11 @@ class JqTreeWidget extends MouseWidget
                 e.preventDefault()
                 e.stopPropagation()
 
-                event = $.Event('tree.contextmenu')
-                event.node = node
-                event.click_event = e
-                @element.trigger(event)
+                @_triggerEvent(
+                    'tree.contextmenu',
+                        node: node
+                        click_event: e
+                )
                 return false
 
     _saveState: ->
@@ -788,6 +785,17 @@ class JqTreeWidget extends MouseWidget
             return @dnd_handler.mouseStop()
         else
             return false
+
+    _triggerEvent: (event_name, values) ->
+        event = $.Event(event_name)
+
+        # todo: use $.extend?
+        if values
+            for key, value of values
+                event[key] = value
+
+        @element.trigger(event)
+        return event
 
     testGenerateHitAreas: (moving_node) ->
         @dnd_handler.current_item = @_getNodeElementForNode(moving_node)
@@ -849,12 +857,12 @@ class BorderDropHint
 
 
 class NodeElement
-    constructor: (node, tree_element) ->
-        @init(node, tree_element)
+    constructor: (node, tree_widget) ->
+        @init(node, tree_widget)
 
-    init: (node, tree_element) ->
+    init: (node, tree_widget) ->
         @node = node
-        @tree_element = tree_element
+        @tree_widget = tree_widget
         @$element = $(node.element)
 
     getUl: ->
@@ -896,9 +904,7 @@ class FolderElement extends NodeElement
                 if on_finished
                     on_finished()
 
-                event = $.Event('tree.open')
-                event.node = @node
-                @tree_element.trigger(event)
+                @tree_widget._triggerEvent('tree.open', node: @node)
 
             if skip_slide
                 @getUl().show()
@@ -914,9 +920,7 @@ class FolderElement extends NodeElement
             doClose = =>
                 @getLi().addClass('closed')
 
-                event = $.Event('tree.close')
-                event.node = @node
-                @tree_element.trigger(event)
+                @tree_widget._triggerEvent('tree.close', node: @node)
 
             if skip_slide
                 doClose()
@@ -1411,15 +1415,16 @@ class DragAndDropHandler
               @tree_widget.element.empty()
               @tree_widget._refreshElements()
 
-            event = $.Event('tree.move')
-            event.move_info =
-                moved_node: moved_node
-                target_node: target_node
-                position: Position.getName(position)
-                previous_parent: previous_parent
-                do_move: doMove
+            event = @tree_widget._triggerEvent(
+                'tree.move',
+                move_info:
+                    moved_node: moved_node
+                    target_node: target_node
+                    position: Position.getName(position)
+                    previous_parent: previous_parent
+                    do_move: doMove
+            )
 
-            @tree_widget.element.trigger(event)
             doMove() unless event.isDefaultPrevented()
 
 @Tree.Node = Node
