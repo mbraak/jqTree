@@ -925,6 +925,7 @@ class FolderElement extends NodeElement
                 @tree_widget._triggerEvent('tree.close', node: @node)
 
             if skip_slide
+                @getUl().hide()
                 doClose()
             else
                 @getUl().slideUp('fast', doClose)

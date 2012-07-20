@@ -1324,6 +1324,7 @@ limitations under the License.
           });
         };
         if (skip_slide) {
+          this.getUl().hide();
           return doClose();
         } else {
           return this.getUl().slideUp('fast', doClose);
