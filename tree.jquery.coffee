@@ -790,11 +790,7 @@ class JqTreeWidget extends MouseWidget
 
     _triggerEvent: (event_name, values) ->
         event = $.Event(event_name)
-
-        # todo: use $.extend?
-        if values
-            for key, value of values
-                event[key] = value
+        $.extend(event, values)
 
         @element.trigger(event)
         return event

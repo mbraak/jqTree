@@ -1137,14 +1137,9 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._triggerEvent = function(event_name, values) {
-      var event, key, value;
+      var event;
       event = $.Event(event_name);
-      if (values) {
-        for (key in values) {
-          value = values[key];
-          event[key] = value;
-        }
-      }
+      $.extend(event, values);
       this.element.trigger(event);
       return event;
     };
