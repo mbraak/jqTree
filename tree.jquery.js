@@ -925,9 +925,17 @@ limitations under the License.
       return this._refreshElements();
     };
 
+    JqTreeWidget.prototype.getStateFromStorage = function() {
+      return this.save_state_handler.getStateFromStorage();
+    };
+
     JqTreeWidget.prototype._init = function() {
       JqTreeWidget.__super__._init.call(this);
       this.element = this.$el;
+      this.selected_node = null;
+      this.save_state_handler = new SaveStateHandler(this);
+      this.select_node_handler = new SelectNodeHandler(this);
+      this.dnd_handler = new DragAndDropHandler(this);
       this._initData();
       this.element.click($.proxy(this._click, this));
       return this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
@@ -988,10 +996,6 @@ limitations under the License.
     JqTreeWidget.prototype._initTree = function(data) {
       this.tree = new Tree();
       this.tree.loadFromData(data);
-      this.selected_node = null;
-      this.save_state_handler = new SaveStateHandler(this);
-      this.select_node_handler = new SelectNodeHandler(this);
-      this.dnd_handler = new DragAndDropHandler(this);
       this._openNodes();
       this._refreshElements();
       this.select_node_handler.selectCurrentNode();
@@ -1464,22 +1468,26 @@ limitations under the License.
 
     SaveStateHandler.prototype.restoreState = function() {
       var state;
+      state = this.getStateFromStorage();
+      if (state) {
+        this.setState(state);
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    SaveStateHandler.prototype.getStateFromStorage = function() {
       if (this.tree_widget.options.onGetStateFromStorage) {
-        state = this.tree_widget.options.onGetStateFromStorage();
+        return this.tree_widget.options.onGetStateFromStorage();
       } else if (typeof localStorage !== "undefined" && localStorage !== null) {
-        state = localStorage.getItem(this.getCookieName());
+        return localStorage.getItem(this.getCookieName());
       } else if ($.cookie) {
-        state = $.cookie(this.getCookieName(), {
+        return $.cookie(this.getCookieName(), {
           path: '/'
         });
       } else {
-        state = null;
-      }
-      if (!state) {
-        return false;
-      } else {
-        this.setState(state);
-        return true;
+        return null;
       }
     };
 
