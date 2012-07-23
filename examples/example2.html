@@ -11,9 +11,11 @@
     <link rel="stylesheet" href="../jqtree.css">
     <script src="../extra/js/jquery-1.7.2.min.js"></script>
     <script src="../tree.jquery.js"></script>
+    <script src="../extra/js/jquery.mockjax.js"></script>
     <script src="../extra/syntax_highlighter/XRegExp.js"></script>
     <script src="../extra/syntax_highlighter/shCore.js"></script>
     <script src="../extra/syntax_highlighter/shBrushJScript.js"></script>
+    <script src="../extra/example_data.js"></script>
     <script src="example.js"></script>
 </head>
 <body>
@@ -24,11 +26,7 @@
 
     <h1>Example 2 - load the data from the server</h1>
 
-    <p>
-        NB. This example loads the data by ajax. It does not work if you open this page in the local filesystem.
-    </p>
-
-    <div id="tree1" data-url="../extra/example_data.json"></div>
+    <div id="tree1" data-url="/example_data/"></div>
 
     <p>
         In this example we load the data from the server using the <strong>data-url</strong> property on the dom element.
@@ -36,7 +34,7 @@
 
     <h3>html</h3>
 <pre>
-&lt;div id="tree1" data-url="../extra/example_data.json"&gt;&lt;/div&gt;
+&lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;
 </pre>
 
     <h3>javascript</h3>
@@ -44,6 +42,13 @@
     $('#tree1').tree();
 </pre>
     <script>
+        $.mockjax({
+            url: '*',
+            response: function(options) {
+                this.responseText = ExampleData.example_data;
+            }
+        });
+
         $(function() {
             $('#tree1').tree();
         });

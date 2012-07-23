@@ -11,10 +11,12 @@
     <link rel="stylesheet" href="../jqtree.css">
     <script src="../extra/js/jquery-1.7.2.min.js"></script>
     <script src="../tree.jquery.js"></script>
+    <script src="../extra/js/jquery.mockjax.js"></script>
     <script src="../extra/js/jquery.cookie.js"></script>
     <script src="../extra/syntax_highlighter/XRegExp.js"></script>
     <script src="../extra/syntax_highlighter/shCore.js"></script>
     <script src="../extra/syntax_highlighter/shBrushJScript.js"></script>
+    <script src="../extra/example_data.js"></script>
     <script src="example.js"></script>
 </head>
 <body>
@@ -24,7 +26,7 @@
 
     <h1>Example 4 - Save the state</h1>
 
-    <div id="tree1" data-url="../extra/example_data.json"></div>
+    <div id="tree1" data-url="/example_data/"></div>
 
     <p>
        If you set the option <strong>saveState</strong> to true, then jqtree remembers the tree state after a page reload.
@@ -41,7 +43,7 @@
 
     <h3>html</h3>
 <pre>
-&lt;div id="tree1" data-url="../extra/example_data.json"&gt;&lt;/div&gt;
+&lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;
 </pre>
 
     <h3>javascript</h3>
@@ -62,6 +64,13 @@ $('#tree1').tree({
 </pre>
 
     <script>
+        $.mockjax({
+            url: '*',
+            response: function(options) {
+                this.responseText = ExampleData.example_data;
+            }
+        });
+
         $(function() {
             $('#tree1').tree({
                 saveState: true
