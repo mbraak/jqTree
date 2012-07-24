@@ -505,6 +505,10 @@ limitations under the License.
       return this.children.length !== 0;
     };
 
+    Node.prototype.isFolder = function() {
+      return this.hasChildren() || this.load_on_demand;
+    };
+
     /*
         Iterate over all the nodes in the tree.
     
@@ -733,10 +737,11 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.toggle = function(node) {
-      if (node.hasChildren()) {
-        new FolderElement(node, this).toggle();
+      if (node.is_open) {
+        return this.closeNode(node);
+      } else {
+        return this.openNode(node);
       }
-      return this._saveState();
     };
 
     JqTreeWidget.prototype.getTree = function() {
@@ -784,14 +789,38 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.openNode = function(node, skip_slide) {
-      if (node.hasChildren()) {
-        new FolderElement(node, this).open(null, skip_slide);
-        return this._saveState();
+      var folder_element;
+      if (node.isFolder()) {
+        if (node.load_on_demand) {
+          return this._loadFolderOnDemand(node, skip_slide);
+        } else {
+          folder_element = new FolderElement(node, this);
+          folder_element.open(null, skip_slide);
+          return this._saveState();
+        }
+      }
+    };
+
+    JqTreeWidget.prototype._loadFolderOnDemand = function(node, skip_slide) {
+      var $li, data_url, folder_element,
+        _this = this;
+      node.load_on_demand = false;
+      data_url = this._getDataUrl();
+      folder_element = new FolderElement(node, this);
+      if (data_url && folder_element) {
+        $li = folder_element.getLi();
+        $li.addClass('jqtree-loading');
+        data_url += "?node=" + node.id;
+        return this._loadDataFromServer(data_url, function(data) {
+          $li.removeClass('loading');
+          _this.loadData(data, node);
+          return _this.openNode(node, skip_slide);
+        });
       }
     };
 
     JqTreeWidget.prototype.closeNode = function(node, skip_slide) {
-      if (node.hasChildren()) {
+      if (node.isFolder()) {
         new FolderElement(node, this).close(skip_slide);
         return this._saveState();
       }
@@ -840,7 +869,7 @@ limitations under the License.
       if (!parent_node) {
         parent_node = this.tree;
       }
-      is_already_root_node = parent_node.hasChildren();
+      is_already_root_node = parent_node.isFolder();
       node = parent_node.append(new_node_info);
       if (is_already_root_node) {
         this._refreshElements(parent_node);
@@ -881,23 +910,34 @@ limitations under the License.
       if (this.options.data) {
         return this._initTree(this.options.data);
       } else {
-        data_url = this.options.dataUrl || this.element.data('url');
+        data_url = this._getDataUrl();
         if (data_url) {
-          return $.ajax({
-            url: data_url,
-            cache: false,
-            success: function(response) {
-              var data;
-              if ($.isArray(response) || typeof response === 'object') {
-                data = response;
-              } else {
-                data = $.parseJSON(response);
-              }
-              return _this._initTree(data);
-            }
+          return this._loadDataFromServer(data_url, function(data) {
+            return _this._initTree(data);
           });
         }
       }
+    };
+
+    JqTreeWidget.prototype._getDataUrl = function() {
+      return this.options.dataUrl || this.element.data('url');
+    };
+
+    JqTreeWidget.prototype._loadDataFromServer = function(data_url, on_success) {
+      var _this = this;
+      return $.ajax({
+        url: data_url,
+        cache: false,
+        success: function(response) {
+          var data;
+          if ($.isArray(response) || typeof response === 'object') {
+            data = response;
+          } else {
+            data = $.parseJSON(response);
+          }
+          return on_success(data);
+        }
+      });
     };
 
     JqTreeWidget.prototype._initTree = function(data) {
@@ -957,7 +997,7 @@ limitations under the License.
       };
       createLi = function(node) {
         var $li;
-        if (node.hasChildren()) {
+        if (node.isFolder()) {
           $li = createFolderLi(node);
         } else {
           $li = createNodeLi(node);
@@ -1027,16 +1067,15 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._click = function(e) {
-      var $target, node, node_element;
+      var $target, node;
       if (e.ctrlKey) {
         return;
       }
       $target = $(e.target);
       if ($target.is('.jqtree-toggler')) {
-        node_element = this._getNodeElement($target);
-        if (node_element && node_element.node.hasChildren()) {
-          node_element.toggle();
-          this._saveState();
+        node = this._getNode($target);
+        if (node) {
+          this.toggle(node);
           e.preventDefault();
           return e.stopPropagation();
         }
@@ -1064,7 +1103,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._getNodeElementForNode = function(node) {
-      if (node.hasChildren()) {
+      if (node.isFolder()) {
         return new FolderElement(node, this);
       } else {
         return new NodeElement(node, this);
@@ -1167,7 +1206,7 @@ limitations under the License.
       } else if (position === Position.BEFORE) {
         this.moveBefore();
       } else if (position === Position.INSIDE) {
-        if (node.hasChildren() && node.is_open) {
+        if (node.isFolder() && node.is_open) {
           this.moveInsideOpenFolder();
         } else {
           this.moveInside();
@@ -1273,14 +1312,6 @@ limitations under the License.
     function FolderElement() {
       return FolderElement.__super__.constructor.apply(this, arguments);
     }
-
-    FolderElement.prototype.toggle = function() {
-      if (this.node.is_open) {
-        return this.close();
-      } else {
-        return this.open();
-      }
-    };
 
     FolderElement.prototype.open = function(on_finished, skip_slide) {
       var doOpen,
@@ -1779,7 +1810,7 @@ limitations under the License.
         return;
       }
       node = this.hovered_area.node;
-      if (node.hasChildren() && !node.is_open && this.hovered_area.position === Position.INSIDE) {
+      if (node.isFolder() && !node.is_open && this.hovered_area.position === Position.INSIDE) {
         this.startOpenFolderTimer(node);
       }
       this.removeDropHint();

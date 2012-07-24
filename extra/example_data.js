@@ -1,4 +1,6 @@
-var example_data = [
+var ExampleData = {};
+
+ExampleData.example_data = [
     {
         label: 'Saurischia',
         id: 1,
@@ -76,3 +78,52 @@ var example_data = [
         ]
     }
 ];
+
+
+ExampleData.getFirstLevelData = function(nodes) {
+    if (! nodes) {
+        nodes = ExampleData.example_data;
+    }
+
+    var data = [];
+
+    $.each(nodes, function() {
+        var node = {
+            label: this.label,
+            id: this.id,
+        };
+
+        if (this.children) {
+            node.load_on_demand = true;
+        }
+
+        data.push(node);
+    });
+
+    return data;
+}
+
+ExampleData.getChildrenOfNode = function(node_id) {
+    var result = null;
+
+    function iterate(nodes) {
+        $.each(nodes, function() {
+            if (result) {
+                return;
+            }
+            else {
+                if (this.id == node_id) {
+                    result = this;
+                }
+
+                if (this.children) {
+                    iterate(this.children);
+                }
+            }
+        });
+    }
+
+    iterate(ExampleData.example_data);
+
+    return ExampleData.getFirstLevelData(result.children);
+}

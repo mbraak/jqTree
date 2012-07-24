@@ -41,3 +41,8 @@ p {
 #nav .next {
     float: right;
 }
+
+.jqtree-tree .jqtree-loading > div .jqtree-title:after {
+    content: url(spinner.gif);
+    margin-left: 8px;
+}

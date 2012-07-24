@@ -255,6 +255,9 @@ class Node
     hasChildren: ->
         return @children.length != 0
 
+    isFolder: ->
+        return @hasChildren() or @load_on_demand
+
     ###
     Iterate over all the nodes in the tree.
 
@@ -438,10 +441,10 @@ class JqTreeWidget extends MouseWidget
         dataUrl: null
 
     toggle: (node) ->
-        if node.hasChildren()
-            new FolderElement(node, this).toggle()
-
-        @_saveState()
+        if node.is_open
+            @closeNode(node)
+        else
+            @openNode(node)
     
     getTree: ->
         return @tree
@@ -480,13 +483,36 @@ class JqTreeWidget extends MouseWidget
         return @tree.getNodeByName(name)
 
     openNode: (node, skip_slide) ->
-        if node.hasChildren()
-            new FolderElement(node, this).open(null, skip_slide)
+        if node.isFolder()
+            if node.load_on_demand
+                @_loadFolderOnDemand(node, skip_slide)
+            else
+                folder_element = new FolderElement(node, this)
+                folder_element.open(null, skip_slide)
+                @_saveState()
 
-            @_saveState()
+    _loadFolderOnDemand: (node, skip_slide) ->
+        node.load_on_demand = false
+        data_url = @_getDataUrl()
+        folder_element = new FolderElement(node, this)
+
+        if data_url and folder_element
+            $li = folder_element.getLi()
+            $li.addClass('jqtree-loading')
+
+            data_url += "?node=#{ node.id }"
+
+            @_loadDataFromServer(
+                data_url,
+                (data) =>
+                    $li.removeClass('loading')
+
+                    @loadData(data, node)
+                    @openNode(node, skip_slide)
+            )
 
     closeNode: (node, skip_slide) ->
-        if node.hasChildren()
+        if node.isFolder()
             new FolderElement(node, this).close(skip_slide)
 
             @_saveState()
@@ -523,7 +549,7 @@ class JqTreeWidget extends MouseWidget
             parent_node = @tree
 
         # Is the parent already a root node?
-        is_already_root_node = parent_node.hasChildren()
+        is_already_root_node = parent_node.isFolder()
 
         node = parent_node.append(new_node_info)
 
@@ -566,19 +592,29 @@ class JqTreeWidget extends MouseWidget
         if @options.data
             @_initTree(@options.data)
         else
-            data_url = @options.dataUrl or @element.data('url')
+            data_url = @_getDataUrl()
             if data_url
-                $.ajax(
-                    url: data_url
-                    cache: false
-                    success: (response) =>
-                        if $.isArray(response) or typeof response == 'object'
-                            data = response
-                        else
-                            data = $.parseJSON(response)
-
+                @_loadDataFromServer(
+                    data_url,
+                    (data) =>
                         @_initTree(data)
                 )
+
+    _getDataUrl: ->
+        return @options.dataUrl or @element.data('url')
+
+    _loadDataFromServer: (data_url, on_success) ->
+        $.ajax(
+            url: data_url
+            cache: false
+            success: (response) =>
+                if $.isArray(response) or typeof response == 'object'
+                    data = response
+                else
+                    data = $.parseJSON(response)
+
+                on_success(data)
+        )
 
     _initTree: (data) ->
         @tree = new Tree()
@@ -630,7 +666,7 @@ class JqTreeWidget extends MouseWidget
             return $("<ul#{ class_string }></ul>")
 
         createLi = (node) =>
-            if node.hasChildren()
+            if node.isFolder()
                 $li = createFolderLi(node)
             else
                 $li = createNodeLi(node)
@@ -683,6 +719,7 @@ class JqTreeWidget extends MouseWidget
 
                 if child.hasChildren()
                     doCreateDomElements($li, child.children, false, child.is_open)
+
             return null
 
         if from_node and from_node.parent
@@ -707,11 +744,10 @@ class JqTreeWidget extends MouseWidget
         $target = $(e.target)
 
         if $target.is('.jqtree-toggler')
-            node_element = @_getNodeElement($target)
-            if node_element and node_element.node.hasChildren()
-                node_element.toggle()
+            node = @_getNode($target)
 
-                @_saveState()
+            if node
+                @toggle(node)
 
                 e.preventDefault()
                 e.stopPropagation()
@@ -733,7 +769,7 @@ class JqTreeWidget extends MouseWidget
             return $li.data('node')
 
     _getNodeElementForNode: (node) ->
-        if node.hasChildren()
+        if node.isFolder()
             return new FolderElement(node, this)
         else
             return new NodeElement(node, this)
@@ -815,7 +851,7 @@ class GhostDropHint
         else if position == Position.BEFORE
             @moveBefore()
         else if position == Position.INSIDE
-            if node.hasChildren() and node.is_open
+            if node.isFolder() and node.is_open
                 @moveInsideOpenFolder()
             else
                 @moveInside()
@@ -886,12 +922,6 @@ class NodeElement
 
 
 class FolderElement extends NodeElement
-    toggle: ->
-        if @node.is_open
-            @close()
-        else
-            @open()
-
     open: (on_finished, skip_slide) ->
         if not @node.is_open
             @node.is_open = true
@@ -930,7 +960,7 @@ class FolderElement extends NodeElement
         return @$element.children('div').find('a.jqtree-toggler')
 
     addDropHint: (position) ->
-        if not this.node.is_open and position == Position.INSIDE
+        if not @node.is_open and position == Position.INSIDE
             return new BorderDropHint(@$element)
         else
             return new GhostDropHint(@node, @$element, position)
@@ -1368,7 +1398,7 @@ class DragAndDropHandler
         # if this is a closed folder, start timer to open it
         node = @hovered_area.node
         if (
-            node.hasChildren() and
+            node.isFolder() and
             not node.is_open and
             @hovered_area.position == Position.INSIDE
         )
