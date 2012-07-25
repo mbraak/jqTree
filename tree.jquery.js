@@ -789,19 +789,23 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.openNode = function(node, skip_slide) {
+      return this._openNode(node, skip_slide);
+    };
+
+    JqTreeWidget.prototype._openNode = function(node, skip_slide, on_finished) {
       var folder_element;
       if (node.isFolder()) {
         if (node.load_on_demand) {
-          return this._loadFolderOnDemand(node, skip_slide);
+          return this._loadFolderOnDemand(node, skip_slide, on_finished);
         } else {
           folder_element = new FolderElement(node, this);
-          folder_element.open(null, skip_slide);
+          folder_element.open(on_finished, skip_slide);
           return this._saveState();
         }
       }
     };
 
-    JqTreeWidget.prototype._loadFolderOnDemand = function(node, skip_slide) {
+    JqTreeWidget.prototype._loadFolderOnDemand = function(node, skip_slide, on_finished) {
       var $li, data_url, folder_element,
         _this = this;
       node.load_on_demand = false;
@@ -814,7 +818,7 @@ limitations under the License.
         return this._loadDataFromServer(data_url, function(data) {
           $li.removeClass('loading');
           _this.loadData(data, node);
-          return _this.openNode(node, skip_slide);
+          return _this._openNode(node, skip_slide, on_finished);
         });
       }
     };
@@ -1822,7 +1826,7 @@ limitations under the License.
       var openFolder,
         _this = this;
       openFolder = function() {
-        return _this.tree_widget._getNodeElementForNode(folder).open(function() {
+        return _this.tree_widget._openNode(folder, false, function() {
           _this.refreshHitAreas();
           return _this.updateDropHint();
         });

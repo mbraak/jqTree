@@ -75,7 +75,9 @@
     <h3>javascript</h3>
 
 <pre>
-$('#tree1').tree();
+$('#tree1').tree({
+    dragAndDrop: true
+});
 </pre>
 
     <script>
@@ -99,7 +101,9 @@ $('#tree1').tree();
         $(function() {
             var $tree = $('#tree1');
 
-            $tree.tree();
+            $tree.tree({
+                dragAndDrop: true
+            });
         });
     </script>
 </body>

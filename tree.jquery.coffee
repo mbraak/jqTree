@@ -483,15 +483,18 @@ class JqTreeWidget extends MouseWidget
         return @tree.getNodeByName(name)
 
     openNode: (node, skip_slide) ->
+        @_openNode(node, skip_slide)
+
+    _openNode: (node, skip_slide, on_finished) ->
         if node.isFolder()
             if node.load_on_demand
-                @_loadFolderOnDemand(node, skip_slide)
+                @_loadFolderOnDemand(node, skip_slide, on_finished)
             else
                 folder_element = new FolderElement(node, this)
-                folder_element.open(null, skip_slide)
+                folder_element.open(on_finished, skip_slide)
                 @_saveState()
 
-    _loadFolderOnDemand: (node, skip_slide) ->
+    _loadFolderOnDemand: (node, skip_slide, on_finished) ->
         node.load_on_demand = false
         data_url = @_getDataUrl()
         folder_element = new FolderElement(node, this)
@@ -508,7 +511,7 @@ class JqTreeWidget extends MouseWidget
                     $li.removeClass('loading')
 
                     @loadData(data, node)
-                    @openNode(node, skip_slide)
+                    @_openNode(node, skip_slide, on_finished)
             )
 
     closeNode: (node, skip_slide) ->
@@ -1413,7 +1416,9 @@ class DragAndDropHandler
 
     startOpenFolderTimer: (folder) ->
         openFolder = =>
-            @tree_widget._getNodeElementForNode(folder).open(
+            @tree_widget._openNode(
+                folder,
+                false,
                 =>
                     @refreshHitAreas()
                     @updateDropHint()
