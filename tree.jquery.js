@@ -762,6 +762,9 @@ limitations under the License.
 
     JqTreeWidget.prototype.loadData = function(data, parent_node) {
       var child, subtree, _i, _len, _ref;
+      this._triggerEvent('tree.load_data', {
+        tree_data: data
+      });
       if (!parent_node) {
         this._initTree(data);
       } else {
@@ -912,12 +915,12 @@ limitations under the License.
       var data_url,
         _this = this;
       if (this.options.data) {
-        return this._initTree(this.options.data);
+        return this.loadData(this.options.data);
       } else {
         data_url = this._getDataUrl();
         if (data_url) {
           return this._loadDataFromServer(data_url, function(data) {
-            return _this._initTree(data);
+            return _this.loadData(data);
           });
         }
       }

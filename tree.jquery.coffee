@@ -461,6 +461,8 @@ class JqTreeWidget extends MouseWidget
         )
 
     loadData: (data, parent_node) ->
+        @_triggerEvent('tree.load_data', tree_data: data)
+
         if not parent_node
             @_initTree(data)
         else
@@ -593,14 +595,14 @@ class JqTreeWidget extends MouseWidget
 
     _initData: ->
         if @options.data
-            @_initTree(@options.data)
+            @loadData(@options.data)
         else
             data_url = @_getDataUrl()
             if data_url
                 @_loadDataFromServer(
                     data_url,
                     (data) =>
-                        @_initTree(data)
+                        @loadData(data)
                 )
 
     _getDataUrl: ->
