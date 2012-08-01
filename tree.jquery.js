@@ -812,12 +812,11 @@ limitations under the License.
       var $li, data_url, folder_element,
         _this = this;
       node.load_on_demand = false;
-      data_url = this._getDataUrl();
+      data_url = this._getDataUrl(node);
       folder_element = new FolderElement(node, this);
       if (data_url && folder_element) {
         $li = folder_element.getLi();
         $li.addClass('jqtree-loading');
-        data_url += "?node=" + node.id;
         return this._loadDataFromServer(data_url, function(data) {
           $li.removeClass('loading');
           _this.loadData(data, node);
@@ -926,8 +925,17 @@ limitations under the License.
       }
     };
 
-    JqTreeWidget.prototype._getDataUrl = function() {
-      return this.options.dataUrl || this.element.data('url');
+    JqTreeWidget.prototype._getDataUrl = function(node) {
+      var data_url;
+      data_url = this.options.dataUrl || this.element.data('url');
+      if ($.isFunction(data_url)) {
+        return data_url(node);
+      } else {
+        if (node) {
+          data_url += "?node=" + node.id;
+        }
+        return data_url;
+      }
     };
 
     JqTreeWidget.prototype._loadDataFromServer = function(data_url, on_success) {

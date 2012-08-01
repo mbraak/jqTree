@@ -498,14 +498,12 @@ class JqTreeWidget extends MouseWidget
 
     _loadFolderOnDemand: (node, skip_slide, on_finished) ->
         node.load_on_demand = false
-        data_url = @_getDataUrl()
+        data_url = @_getDataUrl(node)
         folder_element = new FolderElement(node, this)
 
         if data_url and folder_element
             $li = folder_element.getLi()
             $li.addClass('jqtree-loading')
-
-            data_url += "?node=#{ node.id }"
 
             @_loadDataFromServer(
                 data_url,
@@ -605,8 +603,16 @@ class JqTreeWidget extends MouseWidget
                         @loadData(data)
                 )
 
-    _getDataUrl: ->
-        return @options.dataUrl or @element.data('url')
+    _getDataUrl: (node) ->
+        data_url = @options.dataUrl or @element.data('url')
+
+        if $.isFunction(data_url)
+            return data_url(node)
+        else
+            if node
+                data_url += "?node=#{ node.id }"
+
+            return data_url
 
     _loadDataFromServer: (data_url, on_success) ->
         $.ajax(
