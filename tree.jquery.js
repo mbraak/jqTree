@@ -358,24 +358,26 @@ limitations under the License.
 
     function Node(o) {
       this.setData(o);
+      this.children = [];
+      this.parent = null;
     }
 
     Node.prototype.setData = function(o) {
-      var key, value;
+      var key, value, _results;
       if (typeof o !== 'object') {
-        this.name = o;
+        return this.name = o;
       } else {
+        _results = [];
         for (key in o) {
           value = o[key];
           if (key === 'label') {
-            this.name = value;
+            _results.push(this.name = value);
           } else {
-            this[key] = value;
+            _results.push(this[key] = value);
           }
         }
+        return _results;
       }
-      this.children = [];
-      return this.parent = null;
     };
 
     Node.prototype.initFromData = function(data) {
@@ -893,6 +895,12 @@ limitations under the License.
       node = parent_node.prepend(new_node_info);
       this._refreshElements(parent_node);
       return node;
+    };
+
+    JqTreeWidget.prototype.updateNode = function(node, data) {
+      node.setData(data);
+      this._refreshElements(node.parent);
+      return this.select_node_handler.selectCurrentNode();
     };
 
     JqTreeWidget.prototype._init = function() {

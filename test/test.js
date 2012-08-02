@@ -749,6 +749,36 @@ test('init event', function() {
     });
 });
 
+test('updateNode', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+
+    equal(formatTitles($tree), 'node1 child1 child2 node2 child3');
+
+    // -- update label
+    var node2 = $tree.tree('getNodeByName', 'node2');
+    $tree.tree('updateNode', node2, 'CHANGED');
+
+    equal(formatTitles($tree), 'node1 child1 child2 CHANGED child3');
+    equal(node2.name, 'CHANGED');
+
+    // -- update data
+    $tree.tree(
+        'updateNode',
+        node2,
+        {
+            name: 'xyz',
+            tag1: 'abc'
+        }
+    );
+
+    equal(formatTitles($tree), 'node1 child1 child2 xyz child3');
+    equal(node2.name, 'xyz');
+    equal(node2.tag1, 'abc');
+});
+
 module("Tree");
 test('constructor', function() {
     // 1. Create node from string

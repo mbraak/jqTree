@@ -64,6 +64,7 @@
                 <li><a href="#functions-addparentnode">addParentNode</a></li>
                 <li><a href="#functions-removenode">removeNode</a></li>
                 <li><a href="#functions-appendnode">appendNode</a></li>
+                <li><a href="#functions-updatenode">updateNode</a></li>
             </ul>
         </li>
         <li>
@@ -214,6 +215,7 @@ $.getJSON(
         <li>Issue 47: Function 'selectNode' must properly open the parent nodes</li>
         <li>Issue 49: Make sure that widget functions can be called in the 'tree.init' event</li>
         <li>Issue 50: Add namespace to css classes</li>
+        <li>Story 58: Added updateNode function</li>
     </ul>
 
     <h5>0.11 (july 8 2012)</h5>
@@ -772,11 +774,53 @@ $tree.appendNode(
 );
 </pre>
 
+    <h5 id="functions-updatenode">updateNode</h5>
+
+    <p>
+        <strong>function updateNode(node, label);</strong>
+        <br>
+        <strong>function updateNode(node, data);</strong>
+    </p>
+
+    <p>
+        Update the title of a node. You can also update the data.
+    </p>
+
+    <p>
+        Update the label:
+    </p>
+
+<pre>
+var node = $tree.tree('getNodeById', 123);
+
+$tree.tree('updateNode', 'new label');
+</pre>
+
+    <p>
+        Update the data (including the label)
+    </p>
+
+<pre>
+var node = $tree.tree('getNodeById', 123);
+
+$tree.tree(
+    'updateNode',
+    {
+        label: 'new label',
+        other_property: 'abc'
+    }
+);
+</pre>
+
+
     <h4 id="events">Events</h4>
+
     <h5 id="event-tree-click">tree.click</h5>
+
     <p>
         Triggered when a tree node is clicked.
     </p>
+
 <pre>
 // create tree
 $('#tree1').tree({

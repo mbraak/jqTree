@@ -136,6 +136,9 @@ class Node
     constructor: (o) ->
         @setData(o)
 
+        @children = []
+        @parent = null
+
     setData: (o) ->
         if typeof o != 'object'
             @name = o
@@ -146,9 +149,6 @@ class Node
                     @name = value
                 else
                     @[key] = value
-
-        @children = []
-        @parent = null
 
     # Init Node from data without making it the root of the tree
     initFromData: (data) ->
@@ -573,6 +573,12 @@ class JqTreeWidget extends MouseWidget
 
         @_refreshElements(parent_node)
         return node
+
+    updateNode: (node, data) ->
+        node.setData(data)
+
+        @_refreshElements(node.parent)
+        @select_node_handler.selectCurrentNode()
 
     _init: ->
         super()
