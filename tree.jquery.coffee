@@ -116,19 +116,20 @@ html_escape = (string) ->
 
 Position =
     getName: (position) ->
-        if position == Position.BEFORE
-            return 'before'
-        else if position == Position.AFTER
-            return 'after'
-        else if position == Position.INSIDE
-            return 'inside'
-        else
-            return 'none'
+        return Position.strings[position - 1]
+
+    nameToIndex: (name) ->
+        for i in [1..Position.strings.length]
+            if Position.strings[i - 1] == name
+                return i
+        return 0
 
 Position.BEFORE = 1
 Position.AFTER = 2
 Position.INSIDE = 3
 Position.NONE = 4
+
+Position.strings = ['before', 'after', 'inside', 'none']
 
 @Tree.Position = Position
 
@@ -297,7 +298,10 @@ class Node
     tree.moveNode(node1, node2, Position.AFTER);
     ###
     moveNode: (moved_node, target_node, position) ->
-        # todo: check for illegal move
+        if moved_node.isParentOf(target_node)
+            # Node is parent of target node. This is an illegal move
+            return
+
         moved_node.parent.removeChild(moved_node)
         if position == Position.AFTER
             target_node.parent.addChildAtPosition(
@@ -401,6 +405,17 @@ class Node
         node = new Node(node_info)
         @addChildAtPosition(node, 0)
         return node
+
+    isParentOf: (node) ->
+        parent = node.parent
+
+        while parent
+            if parent == this
+                return true
+
+            parent = parent.parent
+
+        return false
 
 
 class Tree extends Node
@@ -579,6 +594,12 @@ class JqTreeWidget extends MouseWidget
 
         @_refreshElements(node.parent)
         @select_node_handler.selectCurrentNode()
+
+    moveNode: (node, target_node, position) ->
+        position_index = Position.nameToIndex(position)
+
+        @tree.moveNode(node, target_node, position_index)
+        @_refreshElements()
 
     _init: ->
         super()

@@ -332,15 +332,16 @@ limitations under the License.
 
   Position = {
     getName: function(position) {
-      if (position === Position.BEFORE) {
-        return 'before';
-      } else if (position === Position.AFTER) {
-        return 'after';
-      } else if (position === Position.INSIDE) {
-        return 'inside';
-      } else {
-        return 'none';
+      return Position.strings[position - 1];
+    },
+    nameToIndex: function(name) {
+      var i, _i, _ref;
+      for (i = _i = 1, _ref = Position.strings.length; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
+        if (Position.strings[i - 1] === name) {
+          return i;
+        }
       }
+      return 0;
     }
   };
 
@@ -351,6 +352,8 @@ limitations under the License.
   Position.INSIDE = 3;
 
   Position.NONE = 4;
+
+  Position.strings = ['before', 'after', 'inside', 'none'];
 
   this.Tree.Position = Position;
 
@@ -561,6 +564,9 @@ limitations under the License.
 
 
     Node.prototype.moveNode = function(moved_node, target_node, position) {
+      if (moved_node.isParentOf(target_node)) {
+        return;
+      }
       moved_node.parent.removeChild(moved_node);
       if (position === Position.AFTER) {
         return target_node.parent.addChildAtPosition(moved_node, target_node.parent.getChildIndex(target_node) + 1);
@@ -676,6 +682,18 @@ limitations under the License.
       node = new Node(node_info);
       this.addChildAtPosition(node, 0);
       return node;
+    };
+
+    Node.prototype.isParentOf = function(node) {
+      var parent;
+      parent = node.parent;
+      while (parent) {
+        if (parent === this) {
+          return true;
+        }
+        parent = parent.parent;
+      }
+      return false;
     };
 
     return Node;
@@ -901,6 +919,13 @@ limitations under the License.
       node.setData(data);
       this._refreshElements(node.parent);
       return this.select_node_handler.selectCurrentNode();
+    };
+
+    JqTreeWidget.prototype.moveNode = function(node, target_node, position) {
+      var position_index;
+      position_index = Position.nameToIndex(position);
+      this.tree.moveNode(node, target_node, position_index);
+      return this._refreshElements();
     };
 
     JqTreeWidget.prototype._init = function() {

@@ -779,6 +779,26 @@ test('updateNode', function() {
     equal(node2.tag1, 'abc');
 });
 
+test('moveNode', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+
+    var child1 = $tree.tree('getNodeByName', 'child1');
+    var child2 = $tree.tree('getNodeByName', 'child2');
+    var node1 = $tree.tree('getNodeByName', 'node1');
+    var node2 = $tree.tree('getNodeByName', 'node2');
+
+    // -- Move child1 after node2
+    $tree.tree('moveNode', child1, node2, 'after');
+
+    equal(formatTitles($tree), 'node1 child2 node2 child3 child1');
+
+    // -- Check that illegal moves are skipped
+    $tree.tree('moveNode', node1, child2, 'inside');
+});
+
 module("Tree");
 test('constructor', function() {
     // 1. Create node from string
@@ -1322,6 +1342,11 @@ test('Position.getName', function() {
     equal(Tree.Position.getName(Tree.Position.AFTER), 'after');
     equal(Tree.Position.getName(Tree.Position.INSIDE), 'inside');
     equal(Tree.Position.getName(Tree.Position.NONE), 'none');
+});
+
+test('Position.nameToIndex', function() {
+    equal(Tree.Position.nameToIndex('before'), Tree.Position.BEFORE);
+    equal(Tree.Position.nameToIndex('after'), Tree.Position.AFTER);
 });
 
 });

@@ -65,6 +65,7 @@
                 <li><a href="#functions-removenode">removeNode</a></li>
                 <li><a href="#functions-appendnode">appendNode</a></li>
                 <li><a href="#functions-updatenode">updateNode</a></li>
+                <li><a href="#functions-movenode">moveNode</a></li>
             </ul>
         </li>
         <li>
@@ -216,6 +217,7 @@ $.getJSON(
         <li>Issue 49: Make sure that widget functions can be called in the 'tree.init' event</li>
         <li>Issue 50: Add namespace to css classes</li>
         <li>Story 58: Added updateNode function</li>
+        <li>Story 59: Added moveNode function</li>
     </ul>
 
     <h5>0.11 (july 8 2012)</h5>
@@ -812,6 +814,22 @@ $tree.tree(
 );
 </pre>
 
+    <h5 id="functions-movenode">moveNode</h5>
+
+    <p>
+        <strong>function moveNode(node, target_node, position);</strong>
+    </p>
+
+    <p>
+        Move a node. Position can be 'before', 'after' or 'inside'.
+    </p>
+
+<pre>
+var node = $tree.tree('getNodeBydId', 1);
+var target_node = $tree.tree('getNodeBydId', 2);
+
+$tree.tree('moveNode', node, target_node, 'after');
+</pre>
 
     <h4 id="events">Events</h4>
 
