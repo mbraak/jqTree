@@ -31,78 +31,79 @@ indexOf = (array, item) ->
 
 @Tree.indexOf = indexOf
 
-# toJson function; copied from json2
-Json = {}
-Json.escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
-Json.meta = {
-    '\b': '\\b',
-    '\t': '\\t',
-    '\n': '\\n',
-    '\f': '\\f',
-    '\r': '\\r',
-    '"' : '\\"',
-    '\\': '\\\\'
-}
+# JSON.stringify function; copied from json2
+if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
+    json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
+    json_meta = {
+        '\b': '\\b',
+        '\t': '\\t',
+        '\n': '\\n',
+        '\f': '\\f',
+        '\r': '\\r',
+        '"' : '\\"',
+        '\\': '\\\\'
+    }
 
-Json.quote = (string) ->
-    Json.escapable.lastIndex = 0
+    json_quote = (string) ->
+        json_escapable.lastIndex = 0
 
-    if Json.escapable.test(string)
-        return '"' + string.replace(Json.escapable, (a) ->
-            c = Json.meta[a]
-            return (
-                if typeof c is 'string' then c
-                else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
-            )
-        ) + '"'
-    else
-        return '"' + string + '"'
+        if json_escapable.test(string)
+            return '"' + string.replace(json_escapable, (a) ->
+                c = json_meta[a]
+                return (
+                    if typeof c is 'string' then c
+                    else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
+                )
+            ) + '"'
+        else
+            return '"' + string + '"'
 
-Json.str = (key, holder) ->
-    value = holder[key]
+    json_str = (key, holder) ->
+        value = holder[key]
 
-    switch typeof value
-        when 'string'
-            return Json.quote(value)
+        switch typeof value
+            when 'string'
+                return json_quote(value)
 
-        when 'number'
-            return if isFinite(value) then String(value) else 'null'
+            when 'number'
+                return if isFinite(value) then String(value) else 'null'
 
-        when 'boolean', 'null'
-            return String(value)
+            when 'boolean', 'null'
+                return String(value)
 
-        when 'object'
-            if not value
-                return 'null'
+            when 'object'
+                if not value
+                    return 'null'
 
-            partial = []
-            if Object.prototype.toString.apply(value) is '[object Array]'
-                for v, i in value
-                    partial[i] = Json.str(i, value) or 'null'
+                partial = []
+                if Object::toString.apply(value) is '[object Array]'
+                    for v, i in value
+                        partial[i] = json_str(i, value) or 'null'
+
+                    return (
+                        if partial.length is 0 then '[]'
+                        else '[' + partial.join(',') + ']'
+                    )
+
+                for k of value
+                    if Object::hasOwnProperty.call(value, k)
+                        v = json_str(k, value)
+                        if v
+                            partial.push(json_quote(k) + ':' + v)
 
                 return (
-                    if partial.length is 0 then '[]'
-                    else '[' + partial.join(',') + ']'
+                    if partial.length is 0 then '{}'
+                    else '{' + partial.join(',') + '}'
                 )
 
-            for k of value
-                if Object.prototype.hasOwnProperty.call(value, k)
-                    v = Json.str(k, value)
-                    if v
-                        partial.push(Json.quote(k) + ':' + v)
+    if not @JSON?
+        @JSON = {}
 
-            return (
-                if partial.length is 0 then '{}'
-                else '{' + partial.join(',') + '}'
-            )
-
-toJson = (value) ->
-    return Json.str(
-        '',
-        {'': value}
-    )
-
-@Tree.toJson = toJson
+    @JSON.stringify = (value) ->
+        return json_str(
+            '',
+            {'': value}
+        )
 
 # Escape a string for HTML interpolation; copied from underscore js
 html_escape = (string) ->
@@ -471,7 +472,7 @@ class JqTreeWidget extends MouseWidget
         return @selected_node or false
 
     toJson: ->
-        return toJson(
+        return JSON.stringify(
             @tree.getData()
         )
 
@@ -1080,7 +1081,7 @@ class SaveStateHandler
         if @tree_widget.selected_node
             selected_node = @tree_widget.selected_node.id
 
-        return toJson(
+        return JSON.stringify(
             open_nodes: open_nodes,
             selected_node: selected_node
         )
