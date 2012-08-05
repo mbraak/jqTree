@@ -604,7 +604,7 @@ test('save state', function() {
     }
 
     // Remove state from localstorage
-    if (localStorage) {
+    if (typeof localStorage != 'undefined') {
         localStorage.setItem('my_tree', null);
     }
 
