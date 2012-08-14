@@ -1,6 +1,7 @@
 body {
     width: 960px;
     margin: 1em auto;
+    padding-bottom: 2em;
 }
 
 h1 {
@@ -40,4 +41,9 @@ p {
 
 #nav .next {
     float: right;
+}
+
+.jqtree-tree .jqtree-loading > div .jqtree-title:after {
+    content: url(spinner.gif);
+    margin-left: 8px;
 }

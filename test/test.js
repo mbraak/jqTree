@@ -39,24 +39,24 @@ function formatNodes(nodes) {
 
 function isNodeClosed($node) {
     return (
-        ($node.is('li.folder.closed')) &&
-        ($node.find('a:eq(0)').is('a.toggler.closed')) &&
+        ($node.is('li.jqtree-folder.jqtree-closed')) &&
+        ($node.find('a:eq(0)').is('a.jqtree-toggler.jqtree-closed')) &&
         ($node.find('ul:eq(0)').is('ul'))
     );
 }
 
 function isNodeOpen($node) {
     return (
-        ($node.is('li.folder')) &&
-        ($node.find('a:eq(0)').is('a.toggler')) &&
+        ($node.is('li.jqtree-folder')) &&
+        ($node.find('a:eq(0)').is('a.jqtree-toggler')) &&
         ($node.find('ul:eq(0)').is('ul')) &&
-        (! $node.is('li.folder.closed')) &&
-        (! $node.find('span:eq(0)').is('a.toggler.closed'))
+        (! $node.is('li.jqtree-folder.jqtree-closed')) &&
+        (! $node.find('span:eq(0)').is('a.jqtree-toggler.jqtree-closed'))
     );
 }
 
 function formatTitles($node) {
-    var titles = $node.find('.title').map(
+    var titles = $node.find('.jqtree-title').map(
         function(i, el) {
             return $(el).text();
         }
@@ -87,23 +87,23 @@ test("create jqtree from data", function() {
         'number of children on level 0'
     );
     ok(
-        $('#tree1').children().is('ul.tree'),
-        'first element is ul.tree'
+        $('#tree1').children().is('ul.jqtree-tree'),
+        'first element is ul.jqtree-tree'
     );
     equal(
-        $('#tree1 ul.tree > li').length, 2,
+        $('#tree1 ul.jqtree-tree > li').length, 2,
         'number of children on level 1'
     );
     ok(
-        $('#tree1 ul.tree li:eq(0)').is('li.folder.closed'),
-        'first child is li.folder.closed'
+        $('#tree1 ul.jqtree-tree li:eq(0)').is('li.jqtree-folder.jqtree-closed'),
+        'first child is li.jqtree-folder.jqtree-closed'
     );
     ok(
-        $('#tree1 ul.tree li:eq(0) > div > a.toggler').is('a.toggler.closed'),
+        $('#tree1 ul.jqtree-tree li:eq(0) > div > a.jqtree-toggler').is('a.jqtree-toggler.jqtree-closed'),
         'button in first folder'
     );
     equal(
-        $('#tree1 ul.tree li:eq(0) > div span.title').text(),
+        $('#tree1 ul.jqtree-tree li:eq(0) > div span.jqtree-title').text(),
         'node1'
     );
 });
@@ -111,6 +111,9 @@ test("create jqtree from data", function() {
 test('toggle', function() {
     // create tree
     var $tree = $('#tree1');
+    var $node1;
+    var node1;
+
     $tree.tree({
         data: example_data
     });
@@ -139,11 +142,11 @@ test('toggle', function() {
     );
 
     var tree = $tree.tree('getTree');
-    var node1 = tree.children[0];
-    var $node1 = $tree.find('ul.tree li:eq(0)');
+    node1 = tree.children[0];
+    $node1 = $tree.find('ul.jqtree-tree li:eq(0)');
 
     // node1 is initially closed
-    ok(isNodeClosed($node1), 'node1 is open');
+    ok(isNodeClosed($node1), 'node1 is closed');
 
     // 1. open node1
     $tree.tree('toggle', node1);
@@ -166,7 +169,7 @@ test("click event", function() {
     });
 
     // click on node1
-    var $node1 = $tree.find('ul.tree li:first');
+    var $node1 = $tree.find('ul.jqtree-tree li:first');
     var $text_span = $node1.find('span:first');
     $text_span.click();
 });
@@ -200,7 +203,7 @@ test('saveState', function() {
     // nodes are initially closed
     var tree = $tree.tree('getTree');
     tree.iterate(function(node) {
-        ok(! node.is_open, 'closed');
+        ok(! node.is_open, 'jqtree-closed');
         return true;
     });
 
@@ -330,7 +333,7 @@ test('loadData', function() {
 
     // first node in html is still 'node1'
     equal(
-        $tree.find('li:eq(0)').find('div:eq(0) span.title').text(),
+        $tree.find('li:eq(0)').find('div:eq(0) span.jqtree-title').text(),
         'node1'
     );
 
@@ -338,12 +341,12 @@ test('loadData', function() {
     var $child3 = $tree.find('span:contains(child3)');
     var $li = $child3.closest('li');
     equal(
-        $li.children('ul').children('li:eq(0)').find('div span.title').text(),
+        $li.children('ul').children('li:eq(0)').find('div span.jqtree-title').text(),
         'c4'
     );
 
     // Node 'child3' must have toggler button
-    ok($child3.prev().is('a.toggler'));
+    ok($child3.prev().is('a.jqtree-toggler'));
 });
 
 test('openNode and closeNode', function() {
@@ -408,10 +411,10 @@ test('click toggler', function() {
         selectable: true
     });
 
-    var $title = $tree.find('li:eq(0)').find('> div > span.title');
+    var $title = $tree.find('li:eq(0)').find('> div > span.jqtree-title');
     equal($title.text(), 'node1');
     var $toggler = $title.prev();
-    ok($toggler.is('a.toggler.closed'));
+    ok($toggler.is('a.jqtree-toggler.jqtree-closed'));
 
     $tree.bind('tree.open', function(e) {
         // 2. handle 'open' event
@@ -503,7 +506,7 @@ test('autoOpen', function() {
         var open_nodes = [];
         $tree.find('li').each(function() {
             var $li = $(this);
-            if ($li.is('.folder') && ! $li.is('.closed')) {
+            if ($li.is('.jqtree-folder') && ! $li.is('.jqtree-closed')) {
                 var label = $li.children('div').find('span').text();
                 open_nodes.push(label);
             };
@@ -601,7 +604,7 @@ test('save state', function() {
     }
 
     // Remove state from localstorage
-    if (localStorage) {
+    if (typeof localStorage != 'undefined') {
         localStorage.setItem('my_tree', null);
     }
 
@@ -697,7 +700,7 @@ test('appendNode', function() {
 
     // Node 'child1' does not have a toggler button
     equal(
-        $(child1.element).find('> div > .toggler').length,
+        $(child1.element).find('> div > .jqtree-toggler').length,
         0
     );
 
@@ -707,7 +710,7 @@ test('appendNode', function() {
 
     // Node 'child1' must get a toggler button
     equal(
-        $(child1.element).find('> div > .toggler').length,
+        $(child1.element).find('> div > .jqtree-toggler').length,
         1
     );
 });
@@ -728,6 +731,72 @@ test('prependNode', function() {
         formatTitles($(node1.element)),
         'node1 child0 child1 child2'
     );
+});
+test('init event', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.bind('tree.init', function() {
+        start();
+
+        // Check that we can call functions in 'tree.init' event
+        equal($tree.tree('getNodeByName', 'node2').name, 'node2');
+    });
+    stop();
+
+    $tree.tree({
+        data: example_data
+    });
+});
+
+test('updateNode', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+
+    equal(formatTitles($tree), 'node1 child1 child2 node2 child3');
+
+    // -- update label
+    var node2 = $tree.tree('getNodeByName', 'node2');
+    $tree.tree('updateNode', node2, 'CHANGED');
+
+    equal(formatTitles($tree), 'node1 child1 child2 CHANGED child3');
+    equal(node2.name, 'CHANGED');
+
+    // -- update data
+    $tree.tree(
+        'updateNode',
+        node2,
+        {
+            name: 'xyz',
+            tag1: 'abc'
+        }
+    );
+
+    equal(formatTitles($tree), 'node1 child1 child2 xyz child3');
+    equal(node2.name, 'xyz');
+    equal(node2.tag1, 'abc');
+});
+
+test('moveNode', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+
+    var child1 = $tree.tree('getNodeByName', 'child1');
+    var child2 = $tree.tree('getNodeByName', 'child2');
+    var node1 = $tree.tree('getNodeByName', 'node1');
+    var node2 = $tree.tree('getNodeByName', 'node2');
+
+    // -- Move child1 after node2
+    $tree.tree('moveNode', child1, node2, 'after');
+
+    equal(formatTitles($tree), 'node1 child2 node2 child3 child1');
+
+    // -- Check that illegal moves are skipped
+    $tree.tree('moveNode', node1, child2, 'inside');
 });
 
 module("Tree");
@@ -1249,18 +1318,18 @@ test('getNodeById', function() {
 
 module('util');
 
-test('toJson', function() {
-    equal(Tree.toJson('abc'), '"abc"');
-    equal(Tree.toJson(123), '123');
-    equal(Tree.toJson(true), 'true');
-    equal(Tree.toJson({abc: 'def'}), '{"abc":"def"}');
-    equal(Tree.toJson({}), '{}');
-    equal(Tree.toJson([1, 2, 3]), '[1,2,3]');
-    equal(Tree.toJson(null), 'null');
-    equal(Tree.toJson(Number.NEGATIVE_INFINITY), 'null');
+test('JSON.stringify', function() {
+    equal(JSON.stringify('abc'), '"abc"');
+    equal(JSON.stringify(123), '123');
+    equal(JSON.stringify(true), 'true');
+    equal(JSON.stringify({abc: 'def'}), '{"abc":"def"}');
+    equal(JSON.stringify({}), '{}');
+    equal(JSON.stringify([1, 2, 3]), '[1,2,3]');
+    equal(JSON.stringify(null), 'null');
+    equal(JSON.stringify(Number.NEGATIVE_INFINITY), 'null');
 
     // test escapable
-    Tree.toJson("\u200c");
+    JSON.stringify("\u200c");
 });
 
 test('indexOf', function() {
@@ -1273,6 +1342,11 @@ test('Position.getName', function() {
     equal(Tree.Position.getName(Tree.Position.AFTER), 'after');
     equal(Tree.Position.getName(Tree.Position.INSIDE), 'inside');
     equal(Tree.Position.getName(Tree.Position.NONE), 'none');
+});
+
+test('Position.nameToIndex', function() {
+    equal(Tree.Position.nameToIndex('before'), Tree.Position.BEFORE);
+    equal(Tree.Position.nameToIndex('after'), Tree.Position.AFTER);
 });
 
 });

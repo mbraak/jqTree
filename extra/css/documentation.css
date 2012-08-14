@@ -115,7 +115,7 @@ img {
 }
 
 /* tree */
-.tree a:hover {
+.jqtree-tree a:hover {
 	border-bottom: none;
 }
 

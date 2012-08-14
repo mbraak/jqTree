@@ -31,78 +31,79 @@ indexOf = (array, item) ->
 
 @Tree.indexOf = indexOf
 
-# toJson function; copied from json2
-Json = {}
-Json.escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
-Json.meta = {
-    '\b': '\\b',
-    '\t': '\\t',
-    '\n': '\\n',
-    '\f': '\\f',
-    '\r': '\\r',
-    '"' : '\\"',
-    '\\': '\\\\'
-}
+# JSON.stringify function; copied from json2
+if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
+    json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
+    json_meta = {
+        '\b': '\\b',
+        '\t': '\\t',
+        '\n': '\\n',
+        '\f': '\\f',
+        '\r': '\\r',
+        '"' : '\\"',
+        '\\': '\\\\'
+    }
 
-Json.quote = (string) ->
-    Json.escapable.lastIndex = 0
+    json_quote = (string) ->
+        json_escapable.lastIndex = 0
 
-    if Json.escapable.test(string)
-        return '"' + string.replace(Json.escapable, (a) ->
-            c = Json.meta[a]
-            return (
-                if typeof c is 'string' then c
-                else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
-            )
-        ) + '"'
-    else
-        return '"' + string + '"'
+        if json_escapable.test(string)
+            return '"' + string.replace(json_escapable, (a) ->
+                c = json_meta[a]
+                return (
+                    if typeof c is 'string' then c
+                    else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
+                )
+            ) + '"'
+        else
+            return '"' + string + '"'
 
-Json.str = (key, holder) ->
-    value = holder[key]
+    json_str = (key, holder) ->
+        value = holder[key]
 
-    switch typeof value
-        when 'string'
-            return Json.quote(value)
+        switch typeof value
+            when 'string'
+                return json_quote(value)
 
-        when 'number'
-            return if isFinite(value) then String(value) else 'null'
+            when 'number'
+                return if isFinite(value) then String(value) else 'null'
 
-        when 'boolean', 'null'
-            return String(value)
+            when 'boolean', 'null'
+                return String(value)
 
-        when 'object'
-            if not value
-                return 'null'
+            when 'object'
+                if not value
+                    return 'null'
 
-            partial = []
-            if Object.prototype.toString.apply(value) is '[object Array]'
-                for v, i in value
-                    partial[i] = Json.str(i, value) or 'null'
+                partial = []
+                if Object::toString.apply(value) is '[object Array]'
+                    for v, i in value
+                        partial[i] = json_str(i, value) or 'null'
+
+                    return (
+                        if partial.length is 0 then '[]'
+                        else '[' + partial.join(',') + ']'
+                    )
+
+                for k of value
+                    if Object::hasOwnProperty.call(value, k)
+                        v = json_str(k, value)
+                        if v
+                            partial.push(json_quote(k) + ':' + v)
 
                 return (
-                    if partial.length is 0 then '[]'
-                    else '[' + partial.join(',') + ']'
+                    if partial.length is 0 then '{}'
+                    else '{' + partial.join(',') + '}'
                 )
 
-            for k of value
-                if Object.prototype.hasOwnProperty.call(value, k)
-                    v = Json.str(k, value)
-                    if v
-                        partial.push(Json.quote(k) + ':' + v)
+    if not @JSON?
+        @JSON = {}
 
-            return (
-                if partial.length is 0 then '{}'
-                else '{' + partial.join(',') + '}'
-            )
-
-toJson = (value) ->
-    return Json.str(
-        '',
-        {'': value}
-    )
-
-@Tree.toJson = toJson
+    @JSON.stringify = (value) ->
+        return json_str(
+            '',
+            {'': value}
+        )
 
 # Escape a string for HTML interpolation; copied from underscore js
 html_escape = (string) ->
@@ -116,25 +117,29 @@ html_escape = (string) ->
 
 Position =
     getName: (position) ->
-        if position == Position.BEFORE
-            return 'before'
-        else if position == Position.AFTER
-            return 'after'
-        else if position == Position.INSIDE
-            return 'inside'
-        else
-            return 'none'
+        return Position.strings[position - 1]
+
+    nameToIndex: (name) ->
+        for i in [1..Position.strings.length]
+            if Position.strings[i - 1] == name
+                return i
+        return 0
 
 Position.BEFORE = 1
 Position.AFTER = 2
 Position.INSIDE = 3
 Position.NONE = 4
 
+Position.strings = ['before', 'after', 'inside', 'none']
+
 @Tree.Position = Position
 
 class Node
     constructor: (o) ->
         @setData(o)
+
+        @children = []
+        @parent = null
 
     setData: (o) ->
         if typeof o != 'object'
@@ -146,9 +151,6 @@ class Node
                     @name = value
                 else
                     @[key] = value
-
-        @children = []
-        @parent = null
 
     # Init Node from data without making it the root of the tree
     initFromData: (data) ->
@@ -255,6 +257,9 @@ class Node
     hasChildren: ->
         return @children.length != 0
 
+    isFolder: ->
+        return @hasChildren() or @load_on_demand
+
     ###
     Iterate over all the nodes in the tree.
 
@@ -294,7 +299,10 @@ class Node
     tree.moveNode(node1, node2, Position.AFTER);
     ###
     moveNode: (moved_node, target_node, position) ->
-        # todo: check for illegal move
+        if moved_node.isParentOf(target_node)
+            # Node is parent of target node. This is an illegal move
+            return
+
         moved_node.parent.removeChild(moved_node)
         if position == Position.AFTER
             target_node.parent.addChildAtPosition(
@@ -399,6 +407,17 @@ class Node
         @addChildAtPosition(node, 0)
         return node
 
+    isParentOf: (node) ->
+        parent = node.parent
+
+        while parent
+            if parent == this
+                return true
+
+            parent = parent.parent
+
+        return false
+
 
 class Tree extends Node
     constructor: (o) ->
@@ -438,10 +457,10 @@ class JqTreeWidget extends MouseWidget
         dataUrl: null
 
     toggle: (node) ->
-        if node.hasChildren()
-            new FolderElement(node, @element).toggle()
-
-        @_saveState()
+        if node.is_open
+            @closeNode(node)
+        else
+            @openNode(node)
     
     getTree: ->
         return @tree
@@ -453,11 +472,13 @@ class JqTreeWidget extends MouseWidget
         return @selected_node or false
 
     toJson: ->
-        return toJson(
+        return JSON.stringify(
             @tree.getData()
         )
 
     loadData: (data, parent_node) ->
+        @_triggerEvent('tree.load_data', tree_data: data)
+
         if not parent_node
             @_initTree(data)
         else
@@ -480,14 +501,38 @@ class JqTreeWidget extends MouseWidget
         return @tree.getNodeByName(name)
 
     openNode: (node, skip_slide) ->
-        if node.hasChildren()
-            new FolderElement(node, @element).open(null, skip_slide)
+        @_openNode(node, skip_slide)
 
-            @_saveState()
+    _openNode: (node, skip_slide, on_finished) ->
+        if node.isFolder()
+            if node.load_on_demand
+                @_loadFolderOnDemand(node, skip_slide, on_finished)
+            else
+                folder_element = new FolderElement(node, this)
+                folder_element.open(on_finished, skip_slide)
+                @_saveState()
+
+    _loadFolderOnDemand: (node, skip_slide, on_finished) ->
+        node.load_on_demand = false
+        data_url = @_getDataUrl(node)
+        folder_element = new FolderElement(node, this)
+
+        if data_url and folder_element
+            $li = folder_element.getLi()
+            $li.addClass('jqtree-loading')
+
+            @_loadDataFromServer(
+                data_url,
+                (data) =>
+                    $li.removeClass('loading')
+
+                    @loadData(data, node)
+                    @_openNode(node, skip_slide, on_finished)
+            )
 
     closeNode: (node, skip_slide) ->
-        if node.hasChildren()
-            new FolderElement(node, @element).close(skip_slide)
+        if node.isFolder()
+            new FolderElement(node, this).close(skip_slide)
 
             @_saveState()
 
@@ -523,7 +568,7 @@ class JqTreeWidget extends MouseWidget
             parent_node = @tree
 
         # Is the parent already a root node?
-        is_already_root_node = parent_node.hasChildren()
+        is_already_root_node = parent_node.isFolder()
 
         node = parent_node.append(new_node_info)
 
@@ -545,10 +590,30 @@ class JqTreeWidget extends MouseWidget
         @_refreshElements(parent_node)
         return node
 
+    updateNode: (node, data) ->
+        node.setData(data)
+
+        @_refreshElements(node.parent)
+        @select_node_handler.selectCurrentNode()
+
+    moveNode: (node, target_node, position) ->
+        position_index = Position.nameToIndex(position)
+
+        @tree.moveNode(node, target_node, position_index)
+        @_refreshElements()
+
+    getStateFromStorage: ->
+        return @save_state_handler.getStateFromStorage()
+
     _init: ->
         super()
 
         @element = @$el
+        @selected_node = null
+
+        @save_state_handler = new SaveStateHandler(this)
+        @select_node_handler = new SelectNodeHandler(this)
+        @dnd_handler = new DragAndDropHandler(this)
 
         @_initData()
 
@@ -564,39 +629,50 @@ class JqTreeWidget extends MouseWidget
 
     _initData: ->
         if @options.data
-            @_initTree(@options.data)
+            @loadData(@options.data)
         else
-            data_url = @options.dataUrl or @element.data('url')
+            data_url = @_getDataUrl()
             if data_url
-                $.ajax(
-                    url: data_url
-                    cache: false
-                    success: (response) =>
-                        if $.isArray(response) or typeof response == 'object'
-                            data = response
-                        else
-                            data = $.parseJSON(response)
-
-                        @_initTree(data)
+                @_loadDataFromServer(
+                    data_url,
+                    (data) =>
+                        @loadData(data)
                 )
+
+    _getDataUrl: (node) ->
+        data_url = @options.dataUrl or @element.data('url')
+
+        if $.isFunction(data_url)
+            return data_url(node)
+        else
+            if node
+                data_url += "?node=#{ node.id }"
+
+            return data_url
+
+    _loadDataFromServer: (data_url, on_success) ->
+        $.ajax(
+            url: data_url
+            cache: false
+            success: (response) =>
+                if $.isArray(response) or typeof response == 'object'
+                    data = response
+                else
+                    data = $.parseJSON(response)
+
+                on_success(data)
+        )
 
     _initTree: (data) ->
         @tree = new Tree()
         @tree.loadFromData(data)
-
-        @selected_node = null
-
-        @save_state_handler = new SaveStateHandler(this)
-        @select_node_handler = new SelectNodeHandler(this)
-        @dnd_handler = new DragAndDropHandler(this)
 
         @_openNodes()
         @_refreshElements()
 
         @select_node_handler.selectCurrentNode()
 
-        event = $.Event('tree.init')
-        @element.trigger(event)
+        @_triggerEvent('tree.init')
 
     _openNodes: ->
         if @options.saveState
@@ -624,14 +700,14 @@ class JqTreeWidget extends MouseWidget
 
         createUl = (is_root_node) =>
             if is_root_node
-                class_string = ' class="tree"'
+                class_string = ' class="jqtree-tree"'
             else
                 class_string = ''
 
             return $("<ul#{ class_string }></ul>")
 
         createLi = (node) =>
-            if node.hasChildren()
+            if node.isFolder()
                 $li = createFolderLi(node)
             else
                 $li = createNodeLi(node)
@@ -643,22 +719,22 @@ class JqTreeWidget extends MouseWidget
 
         createNodeLi = (node) =>
             escaped_name = escapeIfNecessary(node.name)
-            return $("<li><div><span class=\"title\">#{ escaped_name }</span></div></li>")
+            return $("<li><div><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>")
 
         createFolderLi = (node) =>
             getButtonClass = ->
-                classes = ['toggler']
+                classes = ['jqtree-toggler']
 
                 if not node.is_open
-                    classes.push('closed')
+                    classes.push('jqtree-closed')
 
                 return classes.join(' ')
 
             getFolderClass = ->
-                classes = ['folder']
+                classes = ['jqtree-folder']
 
                 if not node.is_open
-                    classes.push('closed')
+                    classes.push('jqtree-closed')
 
                 return classes.join(' ')
 
@@ -668,7 +744,7 @@ class JqTreeWidget extends MouseWidget
             escaped_name = escapeIfNecessary(node.name)
 
             return $(
-                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"title\">#{ escaped_name }</span></div></li>"
+                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->
@@ -684,6 +760,7 @@ class JqTreeWidget extends MouseWidget
 
                 if child.hasChildren()
                     doCreateDomElements($li, child.children, false, child.is_open)
+
             return null
 
         if from_node and from_node.parent
@@ -699,18 +776,19 @@ class JqTreeWidget extends MouseWidget
 
         doCreateDomElements($element, from_node.children, is_root_node, is_root_node)
 
+        @_triggerEvent('tree.refresh')
+
     _click: (e) ->
         if e.ctrlKey
             return
 
         $target = $(e.target)
 
-        if $target.is('.toggler')
-            node_element = @_getNodeElement($target)
-            if node_element and node_element.node.hasChildren()
-                node_element.toggle()
+        if $target.is('.jqtree-toggler')
+            node = @_getNode($target)
 
-                @_saveState()
+            if node
+                @toggle(node)
 
                 e.preventDefault()
                 e.stopPropagation()
@@ -722,10 +800,7 @@ class JqTreeWidget extends MouseWidget
                     @options.onCanSelectNode(node)
                 )
                     @selectNode(node)
-
-                    event = $.Event('tree.click')
-                    event.node = node
-                    @element.trigger(event)
+                    @_triggerEvent('tree.click', node: node)
 
     _getNode: ($element) ->
         $li = $element.closest('li')
@@ -735,10 +810,10 @@ class JqTreeWidget extends MouseWidget
             return $li.data('node')
 
     _getNodeElementForNode: (node) ->
-        if node.hasChildren()
-            return new FolderElement(node, @element)
+        if node.isFolder()
+            return new FolderElement(node, this)
         else
-            return new NodeElement(node, @element)
+            return new NodeElement(node, this)
 
     _getNodeElement: ($element) ->
         node = @_getNode($element)
@@ -755,10 +830,11 @@ class JqTreeWidget extends MouseWidget
                 e.preventDefault()
                 e.stopPropagation()
 
-                event = $.Event('tree.contextmenu')
-                event.node = node
-                event.click_event = e
-                @element.trigger(event)
+                @_triggerEvent(
+                    'tree.contextmenu',
+                        node: node
+                        click_event: e
+                )
                 return false
 
     _saveState: ->
@@ -789,6 +865,13 @@ class JqTreeWidget extends MouseWidget
         else
             return false
 
+    _triggerEvent: (event_name, values) ->
+        event = $.Event(event_name)
+        $.extend(event, values)
+
+        @element.trigger(event)
+        return event
+
     testGenerateHitAreas: (moving_node) ->
         @dnd_handler.current_item = @_getNodeElementForNode(moving_node)
         @dnd_handler.generateHitAreas()
@@ -802,14 +885,14 @@ class GhostDropHint
         @$element = $element
 
         @node = node
-        @$ghost = $('<li class="ghost"><span class="circle"></span><span class="line"></span></li>')
+        @$ghost = $('<li class="jqtree-ghost"><span class="jqtree-circle"></span><span class="jqtree-line"></span></li>')
 
         if position == Position.AFTER
             @moveAfter()
         else if position == Position.BEFORE
             @moveBefore()
         else if position == Position.INSIDE
-            if node.hasChildren() and node.is_open
+            if node.isFolder() and node.is_open
                 @moveInsideOpenFolder()
             else
                 @moveInside()
@@ -828,7 +911,7 @@ class GhostDropHint
 
     moveInside: ->
         @$element.after(@$ghost)
-        @$ghost.addClass('inside')
+        @$ghost.addClass('jqtree-inside')
 
 
 class BorderDropHint
@@ -836,7 +919,7 @@ class BorderDropHint
         $div = $element.children('div')
         width = $element.width() - 4
 
-        @$hint = $('<span class="border"></span>')
+        @$hint = $('<span class="jqtree-border"></span>')
         $div.append(@$hint)
 
         @$hint.css({
@@ -849,19 +932,19 @@ class BorderDropHint
 
 
 class NodeElement
-    constructor: (node, tree_element) ->
-        @init(node, tree_element)
+    constructor: (node, tree_widget) ->
+        @init(node, tree_widget)
 
-    init: (node, tree_element) ->
+    init: (node, tree_widget) ->
         @node = node
-        @tree_element = tree_element
+        @tree_widget = tree_widget
         @$element = $(node.element)
 
     getUl: ->
         return @$element.children('ul:first')
 
     getSpan: ->
-        return @$element.children('div').find('span.title')
+        return @$element.children('div').find('span.jqtree-title')
 
     getLi: ->
         return @$element
@@ -873,34 +956,27 @@ class NodeElement
             return new GhostDropHint(@node, @$element, position)
 
     select: ->
-        @getLi().addClass('selected')
+        @getLi().addClass('jqtree-selected')
 
     deselect: ->
-        @getLi().removeClass('selected')
+        @getLi().removeClass('jqtree-selected')
 
 
 class FolderElement extends NodeElement
-    toggle: ->
-        if @node.is_open
-            @close()
-        else
-            @open()
-
     open: (on_finished, skip_slide) ->
         if not @node.is_open
             @node.is_open = true
-            @getButton().removeClass('closed')
+            @getButton().removeClass('jqtree-closed')
 
             doOpen = =>
-                @getLi().removeClass('closed')
+                @getLi().removeClass('jqtree-closed')
                 if on_finished
                     on_finished()
 
-                event = $.Event('tree.open')
-                event.node = @node
-                @tree_element.trigger(event)
+                @tree_widget._triggerEvent('tree.open', node: @node)
 
             if skip_slide
+                @getUl().show()
                 doOpen()
             else
                 @getUl().slideDown('fast', doOpen)
@@ -908,25 +984,24 @@ class FolderElement extends NodeElement
     close: (skip_slide) ->
         if @node.is_open
             @node.is_open = false
-            @getButton().addClass('closed')
+            @getButton().addClass('jqtree-closed')
 
             doClose = =>
-                @getLi().addClass('closed')
+                @getLi().addClass('jqtree-closed')
 
-                event = $.Event('tree.close')
-                event.node = @node
-                @tree_element.trigger(event)
+                @tree_widget._triggerEvent('tree.close', node: @node)
 
             if skip_slide
+                @getUl().hide()
                 doClose()
             else
                 @getUl().slideUp('fast', doClose)
 
     getButton: ->
-        return @$element.children('div').find('a.toggler')
+        return @$element.children('div').find('a.jqtree-toggler')
 
     addDropHint: (position) ->
-        if not this.node.is_open and position == Position.INSIDE
+        if not @node.is_open and position == Position.INSIDE
             return new BorderDropHint(@$element)
         else
             return new GhostDropHint(@node, @$element, position)
@@ -937,7 +1012,7 @@ class DragElement
         @offset_x = offset_x
         @offset_y = offset_y
 
-        @$element = $("<span class=\"title tree-dragging\">#{ node.name }</span>")
+        @$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node.name }</span>")
         @$element.css("position", "absolute")
         $tree.append(@$element)
 
@@ -971,25 +1046,28 @@ class SaveStateHandler
             )
 
     restoreState: ->
+        state = @getStateFromStorage()
+
+        if state
+            @setState(state)
+            return true
+        else
+            return false
+
+    getStateFromStorage: ->
         if @tree_widget.options.onGetStateFromStorage
-            state = @tree_widget.options.onGetStateFromStorage()
+            return @tree_widget.options.onGetStateFromStorage()
         else if localStorage?
-            state = localStorage.getItem(
+            return localStorage.getItem(
                 @getCookieName()
             )
         else if $.cookie
-            state = $.cookie(
+            return $.cookie(
                 @getCookieName(),
                 {path: '/'}
             )
         else
-            state = null
-
-        if not state
-            return false
-        else
-            @setState(state)
-            return true
+            return null
 
     getState: ->
         open_nodes = []
@@ -1008,7 +1086,7 @@ class SaveStateHandler
         if @tree_widget.selected_node
             selected_node = @tree_widget.selected_node.id
 
-        return toJson(
+        return JSON.stringify(
             open_nodes: open_nodes,
             selected_node: selected_node
         )
@@ -1110,7 +1188,7 @@ class DragAndDropHandler
         )
 
         @is_dragging = true
-        @current_item.$element.addClass('moving')
+        @current_item.$element.addClass('jqtree-moving')
         return true
 
     mouseDrag: (event) ->
@@ -1143,7 +1221,7 @@ class DragAndDropHandler
         @removeDropHint()
         @removeHitAreas()
 
-        @current_item.$element.removeClass('moving')
+        @current_item.$element.removeClass('jqtree-moving')
         @is_dragging = false
 
         return false
@@ -1364,7 +1442,7 @@ class DragAndDropHandler
         # if this is a closed folder, start timer to open it
         node = @hovered_area.node
         if (
-            node.hasChildren() and
+            node.isFolder() and
             not node.is_open and
             @hovered_area.position == Position.INSIDE
         )
@@ -1379,7 +1457,9 @@ class DragAndDropHandler
 
     startOpenFolderTimer: (folder) ->
         openFolder = =>
-            @tree_widget._getNodeElementForNode(folder).open(
+            @tree_widget._openNode(
+                folder,
+                false,
                 =>
                     @refreshHitAreas()
                     @updateDropHint()
@@ -1410,15 +1490,16 @@ class DragAndDropHandler
               @tree_widget.element.empty()
               @tree_widget._refreshElements()
 
-            event = $.Event('tree.move')
-            event.move_info =
-                moved_node: moved_node
-                target_node: target_node
-                position: Position.getName(position)
-                previous_parent: previous_parent
-                do_move: doMove
+            event = @tree_widget._triggerEvent(
+                'tree.move',
+                move_info:
+                    moved_node: moved_node
+                    target_node: target_node
+                    position: Position.getName(position)
+                    previous_parent: previous_parent
+                    do_move: doMove
+            )
 
-            @tree_widget.element.trigger(event)
             doMove() unless event.isDefaultPrevented()
 
 @Tree.Node = Node

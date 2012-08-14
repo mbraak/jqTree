@@ -1,29 +1,29 @@
-ul.tree {
+ul.jqtree-tree {
     margin-left: 12px;
 }
 
-ul.tree,
-ul.tree ul {
+ul.jqtree-tree,
+ul.jqtree-tree ul {
     list-style: none outside;
     margin-bottom: 0;
     padding: 0;
 }
 
-ul.tree ul {
+ul.jqtree-tree ul {
     display: block;
     margin-left: 12px;
     margin-right: 0;
 }
 
-ul.tree li.closed > ul {
+ul.jqtree-tree li.jqtree-closed > ul {
     display: none;
 }
 
-ul.tree li {
+ul.jqtree-tree li {
     clear: both;
 }
 
-ul.tree .toggler {
+ul.jqtree-tree .jqtree-toggler {
     background-image: url(jqtree-icons.png);
     background-repeat: no-repeat;
     background-position: -8px 0;
@@ -37,32 +37,32 @@ ul.tree .toggler {
     border-bottom: none;
 }
 
-ul.tree div {
+ul.jqtree-tree div {
     cursor: pointer;
 }
 
-ul.tree .title {
+ul.jqtree-tree .jqtree-title {
     color: #1C4257;
     vertical-align: middle;
 }
 
-ul.tree li.folder {
+ul.jqtree-tree li.jqtree-folder {
     margin-bottom: 4px;
 }
 
-ul.tree li.folder.closed {
+ul.jqtree-tree li.jqtree-folder.jqtree-closed {
     margin-bottom: 1px;
 }
 
-ul.tree li.folder .title {
+ul.jqtree-tree li.jqtree-folder .jqtree-title {
     margin-left: 0;
 }
 
-ul.tree .toggler.closed {
+ul.jqtree-tree .jqtree-toggler.jqtree-closed {
     background-position: 0 0;
 }
 
-span.tree-dragging {
+span.jqtree-dragging {
     color: #fff;
     background: #000;
     opacity: 0.6;
@@ -70,17 +70,17 @@ span.tree-dragging {
     padding: 2px 8px;
 }
 
-ul.tree li.ghost {
+ul.jqtree-tree li.jqtree-ghost {
     position: relative;
     z-index: 10;
     margin-right: 10px;
 }
 
-ul.tree li.ghost span {
+ul.jqtree-tree li.jqtree-ghost span {
     display: block;
 }
 
-ul.tree li.ghost span.circle {
+ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     background-image: url(jqtree-icons.png);
     background-repeat: no-repeat;
     background-position: 0 -8px;
@@ -91,7 +91,7 @@ ul.tree li.ghost span.circle {
     left: 2px;
 }
 
-ul.tree li.ghost span.line {
+ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     background-color: #0000ff;
     height: 2px;
     padding: 0;
@@ -101,16 +101,11 @@ ul.tree li.ghost span.line {
     width: 100%;
 }
 
-ul.tree li.ghost.inside {
+ul.jqtree-tree li.jqtree-ghost.jqtree-inside {
     margin-left: 48px;
 }
 
-ul.tree span.tree-hit {
-    position: absolute;
-    display: block;
-}
-
-ul.tree span.border {
+ul.jqtree-tree span.jqtree-border {
     position: absolute;
     display: block;
     left: -2px;
@@ -122,14 +117,14 @@ ul.tree span.border {
     margin: 0;
 }
 
-ul.tree div {
+ul.jqtree-tree div {
     width: 100%; /* todo: why is this in here? */
     *width: auto; /* ie7 fix; issue 41 */
     position: relative;
 }
 
-ul.tree li.selected > div,
-ul.tree li.selected > div:hover {
+ul.jqtree-tree li.jqtree-selected > div,
+ul.jqtree-tree li.jqtree-selected > div:hover {
     background-color: #97BDD6;
     background: -webkit-gradient(linear, left top, left bottom, from(#BEE0F5), to(#89AFCA));
     background: -moz-linear-gradient(top, #BEE0F5, #89AFCA);
@@ -138,6 +133,6 @@ ul.tree li.selected > div:hover {
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
-ul.tree .moving > div .title {
+ul.jqtree-tree .jqtree-moving > div .jqtree-title {
     outline: dashed 1px #0000ff;
 }

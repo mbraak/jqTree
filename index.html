@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="jqtree.css">
     <link rel="stylesheet" href="extra/css/documentation.css">
     <link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
-    <script src="extra/js/jquery-1.7.2.min.js"></script>
+    <script src="extra/js/jquery-1.8.0.min.js"></script>
     <script src="extra/js/jquery.lettering.js"></script>
     <script src="extra/syntax_highlighter/XRegExp.js"></script>
     <script src="extra/syntax_highlighter/shCore.js"></script>
@@ -78,6 +78,8 @@
                 <li><a href="#functions-addparentnode">addParentNode</a></li>
                 <li><a href="#functions-removenode">removeNode</a></li>
                 <li><a href="#functions-appendnode">appendNode</a></li>
+                <li><a href="#functions-updatenode">updateNode</a></li>
+                <li><a href="#functions-movenode">moveNode</a></li>
             </ul>
         </li>
         <li>
@@ -86,6 +88,7 @@
                 <li><a href="#event-tree-click">tree.click</a></li>
                 <li><a href="#event-tree-contextmenu">tree.contextmenu</a></li>
                 <li><a href="#event-tree-move">tree.move</a></li>
+                <li><a href="#event-tree-init">tree.init</a></li>
             </ul>
         </li>
     </ul>
@@ -146,7 +149,7 @@ $('#tree1').tree({
     </ul>
     <h4 id="downloads">Downloads</h4>
     <ul>
-        <li>All (version 0.11): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+        <li>All (version 0.12): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
         <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
         <li>Css: <a href="jqtree.css">jqtree.css</a></li>
         <li>Image: <a href="jqtree-icons.png">jqtree-icons.png</a></li>
@@ -154,8 +157,8 @@ $('#tree1').tree({
     <h4 id="tutorial">Tutorial</h4>
     <ul>
         <li>
-            Include <a href="http://code.jquery.com/jquery-1.7.2.min.js">jQuery</a>.
-            <pre>&lt;script src="jquery-1.7.2.min.js"&gt;&lt;/script&gt;</pre>
+            Include <a href="http://code.jquery.com/jquery-1.8.0.min.js">jQuery</a>.
+            <pre>&lt;script src="jquery-1.8.0.min.js"&gt;&lt;/script&gt;</pre>
         </li>
         <li>
             Include tree.jquery.js:
@@ -219,6 +222,19 @@ $.getJSON(
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.12 (august 14 2012)</h5>
+    <ul>
+        <li>Issue 46: Added tree.refresh event</li>
+        <li>Issue 47: Function 'selectNode' must properly open the parent nodes</li>
+        <li>Issue 49: Make sure that widget functions can be called in the 'tree.init' event</li>
+        <li>Issue 50: Add namespace to css classes</li>
+        <li>Issue 51: closeNode to collapse tree doesn't work</li>
+        <li>Issue 55: Load-on-demand from the server</li>
+        <li>Issue 58: Added updateNode function</li>
+        <li>Issue 59: Added moveNode function</li>
+        <li>Issue 60: Use native JSON.stringify function</li>
+    </ul>
 
     <h5>0.11 (july 8 2012)</h5>
     <ul>
@@ -776,11 +792,69 @@ $tree.appendNode(
 );
 </pre>
 
+    <h5 id="functions-updatenode">updateNode</h5>
+
+    <p>
+        <strong>function updateNode(node, label);</strong>
+        <br>
+        <strong>function updateNode(node, data);</strong>
+    </p>
+
+    <p>
+        Update the title of a node. You can also update the data.
+    </p>
+
+    <p>
+        Update the label:
+    </p>
+
+<pre>
+var node = $tree.tree('getNodeById', 123);
+
+$tree.tree('updateNode', 'new label');
+</pre>
+
+    <p>
+        Update the data (including the label)
+    </p>
+
+<pre>
+var node = $tree.tree('getNodeById', 123);
+
+$tree.tree(
+    'updateNode',
+    {
+        label: 'new label',
+        other_property: 'abc'
+    }
+);
+</pre>
+
+    <h5 id="functions-movenode">moveNode</h5>
+
+    <p>
+        <strong>function moveNode(node, target_node, position);</strong>
+    </p>
+
+    <p>
+        Move a node. Position can be 'before', 'after' or 'inside'.
+    </p>
+
+<pre>
+var node = $tree.tree('getNodeBydId', 1);
+var target_node = $tree.tree('getNodeBydId', 2);
+
+$tree.tree('moveNode', node, target_node, 'after');
+</pre>
+
     <h4 id="events">Events</h4>
+
     <h5 id="event-tree-click">tree.click</h5>
+
     <p>
         Triggered when a tree node is clicked.
     </p>
+
 <pre>
 // create tree
 $('#tree1').tree({
@@ -875,6 +949,20 @@ $('#tree1).bind(
         if (confirm('Really move?')) {
             event.doMove();
         }
+    }
+);
+</pre>
+
+    <h5 id="event-tree-init">tree.init</h5>
+    <p>
+        Called when the tree is initialized. This is particularly useful when the data is loaded from the server.
+    </p>
+
+<pre>
+$('#tree1).bind(
+    'tree.init',
+    function() {
+        // initializing code
     }
 );
 </pre>

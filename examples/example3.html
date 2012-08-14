@@ -9,11 +9,13 @@
     <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeDefault.css">
     <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeRDark.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <script src="../extra/js/jquery-1.7.2.min.js"></script>
+    <script src="../extra/js/jquery-1.8.0.min.js"></script>
     <script src="../tree.jquery.js"></script>
+    <script src="../extra/js/jquery.mockjax.js"></script>
     <script src="../extra/syntax_highlighter/XRegExp.js"></script>
     <script src="../extra/syntax_highlighter/shCore.js"></script>
     <script src="../extra/syntax_highlighter/shBrushJScript.js"></script>
+    <script src="../extra/example_data.js"></script>
     <script src="example.js"></script>
 </head>
 <body>
@@ -24,7 +26,7 @@
 
     <h1>Example 3 - Drag and drop</h1>
 
-    <div id="tree1" data-url="../extra/example_data.json"></div>
+    <div id="tree1" data-url="/example_data/"></div>
 
     <p>
        Let's add drag-and-drop support by setting the option <strong>dragAndDrop</strong> to true.
@@ -40,7 +42,7 @@
 
     <h3>html</h3>
 <pre>
-&lt;div id="tree1" data-url="../extra/example_data.json"&gt;&lt;/div&gt;
+&lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;
 </pre>
 
     <h3>javascript</h3>
@@ -53,6 +55,13 @@ $tree.tree({
 });
 </pre>
     <script>
+        $.mockjax({
+            url: '*',
+            response: function(options) {
+                this.responseText = ExampleData.example_data;
+            }
+        });
+
         $(function() {
             var $tree = $('#tree1');
             $tree.tree({
