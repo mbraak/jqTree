@@ -1171,7 +1171,7 @@ limitations under the License.
 
     JqTreeWidget.prototype._contextmenu = function(e) {
       var $div, node;
-      $div = $(e.target).closest('ul.tree div');
+      $div = $(e.target).closest('ul.jqtree-tree div');
       if ($div.length) {
         node = this._getNode($div);
         if (node) {

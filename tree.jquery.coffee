@@ -823,7 +823,7 @@ class JqTreeWidget extends MouseWidget
             return null
 
     _contextmenu: (e) ->
-        $div = $(e.target).closest('ul.tree div')
+        $div = $(e.target).closest('ul.jqtree-tree div')
         if $div.length
             node = @_getNode($div)
             if node
