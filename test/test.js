@@ -799,6 +799,51 @@ test('moveNode', function() {
     $tree.tree('moveNode', node1, child2, 'inside');
 });
 
+test('load on demand', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({
+        data: [
+            {
+                id: 1,
+                label: 'node1',
+                load_on_demand: true
+            }
+        ],
+        dataUrl: '/tree/'
+    });
+
+    $.mockjax({
+        url: '*',
+        response: function(options) {
+            equal(options.url, '/tree/?node=1');
+
+            this.responseText = [
+                {
+                    id: 2,
+                    label: 'child1'
+                }
+            ];
+        }
+    });
+
+    // -- open node
+    $tree.bind('tree.refresh', function(e) {
+        start();
+
+        equal(formatTitles($tree), 'node1 child1');
+    });
+
+    var node1 = $tree.tree('getNodeByName', 'node1');
+    equal(formatTitles($tree), 'node1');
+
+    $tree.tree('openNode', node1, true);
+
+    stop();
+});
+
+
 module("Tree");
 test('constructor', function() {
     // 1. Create node from string
