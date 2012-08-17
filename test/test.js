@@ -843,6 +843,44 @@ test('load on demand', function() {
     stop();
 });
 
+test('addNodeAfter', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // -- add node after node1
+    $tree.tree('addNodeAfter', 'node3', node1);
+
+    equal(formatTitles($tree), 'node1 child1 child2 node3 node2 child3');
+});
+
+test('addNodeBefore', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // -- add node before node1
+    $tree.tree('addNodeBefore', 'node3', node1);
+
+    equal(formatTitles($tree), 'node3 node1 child1 child2 node2 child3');
+});
+
+test('addParentNode', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+    var child3 = $tree.tree('getNodeByName', 'child3');
+
+    // -- add parent to child3
+    $tree.tree('addParentNode', 'node3', child3);
+
+    equal(formatTitles($tree), 'node1 child1 child2 node2 node3 child3');
+});
 
 module("Tree");
 test('constructor', function() {
