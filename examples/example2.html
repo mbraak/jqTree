@@ -50,20 +50,7 @@
         });
 
         $(function() {
-var $tree = $('#tree1');
-$tree.tree();
-
-$tree.bind(
-    'tree.click',
-    function(e) {
-        var node = e.node;
-
-        $(node.element).toggleClass('jqtree-selected');
-
-        node.selected = !node.selected;
-    }
-);
-
+            $('#tree1').tree();
         });
     </script>
 </body>
