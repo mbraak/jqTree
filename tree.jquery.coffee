@@ -722,7 +722,7 @@ class JqTreeWidget extends MouseWidget
             return $("<li><div><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>")
 
         createFolderLi = (node) =>
-            getButtonClass = ->
+            getButtonClasses = ->
                 classes = ['jqtree-toggler']
 
                 if not node.is_open
@@ -730,7 +730,7 @@ class JqTreeWidget extends MouseWidget
 
                 return classes.join(' ')
 
-            getFolderClass = ->
+            getFolderClasses = ->
                 classes = ['jqtree-folder']
 
                 if not node.is_open
@@ -738,13 +738,13 @@ class JqTreeWidget extends MouseWidget
 
                 return classes.join(' ')
 
-            button_class = getButtonClass()
-            folder_class = getFolderClass()
+            button_classes = getButtonClasses()
+            folder_classes = getFolderClasses()
 
             escaped_name = escapeIfNecessary(node.name)
 
             return $(
-                "<li class=\"#{ folder_class }\"><div><a class=\"#{ button_class }\">&raquo;</a><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
+                "<li class=\"#{ folder_classes }\"><div><a class=\"#{ button_classes }\">&#9654;</a><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->
@@ -963,7 +963,9 @@ class FolderElement extends NodeElement
     open: (on_finished, skip_slide) ->
         if not @node.is_open
             @node.is_open = true
-            @getButton().removeClass('jqtree-closed')
+            $button = @getButton()
+            $button.removeClass('jqtree-closed')
+            $button.html('&#9660;')
 
             doOpen = =>
                 @getLi().removeClass('jqtree-closed')
@@ -981,7 +983,9 @@ class FolderElement extends NodeElement
     close: (skip_slide) ->
         if @node.is_open
             @node.is_open = false
-            @getButton().addClass('jqtree-closed')
+            $button = @getButton()
+            $button.addClass('jqtree-closed')
+            $button.html('&#9654;')
 
             doClose = =>
                 @getLi().addClass('jqtree-closed')
@@ -1129,6 +1133,7 @@ class SelectNodeHandler
 
             return @tree_widget.options.onCanSelectNode(node)
 
+        console.log(canSelect())
         if canSelect()
             if @tree_widget.selected_node
                 @tree_widget._getNodeElementForNode(@tree_widget.selected_node).deselect()
