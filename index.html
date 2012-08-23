@@ -72,6 +72,7 @@
             <a href="#events">Events</a>
             <ul>
                 <li><a href="#event-tree-click">tree.click</a></li>
+                <li><a href="#event-tree-select">tree.select</a></li>
                 <li><a href="#event-tree-contextmenu">tree.contextmenu</a></li>
                 <li><a href="#event-tree-move">tree.move</a></li>
                 <li><a href="#event-tree-init">tree.init</a></li>
@@ -852,6 +853,22 @@ $('#tree1').bind(
     'tree.click',
     function(event) {
         // The clicked node is 'event.node'
+        var node = event.node;
+        alert(node.name);
+    }
+);
+</pre>
+
+    <h5 id="event-tree-select">tree.select</h5>
+
+    <p>
+        Triggered when a tree node is selected.
+    </p>
+
+<pre>
+$('#tree1').bind(
+    'tree.select',
+    function(event) {
         var node = event.node;
         alert(node.name);
     }

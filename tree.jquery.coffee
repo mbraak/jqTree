@@ -795,12 +795,13 @@ class JqTreeWidget extends MouseWidget
         else if $target.is('div') or $target.is('span')
             node = @_getNode($target)
             if node
+                @_triggerEvent('tree.click', node: node)
+
                 if (
                     (not @options.onCanSelectNode) or
                     @options.onCanSelectNode(node)
                 )
                     @selectNode(node)
-                    @_triggerEvent('tree.click', node: node)
 
     _getNode: ($element) ->
         $li = $element.closest('li')
@@ -1122,7 +1123,7 @@ class SelectNodeHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
 
-    selectNode:  (node, must_open_parents) ->
+    selectNode: (node, must_open_parents) ->
         if @tree_widget.options.selectable
             if @tree_widget.selected_node
                 @tree_widget._getNodeElementForNode(@tree_widget.selected_node).deselect()
@@ -1131,6 +1132,7 @@ class SelectNodeHandler
             if node
                 @tree_widget._getNodeElementForNode(node).select()
                 @tree_widget.selected_node = node
+                @tree_widget._triggerEvent('tree.select', node: node)
 
                 if must_open_parents
                     parent = @tree_widget.selected_node.parent

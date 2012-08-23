@@ -160,10 +160,15 @@ test("click event", function() {
     // create tree
     var $tree = $('#tree1');
     $tree.tree({
-        data: example_data
+        data: example_data,
+        selectable: true
     });
 
     $tree.bind('tree.click', function(e) {
+        equal(e.node.name, 'node1');
+    });
+
+    $tree.bind('tree.select', function(e) {
         start();
         equal(e.node.name, 'node1');
     });

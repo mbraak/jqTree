@@ -1131,11 +1131,11 @@ limitations under the License.
       } else if ($target.is('div') || $target.is('span')) {
         node = this._getNode($target);
         if (node) {
+          this._triggerEvent('tree.click', {
+            node: node
+          });
           if ((!this.options.onCanSelectNode) || this.options.onCanSelectNode(node)) {
-            this.selectNode(node);
-            return this._triggerEvent('tree.click', {
-              node: node
-            });
+            return this.selectNode(node);
           }
         }
       }
@@ -1558,6 +1558,9 @@ limitations under the License.
         if (node) {
           this.tree_widget._getNodeElementForNode(node).select();
           this.tree_widget.selected_node = node;
+          this.tree_widget._triggerEvent('tree.select', {
+            node: node
+          });
           if (must_open_parents) {
             parent = this.tree_widget.selected_node.parent;
             while (parent) {
