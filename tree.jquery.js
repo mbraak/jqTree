@@ -1134,9 +1134,7 @@ limitations under the License.
           this._triggerEvent('tree.click', {
             node: node
           });
-          if ((!this.options.onCanSelectNode) || this.options.onCanSelectNode(node)) {
-            return this.selectNode(node);
-          }
+          return this.selectNode(node);
         }
       }
     };
@@ -1549,8 +1547,18 @@ limitations under the License.
     }
 
     SelectNodeHandler.prototype.selectNode = function(node, must_open_parents) {
-      var parent;
-      if (this.tree_widget.options.selectable) {
+      var canSelect, parent,
+        _this = this;
+      canSelect = function() {
+        if (!_this.tree_widget.options.selectable) {
+          return false;
+        }
+        if (!_this.tree_widget.options.onCanSelectNode) {
+          return true;
+        }
+        return _this.tree_widget.options.onCanSelectNode(node);
+      };
+      if (canSelect()) {
         if (this.tree_widget.selected_node) {
           this.tree_widget._getNodeElementForNode(this.tree_widget.selected_node).deselect();
           this.tree_widget.selected_node = null;
