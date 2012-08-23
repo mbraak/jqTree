@@ -1562,7 +1562,6 @@ limitations under the License.
         }
         return _this.tree_widget.options.onCanSelectNode(node);
       };
-      console.log(canSelect());
       if (canSelect()) {
         if (this.tree_widget.selected_node) {
           this.tree_widget._getNodeElementForNode(this.tree_widget.selected_node).deselect();

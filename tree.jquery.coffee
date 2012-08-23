@@ -1133,7 +1133,6 @@ class SelectNodeHandler
 
             return @tree_widget.options.onCanSelectNode(node)
 
-        console.log(canSelect())
         if canSelect()
             if @tree_widget.selected_node
                 @tree_widget._getNodeElementForNode(@tree_widget.selected_node).deselect()
