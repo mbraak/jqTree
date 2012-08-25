@@ -79,7 +79,6 @@ ExampleData.example_data = [
     }
 ];
 
-
 ExampleData.getFirstLevelData = function(nodes) {
     if (! nodes) {
         nodes = ExampleData.example_data;
@@ -90,7 +89,7 @@ ExampleData.getFirstLevelData = function(nodes) {
     $.each(nodes, function() {
         var node = {
             label: this.label,
-            id: this.id,
+            id: this.id
         };
 
         if (this.children) {
