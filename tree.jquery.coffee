@@ -440,6 +440,10 @@ class Tree extends Node
 @Tree.Tree = Tree
 
 
+TRIANGLE_RIGHT = '&#x25ba;'  # ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
+TRIANGLE_DOWN = '&#x25bc;'  # ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
+
+
 class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
@@ -743,8 +747,13 @@ class JqTreeWidget extends MouseWidget
 
             escaped_name = escapeIfNecessary(node.name)
 
+            if node.is_open
+                button_char = TRIANGLE_DOWN
+            else
+                button_char = TRIANGLE_RIGHT
+
             return $(
-                "<li class=\"#{ folder_classes }\"><div><a class=\"#{ button_classes }\">&#9654;</a><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
+                "<li class=\"#{ folder_classes }\"><div><a class=\"#{ button_classes }\">#{ button_char }</a><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->
@@ -965,7 +974,7 @@ class FolderElement extends NodeElement
             @node.is_open = true
             $button = @getButton()
             $button.removeClass('jqtree-closed')
-            $button.html('&#9660;')
+            $button.html(TRIANGLE_DOWN)
 
             doOpen = =>
                 @getLi().removeClass('jqtree-closed')
@@ -985,7 +994,7 @@ class FolderElement extends NodeElement
             @node.is_open = false
             $button = @getButton()
             $button.addClass('jqtree-closed')
-            $button.html('&#9654;')
+            $button.html(TRIANGLE_RIGHT)
 
             doClose = =>
                 @getLi().addClass('jqtree-closed')
