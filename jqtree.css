@@ -31,6 +31,7 @@ ul.jqtree-tree .jqtree-toggler {
     *top: 0;  /* fix for ie7 */
     font-size: 12px;
     line-height: 12px;
+    font-family: arial;  /* fix for ie9 */
     border-bottom: none;
     color: #333;
 }
