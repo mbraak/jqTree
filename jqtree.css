@@ -83,9 +83,8 @@ ul.jqtree-tree li.jqtree-ghost span {
 }
 
 ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
-    background-image: url(jqtree-icons.png);
+    background-image: url(jqtree-circle.png);
     background-repeat: no-repeat;
-    background-position: 0 -8px;
     height: 8px;
     width: 8px;
     position: absolute;
