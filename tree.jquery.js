@@ -18,7 +18,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, MouseWidget, Node, NodeElement, Position, SaveStateHandler, SelectNodeHandler, SimpleWidget, Tree, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, MouseWidget, Node, NodeElement, Position, SaveStateHandler, SelectNodeHandler, SimpleWidget, TRIANGLE_DOWN, TRIANGLE_RIGHT, Tree, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -729,6 +729,10 @@ limitations under the License.
 
   this.Tree.Tree = Tree;
 
+  TRIANGLE_RIGHT = '&#x25ba;';
+
+  TRIANGLE_DOWN = '&#x25bc;';
+
   JqTreeWidget = (function(_super) {
 
     __extends(JqTreeWidget, _super);
@@ -1062,8 +1066,8 @@ limitations under the License.
         return $("<li><div><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
       };
       createFolderLi = function(node) {
-        var button_class, escaped_name, folder_class, getButtonClass, getFolderClass;
-        getButtonClass = function() {
+        var button_char, button_classes, escaped_name, folder_classes, getButtonClasses, getFolderClasses;
+        getButtonClasses = function() {
           var classes;
           classes = ['jqtree-toggler'];
           if (!node.is_open) {
@@ -1071,7 +1075,7 @@ limitations under the License.
           }
           return classes.join(' ');
         };
-        getFolderClass = function() {
+        getFolderClasses = function() {
           var classes;
           classes = ['jqtree-folder'];
           if (!node.is_open) {
@@ -1079,10 +1083,15 @@ limitations under the License.
           }
           return classes.join(' ');
         };
-        button_class = getButtonClass();
-        folder_class = getFolderClass();
+        button_classes = getButtonClasses();
+        folder_classes = getFolderClasses();
         escaped_name = escapeIfNecessary(node.name);
-        return $("<li class=\"" + folder_class + "\"><div><a class=\"" + button_class + "\">&raquo;</a><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
+        if (node.is_open) {
+          button_char = TRIANGLE_DOWN;
+        } else {
+          button_char = TRIANGLE_RIGHT;
+        }
+        return $("<li class=\"" + folder_classes + "\"><div><a class=\"" + button_classes + "\">" + button_char + "</a><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
       };
       doCreateDomElements = function($element, children, is_root_node, is_open) {
         var $li, $ul, child, _i, _len;
@@ -1361,11 +1370,13 @@ limitations under the License.
     }
 
     FolderElement.prototype.open = function(on_finished, skip_slide) {
-      var doOpen,
+      var $button, doOpen,
         _this = this;
       if (!this.node.is_open) {
         this.node.is_open = true;
-        this.getButton().removeClass('jqtree-closed');
+        $button = this.getButton();
+        $button.removeClass('jqtree-closed');
+        $button.html(TRIANGLE_DOWN);
         doOpen = function() {
           _this.getLi().removeClass('jqtree-closed');
           if (on_finished) {
@@ -1385,11 +1396,13 @@ limitations under the License.
     };
 
     FolderElement.prototype.close = function(skip_slide) {
-      var doClose,
+      var $button, doClose,
         _this = this;
       if (this.node.is_open) {
         this.node.is_open = false;
-        this.getButton().addClass('jqtree-closed');
+        $button = this.getButton();
+        $button.addClass('jqtree-closed');
+        $button.html(TRIANGLE_RIGHT);
         doClose = function() {
           _this.getLi().addClass('jqtree-closed');
           return _this.tree_widget._triggerEvent('tree.close', {
