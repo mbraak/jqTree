@@ -136,3 +136,7 @@ pre[class*="language-"] {
 pre[class*="language-"].dark {
     margin: .5em 0 1em 0;
 }
+
+code.dark {
+    font-size: 0.9em;
+}
