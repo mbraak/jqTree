@@ -480,7 +480,18 @@ class JqTreeWidget extends MouseWidget
             @tree.getData()
         )
 
-    loadData: (data, parent_node) ->
+    loadData: (data_or_url, parent_node, on_finished) ->
+        if typeof data_or_url == 'string'
+            data_url = data_or_url
+            @_loadDataFromServer(data_url, parent_node, on_finished)
+        else
+            data = data_or_url
+            @_loadData(data, parent_node)
+
+            if on_finished
+                on_finished()
+
+    _loadData: (data, parent_node) ->
         @_triggerEvent('tree.load_data', tree_data: data)
 
         if not parent_node
@@ -497,6 +508,36 @@ class JqTreeWidget extends MouseWidget
 
         if @is_dragging
             @dnd_handler.refreshHitAreas()
+
+    _loadDataFromServer: (data_url, parent_node, on_finished) ->
+        if not data_url
+            return
+
+        if parent_node
+            folder_element = new FolderElement(parent_node, this)
+
+            $li = folder_element.getLi()
+            $li.addClass('jqtree-loading')
+        else
+            $li = null
+
+        $.ajax(
+            url: data_url
+            cache: false
+            success: (response) =>
+                if $.isArray(response) or typeof response == 'object'
+                    data = response
+                else
+                    data = $.parseJSON(response)
+
+                if $li
+                    $li.removeClass('loading')
+
+                @_loadData(data, parent_node)
+
+                if on_finished
+                    on_finished()
+        )
 
     getNodeById: (node_id) ->
         return @tree.getNodeById(node_id)
@@ -518,21 +559,13 @@ class JqTreeWidget extends MouseWidget
 
     _loadFolderOnDemand: (node, skip_slide, on_finished) ->
         node.load_on_demand = false
-        data_url = @_getDataUrl(node)
-        folder_element = new FolderElement(node, this)
 
-        if data_url and folder_element
-            $li = folder_element.getLi()
-            $li.addClass('jqtree-loading')
-
-            @_loadDataFromServer(
-                data_url,
-                (data) =>
-                    $li.removeClass('loading')
-
-                    @loadData(data, node)
-                    @_openNode(node, skip_slide, on_finished)
-            )
+        @loadData(
+            @_getDataUrl(node),
+            node,
+            =>
+                @_openNode(node, skip_slide, on_finished)
+        )
 
     closeNode: (node, skip_slide) ->
         if node.isFolder()
@@ -635,13 +668,7 @@ class JqTreeWidget extends MouseWidget
         if @options.data
             @loadData(@options.data)
         else
-            data_url = @_getDataUrl()
-            if data_url
-                @_loadDataFromServer(
-                    data_url,
-                    (data) =>
-                        @loadData(data)
-                )
+            @loadData(@_getDataUrl())
 
     _getDataUrl: (node) ->
         data_url = @options.dataUrl or @element.data('url')
@@ -653,19 +680,6 @@ class JqTreeWidget extends MouseWidget
                 data_url += "?node=#{ node.id }"
 
             return data_url
-
-    _loadDataFromServer: (data_url, on_success) ->
-        $.ajax(
-            url: data_url
-            cache: false
-            success: (response) =>
-                if $.isArray(response) or typeof response == 'object'
-                    data = response
-                else
-                    data = $.parseJSON(response)
-
-                on_success(data)
-        )
 
     _initTree: (data) ->
         @tree = new Tree()

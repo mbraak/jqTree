@@ -781,7 +781,21 @@ limitations under the License.
       return JSON.stringify(this.tree.getData());
     };
 
-    JqTreeWidget.prototype.loadData = function(data, parent_node) {
+    JqTreeWidget.prototype.loadData = function(data_or_url, parent_node, on_finished) {
+      var data, data_url;
+      if (typeof data_or_url === 'string') {
+        data_url = data_or_url;
+        return this._loadDataFromServer(data_url, parent_node, on_finished);
+      } else {
+        data = data_or_url;
+        this._loadData(data, parent_node);
+        if (on_finished) {
+          return on_finished();
+        }
+      }
+    };
+
+    JqTreeWidget.prototype._loadData = function(data, parent_node) {
       var child, subtree, _i, _len, _ref;
       this._triggerEvent('tree.load_data', {
         tree_data: data
@@ -802,6 +816,40 @@ limitations under the License.
       if (this.is_dragging) {
         return this.dnd_handler.refreshHitAreas();
       }
+    };
+
+    JqTreeWidget.prototype._loadDataFromServer = function(data_url, parent_node, on_finished) {
+      var $li, folder_element,
+        _this = this;
+      if (!data_url) {
+        return;
+      }
+      if (parent_node) {
+        folder_element = new FolderElement(parent_node, this);
+        $li = folder_element.getLi();
+        $li.addClass('jqtree-loading');
+      } else {
+        $li = null;
+      }
+      return $.ajax({
+        url: data_url,
+        cache: false,
+        success: function(response) {
+          var data;
+          if ($.isArray(response) || typeof response === 'object') {
+            data = response;
+          } else {
+            data = $.parseJSON(response);
+          }
+          if ($li) {
+            $li.removeClass('loading');
+          }
+          _this._loadData(data, parent_node);
+          if (on_finished) {
+            return on_finished();
+          }
+        }
+      });
     };
 
     JqTreeWidget.prototype.getNodeById = function(node_id) {
@@ -830,20 +878,11 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._loadFolderOnDemand = function(node, skip_slide, on_finished) {
-      var $li, data_url, folder_element,
-        _this = this;
+      var _this = this;
       node.load_on_demand = false;
-      data_url = this._getDataUrl(node);
-      folder_element = new FolderElement(node, this);
-      if (data_url && folder_element) {
-        $li = folder_element.getLi();
-        $li.addClass('jqtree-loading');
-        return this._loadDataFromServer(data_url, function(data) {
-          $li.removeClass('loading');
-          _this.loadData(data, node);
-          return _this._openNode(node, skip_slide, on_finished);
-        });
-      }
+      return this.loadData(this._getDataUrl(node), node, function() {
+        return _this._openNode(node, skip_slide, on_finished);
+      });
     };
 
     JqTreeWidget.prototype.closeNode = function(node, skip_slide) {
@@ -953,17 +992,10 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._initData = function() {
-      var data_url,
-        _this = this;
       if (this.options.data) {
         return this.loadData(this.options.data);
       } else {
-        data_url = this._getDataUrl();
-        if (data_url) {
-          return this._loadDataFromServer(data_url, function(data) {
-            return _this.loadData(data);
-          });
-        }
+        return this.loadData(this._getDataUrl());
       }
     };
 
@@ -978,23 +1010,6 @@ limitations under the License.
         }
         return data_url;
       }
-    };
-
-    JqTreeWidget.prototype._loadDataFromServer = function(data_url, on_success) {
-      var _this = this;
-      return $.ajax({
-        url: data_url,
-        cache: false,
-        success: function(response) {
-          var data;
-          if ($.isArray(response) || typeof response === 'object') {
-            data = response;
-          } else {
-            data = $.parseJSON(response);
-          }
-          return on_success(data);
-        }
-      });
     };
 
     JqTreeWidget.prototype._initTree = function(data) {

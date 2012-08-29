@@ -210,7 +210,8 @@ $.getJSON(
     <ul>
         <li>Issue 54: Added tree.select event</li>
         <li>Issue 63: Fixed contextmenu event</li>
-        <li>Issue 67: use unicode characters for triangle buttons</li>
+        <li>Issue 67: Use unicode characters for triangle buttons</li>
+        <li>issue 70: Load data from the server using the loadData function</li>
     </ul>
 
     <h5>0.12 (august 14 2012)</h5>
@@ -542,9 +543,18 @@ $('#tree1').tree({
         <strong>function loadData(data);</strong>
         <br>
         <strong>function loadData(data, parent_node);</strong>
+        <br>
+        <strong>function loadData(url);</strong>
+        <br>
+        <strong>function loadData(url, parent_node);</strong>
     </p>
     <p>
-        Load the tree with new data.
+        Load data in the tree. You can provide an <strong>array of nodes</strong> or you can provide a <strong>url</strong>.
+        <br>
+        You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
+    </p>
+    <p>
+        Provide an array of nodes:
     </p>
 <pre><code class="language-javascript">
 // Assuming the tree exists
@@ -567,7 +577,7 @@ $('#tree1').tree('loadData', new_data);
 </code></pre>
 
     <p>
-        It's also possible to add the nodes to an existing node in the tree.
+        Load a subtree:
     </p>
 
 <pre><code class="language-javascript">
@@ -580,6 +590,14 @@ var data = [
     { label: 'another new node' }
 ];
 $('#tree1').tree('loadData', data, node);
+</code></pre>
+
+    <p>
+        Load the data from an url:
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree('loadData', '/category/tree/');
 </code></pre>
 
     <h5 id="functions-tojson">toJson</h5>
