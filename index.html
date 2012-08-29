@@ -481,7 +481,7 @@ $('#tree1).tree({
     data: data,
     onCreateLi: function(node, $li) {
         // Add 'icon' span before title
-        $li.find('.title').before('<span class="icon"></span>');
+        $li.find('.jqtree-title').before('<span class="icon"></span>');
     }
 });
 </pre>
@@ -494,9 +494,9 @@ $('#tree1).tree({
 $('#tree1').tree({
     data: data,
     onIsMoveHandle: function($element) {
-        // Only dom elements with 'title' class can be used
+        // Only dom elements with 'jqtree-title' class can be used
         // as move handle.
-        return ($element.is('.title'));
+        return ($element.is('.jqtree-title'));
     }
 });
 </pre>
