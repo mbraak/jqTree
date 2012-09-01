@@ -27,7 +27,7 @@ ul.jqtree-tree .jqtree-toggler {
     display: block;
     position: absolute;
     left: -1.5em;
-    top: 20%;
+    top: 30%;
     *top: 0;  /* fix for ie7 */
     font-size: 12px;
     line-height: 12px;
