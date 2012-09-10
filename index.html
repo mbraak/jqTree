@@ -973,7 +973,7 @@ $('#tree1).bind(
 </code></pre>
 
     <p>
-        You can later call <strong>event.move_info.move_info.doMove()</strong> to move the node. This way you can ask the user before moving the node:
+        You can later call <strong>event.move_info.move_info.do_move()</strong> to move the node. This way you can ask the user before moving the node:
     </p>
 
 <pre><code class="language-javascript">
@@ -983,7 +983,7 @@ $('#tree1).bind(
         event.preventDefault();
 
         if (confirm('Really move?')) {
-            event.move_info.doMove();
+            event.move_info.do_move();
         }
     }
 );
