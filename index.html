@@ -989,6 +989,23 @@ $('#tree1).bind(
 );
 </code></pre>
 
+    <p>
+        Note that if you want to serialise the tree, for example to POST back to a server, you need to let tree complete the move first:
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1).bind(
+    'tree.move',
+    function(event)
+    {
+        event.preventDefault();
+        // do the move first, and _then_ POST back.
+        event.move_info.do_move();
+        $.post('your_url', {tree: $(this).tree('toJson')});
+    }
+);
+</code></pre>
+
     <h5 id="event-tree-init">tree.init</h5>
     <p>
         Called when the tree is initialized. This is particularly useful when the data is loaded from the server.
