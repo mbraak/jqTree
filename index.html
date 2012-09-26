@@ -73,6 +73,7 @@
                 <li><a href="#event-tree-contextmenu">tree.contextmenu</a></li>
                 <li><a href="#event-tree-move">tree.move</a></li>
                 <li><a href="#event-tree-init">tree.init</a></li>
+                <li><a href="#event-tree-open">tree.open</a></li>
             </ul>
         </li>
     </ul>
@@ -1016,6 +1017,20 @@ $('#tree1).bind(
     'tree.init',
     function() {
         // initializing code
+    }
+);
+</code></pre>
+
+    <h5 id="event-tree-open">tree.open</h5>
+    <p>
+        Called when a node is opened.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1).bind(
+    'tree.open',
+    function(e) {
+        console.log(e.node);
     }
 );
 </code></pre>
