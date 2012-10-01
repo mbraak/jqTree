@@ -647,6 +647,7 @@ class JqTreeWidget extends MouseWidget
 
         @element = @$el
         @selected_node = null
+        @mouse_delay = 300
 
         @save_state_handler = new SaveStateHandler(this)
         @select_node_handler = new SelectNodeHandler(this)

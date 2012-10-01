@@ -134,7 +134,10 @@ limitations under the License.
 
     MouseWidget.prototype._init = function() {
       this.$el.bind('mousedown.mousewidget', $.proxy(this._mouseDown, this));
-      return this.is_mouse_started = false;
+      this.is_mouse_started = false;
+      this.mouse_delay = 0;
+      this._mouse_delay_timer = null;
+      return this._is_mouse_delay_met = true;
     };
 
     MouseWidget.prototype._deinit = function() {
@@ -163,15 +166,32 @@ limitations under the License.
       $document = $(document);
       $document.bind('mousemove.mousewidget', $.proxy(this._mouseMove, this));
       $document.bind('mouseup.mousewidget', $.proxy(this._mouseUp, this));
+      if (this.mouse_delay) {
+        this._startMouseDelayTimer();
+      }
       e.preventDefault();
       this.is_mouse_handled = true;
       return true;
+    };
+
+    MouseWidget.prototype._startMouseDelayTimer = function() {
+      var _this = this;
+      if (this._mouse_delay_timer) {
+        clearTimeout(this._mouse_delay_timer);
+      }
+      this._mouse_delay_timer = setTimeout(function() {
+        return _this._is_mouse_delay_met = true;
+      }, this.mouse_delay);
+      return this._is_mouse_delay_met = false;
     };
 
     MouseWidget.prototype._mouseMove = function(e) {
       if (this.is_mouse_started) {
         this._mouseDrag(e);
         return e.preventDefault();
+      }
+      if (this.mouse_delay && !this._is_mouse_delay_met) {
+        return true;
       }
       this.is_mouse_started = this._mouseStart(this.mouse_down_event) !== false;
       if (this.is_mouse_started) {
@@ -976,6 +996,7 @@ limitations under the License.
       JqTreeWidget.__super__._init.call(this);
       this.element = this.$el;
       this.selected_node = null;
+      this.mouse_delay = 300;
       this.save_state_handler = new SaveStateHandler(this);
       this.select_node_handler = new SelectNodeHandler(this);
       this.dnd_handler = new DragAndDropHandler(this);
