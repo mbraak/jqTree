@@ -87,6 +87,11 @@ h1 span.char6 {
     padding-right: 0.1em;
 }
 
+.logo {
+    float: left;
+    margin-right: 1em;
+}
+
 /* general style */
 h4 {
     font-size: 1.2em;
