@@ -58,38 +58,25 @@
 }
 
 /* header */
-h1 {
-    color: #C7518C;
+#main-title {
+    margin: 1em 0 1em 0;
+    background-color: #F35EA1;
+    padding: 1em 1.5em;
+    float: left;
+}
+
+#main-title h1 {
+    color: #fff;
     font-family: 'Corben', arial, serif;
     font-size: 55px;
-    margin: 0.5em 0;
-}
-
-h1 span {
-    background-color: #F35EA1;
-}
-
-h1 span.char1,
-h1 span.char2 {
-    color: #75CBC6;
-    background-color: #fff;
-}
-
-h1 span.char2 {
-    padding-right: 0.1em;
-}
-
-h1 span.char3 {
-    padding-left: 0.1em;
-}
-
-h1 span.char6 {
-    padding-right: 0.1em;
-}
-
-.logo {
+    margin: 0;
+    line-height: 90px;
     float: left;
-    margin-right: 1em;
+}
+
+#main-title .logo {
+    float: left;
+    margin: 0 1.5em 0 0;
 }
 
 /* general style */

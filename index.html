@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="extra/css/documentation.css">
     <link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
     <script src="extra/js/jquery-1.8.2.min.js"></script>
-    <script src="extra/js/jquery.lettering.js"></script>
     <script src="extra/prism/prism.js"></script>
     <script src="tree.jquery.js"></script>
 </head>
@@ -79,8 +78,12 @@
     </ul>
 </div>
 <div id="page">
-    <img src="tree_logo.png" class="logo" />
-    <h1 id="jqtree">jqTree</h1>
+    <div class="group">
+        <div id="main-title">
+            <img src="tree_logo.png" class="logo" />
+            <h1 id="jqtree">jqTree</h1>
+        </div>
+    </div>
     <p id="introduction">
         JqTree is a tree widget.
     </p>
@@ -1066,8 +1069,6 @@ $('#tree1).bind(
             autoOpen: true,
             dragAndDrop: true
         });
-
-        $('h1').lettering();
     });
 </script>
 </body>
