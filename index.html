@@ -837,7 +837,7 @@ $tree.appendNode(
 <pre><code class="language-javascript">
 var node = $tree.tree('getNodeById', 123);
 
-$tree.tree('updateNode', 'new label');
+$tree.tree('updateNode', node, 'new label');
 </code></pre>
 
     <p>
@@ -849,6 +849,7 @@ var node = $tree.tree('getNodeById', 123);
 
 $tree.tree(
     'updateNode',
+    node,
     {
         label: 'new label',
         other_property: 'abc'
