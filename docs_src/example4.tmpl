@@ -1,29 +1,15 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Example 4</title>
-    <link rel="stylesheet" href="../extra/css/gridless.css">
-    <link rel="stylesheet" href="../extra/prism/prism.css">
-    <link rel="stylesheet" href="example.css">
-    <link rel="stylesheet" href="../jqtree.css">
-    <script src="../extra/js/jquery-1.8.2.min.js"></script>
-    <script src="../extra/prism/prism.js"></script>
-    <script src="../extra/js/jquery.mockjax.js"></script>
-    <script src="../extra/example_data.js"></script>
-    <script src="../tree.jquery.js"></script>
-</head>
-<body>
-    <p id="nav">
-        <a href="example3.html">&laquo; Example 3</a>
-        
-            <a href="example5.html" class="next">Example 5 &raquo;</a>
-        
-    </p>
+{% extends "base.tmpl" %}
 
-    <h1>Example 4 - Save the state</h1>
+{% block title %}Example 4{% endblock %}
+{% block h1 %}Example 4 - Save the state{% endblock %}
 
-    
+{% block previous_url %}example3.html{% endblock %}
+{% block previous_title %}Example 3{% endblock %}
+
+{% block next_url %}example5.html{% endblock %}"
+{% block next_title %}Example 5{% endblock %}
+
+{% block contents %}
     <div id="tree1" data-url="/example_data/"></div>
 
     <p>
@@ -76,6 +62,4 @@ $('#tree1').tree({
             });
         });
     </script>
-
-</body>
-</html>
+{% endblock %}

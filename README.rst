@@ -22,3 +22,4 @@ Thanks
 ------
 
 The code for the mouse widget is heavily inspired by the mouse widget from jquery ui.
+Tree designed by Hernan D. Schlosman from The Noun Project.

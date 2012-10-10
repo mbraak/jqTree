@@ -45,100 +45,90 @@
 /* page */
 .container-left,
 .container-right {
-	float: left;
-	width: 50%;
+    float: left;
+    width: 50%;
 }
 
 .container-left .inner {
-	margin-right: 0.5em;
+    margin-right: 0.5em;
 }
 
 .container-right .inner {
-	margin-left: 0.5em;
+    margin-left: 0.5em;
 }
 
 /* header */
-h1 {
-	color: #C7518C;
-	font-family: 'Corben', arial, serif;
-	font-size: 55px;
-	margin: 0.5em 0;
+#main-title {
+    margin: 1em 0 1em 0;
+    background-color: #F35EA1;
+    padding: 1em 1.5em;
+    float: left;
 }
 
-h1 span {
-	background-color: #F35EA1;
+#main-title h1 {
+    color: #fff;
+    font-family: 'Corben', arial, serif;
+    font-size: 55px;
+    margin: 0;
+    line-height: 90px;
+    float: left;
 }
 
-h1 span.char1,
-h1 span.char2 {
-	color: #75CBC6;
-	background-color: #fff;
-}
-
-h1 span.char2 {
-	padding-right: 0.1em;
-}
-
-h1 span.char3 {
-	padding-left: 0.1em;
-}
-
-h1 span.char6 {
-	padding-right: 0.1em;
+#main-title .logo {
+    float: left;
+    margin: 0 1.5em 0 0;
 }
 
 /* general style */
 h4 {
-	font-size: 1.2em;
-	margin: 0.5em 0 0.2em 0;
-	color: #777;
-	font-family: 'Helvetica', Arial, sans-serif;
+    font-size: 1.2em;
+    margin: 0.5em 0 0.2em 0;
+    color: #777;
+    font-family: 'Helvetica', Arial, sans-serif;
 }
 
 h5 {
-	font-size: 0.9em;
-	margin: 1em 0 0.5em 0;
-	background-color: #333;
-	color: #fff;
-	display: inline;
-	padding: 0.2em 0.5em 0.1em 0.5em;
-	font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+    font-size: 0.9em;
+    margin: 1em 0 0.5em 0;
+    background-color: #333;
+    color: #fff;
+    display: inline;
+    padding: 0.2em 0.5em 0.1em 0.5em;
+    font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
 }
 
 a,
 a:visited {
-	color: #b2497e;
+    color: #b2497e;
 }
 
 img {
-	margin: 0 0.5em;
+    margin: 0 0.5em;
 }
 
 /* tree */
 .jqtree-tree a:hover {
-	border-bottom: none;
+    border-bottom: none;
 }
 
 #tree1 {
-	border: solid 1px #666;
-	padding: 1em;
+    border: solid 1px #666;
+    padding: 1em;
 }
 
 /* code */
-.syntaxhighlighter {
-	padding-bottom: 0.2em;
+pre {
+    background-color: #333;
 }
 
-.syntaxhighlighter .container {
-	padding: 1em;
+pre[class*="language-"] {
+    margin: 0 0 2em 0;
 }
 
-.syntaxhighlighter {
-	margin: 0.5em 0 1em 0;
-	border-left: solid 6px #aaa;
+pre[class*="language-"].dark {
+    margin: .5em 0 1em 0;
 }
 
-.syntaxhighlighter.dark {
-	border-left: none;
-	margin: 0 0 1em 0;
+code.dark {
+    font-size: 0.9em;
 }

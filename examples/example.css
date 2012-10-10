@@ -19,20 +19,6 @@ p {
     margin-top: 1em;
 }
 
-.syntaxhighlighter .container {
-    padding: 1em;
-}
-
-.syntaxhighlighter {
-    margin: 0;
-    border-left: solid 6px #aaa;
-    padding-bottom: 0.2em;
-}
-
-.syntaxhighlighter.dark {
-    border-left: none;
-}
-
 #tree1 {
     margin-bottom: 1em;
     background-color: #ccc;
@@ -46,4 +32,8 @@ p {
 .jqtree-tree .jqtree-loading > div .jqtree-title:after {
     content: url(spinner.gif);
     margin-left: 8px;
+}
+
+pre {
+    background-color: #333;
 }

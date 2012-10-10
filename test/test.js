@@ -160,10 +160,15 @@ test("click event", function() {
     // create tree
     var $tree = $('#tree1');
     $tree.tree({
-        data: example_data
+        data: example_data,
+        selectable: true
     });
 
     $tree.bind('tree.click', function(e) {
+        equal(e.node.name, 'node1');
+    });
+
+    $tree.bind('tree.select', function(e) {
         start();
         equal(e.node.name, 'node1');
     });
@@ -797,6 +802,89 @@ test('moveNode', function() {
 
     // -- Check that illegal moves are skipped
     $tree.tree('moveNode', node1, child2, 'inside');
+});
+
+test('load on demand', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({
+        data: [
+            {
+                id: 1,
+                label: 'node1',
+                load_on_demand: true
+            }
+        ],
+        dataUrl: '/tree/'
+    });
+
+    $.mockjax({
+        url: '*',
+        response: function(options) {
+            equal(options.url, '/tree/?node=1');
+
+            this.responseText = [
+                {
+                    id: 2,
+                    label: 'child1'
+                }
+            ];
+        }
+    });
+
+    // -- open node
+    $tree.bind('tree.refresh', function(e) {
+        start();
+
+        equal(formatTitles($tree), 'node1 child1');
+    });
+
+    var node1 = $tree.tree('getNodeByName', 'node1');
+    equal(formatTitles($tree), 'node1');
+
+    $tree.tree('openNode', node1, true);
+
+    stop();
+});
+
+test('addNodeAfter', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // -- add node after node1
+    $tree.tree('addNodeAfter', 'node3', node1);
+
+    equal(formatTitles($tree), 'node1 child1 child2 node3 node2 child3');
+});
+
+test('addNodeBefore', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // -- add node before node1
+    $tree.tree('addNodeBefore', 'node3', node1);
+
+    equal(formatTitles($tree), 'node3 node1 child1 child2 node2 child3');
+});
+
+test('addParentNode', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    $tree.tree({ data: example_data });
+    var child3 = $tree.tree('getNodeByName', 'child3');
+
+    // -- add parent to child3
+    $tree.tree('addParentNode', 'node3', child3);
+
+    equal(formatTitles($tree), 'node1 child1 child2 node2 node3 child3');
 });
 
 module("Tree");

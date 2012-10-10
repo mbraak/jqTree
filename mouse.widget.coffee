@@ -9,6 +9,9 @@ class MouseWidget extends SimpleWidget
         @$el.bind('mousedown.mousewidget', $.proxy(@_mouseDown, this))
 
         @is_mouse_started = false
+        @mouse_delay = 0
+        @_mouse_delay_timer = null
+        @_is_mouse_delay_met = true
 
     _deinit: ->
         @$el.unbind('mousedown.mousewidget')
@@ -39,14 +42,32 @@ class MouseWidget extends SimpleWidget
         $document.bind('mousemove.mousewidget', $.proxy(@_mouseMove, this))
         $document.bind('mouseup.mousewidget', $.proxy(@_mouseUp, this))
 
-        e.preventDefault();
+        if @mouse_delay
+            @_startMouseDelayTimer()
+
+        e.preventDefault()
         @is_mouse_handled = true
         return true
+
+    _startMouseDelayTimer: ->
+        if @_mouse_delay_timer
+            clearTimeout(@_mouse_delay_timer)
+
+        @_mouse_delay_timer = setTimeout(
+            =>
+                @_is_mouse_delay_met = true
+            , @mouse_delay
+        )
+
+        @_is_mouse_delay_met = false
 
     _mouseMove: (e) ->
         if @is_mouse_started
             @_mouseDrag(e)
             return e.preventDefault()
+
+        if @mouse_delay and not @_is_mouse_delay_met
+            return true
 
         @is_mouse_started = @_mouseStart(@mouse_down_event) != false
 

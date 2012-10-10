@@ -4,28 +4,26 @@
     <meta charset="utf-8">
     <title>Example 2</title>
     <link rel="stylesheet" href="../extra/css/gridless.css">
+    <link rel="stylesheet" href="../extra/prism/prism.css">
     <link rel="stylesheet" href="example.css">
-    <link rel="stylesheet" href="../extra/syntax_highlighter/shCore.css">
-    <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeDefault.css">
-    <link rel="stylesheet" href="../extra/syntax_highlighter/shThemeRDark.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <script src="../extra/js/jquery-1.8.0.min.js"></script>
-    <script src="../tree.jquery.js"></script>
+    <script src="../extra/js/jquery-1.8.2.min.js"></script>
+    <script src="../extra/prism/prism.js"></script>
     <script src="../extra/js/jquery.mockjax.js"></script>
-    <script src="../extra/syntax_highlighter/XRegExp.js"></script>
-    <script src="../extra/syntax_highlighter/shCore.js"></script>
-    <script src="../extra/syntax_highlighter/shBrushJScript.js"></script>
     <script src="../extra/example_data.js"></script>
-    <script src="example.js"></script>
+    <script src="../tree.jquery.js"></script>
 </head>
 <body>
     <p id="nav">
         <a href="example1.html">&laquo; Example 1</a>
-        <a href="example3.html" class="next">Example 3 &raquo;</a>
+        
+            <a href="example3.html" class="next">Example 3 &raquo;</a>
+        
     </p>
 
     <h1>Example 2 - load the data from the server</h1>
 
+    
     <div id="tree1" data-url="/example_data/"></div>
 
     <p>
@@ -33,38 +31,27 @@
     </p>
 
     <h3>html</h3>
-<pre>
+<pre><code class="language-markup">
 &lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;
-</pre>
+</code></pre>
 
     <h3>javascript</h3>
-<pre>
-    $('#tree1').tree();
-</pre>
+<pre><code class="language-javascript">
+$('#tree1').tree();
+</code></pre>
     <script>
         $.mockjax({
             url: '*',
             response: function(options) {
                 this.responseText = ExampleData.example_data;
-            }
+            },
+            responseTime: 0
         });
 
         $(function() {
-var $tree = $('#tree1');
-$tree.tree();
-
-$tree.bind(
-    'tree.click',
-    function(e) {
-        var node = e.node;
-
-        $(node.element).toggleClass('jqtree-selected');
-
-        node.selected = !node.selected;
-    }
-);
-
+            $('#tree1').tree();
         });
     </script>
+
 </body>
 </html>

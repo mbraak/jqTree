@@ -24,17 +24,20 @@ ul.jqtree-tree li {
 }
 
 ul.jqtree-tree .jqtree-toggler {
-    background-image: url(jqtree-icons.png);
-    background-repeat: no-repeat;
-    background-position: -8px 0;
-    width: 8px;
-    height: 8px;
     display: block;
     position: absolute;
-    left: -12px;
+    left: -1.5em;
     top: 30%;
-    text-indent: -9999px;
+    *top: 0;  /* fix for ie7 */
+    font-size: 12px;
+    line-height: 12px;
+    font-family: arial;  /* fix for ie9 */
     border-bottom: none;
+    color: #333;
+}
+
+ul.jqtree-tree .jqtree-toggler:hover {
+    color: #000;
 }
 
 ul.jqtree-tree div {
@@ -81,9 +84,8 @@ ul.jqtree-tree li.jqtree-ghost span {
 }
 
 ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
-    background-image: url(jqtree-icons.png);
+    background-image: url(jqtree-circle.png);
     background-repeat: no-repeat;
-    background-position: 0 -8px;
     height: 8px;
     width: 8px;
     position: absolute;
