@@ -600,6 +600,9 @@ class JqTreeWidget extends MouseWidget
             node.remove()
             @_refreshElements(parent.parent)
 
+        if node == @selected_node
+            @selected_node = null
+
     appendNode: (new_node_info, parent_node) ->
         if not parent_node
             parent_node = @tree

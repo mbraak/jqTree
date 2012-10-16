@@ -946,7 +946,10 @@ limitations under the License.
       parent = node.parent;
       if (parent) {
         node.remove();
-        return this._refreshElements(parent.parent);
+        this._refreshElements(parent.parent);
+      }
+      if (node === this.selected_node) {
+        return this.selected_node = null;
       }
     };
 
