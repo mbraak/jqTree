@@ -49,6 +49,7 @@
             <a href="#functions">Functions</a>
             <ul>
                 <li><a href="#functions-loadData">loadData</a></li>
+                <li><a href="#functions-loaddatafromurl">loadDataFromUrl</a></li>
                 <li><a href="#functions-tojson">toJson</a></li>
                 <li><a href="#functions-getnodebyid">getNodeById</a></li>
                 <li><a href="#functions-selectnode">selectNode</a></li>
@@ -222,6 +223,12 @@ $.getJSON(
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.14</h5>
+    <ul>
+        <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method</li>
+        <li>Issue 81: getSelectedNode must return false if node is removed</li>
+    </ul>
 
     <h5>0.13 (october 10 2012)</h5>
     <ul>
@@ -562,17 +569,11 @@ $('#tree1').tree({
         <br>
         <strong>function loadData(data, parent_node);</strong>
         <br>
-        <strong>function loadData(url);</strong>
-        <br>
-        <strong>function loadData(url, parent_node);</strong>
     </p>
     <p>
-        Load data in the tree. You can provide an <strong>array of nodes</strong> or you can provide a <strong>url</strong>.
+        Load data in the tree. The data is array of nodes.
         <br>
         You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
-    </p>
-    <p>
-        Provide an array of nodes:
     </p>
 <pre><code class="language-javascript">
 // Assuming the tree exists
@@ -610,12 +611,20 @@ var data = [
 $('#tree1').tree('loadData', data, node);
 </code></pre>
 
+
+    <h5 id="functions-loaddatafromurl">loadDataFromUrl</h5>
+    <p>
+        <strong>function loadDataFromUrl(url);</strong>
+        <br>
+        <strong>function loadDataFromUrl(url, parent_node);</strong>
+    </p>
+
     <p>
         Load the data from an url:
     </p>
 
 <pre><code class="language-javascript">
-$('#tree1').tree('loadData', '/category/tree/');
+$('#tree1').tree('loadDataFromUrl', '/category/tree/');
 </code></pre>
 
     <h5 id="functions-tojson">toJson</h5>

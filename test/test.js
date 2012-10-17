@@ -830,7 +830,8 @@ test('load on demand', function() {
     $.mockjax({
         url: '*',
         response: function(options) {
-            equal(options.url, '/tree/?node=1');
+            equal(options.url, '/tree/');
+            deepEqual(options.data, { 'node' : 1 })
 
             this.responseText = [
                 {

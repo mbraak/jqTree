@@ -84,12 +84,8 @@ $('#tree1').tree({
             url: '*',
             responseTime: 1000,
             response: function(options) {
-                // todo: use url library for this?
-                var query_string = options.url.replace('/nodes/', '');
-
-                if (query_string) {
-                    var node_id = query_string.replace('?node=', '');
-                    this.responseText = ExampleData.getChildrenOfNode(node_id);
+                if (options.data && options.data.node) {
+                    this.responseText = ExampleData.getChildrenOfNode(options.data.node);
                 }
                 else {
                     this.responseText = ExampleData.getFirstLevelData();

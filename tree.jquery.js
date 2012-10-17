@@ -801,18 +801,58 @@ limitations under the License.
       return JSON.stringify(this.tree.getData());
     };
 
-    JqTreeWidget.prototype.loadData = function(data_or_url, parent_node, on_finished) {
-      var data, data_url;
-      if (typeof data_or_url === 'string') {
-        data_url = data_or_url;
-        return this._loadDataFromServer(data_url, parent_node, on_finished);
-      } else {
-        data = data_or_url;
-        this._loadData(data, parent_node);
-        if (on_finished) {
-          return on_finished();
+    JqTreeWidget.prototype.loadData = function(data, parent_node) {
+      return this._loadData(data, parent_node);
+    };
+
+    JqTreeWidget.prototype.loadDataFromUrl = function(url_info, parent_node, on_finished) {
+      var $li, addLoadingClass, parseUrlInfo, removeLoadingClass,
+        _this = this;
+      $li = null;
+      addLoadingClass = function() {
+        var folder_element;
+        if (parent_node) {
+          folder_element = new FolderElement(parent_node, _this);
+          $li = folder_element.getLi();
+          return $li.addClass('jqtree-loading');
         }
-      }
+      };
+      removeLoadingClass = function() {
+        if ($li) {
+          return $li.removeClass('loading');
+        }
+      };
+      parseUrlInfo = function() {
+        if ($.type(url_info) === 'string') {
+          url_info = {
+            url: url_info
+          };
+        }
+        if (!url_info.method) {
+          return url_info.method = 'get';
+        }
+      };
+      addLoadingClass();
+      parseUrlInfo();
+      return $.ajax({
+        url: url_info.url,
+        data: url_info.data,
+        method: url_info.method.toUpperCase(),
+        cache: false,
+        success: function(response) {
+          var data;
+          if ($.isArray(response) || typeof response === 'object') {
+            data = response;
+          } else {
+            data = $.parseJSON(response);
+          }
+          removeLoadingClass();
+          _this._loadData(data, parent_node);
+          if (on_finished) {
+            return on_finished();
+          }
+        }
+      });
     };
 
     JqTreeWidget.prototype._loadData = function(data, parent_node) {
@@ -836,40 +876,6 @@ limitations under the License.
       if (this.is_dragging) {
         return this.dnd_handler.refreshHitAreas();
       }
-    };
-
-    JqTreeWidget.prototype._loadDataFromServer = function(data_url, parent_node, on_finished) {
-      var $li, folder_element,
-        _this = this;
-      if (!data_url) {
-        return;
-      }
-      if (parent_node) {
-        folder_element = new FolderElement(parent_node, this);
-        $li = folder_element.getLi();
-        $li.addClass('jqtree-loading');
-      } else {
-        $li = null;
-      }
-      return $.ajax({
-        url: data_url,
-        cache: false,
-        success: function(response) {
-          var data;
-          if ($.isArray(response) || typeof response === 'object') {
-            data = response;
-          } else {
-            data = $.parseJSON(response);
-          }
-          if ($li) {
-            $li.removeClass('loading');
-          }
-          _this._loadData(data, parent_node);
-          if (on_finished) {
-            return on_finished();
-          }
-        }
-      });
     };
 
     JqTreeWidget.prototype.getNodeById = function(node_id) {
@@ -900,7 +906,7 @@ limitations under the License.
     JqTreeWidget.prototype._loadFolderOnDemand = function(node, skip_slide, on_finished) {
       var _this = this;
       node.load_on_demand = false;
-      return this.loadData(this._getDataUrl(node), node, function() {
+      return this.loadDataFromUrl(this._getDataUrlInfo(node), node, function() {
         return _this._openNode(node, skip_slide, on_finished);
       });
     };
@@ -1019,19 +1025,27 @@ limitations under the License.
       if (this.options.data) {
         return this.loadData(this.options.data);
       } else {
-        return this.loadData(this._getDataUrl());
+        return this.loadDataFromUrl(this._getDataUrlInfo());
       }
     };
 
-    JqTreeWidget.prototype._getDataUrl = function(node) {
-      var data_url;
+    JqTreeWidget.prototype._getDataUrlInfo = function(node) {
+      var data, data_url, url_info;
       data_url = this.options.dataUrl || this.element.data('url');
       if ($.isFunction(data_url)) {
         return data_url(node);
-      } else {
-        if (node) {
-          data_url += "?node=" + node.id;
+      } else if ($.type(data_url) === 'string') {
+        url_info = {
+          url: data_url
+        };
+        if (node && node.id) {
+          data = {
+            node: node.id
+          };
+          url_info['data'] = data;
         }
+        return url_info;
+      } else {
         return data_url;
       }
     };
