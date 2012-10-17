@@ -233,6 +233,13 @@ class Node
     tree.removeChild(tree.children[0]);
     ###
     removeChild: (node) ->
+        # remove children from the index
+        node.iterate(
+            (child) =>
+                @tree.removeNodeFromIndex(child)
+                return true
+        )
+
         @children.splice(
             @getChildIndex(node),
             1
@@ -599,13 +606,31 @@ class JqTreeWidget extends MouseWidget
         return new_node    
 
     removeNode: (node) ->
+        mustUnselectedNode = =>
+            if @selected_node == node
+                return true
+            else
+                result = true
+
+                iterate(
+                    (child) =>
+                        if node == child
+                            result = true
+                            return false
+                        else
+                            return true
+                )
+
+                return result
+
         parent = node.parent
         if parent
+            if mustUnselectedNode()
+                @selected_node = null
+
             node.remove()
             @_refreshElements(parent.parent)
 
-        if node == @selected_node
-            @selected_node = null
 
     appendNode: (new_node_info, parent_node) ->
         if not parent_node

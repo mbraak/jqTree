@@ -499,6 +499,11 @@ limitations under the License.
 
 
     Node.prototype.removeChild = function(node) {
+      var _this = this;
+      node.iterate(function(child) {
+        _this.tree.removeNodeFromIndex(child);
+        return true;
+      });
       this.children.splice(this.getChildIndex(node), 1);
       return this.tree.removeNodeFromIndex(node);
     };
@@ -948,14 +953,32 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.removeNode = function(node) {
-      var parent;
+      var mustUnselectedNode, parent,
+        _this = this;
+      mustUnselectedNode = function() {
+        var result;
+        if (_this.selected_node === node) {
+          return true;
+        } else {
+          result = true;
+          iterate(function(child) {
+            if (node === child) {
+              result = true;
+              return false;
+            } else {
+              return true;
+            }
+          });
+          return result;
+        }
+      };
       parent = node.parent;
       if (parent) {
+        if (mustUnselectedNode()) {
+          this.selected_node = null;
+        }
         node.remove();
-        this._refreshElements(parent.parent);
-      }
-      if (node === this.selected_node) {
-        return this.selected_node = null;
+        return this._refreshElements(parent.parent);
       }
     };
 

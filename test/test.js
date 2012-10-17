@@ -1009,18 +1009,25 @@ test('addChildAtPosition', function() {
 test('removeChild', function() {
     var tree = new Tree.Tree();
 
-    var abc = new Tree.Node('abc');
-    var def = new Tree.Node('def');
-    var ghi = new Tree.Node('ghi');
+    var abc = new Tree.Node({'label': 'abc', 'id': 1});
+    var def = new Tree.Node({'label': 'def', 'id': 2});
+    var ghi = new Tree.Node({'label': 'ghi', 'id': 3});
+
     tree.addChild(abc);
     tree.addChild(def);
     tree.addChild(ghi);
+
+    var jkl = new Tree.Node({'label': 'jkl', 'id': 4});
+    def.addChild(jkl);
 
     equal(
         formatNodes(tree.children),
         'abc def ghi',
         'children'
     );
+
+    equal(tree.id_mapping[2].name, 'def');
+    equal(tree.id_mapping[4].name, 'jkl');
 
     // remove 'def'
     tree.removeChild(def);
@@ -1029,6 +1036,9 @@ test('removeChild', function() {
         'abc ghi',
         'children'
     );
+
+    equal(tree.id_mapping[2], null);
+    equal(tree.id_mapping[4], null);
 
     // remove 'ghi'
     tree.removeChild(ghi);
