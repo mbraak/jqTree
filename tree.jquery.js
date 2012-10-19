@@ -844,6 +844,7 @@ limitations under the License.
         data: url_info.data,
         type: url_info.method.toUpperCase(),
         cache: false,
+        dataType: 'json',
         success: function(response) {
           var data;
           if ($.isArray(response) || typeof response === 'object') {

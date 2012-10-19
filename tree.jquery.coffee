@@ -519,6 +519,7 @@ class JqTreeWidget extends MouseWidget
             data: url_info.data
             type: url_info.method.toUpperCase()
             cache: false
+            dataType: 'json'
             success: (response) =>
                 if $.isArray(response) or typeof response == 'object'
                     data = response
