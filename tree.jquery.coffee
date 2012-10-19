@@ -517,7 +517,7 @@ class JqTreeWidget extends MouseWidget
         $.ajax(
             url: url_info.url
             data: url_info.data
-            method: url_info.method.toUpperCase()
+            type: url_info.method.toUpperCase()
             cache: false
             success: (response) =>
                 if $.isArray(response) or typeof response == 'object'
