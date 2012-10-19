@@ -608,7 +608,9 @@ class JqTreeWidget extends MouseWidget
 
     removeNode: (node) ->
         mustUnselectedNode = =>
-            if @selected_node == node
+            if not @selected_node
+                return false
+            else if @selected_node == node
                 return true
             else
                 result = true

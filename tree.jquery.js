@@ -958,7 +958,9 @@ limitations under the License.
         _this = this;
       mustUnselectedNode = function() {
         var result;
-        if (_this.selected_node === node) {
+        if (!_this.selected_node) {
+          return false;
+        } else if (_this.selected_node === node) {
           return true;
         } else {
           result = true;
