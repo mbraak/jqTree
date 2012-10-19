@@ -842,7 +842,7 @@ limitations under the License.
       return $.ajax({
         url: url_info.url,
         data: url_info.data,
-        method: url_info.method.toUpperCase(),
+        type: url_info.method.toUpperCase(),
         cache: false,
         success: function(response) {
           var data;
