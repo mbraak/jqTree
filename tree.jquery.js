@@ -798,8 +798,8 @@ limitations under the License.
       return this.tree;
     };
 
-    JqTreeWidget.prototype.selectNode = function(node, must_open_parents) {
-      return this.select_node_handler.selectNode(node, must_open_parents);
+    JqTreeWidget.prototype.selectNode = function(node) {
+      return this.select_node_handler.selectNode(node);
     };
 
     JqTreeWidget.prototype.getSelectedNode = function() {
@@ -904,16 +904,26 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._openNode = function(node, slide, on_finished) {
-      var folder_element;
+      var doOpenNode, parent,
+        _this = this;
       if (slide == null) {
         slide = true;
       }
+      doOpenNode = function(_node, _slide, _on_finished) {
+        var folder_element;
+        folder_element = new FolderElement(_node, _this);
+        return folder_element.open(_on_finished, _slide);
+      };
       if (node.isFolder()) {
         if (node.load_on_demand) {
           return this._loadFolderOnDemand(node, slide, on_finished);
         } else {
-          folder_element = new FolderElement(node, this);
-          folder_element.open(on_finished, slide);
+          parent = node.parent;
+          while (parent && !parent.is_open) {
+            doOpenNode(parent, false, null);
+            parent = parent.parent;
+          }
+          doOpenNode(node, slide, on_finished);
           return this._saveState();
         }
       }
@@ -1660,7 +1670,7 @@ limitations under the License.
       this.tree_widget = tree_widget;
     }
 
-    SelectNodeHandler.prototype.selectNode = function(node, must_open_parents) {
+    SelectNodeHandler.prototype.selectNode = function(node) {
       var canSelect, parent,
         _this = this;
       canSelect = function() {
@@ -1683,14 +1693,9 @@ limitations under the License.
           this.tree_widget._triggerEvent('tree.select', {
             node: node
           });
-          if (must_open_parents) {
-            parent = this.tree_widget.selected_node.parent;
-            while (parent) {
-              if (!parent.is_open) {
-                this.tree_widget.openNode(parent, false);
-              }
-              parent = parent.parent;
-            }
+          parent = this.tree_widget.selected_node.parent;
+          if (!parent.is_open) {
+            this.tree_widget.openNode(parent, false);
           }
         }
         if (this.tree_widget.options.saveState) {

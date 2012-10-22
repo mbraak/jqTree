@@ -230,6 +230,7 @@ $.getJSON(
         <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method</li>
         <li>Issue 81: getSelectedNode must return false if node is removed</li>
         <li>Story 85: Option to turn slide animation on or off</li>
+        <li>Story 86: The openNode function must automatically open parents</li>
     </ul>
 
     <h5>0.13 (october 10 2012)</h5>
@@ -676,11 +677,9 @@ var node = $tree.tree('getNodeById', 10);
     <h5 id="functions-selectnode">selectNode</h5>
     <p>
         <strong>function selectNode(node);</strong>
-        <br>
-        <strong>function selectNode(node, must_open_parents);</strong>
     </p>
     <p>
-        Select this node. If <strong>must_open_parents</strong> is true, then open all parents, so the node is visible.
+        Select this node.
     </p>
 <pre><code class="language-javascript">
 // create tree
@@ -691,7 +690,7 @@ $tree.tree({
 });
 
 var node = $tree.tree('getNodeById', 123);
-$tree.tree('selectNode', node, true);
+$tree.tree('selectNode', node);
 </code></pre>
 
     <h5 id="functions-opennode">openNode</h5>

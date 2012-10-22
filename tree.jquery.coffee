@@ -477,8 +477,8 @@ class JqTreeWidget extends MouseWidget
     getTree: ->
         return @tree
 
-    selectNode: (node, must_open_parents) ->
-        @select_node_handler.selectNode(node, must_open_parents)
+    selectNode: (node) ->
+        @select_node_handler.selectNode(node)
 
     getSelectedNode: ->
         return @selected_node or false
@@ -562,12 +562,21 @@ class JqTreeWidget extends MouseWidget
         @_openNode(node, slide)
 
     _openNode: (node, slide=true, on_finished) ->
+        doOpenNode = (_node, _slide, _on_finished) =>
+            folder_element = new FolderElement(_node, this)
+            folder_element.open(_on_finished, _slide)
+
         if node.isFolder()
             if node.load_on_demand
                 @_loadFolderOnDemand(node, slide, on_finished)
             else
-                folder_element = new FolderElement(node, this)
-                folder_element.open(on_finished, slide)
+                parent = node.parent
+
+                while parent and not parent.is_open
+                    doOpenNode(parent, false, null)
+                    parent = parent.parent
+
+                doOpenNode(node, slide, on_finished)
                 @_saveState()
 
     _loadFolderOnDemand: (node, slide=true, on_finished) ->
@@ -1187,7 +1196,7 @@ class SelectNodeHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
 
-    selectNode: (node, must_open_parents) ->
+    selectNode: (node) ->
         canSelect = =>
             if not @tree_widget.options.selectable
                 return false
@@ -1207,14 +1216,10 @@ class SelectNodeHandler
                 @tree_widget.selected_node = node
                 @tree_widget._triggerEvent('tree.select', node: node)
 
-                if must_open_parents
-                    parent = @tree_widget.selected_node.parent
+                parent = @tree_widget.selected_node.parent
 
-                    while parent
-                        if not parent.is_open
-                            @tree_widget.openNode(parent, false)
-
-                        parent = parent.parent
+                if not parent.is_open
+                    @tree_widget.openNode(parent, false)
 
             if @tree_widget.options.saveState
                 @tree_widget.save_state_handler.saveState()
