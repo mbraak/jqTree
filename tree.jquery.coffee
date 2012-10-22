@@ -466,12 +466,13 @@ class JqTreeWidget extends MouseWidget
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
         autoEscape: true
         dataUrl: null
+        slide: true  # must display slide animation?
 
-    toggle: (node) ->
+    toggle: (node, slide=true) ->
         if node.is_open
-            @closeNode(node)
+            @closeNode(node, slide)
         else
-            @openNode(node)
+            @openNode(node, slide)
     
     getTree: ->
         return @tree
@@ -557,31 +558,31 @@ class JqTreeWidget extends MouseWidget
     getNodeByName: (name) ->
         return @tree.getNodeByName(name)
 
-    openNode: (node, skip_slide) ->
-        @_openNode(node, skip_slide)
+    openNode: (node, slide=true) ->
+        @_openNode(node, slide)
 
-    _openNode: (node, skip_slide, on_finished) ->
+    _openNode: (node, slide=true, on_finished) ->
         if node.isFolder()
             if node.load_on_demand
-                @_loadFolderOnDemand(node, skip_slide, on_finished)
+                @_loadFolderOnDemand(node, slide, on_finished)
             else
                 folder_element = new FolderElement(node, this)
-                folder_element.open(on_finished, skip_slide)
+                folder_element.open(on_finished, slide)
                 @_saveState()
 
-    _loadFolderOnDemand: (node, skip_slide, on_finished) ->
+    _loadFolderOnDemand: (node, slide=true, on_finished) ->
         node.load_on_demand = false
 
         @loadDataFromUrl(
             @_getDataUrlInfo(node),
             node,
             =>
-                @_openNode(node, skip_slide, on_finished)
+                @_openNode(node, slide, on_finished)
         )
 
-    closeNode: (node, skip_slide) ->
+    closeNode: (node, slide=true) ->
         if node.isFolder()
-            new FolderElement(node, this).close(skip_slide)
+            new FolderElement(node, this).close(slide)
 
             @_saveState()
 
@@ -851,7 +852,7 @@ class JqTreeWidget extends MouseWidget
             node = @_getNode($target)
 
             if node
-                @toggle(node)
+                @toggle(node, @options.slide)
 
                 e.preventDefault()
                 e.stopPropagation()
@@ -1023,7 +1024,7 @@ class NodeElement
 
 
 class FolderElement extends NodeElement
-    open: (on_finished, skip_slide) ->
+    open: (on_finished, slide=true) ->
         if not @node.is_open
             @node.is_open = true
             $button = @getButton()
@@ -1037,13 +1038,13 @@ class FolderElement extends NodeElement
 
                 @tree_widget._triggerEvent('tree.open', node: @node)
 
-            if skip_slide
-                @getUl().show()
-                doOpen()
-            else
+            if slide
                 @getUl().slideDown('fast', doOpen)
+            else
+                @getUl().show()
+                doOpen()                
 
-    close: (skip_slide) ->
+    close: (slide=true) ->
         if @node.is_open
             @node.is_open = false
             $button = @getButton()
@@ -1055,12 +1056,12 @@ class FolderElement extends NodeElement
 
                 @tree_widget._triggerEvent('tree.close', node: @node)
 
-            if skip_slide
+            if slide
+                @getUl().slideUp('fast', doClose)
+            else
                 @getUl().hide()
                 doClose()
-            else
-                @getUl().slideUp('fast', doClose)
-
+                
     getButton: ->
         return @$element.children('div').find('a.jqtree-toggler')
 
@@ -1211,7 +1212,7 @@ class SelectNodeHandler
 
                     while parent
                         if not parent.is_open
-                            @tree_widget.openNode(parent, true)
+                            @tree_widget.openNode(parent, false)
 
                         parent = parent.parent
 

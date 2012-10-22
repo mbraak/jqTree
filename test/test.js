@@ -366,12 +366,12 @@ test('openNode and closeNode', function() {
     equal(node2.is_open, undefined);
 
     // 1. open node2
-    $tree.tree('openNode', node2, true);
+    $tree.tree('openNode', node2, false);
     equal(node2.is_open, true);
     equal(isNodeOpen($(node2.element)), true);
 
     // 2. close node2
-    $tree.tree('closeNode', node2, true);
+    $tree.tree('closeNode', node2, false);
     equal(node2.is_open, false);
     equal(isNodeClosed($(node2.element)), true);
 });

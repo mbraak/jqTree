@@ -779,14 +779,18 @@ limitations under the License.
       onCanMove: null,
       onCanMoveTo: null,
       autoEscape: true,
-      dataUrl: null
+      dataUrl: null,
+      slide: true
     };
 
-    JqTreeWidget.prototype.toggle = function(node) {
+    JqTreeWidget.prototype.toggle = function(node, slide) {
+      if (slide == null) {
+        slide = true;
+      }
       if (node.is_open) {
-        return this.closeNode(node);
+        return this.closeNode(node, slide);
       } else {
-        return this.openNode(node);
+        return this.openNode(node, slide);
       }
     };
 
@@ -892,34 +896,46 @@ limitations under the License.
       return this.tree.getNodeByName(name);
     };
 
-    JqTreeWidget.prototype.openNode = function(node, skip_slide) {
-      return this._openNode(node, skip_slide);
+    JqTreeWidget.prototype.openNode = function(node, slide) {
+      if (slide == null) {
+        slide = true;
+      }
+      return this._openNode(node, slide);
     };
 
-    JqTreeWidget.prototype._openNode = function(node, skip_slide, on_finished) {
+    JqTreeWidget.prototype._openNode = function(node, slide, on_finished) {
       var folder_element;
+      if (slide == null) {
+        slide = true;
+      }
       if (node.isFolder()) {
         if (node.load_on_demand) {
-          return this._loadFolderOnDemand(node, skip_slide, on_finished);
+          return this._loadFolderOnDemand(node, slide, on_finished);
         } else {
           folder_element = new FolderElement(node, this);
-          folder_element.open(on_finished, skip_slide);
+          folder_element.open(on_finished, slide);
           return this._saveState();
         }
       }
     };
 
-    JqTreeWidget.prototype._loadFolderOnDemand = function(node, skip_slide, on_finished) {
+    JqTreeWidget.prototype._loadFolderOnDemand = function(node, slide, on_finished) {
       var _this = this;
+      if (slide == null) {
+        slide = true;
+      }
       node.load_on_demand = false;
       return this.loadDataFromUrl(this._getDataUrlInfo(node), node, function() {
-        return _this._openNode(node, skip_slide, on_finished);
+        return _this._openNode(node, slide, on_finished);
       });
     };
 
-    JqTreeWidget.prototype.closeNode = function(node, skip_slide) {
+    JqTreeWidget.prototype.closeNode = function(node, slide) {
+      if (slide == null) {
+        slide = true;
+      }
       if (node.isFolder()) {
-        new FolderElement(node, this).close(skip_slide);
+        new FolderElement(node, this).close(slide);
         return this._saveState();
       }
     };
@@ -1212,7 +1228,7 @@ limitations under the License.
       if ($target.is('.jqtree-toggler')) {
         node = this._getNode($target);
         if (node) {
-          this.toggle(node);
+          this.toggle(node, this.options.slide);
           e.preventDefault();
           return e.stopPropagation();
         }
@@ -1448,9 +1464,12 @@ limitations under the License.
       return FolderElement.__super__.constructor.apply(this, arguments);
     }
 
-    FolderElement.prototype.open = function(on_finished, skip_slide) {
+    FolderElement.prototype.open = function(on_finished, slide) {
       var $button, doOpen,
         _this = this;
+      if (slide == null) {
+        slide = true;
+      }
       if (!this.node.is_open) {
         this.node.is_open = true;
         $button = this.getButton();
@@ -1465,18 +1484,21 @@ limitations under the License.
             node: _this.node
           });
         };
-        if (skip_slide) {
+        if (slide) {
+          return this.getUl().slideDown('fast', doOpen);
+        } else {
           this.getUl().show();
           return doOpen();
-        } else {
-          return this.getUl().slideDown('fast', doOpen);
         }
       }
     };
 
-    FolderElement.prototype.close = function(skip_slide) {
+    FolderElement.prototype.close = function(slide) {
       var $button, doClose,
         _this = this;
+      if (slide == null) {
+        slide = true;
+      }
       if (this.node.is_open) {
         this.node.is_open = false;
         $button = this.getButton();
@@ -1488,11 +1510,11 @@ limitations under the License.
             node: _this.node
           });
         };
-        if (skip_slide) {
+        if (slide) {
+          return this.getUl().slideUp('fast', doClose);
+        } else {
           this.getUl().hide();
           return doClose();
-        } else {
-          return this.getUl().slideUp('fast', doClose);
         }
       }
     };
@@ -1665,7 +1687,7 @@ limitations under the License.
             parent = this.tree_widget.selected_node.parent;
             while (parent) {
               if (!parent.is_open) {
-                this.tree_widget.openNode(parent, true);
+                this.tree_widget.openNode(parent, false);
               }
               parent = parent.parent;
             }
