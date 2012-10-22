@@ -1674,9 +1674,6 @@ limitations under the License.
       var canSelect, parent,
         _this = this;
       canSelect = function() {
-        if (!_this.tree_widget.options.selectable) {
-          return false;
-        }
         if (!_this.tree_widget.options.onCanSelectNode) {
           return true;
         }

@@ -1198,9 +1198,6 @@ class SelectNodeHandler
 
     selectNode: (node) ->
         canSelect = =>
-            if not @tree_widget.options.selectable
-                return false
-
             if not @tree_widget.options.onCanSelectNode
                 return true
 
