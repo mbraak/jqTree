@@ -859,20 +859,23 @@ class JqTreeWidget extends MouseWidget
 
         $target = $(e.target)
 
-        if $target.is('.jqtree-toggler')
-            node = @_getNode($target)
-
-            if node
-                @toggle(node, @options.slide)
-
-                e.preventDefault()
-                e.stopPropagation()
-        else if $target.is('div') or $target.is('span')
-            node = @_getNode($target)
+        $title = $target.closest('.jqtree-title')
+        if $title.length
+            node = @_getNode($title)
             if node
                 @_triggerEvent('tree.click', node: node)
 
                 @selectNode(node)
+        else
+            $button = $target.closest('.jqtree-toggler')
+            if $button.length
+                node = @_getNode($button)
+
+                if node
+                    @toggle(node, @options.slide)
+
+                    e.preventDefault()
+                    e.stopPropagation()
 
     _getNode: ($element) ->
         $li = $element.closest('li')

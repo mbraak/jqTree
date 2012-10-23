@@ -1232,25 +1232,29 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._click = function(e) {
-      var $target, node;
+      var $button, $target, $title, node;
       if (e.ctrlKey) {
         return;
       }
       $target = $(e.target);
-      if ($target.is('.jqtree-toggler')) {
-        node = this._getNode($target);
-        if (node) {
-          this.toggle(node, this.options.slide);
-          e.preventDefault();
-          return e.stopPropagation();
-        }
-      } else if ($target.is('div') || $target.is('span')) {
-        node = this._getNode($target);
+      $title = $target.closest('.jqtree-title');
+      if ($title.length) {
+        node = this._getNode($title);
         if (node) {
           this._triggerEvent('tree.click', {
             node: node
           });
           return this.selectNode(node);
+        }
+      } else {
+        $button = $target.closest('.jqtree-toggler');
+        if ($button.length) {
+          node = this._getNode($button);
+          if (node) {
+            this.toggle(node, this.options.slide);
+            e.preventDefault();
+            return e.stopPropagation();
+          }
         }
       }
     };
