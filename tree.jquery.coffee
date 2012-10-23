@@ -573,7 +573,9 @@ class JqTreeWidget extends MouseWidget
                 parent = node.parent
 
                 while parent and not parent.is_open
-                    doOpenNode(parent, false, null)
+                    # nb: do not open root element
+                    if parent.parent
+                        doOpenNode(parent, false, null)
                     parent = parent.parent
 
                 doOpenNode(node, slide, on_finished)

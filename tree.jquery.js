@@ -920,7 +920,9 @@ limitations under the License.
         } else {
           parent = node.parent;
           while (parent && !parent.is_open) {
-            doOpenNode(parent, false, null);
+            if (parent.parent) {
+              doOpenNode(parent, false, null);
+            }
             parent = parent.parent;
           }
           doOpenNode(node, slide, on_finished);
