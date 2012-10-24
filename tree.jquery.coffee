@@ -1541,7 +1541,7 @@ class DragAndDropHandler
         openFolder = =>
             @tree_widget._openNode(
                 folder,
-                false,
+                @tree_widget.options.slide,
                 =>
                     @refreshHitAreas()
                     @updateDropHint()

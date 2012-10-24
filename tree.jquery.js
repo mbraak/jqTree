@@ -2008,7 +2008,7 @@ limitations under the License.
       var openFolder,
         _this = this;
       openFolder = function() {
-        return _this.tree_widget._openNode(folder, false, function() {
+        return _this.tree_widget._openNode(folder, _this.tree_widget.options.slide, function() {
           _this.refreshHitAreas();
           return _this.updateDropHint();
         });
