@@ -37,3 +37,8 @@ p {
 pre {
     background-color: #333;
 }
+
+#scroll-container {
+    height: 200px;
+    overflow-y: scroll;
+}
