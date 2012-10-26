@@ -18,7 +18,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, MouseWidget, Node, NodeElement, Position, SaveStateHandler, SelectNodeHandler, SimpleWidget, TRIANGLE_DOWN, TRIANGLE_RIGHT, Tree, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, TRIANGLE_DOWN, TRIANGLE_RIGHT, Tree, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -754,6 +754,8 @@ limitations under the License.
 
   this.Tree.Tree = Tree;
 
+  this.Tree.Node = Node;
+
   TRIANGLE_RIGHT = '&#x25ba;';
 
   TRIANGLE_DOWN = '&#x25bc;';
@@ -1063,6 +1065,7 @@ limitations under the License.
       this.save_state_handler = new SaveStateHandler(this);
       this.select_node_handler = new SelectNodeHandler(this);
       this.dnd_handler = new DragAndDropHandler(this);
+      this.scroll_handler = new ScrollHandler(this);
       this._initData();
       this.element.click($.proxy(this._click, this));
       return this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
@@ -1327,8 +1330,11 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._mouseDrag = function(event) {
+      var result;
       if (this.options.dragAndDrop) {
-        return this.dnd_handler.mouseDrag(event);
+        result = this.dnd_handler.mouseDrag(event);
+        this.scroll_handler.checkScrolling();
+        return result;
       } else {
         return false;
       }
@@ -2058,6 +2064,88 @@ limitations under the License.
 
   })();
 
-  this.Tree.Node = Node;
+  ScrollHandler = (function() {
+
+    function ScrollHandler(tree_widget) {
+      this.tree_widget = tree_widget;
+      this.previous_top = -1;
+      this._initScrollParent();
+    }
+
+    ScrollHandler.prototype._initScrollParent = function() {
+      var $scroll_parent, getParentWithOverflow, setDocumentAsScrollParent,
+        _this = this;
+      getParentWithOverflow = function() {
+        var css_value, css_values, parent, scroll_parent, _i, _j, _len, _len1, _ref, _ref1;
+        css_values = ['overflow', 'overflow-y'];
+        scroll_parent = null;
+        _ref = _this.tree_widget.$el.parents();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          parent = _ref[_i];
+          for (_j = 0, _len1 = css_values.length; _j < _len1; _j++) {
+            css_value = css_values[_j];
+            if ((_ref1 = $.css(parent, css_value)) === 'auto' || _ref1 === 'scroll') {
+              return $(parent);
+            }
+          }
+        }
+        return null;
+      };
+      setDocumentAsScrollParent = function() {
+        _this.scroll_parent_top = 0;
+        return _this.$scroll_parent = null;
+      };
+      if (this.tree_widget.$el.css('position') === 'fixed') {
+        setDocumentAsScrollParent();
+      }
+      $scroll_parent = getParentWithOverflow();
+      if ($scroll_parent && $scroll_parent.length && $scroll_parent[0].tagName !== 'HTML') {
+        this.$scroll_parent = $scroll_parent;
+        return this.scroll_parent_top = this.$scroll_parent.offset().top;
+      } else {
+        return setDocumentAsScrollParent();
+      }
+    };
+
+    ScrollHandler.prototype.checkScrolling = function() {
+      var hovered_area;
+      hovered_area = this.tree_widget.dnd_handler.hovered_area;
+      if (hovered_area && hovered_area.top !== this.previous_top) {
+        this.previous_top = hovered_area.top;
+        if (this.$scroll_parent) {
+          return this._handleScrollingWithScrollParent(hovered_area);
+        } else {
+          return this._handleScrollingWithDocument(hovered_area);
+        }
+      }
+    };
+
+    ScrollHandler.prototype._handleScrollingWithScrollParent = function(area) {
+      var distance_bottom;
+      distance_bottom = this.scroll_parent_top + this.$scroll_parent[0].offsetHeight - area.bottom;
+      if (distance_bottom < 20) {
+        this.$scroll_parent[0].scrollTop += 20;
+        this.tree_widget.refreshHitAreas();
+        return this.previous_top = -1;
+      } else if ((area.top - this.scroll_parent_top) < 20) {
+        this.$scroll_parent[0].scrollTop -= 20;
+        this.tree_widget.refreshHitAreas();
+        return this.previous_top = -1;
+      }
+    };
+
+    ScrollHandler.prototype._handleScrollingWithDocument = function(area) {
+      var distance_top;
+      distance_top = area.top - $(document).scrollTop();
+      if (distance_top < 20) {
+        return $(document).scrollTop($(document).scrollTop() - 20);
+      } else if ($(window).height() - (area.bottom - $(document).scrollTop()) < 20) {
+        return $(document).scrollTop($(document).scrollTop() + 20);
+      }
+    };
+
+    return ScrollHandler;
+
+  })();
 
 }).call(this);

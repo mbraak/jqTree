@@ -445,7 +445,7 @@ class Tree extends Node
             delete @id_mapping[node.id]
 
 @Tree.Tree = Tree
-
+@Tree.Node = Node
 
 TRIANGLE_RIGHT = '&#x25ba;'  # ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
 TRIANGLE_DOWN = '&#x25bc;'  # ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
@@ -699,6 +699,7 @@ class JqTreeWidget extends MouseWidget
         @save_state_handler = new SaveStateHandler(this)
         @select_node_handler = new SelectNodeHandler(this)
         @dnd_handler = new DragAndDropHandler(this)
+        @scroll_handler = new ScrollHandler(this)
 
         @_initData()
 
@@ -930,7 +931,9 @@ class JqTreeWidget extends MouseWidget
 
     _mouseDrag: (event) ->
         if @options.dragAndDrop
-            return @dnd_handler.mouseDrag(event)
+            result = @dnd_handler.mouseDrag(event)
+            @scroll_handler.checkScrolling()
+            return result
         else
             return false
 
@@ -951,6 +954,7 @@ class JqTreeWidget extends MouseWidget
         @dnd_handler.current_item = @_getNodeElementForNode(moving_node)
         @dnd_handler.generateHitAreas()
         return @dnd_handler.hit_areas
+
 
 SimpleWidget.register(JqTreeWidget, 'tree')
 
@@ -1458,7 +1462,7 @@ class DragAndDropHandler
                 (node.is_open or  not node.element) and node.hasChildren()
             )
 
-            if node.element
+            if node.element                
                 $element = $(node.element)
 
                 if not $element.is(':visible')
@@ -1584,4 +1588,70 @@ class DragAndDropHandler
 
             doMove() unless event.isDefaultPrevented()
 
-@Tree.Node = Node
+class ScrollHandler
+    # todo: ie version
+    # todo: handle document special case
+
+    constructor: (tree_widget) ->
+        @tree_widget = tree_widget
+        @previous_top = -1
+
+        @_initScrollParent()
+
+    _initScrollParent: ->
+        getParentWithOverflow = =>
+            css_values = ['overflow', 'overflow-y']
+            scroll_parent = null
+
+            for parent in @tree_widget.$el.parents()
+                for css_value in css_values
+                    if $.css(parent, css_value) in ['auto', 'scroll']
+                        return $(parent)
+            return null
+
+        setDocumentAsScrollParent = =>
+            @scroll_parent_top = 0
+            @$scroll_parent = null
+
+        if @tree_widget.$el.css('position') == 'fixed'
+            setDocumentAsScrollParent()
+
+        $scroll_parent = getParentWithOverflow()
+
+        if $scroll_parent and $scroll_parent.length and $scroll_parent[0].tagName != 'HTML'
+            @$scroll_parent = $scroll_parent
+            @scroll_parent_top = @$scroll_parent.offset().top
+        else
+            setDocumentAsScrollParent()
+
+    checkScrolling: ->
+        hovered_area = @tree_widget.dnd_handler.hovered_area
+
+        if hovered_area and hovered_area.top != @previous_top
+            @previous_top = hovered_area.top
+
+            if @$scroll_parent
+                @_handleScrollingWithScrollParent(hovered_area)
+            else
+                @_handleScrollingWithDocument(hovered_area)
+
+    _handleScrollingWithScrollParent: (area) ->
+        distance_bottom = @scroll_parent_top + @$scroll_parent[0].offsetHeight - area.bottom
+
+        if distance_bottom < 20
+            @$scroll_parent[0].scrollTop += 20
+            @tree_widget.refreshHitAreas()
+            @previous_top = -1
+        else if (area.top - @scroll_parent_top) < 20
+            @$scroll_parent[0].scrollTop -= 20
+            @tree_widget.refreshHitAreas()
+            @previous_top = -1
+
+    _handleScrollingWithDocument: (area) ->
+        # todo
+        distance_top = area.top - $(document).scrollTop()
+
+        if distance_top < 20
+            $(document).scrollTop($(document).scrollTop() - 20)
+        else if $(window).height() - (area.bottom - $(document).scrollTop()) < 20
+            $(document).scrollTop($(document).scrollTop() + 20)
