@@ -64,6 +64,7 @@
                 <li><a href="#functions-appendnode">appendNode</a></li>
                 <li><a href="#functions-updatenode">updateNode</a></li>
                 <li><a href="#functions-movenode">moveNode</a></li>
+                <li><a href="#functions-toggle">toggle</a></li>
             </ul>
         </li>
         <li>
@@ -903,6 +904,25 @@ var node = $tree.tree('getNodeBydId', 1);
 var target_node = $tree.tree('getNodeBydId', 2);
 
 $tree.tree('moveNode', node, target_node, 'after');
+</code></pre>
+
+    <h5 id="functions-toggle">toggle</h5>
+
+    <p>
+        <strong>function toggle(node);</strong>
+        <br />
+        <strong>function toggle(node, slide);</strong>
+    </p>
+
+    <p>
+        Open or close a node.
+        <br />
+        Parameter <strong>slide</strong>: a slide animation (default is true).
+    </p>
+
+<pre><code class="language-javascript">
+var node = $tree.tree('getNodeBydId', 1);
+$tree.tree('toggle', node);
 </code></pre>
 
     <h4 id="events">Events</h4>
