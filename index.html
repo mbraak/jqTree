@@ -637,7 +637,7 @@ $('#tree1').tree('toJson');
     </p>
 
 <pre><code class="language-javascript">
-var $tree = $('#tree1);
+var $tree = $('#tree1');
 var data = [
     { id: 10, name: 'n1' },
     { id: 11, name: 'n2' }
@@ -955,7 +955,7 @@ $('#tree1').tree({
     dragAndDrop: true
 });
 
-$('#tree1).bind(
+$('#tree1').bind(
     'tree.move',
     function(event) {
         console.log('moved_node', event.move_info.moved_node);
@@ -971,7 +971,7 @@ $('#tree1).bind(
     </p>
 
 <pre><code class="language-javascript">
-$('#tree1).bind(
+$('#tree1').bind(
     'tree.move',
     function(event) {
         event.preventDefault();
@@ -984,7 +984,7 @@ $('#tree1).bind(
     </p>
 
 <pre><code class="language-javascript">
-$('#tree1).bind(
+$('#tree1').bind(
     'tree.move',
     function(event) {
         event.preventDefault();
@@ -1001,7 +1001,7 @@ $('#tree1).bind(
     </p>
 
 <pre><code class="language-javascript">
-$('#tree1).bind(
+$('#tree1').bind(
     'tree.move',
     function(event)
     {
@@ -1019,7 +1019,7 @@ $('#tree1).bind(
     </p>
 
 <pre><code class="language-javascript">
-$('#tree1).bind(
+$('#tree1').bind(
     'tree.init',
     function() {
         // initializing code
@@ -1033,7 +1033,7 @@ $('#tree1).bind(
     </p>
 
 <pre><code class="language-javascript">
-$('#tree1).bind(
+$('#tree1').bind(
     'tree.open',
     function(e) {
         console.log(e.node);
