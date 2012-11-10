@@ -1152,11 +1152,11 @@ limitations under the License.
       createUl = function(is_root_node) {
         var class_string;
         if (is_root_node) {
-          class_string = ' class="jqtree-tree"';
+          class_string = 'jqtree-tree';
         } else {
           class_string = '';
         }
-        return $("<ul" + class_string + "></ul>");
+        return $("<ul class=\"jqtree_common " + class_string + "\"></ul>");
       };
       createLi = function(node) {
         var $li;
@@ -1173,7 +1173,7 @@ limitations under the License.
       createNodeLi = function(node) {
         var escaped_name;
         escaped_name = escapeIfNecessary(node.name);
-        return $("<li><div><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
+        return $("<li class=\"jqtree_common\"><div><span class=\"jqtree-title jqtree_common\">" + escaped_name + "</span></div></li>");
       };
       createFolderLi = function(node) {
         var button_char, button_classes, escaped_name, folder_classes, getButtonClasses, getFolderClasses;
@@ -1201,7 +1201,7 @@ limitations under the License.
         } else {
           button_char = TRIANGLE_RIGHT;
         }
-        return $("<li class=\"" + folder_classes + "\"><div><a class=\"" + button_classes + "\">" + button_char + "</a><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
+        return $("<li class=\"jqtree_common " + folder_classes + "\"><div><a class=\"jqtree_common " + button_classes + "\">" + button_char + "</a><span class=\"jqtree_common jqtree-title\">" + escaped_name + "</span></div></li>");
       };
       doCreateDomElements = function($element, children, is_root_node, is_open) {
         var $li, $ul, child, _i, _len;
@@ -1373,7 +1373,7 @@ limitations under the License.
     function GhostDropHint(node, $element, position) {
       this.$element = $element;
       this.node = node;
-      this.$ghost = $('<li class="jqtree-ghost"><span class="jqtree-circle"></span><span class="jqtree-line"></span></li>');
+      this.$ghost = $('<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span><span class="jqtree_common jqtree-line"></span></li>');
       if (position === Position.AFTER) {
         this.moveAfter();
       } else if (position === Position.BEFORE) {
