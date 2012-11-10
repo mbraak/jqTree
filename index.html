@@ -736,7 +736,7 @@ var node = $tree.tree('getSelectedNode');
     </p>
 
 <pre><code class="language-javascript">
-var node1 = $('#tree1').getNodeByName('node1');
+var node1 = $('#tree1', 'getNodeByName, 'node1');
 $('#tree1').tree(
     'addNodeAfter',
     {
@@ -764,7 +764,7 @@ $('#tree1').tree(
     </p>
 
 <pre><code class="language-javascript">
-var node1 = $('#tree1').getNodeByName('node1');
+var node1 = $('#tree1', 'getNodeByName', 'node1');
 $('#tree1').tree(
     'addParentNode',
     {
@@ -796,7 +796,7 @@ $('#tree1').tree('removeNode', node);
     </p>
 
 <pre><code class="language-javascript">
-var parent_node = $tree.getNodeById(123);
+var parent_node = $tree.tree('getNodeById', 123);
 
 $tree.tree(
     'appendNode',
