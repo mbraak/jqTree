@@ -737,7 +737,8 @@ var node = $tree.tree('getSelectedNode');
 
 <pre><code class="language-javascript">
 var node1 = $('#tree1').getNodeByName('node1');
-$('#tree1').addNodeAfter(
+$('#tree1').tree(
+    'addNodeAfter',
     {
         label: 'new_node',
         id: 456
@@ -764,7 +765,8 @@ $('#tree1').addNodeAfter(
 
 <pre><code class="language-javascript">
 var node1 = $('#tree1').getNodeByName('node1');
-$('#tree1').addParentNode(
+$('#tree1').tree(
+    'addParentNode',
     {
         label: 'new_parent',
         id: 456
@@ -796,7 +798,8 @@ $('#tree1').tree('removeNode', node);
 <pre><code class="language-javascript">
 var parent_node = $tree.getNodeById(123);
 
-$tree.appendNode(
+$tree.tree(
+    'appendNode',
     {
         label: 'new_node',
         id: 456
@@ -810,7 +813,8 @@ $tree.appendNode(
     </p>
 
 <pre><code class="language-javascript">
-$tree.appendNode(
+$tree.tree(
+    'appendNode',
     {
         label: 'new_node',
         id: 456
