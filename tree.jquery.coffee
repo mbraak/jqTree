@@ -1588,10 +1588,8 @@ class DragAndDropHandler
 
             doMove() unless event.isDefaultPrevented()
 
-class ScrollHandler
-    # todo: ie version
-    # todo: handle document special case
 
+class ScrollHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
         @previous_top = -1
@@ -1648,7 +1646,6 @@ class ScrollHandler
             @previous_top = -1
 
     _handleScrollingWithDocument: (area) ->
-        # todo
         distance_top = area.top - $(document).scrollTop()
 
         if distance_top < 20
