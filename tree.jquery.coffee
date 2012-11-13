@@ -719,11 +719,11 @@ class JqTreeWidget extends MouseWidget
 
         createUl = (is_root_node) =>
             if is_root_node
-                class_string = ' class="jqtree-tree"'
+                class_string = 'jqtree-tree'
             else
                 class_string = ''
 
-            return $("<ul#{ class_string }></ul>")
+            return $("<ul class=\"jqtree_common #{ class_string }\"></ul>")
 
         createLi = (node) =>
             if node.isFolder()
@@ -738,7 +738,7 @@ class JqTreeWidget extends MouseWidget
 
         createNodeLi = (node) =>
             escaped_name = escapeIfNecessary(node.name)
-            return $("<li><div><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>")
+            return $("<li class=\"jqtree_common\"><div><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>")
 
         createFolderLi = (node) =>
             getButtonClasses = ->
@@ -768,7 +768,7 @@ class JqTreeWidget extends MouseWidget
                 button_char = TRIANGLE_RIGHT
 
             return $(
-                "<li class=\"#{ folder_classes }\"><div><a class=\"#{ button_classes }\">#{ button_char }</a><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
+                "<li class=\"jqtree_common #{ folder_classes }\"><div><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->
@@ -906,7 +906,7 @@ class GhostDropHint
         @$element = $element
 
         @node = node
-        @$ghost = $('<li class="jqtree-ghost"><span class="jqtree-circle"></span><span class="jqtree-line"></span></li>')
+        @$ghost = $('<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span><span class="jqtree_common jqtree-line"></span></li>')
 
         if position == Position.AFTER
             @moveAfter()

@@ -3,26 +3,24 @@ ul.jqtree-tree {
 }
 
 ul.jqtree-tree,
-ul.jqtree-tree ul {
+ul.jqtree-tree ul.jqtree_common {
     list-style: none outside;
     margin-bottom: 0;
     padding: 0;
 }
 
-ul.jqtree-tree ul {
+ul.jqtree-tree ul.jqtree_common {
     display: block;
     margin-left: 12px;
     margin-right: 0;
 }
-
-ul.jqtree-tree li.jqtree-closed > ul {
+ul.jqtree-tree li.jqtree-closed > ul.jqtree_common {
     display: none;
 }
 
-ul.jqtree-tree li {
+ul.jqtree-tree li.jqtree_common {
     clear: both;
 }
-
 ul.jqtree-tree .jqtree-toggler {
     display: block;
     position: absolute;
