@@ -1027,7 +1027,11 @@ limitations under the License.
         return data_url(node);
       } else {
         if (node) {
-          data_url += "?node=" + node.id;
+            if(data_url.indexOf('?') >= 0) {
+                data_url += "&node=" + node.id;
+            } else {
+                data_url += "?node=" + node.id;
+            }
         }
         return data_url;
       }
