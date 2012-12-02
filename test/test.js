@@ -366,12 +366,12 @@ test('openNode and closeNode', function() {
     equal(node2.is_open, undefined);
 
     // 1. open node2
-    $tree.tree('openNode', node2, true);
+    $tree.tree('openNode', node2, false);
     equal(node2.is_open, true);
     equal(isNodeOpen($(node2.element)), true);
 
     // 2. close node2
-    $tree.tree('closeNode', node2, true);
+    $tree.tree('closeNode', node2, false);
     equal(node2.is_open, false);
     equal(isNodeClosed($(node2.element)), true);
 });
@@ -663,24 +663,32 @@ test('removeNode', function() {
     // setup
     var $tree = $('#tree1');
     $tree.tree({
-        data: example_data
+        data: example_data,
+        selectable: true
     });
 
     var child1 = $tree.tree('getNodeByName', 'child1');
     var node1 = $tree.tree('getNodeByName', 'node1');
 
     equal(
-        formatTitles($(node1.element)),
-        'node1 child1 child2'
+        formatTitles($tree),
+        'node1 child1 child2 node2 child3'
     );
+
+    // select node 'child1'
+    $tree.tree('selectNode', child1);
+    equal($tree.tree('getSelectedNode').name, 'child1');
 
     // 1. Remove child1
     $tree.tree('removeNode', child1);
 
     equal(
-        formatTitles($(node1.element)),
-        'node1 child2'
+        formatTitles($tree),
+        'node1 child2 node2 child3'
     );
+
+    // getSelectedNode must now return false
+    equal($tree.tree('getSelectedNode'), false);
 });
 
 test('appendNode', function() {
@@ -822,7 +830,8 @@ test('load on demand', function() {
     $.mockjax({
         url: '*',
         response: function(options) {
-            equal(options.url, '/tree/?node=1');
+            equal(options.url, '/tree/');
+            deepEqual(options.data, { 'node' : 1 })
 
             this.responseText = [
                 {
@@ -1000,18 +1009,25 @@ test('addChildAtPosition', function() {
 test('removeChild', function() {
     var tree = new Tree.Tree();
 
-    var abc = new Tree.Node('abc');
-    var def = new Tree.Node('def');
-    var ghi = new Tree.Node('ghi');
+    var abc = new Tree.Node({'label': 'abc', 'id': 1});
+    var def = new Tree.Node({'label': 'def', 'id': 2});
+    var ghi = new Tree.Node({'label': 'ghi', 'id': 3});
+
     tree.addChild(abc);
     tree.addChild(def);
     tree.addChild(ghi);
+
+    var jkl = new Tree.Node({'label': 'jkl', 'id': 4});
+    def.addChild(jkl);
 
     equal(
         formatNodes(tree.children),
         'abc def ghi',
         'children'
     );
+
+    equal(tree.id_mapping[2].name, 'def');
+    equal(tree.id_mapping[4].name, 'jkl');
 
     // remove 'def'
     tree.removeChild(def);
@@ -1020,6 +1036,9 @@ test('removeChild', function() {
         'abc ghi',
         'children'
     );
+
+    equal(tree.id_mapping[2], null);
+    equal(tree.id_mapping[4], null);
 
     // remove 'ghi'
     tree.removeChild(ghi);

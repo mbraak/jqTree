@@ -25,7 +25,7 @@ class SimpleWidget
         @options = $.extend({}, @defaults, options)
 
     destroy: ->
-        @_deinit();
+        @_deinit()
 
     _init: ->
         null

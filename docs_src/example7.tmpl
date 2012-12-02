@@ -1,0 +1,31 @@
+{% extends "base.tmpl" %}
+
+{% block title %}Example 7{% endblock %}
+{% block h1 %}Example 7 - autoscroll{% endblock %}
+
+{% block previous_url %}example6.html{% endblock %}
+{% block previous_title %}Example 6{% endblock %}
+{% block next %}{% endblock %}
+
+{% block contents %}
+    <div id="scroll-container">
+        <div id="tree1" data-url="/example_data/"></div>
+    </div>
+
+    <p>
+        This example autoscroll. The tree will scroll automatically if you drag an item outside of the tree.
+        <br />
+        Autoscroll will work automatically. There is no option for it.
+    </p>
+
+    <script>
+        $(function() {
+            var $tree = $('#tree1');
+            $tree.tree({
+                data: ExampleData.example_data,
+                dragAndDrop: true,
+                autoOpen: true
+            });
+        });
+    </script>
+{% endblock %}

@@ -97,6 +97,10 @@ h5 {
     font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
 }
 
+h6 {
+    margin: 0.5em 0;
+}
+
 a,
 a:visited {
     color: #b2497e;

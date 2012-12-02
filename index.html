@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="jqtree.css">
     <link rel="stylesheet" href="extra/css/documentation.css">
     <link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
-    <script src="extra/js/jquery-1.8.2.min.js"></script>
+    <script src="extra/js/jquery-1.8.3.min.js"></script>
     <script src="extra/prism/prism.js"></script>
     <script src="tree.jquery.js"></script>
     <script type="text/javascript">
@@ -57,12 +57,14 @@
                 <li><a href="#tree-options-oncanmove">onCanMove</a></li>
                 <li><a href="#tree-options-oncanmoveto">onCanMoveTo</a></li>
                 <li><a href="#tree-options-autoescape">autoEscape</a></li>
+                <li><a href="#tree-options-slide">slide</a></li>
             </ul>
         </li>
         <li>
             <a href="#functions">Functions</a>
             <ul>
                 <li><a href="#functions-loadData">loadData</a></li>
+                <li><a href="#functions-loaddatafromurl">loadDataFromUrl</a></li>
                 <li><a href="#functions-tojson">toJson</a></li>
                 <li><a href="#functions-getnodebyid">getNodeById</a></li>
                 <li><a href="#functions-selectnode">selectNode</a></li>
@@ -76,6 +78,7 @@
                 <li><a href="#functions-appendnode">appendNode</a></li>
                 <li><a href="#functions-updatenode">updateNode</a></li>
                 <li><a href="#functions-movenode">moveNode</a></li>
+                <li><a href="#functions-toggle">toggle</a></li>
             </ul>
         </li>
         <li>
@@ -160,8 +163,8 @@ $('#tree1').tree({
     <h4 id="tutorial">Tutorial</h4>
     <ul>
         <li>
-            Include <a href="http://code.jquery.com/jquery-1.8.2.min.js">jQuery</a>.
-            <pre><code class="language-markup">&lt;script src="jquery-1.8.2.min.js"&gt;&lt;/script&gt;</code></pre>
+            Include <a href="http://code.jquery.com/jquery-1.8.3.min.js">jQuery</a>.
+            <pre><code class="language-markup">&lt;script src="jquery-1.8.3.min.js"&gt;&lt;/script&gt;</code></pre>
         </li>
         <li>
             Include tree.jquery.js:
@@ -233,9 +236,29 @@ $.getJSON(
         <li><a href="examples/example4.html">Example 4 - save the state</a></li>
         <li><a href="examples/example5.html">Example 5 - load nodes on demand from the server</a></li>
         <li><a href="examples/example6.html">Example 6 - put html in the node title</a></li>
+        <li><a href="examples/example7.html">Example 7 - autoscroll</a></li>
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.14 (december 2 2012)</h5>
+    <h6>Api changes</h6>
+    <ul>
+        <li>Removed parameter <strong>must_open_parents</strong> from function <strong>selectNode</strong>.</li>
+        <li>Changed <strong>slide</strong> parameter in functions <strong>openNode</strong> and <strong>closeNode</strong>.</li>
+    </ul>
+    <h6>Issues</h6>
+    <ul>
+        <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method</li>
+        <li>Issue 81: getSelectedNode must return false if node is removed</li>
+        <li>Issue 82: Autoscroll for drag-and-drop</li>
+        <li>Issue 85: Option to turn slide animation on or off</li>
+        <li>Issue 86: The openNode function must automatically open parents</li>
+        <li>Issue 87: Remove the must_open_parents parameter from the selectNode function</li>
+        <li>Issue 88: selectNode must also work if selectable option is false</li>
+        <li>Issue 89: Clicking in title with img or em does not work</li>
+        <li>Issue 96: Added jqtree_common class to avoid css clashes</li> 
+    </ul>
 
     <h5>0.13 (october 10 2012)</h5>
     <ul>
@@ -504,7 +527,7 @@ $('#tree1).tree({
     data: data,
     onCreateLi: function(node, $li) {
         // Add 'icon' span before title
-        $li.find('.jqtree-title').before('<span class="icon"></span>');
+        $li.find('.jqtree-title').before('&lt;span class="icon"&gt;&lt;/span&gt;');
     }
 });
 </code></pre>
@@ -569,6 +592,19 @@ $('#tree1').tree({
         Determine if text is autoescaped. The default is true.
     </p>
 
+    <h5 id="tree-options-slide">slide</h5>
+
+    <p>
+        Turn slide animation on or off. Default is true.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    slide: false
+});
+</code></pre>
+
+
     <h4 id="functions">Functions</h4>
     <h5 id="functions-loadData">loadData</h5>
     <p>
@@ -576,17 +612,11 @@ $('#tree1').tree({
         <br>
         <strong>function loadData(data, parent_node);</strong>
         <br>
-        <strong>function loadData(url);</strong>
-        <br>
-        <strong>function loadData(url, parent_node);</strong>
     </p>
     <p>
-        Load data in the tree. You can provide an <strong>array of nodes</strong> or you can provide a <strong>url</strong>.
+        Load data in the tree. The data is array of nodes.
         <br>
         You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
-    </p>
-    <p>
-        Provide an array of nodes:
     </p>
 <pre><code class="language-javascript">
 // Assuming the tree exists
@@ -624,12 +654,20 @@ var data = [
 $('#tree1').tree('loadData', data, node);
 </code></pre>
 
+
+    <h5 id="functions-loaddatafromurl">loadDataFromUrl</h5>
+    <p>
+        <strong>function loadDataFromUrl(url);</strong>
+        <br>
+        <strong>function loadDataFromUrl(url, parent_node);</strong>
+    </p>
+
     <p>
         Load the data from an url:
     </p>
 
 <pre><code class="language-javascript">
-$('#tree1').tree('loadData', '/category/tree/');
+$('#tree1').tree('loadDataFromUrl', '/category/tree/');
 </code></pre>
 
     <h5 id="functions-tojson">toJson</h5>
@@ -666,11 +704,9 @@ var node = $tree.tree('getNodeById', 10);
     <h5 id="functions-selectnode">selectNode</h5>
     <p>
         <strong>function selectNode(node);</strong>
-        <br>
-        <strong>function selectNode(node, must_open_parents);</strong>
     </p>
     <p>
-        Select this node. If <strong>must_open_parents</strong> is true, then open all parents, so the node is visible.
+        Select this node.
     </p>
 <pre><code class="language-javascript">
 // create tree
@@ -681,17 +717,19 @@ $tree.tree({
 });
 
 var node = $tree.tree('getNodeById', 123);
-$tree.tree('selectNode', node, true);
+$tree.tree('selectNode', node);
 </code></pre>
 
     <h5 id="functions-opennode">openNode</h5>
     <p>
         <strong>function openNode(node);</strong>
         <br>
-        <strong>function openNode(node, skip_slide);</strong>
+        <strong>function openNode(node, slide);</strong>
     </p>
     <p>
-        Open this node with a slide animation. The node must have child nodes.
+        Open this node. The node must have child nodes.
+        <br>
+        Parameter <strong>slide</strong>: open the node using a slide animation (default is true).
     </p>
 <pre><code class="language-javascript">
 // create tree
@@ -705,20 +743,22 @@ $tree.tree('openNode', node);
 </code></pre>
 
     <p>
-        To open the node without the slide animation, call with <strong>skip_slide</strong> parameter is true.
+        To open the node without the slide animation, call with <strong>slide</strong> parameter is false.
     </p>
 <pre><code class="language-javascript">
-$tree.tree('openNode', node, true);
+$tree.tree('openNode', node, false);
 </code></pre>
 
     <h5 id="functions-closenode">closeNode</h5>
     <p>
         <strong>function closeNode(node);</strong>
         <br>
-        <strong>function closeNode(node, skip_slide);</strong>
+        <strong>function closeNode(node, slide);</strong>
     </p>
     <p>
-        Close this node with a slide animation. The node must have child nodes.
+        Close this node. The node must have child nodes.
+        <br>
+        Parameter <strong>slide</strong>: close the node using a slide animation (default is true).
     </p>
 <pre><code class="language-javascript">
 var node = $tree.tree('getNodeById', 123);
@@ -726,10 +766,10 @@ $tree.tree('closeNode', node);
 </code></pre>
 
     <p>
-        To close the node without the slide animation, call with <strong>skip_slide</strong> parameter is true.
+        To close the node without the slide animation, call with <strong>slide</strong> parameter is false.
     </p>
 <pre><code class="language-javascript">
-$tree.tree('closeNode', node, true);
+$tree.tree('closeNode', node, false);
 </code></pre>
 
     <h5 id="functions-getselectednode">getSelectedNode</h5>
@@ -890,6 +930,25 @@ var node = $tree.tree('getNodeBydId', 1);
 var target_node = $tree.tree('getNodeBydId', 2);
 
 $tree.tree('moveNode', node, target_node, 'after');
+</code></pre>
+
+    <h5 id="functions-toggle">toggle</h5>
+
+    <p>
+        <strong>function toggle(node);</strong>
+        <br />
+        <strong>function toggle(node, slide);</strong>
+    </p>
+
+    <p>
+        Open or close a node.
+        <br />
+        Parameter <strong>slide</strong>: a slide animation (default is true).
+    </p>
+
+<pre><code class="language-javascript">
+var node = $tree.tree('getNodeBydId', 1);
+$tree.tree('toggle', node);
 </code></pre>
 
     <h4 id="events">Events</h4>
