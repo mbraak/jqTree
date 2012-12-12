@@ -1173,7 +1173,7 @@ limitations under the License.
       createNodeLi = function(node) {
         var escaped_name;
         escaped_name = escapeIfNecessary(node.name);
-        return $("<li class=\"jqtree_common\"><div><span class=\"jqtree-title jqtree_common\">" + escaped_name + "</span></div></li>");
+        return $("<li class=\"jqtree_common\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">" + escaped_name + "</span></div></li>");
       };
       createFolderLi = function(node) {
         var button_char, button_classes, escaped_name, folder_classes, getButtonClasses, getFolderClasses;
@@ -1201,7 +1201,7 @@ limitations under the License.
         } else {
           button_char = TRIANGLE_RIGHT;
         }
-        return $("<li class=\"jqtree_common " + folder_classes + "\"><div><a class=\"jqtree_common " + button_classes + "\">" + button_char + "</a><span class=\"jqtree_common jqtree-title\">" + escaped_name + "</span></div></li>");
+        return $("<li class=\"jqtree_common " + folder_classes + "\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common " + button_classes + "\">" + button_char + "</a><span class=\"jqtree_common jqtree-title\">" + escaped_name + "</span></div></li>");
       };
       doCreateDomElements = function($element, children, is_root_node, is_open) {
         var $li, $ul, child, _i, _len;
@@ -1235,28 +1235,28 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._click = function(e) {
-      var $button, $target, $title, node;
+      var $button, $el, $target, node;
       if (e.ctrlKey) {
         return;
       }
       $target = $(e.target);
-      $title = $target.closest('.jqtree-title');
-      if ($title.length) {
-        node = this._getNode($title);
+      $button = $target.closest('.jqtree-toggler');
+      if ($button.length) {
+        node = this._getNode($button);
         if (node) {
-          this._triggerEvent('tree.click', {
-            node: node
-          });
-          return this.selectNode(node);
+          this.toggle(node, this.options.slide);
+          e.preventDefault();
+          return e.stopPropagation();
         }
       } else {
-        $button = $target.closest('.jqtree-toggler');
-        if ($button.length) {
-          node = this._getNode($button);
+        $el = $target.closest('.jqtree-element');
+        if ($el.length) {
+          node = this._getNode($el);
           if (node) {
-            this.toggle(node, this.options.slide);
-            e.preventDefault();
-            return e.stopPropagation();
+            this._triggerEvent('tree.click', {
+              node: node
+            });
+            return this.selectNode(node);
           }
         }
       }

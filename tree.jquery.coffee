@@ -790,7 +790,9 @@ class JqTreeWidget extends MouseWidget
 
         createNodeLi = (node) =>
             escaped_name = escapeIfNecessary(node.name)
-            return $("<li class=\"jqtree_common\"><div><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>")
+            return $(
+                "<li class=\"jqtree_common\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>"
+            )
 
         createFolderLi = (node) =>
             getButtonClasses = ->
@@ -820,7 +822,7 @@ class JqTreeWidget extends MouseWidget
                 button_char = TRIANGLE_RIGHT
 
             return $(
-                "<li class=\"jqtree_common #{ folder_classes }\"><div><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
+                "<li class=\"jqtree_common #{ folder_classes }\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->
@@ -860,23 +862,23 @@ class JqTreeWidget extends MouseWidget
 
         $target = $(e.target)
 
-        $title = $target.closest('.jqtree-title')
-        if $title.length
-            node = @_getNode($title)
+        $button = $target.closest('.jqtree-toggler')
+        if $button.length
+            node = @_getNode($button)
+
             if node
-                @_triggerEvent('tree.click', node: node)
+                @toggle(node, @options.slide)
 
-                @selectNode(node)
+                e.preventDefault()
+                e.stopPropagation()
         else
-            $button = $target.closest('.jqtree-toggler')
-            if $button.length
-                node = @_getNode($button)
-
+            $el = $target.closest('.jqtree-element')
+            if $el.length
+                node = @_getNode($el)
                 if node
-                    @toggle(node, @options.slide)
+                    @_triggerEvent('tree.click', node: node)
 
-                    e.preventDefault()
-                    e.stopPropagation()
+                    @selectNode(node)
 
     _getNode: ($element) ->
         $li = $element.closest('li')
