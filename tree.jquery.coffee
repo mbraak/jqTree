@@ -901,7 +901,7 @@ class JqTreeWidget extends MouseWidget
             return null
 
     _contextmenu: (e) ->
-        $div = $(e.target).closest('ul.jqtree-tree div')
+        $div = $(e.target).closest('ul.jqtree-tree .jqtree-element')
         if $div.length
             node = @_getNode($div)
             if node
@@ -997,7 +997,7 @@ class GhostDropHint
 
 class BorderDropHint
     constructor: ($element) ->
-        $div = $element.children('div')
+        $div = $element.children('.jqtree-element')
         width = $element.width() - 4
 
         @$hint = $('<span class="jqtree-border"></span>')
@@ -1025,7 +1025,7 @@ class NodeElement
         return @$element.children('ul:first')
 
     getSpan: ->
-        return @$element.children('div').find('span.jqtree-title')
+        return @$element.children('.jqtree-element').find('span.jqtree-title')
 
     getLi: ->
         return @$element
@@ -1083,7 +1083,7 @@ class FolderElement extends NodeElement
                 doClose()
                 
     getButton: ->
-        return @$element.children('div').find('a.jqtree-toggler')
+        return @$element.children('.jqtree-element').find('a.jqtree-toggler')
 
     addDropHint: (position) ->
         if not @node.is_open and position == Position.INSIDE

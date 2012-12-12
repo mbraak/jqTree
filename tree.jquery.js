@@ -1292,7 +1292,7 @@ limitations under the License.
 
     JqTreeWidget.prototype._contextmenu = function(e) {
       var $div, node;
-      $div = $(e.target).closest('ul.jqtree-tree div');
+      $div = $(e.target).closest('ul.jqtree-tree .jqtree-element');
       if ($div.length) {
         node = this._getNode($div);
         if (node) {
@@ -1416,7 +1416,7 @@ limitations under the License.
 
     function BorderDropHint($element) {
       var $div, width;
-      $div = $element.children('div');
+      $div = $element.children('.jqtree-element');
       width = $element.width() - 4;
       this.$hint = $('<span class="jqtree-border"></span>');
       $div.append(this.$hint);
@@ -1451,7 +1451,7 @@ limitations under the License.
     };
 
     NodeElement.prototype.getSpan = function() {
-      return this.$element.children('div').find('span.jqtree-title');
+      return this.$element.children('.jqtree-element').find('span.jqtree-title');
     };
 
     NodeElement.prototype.getLi = function() {
@@ -1542,7 +1542,7 @@ limitations under the License.
     };
 
     FolderElement.prototype.getButton = function() {
-      return this.$element.children('div').find('a.jqtree-toggler');
+      return this.$element.children('.jqtree-element').find('a.jqtree-toggler');
     };
 
     FolderElement.prototype.addDropHint = function(position) {

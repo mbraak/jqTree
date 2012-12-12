@@ -99,11 +99,11 @@ test("create jqtree from data", function() {
         'first child is li.jqtree-folder.jqtree-closed'
     );
     ok(
-        $('#tree1 ul.jqtree-tree li:eq(0) > div > a.jqtree-toggler').is('a.jqtree-toggler.jqtree-closed'),
+        $('#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element > a.jqtree-toggler').is('a.jqtree-toggler.jqtree-closed'),
         'button in first folder'
     );
     equal(
-        $('#tree1 ul.jqtree-tree li:eq(0) > div span.jqtree-title').text(),
+        $('#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element span.jqtree-title').text(),
         'node1'
     );
 });
@@ -305,7 +305,7 @@ test('loadData', function() {
 
     // first node is 'node1'
     equal(
-        $tree.find('> ul > li:first div:first > span').text(),
+        $tree.find('> ul > li:first .jqtree-element:first > span').text(),
         'node1'
     );
 
@@ -314,7 +314,7 @@ test('loadData', function() {
 
     // first node is 'main'
     equal(
-        $tree.find('> ul > li:first div:first > span').text(),
+        $tree.find('> ul > li:first .jqtree-element:first > span').text(),
         'main'
     );
 
@@ -338,7 +338,7 @@ test('loadData', function() {
 
     // first node in html is still 'node1'
     equal(
-        $tree.find('li:eq(0)').find('div:eq(0) span.jqtree-title').text(),
+        $tree.find('li:eq(0)').find('.jqtree-element:eq(0) span.jqtree-title').text(),
         'node1'
     );
 
@@ -346,7 +346,7 @@ test('loadData', function() {
     var $child3 = $tree.find('span:contains(child3)');
     var $li = $child3.closest('li');
     equal(
-        $li.children('ul').children('li:eq(0)').find('div span.jqtree-title').text(),
+        $li.children('ul').children('li:eq(0)').find('.jqtree-element span.jqtree-title').text(),
         'c4'
     );
 
@@ -416,7 +416,7 @@ test('click toggler', function() {
         selectable: true
     });
 
-    var $title = $tree.find('li:eq(0)').find('> div > span.jqtree-title');
+    var $title = $tree.find('li:eq(0)').find('> .jqtree-element > span.jqtree-title');
     equal($title.text(), 'node1');
     var $toggler = $title.prev();
     ok($toggler.is('a.jqtree-toggler.jqtree-closed'));
@@ -512,7 +512,7 @@ test('autoOpen', function() {
         $tree.find('li').each(function() {
             var $li = $(this);
             if ($li.is('.jqtree-folder') && ! $li.is('.jqtree-closed')) {
-                var label = $li.children('div').find('span').text();
+                var label = $li.children('.jqtree-element').find('span').text();
                 open_nodes.push(label);
             };
         });
@@ -581,7 +581,7 @@ test('onCreateLi', function() {
     $tree.tree({
         data: example_data,
         onCreateLi: function(node, $li) {
-            var $span = $li.children('div').find('span');
+            var $span = $li.children('.jqtree-element').find('span');
             $span.html('_' + node.name + '_');
         }
     });
@@ -713,7 +713,7 @@ test('appendNode', function() {
 
     // Node 'child1' does not have a toggler button
     equal(
-        $(child1.element).find('> div > .jqtree-toggler').length,
+        $(child1.element).find('> .jqtree-element > .jqtree-toggler').length,
         0
     );
 
@@ -723,7 +723,7 @@ test('appendNode', function() {
 
     // Node 'child1' must get a toggler button
     equal(
-        $(child1.element).find('> div > .jqtree-toggler').length,
+        $(child1.element).find('> .jqtree-element > .jqtree-toggler').length,
         1
     );
 });
