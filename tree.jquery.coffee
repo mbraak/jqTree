@@ -939,9 +939,9 @@ class JqTreeWidget extends MouseWidget
         else
             return false
 
-    _mouseStop: ->
+    _mouseStop: (e) ->
         if @options.dragAndDrop
-            return @dnd_handler.mouseStop()
+            return @dnd_handler.mouseStop(e)
         else
             return false
 
@@ -1302,8 +1302,8 @@ class DragAndDropHandler
 
         return true
 
-    mouseStop: ->
-        @moveItem()
+    mouseStop: (e) ->
+        @moveItem(e)
         @clear()
         @removeHover()
         @removeDropHint()
@@ -1560,7 +1560,7 @@ class DragAndDropHandler
             clearTimeout(@open_folder_timer)
             @open_folder_timer = null
 
-    moveItem: ->
+    moveItem: (original_event) ->
         if (
             @hovered_area and
             @hovered_area.position != Position.NONE
@@ -1586,6 +1586,7 @@ class DragAndDropHandler
                     position: Position.getName(position)
                     previous_parent: previous_parent
                     do_move: doMove
+                    original_event: original_event
             )
 
             doMove() unless event.isDefaultPrevented()

@@ -1340,9 +1340,9 @@ limitations under the License.
       }
     };
 
-    JqTreeWidget.prototype._mouseStop = function() {
+    JqTreeWidget.prototype._mouseStop = function(e) {
       if (this.options.dragAndDrop) {
-        return this.dnd_handler.mouseStop();
+        return this.dnd_handler.mouseStop(e);
       } else {
         return false;
       }
@@ -1786,8 +1786,8 @@ limitations under the License.
       return true;
     };
 
-    DragAndDropHandler.prototype.mouseStop = function() {
-      this.moveItem();
+    DragAndDropHandler.prototype.mouseStop = function(e) {
+      this.moveItem(e);
       this.clear();
       this.removeHover();
       this.removeDropHint();
@@ -2029,7 +2029,7 @@ limitations under the License.
       }
     };
 
-    DragAndDropHandler.prototype.moveItem = function() {
+    DragAndDropHandler.prototype.moveItem = function(original_event) {
       var doMove, event, moved_node, position, previous_parent, target_node,
         _this = this;
       if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
@@ -2051,7 +2051,8 @@ limitations under the License.
             target_node: target_node,
             position: Position.getName(position),
             previous_parent: previous_parent,
-            do_move: doMove
+            do_move: doMove,
+            original_event: original_event
           }
         });
         if (!event.isDefaultPrevented()) {
