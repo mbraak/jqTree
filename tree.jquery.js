@@ -718,6 +718,17 @@ limitations under the License.
       return false;
     };
 
+    Node.prototype.getLevel = function() {
+      var level, node;
+      level = 0;
+      node = this;
+      while (node.parent) {
+        level += 1;
+        node = node.parent;
+      }
+      return level;
+    };
+
     return Node;
 
   })();

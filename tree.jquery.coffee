@@ -425,6 +425,16 @@ class Node
 
         return false
 
+    getLevel: ->
+        level = 0
+        node = this
+
+        while node.parent
+            level += 1
+            node = node.parent
+
+        return level
+
 
 class Tree extends Node
     constructor: (o) ->
