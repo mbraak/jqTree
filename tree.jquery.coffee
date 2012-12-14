@@ -383,6 +383,7 @@ class Node
 
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index)
+            return node
 
     addParent: (node_info) ->
         if not @parent

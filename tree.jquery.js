@@ -662,7 +662,8 @@ limitations under the License.
       } else {
         node = new Node(node_info);
         child_index = this.parent.getChildIndex(this);
-        return this.parent.addChildAtPosition(node, child_index);
+        this.parent.addChildAtPosition(node, child_index);
+        return node;
       }
     };
 

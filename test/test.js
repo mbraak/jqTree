@@ -878,7 +878,8 @@ test('addNodeBefore', function() {
     var node1 = $tree.tree('getNodeByName', 'node1');
 
     // -- add node before node1
-    $tree.tree('addNodeBefore', 'node3', node1);
+    var new_node = $tree.tree('addNodeBefore', 'node3', node1);
+    console.log(new_node.name, 'node3')
 
     equal(formatTitles($tree), 'node3 node1 child1 child2 node2 child3');
 });
