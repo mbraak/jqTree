@@ -1461,6 +1461,16 @@ test('getNodeById', function() {
     equal(node.name, 'new node');
 });
 
+test('getLevel', function() {
+    // setup
+    var tree = new Tree.Tree()
+    tree.loadFromData(example_data);
+
+    // 1. get level for node1 and child1
+    equal(tree.getNodeByName('node1').getLevel(), 1);
+    equal(tree.getNodeByName('child1').getLevel(), 2);
+});
+
 module('util');
 
 test('JSON.stringify', function() {
@@ -1494,6 +1504,7 @@ test('Position.getName', function() {
 test('Position.nameToIndex', function() {
     equal(Tree.Position.nameToIndex('before'), Tree.Position.BEFORE);
     equal(Tree.Position.nameToIndex('after'), Tree.Position.AFTER);
+    equal(Tree.Position.nameToIndex(''), 0);
 });
 
 });
