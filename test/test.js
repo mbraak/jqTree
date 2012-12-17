@@ -2,6 +2,16 @@ $(function() {
 
 QUnit.config.testTimeout = 5000;
 
+/*
+example data:
+
+node1
+---child1
+---child2
+-node2
+---child3
+*/
+
 var example_data = [
     {
         label: 'node1',
@@ -19,6 +29,14 @@ var example_data = [
         ]
     }
 ];
+
+/*
+example data 2:
+
+-main
+---c1
+---c2
+*/
 
 var example_data2 = [
     {
@@ -667,19 +685,12 @@ test('removeNode', function() {
         selectable: true
     });
 
+    // 1. Remove selected node; node is 'child1'
     var child1 = $tree.tree('getNodeByName', 'child1');
-    var node1 = $tree.tree('getNodeByName', 'node1');
-
-    equal(
-        formatTitles($tree),
-        'node1 child1 child2 node2 child3'
-    );
-
-    // select node 'child1'
     $tree.tree('selectNode', child1);
+
     equal($tree.tree('getSelectedNode').name, 'child1');
 
-    // 1. Remove child1
     $tree.tree('removeNode', child1);
 
     equal(
@@ -688,6 +699,32 @@ test('removeNode', function() {
     );
 
     // getSelectedNode must now return false
+    equal($tree.tree('getSelectedNode'), false);
+
+    // 2. No node is selected; remove child3
+    $tree.tree('loadData', example_data);
+
+    var child3 = $tree.tree('getNodeByName', 'child3');
+    $tree.tree('removeNode', child3);
+
+    equal(
+        formatTitles($tree),
+        'node1 child1 child2 node2'
+    );
+
+    equal($tree.tree('getSelectedNode'), false);
+
+    // 3. Remove parent of selected node
+    $tree.tree('loadData', example_data);
+
+    child1 = $tree.tree('getNodeByName', 'child1');
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    $tree.tree('selectNode', child1);
+
+    $tree.tree('removeNode', node1);
+
+    // node is unselected
     equal($tree.tree('getSelectedNode'), false);
 });
 
