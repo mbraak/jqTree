@@ -18,7 +18,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, TRIANGLE_DOWN, TRIANGLE_RIGHT, Tree, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, TRIANGLE_DOWN, TRIANGLE_RIGHT, Tree, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -255,22 +255,28 @@ limitations under the License.
 
   $ = this.jQuery;
 
-  indexOf = function(array, item) {
+  _indexOf = function(array, item) {
     var i, value, _i, _len;
+    for (i = _i = 0, _len = array.length; _i < _len; i = ++_i) {
+      value = array[i];
+      if (value === item) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+  indexOf = function(array, item) {
     if (array.indexOf) {
       return array.indexOf(item);
     } else {
-      for (i = _i = 0, _len = array.length; _i < _len; i = ++_i) {
-        value = array[i];
-        if (value === item) {
-          return i;
-        }
-      }
-      return -1;
+      return _indexOf(array, item);
     }
   };
 
   this.Tree.indexOf = indexOf;
+
+  this.Tree._indexOf = _indexOf;
 
   if (!((this.JSON != null) && (this.JSON.stringify != null) && typeof this.JSON.stringify === 'function')) {
     json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;

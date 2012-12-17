@@ -1479,7 +1479,9 @@ test('JSON.stringify', function() {
 
 test('indexOf', function() {
     equal(Tree.indexOf([3, 2, 1], 1), 2);
+    equal(Tree._indexOf([3, 2, 1], 1), 2);
     equal(Tree.indexOf([4, 5, 6], 1), -1);
+    equal(Tree._indexOf([4, 5, 6], 1), -1);
 });
 
 test('Position.getName', function() {

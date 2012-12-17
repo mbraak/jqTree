@@ -18,18 +18,22 @@ limitations under the License.
 $ = @jQuery
 
 # Standard javascript indexOf. Implemented here because not all browsers support it.
+_indexOf = (array, item) ->
+    for value, i in array
+        if value == item
+            return i
+    return -1
+
 indexOf = (array, item) ->
     if array.indexOf
         # The browser supports indexOf
         return array.indexOf(item)
     else
         # Do our own indexOf
-        for value, i in array
-            if value == item
-                return i
-        return -1
+        return _indexOf(array, item)
 
 @Tree.indexOf = indexOf
+@Tree._indexOf = _indexOf
 
 # JSON.stringify function; copied from json2
 if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
