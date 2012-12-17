@@ -392,6 +392,23 @@ test('openNode and closeNode', function() {
     $tree.tree('closeNode', node2, false);
     equal(node2.is_open, false);
     equal(isNodeClosed($(node2.element)), true);
+
+    // 3. open child1
+    var node1 = $tree.tree('getNodeByName', 'node1');
+    var child1 = $tree.tree('getNodeByName', 'child1');
+
+    // add a child to child1 so it is a folder
+    $tree.tree('appendNode', 'child1a', child1);
+
+    // node1 is initialy closed
+    equal(node1.is_open, undefined);
+
+    // open child1
+    $tree.tree('openNode', child1, false);
+
+    // node1 and child1 are now open1
+    equal(node1.is_open, true);
+    equal(child1.is_open, true);
 });
 
 test('selectNode', function() {
