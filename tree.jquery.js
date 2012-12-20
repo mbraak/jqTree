@@ -230,6 +230,10 @@ limitations under the License.
       return null;
     };
 
+    MouseWidget.prototype.setMouseDelay = function(mouse_delay) {
+      return this.mouse_delay = mouse_delay;
+    };
+
     return MouseWidget;
 
   })(SimpleWidget);
@@ -1795,11 +1799,9 @@ limitations under the License.
         this.removeDropHint();
         this.removeHover();
         this.stopOpenFolderTimer();
-      } else {
-        if (this.hovered_area !== area) {
-          this.hovered_area = area;
-          this.updateDropHint();
-        }
+      } else if (this.hovered_area !== area) {
+        this.hovered_area = area;
+        this.updateDropHint();
       }
       return true;
     };

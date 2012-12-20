@@ -1309,11 +1309,10 @@ class DragAndDropHandler
             @removeDropHint()
             @removeHover()
             @stopOpenFolderTimer()
-        else
-            if @hovered_area != area
-                @hovered_area = area
+        else if @hovered_area != area
+            @hovered_area = area
 
-                @updateDropHint()
+            @updateDropHint()
 
         return true
 

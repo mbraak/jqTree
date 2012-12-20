@@ -933,7 +933,6 @@ test('addNodeBefore', function() {
 
     // -- add node before node1
     var new_node = $tree.tree('addNodeBefore', 'node3', node1);
-    console.log(new_node.name, 'node3')
 
     equal(formatTitles($tree), 'node3 node1 child1 child2 node2 child3');
 });
@@ -949,6 +948,44 @@ test('addParentNode', function() {
     $tree.tree('addParentNode', 'node3', child3);
 
     equal(formatTitles($tree), 'node1 child1 child2 node2 node3 child3');
+});
+
+test('mouse events', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        dragAndDrop: true,
+        autoOpen: true
+    });
+    $tree.tree('setMouseDelay', 0);
+
+    function getTitleElement(node_name) {
+        var node = $tree.tree('getNodeByName', node_name);
+        var $el = $(node.element);
+        return $($el.find('.jqtree-title'));
+    }
+
+    var $node1 = getTitleElement('node1');
+    var $child3 = getTitleElement('child3');
+
+    // Move node1 inside child3
+    // trigger mousedown event on node1
+    $node1.trigger(
+        $.Event('mousedown', { which: 1 })
+    );
+
+    // trigger mouse move to child3
+    var child3_offset = $child3.offset();
+    $tree.trigger(
+        $.Event('mousemove', { pageX: child3_offset.left, pageY: child3_offset.top })
+    );
+    $tree.trigger('mouseup');
+
+    equal(
+        formatTitles($tree),
+        'node2 child3 node1 child1 child2'
+    );
 });
 
 module("Tree");

@@ -100,3 +100,6 @@ class MouseWidget extends SimpleWidget
 
     _mouseStop: (e) ->
         null
+
+    setMouseDelay: (mouse_delay) ->
+        @mouse_delay = mouse_delay
