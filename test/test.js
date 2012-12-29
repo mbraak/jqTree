@@ -1039,7 +1039,7 @@ test("create tree from data", function() {
     }
 
     // 1. create tree from example data
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
     checkData(tree);
 
@@ -1056,13 +1056,13 @@ test("create tree from data", function() {
             children: ['child3']
         }
     ];
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(data);
     checkData(tree);
 });
 
 test("addChild", function() {
-    var tree = new Tree.Tree('tree1');
+    var tree = new Tree.Node('tree1', true);
     tree.addChild(
         new Tree.Node('abc')
     );
@@ -1085,7 +1085,7 @@ test("addChild", function() {
 });
 
 test('addChildAtPosition', function() {
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     tree.addChildAtPosition(new Tree.Node('abc'), 0);  // first
     tree.addChildAtPosition(new Tree.Node('ghi'), 2);  // index 2 does not exist
     tree.addChildAtPosition(new Tree.Node('def'), 1);
@@ -1099,7 +1099,7 @@ test('addChildAtPosition', function() {
 });
 
 test('removeChild', function() {
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
 
     var abc = new Tree.Node({'label': 'abc', 'id': 1});
     var def = new Tree.Node({'label': 'def', 'id': 2});
@@ -1151,7 +1151,7 @@ test('removeChild', function() {
 
 test('getChildIndex', function() {
     // setup
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
 
     var abc = new Tree.Node('abc');
     var def = new Tree.Node('def');
@@ -1168,7 +1168,7 @@ test('getChildIndex', function() {
 });
 
 test('hasChildren', function() {
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     equal(
         tree.hasChildren(),
         false,
@@ -1184,7 +1184,7 @@ test('hasChildren', function() {
 });
 
 test('iterate', function() {
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // iterate over all the nodes
@@ -1239,7 +1239,7 @@ test('iterate', function() {
 });
 
 test('moveNode', function() {
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     /*
@@ -1334,7 +1334,7 @@ test('initFromData', function() {
                 }
             ]
         };
-    var node = new Tree.Tree();
+    var node = new Tree.Node(null, true);
     node.initFromData(data);
 
     equal(node.name, 'main')
@@ -1348,7 +1348,7 @@ test('initFromData', function() {
 
 test('getData', function() {
     // 1. empty node
-    var node = new Tree.Tree();
+    var node = new Tree.Node(null, true);
     deepEqual(node.getData(), []);
 
     // 2.node with data
@@ -1381,7 +1381,7 @@ test('getData', function() {
 
 test('addAfter', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     /*
@@ -1423,7 +1423,7 @@ test('addAfter', function() {
 
 test('addBefore', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // 1. Add 'node_0' before node1
@@ -1434,7 +1434,7 @@ test('addBefore', function() {
 
 test('addParent', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // 1. Add node 'root' as parent of node1
@@ -1448,7 +1448,7 @@ test('addParent', function() {
 
 test('remove', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     var child1 = tree.getNodeByName('child1');
@@ -1466,7 +1466,7 @@ test('remove', function() {
 
 test('append', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     var node1 = tree.getNodeByName('node1');
@@ -1479,7 +1479,7 @@ test('append', function() {
 
 test('prepend', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     var node1 = tree.getNodeByName('node1');
@@ -1492,7 +1492,7 @@ test('prepend', function() {
 
 test('getNodeById', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // 1. Get node with id 124
@@ -1517,7 +1517,7 @@ test('getNodeById', function() {
 
 test('getLevel', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // 1. get level for node1 and child1

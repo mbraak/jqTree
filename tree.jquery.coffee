@@ -139,11 +139,16 @@ Position.strings = ['before', 'after', 'inside', 'none']
 @Tree.Position = Position
 
 class Node
-    constructor: (o) ->
+    constructor: (o, is_root=false, node_class=Node) ->
         @setData(o)
 
         @children = []
         @parent = null
+
+        if is_root
+            @id_mapping = {}
+            @tree = this
+            @node_class = node_class
 
     setData: (o) ->
         if typeof o != 'object'
@@ -166,7 +171,7 @@ class Node
 
         addChildren = (children_data) =>
             for child in children_data
-                node = new Node('')
+                node = new @tree.node_class('')
                 node.initFromData(child)
                 @addChild(node)
             return null
@@ -195,7 +200,7 @@ class Node
         @children = []
 
         for o in data
-            node = new Node(o)
+            node = new @tree.node_class(o)
             @addChild(node)
 
             if typeof o == 'object' and o.children
@@ -373,7 +378,7 @@ class Node
         if not @parent
             return null
         else
-            node = new Node(node_info)
+            node = new @tree.node_class(node_info)
 
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index + 1)
@@ -383,7 +388,7 @@ class Node
         if not @parent
             return null
         else
-            node = new Node(node_info)
+            node = new @tree.node_class(node_info)
 
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index)
@@ -393,7 +398,7 @@ class Node
         if not @parent
             return null
         else
-            new_parent = new Node(node_info)
+            new_parent = new @tree.node_class(node_info)
             new_parent._setParent(@tree)
             original_parent = @parent
 
@@ -410,12 +415,12 @@ class Node
             @parent = null
 
     append: (node_info) ->
-        node = new Node(node_info)
+        node = new @tree.node_class(node_info)
         @addChild(node)
         return node
 
     prepend: (node_info) ->
-        node = new Node(node_info)
+        node = new @tree.node_class(node_info)
         @addChildAtPosition(node, 0)
         return node
 
@@ -440,14 +445,6 @@ class Node
 
         return level
 
-
-class Tree extends Node
-    constructor: (o) ->
-        super(o, null, true)
-
-        @id_mapping = {}
-        @tree = this
-
     getNodeById: (node_id) ->
         return @id_mapping[node_id]
 
@@ -459,7 +456,7 @@ class Tree extends Node
         if node.id
             delete @id_mapping[node.id]
 
-@Tree.Tree = Tree
+
 @Tree.Node = Node
 
 TRIANGLE_RIGHT = '&#x25ba;'  # ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
@@ -482,6 +479,7 @@ class JqTreeWidget extends MouseWidget
         autoEscape: true
         dataUrl: null
         slide: true  # must display slide animation?
+        nodeClass: Node
 
     toggle: (node, slide=true) ->
         if node.is_open
@@ -553,9 +551,9 @@ class JqTreeWidget extends MouseWidget
         @_triggerEvent('tree.load_data', tree_data: data)
 
         if not parent_node
-            @_initTree(data)
+            @_initTree(data, false, @options.nodeClass)
         else
-            subtree = new Node('')
+            subtree = new @options.nodeClass('')
             subtree._setParent(parent_node.tree)
             subtree.loadFromData(data)
 
@@ -750,7 +748,7 @@ class JqTreeWidget extends MouseWidget
             return data_url
 
     _initTree: (data) ->
-        @tree = new Tree()
+        @tree = new @options.nodeClass(null, true, @options.nodeClass)
         @tree.loadFromData(data)
 
         @_openNodes()

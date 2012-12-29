@@ -18,7 +18,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, TRIANGLE_DOWN, TRIANGLE_RIGHT, Tree, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str, _indexOf,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, TRIANGLE_DOWN, TRIANGLE_RIGHT, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -30,6 +30,7 @@ limitations under the License.
     SimpleWidget.prototype.defaults = {};
 
     function SimpleWidget(el, options) {
+      console.log(options);
       this.$el = $(el);
       this.options = $.extend({}, this.defaults, options);
     }
@@ -386,10 +387,21 @@ limitations under the License.
 
   Node = (function() {
 
-    function Node(o) {
+    function Node(o, is_root, node_class) {
+      if (is_root == null) {
+        is_root = false;
+      }
+      if (node_class == null) {
+        node_class = Node;
+      }
       this.setData(o);
       this.children = [];
       this.parent = null;
+      if (is_root) {
+        this.id_mapping = {};
+        this.tree = this;
+        this.node_class = node_class;
+      }
     }
 
     Node.prototype.setData = function(o) {
@@ -423,7 +435,7 @@ limitations under the License.
         var child, node, _i, _len;
         for (_i = 0, _len = children_data.length; _i < _len; _i++) {
           child = children_data[_i];
-          node = new Node('');
+          node = new _this.tree.node_class('');
           node.initFromData(child);
           _this.addChild(node);
         }
@@ -457,7 +469,7 @@ limitations under the License.
       this.children = [];
       for (_i = 0, _len = data.length; _i < _len; _i++) {
         o = data[_i];
-        node = new Node(o);
+        node = new this.tree.node_class(o);
         this.addChild(node);
         if (typeof o === 'object' && o.children) {
           node.loadFromData(o.children);
@@ -658,7 +670,7 @@ limitations under the License.
       if (!this.parent) {
         return null;
       } else {
-        node = new Node(node_info);
+        node = new this.tree.node_class(node_info);
         child_index = this.parent.getChildIndex(this);
         this.parent.addChildAtPosition(node, child_index + 1);
         return node;
@@ -670,7 +682,7 @@ limitations under the License.
       if (!this.parent) {
         return null;
       } else {
-        node = new Node(node_info);
+        node = new this.tree.node_class(node_info);
         child_index = this.parent.getChildIndex(this);
         this.parent.addChildAtPosition(node, child_index);
         return node;
@@ -682,7 +694,7 @@ limitations under the License.
       if (!this.parent) {
         return null;
       } else {
-        new_parent = new Node(node_info);
+        new_parent = new this.tree.node_class(node_info);
         new_parent._setParent(this.tree);
         original_parent = this.parent;
         _ref = original_parent.children;
@@ -705,14 +717,14 @@ limitations under the License.
 
     Node.prototype.append = function(node_info) {
       var node;
-      node = new Node(node_info);
+      node = new this.tree.node_class(node_info);
       this.addChild(node);
       return node;
     };
 
     Node.prototype.prepend = function(node_info) {
       var node;
-      node = new Node(node_info);
+      node = new this.tree.node_class(node_info);
       this.addChildAtPosition(node, 0);
       return node;
     };
@@ -740,41 +752,25 @@ limitations under the License.
       return level;
     };
 
-    return Node;
-
-  })();
-
-  Tree = (function(_super) {
-
-    __extends(Tree, _super);
-
-    function Tree(o) {
-      Tree.__super__.constructor.call(this, o, null, true);
-      this.id_mapping = {};
-      this.tree = this;
-    }
-
-    Tree.prototype.getNodeById = function(node_id) {
+    Node.prototype.getNodeById = function(node_id) {
       return this.id_mapping[node_id];
     };
 
-    Tree.prototype.addNodeToIndex = function(node) {
+    Node.prototype.addNodeToIndex = function(node) {
       if (node.id) {
         return this.id_mapping[node.id] = node;
       }
     };
 
-    Tree.prototype.removeNodeFromIndex = function(node) {
+    Node.prototype.removeNodeFromIndex = function(node) {
       if (node.id) {
         return delete this.id_mapping[node.id];
       }
     };
 
-    return Tree;
+    return Node;
 
-  })(Node);
-
-  this.Tree.Tree = Tree;
+  })();
 
   this.Tree.Node = Node;
 
@@ -804,7 +800,8 @@ limitations under the License.
       onCanMoveTo: null,
       autoEscape: true,
       dataUrl: null,
-      slide: true
+      slide: true,
+      nodeClass: Node
     };
 
     JqTreeWidget.prototype.toggle = function(node, slide) {
@@ -895,9 +892,9 @@ limitations under the License.
         tree_data: data
       });
       if (!parent_node) {
-        this._initTree(data);
+        this._initTree(data, false, this.options.nodeClass);
       } else {
-        subtree = new Node('');
+        subtree = new this.options.nodeClass('');
         subtree._setParent(parent_node.tree);
         subtree.loadFromData(data);
         _ref = subtree.children;
@@ -1130,7 +1127,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._initTree = function(data) {
-      this.tree = new Tree();
+      this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
       this.tree.loadFromData(data);
       this._openNodes();
       this._refreshElements();
