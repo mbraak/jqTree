@@ -30,7 +30,6 @@ limitations under the License.
     SimpleWidget.prototype.defaults = {};
 
     function SimpleWidget(el, options) {
-      console.log(options);
       this.$el = $(el);
       this.options = $.extend({}, this.defaults, options);
     }
