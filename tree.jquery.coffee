@@ -1137,6 +1137,7 @@ class SaveStateHandler
                 @getState()
             )
         else if $.cookie
+            $.cookie.raw = true
             $.cookie(
                 @getCookieName(),
                 @getState(),
@@ -1160,10 +1161,8 @@ class SaveStateHandler
                 @getCookieName()
             )
         else if $.cookie
-            return $.cookie(
-                @getCookieName(),
-                {path: '/'}
-            )
+            $.cookie.raw = true
+            return $.cookie(@getCookieName())
         else
             return null
 

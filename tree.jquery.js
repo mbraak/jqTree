@@ -1612,6 +1612,7 @@ limitations under the License.
       } else if (typeof localStorage !== "undefined" && localStorage !== null) {
         return localStorage.setItem(this.getCookieName(), this.getState());
       } else if ($.cookie) {
+        $.cookie.raw = true;
         return $.cookie(this.getCookieName(), this.getState(), {
           path: '/'
         });
@@ -1635,9 +1636,8 @@ limitations under the License.
       } else if (typeof localStorage !== "undefined" && localStorage !== null) {
         return localStorage.getItem(this.getCookieName());
       } else if ($.cookie) {
-        return $.cookie(this.getCookieName(), {
-          path: '/'
-        });
+        $.cookie.raw = true;
+        return $.cookie(this.getCookieName());
       } else {
         return null;
       }
