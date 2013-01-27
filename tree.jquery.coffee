@@ -627,7 +627,7 @@ class JqTreeWidget extends MouseWidget
             else
                 result = true
 
-                iterate(
+                @tree.iterate(
                     (child) =>
                         if node == child
                             result = true
