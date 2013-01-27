@@ -994,7 +994,7 @@ limitations under the License.
           return true;
         } else {
           result = true;
-          iterate(function(child) {
+          _this.tree.iterate(function(child) {
             if (node === child) {
               result = true;
               return false;
