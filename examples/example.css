@@ -34,6 +34,10 @@ p {
     margin-left: 8px;
 }
 
+#tree1.jqtree-loading:after {
+    content: url(spinner.gif);
+}
+
 pre {
     background-color: #333;
 }

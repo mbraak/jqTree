@@ -505,18 +505,20 @@ class JqTreeWidget extends MouseWidget
         @_loadData(data, parent_node)
 
     loadDataFromUrl: (url_info, parent_node, on_finished) ->
-        $li = null
+        $el = null
 
         addLoadingClass = =>
-            if parent_node
+            if not parent_node
+                $el = @element
+            else
                 folder_element = new FolderElement(parent_node, this)
+                $el = folder_element.getLi()
 
-                $li = folder_element.getLi()
-                $li.addClass('jqtree-loading')
+            $el.addClass('jqtree-loading')
 
         removeLoadingClass = =>
-            if $li
-                $li.removeClass('loading')
+            if $el
+                $el.removeClass('jqtree-loading')
 
         parseUrlInfo = =>
             if $.type(url_info) == 'string'
