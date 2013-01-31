@@ -1151,7 +1151,9 @@ limitations under the License.
         max_level = parseInt(this.options.autoOpen);
       }
       return this.tree.iterate(function(node, level) {
-        node.is_open = true;
+        if (node.hasChildren()) {
+          node.is_open = true;
+        }
         return level !== max_level;
       });
     };
