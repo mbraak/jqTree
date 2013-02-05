@@ -797,6 +797,7 @@ limitations under the License.
       onIsMoveHandle: null,
       onCanMove: null,
       onCanMoveTo: null,
+      onLoadFailed: null,
       autoEscape: true,
       dataUrl: null,
       slide: true,
@@ -873,6 +874,7 @@ limitations under the License.
         dataType: 'json',
         success: function(response) {
           var data;
+          parent_node.load_on_demand = false;
           if ($.isArray(response) || typeof response === 'object') {
             data = response;
           } else {
@@ -882,6 +884,11 @@ limitations under the License.
           _this._loadData(data, parent_node);
           if (on_finished) {
             return on_finished();
+          }
+        },
+        error: function(response) {
+          if (_this.options.onLoadFailed) {
+            return _this.options.onLoadFailed(response);
           }
         }
       });
@@ -958,7 +965,6 @@ limitations under the License.
       if (slide == null) {
         slide = true;
       }
-      node.load_on_demand = false;
       return this.loadDataFromUrl(this._getDataUrlInfo(node), node, function() {
         return _this._openNode(node, slide, on_finished);
       });
