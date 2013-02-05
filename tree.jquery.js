@@ -797,6 +797,7 @@ limitations under the License.
       onIsMoveHandle: null,
       onCanMove: null,
       onCanMoveTo: null,
+      onLoadFailed: null,
       autoEscape: true,
       dataUrl: null,
       slide: true,
@@ -883,6 +884,11 @@ limitations under the License.
           _this._loadData(data, parent_node);
           if (on_finished) {
             return on_finished();
+          }
+        },
+        error: function(response) {
+          if (_this.options.onLoadFailed) {
+            return _this.options.onLoadFailed(response);
           }
         }
       });
