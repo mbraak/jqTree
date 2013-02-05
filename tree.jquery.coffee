@@ -476,6 +476,7 @@ class JqTreeWidget extends MouseWidget
         onIsMoveHandle: null
         onCanMove: null  # Can this node be moved? function(node)
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
+        onLoadFailed: null
         autoEscape: true
         dataUrl: null
         slide: true  # must display slide animation?
@@ -537,6 +538,7 @@ class JqTreeWidget extends MouseWidget
             cache: false
             dataType: 'json'
             success: (response) =>
+                parent_node.load_on_demand = false
                 if $.isArray(response) or typeof response == 'object'
                     data = response
                 else
@@ -547,6 +549,9 @@ class JqTreeWidget extends MouseWidget
 
                 if on_finished
                     on_finished()
+            error: (response) =>
+                if @options.onLoadFailed
+                    @options.onLoadFailed(response)
         )
 
     _loadData: (data, parent_node) ->
@@ -597,8 +602,6 @@ class JqTreeWidget extends MouseWidget
                 @_saveState()
 
     _loadFolderOnDemand: (node, slide=true, on_finished) ->
-        node.load_on_demand = false
-
         @loadDataFromUrl(
             @_getDataUrlInfo(node),
             node,
