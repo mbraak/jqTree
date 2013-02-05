@@ -537,6 +537,7 @@ class JqTreeWidget extends MouseWidget
             cache: false
             dataType: 'json'
             success: (response) =>
+                parent_node.load_on_demand = false
                 if $.isArray(response) or typeof response == 'object'
                     data = response
                 else
@@ -597,8 +598,6 @@ class JqTreeWidget extends MouseWidget
                 @_saveState()
 
     _loadFolderOnDemand: (node, slide=true, on_finished) ->
-        node.load_on_demand = false
-
         @loadDataFromUrl(
             @_getDataUrlInfo(node),
             node,
