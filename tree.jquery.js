@@ -874,7 +874,6 @@ limitations under the License.
         dataType: 'json',
         success: function(response) {
           var data;
-          parent_node.load_on_demand = false;
           if ($.isArray(response) || typeof response === 'object') {
             data = response;
           } else {
@@ -966,6 +965,7 @@ limitations under the License.
         slide = true;
       }
       return this.loadDataFromUrl(this._getDataUrlInfo(node), node, function() {
+        node.load_on_demand = false;
         return _this._openNode(node, slide, on_finished);
       });
     };
