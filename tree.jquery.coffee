@@ -549,6 +549,8 @@ class JqTreeWidget extends MouseWidget
                 if on_finished
                     on_finished()
             error: (response) =>
+                removeLoadingClass()
+
                 if @options.onLoadFailed
                     @options.onLoadFailed(response)
         )

@@ -886,6 +886,7 @@ limitations under the License.
           }
         },
         error: function(response) {
+          removeLoadingClass();
           if (_this.options.onLoadFailed) {
             return _this.options.onLoadFailed(response);
           }
