@@ -1285,7 +1285,7 @@ limitations under the License.
             this._triggerEvent('tree.click', {
               node: node
             });
-            return this.selectNode(node);
+            return this.select_node_handler.selectNode(node, true);
           }
         }
       }
@@ -1711,29 +1711,54 @@ limitations under the License.
       this.tree_widget = tree_widget;
     }
 
-    SelectNodeHandler.prototype.selectNode = function(node) {
-      var canSelect, parent,
+    SelectNodeHandler.prototype.selectNode = function(node, must_toggle) {
+      var canSelect, mustToggle, node_element, parent, previous_node,
         _this = this;
+      if (must_toggle == null) {
+        must_toggle = false;
+      }
       canSelect = function() {
         if (!_this.tree_widget.options.onCanSelectNode) {
           return true;
         }
         return _this.tree_widget.options.onCanSelectNode(node);
       };
+      mustToggle = function(previous_node, node) {
+        if (must_toggle && previous_node && node) {
+          if (node.id) {
+            return node.id === previous_node.id;
+          } else {
+            return node.element === previous_node.element;
+          }
+        } else {
+          return false;
+        }
+      };
       if (canSelect()) {
         if (this.tree_widget.selected_node) {
-          this.tree_widget._getNodeElementForNode(this.tree_widget.selected_node).deselect();
+          previous_node = this.tree_widget.selected_node;
+          this.tree_widget._getNodeElementForNode(previous_node).deselect();
           this.tree_widget.selected_node = null;
+        } else {
+          previous_node = null;
         }
         if (node) {
-          this.tree_widget._getNodeElementForNode(node).select();
-          this.tree_widget.selected_node = node;
-          this.tree_widget._triggerEvent('tree.select', {
-            node: node
-          });
-          parent = this.tree_widget.selected_node.parent;
-          if (!parent.is_open) {
-            this.tree_widget.openNode(parent, false);
+          node_element = this.tree_widget._getNodeElementForNode(node);
+          if (mustToggle(previous_node, node)) {
+            node_element.deselect();
+            this.tree_widget._triggerEvent('tree.select', {
+              node: null
+            });
+          } else {
+            node_element.select();
+            this.tree_widget.selected_node = node;
+            this.tree_widget._triggerEvent('tree.select', {
+              node: node
+            });
+            parent = this.tree_widget.selected_node.parent;
+            if (!parent.is_open) {
+              this.tree_widget.openNode(parent, false);
+            }
           }
         }
         if (this.tree_widget.options.saveState) {
