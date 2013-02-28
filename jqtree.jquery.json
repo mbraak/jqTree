@@ -11,7 +11,7 @@
     },
     "homepage": "http://mbraak.github.com/jqTree/",
     "download": "https://github.com/mbraak/jqTree/tarball/master",
-    "license": [
+    "licenses": [
         {
             "type": "Apache-2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0"
