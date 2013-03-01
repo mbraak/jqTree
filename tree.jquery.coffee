@@ -561,13 +561,8 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data, false, @options.nodeClass)
         else
-            subtree = new @options.nodeClass('')
-            subtree._setParent(parent_node.tree)
-            subtree.loadFromData(data)
-
-            for child in subtree.children
-                parent_node.addChild(child)
-
+            parent_node.loadFromData(data)
+            parent_node.load_on_demand = false
             @_refreshElements(parent_node.parent)
 
         if @is_dragging
@@ -607,7 +602,6 @@ class JqTreeWidget extends MouseWidget
             @_getDataUrlInfo(node),
             node,
             =>
-                node.load_on_demand = false
                 @_openNode(node, slide, on_finished)
         )
 

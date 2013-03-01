@@ -895,21 +895,14 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._loadData = function(data, parent_node) {
-      var child, subtree, _i, _len, _ref;
       this._triggerEvent('tree.load_data', {
         tree_data: data
       });
       if (!parent_node) {
         this._initTree(data, false, this.options.nodeClass);
       } else {
-        subtree = new this.options.nodeClass('');
-        subtree._setParent(parent_node.tree);
-        subtree.loadFromData(data);
-        _ref = subtree.children;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          child = _ref[_i];
-          parent_node.addChild(child);
-        }
+        parent_node.loadFromData(data);
+        parent_node.load_on_demand = false;
         this._refreshElements(parent_node.parent);
       }
       if (this.is_dragging) {
@@ -966,7 +959,6 @@ limitations under the License.
         slide = true;
       }
       return this.loadDataFromUrl(this._getDataUrlInfo(node), node, function() {
-        node.load_on_demand = false;
         return _this._openNode(node, slide, on_finished);
       });
     };
