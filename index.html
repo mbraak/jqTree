@@ -657,15 +657,26 @@ $('#tree1').tree('loadData', data, node);
         <strong>function loadDataFromUrl(url);</strong>
         <br>
         <strong>function loadDataFromUrl(url, parent_node);</strong>
+        <br>
+        <strong>function loadDataFromUrl(parent_node);</strong>
     </p>
 
     <p>
-        Load the data from an url:
+        Load data in the tree from an url using ajax. You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
     </p>
 
 <pre><code class="language-javascript">
 $('#tree1').tree('loadDataFromUrl', '/category/tree/');
 </code></pre>
+
+    <p>
+        Load a subtree:
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').getNodeById(123);
+$('#tree1').tree('loadDataFromUrl', '/category/tree/123', node);
+</code></pre>    
 
     <h5 id="functions-tojson">toJson</h5>
     <p>
