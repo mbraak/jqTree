@@ -695,6 +695,25 @@ var node = $tree.tree('getNodeById', 456);
 $tree.tree('loadDataFromUrl', node);
 </code></pre>
 
+    <p>
+        You can also add an <strong>on_finished</strong> callback parameter that will be called when the data is loaded:
+    </p>
+    <p>
+        <strong>function loadDataFromUrl(url, parent_node, on_finished);</strong>
+        <br>
+        <strong>function loadDataFromUrl(parent_node, on_finished);</strong>
+    </p>
+
+<pre><code class="language-javascript">$('#tree1').tree(
+    'loadDataFromUrl',
+    '/category/tree/123',
+    null,
+    function() {
+        alert('data is loaded');
+    }
+);
+</code></pre>
+
     <h5 id="functions-tojson">toJson</h5>
     <p>
         <strong>function toJson();</strong>
