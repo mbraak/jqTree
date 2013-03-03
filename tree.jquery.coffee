@@ -505,7 +505,17 @@ class JqTreeWidget extends MouseWidget
     loadData: (data, parent_node) ->
         @_loadData(data, parent_node)
 
-    loadDataFromUrl: (url_info, parent_node, on_finished) ->
+    loadDataFromUrl: (url, parent_node, on_finished) ->
+        if $.type(url) != 'string'
+            # Url parameter is omitted
+            parent_node = url
+            on_finished = parent_node
+            url = null
+            on_finished = null
+
+        @_loadDataFromUrl(url, parent_node, on_finished)
+
+    _loadDataFromUrl: (url_info, parent_node, on_finished) ->
         $el = null
 
         addLoadingClass = =>
@@ -529,6 +539,11 @@ class JqTreeWidget extends MouseWidget
                 url_info.method = 'get'
 
         addLoadingClass()
+
+        if not url_info
+            # Generate url for node
+            url_info = @_getDataUrlInfo(parent_node)
+
         parseUrlInfo()
 
         $.ajax(
@@ -546,7 +561,7 @@ class JqTreeWidget extends MouseWidget
                 removeLoadingClass()                
                 @_loadData(data, parent_node)
 
-                if on_finished
+                if on_finished and $.isFunction(on_finished)
                     on_finished()
             error: (response) =>
                 removeLoadingClass()
@@ -598,8 +613,8 @@ class JqTreeWidget extends MouseWidget
                 @_saveState()
 
     _loadFolderOnDemand: (node, slide=true, on_finished) ->
-        @loadDataFromUrl(
-            @_getDataUrlInfo(node),
+        @_loadDataFromUrl(
+            null,
             node,
             =>
                 @_openNode(node, slide, on_finished)
@@ -731,7 +746,7 @@ class JqTreeWidget extends MouseWidget
         if @options.data
             @loadData(@options.data)
         else
-            @loadDataFromUrl(@_getDataUrlInfo())
+            @_loadDataFromUrl(@_getDataUrlInfo())
 
     _getDataUrlInfo: (node) ->
         data_url = @options.dataUrl or @element.data('url')

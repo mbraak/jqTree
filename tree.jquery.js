@@ -835,7 +835,17 @@ limitations under the License.
       return this._loadData(data, parent_node);
     };
 
-    JqTreeWidget.prototype.loadDataFromUrl = function(url_info, parent_node, on_finished) {
+    JqTreeWidget.prototype.loadDataFromUrl = function(url, parent_node, on_finished) {
+      if ($.type(url) !== 'string') {
+        parent_node = url;
+        on_finished = parent_node;
+        url = null;
+        on_finished = null;
+      }
+      return this._loadDataFromUrl(url, parent_node, on_finished);
+    };
+
+    JqTreeWidget.prototype._loadDataFromUrl = function(url_info, parent_node, on_finished) {
       var $el, addLoadingClass, parseUrlInfo, removeLoadingClass,
         _this = this;
       $el = null;
@@ -865,6 +875,9 @@ limitations under the License.
         }
       };
       addLoadingClass();
+      if (!url_info) {
+        url_info = this._getDataUrlInfo(parent_node);
+      }
       parseUrlInfo();
       return $.ajax({
         url: url_info.url,
@@ -881,7 +894,7 @@ limitations under the License.
           }
           removeLoadingClass();
           _this._loadData(data, parent_node);
-          if (on_finished) {
+          if (on_finished && $.isFunction(on_finished)) {
             return on_finished();
           }
         },
@@ -958,7 +971,7 @@ limitations under the License.
       if (slide == null) {
         slide = true;
       }
-      return this.loadDataFromUrl(this._getDataUrlInfo(node), node, function() {
+      return this._loadDataFromUrl(null, node, function() {
         return _this._openNode(node, slide, on_finished);
       });
     };
@@ -1101,7 +1114,7 @@ limitations under the License.
       if (this.options.data) {
         return this.loadData(this.options.data);
       } else {
-        return this.loadDataFromUrl(this._getDataUrlInfo());
+        return this._loadDataFromUrl(this._getDataUrlInfo());
       }
     };
 
