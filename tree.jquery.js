@@ -914,6 +914,9 @@ limitations under the License.
       if (!parent_node) {
         this._initTree(data, false, this.options.nodeClass);
       } else {
+        if (parent_node === this.selected_node) {
+          this.selected_node = null;
+        }
         parent_node.loadFromData(data);
         parent_node.load_on_demand = false;
         this._refreshElements(parent_node.parent);

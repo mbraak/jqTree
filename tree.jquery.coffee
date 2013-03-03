@@ -576,6 +576,9 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data, false, @options.nodeClass)
         else
+            if parent_node == @selected_node
+                @selected_node = null
+
             parent_node.loadFromData(data)
             parent_node.load_on_demand = false
             @_refreshElements(parent_node.parent)
