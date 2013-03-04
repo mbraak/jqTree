@@ -17,15 +17,15 @@ var example_data = [
         label: 'node1',
         id: 123,  // extra data
         children: [
-            { label: 'child1' },
-            { label: 'child2' }
+            { label: 'child1', id: 125 },
+            { label: 'child2', id: 126 }
         ]
     },
     {
         label: 'node2',
         id: 124,
         children: [
-            { label: 'child3' }
+            { label: 'child3', id: 127 }
         ]
     }
 ];
@@ -302,8 +302,8 @@ test("toJson", function() {
     equal(
         $tree.tree('toJson'),
         '[{"name":"node1","id":123,"children":'+
-        '[{"name":"child1"},{"name":"child2"}]},'+
-        '{"name":"node2","id":124,"children":[{"name":"child3"}]}]'
+        '[{"name":"child1","id":125},{"name":"child2","id":126}]},'+
+        '{"name":"node2","id":124,"children":[{"name":"child3","id":127}]}]'
     );
 
     // Check that properties 'children', 'parent' and 'element' still exist.
@@ -1038,17 +1038,17 @@ test("create tree from data", function() {
         );
     }
 
-    // 1. create tree from example data
+    // - create tree from example data
     var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
     checkData(tree);
 
-    // 2. create tree from new data format
+    // - create tree from new data format
     var data = [
         {
             label: 'node1',
-            id: 123,  // extra data
-            children: ['child1', 'child2']
+            id: 123,
+            children: ['child1', 'child2']  // nodes are only defined by a string
         },
         {
             label: 'node2',
@@ -1523,6 +1523,54 @@ test('getLevel', function() {
     // 1. get level for node1 and child1
     equal(tree.getNodeByName('node1').getLevel(), 1);
     equal(tree.getNodeByName('child1').getLevel(), 2);
+});
+
+test('loadFromData and id mapping', function() {
+    // - get node from empty tree
+    var tree = new Tree.Node(null, true);
+    equal(tree.getNodeById(999), null);
+
+    // - load example data in tree
+    tree.loadFromData(example_data);
+    equal(tree.getNodeById(124).name, 'node2');
+
+    var child2 = tree.getNodeById(126);
+    child2.addChild(
+        new Tree.Node({label: 'child4', id: 128})
+    );
+    child2.addChild(
+        new Tree.Node({label: 'child5', id: 129})
+    );
+
+    // - load data in node child2
+    child2.loadFromData(['abc', 'def']);
+
+    equal(tree.getNodeById(128), null);
+    equal(child2.children.length, 2);
+    equal(child2.children[0].name, 'abc');
+});
+
+test('removeChildren', function() {
+    // - load example data
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData(example_data);
+
+    // add child4 and child5
+    var child2 = tree.getNodeById(126);
+    equal(child2.name, 'child2');
+
+    child2.addChild(
+        new Tree.Node({label: 'child4', id: 128})
+    );
+    child2.addChild(
+        new Tree.Node({label: 'child5', id: 129})
+    );
+    equal(tree.getNodeById(128).name, 'child4');
+
+    // - remove children from child2
+    child2.removeChildren();
+    equal(tree.getNodeById(128), null);
+    equal(child2.children.length, 0);
 });
 
 module('util');

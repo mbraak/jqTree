@@ -465,7 +465,7 @@ limitations under the License.
 
     Node.prototype.loadFromData = function(data) {
       var node, o, _i, _len;
-      this.children = [];
+      this.removeChildren();
       for (_i = 0, _len = data.length; _i < _len; _i++) {
         o = data[_i];
         node = new this.tree.node_class(o);
@@ -513,18 +513,18 @@ limitations under the License.
     };
 
     /*
-    Remove child.
+    Remove child. This also removes the children of the node.
     
     tree.removeChild(tree.children[0]);
     */
 
 
     Node.prototype.removeChild = function(node) {
-      var _this = this;
-      node.iterate(function(child) {
-        _this.tree.removeNodeFromIndex(child);
-        return true;
-      });
+      node.removeChildren();
+      return this._removeChild(node);
+    };
+
+    Node.prototype._removeChild = function(node) {
       this.children.splice(this.getChildIndex(node), 1);
       return this.tree.removeNodeFromIndex(node);
     };
@@ -610,7 +610,7 @@ limitations under the License.
       if (moved_node.isParentOf(target_node)) {
         return;
       }
-      moved_node.parent.removeChild(moved_node);
+      moved_node.parent._removeChild(moved_node);
       if (position === Position.AFTER) {
         return target_node.parent.addChildAtPosition(moved_node, target_node.parent.getChildIndex(target_node) + 1);
       } else if (position === Position.BEFORE) {
@@ -765,6 +765,15 @@ limitations under the License.
       if (node.id) {
         return delete this.id_mapping[node.id];
       }
+    };
+
+    Node.prototype.removeChildren = function() {
+      var _this = this;
+      this.iterate(function(child) {
+        _this.tree.removeNodeFromIndex(child);
+        return true;
+      });
+      return this.children = [];
     };
 
     return Node;

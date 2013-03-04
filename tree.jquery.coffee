@@ -197,7 +197,7 @@ class Node
     ]
     ###
     loadFromData: (data) ->
-        @children = []
+        @removeChildren()
 
         for o in data
             node = new @tree.node_class(o)
@@ -237,23 +237,22 @@ class Node
         @tree.addNodeToIndex(this)
 
     ###
-    Remove child.
+    Remove child. This also removes the children of the node.
 
     tree.removeChild(tree.children[0]);
     ###
     removeChild: (node) ->
         # remove children from the index
-        node.iterate(
-            (child) =>
-                @tree.removeNodeFromIndex(child)
-                return true
-        )
+        node.removeChildren()
 
+        @_removeChild(node)
+
+    _removeChild: (node) ->
         @children.splice(
             @getChildIndex(node),
             1
         )
-        @tree.removeNodeFromIndex(node)
+        @tree.removeNodeFromIndex(node)        
 
     ###
     Get child index.
@@ -319,7 +318,7 @@ class Node
             # Node is parent of target node. This is an illegal move
             return
 
-        moved_node.parent.removeChild(moved_node)
+        moved_node.parent._removeChild(moved_node)
         if position == Position.AFTER
             target_node.parent.addChildAtPosition(
                 moved_node,
@@ -455,6 +454,15 @@ class Node
     removeNodeFromIndex: (node) ->
         if node.id
             delete @id_mapping[node.id]
+
+    removeChildren: ->
+        @iterate(
+            (child) =>
+                @tree.removeNodeFromIndex(child)
+                return true
+        )
+
+        @children = []
 
 
 @Tree.Node = Node
