@@ -922,8 +922,9 @@ limitations under the License.
       });
       if (!parent_node) {
         this._initTree(data, false, this.options.nodeClass);
+        this.selected_node = null;
       } else {
-        if (parent_node === this.selected_node) {
+        if (this.selected_node && parent_node.isParentOf(this.selected_node)) {
           this.selected_node = null;
         }
         parent_node.loadFromData(data);
