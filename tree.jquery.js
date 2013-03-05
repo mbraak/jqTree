@@ -1130,7 +1130,7 @@ limitations under the License.
 
     JqTreeWidget.prototype._initData = function() {
       if (this.options.data) {
-        return this.loadData(this.options.data);
+        return this._loadData(this.options.data);
       } else {
         return this._loadDataFromUrl(this._getDataUrlInfo());
       }

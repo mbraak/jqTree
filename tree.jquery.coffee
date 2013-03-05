@@ -761,7 +761,7 @@ class JqTreeWidget extends MouseWidget
 
     _initData: ->
         if @options.data
-            @loadData(@options.data)
+            @_loadData(@options.data)
         else
             @_loadDataFromUrl(@_getDataUrlInfo())
 
