@@ -513,6 +513,9 @@ class JqTreeWidget extends MouseWidget
     loadData: (data, parent_node) ->
         @_loadData(data, parent_node)
 
+        if not parent_node
+            @selected_node = null
+
     loadDataFromUrl: (url, parent_node, on_finished) ->
         if $.type(url) != 'string'
             # Url parameter is omitted
@@ -522,6 +525,9 @@ class JqTreeWidget extends MouseWidget
             on_finished = null
 
         @_loadDataFromUrl(url, parent_node, on_finished)
+
+        if not parent_node
+            @selected_node = null
 
     _loadDataFromUrl: (url_info, parent_node, on_finished) ->
         $el = null
@@ -583,7 +589,6 @@ class JqTreeWidget extends MouseWidget
 
         if not parent_node
             @_initTree(data, false, @options.nodeClass)
-            @selected_node = null
         else
             if @selected_node and parent_node.isParentOf(@selected_node)
                 @selected_node = null
@@ -782,8 +787,6 @@ class JqTreeWidget extends MouseWidget
         @_openNodes()
         @_refreshElements()
 
-        @select_node_handler.selectCurrentNode()
-
         @_triggerEvent('tree.init')
 
     _openNodes: ->
@@ -831,9 +834,16 @@ class JqTreeWidget extends MouseWidget
             return $li
 
         createNodeLi = (node) =>
+            li_classes = ['jqtree_common']
+
+            if node == @selected_node
+                li_classes.push('jqtree-selected')
+
+            class_string = li_classes.join(' ')
+
             escaped_name = escapeIfNecessary(node.name)
             return $(
-                "<li class=\"jqtree_common\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>"
+                "<li class=\"#{ class_string }\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>"
             )
 
         createFolderLi = (node) =>
@@ -845,11 +855,14 @@ class JqTreeWidget extends MouseWidget
 
                 return classes.join(' ')
 
-            getFolderClasses = ->
+            getFolderClasses = =>
                 classes = ['jqtree-folder']
 
                 if not node.is_open
                     classes.push('jqtree-closed')
+
+                if node == @selected_node
+                    classes.push('jqtree-selected')
 
                 return classes.join(' ')
 

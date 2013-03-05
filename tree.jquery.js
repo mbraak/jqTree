@@ -841,7 +841,10 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.loadData = function(data, parent_node) {
-      return this._loadData(data, parent_node);
+      this._loadData(data, parent_node);
+      if (!parent_node) {
+        return this.selected_node = null;
+      }
     };
 
     JqTreeWidget.prototype.loadDataFromUrl = function(url, parent_node, on_finished) {
@@ -851,7 +854,10 @@ limitations under the License.
         url = null;
         on_finished = null;
       }
-      return this._loadDataFromUrl(url, parent_node, on_finished);
+      this._loadDataFromUrl(url, parent_node, on_finished);
+      if (!parent_node) {
+        return this.selected_node = null;
+      }
     };
 
     JqTreeWidget.prototype._loadDataFromUrl = function(url_info, parent_node, on_finished) {
@@ -922,7 +928,6 @@ limitations under the License.
       });
       if (!parent_node) {
         this._initTree(data, false, this.options.nodeClass);
-        this.selected_node = null;
       } else {
         if (this.selected_node && parent_node.isParentOf(this.selected_node)) {
           this.selected_node = null;
@@ -1157,7 +1162,6 @@ limitations under the License.
       this.tree.loadFromData(data);
       this._openNodes();
       this._refreshElements();
-      this.select_node_handler.selectCurrentNode();
       return this._triggerEvent('tree.init');
     };
 
@@ -1218,9 +1222,14 @@ limitations under the License.
         return $li;
       };
       createNodeLi = function(node) {
-        var escaped_name;
+        var class_string, escaped_name, li_classes;
+        li_classes = ['jqtree_common'];
+        if (node === _this.selected_node) {
+          li_classes.push('jqtree-selected');
+        }
+        class_string = li_classes.join(' ');
         escaped_name = escapeIfNecessary(node.name);
-        return $("<li class=\"jqtree_common\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">" + escaped_name + "</span></div></li>");
+        return $("<li class=\"" + class_string + "\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">" + escaped_name + "</span></div></li>");
       };
       createFolderLi = function(node) {
         var button_char, button_classes, escaped_name, folder_classes, getButtonClasses, getFolderClasses;
@@ -1237,6 +1246,9 @@ limitations under the License.
           classes = ['jqtree-folder'];
           if (!node.is_open) {
             classes.push('jqtree-closed');
+          }
+          if (node === _this.selected_node) {
+            classes.push('jqtree-selected');
           }
           return classes.join(' ');
         };
