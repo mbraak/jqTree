@@ -1,15 +1,29 @@
-{% extends "base.tmpl" %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>jqTree - Example 5 - Load nodes on demand from the server</title>
+    <link rel="stylesheet" href="../extra/css/gridless.css">
+    <link rel="stylesheet" href="../extra/prism/prism.css">
+    <link rel="stylesheet" href="example.css">
+    <link rel="stylesheet" href="../jqtree.css">
+    <script src="../extra/js/jquery-1.9.1.min.js"></script>
+    <script src="../extra/prism/prism.js"></script>
+    <script src="../extra/js/jquery.mockjax.js"></script>
+    <script src="../extra/example_data.js"></script>
+    <script src="../tree.jquery.js"></script>
+</head>
+<body>
+    <p id="nav">
+        <a href="save_state.html">&laquo; Example 4</a>
+        
+            <a href="autoescape.html" class="next">Example 6 &raquo;</a>
+        
+    </p>
 
-{% block title %}Example 5{% endblock %}
-{% block h1 %}Example 5 - Load nodes on demand from the server{% endblock %}
+    <h1>Example 5 - Load nodes on demand from the server</h1>
 
-{% block previous_url %}example4.html{% endblock %}
-{% block previous_title %}Example 4{% endblock %}
-
-{% block next_url %}example6.html{% endblock %}"
-{% block next_title %}Example 6{% endblock %}
-
-{% block contents %}
+    
     <div id="tree1" data-url="/nodes/"></div>
 
     <p>
@@ -87,4 +101,6 @@ $('#tree1').tree({
             });
         });
     </script>
-{% endblock %}
+
+</body>
+</html>

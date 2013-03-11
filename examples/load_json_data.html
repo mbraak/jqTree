@@ -1,15 +1,29 @@
-{% extends "base.tmpl" %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>jqTree - Example 1 - load json data</title>
+    <link rel="stylesheet" href="../extra/css/gridless.css">
+    <link rel="stylesheet" href="../extra/prism/prism.css">
+    <link rel="stylesheet" href="example.css">
+    <link rel="stylesheet" href="../jqtree.css">
+    <script src="../extra/js/jquery-1.9.1.min.js"></script>
+    <script src="../extra/prism/prism.js"></script>
+    <script src="../extra/js/jquery.mockjax.js"></script>
+    <script src="../extra/example_data.js"></script>
+    <script src="../tree.jquery.js"></script>
+</head>
+<body>
+    <p id="nav">
+        <a href="../index.html">&laquo; Documentation</a>
+        
+            <a href="load_json_data_from_server.html" class="next">Example 2 &raquo;</a>
+        
+    </p>
 
-{% block title %}Example 1{% endblock %}
-{% block h1 %}Example 1 - the data option{% endblock %}
+    <h1>Example 1 - load json data</h1>
 
-{% block previous_url %}../index.html{% endblock %}
-{% block previous_title %}Documentation{% endblock %}
-
-{% block next_url %}example2.html{% endblock %}"
-{% block next_title %}Example 2{% endblock %}
-
-{% block contents %}
+    
     <div id="tree1"></div>
 
     <p>
@@ -74,4 +88,6 @@ $('#tree1').tree({
             });
         });
     </script>
-{% endblock %}
+
+</body>
+</html>
