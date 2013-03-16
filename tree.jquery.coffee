@@ -1,5 +1,5 @@
 ###
-Copyright 2012 Marco Braak
+Copyright 2013 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,18 +18,22 @@ limitations under the License.
 $ = @jQuery
 
 # Standard javascript indexOf. Implemented here because not all browsers support it.
+_indexOf = (array, item) ->
+    for value, i in array
+        if value == item
+            return i
+    return -1
+
 indexOf = (array, item) ->
     if array.indexOf
         # The browser supports indexOf
         return array.indexOf(item)
     else
         # Do our own indexOf
-        for value, i in array
-            if value == item
-                return i
-        return -1
+        return _indexOf(array, item)
 
 @Tree.indexOf = indexOf
+@Tree._indexOf = _indexOf
 
 # JSON.stringify function; copied from json2
 if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
@@ -135,11 +139,16 @@ Position.strings = ['before', 'after', 'inside', 'none']
 @Tree.Position = Position
 
 class Node
-    constructor: (o) ->
+    constructor: (o, is_root=false, node_class=Node) ->
         @setData(o)
 
         @children = []
         @parent = null
+
+        if is_root
+            @id_mapping = {}
+            @tree = this
+            @node_class = node_class
 
     setData: (o) ->
         if typeof o != 'object'
@@ -162,7 +171,7 @@ class Node
 
         addChildren = (children_data) =>
             for child in children_data
-                node = new Node('')
+                node = new @tree.node_class('')
                 node.initFromData(child)
                 @addChild(node)
             return null
@@ -188,10 +197,10 @@ class Node
     ]
     ###
     loadFromData: (data) ->
-        @children = []
+        @removeChildren()
 
         for o in data
-            node = new Node(o)
+            node = new @tree.node_class(o)
             @addChild(node)
 
             if typeof o == 'object' and o.children
@@ -228,23 +237,22 @@ class Node
         @tree.addNodeToIndex(this)
 
     ###
-    Remove child.
+    Remove child. This also removes the children of the node.
 
     tree.removeChild(tree.children[0]);
     ###
     removeChild: (node) ->
         # remove children from the index
-        node.iterate(
-            (child) =>
-                @tree.removeNodeFromIndex(child)
-                return true
-        )
+        node.removeChildren()
 
+        @_removeChild(node)
+
+    _removeChild: (node) ->
         @children.splice(
             @getChildIndex(node),
             1
         )
-        @tree.removeNodeFromIndex(node)
+        @tree.removeNodeFromIndex(node)        
 
     ###
     Get child index.
@@ -310,7 +318,7 @@ class Node
             # Node is parent of target node. This is an illegal move
             return
 
-        moved_node.parent.removeChild(moved_node)
+        moved_node.parent._removeChild(moved_node)
         if position == Position.AFTER
             target_node.parent.addChildAtPosition(
                 moved_node,
@@ -369,7 +377,7 @@ class Node
         if not @parent
             return null
         else
-            node = new Node(node_info)
+            node = new @tree.node_class(node_info)
 
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index + 1)
@@ -379,16 +387,17 @@ class Node
         if not @parent
             return null
         else
-            node = new Node(node_info)
+            node = new @tree.node_class(node_info)
 
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index)
+            return node
 
     addParent: (node_info) ->
         if not @parent
             return null
         else
-            new_parent = new Node(node_info)
+            new_parent = new @tree.node_class(node_info)
             new_parent._setParent(@tree)
             original_parent = @parent
 
@@ -405,12 +414,12 @@ class Node
             @parent = null
 
     append: (node_info) ->
-        node = new Node(node_info)
+        node = new @tree.node_class(node_info)
         @addChild(node)
         return node
 
     prepend: (node_info) ->
-        node = new Node(node_info)
+        node = new @tree.node_class(node_info)
         @addChildAtPosition(node, 0)
         return node
 
@@ -425,13 +434,15 @@ class Node
 
         return false
 
+    getLevel: ->
+        level = 0
+        node = this
 
-class Tree extends Node
-    constructor: (o) ->
-        super(o, null, true)
+        while node.parent
+            level += 1
+            node = node.parent
 
-        @id_mapping = {}
-        @tree = this
+        return level
 
     getNodeById: (node_id) ->
         return @id_mapping[node_id]
@@ -444,7 +455,16 @@ class Tree extends Node
         if node.id
             delete @id_mapping[node.id]
 
-@Tree.Tree = Tree
+    removeChildren: ->
+        @iterate(
+            (child) =>
+                @tree.removeNodeFromIndex(child)
+                return true
+        )
+
+        @children = []
+
+
 @Tree.Node = Node
 
 TRIANGLE_RIGHT = '&#x25ba;'  # ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
@@ -464,9 +484,11 @@ class JqTreeWidget extends MouseWidget
         onIsMoveHandle: null
         onCanMove: null  # Can this node be moved? function(node)
         onCanMoveTo: null  # Can this node be moved to this position? function(moved_node, target_node, position)
+        onLoadFailed: null
         autoEscape: true
         dataUrl: null
         slide: true  # must display slide animation?
+        nodeClass: Node
 
     toggle: (node, slide=true) ->
         if node.is_open
@@ -491,19 +513,37 @@ class JqTreeWidget extends MouseWidget
     loadData: (data, parent_node) ->
         @_loadData(data, parent_node)
 
-    loadDataFromUrl: (url_info, parent_node, on_finished) ->
-        $li = null
+        if not parent_node
+            @selected_node = null
+
+    loadDataFromUrl: (url, parent_node, on_finished) ->
+        if $.type(url) != 'string'
+            # Url parameter is omitted
+            parent_node = url
+            on_finished = parent_node
+            url = null
+            on_finished = null
+
+        @_loadDataFromUrl(url, parent_node, on_finished)
+
+        if not parent_node
+            @selected_node = null
+
+    _loadDataFromUrl: (url_info, parent_node, on_finished) ->
+        $el = null
 
         addLoadingClass = =>
-            if parent_node
+            if not parent_node
+                $el = @element
+            else
                 folder_element = new FolderElement(parent_node, this)
+                $el = folder_element.getLi()
 
-                $li = folder_element.getLi()
-                $li.addClass('jqtree-loading')
+            $el.addClass('jqtree-loading')
 
         removeLoadingClass = =>
-            if $li
-                $li.removeClass('loading')
+            if $el
+                $el.removeClass('jqtree-loading')
 
         parseUrlInfo = =>
             if $.type(url_info) == 'string'
@@ -513,6 +553,11 @@ class JqTreeWidget extends MouseWidget
                 url_info.method = 'get'
 
         addLoadingClass()
+
+        if not url_info
+            # Generate url for node
+            url_info = @_getDataUrlInfo(parent_node)
+
         parseUrlInfo()
 
         $.ajax(
@@ -530,23 +575,26 @@ class JqTreeWidget extends MouseWidget
                 removeLoadingClass()                
                 @_loadData(data, parent_node)
 
-                if on_finished
+                if on_finished and $.isFunction(on_finished)
                     on_finished()
+            error: (response) =>
+                removeLoadingClass()
+
+                if @options.onLoadFailed
+                    @options.onLoadFailed(response)
         )
 
     _loadData: (data, parent_node) ->
         @_triggerEvent('tree.load_data', tree_data: data)
 
         if not parent_node
-            @_initTree(data)
+            @_initTree(data, false, @options.nodeClass)
         else
-            subtree = new Node('')
-            subtree._setParent(parent_node.tree)
-            subtree.loadFromData(data)
+            if @selected_node and parent_node.isParentOf(@selected_node)
+                @selected_node = null
 
-            for child in subtree.children
-                parent_node.addChild(child)
-
+            parent_node.loadFromData(data)
+            parent_node.load_on_demand = false
             @_refreshElements(parent_node.parent)
 
         if @is_dragging
@@ -582,10 +630,8 @@ class JqTreeWidget extends MouseWidget
                 @_saveState()
 
     _loadFolderOnDemand: (node, slide=true, on_finished) ->
-        node.load_on_demand = false
-
-        @loadDataFromUrl(
-            @_getDataUrlInfo(node),
+        @_loadDataFromUrl(
+            null,
             node,
             =>
                 @_openNode(node, slide, on_finished)
@@ -715,9 +761,9 @@ class JqTreeWidget extends MouseWidget
 
     _initData: ->
         if @options.data
-            @loadData(@options.data)
+            @_loadData(@options.data)
         else
-            @loadDataFromUrl(@_getDataUrlInfo())
+            @_loadDataFromUrl(@_getDataUrlInfo())
 
     _getDataUrlInfo: (node) ->
         data_url = @options.dataUrl or @element.data('url')
@@ -735,13 +781,11 @@ class JqTreeWidget extends MouseWidget
             return data_url
 
     _initTree: (data) ->
-        @tree = new Tree()
+        @tree = new @options.nodeClass(null, true, @options.nodeClass)
         @tree.loadFromData(data)
 
         @_openNodes()
         @_refreshElements()
-
-        @select_node_handler.selectCurrentNode()
 
         @_triggerEvent('tree.init')
 
@@ -758,7 +802,8 @@ class JqTreeWidget extends MouseWidget
             max_level = parseInt(@options.autoOpen)
 
         @tree.iterate((node, level) ->
-            node.is_open = true
+            if node.hasChildren()
+                node.is_open = true
             return (level != max_level)
         )
 
@@ -789,8 +834,17 @@ class JqTreeWidget extends MouseWidget
             return $li
 
         createNodeLi = (node) =>
+            li_classes = ['jqtree_common']
+
+            if node == @selected_node
+                li_classes.push('jqtree-selected')
+
+            class_string = li_classes.join(' ')
+
             escaped_name = escapeIfNecessary(node.name)
-            return $("<li class=\"jqtree_common\"><div><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>")
+            return $(
+                "<li class=\"#{ class_string }\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>"
+            )
 
         createFolderLi = (node) =>
             getButtonClasses = ->
@@ -801,11 +855,14 @@ class JqTreeWidget extends MouseWidget
 
                 return classes.join(' ')
 
-            getFolderClasses = ->
+            getFolderClasses = =>
                 classes = ['jqtree-folder']
 
                 if not node.is_open
                     classes.push('jqtree-closed')
+
+                if node == @selected_node
+                    classes.push('jqtree-selected')
 
                 return classes.join(' ')
 
@@ -820,7 +877,7 @@ class JqTreeWidget extends MouseWidget
                 button_char = TRIANGLE_RIGHT
 
             return $(
-                "<li class=\"jqtree_common #{ folder_classes }\"><div><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
+                "<li class=\"jqtree_common #{ folder_classes }\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->
@@ -860,23 +917,23 @@ class JqTreeWidget extends MouseWidget
 
         $target = $(e.target)
 
-        $title = $target.closest('.jqtree-title')
-        if $title.length
-            node = @_getNode($title)
+        $button = $target.closest('.jqtree-toggler')
+        if $button.length
+            node = @_getNode($button)
+
             if node
-                @_triggerEvent('tree.click', node: node)
+                @toggle(node, @options.slide)
 
-                @selectNode(node)
+                e.preventDefault()
+                e.stopPropagation()
         else
-            $button = $target.closest('.jqtree-toggler')
-            if $button.length
-                node = @_getNode($button)
-
+            $el = $target.closest('.jqtree-element')
+            if $el.length
+                node = @_getNode($el)
                 if node
-                    @toggle(node, @options.slide)
+                    @_triggerEvent('tree.click', node: node)
 
-                    e.preventDefault()
-                    e.stopPropagation()
+                    @select_node_handler.selectNode(node, true)
 
     _getNode: ($element) ->
         $li = $element.closest('li')
@@ -899,7 +956,7 @@ class JqTreeWidget extends MouseWidget
             return null
 
     _contextmenu: (e) ->
-        $div = $(e.target).closest('ul.jqtree-tree div')
+        $div = $(e.target).closest('ul.jqtree-tree .jqtree-element')
         if $div.length
             node = @_getNode($div)
             if node
@@ -937,9 +994,9 @@ class JqTreeWidget extends MouseWidget
         else
             return false
 
-    _mouseStop: ->
+    _mouseStop: (e) ->
         if @options.dragAndDrop
-            return @dnd_handler.mouseStop()
+            return @dnd_handler.mouseStop(e)
         else
             return false
 
@@ -995,7 +1052,7 @@ class GhostDropHint
 
 class BorderDropHint
     constructor: ($element) ->
-        $div = $element.children('div')
+        $div = $element.children('.jqtree-element')
         width = $element.width() - 4
 
         @$hint = $('<span class="jqtree-border"></span>')
@@ -1023,7 +1080,7 @@ class NodeElement
         return @$element.children('ul:first')
 
     getSpan: ->
-        return @$element.children('div').find('span.jqtree-title')
+        return @$element.children('.jqtree-element').find('span.jqtree-title')
 
     getLi: ->
         return @$element
@@ -1081,7 +1138,7 @@ class FolderElement extends NodeElement
                 doClose()
                 
     getButton: ->
-        return @$element.children('div').find('a.jqtree-toggler')
+        return @$element.children('.jqtree-element').find('a.jqtree-toggler')
 
     addDropHint: (position) ->
         if not @node.is_open and position == Position.INSIDE
@@ -1122,6 +1179,7 @@ class SaveStateHandler
                 @getState()
             )
         else if $.cookie
+            $.cookie.raw = true
             $.cookie(
                 @getCookieName(),
                 @getState(),
@@ -1145,10 +1203,8 @@ class SaveStateHandler
                 @getCookieName()
             )
         else if $.cookie
-            return $.cookie(
-                @getCookieName(),
-                {path: '/'}
-            )
+            $.cookie.raw = true
+            return $.cookie(@getCookieName())
         else
             return null
 
@@ -1205,27 +1261,49 @@ class SelectNodeHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
 
-    selectNode: (node) ->
+    selectNode: (node, must_toggle=false) ->
         canSelect = =>
             if not @tree_widget.options.onCanSelectNode
                 return true
 
             return @tree_widget.options.onCanSelectNode(node)
 
+        mustToggle = (previous_node, node) ->
+            if must_toggle and previous_node and node
+                if node.id
+                    return node.id == previous_node.id
+                else
+                    # If nodes have no id, then use the dom element
+                    return node.element == previous_node.element
+            else
+                return false
+
         if canSelect()
             if @tree_widget.selected_node
-                @tree_widget._getNodeElementForNode(@tree_widget.selected_node).deselect()
+                previous_node = @tree_widget.selected_node
+
+                @tree_widget._getNodeElementForNode(previous_node).deselect()
                 @tree_widget.selected_node = null
+            else
+                previous_node = null
 
             if node
-                @tree_widget._getNodeElementForNode(node).select()
-                @tree_widget.selected_node = node
-                @tree_widget._triggerEvent('tree.select', node: node)
+                node_element = @tree_widget._getNodeElementForNode(node)
 
-                parent = @tree_widget.selected_node.parent
+                if mustToggle(previous_node, node)
+                    node_element.deselect()
 
-                if not parent.is_open
-                    @tree_widget.openNode(parent, false)
+                    @tree_widget._triggerEvent('tree.select', node: null)
+                else
+                    node_element.select()
+                    @tree_widget.selected_node = node
+
+                    @tree_widget._triggerEvent('tree.select', node: node)
+
+                    parent = @tree_widget.selected_node.parent
+
+                    if not parent.is_open
+                        @tree_widget.openNode(parent, false)
 
             if @tree_widget.options.saveState
                 @tree_widget.save_state_handler.saveState()
@@ -1292,16 +1370,15 @@ class DragAndDropHandler
             @removeDropHint()
             @removeHover()
             @stopOpenFolderTimer()
-        else
-            if @hovered_area != area
-                @hovered_area = area
+        else if @hovered_area != area
+            @hovered_area = area
 
-                @updateDropHint()
+            @updateDropHint()
 
         return true
 
-    mouseStop: ->
-        @moveItem()
+    mouseStop: (e) ->
+        @moveItem(e)
         @clear()
         @removeHover()
         @removeDropHint()
@@ -1558,7 +1635,7 @@ class DragAndDropHandler
             clearTimeout(@open_folder_timer)
             @open_folder_timer = null
 
-    moveItem: ->
+    moveItem: (original_event) ->
         if (
             @hovered_area and
             @hovered_area.position != Position.NONE
@@ -1584,6 +1661,7 @@ class DragAndDropHandler
                     position: Position.getName(position)
                     previous_parent: previous_parent
                     do_move: doMove
+                    original_event: original_event
             )
 
             doMove() unless event.isDefaultPrevented()
