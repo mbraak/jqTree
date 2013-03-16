@@ -21,11 +21,9 @@ def get_template_files():
     def get_filename(f):
         return os.path.splitext(f)[0]
 
-    pattern = r'example(?P<id>\d+).tmpl'
-
     return [
         get_filename(f) for f in os.listdir('.')
-        if re.match(pattern, f)
+        if f.endswith('.tmpl')
     ]
 
 

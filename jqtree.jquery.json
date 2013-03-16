@@ -1,0 +1,23 @@
+{
+    "name": "jqtree",
+    "version": "0.15",
+    "title": "jqTree",
+    "description": "JqTree is a tree widget",
+    "keywords": [
+        "tree"
+    ],
+    "author": {
+        "name": "Marco Braak"
+    },
+    "homepage": "http://mbraak.github.com/jqTree/",
+    "download": "https://github.com/mbraak/jqTree/tarball/master",
+    "licenses": [
+        {
+            "type": "Apache-2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0"
+        }
+    ],
+    "dependencies": {
+        "jquery": ">=1.5"
+    }
+}

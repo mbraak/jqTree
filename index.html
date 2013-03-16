@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="jqtree.css">
     <link rel="stylesheet" href="extra/css/documentation.css">
     <link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
-    <script src="extra/js/jquery-1.8.3.min.js"></script>
+    <script src="extra/js/jquery-1.9.1.min.js"></script>
     <script src="extra/prism/prism.js"></script>
     <script src="tree.jquery.js"></script>
     <script type="text/javascript">
@@ -155,7 +155,7 @@ $('#tree1').tree({
     </ul>
     <h4 id="downloads">Downloads</h4>
     <ul>
-        <li>All (version 0.14): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+        <li>All (version 0.15): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
         <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
         <li>Css: <a href="jqtree.css">jqtree.css</a></li>
         <li>Image: <a href="jqtree-circle.png">jqtree-circle.png</a></li>
@@ -163,8 +163,8 @@ $('#tree1').tree({
     <h4 id="tutorial">Tutorial</h4>
     <ul>
         <li>
-            Include <a href="http://code.jquery.com/jquery-1.8.3.min.js">jQuery</a>.
-            <pre><code class="language-markup">&lt;script src="jquery-1.8.3.min.js"&gt;&lt;/script&gt;</code></pre>
+            Include <a href="http://code.jquery.com/jquery-1.9.1.min.js">jQuery</a>.
+            <pre><code class="language-markup">&lt;script src="jquery-1.9.1.min.js"&gt;&lt;/script&gt;</code></pre>
         </li>
         <li>
             Include tree.jquery.js:
@@ -230,16 +230,29 @@ $.getJSON(
     <h4 id="examples">Examples</h4>
 
     <ul>
-        <li><a href="examples/example1.html">Example 1 - the data option</a></li>
-        <li><a href="examples/example2.html">Example 2 - load the data from the server</a></li>
-        <li><a href="examples/example3.html">Example 3 - drag and drop</a></li>
-        <li><a href="examples/example4.html">Example 4 - save the state</a></li>
-        <li><a href="examples/example5.html">Example 5 - load nodes on demand from the server</a></li>
-        <li><a href="examples/example6.html">Example 6 - put html in the node title</a></li>
-        <li><a href="examples/example7.html">Example 7 - autoscroll</a></li>
+        <li><a href="examples/load_json_data.html">Example 1 - load json data</a></li>
+        <li><a href="examples/load_json_data_from_server.html">Example 2 - load json data from the server</a></li>
+        <li><a href="examples/drag_and_drop.html">Example 3 - drag and drop</a></li>
+        <li><a href="examples/save_state.html">Example 4 - save the state</a></li>
+        <li><a href="examples/load_on_demand.html">Example 5 - load nodes on demand from the server</a></li>
+        <li><a href="examples/autoescape.html">Example 6 - autoEscape</a></li>
+        <li><a href="examples/autoscroll.html">Example 7 - autoscroll</a></li>
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.15 (march 16 2013)</h5>
+    <ul>
+        <li>Issue 100: Clicking on the jqtree-element element will trigger click event</li>
+        <li>Issue 102: Add original event to tree.move event</li>
+        <li>Issue 103: Added getLevel function to Node class</li>
+        <li>Issue 104: The addNodeBefore method must return the new node</li>
+        <li>Issue 105: Added nodeClass option</li>
+        <li>Issue 112: Fix call to iterate in removeNode</li>
+        <li>Issue 118: Deselect a node when click and already selected</li>
+        <li>Issue 119: Make it easier to reload a subtree</li>
+        <li>Issue 121: Unselect node if it's reloaded by loadDataFromUrl</li>
+    </ul>
 
     <h5>0.14 (december 2 2012)</h5>
     <h6>Api changes</h6>
@@ -660,14 +673,61 @@ $('#tree1').tree('loadData', data, node);
         <strong>function loadDataFromUrl(url);</strong>
         <br>
         <strong>function loadDataFromUrl(url, parent_node);</strong>
+        <br>
+        <strong>function loadDataFromUrl(parent_node);</strong>
     </p>
 
     <p>
-        Load the data from an url:
+        Load data in the tree from an url using ajax. You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
     </p>
 
 <pre><code class="language-javascript">
 $('#tree1').tree('loadDataFromUrl', '/category/tree/');
+</code></pre>
+
+    <p>
+        Load a subtree:
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').getNodeById(123);
+$('#tree1').tree('loadDataFromUrl', '/category/tree/123', node);
+</code></pre>
+
+    <p>
+        You can also omit the url. In this case jqTree will generate a url for you. This is very useful if you use the load-on-demand feature:
+    </p>
+
+<pre><code class="language-javascript">
+var $tree = $('#tree1');
+
+$tree.tree({
+    dataUrl: '/my_data/'
+});
+
+var node = $tree.tree('getNodeById', 456);
+
+// jqTree will load data from /my_data/?node=456
+$tree.tree('loadDataFromUrl', node);
+</code></pre>
+
+    <p>
+        You can also add an <strong>on_finished</strong> callback parameter that will be called when the data is loaded:
+    </p>
+    <p>
+        <strong>function loadDataFromUrl(url, parent_node, on_finished);</strong>
+        <br>
+        <strong>function loadDataFromUrl(parent_node, on_finished);</strong>
+    </p>
+
+<pre><code class="language-javascript">$('#tree1').tree(
+    'loadDataFromUrl',
+    '/category/tree/123',
+    null,
+    function() {
+        alert('data is loaded');
+    }
+);
 </code></pre>
 
     <h5 id="functions-tojson">toJson</h5>

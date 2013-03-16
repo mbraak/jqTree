@@ -2,23 +2,41 @@ $(function() {
 
 QUnit.config.testTimeout = 5000;
 
+/*
+example data:
+
+node1
+---child1
+---child2
+-node2
+---child3
+*/
+
 var example_data = [
     {
         label: 'node1',
         id: 123,  // extra data
         children: [
-            { label: 'child1' },
-            { label: 'child2' }
+            { label: 'child1', id: 125 },
+            { label: 'child2', id: 126 }
         ]
     },
     {
         label: 'node2',
         id: 124,
         children: [
-            { label: 'child3' }
+            { label: 'child3', id: 127 }
         ]
     }
 ];
+
+/*
+example data 2:
+
+-main
+---c1
+---c2
+*/
 
 var example_data2 = [
     {
@@ -99,11 +117,11 @@ test("create jqtree from data", function() {
         'first child is li.jqtree-folder.jqtree-closed'
     );
     ok(
-        $('#tree1 ul.jqtree-tree li:eq(0) > div > a.jqtree-toggler').is('a.jqtree-toggler.jqtree-closed'),
+        $('#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element > a.jqtree-toggler').is('a.jqtree-toggler.jqtree-closed'),
         'button in first folder'
     );
     equal(
-        $('#tree1 ul.jqtree-tree li:eq(0) > div span.jqtree-title').text(),
+        $('#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element span.jqtree-title').text(),
         'node1'
     );
 });
@@ -284,8 +302,8 @@ test("toJson", function() {
     equal(
         $tree.tree('toJson'),
         '[{"name":"node1","id":123,"children":'+
-        '[{"name":"child1"},{"name":"child2"}]},'+
-        '{"name":"node2","id":124,"children":[{"name":"child3"}]}]'
+        '[{"name":"child1","id":125},{"name":"child2","id":126}]},'+
+        '{"name":"node2","id":124,"children":[{"name":"child3","id":127}]}]'
     );
 
     // Check that properties 'children', 'parent' and 'element' still exist.
@@ -305,7 +323,7 @@ test('loadData', function() {
 
     // first node is 'node1'
     equal(
-        $tree.find('> ul > li:first div:first > span').text(),
+        $tree.find('> ul > li:first .jqtree-element:first > span').text(),
         'node1'
     );
 
@@ -314,7 +332,7 @@ test('loadData', function() {
 
     // first node is 'main'
     equal(
-        $tree.find('> ul > li:first div:first > span').text(),
+        $tree.find('> ul > li:first .jqtree-element:first > span').text(),
         'main'
     );
 
@@ -338,7 +356,7 @@ test('loadData', function() {
 
     // first node in html is still 'node1'
     equal(
-        $tree.find('li:eq(0)').find('div:eq(0) span.jqtree-title').text(),
+        $tree.find('li:eq(0)').find('.jqtree-element:eq(0) span.jqtree-title').text(),
         'node1'
     );
 
@@ -346,7 +364,7 @@ test('loadData', function() {
     var $child3 = $tree.find('span:contains(child3)');
     var $li = $child3.closest('li');
     equal(
-        $li.children('ul').children('li:eq(0)').find('div span.jqtree-title').text(),
+        $li.children('ul').children('li:eq(0)').find('.jqtree-element span.jqtree-title').text(),
         'c4'
     );
 
@@ -374,6 +392,23 @@ test('openNode and closeNode', function() {
     $tree.tree('closeNode', node2, false);
     equal(node2.is_open, false);
     equal(isNodeClosed($(node2.element)), true);
+
+    // 3. open child1
+    var node1 = $tree.tree('getNodeByName', 'node1');
+    var child1 = $tree.tree('getNodeByName', 'child1');
+
+    // add a child to child1 so it is a folder
+    $tree.tree('appendNode', 'child1a', child1);
+
+    // node1 is initialy closed
+    equal(node1.is_open, undefined);
+
+    // open child1
+    $tree.tree('openNode', child1, false);
+
+    // node1 and child1 are now open1
+    equal(node1.is_open, true);
+    equal(child1.is_open, true);
 });
 
 test('selectNode', function() {
@@ -416,7 +451,7 @@ test('click toggler', function() {
         selectable: true
     });
 
-    var $title = $tree.find('li:eq(0)').find('> div > span.jqtree-title');
+    var $title = $tree.find('li:eq(0)').find('> .jqtree-element > span.jqtree-title');
     equal($title.text(), 'node1');
     var $toggler = $title.prev();
     ok($toggler.is('a.jqtree-toggler.jqtree-closed'));
@@ -512,7 +547,7 @@ test('autoOpen', function() {
         $tree.find('li').each(function() {
             var $li = $(this);
             if ($li.is('.jqtree-folder') && ! $li.is('.jqtree-closed')) {
-                var label = $li.children('div').find('span').text();
+                var label = $li.children('.jqtree-element').find('span').text();
                 open_nodes.push(label);
             };
         });
@@ -581,7 +616,7 @@ test('onCreateLi', function() {
     $tree.tree({
         data: example_data,
         onCreateLi: function(node, $li) {
-            var $span = $li.children('div').find('span');
+            var $span = $li.children('.jqtree-element').find('span');
             $span.html('_' + node.name + '_');
         }
     });
@@ -667,19 +702,12 @@ test('removeNode', function() {
         selectable: true
     });
 
+    // 1. Remove selected node; node is 'child1'
     var child1 = $tree.tree('getNodeByName', 'child1');
-    var node1 = $tree.tree('getNodeByName', 'node1');
-
-    equal(
-        formatTitles($tree),
-        'node1 child1 child2 node2 child3'
-    );
-
-    // select node 'child1'
     $tree.tree('selectNode', child1);
+
     equal($tree.tree('getSelectedNode').name, 'child1');
 
-    // 1. Remove child1
     $tree.tree('removeNode', child1);
 
     equal(
@@ -688,6 +716,32 @@ test('removeNode', function() {
     );
 
     // getSelectedNode must now return false
+    equal($tree.tree('getSelectedNode'), false);
+
+    // 2. No node is selected; remove child3
+    $tree.tree('loadData', example_data);
+
+    var child3 = $tree.tree('getNodeByName', 'child3');
+    $tree.tree('removeNode', child3);
+
+    equal(
+        formatTitles($tree),
+        'node1 child1 child2 node2'
+    );
+
+    equal($tree.tree('getSelectedNode'), false);
+
+    // 3. Remove parent of selected node
+    $tree.tree('loadData', example_data);
+
+    child1 = $tree.tree('getNodeByName', 'child1');
+    var node1 = $tree.tree('getNodeByName', 'node1');
+
+    $tree.tree('selectNode', child1);
+
+    $tree.tree('removeNode', node1);
+
+    // node is unselected
     equal($tree.tree('getSelectedNode'), false);
 });
 
@@ -713,7 +767,7 @@ test('appendNode', function() {
 
     // Node 'child1' does not have a toggler button
     equal(
-        $(child1.element).find('> div > .jqtree-toggler').length,
+        $(child1.element).find('> .jqtree-element > .jqtree-toggler').length,
         0
     );
 
@@ -723,7 +777,7 @@ test('appendNode', function() {
 
     // Node 'child1' must get a toggler button
     equal(
-        $(child1.element).find('> div > .jqtree-toggler').length,
+        $(child1.element).find('> .jqtree-element > .jqtree-toggler').length,
         1
     );
 });
@@ -878,7 +932,7 @@ test('addNodeBefore', function() {
     var node1 = $tree.tree('getNodeByName', 'node1');
 
     // -- add node before node1
-    $tree.tree('addNodeBefore', 'node3', node1);
+    var new_node = $tree.tree('addNodeBefore', 'node3', node1);
 
     equal(formatTitles($tree), 'node3 node1 child1 child2 node2 child3');
 });
@@ -894,6 +948,44 @@ test('addParentNode', function() {
     $tree.tree('addParentNode', 'node3', child3);
 
     equal(formatTitles($tree), 'node1 child1 child2 node2 node3 child3');
+});
+
+test('mouse events', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        dragAndDrop: true,
+        autoOpen: true
+    });
+    $tree.tree('setMouseDelay', 0);
+
+    function getTitleElement(node_name) {
+        var node = $tree.tree('getNodeByName', node_name);
+        var $el = $(node.element);
+        return $($el.find('.jqtree-title'));
+    }
+
+    var $node1 = getTitleElement('node1');
+    var $child3 = getTitleElement('child3');
+
+    // Move node1 inside child3
+    // trigger mousedown event on node1
+    $node1.trigger(
+        $.Event('mousedown', { which: 1 })
+    );
+
+    // trigger mouse move to child3
+    var child3_offset = $child3.offset();
+    $tree.trigger(
+        $.Event('mousemove', { pageX: child3_offset.left, pageY: child3_offset.top })
+    );
+    $tree.trigger('mouseup');
+
+    equal(
+        formatTitles($tree),
+        'node2 child3 node1 child1 child2'
+    );
 });
 
 module("Tree");
@@ -946,17 +1038,17 @@ test("create tree from data", function() {
         );
     }
 
-    // 1. create tree from example data
-    var tree = new Tree.Tree();
+    // - create tree from example data
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
     checkData(tree);
 
-    // 2. create tree from new data format
+    // - create tree from new data format
     var data = [
         {
             label: 'node1',
-            id: 123,  // extra data
-            children: ['child1', 'child2']
+            id: 123,
+            children: ['child1', 'child2']  // nodes are only defined by a string
         },
         {
             label: 'node2',
@@ -964,13 +1056,13 @@ test("create tree from data", function() {
             children: ['child3']
         }
     ];
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(data);
     checkData(tree);
 });
 
 test("addChild", function() {
-    var tree = new Tree.Tree('tree1');
+    var tree = new Tree.Node('tree1', true);
     tree.addChild(
         new Tree.Node('abc')
     );
@@ -993,7 +1085,7 @@ test("addChild", function() {
 });
 
 test('addChildAtPosition', function() {
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     tree.addChildAtPosition(new Tree.Node('abc'), 0);  // first
     tree.addChildAtPosition(new Tree.Node('ghi'), 2);  // index 2 does not exist
     tree.addChildAtPosition(new Tree.Node('def'), 1);
@@ -1007,7 +1099,7 @@ test('addChildAtPosition', function() {
 });
 
 test('removeChild', function() {
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
 
     var abc = new Tree.Node({'label': 'abc', 'id': 1});
     var def = new Tree.Node({'label': 'def', 'id': 2});
@@ -1059,7 +1151,7 @@ test('removeChild', function() {
 
 test('getChildIndex', function() {
     // setup
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
 
     var abc = new Tree.Node('abc');
     var def = new Tree.Node('def');
@@ -1076,7 +1168,7 @@ test('getChildIndex', function() {
 });
 
 test('hasChildren', function() {
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     equal(
         tree.hasChildren(),
         false,
@@ -1092,7 +1184,7 @@ test('hasChildren', function() {
 });
 
 test('iterate', function() {
-    var tree = new Tree.Tree();
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // iterate over all the nodes
@@ -1147,7 +1239,7 @@ test('iterate', function() {
 });
 
 test('moveNode', function() {
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     /*
@@ -1242,7 +1334,7 @@ test('initFromData', function() {
                 }
             ]
         };
-    var node = new Tree.Tree();
+    var node = new Tree.Node(null, true);
     node.initFromData(data);
 
     equal(node.name, 'main')
@@ -1256,7 +1348,7 @@ test('initFromData', function() {
 
 test('getData', function() {
     // 1. empty node
-    var node = new Tree.Tree();
+    var node = new Tree.Node(null, true);
     deepEqual(node.getData(), []);
 
     // 2.node with data
@@ -1289,7 +1381,7 @@ test('getData', function() {
 
 test('addAfter', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     /*
@@ -1331,7 +1423,7 @@ test('addAfter', function() {
 
 test('addBefore', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // 1. Add 'node_0' before node1
@@ -1342,7 +1434,7 @@ test('addBefore', function() {
 
 test('addParent', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // 1. Add node 'root' as parent of node1
@@ -1356,7 +1448,7 @@ test('addParent', function() {
 
 test('remove', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     var child1 = tree.getNodeByName('child1');
@@ -1374,7 +1466,7 @@ test('remove', function() {
 
 test('append', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     var node1 = tree.getNodeByName('node1');
@@ -1387,7 +1479,7 @@ test('append', function() {
 
 test('prepend', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     var node1 = tree.getNodeByName('node1');
@@ -1400,7 +1492,7 @@ test('prepend', function() {
 
 test('getNodeById', function() {
     // setup
-    var tree = new Tree.Tree()
+    var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
     // 1. Get node with id 124
@@ -1423,6 +1515,64 @@ test('getNodeById', function() {
     equal(node.name, 'new node');
 });
 
+test('getLevel', function() {
+    // setup
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData(example_data);
+
+    // 1. get level for node1 and child1
+    equal(tree.getNodeByName('node1').getLevel(), 1);
+    equal(tree.getNodeByName('child1').getLevel(), 2);
+});
+
+test('loadFromData and id mapping', function() {
+    // - get node from empty tree
+    var tree = new Tree.Node(null, true);
+    equal(tree.getNodeById(999), null);
+
+    // - load example data in tree
+    tree.loadFromData(example_data);
+    equal(tree.getNodeById(124).name, 'node2');
+
+    var child2 = tree.getNodeById(126);
+    child2.addChild(
+        new Tree.Node({label: 'child4', id: 128})
+    );
+    child2.addChild(
+        new Tree.Node({label: 'child5', id: 129})
+    );
+
+    // - load data in node child2
+    child2.loadFromData(['abc', 'def']);
+
+    equal(tree.getNodeById(128), null);
+    equal(child2.children.length, 2);
+    equal(child2.children[0].name, 'abc');
+});
+
+test('removeChildren', function() {
+    // - load example data
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData(example_data);
+
+    // add child4 and child5
+    var child2 = tree.getNodeById(126);
+    equal(child2.name, 'child2');
+
+    child2.addChild(
+        new Tree.Node({label: 'child4', id: 128})
+    );
+    child2.addChild(
+        new Tree.Node({label: 'child5', id: 129})
+    );
+    equal(tree.getNodeById(128).name, 'child4');
+
+    // - remove children from child2
+    child2.removeChildren();
+    equal(tree.getNodeById(128), null);
+    equal(child2.children.length, 0);
+});
+
 module('util');
 
 test('JSON.stringify', function() {
@@ -1441,7 +1591,9 @@ test('JSON.stringify', function() {
 
 test('indexOf', function() {
     equal(Tree.indexOf([3, 2, 1], 1), 2);
+    equal(Tree._indexOf([3, 2, 1], 1), 2);
     equal(Tree.indexOf([4, 5, 6], 1), -1);
+    equal(Tree._indexOf([4, 5, 6], 1), -1);
 });
 
 test('Position.getName', function() {
@@ -1454,6 +1606,7 @@ test('Position.getName', function() {
 test('Position.nameToIndex', function() {
     equal(Tree.Position.nameToIndex('before'), Tree.Position.BEFORE);
     equal(Tree.Position.nameToIndex('after'), Tree.Position.AFTER);
+    equal(Tree.Position.nameToIndex(''), 0);
 });
 
 });
