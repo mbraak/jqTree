@@ -1,4 +1,4 @@
-###
+﻿###
 Copyright 2013 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -467,10 +467,6 @@ class Node
 
 @Tree.Node = Node
 
-TRIANGLE_RIGHT = '&#x25ba;'  # ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
-TRIANGLE_DOWN = '&#x25bc;'  # ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
-
-
 class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
@@ -487,6 +483,8 @@ class JqTreeWidget extends MouseWidget
         onLoadFailed: null
         autoEscape: true
         dataUrl: null
+        closedIcon: '&#x25ba;'  # The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
+        openedIcon: '&#x25bc;'  # The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
         slide: true  # must display slide animation?
         nodeClass: Node
 
@@ -872,9 +870,9 @@ class JqTreeWidget extends MouseWidget
             escaped_name = escapeIfNecessary(node.name)
 
             if node.is_open
-                button_char = TRIANGLE_DOWN
+                button_char = @options.openedIcon
             else
-                button_char = TRIANGLE_RIGHT
+                button_char = @options.closedIcon
 
             return $(
                 "<li class=\"jqtree_common #{ folder_classes }\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
@@ -1104,7 +1102,7 @@ class FolderElement extends NodeElement
             @node.is_open = true
             $button = @getButton()
             $button.removeClass('jqtree-closed')
-            $button.html(TRIANGLE_DOWN)
+            $button.html(@tree_widget.options.openedIcon)
 
             doOpen = =>
                 @getLi().removeClass('jqtree-closed')
@@ -1124,7 +1122,7 @@ class FolderElement extends NodeElement
             @node.is_open = false
             $button = @getButton()
             $button.addClass('jqtree-closed')
-            $button.html(TRIANGLE_RIGHT)
+            $button.html(@tree_widget.options.closedIcon)
 
             doClose = =>
                 @getLi().addClass('jqtree-closed')
