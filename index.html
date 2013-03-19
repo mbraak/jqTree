@@ -44,6 +44,8 @@
                 <li><a href="#tree-options-oncanmoveto">onCanMoveTo</a></li>
                 <li><a href="#tree-options-autoescape">autoEscape</a></li>
                 <li><a href="#tree-options-slide">slide</a></li>
+                <li><a href="#tree-options-openedIcon">openedIcon</a></li>
+                <li><a href="#tree-options-closedIcon">closedIcon</a></li>
             </ul>
         </li>
         <li>
@@ -602,6 +604,31 @@ $('#tree1').tree({
     slide: false
 });
 </code></pre>
+
+    <h5 id="tree-options-openedIcon">openedIcon</h5>
+
+    <p>
+        A character or symbol to display on opened nodes. The default is '&amp;#x25bc;' (&#x25bc;)
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    openedIcon: '-'
+});
+</code></pre>
+
+    <h5 id="tree-options-closedIcon">closedIcon</h5>
+
+    <p>
+        A character or symbol to display on closed nodes. The default is '&amp;#x25ba;' (&#x25ba;)
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    closedIcon: '+'
+});
+</code></pre>
+
 
 
     <h4 id="functions">Functions</h4>
