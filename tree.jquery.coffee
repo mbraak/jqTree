@@ -1302,7 +1302,7 @@ class SelectNodeHandler
 
                     parent = @tree_widget.selected_node.parent
 
-                    if not parent.is_open
+                    if not parent.is_open and parent.parent
                         @tree_widget.openNode(parent, false)
 
             if @tree_widget.options.saveState
@@ -1536,7 +1536,7 @@ class DragAndDropHandler
 
         iterate = (node, next_node) =>
             must_iterate_inside = (
-                (node.is_open or  not node.element) and node.hasChildren()
+                (node.is_open or not node.element) and node.hasChildren()
             )
 
             if node.element                

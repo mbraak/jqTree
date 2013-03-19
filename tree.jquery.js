@@ -1786,7 +1786,7 @@ limitations under the License.
               node: node
             });
             parent = this.tree_widget.selected_node.parent;
-            if (!parent.is_open) {
+            if (!parent.is_open && parent.parent) {
               this.tree_widget.openNode(parent, false);
             }
           }
