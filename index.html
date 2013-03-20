@@ -78,6 +78,7 @@
                 <li><a href="#event-tree-move">tree.move</a></li>
                 <li><a href="#event-tree-init">tree.init</a></li>
                 <li><a href="#event-tree-open">tree.open</a></li>
+                <li><a href="#event-tree-close">tree.close</a></li>	
             </ul>
         </li>
     </ul>
@@ -1185,6 +1186,20 @@ $('#tree1').bind(
 <pre><code class="language-javascript">
 $('#tree1').bind(
     'tree.open',
+    function(e) {
+        console.log(e.node);
+    }
+);
+</code></pre>
+
+    <h5 id="event-tree-open">tree.close</h5>
+    <p>
+        Called when a node is closed.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').bind(
+    'tree.close',
     function(e) {
         console.log(e.node);
     }
