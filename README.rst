@@ -4,7 +4,9 @@
 jqTree
 ======
 
-JqTree is a tree widget.
+JqTree is a tree widget. Read more in the `documentation <http://mbraak.github.com/jqTree/>`_.
+
+.. image:: https://raw.github.com/mbraak/jqTree/master/screenshot.png
 
 Features
 --------
