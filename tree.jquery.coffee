@@ -1262,7 +1262,7 @@ class SelectNodeHandler
     selectNode: (node, must_toggle=false) ->
         canSelect = =>
             if not @tree_widget.options.onCanSelectNode
-                return true
+                return @tree_widget.options.selectable
 
             return @tree_widget.options.onCanSelectNode(node)
 
