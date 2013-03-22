@@ -473,6 +473,7 @@ class JqTreeWidget extends MouseWidget
         saveState: false  # true / false / string (cookie name)
         dragAndDrop: false
         selectable: false
+        useContextMenu: true
         onCanSelectNode: null
         onSetStateFromStorage: null
         onGetStateFromStorage: null
@@ -748,7 +749,8 @@ class JqTreeWidget extends MouseWidget
         @_initData()
 
         @element.click($.proxy(@_click, this))
-        @element.bind('contextmenu', $.proxy(@_contextmenu, this))
+        if @options.useContextMenu
+            @element.bind('contextmenu', $.proxy(@_contextmenu, this))
 
     _deinit: ->
         @element.empty()
