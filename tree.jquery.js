@@ -822,6 +822,7 @@ limitations under the License.
       saveState: false,
       dragAndDrop: false,
       selectable: false,
+      useContextMenu: true,
       onCanSelectNode: null,
       onSetStateFromStorage: null,
       onGetStateFromStorage: null,
@@ -1157,7 +1158,9 @@ limitations under the License.
       this.scroll_handler = new ScrollHandler(this);
       this._initData();
       this.element.click($.proxy(this._click, this));
-      return this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
+      if (this.options.useContextMenu) {
+        return this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
+      }
     };
 
     JqTreeWidget.prototype._deinit = function() {

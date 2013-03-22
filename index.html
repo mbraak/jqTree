@@ -46,6 +46,7 @@
                 <li><a href="#tree-options-slide">slide</a></li>
                 <li><a href="#tree-options-openedIcon">openedIcon</a></li>
                 <li><a href="#tree-options-closedIcon">closedIcon</a></li>
+                <li><a href="#tree-options-usecontextmenu">useContextMenu</a></li>
             </ul>
         </li>
         <li>
@@ -230,10 +231,11 @@ $.getJSON(
 
     <h4 id="changelog">Changelog</h4>
 
-    <h5>0.16 (development version)
+    <h5>0.16 (development version)</h5>
     <ul>
         <li>Issue 125: Add option for overriding TRIANGLE_RIGHT and TRIANGLE_DOWN</li>
         <li>Issue 126: Event tree.open event fires after first tree.select on top level node</li>
+        <li>Issue 129: Allow native context menu to be display</li>
     </ul>
 
     <h5>0.15 (march 16 2013)</h5>
@@ -636,7 +638,21 @@ $('#tree1').tree({
 });
 </code></pre>
 
+    <h5 id="tree-options-usecontextmenu">useContextMenu</h5>
 
+    <p>
+        Bind the context menu event (true/false).
+    </p>
+    <p>
+        <strong>true</strong> (default)
+        <br>
+        A right mouse-click will trigger a <a href="#event-tree-contextmenu">tree.contextmenu</a> event. This overrides the native contextmenu of the browser.
+    </p>
+    <p>
+        <strong>false</strong>
+        <br>
+        A right mouse-click will trigger the native contextmenu of the browser.
+    </p>
 
     <h4 id="functions">Functions</h4>
     <h5 id="functions-loadData">loadData</h5>
