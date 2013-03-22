@@ -472,7 +472,7 @@ class JqTreeWidget extends MouseWidget
         autoOpen: false  # true / false / int (open n levels starting at 0)
         saveState: false  # true / false / string (cookie name)
         dragAndDrop: false
-        selectable: false
+        selectable: true
         onCanSelectNode: null
         onSetStateFromStorage: null
         onGetStateFromStorage: null
@@ -1264,7 +1264,7 @@ class SelectNodeHandler
             if not @tree_widget.options.onCanSelectNode
                 return @tree_widget.options.selectable
 
-            return @tree_widget.options.onCanSelectNode(node)
+            return @tree_widget.options.selectable and @tree_widget.options.onCanSelectNode(node)
 
         mustToggle = (previous_node, node) ->
             if must_toggle and previous_node and node

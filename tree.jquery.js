@@ -821,7 +821,7 @@ limitations under the License.
       autoOpen: false,
       saveState: false,
       dragAndDrop: false,
-      selectable: false,
+      selectable: true,
       onCanSelectNode: null,
       onSetStateFromStorage: null,
       onGetStateFromStorage: null,
@@ -1807,7 +1807,7 @@ limitations under the License.
         if (!_this.tree_widget.options.onCanSelectNode) {
           return _this.tree_widget.options.selectable;
         }
-        return _this.tree_widget.options.onCanSelectNode(node);
+        return _this.tree_widget.options.selectable && _this.tree_widget.options.onCanSelectNode(node);
       };
       mustToggle = function(previous_node, node) {
         if (must_toggle && previous_node && node) {
