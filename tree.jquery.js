@@ -1805,7 +1805,7 @@ limitations under the License.
       }
       canSelect = function() {
         if (!_this.tree_widget.options.onCanSelectNode) {
-          return true;
+          return _this.tree_widget.options.selectable;
         }
         return _this.tree_widget.options.onCanSelectNode(node);
       };
