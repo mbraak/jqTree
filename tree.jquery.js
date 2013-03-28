@@ -1196,6 +1196,7 @@ limitations under the License.
 
     JqTreeWidget.prototype._initTree = function(data) {
       this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
+      this.selected_node = null;
       this.tree.loadFromData(data);
       this._openNodes();
       this._refreshElements();

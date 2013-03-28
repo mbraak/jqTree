@@ -776,7 +776,7 @@ class JqTreeWidget extends MouseWidget
 
     _initTree: (data) ->
         @tree = new @options.nodeClass(null, true, @options.nodeClass)
-		@selected_node = null
+        @selected_node = null
         @tree.loadFromData(data)
 
         @_openNodes()
