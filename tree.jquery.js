@@ -867,10 +867,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.loadData = function(data, parent_node) {
-      this._loadData(data, parent_node);
-      if (!parent_node) {
-        return this.selected_node = null;
-      }
+      return this._loadData(data, parent_node);
     };
 
     JqTreeWidget.prototype.loadDataFromUrl = function(url, parent_node, on_finished) {
@@ -880,10 +877,7 @@ limitations under the License.
         url = null;
         on_finished = null;
       }
-      this._loadDataFromUrl(url, parent_node, on_finished);
-      if (!parent_node) {
-        return this.selected_node = null;
-      }
+      return this._loadDataFromUrl(url, parent_node, on_finished);
     };
 
     JqTreeWidget.prototype._loadDataFromUrl = function(url_info, parent_node, on_finished) {

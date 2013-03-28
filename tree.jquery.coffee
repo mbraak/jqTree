@@ -512,9 +512,6 @@ class JqTreeWidget extends MouseWidget
     loadData: (data, parent_node) ->
         @_loadData(data, parent_node)
 
-        if not parent_node
-            @selected_node = null
-
     loadDataFromUrl: (url, parent_node, on_finished) ->
         if $.type(url) != 'string'
             # Url parameter is omitted
@@ -524,9 +521,6 @@ class JqTreeWidget extends MouseWidget
             on_finished = null
 
         @_loadDataFromUrl(url, parent_node, on_finished)
-
-        if not parent_node
-            @selected_node = null
 
     _loadDataFromUrl: (url_info, parent_node, on_finished) ->
         $el = null
@@ -782,6 +776,7 @@ class JqTreeWidget extends MouseWidget
 
     _initTree: (data) ->
         @tree = new @options.nodeClass(null, true, @options.nodeClass)
+		@selected_node = null
         @tree.loadFromData(data)
 
         @_openNodes()
