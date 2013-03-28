@@ -233,9 +233,10 @@ $.getJSON(
 
     <h5>0.16 (development version)</h5>
     <ul>
-        <li>Issue 125: Add option for overriding TRIANGLE_RIGHT and TRIANGLE_DOWN</li>
+        <li>Issue 125: Add option for overriding TRIANGLE_RIGHT and TRIANGLE_DOWN (thanks to Sam D)</li>
         <li>Issue 126: Event tree.open event fires after first tree.select on top level node</li>
-        <li>Issue 129: Allow native context menu to be display</li>
+        <li>Issue 129: Allow native context menu to be display (thanks to Charles Bourasseau)</li>
+        <li>Issue 130: Selectable not implemented (thanks to Sam D)</li>
     </ul>
 
     <h5>0.15 (march 16 2013)</h5>
@@ -245,7 +246,8 @@ $.getJSON(
         <li>Issue 103: Added getLevel function to Node class</li>
         <li>Issue 104: The addNodeBefore method must return the new node</li>
         <li>Issue 105: Added nodeClass option</li>
-        <li>Issue 112: Fix call to iterate in removeNode</li>
+        <li>Issue 112: Fix call to iterate in removeNode (thanks to Ingemar Ådahl)</li>
+        <li>Issue 113: Added onLoadFailed option (thanks to Shuhei Kondo)</li>
         <li>Issue 118: Deselect a node when click and already selected</li>
         <li>Issue 119: Make it easier to reload a subtree</li>
         <li>Issue 121: Unselect node if it's reloaded by loadDataFromUrl</li>
@@ -259,22 +261,23 @@ $.getJSON(
     </ul>
     <h6>Issues</h6>
     <ul>
-        <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method</li>
+        <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method (thanks to Rodrigo Rosenfeld Rosas)</li>
         <li>Issue 81: getSelectedNode must return false if node is removed</li>
         <li>Issue 82: Autoscroll for drag-and-drop</li>
+        <li>Issue 84: Fix correct type param in $.ajax() (thanks to Rodrigo Rosenfeld Rosas)</li>
         <li>Issue 85: Option to turn slide animation on or off</li>
         <li>Issue 86: The openNode function must automatically open parents</li>
         <li>Issue 87: Remove the must_open_parents parameter from the selectNode function</li>
         <li>Issue 88: selectNode must also work if selectable option is false</li>
         <li>Issue 89: Clicking in title with img or em does not work</li>
-        <li>Issue 96: Added jqtree_common class to avoid css clashes</li> 
+        <li>Issue 96: Added jqtree_common class to avoid css clashes (thanks to Yaniv Iny)</li> 
     </ul>
 
     <h5>0.13 (october 10 2012)</h5>
     <ul>
         <li>Issue 54: Added tree.select event</li>
         <li>Issue 63: Fixed contextmenu event</li>
-        <li>Issue 67: Use unicode characters for triangle buttons</li>
+        <li>Issue 67: Use unicode characters for triangle buttons (thanks to Younès)</li>
         <li>Issue 70: Load data from the server using the loadData function</li>
         <li>Issue 78: Drag and drop is trigger happy</li>
     </ul>
@@ -318,8 +321,8 @@ $.getJSON(
 
     <h5>0.9 (may 9 2012)</h5>
     <ul>
-        <li>Issue #15: 'tree.open' event is not triggered when dragging nodes</li>
-        <li>Issue #18: Allow moveNode to be canceled through ev.preventDefault()</li>
+        <li>Issue 15: 'tree.open' event is not triggered when dragging nodes</li>
+        <li>Issue 18: Allow moveNode to be canceled through ev.preventDefault()</li>
         <li>Use sprite for images</li>
         <li>Added function closeNode</li>
         <li>Added support for localstorage</li>
