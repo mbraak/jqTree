@@ -872,10 +872,9 @@ limitations under the License.
 
     JqTreeWidget.prototype.loadDataFromUrl = function(url, parent_node, on_finished) {
       if ($.type(url) !== 'string') {
-        parent_node = url;
         on_finished = parent_node;
+        parent_node = url;
         url = null;
-        on_finished = null;
       }
       return this._loadDataFromUrl(url, parent_node, on_finished);
     };

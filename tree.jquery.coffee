@@ -515,10 +515,9 @@ class JqTreeWidget extends MouseWidget
     loadDataFromUrl: (url, parent_node, on_finished) ->
         if $.type(url) != 'string'
             # Url parameter is omitted
-            parent_node = url
             on_finished = parent_node
+            parent_node = url
             url = null
-            on_finished = null
 
         @_loadDataFromUrl(url, parent_node, on_finished)
 
