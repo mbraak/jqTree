@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Javascript tree with autoscroll</title>
+    <title>Javascript tree with multiple select</title>
     <link rel="stylesheet" href="../extra/css/gridless.css">
     <link rel="stylesheet" href="../extra/prism/prism.css">
     <link rel="stylesheet" href="example.css">
@@ -15,33 +15,37 @@
 </head>
 <body>
     <p id="nav">
-        <a href="autoescape.html">&laquo; Example 6</a>
-        
-            <a href="multiple_select.html" class="next">Example 8 &raquo;</a>
+        <a href="autoscroll.html">&laquo; Example 7</a>
         
     </p>
 
-    <h1>Example 7 - autoscroll</h1>
+    <h1>Example 8 - multiple select</h1>
 
     
-    <div id="scroll-container">
-        <div id="tree1"></div>
-    </div>
-
-    <p>
-        This example autoscroll. The tree will scroll automatically if you drag an item outside of the tree.
-        <br />
-        Autoscroll will work automatically. There is no option for it.
-    </p>
-
+    <div id="tree1"></div>
     <script>
         $(function() {
             var $tree = $('#tree1');
             $tree.tree({
                 data: ExampleData.example_data,
-                dragAndDrop: true,
-                autoOpen: true
+                autoOpen: true,
             });
+            $tree.bind(
+                'tree.click',
+                function(e) {
+                    // Disable single selection
+                    e.preventDefault();
+
+                    var selected_node = e.node;
+
+                    if ($tree.tree('isNodeSelected', selected_node)) {
+                        $tree.tree('removeFromSelection', selected_node);
+                    }
+                    else {
+                        $tree.tree('addToSelection', selected_node);
+                    }
+                }
+            );
         });
     </script>
 
