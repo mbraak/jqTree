@@ -82,6 +82,15 @@
                 <li><a href="#event-tree-close">tree.close</a></li>	
             </ul>
         </li>
+        <li>
+            <a href="#multiple-selection">Multiple selection</a>
+            <ul>
+                <li><a href="#multiple-selection-add-to-selection">addToSelection</a></li>
+                <li><a href="#multiple-selection-get-selected-nodes">getSelectedNodes</a></li>
+                <li><a href="#multiple-selection-is-node-selected">isNodeSelected</a></li>
+                <li><a href="#multiple-selection-remove-from-selection">removeFromSelection</a></li>
+            </ul>
+        </li>
     </ul>
 </div>
 <div id="page">
@@ -1078,6 +1087,20 @@ $('#tree1').bind(
 );
 </code></pre>
 
+    <p>
+        The default action is to select the node. You can prevent the selection by calling
+        <strong>preventDefault</strong>:
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').bind(
+    'tree.click',
+    function(event) {
+        event.preventDefault();
+    }
+);
+</code></pre>
+
     <h5 id="event-tree-select">tree.select</h5>
 
     <p>
@@ -1232,6 +1255,59 @@ $('#tree1').bind(
         console.log(e.node);
     }
 );
+</code></pre>
+
+    <h4 id="multiple-selection">Multiple selection</h4>
+
+    <p>
+        Jqtree has some functions that can help you to implement multiple selection. See
+        <a href="examples/multiple_select.html">Example 8 - multiple select</a>.
+    </p>
+    <p>
+        In order for multiple selection to work, you must give the nodes an id.
+    </p>
+
+    <h5 id="multiple-selection-add-to-selection">addToSelection</h5>
+
+    <p>
+        Add this node to the selection
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+$('#tree1').tree('addToSelection', node);
+</code></pre>
+
+    <h5 id="multiple-selection-get-selected-nodes">getSelectedNodes</h5>
+
+    <p>
+        Return a list of selected nodes.
+    </p>
+
+<pre><code class="language-javascript">
+var nodes = $('#tree1').tree('getSelectedNodes');
+</code></pre>
+
+    <h5 id="multiple-selection-is-node-selected">isNodeSelected</h5>
+
+    <p>
+        Return if this node is selected.
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+var is_selected = $('#tree1').tree('isNodeSelected', node);
+</code></pre>
+
+    <h5 id="multiple-selection-remove-from-selection">removeFromSelection</h5>
+
+    <p>
+        Remove this node from the selection.
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+$('#tree1').tree('removeFromSelection', node);
 </code></pre>
 
     <p>
