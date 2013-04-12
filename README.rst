@@ -4,7 +4,7 @@
 jqTree
 ======
 
-JqTree is a tree widget. Read more in the `documentation <http://mbraak.github.com/jqTree/>`_.
+JqTree is a tree widget. Read more in the `documentation <http://mbraak.github.io/jqTree/>`_.
 
 .. image:: https://raw.github.com/mbraak/jqTree/master/screenshot.png
 
@@ -18,7 +18,7 @@ Features
 
 The project is hosted on github (https://github.com/mbraak/jqTree), has a test suite (test/test.html) and a demo (demo.html).
 
-See index.html for the full documentation. The documentation is also on http://mbraak.github.com/jqTree/
+See index.html for the full documentation. The documentation is also on http://mbraak.github.io/jqTree/
 
 Thanks
 ------
