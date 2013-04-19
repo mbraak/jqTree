@@ -887,8 +887,8 @@ test('load on demand', function() {
     $.mockjax({
         url: '*',
         response: function(options) {
-            equal(options.url, '/tree/');
-            deepEqual(options.data, { 'node' : 1 })
+            equal(options.url, '/tree/', '2');
+            deepEqual(options.data, { 'node' : 1 }, '3')
 
             this.responseText = [
                 {
@@ -903,11 +903,11 @@ test('load on demand', function() {
     $tree.bind('tree.refresh', function(e) {
         start();
 
-        equal(formatTitles($tree), 'node1 child1');
+        equal(formatTitles($tree), 'node1 child1', '4');
     });
 
     var node1 = $tree.tree('getNodeByName', 'node1');
-    equal(formatTitles($tree), 'node1');
+    equal(formatTitles($tree), 'node1', '1');
 
     $tree.tree('openNode', node1, true);
 
