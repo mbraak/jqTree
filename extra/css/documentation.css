@@ -1,4 +1,8 @@
 /* main layout */
+body, button, input, select, textarea {
+    font-family: 'Open Sans', sans-serif;
+}
+
 #sidebar {
     width: 200px;
     position: fixed;
