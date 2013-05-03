@@ -46,6 +46,14 @@ body, button, input, select, textarea {
     font-weight: bold;
 }
 
+#sidebar ul.first ul {
+    list-style-position: outside;
+}
+
+#sidebar ul.first ul > li {
+    margin-left: 20px;
+}
+
 /* page */
 .container-left,
 .container-right {
