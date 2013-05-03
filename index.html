@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="extra/prism/prism.css">
     <link rel="stylesheet" href="jqtree.css">
     <link rel="stylesheet" href="extra/css/documentation.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
     <!--[if lt IE 9]>
         <script src="extra/js/jquery-1.9.1.min.js"></script>
@@ -1111,15 +1111,26 @@ $('#tree1').bind(
     <h5 id="event-tree-select">tree.select</h5>
 
     <p>
-        Triggered when a tree node is selected.
+        Triggered when a tree node is selected or deselected.
+        <br>
+        If a node is selected, then <strong>event.node</strong> contains the selected node.
+        <br>
+        If a node is deselected, then the <strong>event.node</strong> property is null.
     </p>
 
 <pre><code class="language-javascript">
 $('#tree1').bind(
     'tree.select',
     function(event) {
-        var node = event.node;
-        alert(node.name);
+        if (event.node) {
+            // node was selected
+            var node = event.node;
+            alert(node.name);
+        }
+        else {
+            // event.node is null
+            // a node was deselected
+        }
     }
 );
 </code></pre>
