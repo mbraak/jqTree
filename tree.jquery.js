@@ -895,9 +895,6 @@ limitations under the License.
       if (this.select_node_handler.isNodeSelected(node)) {
         if (must_toggle) {
           this._deselectCurrentNode();
-          this._triggerEvent('tree.select', {
-            node: null
-          });
         }
       } else {
         this._deselectCurrentNode();
@@ -1542,7 +1539,9 @@ limitations under the License.
 
       node = this.getSelectedNode();
       if (node) {
-        return this.removeFromSelection(node);
+        var removeNode = this.removeFromSelection(node);
+        this._triggerEvent('tree.deselect', {node: node});
+        return removeNode;
       }
     };
 
