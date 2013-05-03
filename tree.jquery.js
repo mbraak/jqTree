@@ -895,7 +895,7 @@ limitations under the License.
       if (this.select_node_handler.isNodeSelected(node)) {
         if (must_toggle) {
           this._deselectCurrentNode();
-          this._triggerEvent('tree.select', {
+          this._triggerEvent('tree.deselect', {
             node: null
           });
         }
