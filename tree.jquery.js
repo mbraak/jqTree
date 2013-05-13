@@ -869,7 +869,7 @@ limitations under the License.
         if (!_this.options.onCanSelectNode) {
           return _this.options.selectable;
         }
-        return _this.options.selectable && _this.tree_widget.options.onCanSelectNode(node);
+        return _this.options.selectable && _this.options.onCanSelectNode(node);
       };
       openParents = function() {
         var parent;

@@ -506,7 +506,7 @@ class JqTreeWidget extends MouseWidget
             if not @options.onCanSelectNode
                 return @options.selectable
 
-            return @options.selectable and @tree_widget.options.onCanSelectNode(node)
+            return @options.selectable and @options.onCanSelectNode(node)
 
         openParents = =>
             parent = node.parent
