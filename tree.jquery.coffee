@@ -1406,23 +1406,34 @@ class DragAndDropHandler
         @drag_element.move(event.pageX, event.pageY)
 
         area = @findHoveredArea(event.pageX, event.pageY)
+        can_move_to = @canMoveToArea(area)
 
-        if area and @tree_widget.options.onCanMoveTo
-            position_name = Position.getName(area.position)
+        if area
+            if @hovered_area != area
+                @hovered_area = area
 
-            if not @tree_widget.options.onCanMoveTo(@current_item.node, area.node, position_name)
-                area = null
+                # If this is a closed folder, start timer to open it
+                if @mustOpenFolderTimer(area)
+                    @startOpenFolderTimer(area.node)
 
-        if not area
-            @removeDropHint()
+                if can_move_to
+                    @updateDropHint()
+        else
             @removeHover()
+            @removeDropHint()
             @stopOpenFolderTimer()
-        else if @hovered_area != area
-            @hovered_area = area
-
-            @updateDropHint()
 
         return true
+
+    canMoveToArea: (area) ->
+        if not area
+            return false
+        else if @tree_widget.options.onCanMoveTo
+            position_name = Position.getName(area.position)
+
+            return @tree_widget.options.onCanMoveTo(@current_item.node, area.node, position_name)
+        else
+            return true
 
     mouseStop: (e) ->
         @moveItem(e)
@@ -1642,21 +1653,18 @@ class DragAndDropHandler
 
         return null
 
-    updateDropHint: ->
-        # stop open folder timer
-        @stopOpenFolderTimer()
+    mustOpenFolderTimer: (area) ->
+        node = area.node
 
-        if not @hovered_area
-            return
-
-        # if this is a closed folder, start timer to open it
-        node = @hovered_area.node
-        if (
+        return (
             node.isFolder() and
             not node.is_open and
-            @hovered_area.position == Position.INSIDE
+            area.position == Position.INSIDE
         )
-            @startOpenFolderTimer(node)
+
+    updateDropHint: ->
+        if not @hovered_area
+            return
 
         # remove previous drop hint
         @removeDropHint()
@@ -1685,7 +1693,8 @@ class DragAndDropHandler
     moveItem: (original_event) ->
         if (
             @hovered_area and
-            @hovered_area.position != Position.NONE
+            @hovered_area.position != Position.NONE and
+            @canMoveToArea(@hovered_area)
         )
             moved_node = @current_item.node
             target_node = @hovered_area.node

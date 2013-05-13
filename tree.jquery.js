@@ -1986,25 +1986,40 @@ limitations under the License.
     };
 
     DragAndDropHandler.prototype.mouseDrag = function(event) {
-      var area, position_name;
+      var area, can_move_to;
 
       this.drag_element.move(event.pageX, event.pageY);
       area = this.findHoveredArea(event.pageX, event.pageY);
-      if (area && this.tree_widget.options.onCanMoveTo) {
-        position_name = Position.getName(area.position);
-        if (!this.tree_widget.options.onCanMoveTo(this.current_item.node, area.node, position_name)) {
-          area = null;
+      can_move_to = this.canMoveToArea(area);
+      if (area) {
+        if (this.hovered_area !== area) {
+          this.hovered_area = area;
+          if (this.mustOpenFolderTimer(area)) {
+            this.startOpenFolderTimer(area.node);
+          }
+          if (can_move_to) {
+            this.updateDropHint();
+          }
         }
-      }
-      if (!area) {
-        this.removeDropHint();
+      } else {
         this.removeHover();
+        this.removeDropHint();
         this.stopOpenFolderTimer();
-      } else if (this.hovered_area !== area) {
-        this.hovered_area = area;
-        this.updateDropHint();
       }
       return true;
+    };
+
+    DragAndDropHandler.prototype.canMoveToArea = function(area) {
+      var position_name;
+
+      if (!area) {
+        return false;
+      } else if (this.tree_widget.options.onCanMoveTo) {
+        position_name = Position.getName(area.position);
+        return this.tree_widget.options.onCanMoveTo(this.current_item.node, area.node, position_name);
+      } else {
+        return true;
+      }
     };
 
     DragAndDropHandler.prototype.mouseStop = function(e) {
@@ -2225,16 +2240,18 @@ limitations under the License.
       return null;
     };
 
-    DragAndDropHandler.prototype.updateDropHint = function() {
-      var node, node_element;
+    DragAndDropHandler.prototype.mustOpenFolderTimer = function(area) {
+      var node;
 
-      this.stopOpenFolderTimer();
+      node = area.node;
+      return node.isFolder() && !node.is_open && area.position === Position.INSIDE;
+    };
+
+    DragAndDropHandler.prototype.updateDropHint = function() {
+      var node_element;
+
       if (!this.hovered_area) {
         return;
-      }
-      node = this.hovered_area.node;
-      if (node.isFolder() && !node.is_open && this.hovered_area.position === Position.INSIDE) {
-        this.startOpenFolderTimer(node);
       }
       this.removeDropHint();
       node_element = this.tree_widget._getNodeElementForNode(this.hovered_area.node);
@@ -2265,7 +2282,7 @@ limitations under the License.
       var doMove, event, moved_node, position, previous_parent, target_node,
         _this = this;
 
-      if (this.hovered_area && this.hovered_area.position !== Position.NONE) {
+      if (this.hovered_area && this.hovered_area.position !== Position.NONE && this.canMoveToArea(this.hovered_area)) {
         moved_node = this.current_item.node;
         target_node = this.hovered_area.node;
         position = this.hovered_area.position;
