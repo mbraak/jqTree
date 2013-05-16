@@ -74,6 +74,7 @@
                 <li><a href="#functions-updatenode">updateNode</a></li>
                 <li><a href="#functions-movenode">moveNode</a></li>
                 <li><a href="#functions-toggle">toggle</a></li>
+                <li><a href="#functions-scrolltonode">scrollToNode</a></li>
             </ul>
         </li>
         <li>
@@ -257,6 +258,7 @@ $.getJSON(
         <li>Issue 133: loadDataFromUrl doesn't work when only parent_node and callback are passed in (thanks to Simone Deponti)</li>
         <li>Issue 134: selectNode from inside tree.init breaks on loadData (thanks to Sam D)</li>
         <li>Issue 145: Auto-open nodes with drag n drop when drag not enabled for that node (thanks to Daniel Powell)</li>
+        <li>Issue 146: Added function scrollToNode (thanks to Davide Bellini)</li>
     </ul>
 
     <h5>0.15 (march 16 2013)</h5>
@@ -1068,6 +1070,21 @@ $tree.tree('moveNode', node, target_node, 'after');
 <pre><code class="language-javascript">
 var node = $tree.tree('getNodeBydId', 1);
 $tree.tree('toggle', node);
+</code></pre>
+
+    <h5 id="functions-scrolltonode">scrollToNode</h5>
+
+    <p>
+        <strong>function scrollToNode(node);</strong>
+    </p>
+
+    <p>
+        Scroll to this node. This is useful if the tree is in a container div and is scrollable.
+    </p>
+
+<pre><code class="language-javascript">
+var node = $tree.tree('getNodeBydId', 1);
+$tree.tree('scrollToNode', node);
 </code></pre>
 
     <h4 id="events">Events</h4>

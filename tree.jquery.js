@@ -1191,6 +1191,14 @@ limitations under the License.
       return this._getNodeElementForNode(node).deselect();
     };
 
+    JqTreeWidget.prototype.scrollToNode = function(node) {
+      var $element, top;
+
+      $element = $(node.element);
+      top = $element.offset().top - this.$el.offset().top;
+      return this.scroll_handler.scrollTo(top);
+    };
+
     JqTreeWidget.prototype._init = function() {
       JqTreeWidget.__super__._init.call(this);
       this.element = this.$el;
@@ -2396,6 +2404,17 @@ limitations under the License.
         return $(document).scrollTop($(document).scrollTop() - 20);
       } else if ($(window).height() - (area.bottom - $(document).scrollTop()) < 20) {
         return $(document).scrollTop($(document).scrollTop() + 20);
+      }
+    };
+
+    ScrollHandler.prototype.scrollTo = function(top) {
+      var tree_top;
+
+      if (this.$scroll_parent) {
+        return this.$scroll_parent[0].scrollTop = top;
+      } else {
+        tree_top = this.tree_widget.$el.offset().top;
+        return $(document).scrollTop(top + tree_top);
       }
     };
 

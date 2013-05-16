@@ -762,6 +762,12 @@ class JqTreeWidget extends MouseWidget
 
         @_getNodeElementForNode(node).deselect()
 
+    scrollToNode: (node) ->
+        $element = $(node.element)
+        top = $element.offset().top - @$el.offset().top
+
+        @scroll_handler.scrollTo(top)
+
     _init: ->
         super()
 
@@ -1786,3 +1792,10 @@ class ScrollHandler
             $(document).scrollTop($(document).scrollTop() - 20)
         else if $(window).height() - (area.bottom - $(document).scrollTop()) < 20
             $(document).scrollTop($(document).scrollTop() + 20)
+
+    scrollTo: (top) ->
+        if @$scroll_parent
+            @$scroll_parent[0].scrollTop = top
+        else
+            tree_top = @tree_widget.$el.offset().top
+            $(document).scrollTop(top + tree_top)
