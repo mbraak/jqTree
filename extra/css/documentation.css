@@ -1,4 +1,8 @@
 /* main layout */
+body, button, input, select, textarea {
+    font-family: 'Open Sans', sans-serif;
+}
+
 #sidebar {
     width: 200px;
     position: fixed;
@@ -40,6 +44,14 @@
 
 #sidebar ul.first > li > a {
     font-weight: bold;
+}
+
+#sidebar ul.first ul {
+    list-style-position: outside;
+}
+
+#sidebar ul.first ul > li {
+    margin-left: 20px;
 }
 
 /* page */
@@ -108,6 +120,11 @@ a:visited {
 
 img {
     margin: 0 0.5em;
+}
+
+#page ul {
+    list-style-position: outside;
+    margin-left: 1em;
 }
 
 /* tree */

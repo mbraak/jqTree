@@ -4,6 +4,10 @@ body {
     padding-bottom: 2em;
 }
 
+body, button, input, select, textarea {
+    font-family: 'Open Sans', sans-serif;
+}
+
 h1 {
     font-size: 1.625em;
 }
@@ -20,7 +24,6 @@ p {
 }
 
 #tree1 {
-    margin-bottom: 1em;
     background-color: #ccc;
     padding: 1em;
 }

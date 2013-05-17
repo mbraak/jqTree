@@ -3,11 +3,17 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %}{% endblock %}</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../extra/css/gridless.css">
     <link rel="stylesheet" href="../extra/prism/prism.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <script src="../extra/js/jquery-1.9.1.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="../extra/js/jquery-1.9.1.min.js"></script>
+    <![endif]-->
+    <!--[if gte IE 9]><!-->
+        <script src="../extra/js/jquery-2.0.0.min.js"></script>
+    <!--<![endif]-->
     <script src="../extra/prism/prism.js"></script>
     <script src="../extra/js/jquery.mockjax.js"></script>
     <script src="../extra/example_data.js"></script>

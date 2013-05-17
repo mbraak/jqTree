@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Load json data in javascript tree</title>
+    <title>Javascript tree with multiple select</title>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../extra/css/gridless.css">
     <link rel="stylesheet" href="../extra/prism/prism.css">
@@ -35,77 +35,72 @@
 </head>
 <body>
     <p id="nav">
-        <a href="../index.html">&laquo; Documentation</a>
-        
-            <a href="load_json_data_from_server.html" class="next">Example 2 &raquo;</a>
+        <a href="autoscroll.html">&laquo; Example 7</a>
         
     </p>
 
-    <h1>Example 1 - load json data</h1>
+    <h1>Example 8 - multiple select</h1>
 
     
     <div id="tree1"></div>
 
-    <p>
-        In this example we load the data using the <strong>data</strong> option.
-        As you can see, the data is an array of objects.
-    </p>
-    <ul>
-        <li>The <strong>label</strong> property defines the label of the node.</li>
-        <li>The <strong>children</strong> property is an array of nodes.
-    </ul>
-
-    <h3>html<h3>
+    <h3>html</h3>
 
 <pre><code class="language-markup">
-&lt;div id="tree1"&gt;&lt;/div&gt;
+&lt;div id="tree1" data-url="/nodes/"&gt;&lt;/div&gt;
 </code></pre>
 
     <h3>javascript</h3>
 
 <pre><code class="language-javascript">
-var data = [
-    {
-        label: 'node1',
-        children: [
-            { label: 'child1' },
-            { label: 'child2' }
-        ]
-    },
-    {
-        label: 'node2',
-        children: [
-            { label: 'child3' }
-        ]
-    }
-];
+$(function() {
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: ExampleData.example_data,
+        autoOpen: true,
+    });
+    $tree.bind(
+        'tree.click',
+        function(e) {
+            // Disable single selection
+            e.preventDefault();
 
-$('#tree1').tree({
-    data: data
+            var selected_node = e.node;
+
+            if ($tree.tree('isNodeSelected', selected_node)) {
+                $tree.tree('removeFromSelection', selected_node);
+            }
+            else {
+                $tree.tree('addToSelection', selected_node);
+            }
+        }
+    );
 });
 </code></pre>
 
     <script>
         $(function() {
-            var data = [
-                {
-                    label: 'node1',
-                    children: [
-                        { label: 'child1' },
-                        { label: 'child2' }
-                    ]
-                },
-                {
-                    label: 'node2',
-                    children: [
-                        { label: 'child3' }
-                    ]
-                }
-            ];
-
-            $('#tree1').tree({
-                data: data
+            var $tree = $('#tree1');
+            $tree.tree({
+                data: ExampleData.example_data,
+                autoOpen: true,
             });
+            $tree.bind(
+                'tree.click',
+                function(e) {
+                    // Disable single selection
+                    e.preventDefault();
+
+                    var selected_node = e.node;
+
+                    if ($tree.tree('isNodeSelected', selected_node)) {
+                        $tree.tree('removeFromSelection', selected_node);
+                    }
+                    else {
+                        $tree.tree('addToSelection', selected_node);
+                    }
+                }
+            );
         });
     </script>
 

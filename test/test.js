@@ -428,7 +428,7 @@ test('selectNode', function() {
     equal(node2.is_open, undefined);
     equal(child3.is_open, undefined);
 
-    // 1. select node 'child3', which is a child of 'node2'; must_open_parents = true
+    // -- select node 'child3', which is a child of 'node2'; must_open_parents = true
     $tree.tree('selectNode', child3, true);
     equal($tree.tree('getSelectedNode').name, 'child3');
 
@@ -436,9 +436,12 @@ test('selectNode', function() {
     equal(node2.is_open, true);
     equal(child3.is_open, undefined);
 
-    // 2. select node 'node1'
+    // -- select node 'node1'
     $tree.tree('selectNode', node1);
     equal($tree.tree('getSelectedNode').name, 'node1');
+
+    // -- is 'node1' selected?
+    ok($tree.tree('isNodeSelected', node1));
 });
 
 test('click toggler', function() {
@@ -884,8 +887,8 @@ test('load on demand', function() {
     $.mockjax({
         url: '*',
         response: function(options) {
-            equal(options.url, '/tree/');
-            deepEqual(options.data, { 'node' : 1 })
+            equal(options.url, '/tree/', '2');
+            deepEqual(options.data, { 'node' : 1 }, '3')
 
             this.responseText = [
                 {
@@ -900,11 +903,11 @@ test('load on demand', function() {
     $tree.bind('tree.refresh', function(e) {
         start();
 
-        equal(formatTitles($tree), 'node1 child1');
+        equal(formatTitles($tree), 'node1 child1', '4');
     });
 
     var node1 = $tree.tree('getNodeByName', 'node1');
-    equal(formatTitles($tree), 'node1');
+    equal(formatTitles($tree), 'node1', '1');
 
     $tree.tree('openNode', node1, true);
 
@@ -985,6 +988,28 @@ test('mouse events', function() {
     equal(
         formatTitles($tree),
         'node2 child3 node1 child1 child2'
+    );
+});
+
+test('multiple select', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({ data: example_data });
+
+    var child1 = $tree.tree('getNodeByName', 'child1');
+    var child2 = $tree.tree('getNodeByName', 'child2');
+
+    // -- add nodes to selection
+    // todo: more nodes as parameters?
+    // todo: rename to 'selection.add' or 'selection' 'add'?
+    $tree.tree('addToSelection', child1);
+    $tree.tree('addToSelection', child2);
+
+    // -- get selected nodes
+    var selected_nodes = $tree.tree('getSelectedNodes');
+    equal(
+        formatNodes(selected_nodes),
+        'child1 child2'
     );
 });
 

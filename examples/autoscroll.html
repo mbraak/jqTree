@@ -3,11 +3,17 @@
 <head>
     <meta charset="utf-8">
     <title>Javascript tree with autoscroll</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../extra/css/gridless.css">
     <link rel="stylesheet" href="../extra/prism/prism.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <script src="../extra/js/jquery-1.9.1.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="../extra/js/jquery-1.9.1.min.js"></script>
+    <![endif]-->
+    <!--[if gte IE 9]><!-->
+        <script src="../extra/js/jquery-2.0.0.min.js"></script>
+    <!--<![endif]-->
     <script src="../extra/prism/prism.js"></script>
     <script src="../extra/js/jquery.mockjax.js"></script>
     <script src="../extra/example_data.js"></script>
@@ -31,17 +37,19 @@
     <p id="nav">
         <a href="autoescape.html">&laquo; Example 6</a>
         
+            <a href="multiple_select.html" class="next">Example 8 &raquo;</a>
+        
     </p>
 
     <h1>Example 7 - autoscroll</h1>
 
     
     <div id="scroll-container">
-        <div id="tree1" data-url="/example_data/"></div>
+        <div id="tree1"></div>
     </div>
 
     <p>
-        This example autoscroll. The tree will scroll automatically if you drag an item outside of the tree.
+        This is an example of autoscroll. The tree will scroll automatically if you drag an item outside of the tree.
         <br />
         Autoscroll will work automatically. There is no option for it.
     </p>

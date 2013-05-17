@@ -1,0 +1,72 @@
+{% extends "base" %}
+
+{% block title %}Javascript tree with multiple select{% endblock %}
+{% block h1 %}Example 8 - multiple select{% endblock %}
+
+{% block previous_url %}autoscroll.html{% endblock %}
+{% block previous_title %}Example 7{% endblock %}
+{% block next %}{% endblock %}
+
+{% block contents %}
+    <div id="tree1"></div>
+
+    <h3>html</h3>
+
+<pre><code class="language-markup">
+&lt;div id="tree1" data-url="/nodes/"&gt;&lt;/div&gt;
+</code></pre>
+
+    <h3>javascript</h3>
+
+<pre><code class="language-javascript">
+$(function() {
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: ExampleData.example_data,
+        autoOpen: true,
+    });
+    $tree.bind(
+        'tree.click',
+        function(e) {
+            // Disable single selection
+            e.preventDefault();
+
+            var selected_node = e.node;
+
+            if ($tree.tree('isNodeSelected', selected_node)) {
+                $tree.tree('removeFromSelection', selected_node);
+            }
+            else {
+                $tree.tree('addToSelection', selected_node);
+            }
+        }
+    );
+});
+</code></pre>
+
+    <script>
+        $(function() {
+            var $tree = $('#tree1');
+            $tree.tree({
+                data: ExampleData.example_data,
+                autoOpen: true,
+            });
+            $tree.bind(
+                'tree.click',
+                function(e) {
+                    // Disable single selection
+                    e.preventDefault();
+
+                    var selected_node = e.node;
+
+                    if ($tree.tree('isNodeSelected', selected_node)) {
+                        $tree.tree('removeFromSelection', selected_node);
+                    }
+                    else {
+                        $tree.tree('addToSelection', selected_node);
+                    }
+                }
+            );
+        });
+    </script>
+{% endblock %}

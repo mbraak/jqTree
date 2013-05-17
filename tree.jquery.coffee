@@ -1,4 +1,4 @@
-###
+﻿###
 Copyright 2013 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -467,16 +467,13 @@ class Node
 
 @Tree.Node = Node
 
-TRIANGLE_RIGHT = '&#x25ba;'  # ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
-TRIANGLE_DOWN = '&#x25bc;'  # ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
-
-
 class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
         saveState: false  # true / false / string (cookie name)
         dragAndDrop: false
-        selectable: false
+        selectable: true
+        useContextMenu: true
         onCanSelectNode: null
         onSetStateFromStorage: null
         onGetStateFromStorage: null
@@ -487,6 +484,8 @@ class JqTreeWidget extends MouseWidget
         onLoadFailed: null
         autoEscape: true
         dataUrl: null
+        closedIcon: '&#x25ba;'  # The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
+        openedIcon: '&#x25bc;'  # The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
         slide: true  # must display slide animation?
         nodeClass: Node
 
@@ -500,10 +499,49 @@ class JqTreeWidget extends MouseWidget
         return @tree
 
     selectNode: (node) ->
-        @select_node_handler.selectNode(node)
+        @_selectNode(node, true)
+
+    _selectNode: (node, must_toggle=false) ->
+        canSelect = =>
+            if not @options.onCanSelectNode
+                return @options.selectable
+
+            return @options.selectable and @options.onCanSelectNode(node)
+
+        openParents = =>
+            parent = node.parent
+
+            if not parent.is_open and parent.parent
+                @openNode(parent, false)
+
+        saveState = =>
+            if @options.saveState
+                @save_state_handler.saveState()            
+
+        if not node
+            # Called with empty node -> deselect current node
+            @_deselectCurrentNode()
+            saveState
+            return
+
+        if not canSelect()
+            return
+
+        if @select_node_handler.isNodeSelected(node)
+            if must_toggle
+                # Toggle current node -> is now deselected 
+                @_deselectCurrentNode()
+                @_triggerEvent('tree.select', node: null)
+        else
+            @_deselectCurrentNode()
+            @addToSelection(node)
+            @_triggerEvent('tree.select', node: node)
+            openParents()
+
+        saveState()
 
     getSelectedNode: ->
-        return @selected_node or false
+        return @select_node_handler.getSelectedNode()
 
     toJson: ->
         return JSON.stringify(
@@ -513,21 +551,14 @@ class JqTreeWidget extends MouseWidget
     loadData: (data, parent_node) ->
         @_loadData(data, parent_node)
 
-        if not parent_node
-            @selected_node = null
-
     loadDataFromUrl: (url, parent_node, on_finished) ->
         if $.type(url) != 'string'
             # Url parameter is omitted
-            parent_node = url
             on_finished = parent_node
+            parent_node = url
             url = null
-            on_finished = null
 
         @_loadDataFromUrl(url, parent_node, on_finished)
-
-        if not parent_node
-            @selected_node = null
 
     _loadDataFromUrl: (url_info, parent_node, on_finished) ->
         $el = null
@@ -590,8 +621,9 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data, false, @options.nodeClass)
         else
-            if @selected_node and parent_node.isParentOf(@selected_node)
-                @selected_node = null
+            selected_nodes_under_parent = @select_node_handler.getSelectedNodes(parent_node)
+            for n in selected_nodes_under_parent
+                @select_node_handler.removeFromSelection(n)
 
             parent_node.loadFromData(data)
             parent_node.load_on_demand = false
@@ -665,33 +697,12 @@ class JqTreeWidget extends MouseWidget
         return new_node    
 
     removeNode: (node) ->
-        mustUnselectedNode = =>
-            if not @selected_node
-                return false
-            else if @selected_node == node
-                return true
-            else
-                result = true
-
-                @tree.iterate(
-                    (child) =>
-                        if node == child
-                            result = true
-                            return false
-                        else
-                            return true
-                )
-
-                return result
-
         parent = node.parent
         if parent
-            if mustUnselectedNode()
-                @selected_node = null
+            @select_node_handler.removeFromSelection(node, true)  # including children
 
             node.remove()
             @_refreshElements(parent.parent)
-
 
     appendNode: (new_node_info, parent_node) ->
         if not parent_node
@@ -724,7 +735,7 @@ class JqTreeWidget extends MouseWidget
         node.setData(data)
 
         @_refreshElements(node.parent)
-        @select_node_handler.selectCurrentNode()
+        @._selectCurrentNode()
 
     moveNode: (node, target_node, position) ->
         position_index = Position.nameToIndex(position)
@@ -735,11 +746,32 @@ class JqTreeWidget extends MouseWidget
     getStateFromStorage: ->
         return @save_state_handler.getStateFromStorage()
 
+    addToSelection: (node) ->
+        @select_node_handler.addToSelection(node)
+
+        @_getNodeElementForNode(node).select()
+
+    getSelectedNodes: ->
+        return @select_node_handler.getSelectedNodes()
+
+    isNodeSelected: (node) ->
+        return @select_node_handler.isNodeSelected(node)
+
+    removeFromSelection: (node) ->
+        @select_node_handler.removeFromSelection(node)
+
+        @_getNodeElementForNode(node).deselect()
+
+    scrollToNode: (node) ->
+        $element = $(node.element)
+        top = $element.offset().top - @$el.offset().top
+
+        @scroll_handler.scrollTo(top)
+
     _init: ->
         super()
 
         @element = @$el
-        @selected_node = null
         @mouse_delay = 300
 
         @save_state_handler = new SaveStateHandler(this)
@@ -750,7 +782,8 @@ class JqTreeWidget extends MouseWidget
         @_initData()
 
         @element.click($.proxy(@_click, this))
-        @element.bind('contextmenu', $.proxy(@_contextmenu, this))
+        if @options.useContextMenu
+            @element.bind('contextmenu', $.proxy(@_contextmenu, this))
 
     _deinit: ->
         @element.empty()
@@ -782,6 +815,7 @@ class JqTreeWidget extends MouseWidget
 
     _initTree: (data) ->
         @tree = new @options.nodeClass(null, true, @options.nodeClass)
+        @select_node_handler.clear()
         @tree.loadFromData(data)
 
         @_openNodes()
@@ -836,7 +870,7 @@ class JqTreeWidget extends MouseWidget
         createNodeLi = (node) =>
             li_classes = ['jqtree_common']
 
-            if node == @selected_node
+            if @select_node_handler.isNodeSelected(node)
                 li_classes.push('jqtree-selected')
 
             class_string = li_classes.join(' ')
@@ -861,7 +895,7 @@ class JqTreeWidget extends MouseWidget
                 if not node.is_open
                     classes.push('jqtree-closed')
 
-                if node == @selected_node
+                if @select_node_handler.isNodeSelected(node)
                     classes.push('jqtree-selected')
 
                 return classes.join(' ')
@@ -872,9 +906,9 @@ class JqTreeWidget extends MouseWidget
             escaped_name = escapeIfNecessary(node.name)
 
             if node.is_open
-                button_char = TRIANGLE_DOWN
+                button_char = @options.openedIcon
             else
-                button_char = TRIANGLE_RIGHT
+                button_char = @options.closedIcon
 
             return $(
                 "<li class=\"jqtree_common #{ folder_classes }\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
@@ -931,9 +965,10 @@ class JqTreeWidget extends MouseWidget
             if $el.length
                 node = @_getNode($el)
                 if node
-                    @_triggerEvent('tree.click', node: node)
+                    event = @_triggerEvent('tree.click', node: node)
 
-                    @select_node_handler.selectNode(node, true)
+                    if not event.isDefaultPrevented()
+                        @_selectNode(node, true)
 
     _getNode: ($element) ->
         $li = $element.closest('li')
@@ -1012,6 +1047,17 @@ class JqTreeWidget extends MouseWidget
         @dnd_handler.generateHitAreas()
         return @dnd_handler.hit_areas
 
+    _selectCurrentNode: ->
+        node = @getSelectedNode()
+        if node
+            node_element = @_getNodeElementForNode(node)
+            if node_element
+                node_element.select()
+
+    _deselectCurrentNode: ->
+        node = @getSelectedNode()
+        if node
+            @removeFromSelection(node)
 
 SimpleWidget.register(JqTreeWidget, 'tree')
 
@@ -1104,7 +1150,7 @@ class FolderElement extends NodeElement
             @node.is_open = true
             $button = @getButton()
             $button.removeClass('jqtree-closed')
-            $button.html(TRIANGLE_DOWN)
+            $button.html(@tree_widget.options.openedIcon)
 
             doOpen = =>
                 @getLi().removeClass('jqtree-closed')
@@ -1124,7 +1170,7 @@ class FolderElement extends NodeElement
             @node.is_open = false
             $button = @getButton()
             $button.addClass('jqtree-closed')
-            $button.html(TRIANGLE_RIGHT)
+            $button.html(@tree_widget.options.closedIcon)
 
             doClose = =>
                 @getLi().addClass('jqtree-closed')
@@ -1221,13 +1267,16 @@ class SaveStateHandler
             return true
         )
 
-        selected_node = ''
-        if @tree_widget.selected_node
-            selected_node = @tree_widget.selected_node.id
+        # todo : multiple nodes
+        selected_node = @tree_widget.getSelectedNode()
+        if selected_node
+            selected_node_id = selected_node.id
+        else
+            selected_node_id = ''
 
         return JSON.stringify(
             open_nodes: open_nodes,
-            selected_node: selected_node
+            selected_node: selected_node_id
         )
 
     setState: (state) ->
@@ -1244,11 +1293,14 @@ class SaveStateHandler
                 )
                     node.is_open = true
 
-                if selected_node_id and (node.id == selected_node_id)
-                    @tree_widget.selected_node = node
-
                 return true
             )
+
+            if selected_node_id
+                selected_node = @tree_widget.getNodeById(selected_node_id)
+
+                if selected_node
+                    @tree_widget.select_node_handler.addToSelection(selected_node)
 
     getCookieName: ->
         if typeof @tree_widget.options.saveState is 'string'
@@ -1260,59 +1312,60 @@ class SaveStateHandler
 class SelectNodeHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
+        @clear()
 
-    selectNode: (node, must_toggle=false) ->
-        canSelect = =>
-            if not @tree_widget.options.onCanSelectNode
-                return true
+    getSelectedNode: ->
+        selected_nodes = @getSelectedNodes()
 
-            return @tree_widget.options.onCanSelectNode(node)
+        if selected_nodes.length
+            return selected_nodes[0]
+        else
+            return  false
 
-        mustToggle = (previous_node, node) ->
-            if must_toggle and previous_node and node
-                if node.id
-                    return node.id == previous_node.id
-                else
-                    # If nodes have no id, then use the dom element
-                    return node.element == previous_node.element
-            else
-                return false
+    getSelectedNodes: ->
+        if @selected_single_node
+            return [@selected_single_node]
+        else
+            selected_nodes = []
 
-        if canSelect()
-            if @tree_widget.selected_node
-                previous_node = @tree_widget.selected_node
+            for id of @selected_nodes
+                node = @tree_widget.getNodeById(id)
+                if node
+                    selected_nodes.push(node)
 
-                @tree_widget._getNodeElementForNode(previous_node).deselect()
-                @tree_widget.selected_node = null
-            else
-                previous_node = null
+            return selected_nodes
 
-            if node
-                node_element = @tree_widget._getNodeElementForNode(node)
+    isNodeSelected: (node) ->
+        if node.id
+            return @selected_nodes[node.id]
+        else if @selected_single_node
+            return @selected_single_node.element == node.element
+        else
+            return false
 
-                if mustToggle(previous_node, node)
-                    node_element.deselect()
+    clear: ->
+        @selected_nodes = {}
+        @selected_single_node = null
 
-                    @tree_widget._triggerEvent('tree.select', node: null)
-                else
-                    node_element.select()
-                    @tree_widget.selected_node = node
+    removeFromSelection: (node, include_children=false) ->
+        if not node.id
+            if node.element == @selected_single_node
+                @selected_single_node = null
+        else
+            delete @selected_nodes[node.id]
 
-                    @tree_widget._triggerEvent('tree.select', node: node)
+            if include_children
+                node.iterate(
+                    (n) =>
+                        delete @selected_nodes[node.id]
+                        return true
+                )
 
-                    parent = @tree_widget.selected_node.parent
-
-                    if not parent.is_open
-                        @tree_widget.openNode(parent, false)
-
-            if @tree_widget.options.saveState
-                @tree_widget.save_state_handler.saveState()
-
-    selectCurrentNode: ->
-        if @tree_widget.selected_node
-            node_element = @tree_widget._getNodeElementForNode(@tree_widget.selected_node)
-            if node_element
-                node_element.select()
+    addToSelection: (node) ->
+        if node.id
+            @selected_nodes[node.id] = true
+        else
+            @selected_single_node = node
 
 
 class DragAndDropHandler
@@ -1359,23 +1412,34 @@ class DragAndDropHandler
         @drag_element.move(event.pageX, event.pageY)
 
         area = @findHoveredArea(event.pageX, event.pageY)
+        can_move_to = @canMoveToArea(area)
 
-        if area and @tree_widget.options.onCanMoveTo
-            position_name = Position.getName(area.position)
+        if area
+            if @hovered_area != area
+                @hovered_area = area
 
-            if not @tree_widget.options.onCanMoveTo(@current_item.node, area.node, position_name)
-                area = null
+                # If this is a closed folder, start timer to open it
+                if @mustOpenFolderTimer(area)
+                    @startOpenFolderTimer(area.node)
 
-        if not area
-            @removeDropHint()
+                if can_move_to
+                    @updateDropHint()
+        else
             @removeHover()
+            @removeDropHint()
             @stopOpenFolderTimer()
-        else if @hovered_area != area
-            @hovered_area = area
-
-            @updateDropHint()
 
         return true
+
+    canMoveToArea: (area) ->
+        if not area
+            return false
+        else if @tree_widget.options.onCanMoveTo
+            position_name = Position.getName(area.position)
+
+            return @tree_widget.options.onCanMoveTo(@current_item.node, area.node, position_name)
+        else
+            return true
 
     mouseStop: (e) ->
         @moveItem(e)
@@ -1536,7 +1600,7 @@ class DragAndDropHandler
 
         iterate = (node, next_node) =>
             must_iterate_inside = (
-                (node.is_open or  not node.element) and node.hasChildren()
+                (node.is_open or not node.element) and node.hasChildren()
             )
 
             if node.element                
@@ -1595,21 +1659,18 @@ class DragAndDropHandler
 
         return null
 
-    updateDropHint: ->
-        # stop open folder timer
-        @stopOpenFolderTimer()
+    mustOpenFolderTimer: (area) ->
+        node = area.node
 
-        if not @hovered_area
-            return
-
-        # if this is a closed folder, start timer to open it
-        node = @hovered_area.node
-        if (
+        return (
             node.isFolder() and
             not node.is_open and
-            @hovered_area.position == Position.INSIDE
+            area.position == Position.INSIDE
         )
-            @startOpenFolderTimer(node)
+
+    updateDropHint: ->
+        if not @hovered_area
+            return
 
         # remove previous drop hint
         @removeDropHint()
@@ -1638,7 +1699,8 @@ class DragAndDropHandler
     moveItem: (original_event) ->
         if (
             @hovered_area and
-            @hovered_area.position != Position.NONE
+            @hovered_area.position != Position.NONE and
+            @canMoveToArea(@hovered_area)
         )
             moved_node = @current_item.node
             target_node = @hovered_area.node
@@ -1730,3 +1792,10 @@ class ScrollHandler
             $(document).scrollTop($(document).scrollTop() - 20)
         else if $(window).height() - (area.bottom - $(document).scrollTop()) < 20
             $(document).scrollTop($(document).scrollTop() + 20)
+
+    scrollTo: (top) ->
+        if @$scroll_parent
+            @$scroll_parent[0].scrollTop = top
+        else
+            tree_top = @tree_widget.$el.offset().top
+            $(document).scrollTop(top + tree_top)

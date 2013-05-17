@@ -7,8 +7,14 @@
     <link rel="stylesheet" href="extra/prism/prism.css">
     <link rel="stylesheet" href="jqtree.css">
     <link rel="stylesheet" href="extra/css/documentation.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
-    <script src="extra/js/jquery-1.9.1.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="extra/js/jquery-1.9.1.min.js"></script>
+    <![endif]-->
+    <!--[if gte IE 9]><!-->
+        <script src="extra/js/jquery-2.0.0.min.js"></script>
+    <!--<![endif]-->
     <script src="extra/prism/prism.js"></script>
     <script src="tree.jquery.js"></script>
     <script type="text/javascript">
@@ -58,6 +64,9 @@
                 <li><a href="#tree-options-oncanmoveto">onCanMoveTo</a></li>
                 <li><a href="#tree-options-autoescape">autoEscape</a></li>
                 <li><a href="#tree-options-slide">slide</a></li>
+                <li><a href="#tree-options-openedIcon">openedIcon</a></li>
+                <li><a href="#tree-options-closedIcon">closedIcon</a></li>
+                <li><a href="#tree-options-usecontextmenu">useContextMenu</a></li>
             </ul>
         </li>
         <li>
@@ -79,6 +88,7 @@
                 <li><a href="#functions-updatenode">updateNode</a></li>
                 <li><a href="#functions-movenode">moveNode</a></li>
                 <li><a href="#functions-toggle">toggle</a></li>
+                <li><a href="#functions-scrolltonode">scrollToNode</a></li>
             </ul>
         </li>
         <li>
@@ -90,6 +100,16 @@
                 <li><a href="#event-tree-move">tree.move</a></li>
                 <li><a href="#event-tree-init">tree.init</a></li>
                 <li><a href="#event-tree-open">tree.open</a></li>
+                <li><a href="#event-tree-close">tree.close</a></li>	
+            </ul>
+        </li>
+        <li>
+            <a href="#multiple-selection">Multiple selection</a>
+            <ul>
+                <li><a href="#multiple-selection-add-to-selection">addToSelection</a></li>
+                <li><a href="#multiple-selection-get-selected-nodes">getSelectedNodes</a></li>
+                <li><a href="#multiple-selection-is-node-selected">isNodeSelected</a></li>
+                <li><a href="#multiple-selection-remove-from-selection">remove&shy;From&shy;Selection</a></li>
             </ul>
         </li>
     </ul>
@@ -151,11 +171,11 @@ $('#tree1').tree({
 
     <h4 id="requirements">Requirements</h4>
     <ul>
-        <li><a href="http://jquery.com">jQuery</a> 1.5+</li>
+        <li><a href="http://jquery.com">jQuery</a> 1.5+ or 2.0</li>
     </ul>
     <h4 id="downloads">Downloads</h4>
     <ul>
-        <li>All (version 0.15): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+        <li>All (version 0.16): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
         <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
         <li>Css: <a href="jqtree.css">jqtree.css</a></li>
         <li>Image: <a href="jqtree-circle.png">jqtree-circle.png</a></li>
@@ -237,9 +257,23 @@ $.getJSON(
         <li><a href="examples/load_on_demand.html">Example 5 - load nodes on demand from the server</a></li>
         <li><a href="examples/autoescape.html">Example 6 - autoEscape</a></li>
         <li><a href="examples/autoscroll.html">Example 7 - autoscroll</a></li>
+        <li><a href="examples/multiple_select.html">Example 8 - multiple select</a></li>
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.16 (development version)</h5>
+    <ul>
+        <li>Issue 62: Added functions for multiple select</li>
+        <li>Issue 125: Add option for overriding TRIANGLE_RIGHT and TRIANGLE_DOWN (thanks to Sam D)</li>
+        <li>Issue 126: Event tree.open event fires after first tree.select on top level node</li>
+        <li>Issue 129: Allow native context menu to be display (thanks to Charles Bourasseau)</li>
+        <li>Issue 130: Selectable not implemented (thanks to Sam D)</li>
+        <li>Issue 133: loadDataFromUrl doesn't work when only parent_node and callback are passed in (thanks to Simone Deponti)</li>
+        <li>Issue 134: selectNode from inside tree.init breaks on loadData (thanks to Sam D)</li>
+        <li>Issue 145: Auto-open nodes with drag n drop when drag not enabled for that node (thanks to Daniel Powell)</li>
+        <li>Issue 146: Added function scrollToNode (thanks to Davide Bellini)</li>
+    </ul>
 
     <h5>0.15 (march 16 2013)</h5>
     <ul>
@@ -248,7 +282,8 @@ $.getJSON(
         <li>Issue 103: Added getLevel function to Node class</li>
         <li>Issue 104: The addNodeBefore method must return the new node</li>
         <li>Issue 105: Added nodeClass option</li>
-        <li>Issue 112: Fix call to iterate in removeNode</li>
+        <li>Issue 112: Fix call to iterate in removeNode (thanks to Ingemar Ådahl)</li>
+        <li>Issue 113: Added onLoadFailed option (thanks to Shuhei Kondo)</li>
         <li>Issue 118: Deselect a node when click and already selected</li>
         <li>Issue 119: Make it easier to reload a subtree</li>
         <li>Issue 121: Unselect node if it's reloaded by loadDataFromUrl</li>
@@ -262,22 +297,23 @@ $.getJSON(
     </ul>
     <h6>Issues</h6>
     <ul>
-        <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method</li>
+        <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method (thanks to Rodrigo Rosenfeld Rosas)</li>
         <li>Issue 81: getSelectedNode must return false if node is removed</li>
         <li>Issue 82: Autoscroll for drag-and-drop</li>
+        <li>Issue 84: Fix correct type param in $.ajax() (thanks to Rodrigo Rosenfeld Rosas)</li>
         <li>Issue 85: Option to turn slide animation on or off</li>
         <li>Issue 86: The openNode function must automatically open parents</li>
         <li>Issue 87: Remove the must_open_parents parameter from the selectNode function</li>
         <li>Issue 88: selectNode must also work if selectable option is false</li>
         <li>Issue 89: Clicking in title with img or em does not work</li>
-        <li>Issue 96: Added jqtree_common class to avoid css clashes</li> 
+        <li>Issue 96: Added jqtree_common class to avoid css clashes (thanks to Yaniv Iny)</li> 
     </ul>
 
     <h5>0.13 (october 10 2012)</h5>
     <ul>
         <li>Issue 54: Added tree.select event</li>
         <li>Issue 63: Fixed contextmenu event</li>
-        <li>Issue 67: Use unicode characters for triangle buttons</li>
+        <li>Issue 67: Use unicode characters for triangle buttons (thanks to Younès)</li>
         <li>Issue 70: Load data from the server using the loadData function</li>
         <li>Issue 78: Drag and drop is trigger happy</li>
     </ul>
@@ -321,8 +357,8 @@ $.getJSON(
 
     <h5>0.9 (may 9 2012)</h5>
     <ul>
-        <li>Issue #15: 'tree.open' event is not triggered when dragging nodes</li>
-        <li>Issue #18: Allow moveNode to be canceled through ev.preventDefault()</li>
+        <li>Issue 15: 'tree.open' event is not triggered when dragging nodes</li>
+        <li>Issue 18: Allow moveNode to be canceled through ev.preventDefault()</li>
         <li>Use sprite for images</li>
         <li>Added function closeNode</li>
         <li>Added support for localstorage</li>
@@ -494,16 +530,16 @@ $('#tree1').tree({
         Turn on selection of nodes.
     </p>
     <ul>
-        <li><strong>true</strong>: turn on selection of nodes</li>
-        <li><strong>false (default)</strong>: turn off selection of nodes</li>
+        <li><strong>true (default)</strong>: turn on selection of nodes</li>
+        <li><strong>false</strong>: turn off selection of nodes</li>
     </ul>
     <p>
-        Example: turn on selection of nodes.
+        Example: turn off selection of nodes.
     </p>
 <pre><code class="language-javascript">
 $('#tree1').tree({
     data: data,
-    selectable: true
+    selectable: false
 });
 </code></pre>
 
@@ -617,6 +653,45 @@ $('#tree1').tree({
 });
 </code></pre>
 
+    <h5 id="tree-options-openedIcon">openedIcon</h5>
+
+    <p>
+        A character or symbol to display on opened nodes. The default is '&amp;#x25bc;' (&#x25bc;)
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    openedIcon: '-'
+});
+</code></pre>
+
+    <h5 id="tree-options-closedIcon">closedIcon</h5>
+
+    <p>
+        A character or symbol to display on closed nodes. The default is '&amp;#x25ba;' (&#x25ba;)
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    closedIcon: '+'
+});
+</code></pre>
+
+    <h5 id="tree-options-usecontextmenu">useContextMenu</h5>
+
+    <p>
+        Bind the context menu event (true/false).
+    </p>
+    <p>
+        <strong>true</strong> (default)
+        <br>
+        A right mouse-click will trigger a <a href="#event-tree-contextmenu">tree.contextmenu</a> event. This overrides the native contextmenu of the browser.
+    </p>
+    <p>
+        <strong>false</strong>
+        <br>
+        A right mouse-click will trigger the native contextmenu of the browser.
+    </p>
 
     <h4 id="functions">Functions</h4>
     <h5 id="functions-loadData">loadData</h5>
@@ -850,7 +925,7 @@ var node = $tree.tree('getSelectedNode');
     </p>
 
 <pre><code class="language-javascript">
-var node1 = $('#tree1', 'getNodeByName, 'node1');
+var node1 = $('#tree1', 'getNodeByName', 'node1');
 $('#tree1').tree(
     'addNodeAfter',
     {
@@ -1011,6 +1086,21 @@ var node = $tree.tree('getNodeBydId', 1);
 $tree.tree('toggle', node);
 </code></pre>
 
+    <h5 id="functions-scrolltonode">scrollToNode</h5>
+
+    <p>
+        <strong>function scrollToNode(node);</strong>
+    </p>
+
+    <p>
+        Scroll to this node. This is useful if the tree is in a container div and is scrollable.
+    </p>
+
+<pre><code class="language-javascript">
+var node = $tree.tree('getNodeBydId', 1);
+$tree.tree('scrollToNode', node);
+</code></pre>
+
     <h4 id="events">Events</h4>
 
     <h5 id="event-tree-click">tree.click</h5>
@@ -1036,18 +1126,43 @@ $('#tree1').bind(
 );
 </code></pre>
 
+    <p>
+        The default action is to select the node. You can prevent the selection by calling
+        <strong>preventDefault</strong>:
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').bind(
+    'tree.click',
+    function(event) {
+        event.preventDefault();
+    }
+);
+</code></pre>
+
     <h5 id="event-tree-select">tree.select</h5>
 
     <p>
-        Triggered when a tree node is selected.
+        Triggered when a tree node is selected or deselected.
+        <br>
+        If a node is selected, then <strong>event.node</strong> contains the selected node.
+        <br>
+        If a node is deselected, then the <strong>event.node</strong> property is null.
     </p>
 
 <pre><code class="language-javascript">
 $('#tree1').bind(
     'tree.select',
     function(event) {
-        var node = event.node;
-        alert(node.name);
+        if (event.node) {
+            // node was selected
+            var node = event.node;
+            alert(node.name);
+        }
+        else {
+            // event.node is null
+            // a node was deselected
+        }
     }
 );
 </code></pre>
@@ -1176,6 +1291,73 @@ $('#tree1').bind(
         console.log(e.node);
     }
 );
+</code></pre>
+
+    <h5 id="event-tree-close">tree.close</h5>
+    <p>
+        Called when a node is closed.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').bind(
+    'tree.close',
+    function(e) {
+        console.log(e.node);
+    }
+);
+</code></pre>
+
+    <h4 id="multiple-selection">Multiple selection</h4>
+
+    <p>
+        Jqtree has some functions that can help you to implement multiple selection. See
+        <a href="examples/multiple_select.html">Example 8 - multiple select</a>.
+    </p>
+    <p>
+        In order for multiple selection to work, you must give the nodes an id.
+    </p>
+
+    <h5 id="multiple-selection-add-to-selection">addToSelection</h5>
+
+    <p>
+        Add this node to the selection
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+$('#tree1').tree('addToSelection', node);
+</code></pre>
+
+    <h5 id="multiple-selection-get-selected-nodes">getSelectedNodes</h5>
+
+    <p>
+        Return a list of selected nodes.
+    </p>
+
+<pre><code class="language-javascript">
+var nodes = $('#tree1').tree('getSelectedNodes');
+</code></pre>
+
+    <h5 id="multiple-selection-is-node-selected">isNodeSelected</h5>
+
+    <p>
+        Return if this node is selected.
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+var is_selected = $('#tree1').tree('isNodeSelected', node);
+</code></pre>
+
+    <h5 id="multiple-selection-remove-from-selection">removeFromSelection</h5>
+
+    <p>
+        Remove this node from the selection.
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+$('#tree1').tree('removeFromSelection', node);
 </code></pre>
 
     <p>
