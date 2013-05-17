@@ -1050,7 +1050,7 @@ class JqTreeWidget extends MouseWidget
     _selectCurrentNode: ->
         node = @getSelectedNode()
         if node
-            node_element = @tree_widget._getNodeElementForNode(node)
+            node_element = @_getNodeElementForNode(node)
             if node_element
                 node_element.select()
 

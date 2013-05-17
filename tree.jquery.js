@@ -1538,7 +1538,7 @@ limitations under the License.
 
       node = this.getSelectedNode();
       if (node) {
-        node_element = this.tree_widget._getNodeElementForNode(node);
+        node_element = this._getNodeElementForNode(node);
         if (node_element) {
           return node_element.select();
         }
