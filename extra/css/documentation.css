@@ -122,6 +122,11 @@ img {
     margin: 0 0.5em;
 }
 
+#page ul {
+    list-style-position: outside;
+    margin-left: 1em;
+}
+
 /* tree */
 .jqtree-tree a:hover {
     border-bottom: none;
