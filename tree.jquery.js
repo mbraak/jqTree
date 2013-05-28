@@ -1203,6 +1203,7 @@ limitations under the License.
       JqTreeWidget.__super__._init.call(this);
       this.element = this.$el;
       this.mouse_delay = 300;
+      this.is_initialized = false;
       this.save_state_handler = new SaveStateHandler(this);
       this.select_node_handler = new SelectNodeHandler(this);
       this.dnd_handler = new DragAndDropHandler(this);
@@ -1257,7 +1258,10 @@ limitations under the License.
       this.tree.loadFromData(data);
       this._openNodes();
       this._refreshElements();
-      return this._triggerEvent('tree.init');
+      if (!this.is_initialized) {
+        this.is_initialized = true;
+        return this._triggerEvent('tree.init');
+      }
     };
 
     JqTreeWidget.prototype._openNodes = function() {

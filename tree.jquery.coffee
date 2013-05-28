@@ -773,6 +773,7 @@ class JqTreeWidget extends MouseWidget
 
         @element = @$el
         @mouse_delay = 300
+        @is_initialized = false
 
         @save_state_handler = new SaveStateHandler(this)
         @select_node_handler = new SelectNodeHandler(this)
@@ -821,7 +822,9 @@ class JqTreeWidget extends MouseWidget
         @_openNodes()
         @_refreshElements()
 
-        @_triggerEvent('tree.init')
+        if not @is_initialized
+            @is_initialized = true
+            @_triggerEvent('tree.init')
 
     _openNodes: ->
         if @options.saveState
