@@ -1003,7 +1003,7 @@ limitations under the License.
         tree_data: data
       });
       if (!parent_node) {
-        this._initTree(data, false, this.options.nodeClass);
+        this._initTree(data);
       } else {
         selected_nodes_under_parent = this.select_node_handler.getSelectedNodes(parent_node);
         for (_i = 0, _len = selected_nodes_under_parent.length; _i < _len; _i++) {

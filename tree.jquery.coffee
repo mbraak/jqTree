@@ -619,7 +619,7 @@ class JqTreeWidget extends MouseWidget
         @_triggerEvent('tree.load_data', tree_data: data)
 
         if not parent_node
-            @_initTree(data, false, @options.nodeClass)
+            @_initTree(data)
         else
             selected_nodes_under_parent = @select_node_handler.getSelectedNodes(parent_node)
             for n in selected_nodes_under_parent
