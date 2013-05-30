@@ -732,7 +732,15 @@ class JqTreeWidget extends MouseWidget
         return node
 
     updateNode: (node, data) ->
+        id_is_changed = data.id and data.id != node.id
+
+        if id_is_changed
+            @tree.removeNodeFromIndex(node)
+
         node.setData(data)
+
+        if id_is_changed
+            @tree.addNodeToIndex(node)
 
         @_refreshElements(node.parent)
         @._selectCurrentNode()

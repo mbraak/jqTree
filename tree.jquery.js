@@ -1156,7 +1156,16 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.updateNode = function(node, data) {
+      var id_is_changed;
+
+      id_is_changed = data.id && data.id !== node.id;
+      if (id_is_changed) {
+        this.tree.removeNodeFromIndex(node);
+      }
       node.setData(data);
+      if (id_is_changed) {
+        this.tree.addNodeToIndex(node);
+      }
       this._refreshElements(node.parent);
       return this._selectCurrentNode();
     };
