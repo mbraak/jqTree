@@ -529,7 +529,6 @@ class JqTreeWidget extends MouseWidget
 
         if @select_node_handler.isNodeSelected(node)
             if must_toggle
-                # Toggle current node -> is now deselected 
                 @_deselectCurrentNode()
                 @_triggerEvent('tree.select', node: null)
         else
@@ -1360,7 +1359,7 @@ class SelectNodeHandler
 
     removeFromSelection: (node, include_children=false) ->
         if not node.id
-            if node.element == @selected_single_node
+            if node.element == @selected_single_node.element
                 @selected_single_node = null
         else
             delete @selected_nodes[node.id]
