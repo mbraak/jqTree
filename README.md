@@ -11,7 +11,7 @@ JqTree is a tree widget. Read more in the [documentation](http://mbraak.github.i
 * Works on ie7+, firefox 3.6+, chrome and safari
 * Written in Coffeescript
 
-The project is hosted on [github](https://github.com/mbraak/jqTree), has a [test suite](test/test.html) and a [demo](demo.html).
+The project is hosted on [github](https://github.com/mbraak/jqTree), has a [test suite](http://mbraak.github.io/jqTree/test/test.html).
 
 See index.html for the full documentation. The documentation is also on [github](http://mbraak.github.io/jqTree/)
 
