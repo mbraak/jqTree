@@ -2388,7 +2388,7 @@ limitations under the License.
     };
 
     KeyHandler.prototype.handleKeyDown = function(e) {
-      var current_node, key, moveDown, moveUp, selectNode,
+      var current_node, key, moveDown, moveLeft, moveRight, moveUp, selectNode,
         _this = this;
       current_node = this.tree_widget.getSelectedNode();
       selectNode = function(node) {
@@ -2405,6 +2405,22 @@ limitations under the License.
       moveUp = function() {
         return selectNode(_this.getPreviousNode(current_node));
       };
+      moveRight = function() {
+        if (current_node.hasChildren() && !current_node.is_open) {
+          _this.tree_widget.openNode(current_node);
+          return false;
+        } else {
+          return true;
+        }
+      };
+      moveLeft = function() {
+        if (current_node.hasChildren() && current_node.is_open) {
+          _this.tree_widget.closeNode(current_node);
+          return false;
+        } else {
+          return true;
+        }
+      };
       if (!current_node) {
         return true;
       } else {
@@ -2414,6 +2430,10 @@ limitations under the License.
             return moveDown();
           case UP:
             return moveUp();
+          case RIGHT:
+            return moveRight();
+          case LEFT:
+            return moveLeft();
         }
       }
     };

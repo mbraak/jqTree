@@ -1863,6 +1863,20 @@ class KeyHandler
         moveUp = =>
             return selectNode(@getPreviousNode(current_node))
 
+        moveRight = =>
+            if current_node.hasChildren() and not current_node.is_open
+                @tree_widget.openNode(current_node)
+                return false
+            else
+                return true
+
+        moveLeft = =>
+            if current_node.hasChildren() and current_node.is_open
+                @tree_widget.closeNode(current_node)
+                return false
+            else
+                return true
+
         if not current_node
             return true
         else
@@ -1874,6 +1888,12 @@ class KeyHandler
 
                 when UP
                     return moveUp()
+
+                when RIGHT
+                    return moveRight()
+
+                when LEFT
+                    return moveLeft()
 
     getNextNode: (node, include_children=true) ->
         if include_children and node.hasChildren() and node.is_open
