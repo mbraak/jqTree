@@ -464,6 +464,25 @@ class Node
 
         @children = []
 
+    getPreviousSibling: ->
+        if not @parent
+            return null
+        else
+            previous_index = @parent.getChildIndex(this) - 1
+            if previous_index >= 0
+                return @parent.children[previous_index]
+            else
+                return null
+
+    getNextSibling: ->
+        if not @parent
+            return null
+        else
+            next_index = @parent.getChildIndex(this) + 1
+            if next_index < @parent.children.length
+                return @parent.children[next_index]
+            else
+                return null                
 
 @Tree.Node = Node
 
@@ -511,7 +530,7 @@ class JqTreeWidget extends MouseWidget
         openParents = =>
             parent = node.parent
 
-            if not parent.is_open and parent.parent
+            if parent and parent.parent and not parent.is_open
                 @openNode(parent, false)
 
         saveState = =>
@@ -786,6 +805,7 @@ class JqTreeWidget extends MouseWidget
         @select_node_handler = new SelectNodeHandler(this)
         @dnd_handler = new DragAndDropHandler(this)
         @scroll_handler = new ScrollHandler(this)
+        @key_handler = new KeyHandler(this)
 
         @_initData()
 
@@ -793,9 +813,11 @@ class JqTreeWidget extends MouseWidget
         if @options.useContextMenu
             @element.bind('contextmenu', $.proxy(@_contextmenu, this))
 
+
     _deinit: ->
         @element.empty()
         @element.unbind()
+        @key_handler.deinit()
         @tree = null
 
         super()
@@ -1067,7 +1089,7 @@ class JqTreeWidget extends MouseWidget
     _deselectCurrentNode: ->
         node = @getSelectedNode()
         if node
-            @removeFromSelection(node)
+            @removeFromSelection(node)        
 
 SimpleWidget.register(JqTreeWidget, 'tree')
 
@@ -1809,3 +1831,91 @@ class ScrollHandler
         else
             tree_top = @tree_widget.$el.offset().top
             $(document).scrollTop(top + tree_top)
+
+
+class KeyHandler
+    LEFT = 37
+    UP = 38
+    RIGHT = 39
+    DOWN = 40
+
+    constructor: (tree_widget) ->
+        @tree_widget = tree_widget
+
+        $(document).bind('keydown.jqtree', $.proxy(@handleKeyDown, this))
+
+    deinit: ->
+        $(document).unbind('keydown.jqtree')
+
+    handleKeyDown: (e) ->
+        current_node = @tree_widget.getSelectedNode()
+
+        selectNode = (node) =>
+            if node
+                @tree_widget.selectNode(node)
+                return false
+            else
+                return true
+
+        moveDown = =>
+            return selectNode(@getNextNode(current_node))
+
+        moveUp = =>
+            return selectNode(@getPreviousNode(current_node))
+
+        if not current_node
+            return true
+        else
+            key = e.which
+
+            switch key
+                when DOWN
+                    return moveDown()
+
+                when UP
+                    return moveUp()
+
+    getNextNode: (node, include_children=true) ->
+        if include_children and node.hasChildren() and node.is_open
+            # First child
+            return node.children[0]
+        else
+            if not node.parent
+                return null
+            else
+                next_sibling = node.getNextSibling()
+                if next_sibling
+                    # Next sibling
+                    return next_sibling
+                else
+                    # Next node of parent
+                    return @getNextNode(node.parent, false)
+
+    getPreviousNode: (node) ->
+        if not node.parent
+            return null
+        else
+            previous_sibling = node.getPreviousSibling()
+            if previous_sibling
+                if not previous_sibling.hasChildren() or not previous_sibling.is_open
+                    # Previous sibling
+                    return previous_sibling
+                else
+                    # Last child of previous sibling
+                    return @getLastChild(previous_sibling)
+            else
+                # Parent
+                if node.parent.parent
+                    return node.parent
+                else
+                    return null
+
+    getLastChild: (node) ->
+        if not node.hasChildren()
+            return null
+        else
+            last_child = node.children[node.children.length - 1]
+            if not last_child.hasChildren() or not last_child.is_open
+                return last_child
+            else
+                return @getLastChild(last_child)
