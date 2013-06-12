@@ -1832,6 +1832,24 @@ class ScrollHandler
             tree_top = @tree_widget.$el.offset().top
             $(document).scrollTop(top + tree_top)
 
+    isScrolledIntoView: (element) ->
+        $element = $(element)
+
+        if @$scroll_parent
+            view_top = 0
+            view_bottom = @$scroll_parent.height()
+
+            element_top = $element.offset().top - @scroll_parent_top
+            element_bottom = element_top + $element.height()
+        else
+            view_top = $(window).scrollTop()
+            view_bottom = view_top + $(window).height()
+
+            element_top = $element.offset().top
+            element_bottom = element_top + $element.height()
+
+        return (element_bottom <= view_bottom) and (element_top >= view_top)
+
 
 class KeyHandler
     LEFT = 37
@@ -1853,6 +1871,10 @@ class KeyHandler
         selectNode = (node) =>
             if node
                 @tree_widget.selectNode(node)
+
+                if not @tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element'))
+                    @tree_widget.scrollToNode(node)
+
                 return false
             else
                 return true

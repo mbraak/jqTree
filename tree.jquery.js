@@ -2363,6 +2363,23 @@ limitations under the License.
       }
     };
 
+    ScrollHandler.prototype.isScrolledIntoView = function(element) {
+      var $element, element_bottom, element_top, view_bottom, view_top;
+      $element = $(element);
+      if (this.$scroll_parent) {
+        view_top = 0;
+        view_bottom = this.$scroll_parent.height();
+        element_top = $element.offset().top - this.scroll_parent_top;
+        element_bottom = element_top + $element.height();
+      } else {
+        view_top = $(window).scrollTop();
+        view_bottom = view_top + $(window).height();
+        element_top = $element.offset().top;
+        element_bottom = element_top + $element.height();
+      }
+      return (element_bottom <= view_bottom) && (element_top >= view_top);
+    };
+
     return ScrollHandler;
 
   })();
@@ -2394,6 +2411,9 @@ limitations under the License.
       selectNode = function(node) {
         if (node) {
           _this.tree_widget.selectNode(node);
+          if (!_this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element'))) {
+            _this.tree_widget.scrollToNode(node);
+          }
           return false;
         } else {
           return true;
