@@ -113,6 +113,17 @@
                 <li><a href="#multiple-selection-remove-from-selection">remove&shy;From&shy;Selection</a></li>
             </ul>
         </li>
+        <li>
+            <a href="#node-functions">Node functions</a>
+            <ul>
+                <li><a href="#node-functions-parent">parent</a></li>
+                <li><a href="#node-functions-children">children</a></li>
+                <li><a href="#node-functions-getlevel">getLevel</a></li>
+                <li><a href="#node-functions-getprevioussibling">getPreviousSibling</a></li>
+                <li><a href="#node-functions-getnextsibling">getNextSibling</a></li>
+                <li><a href="#node-functions-getdata">getNextSibling</a></li>
+            </ul>
+        </li>
     </ul>
 </div>
 <div id="page">
@@ -1374,11 +1385,84 @@ var node = $('#tree1').tree('getNodeById', 123);
 $('#tree1').tree('removeFromSelection', node);
 </code></pre>
 
+    <h4 id="node-functions">Node functions</h4>
+
+    <p>
+        You can access a node using for example <a href="#functions-getnodebyid">getNodeById</a> function:
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+</code></pre>
+
+    <p>
+        The Node object has the following properties and functions:
+    </p>
+
+    <h5 id="node-functions-parent">parent</h5>
+    <p>
+        You can access the parent of a node using the <strong>parent</strong> property.
+    </p>
+
+<pre><code class="language-javascript">
+var parent_node = node.parent;
+</code></pre>
+
+    <h5 id="node-functions-children">children</h5>
+    <p>
+        You can access the children of a node using the <strong>children</strong> property.
+    </p>
+
+<pre><code class="language-javascript">
+for (var i=0; i < node.children.length; i++) {
+    var child = node.children[i];
+}
+</code></pre>
+
     <p>
         <a href="http://thenounproject.com/noun/tree/#icon-No2141" target="_blank">Tree</a>
         designed by <a href="http://thenounproject.com/hschlosman" target="_blank">Hernan D. Schlosman</a>
         from The Noun Project
     </p>
+
+    <h5 id="node-functions-getlevel">getLevel</h5>
+    <p>
+        Get the level of a node. The level is distance of a node to the root node.
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+
+// result is e.g. 2
+var level = node.getLevel();
+</code></pre>
+
+    <h5 id="node-functions-getprevioussibling">getPreviousSibling</h5>
+    <p>
+        Get the previous sibling of this node. Returns a node or null.
+    </p>
+
+<pre><code class="language-javascript">
+var level = node.getPreviousSibling();
+</code></pre>
+
+    <h5 id="node-functions-getnextsibling">getNextSibling</h5>
+    <p>
+        Get the next sibling of this node. Returns a node or null.
+    </p>
+
+<pre><code class="language-javascript">
+var level = node.getNextSibling();
+</code></pre>
+
+    <h5 id="node-functions-getdata">getData</h5>
+    <p>
+        Get the subtree of this node.
+    </p>
+
+<pre><code class="language-javascript">
+var data = node.getData();
+</code></pre>
 
 </div>
 <script>
