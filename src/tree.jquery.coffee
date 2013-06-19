@@ -48,6 +48,9 @@ class JqTreeWidget extends MouseWidget
         @_selectNode(node, true)
 
     _selectNode: (node, must_toggle=false) ->
+        if not @select_node_handler
+            return
+
         canSelect = =>
             if not @options.onCanSelectNode
                 return @options.selectable
@@ -328,11 +331,24 @@ class JqTreeWidget extends MouseWidget
         @mouse_delay = 300
         @is_initialized = false
 
-        @save_state_handler = new SaveStateHandler(this)
-        @select_node_handler = new SelectNodeHandler(this)
-        @dnd_handler = new DragAndDropHandler(this)
-        @scroll_handler = new ScrollHandler(this)
-        @key_handler = new KeyHandler(this)
+        if SaveStateHandler?
+            @save_state_handler = new SaveStateHandler(this)
+        else
+            @options.saveState = false
+
+        if SelectNodeHandler?
+            @select_node_handler = new SelectNodeHandler(this)
+
+        if DragAndDropHandler?
+            @dnd_handler = new DragAndDropHandler(this)
+        else
+            @options.dragAndDrop = false
+
+        if ScrollHandler?
+            @scroll_handler = new ScrollHandler(this)
+
+        if KeyHandler? and SelectNodeHandler?
+            @key_handler = new KeyHandler(this)
 
         @_initData()
 
@@ -372,7 +388,10 @@ class JqTreeWidget extends MouseWidget
 
     _initTree: (data) ->
         @tree = new @options.nodeClass(null, true, @options.nodeClass)
-        @select_node_handler.clear()
+
+        if @select_node_handler
+            @select_node_handler.clear()
+
         @tree.loadFromData(data)
 
         @_openNodes()
@@ -429,7 +448,7 @@ class JqTreeWidget extends MouseWidget
         createNodeLi = (node) =>
             li_classes = ['jqtree_common']
 
-            if @select_node_handler.isNodeSelected(node)
+            if @select_node_handler and @select_node_handler.isNodeSelected(node)
                 li_classes.push('jqtree-selected')
 
             class_string = li_classes.join(' ')
@@ -454,7 +473,7 @@ class JqTreeWidget extends MouseWidget
                 if not node.is_open
                     classes.push('jqtree-closed')
 
-                if @select_node_handler.isNodeSelected(node)
+                if @select_node_handler and @select_node_handler.isNodeSelected(node)
                     classes.push('jqtree-selected')
 
                 return classes.join(' ')
@@ -583,7 +602,9 @@ class JqTreeWidget extends MouseWidget
     _mouseDrag: (event) ->
         if @options.dragAndDrop
             result = @dnd_handler.mouseDrag(event)
-            @scroll_handler.checkScrolling()
+
+            if @scroll_handler
+                @scroll_handler.checkScrolling()
             return result
         else
             return false

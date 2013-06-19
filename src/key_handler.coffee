@@ -19,7 +19,10 @@ class KeyHandler
             if node
                 @tree_widget.selectNode(node)
 
-                if not @tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element'))
+                if (
+                    @tree_widget.scroll_handler and
+                    (not @tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element')))
+                )
                     @tree_widget.scrollToNode(node)
 
                 return false

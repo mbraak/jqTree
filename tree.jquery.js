@@ -862,6 +862,9 @@
       if (must_toggle == null) {
         must_toggle = false;
       }
+      if (!this.select_node_handler) {
+        return;
+      }
       canSelect = function() {
         if (!_this.options.onCanSelectNode) {
           return _this.options.selectable;
@@ -1193,11 +1196,25 @@
       this.element = this.$el;
       this.mouse_delay = 300;
       this.is_initialized = false;
-      this.save_state_handler = new SaveStateHandler(this);
-      this.select_node_handler = new SelectNodeHandler(this);
-      this.dnd_handler = new DragAndDropHandler(this);
-      this.scroll_handler = new ScrollHandler(this);
-      this.key_handler = new KeyHandler(this);
+      if (typeof SaveStateHandler !== "undefined" && SaveStateHandler !== null) {
+        this.save_state_handler = new SaveStateHandler(this);
+      } else {
+        this.options.saveState = false;
+      }
+      if (typeof SelectNodeHandler !== "undefined" && SelectNodeHandler !== null) {
+        this.select_node_handler = new SelectNodeHandler(this);
+      }
+      if (typeof DragAndDropHandler !== "undefined" && DragAndDropHandler !== null) {
+        this.dnd_handler = new DragAndDropHandler(this);
+      } else {
+        this.options.dragAndDrop = false;
+      }
+      if (typeof ScrollHandler !== "undefined" && ScrollHandler !== null) {
+        this.scroll_handler = new ScrollHandler(this);
+      }
+      if ((typeof KeyHandler !== "undefined" && KeyHandler !== null) && (typeof SelectNodeHandler !== "undefined" && SelectNodeHandler !== null)) {
+        this.key_handler = new KeyHandler(this);
+      }
       this._initData();
       this.element.click($.proxy(this._click, this));
       if (this.options.useContextMenu) {
@@ -1244,7 +1261,9 @@
 
     JqTreeWidget.prototype._initTree = function(data) {
       this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
-      this.select_node_handler.clear();
+      if (this.select_node_handler) {
+        this.select_node_handler.clear();
+      }
       this.tree.loadFromData(data);
       this._openNodes();
       this._refreshElements();
@@ -1313,7 +1332,7 @@
       createNodeLi = function(node) {
         var class_string, escaped_name, li_classes;
         li_classes = ['jqtree_common'];
-        if (_this.select_node_handler.isNodeSelected(node)) {
+        if (_this.select_node_handler && _this.select_node_handler.isNodeSelected(node)) {
           li_classes.push('jqtree-selected');
         }
         class_string = li_classes.join(' ');
@@ -1336,7 +1355,7 @@
           if (!node.is_open) {
             classes.push('jqtree-closed');
           }
-          if (_this.select_node_handler.isNodeSelected(node)) {
+          if (_this.select_node_handler && _this.select_node_handler.isNodeSelected(node)) {
             classes.push('jqtree-selected');
           }
           return classes.join(' ');
@@ -1483,7 +1502,9 @@
       var result;
       if (this.options.dragAndDrop) {
         result = this.dnd_handler.mouseDrag(event);
-        this.scroll_handler.checkScrolling();
+        if (this.scroll_handler) {
+          this.scroll_handler.checkScrolling();
+        }
         return result;
       } else {
         return false;
@@ -2411,7 +2432,7 @@
       selectNode = function(node) {
         if (node) {
           _this.tree_widget.selectNode(node);
-          if (!_this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element'))) {
+          if (_this.tree_widget.scroll_handler && (!_this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element')))) {
             _this.tree_widget.scrollToNode(node);
           }
           return false;
