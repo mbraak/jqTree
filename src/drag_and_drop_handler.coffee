@@ -78,9 +78,10 @@ class DragAndDropHandler
         @removeDropHint()
         @removeHitAreas()
 
-        @current_item.$element.removeClass('jqtree-moving')
-        @is_dragging = false
+        if @current_item
+            @current_item.$element.removeClass('jqtree-moving')
 
+        @is_dragging = false
         return false
 
     getOffsetFromEvent: (event) ->

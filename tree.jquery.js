@@ -2021,7 +2021,9 @@
       this.removeHover();
       this.removeDropHint();
       this.removeHitAreas();
-      this.current_item.$element.removeClass('jqtree-moving');
+      if (this.current_item) {
+        this.current_item.$element.removeClass('jqtree-moving');
+      }
       this.is_dragging = false;
       return false;
     };
