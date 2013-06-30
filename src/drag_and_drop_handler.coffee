@@ -7,8 +7,8 @@ class DragAndDropHandler
         @hit_areas = []
         @is_dragging = false
 
-    mouseCapture: (event) ->
-        $element = $(event.target)
+    mouseCapture: (position_info) ->
+        $element = $(position_info.target)
 
         if @tree_widget.options.onIsMoveHandle and not @tree_widget.options.onIsMoveHandle($element)
             return null
@@ -22,15 +22,15 @@ class DragAndDropHandler
         @current_item = node_element
         return (@current_item != null)
 
-    mouseStart: (event) ->
+    mouseStart: (position_info) ->
         @refreshHitAreas()
 
-        [offsetX, offsetY] = @getOffsetFromEvent(event)
+        offset = $(position_info.target).offset()
 
         @drag_element = new DragElement(
             @current_item.node
-            offsetX,
-            offsetY,
+            position_info.page_x - offset.left,
+            position_info.page_y - offset.top,
             @tree_widget.element
         )
 
@@ -38,10 +38,10 @@ class DragAndDropHandler
         @current_item.$element.addClass('jqtree-moving')
         return true
 
-    mouseDrag: (event) ->
-        @drag_element.move(event.pageX, event.pageY)
+    mouseDrag: (position_info) ->
+        @drag_element.move(position_info.page_x, position_info.page_y)
 
-        area = @findHoveredArea(event.pageX, event.pageY)
+        area = @findHoveredArea(position_info.page_x, position_info.page_y)
         can_move_to = @canMoveToArea(area)
 
         if area
@@ -71,8 +71,8 @@ class DragAndDropHandler
         else
             return true
 
-    mouseStop: (e) ->
-        @moveItem(e)
+    mouseStop: (position_info) ->
+        @moveItem(position_info)
         @clear()
         @removeHover()
         @removeDropHint()
@@ -83,13 +83,6 @@ class DragAndDropHandler
 
         @is_dragging = false
         return false
-
-    getOffsetFromEvent: (event) ->
-        element_offset = $(event.target).offset()
-        return [
-            event.pageX - element_offset.left,
-            event.pageY - element_offset.top
-        ]
 
     refreshHitAreas: ->
         @removeHitAreas()
@@ -327,7 +320,7 @@ class DragAndDropHandler
             clearTimeout(@open_folder_timer)
             @open_folder_timer = null
 
-    moveItem: (original_event) ->
+    moveItem: (position_info) ->
         if (
             @hovered_area and
             @hovered_area.position != Position.NONE and
@@ -342,9 +335,9 @@ class DragAndDropHandler
                 @hovered_area.node.is_open = true
 
             doMove = =>
-              @tree_widget.tree.moveNode(moved_node, target_node, position)
-              @tree_widget.element.empty()
-              @tree_widget._refreshElements()
+                @tree_widget.tree.moveNode(moved_node, target_node, position)
+                @tree_widget.element.empty()
+                @tree_widget._refreshElements()
 
             event = @tree_widget._triggerEvent(
                 'tree.move',
@@ -354,7 +347,26 @@ class DragAndDropHandler
                     position: Position.getName(position)
                     previous_parent: previous_parent
                     do_move: doMove
-                    original_event: original_event
+                    original_event: position_info.original_event
             )
 
             doMove() unless event.isDefaultPrevented()
+
+
+class DragElement
+    constructor: (node, offset_x, offset_y, $tree) ->
+        @offset_x = offset_x
+        @offset_y = offset_y
+
+        @$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node.name }</span>")
+        @$element.css("position", "absolute")
+        $tree.append(@$element)
+
+    move: (page_x, page_y) ->
+        @$element.offset(
+            left: page_x - @offset_x,
+            top: page_y - @offset_y
+        )
+
+    remove: ->
+        @$element.remove()

@@ -587,21 +587,21 @@ class JqTreeWidget extends MouseWidget
         if @options.saveState
             @save_state_handler.saveState()
 
-    _mouseCapture: (event) ->
+    _mouseCapture: (position_info) ->
         if @options.dragAndDrop
-            return @dnd_handler.mouseCapture(event)
+            return @dnd_handler.mouseCapture(position_info)
         else
             return false
 
-    _mouseStart: (event) ->
+    _mouseStart: (position_info) ->
         if @options.dragAndDrop
-            return @dnd_handler.mouseStart(event)
+            return @dnd_handler.mouseStart(position_info)
         else
             return false
 
-    _mouseDrag: (event) ->
+    _mouseDrag: (position_info) ->
         if @options.dragAndDrop
-            result = @dnd_handler.mouseDrag(event)
+            result = @dnd_handler.mouseDrag(position_info)
 
             if @scroll_handler
                 @scroll_handler.checkScrolling()
@@ -609,9 +609,9 @@ class JqTreeWidget extends MouseWidget
         else
             return false
 
-    _mouseStop: (e) ->
+    _mouseStop: (position_info) ->
         if @options.dragAndDrop
-            return @dnd_handler.mouseStop(e)
+            return @dnd_handler.mouseStop(position_info)
         else
             return false
 
@@ -771,22 +771,3 @@ class FolderElement extends NodeElement
             return new BorderDropHint(@$element)
         else
             return new GhostDropHint(@node, @$element, position)
-
-
-class DragElement
-    constructor: (node, offset_x, offset_y, $tree) ->
-        @offset_x = offset_x
-        @offset_y = offset_y
-
-        @$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node.name }</span>")
-        @$element.css("position", "absolute")
-        $tree.append(@$element)
-
-    move: (page_x, page_y) ->
-        @$element.offset(
-            left: page_x - @offset_x,
-            top: page_y - @offset_y
-        )
-
-    remove: ->
-        @$element.remove()

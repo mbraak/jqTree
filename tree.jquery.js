@@ -686,44 +686,61 @@
 
     MouseWidget.prototype._init = function() {
       this.$el.bind('mousedown.mousewidget', $.proxy(this._mouseDown, this));
+      this.$el.bind('touchstart.mousewidget', $.proxy(this._touchStart, this));
       this.is_mouse_started = false;
       this.mouse_delay = 0;
       this._mouse_delay_timer = null;
-      return this._is_mouse_delay_met = true;
+      this._is_mouse_delay_met = true;
+      return this.mouse_down_info = null;
     };
 
     MouseWidget.prototype._deinit = function() {
       var $document;
       this.$el.unbind('mousedown.mousewidget');
+      this.$el.unbind('touchstart.mousewidget');
       $document = $(document);
       $document.unbind('mousemove.mousewidget');
       return $document.unbind('mouseup.mousewidget');
     };
 
     MouseWidget.prototype._mouseDown = function(e) {
-      var $document;
-      if (MouseWidget.is_mouse_handled) {
-        return;
-      }
-      if (!this.is_mouse_started) {
-        this._mouseUp(e);
-      }
+      var result;
       if (e.which !== 1) {
         return;
       }
-      if (!this._mouseCapture(e)) {
+      result = this._handleMouseDown(e, this._getPositionInfo(e));
+      if (result) {
+        e.preventDefault();
+      }
+      return result;
+    };
+
+    MouseWidget.prototype._handleMouseDown = function(e, position_info) {
+      if (MouseWidget.is_mouse_handled) {
         return;
       }
-      this.mouse_down_event = e;
-      $document = $(document);
-      $document.bind('mousemove.mousewidget', $.proxy(this._mouseMove, this));
-      $document.bind('mouseup.mousewidget', $.proxy(this._mouseUp, this));
-      if (this.mouse_delay) {
-        this._startMouseDelayTimer();
+      if (this.is_mouse_started) {
+        this._handleMouseUp(position_info);
       }
-      e.preventDefault();
+      this.mouse_down_info = position_info;
+      if (!this._mouseCapture(position_info)) {
+        return;
+      }
+      this._handleStartMouse();
       this.is_mouse_handled = true;
       return true;
+    };
+
+    MouseWidget.prototype._handleStartMouse = function() {
+      var $document;
+      $document = $(document);
+      $document.bind('mousemove.mousewidget', $.proxy(this._mouseMove, this));
+      $document.bind('touchmove.mousewidget', $.proxy(this._touchMove, this));
+      $document.bind('mouseup.mousewidget', $.proxy(this._mouseUp, this));
+      $document.bind('touchend.mousewidget', $.proxy(this._touchEnd, this));
+      if (this.mouse_delay) {
+        return this._startMouseDelayTimer();
+      }
     };
 
     MouseWidget.prototype._startMouseDelayTimer = function() {
@@ -738,52 +755,97 @@
     };
 
     MouseWidget.prototype._mouseMove = function(e) {
+      return this._handleMouseMove(e, this._getPositionInfo(e));
+    };
+
+    MouseWidget.prototype._handleMouseMove = function(e, position_info) {
       if (this.is_mouse_started) {
-        this._mouseDrag(e);
+        this._mouseDrag(position_info);
         return e.preventDefault();
       }
       if (this.mouse_delay && !this._is_mouse_delay_met) {
         return true;
       }
-      this.is_mouse_started = this._mouseStart(this.mouse_down_event) !== false;
+      this.is_mouse_started = this._mouseStart(this.mouse_down_info) !== false;
       if (this.is_mouse_started) {
-        this._mouseDrag(e);
+        this._mouseDrag(position_info);
       } else {
-        this._mouseUp(e);
+        this._handleMouseUp(position_info);
       }
       return !this.is_mouse_started;
     };
 
+    MouseWidget.prototype._getPositionInfo = function(e) {
+      return {
+        page_x: e.pageX,
+        page_y: e.pageY,
+        target: e.target,
+        original_event: e
+      };
+    };
+
     MouseWidget.prototype._mouseUp = function(e) {
+      return this._handleMouseUp(this._getPositionInfo(e));
+    };
+
+    MouseWidget.prototype._handleMouseUp = function(position_info) {
       var $document;
       $document = $(document);
       $document.unbind('mousemove.mousewidget');
+      $document.unbind('touchmove.mousewidget');
       $document.unbind('mouseup.mousewidget');
+      $document.unbind('touchend.mousewidget');
       if (this.is_mouse_started) {
         this.is_mouse_started = false;
-        this._mouseStop(e);
+        this._mouseStop(position_info);
       }
-      return false;
     };
 
-    MouseWidget.prototype._mouseCapture = function(e) {
+    MouseWidget.prototype._mouseCapture = function(position_info) {
       return true;
     };
 
-    MouseWidget.prototype._mouseStart = function(e) {
+    MouseWidget.prototype._mouseStart = function(position_info) {
       return null;
     };
 
-    MouseWidget.prototype._mouseDrag = function(e) {
+    MouseWidget.prototype._mouseDrag = function(position_info) {
       return null;
     };
 
-    MouseWidget.prototype._mouseStop = function(e) {
+    MouseWidget.prototype._mouseStop = function(position_info) {
       return null;
     };
 
     MouseWidget.prototype.setMouseDelay = function(mouse_delay) {
       return this.mouse_delay = mouse_delay;
+    };
+
+    MouseWidget.prototype._touchStart = function(e) {
+      var touch;
+      if (e.originalEvent.touches.length > 1) {
+        return;
+      }
+      touch = e.originalEvent.changedTouches[0];
+      return this._handleMouseDown(e, this._getPositionInfo(touch));
+    };
+
+    MouseWidget.prototype._touchMove = function(e) {
+      var touch;
+      if (e.originalEvent.touches.length > 1) {
+        return;
+      }
+      touch = e.originalEvent.changedTouches[0];
+      return this._handleMouseMove(e, this._getPositionInfo(touch));
+    };
+
+    MouseWidget.prototype._touchEnd = function(e) {
+      var touch;
+      if (e.originalEvent.touches.length > 1) {
+        return;
+      }
+      touch = e.originalEvent.changedTouches[0];
+      return this._handleMouseUp(this._getPositionInfo(touch));
     };
 
     return MouseWidget;
@@ -1482,26 +1544,26 @@
       }
     };
 
-    JqTreeWidget.prototype._mouseCapture = function(event) {
+    JqTreeWidget.prototype._mouseCapture = function(position_info) {
       if (this.options.dragAndDrop) {
-        return this.dnd_handler.mouseCapture(event);
+        return this.dnd_handler.mouseCapture(position_info);
       } else {
         return false;
       }
     };
 
-    JqTreeWidget.prototype._mouseStart = function(event) {
+    JqTreeWidget.prototype._mouseStart = function(position_info) {
       if (this.options.dragAndDrop) {
-        return this.dnd_handler.mouseStart(event);
+        return this.dnd_handler.mouseStart(position_info);
       } else {
         return false;
       }
     };
 
-    JqTreeWidget.prototype._mouseDrag = function(event) {
+    JqTreeWidget.prototype._mouseDrag = function(position_info) {
       var result;
       if (this.options.dragAndDrop) {
-        result = this.dnd_handler.mouseDrag(event);
+        result = this.dnd_handler.mouseDrag(position_info);
         if (this.scroll_handler) {
           this.scroll_handler.checkScrolling();
         }
@@ -1511,9 +1573,9 @@
       }
     };
 
-    JqTreeWidget.prototype._mouseStop = function(e) {
+    JqTreeWidget.prototype._mouseStop = function(position_info) {
       if (this.options.dragAndDrop) {
-        return this.dnd_handler.mouseStop(e);
+        return this.dnd_handler.mouseStop(position_info);
       } else {
         return false;
       }
@@ -1744,30 +1806,6 @@
 
   })(NodeElement);
 
-  DragElement = (function() {
-    function DragElement(node, offset_x, offset_y, $tree) {
-      this.offset_x = offset_x;
-      this.offset_y = offset_y;
-      this.$element = $("<span class=\"jqtree-title jqtree-dragging\">" + node.name + "</span>");
-      this.$element.css("position", "absolute");
-      $tree.append(this.$element);
-    }
-
-    DragElement.prototype.move = function(page_x, page_y) {
-      return this.$element.offset({
-        left: page_x - this.offset_x,
-        top: page_y - this.offset_y
-      });
-    };
-
-    DragElement.prototype.remove = function() {
-      return this.$element.remove();
-    };
-
-    return DragElement;
-
-  })();
-
   SaveStateHandler = (function() {
     function SaveStateHandler(tree_widget) {
       this.tree_widget = tree_widget;
@@ -1954,9 +1992,9 @@
       this.is_dragging = false;
     }
 
-    DragAndDropHandler.prototype.mouseCapture = function(event) {
+    DragAndDropHandler.prototype.mouseCapture = function(position_info) {
       var $element, node_element;
-      $element = $(event.target);
+      $element = $(position_info.target);
       if (this.tree_widget.options.onIsMoveHandle && !this.tree_widget.options.onIsMoveHandle($element)) {
         return null;
       }
@@ -1970,20 +2008,20 @@
       return this.current_item !== null;
     };
 
-    DragAndDropHandler.prototype.mouseStart = function(event) {
-      var offsetX, offsetY, _ref3;
+    DragAndDropHandler.prototype.mouseStart = function(position_info) {
+      var offset;
       this.refreshHitAreas();
-      _ref3 = this.getOffsetFromEvent(event), offsetX = _ref3[0], offsetY = _ref3[1];
-      this.drag_element = new DragElement(this.current_item.node, offsetX, offsetY, this.tree_widget.element);
+      offset = $(position_info.target).offset();
+      this.drag_element = new DragElement(this.current_item.node, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
       this.is_dragging = true;
       this.current_item.$element.addClass('jqtree-moving');
       return true;
     };
 
-    DragAndDropHandler.prototype.mouseDrag = function(event) {
+    DragAndDropHandler.prototype.mouseDrag = function(position_info) {
       var area, can_move_to;
-      this.drag_element.move(event.pageX, event.pageY);
-      area = this.findHoveredArea(event.pageX, event.pageY);
+      this.drag_element.move(position_info.page_x, position_info.page_y);
+      area = this.findHoveredArea(position_info.page_x, position_info.page_y);
       can_move_to = this.canMoveToArea(area);
       if (area) {
         if (this.hovered_area !== area) {
@@ -2015,8 +2053,8 @@
       }
     };
 
-    DragAndDropHandler.prototype.mouseStop = function(e) {
-      this.moveItem(e);
+    DragAndDropHandler.prototype.mouseStop = function(position_info) {
+      this.moveItem(position_info);
       this.clear();
       this.removeHover();
       this.removeDropHint();
@@ -2026,12 +2064,6 @@
       }
       this.is_dragging = false;
       return false;
-    };
-
-    DragAndDropHandler.prototype.getOffsetFromEvent = function(event) {
-      var element_offset;
-      element_offset = $(event.target).offset();
-      return [event.pageX - element_offset.left, event.pageY - element_offset.top];
     };
 
     DragAndDropHandler.prototype.refreshHitAreas = function() {
@@ -2261,7 +2293,7 @@
       }
     };
 
-    DragAndDropHandler.prototype.moveItem = function(original_event) {
+    DragAndDropHandler.prototype.moveItem = function(position_info) {
       var doMove, event, moved_node, position, previous_parent, target_node,
         _this = this;
       if (this.hovered_area && this.hovered_area.position !== Position.NONE && this.canMoveToArea(this.hovered_area)) {
@@ -2284,7 +2316,7 @@
             position: Position.getName(position),
             previous_parent: previous_parent,
             do_move: doMove,
-            original_event: original_event
+            original_event: position_info.original_event
           }
         });
         if (!event.isDefaultPrevented()) {
@@ -2294,6 +2326,30 @@
     };
 
     return DragAndDropHandler;
+
+  })();
+
+  DragElement = (function() {
+    function DragElement(node, offset_x, offset_y, $tree) {
+      this.offset_x = offset_x;
+      this.offset_y = offset_y;
+      this.$element = $("<span class=\"jqtree-title jqtree-dragging\">" + node.name + "</span>");
+      this.$element.css("position", "absolute");
+      $tree.append(this.$element);
+    }
+
+    DragElement.prototype.move = function(page_x, page_y) {
+      return this.$element.offset({
+        left: page_x - this.offset_x,
+        top: page_y - this.offset_y
+      });
+    };
+
+    DragElement.prototype.remove = function() {
+      return this.$element.remove();
+    };
+
+    return DragElement;
 
   })();
 
