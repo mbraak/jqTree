@@ -1620,70 +1620,6 @@
 
   SimpleWidget.register(JqTreeWidget, 'tree');
 
-  GhostDropHint = (function() {
-    function GhostDropHint(node, $element, position) {
-      this.$element = $element;
-      this.node = node;
-      this.$ghost = $('<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span><span class="jqtree_common jqtree-line"></span></li>');
-      if (position === Position.AFTER) {
-        this.moveAfter();
-      } else if (position === Position.BEFORE) {
-        this.moveBefore();
-      } else if (position === Position.INSIDE) {
-        if (node.isFolder() && node.is_open) {
-          this.moveInsideOpenFolder();
-        } else {
-          this.moveInside();
-        }
-      }
-    }
-
-    GhostDropHint.prototype.remove = function() {
-      return this.$ghost.remove();
-    };
-
-    GhostDropHint.prototype.moveAfter = function() {
-      return this.$element.after(this.$ghost);
-    };
-
-    GhostDropHint.prototype.moveBefore = function() {
-      return this.$element.before(this.$ghost);
-    };
-
-    GhostDropHint.prototype.moveInsideOpenFolder = function() {
-      return $(this.node.children[0].element).before(this.$ghost);
-    };
-
-    GhostDropHint.prototype.moveInside = function() {
-      this.$element.after(this.$ghost);
-      return this.$ghost.addClass('jqtree-inside');
-    };
-
-    return GhostDropHint;
-
-  })();
-
-  BorderDropHint = (function() {
-    function BorderDropHint($element) {
-      var $div, width;
-      $div = $element.children('.jqtree-element');
-      width = $element.width() - 4;
-      this.$hint = $('<span class="jqtree-border"></span>');
-      $div.append(this.$hint);
-      this.$hint.css({
-        width: width,
-        height: $div.height() - 4
-      });
-    }
-
-    BorderDropHint.prototype.remove = function() {
-      return this.$hint.remove();
-    };
-
-    return BorderDropHint;
-
-  })();
-
   NodeElement = (function() {
     function NodeElement(node, tree_widget) {
       this.init(node, tree_widget);
@@ -2350,6 +2286,70 @@
     };
 
     return DragElement;
+
+  })();
+
+  GhostDropHint = (function() {
+    function GhostDropHint(node, $element, position) {
+      this.$element = $element;
+      this.node = node;
+      this.$ghost = $('<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span><span class="jqtree_common jqtree-line"></span></li>');
+      if (position === Position.AFTER) {
+        this.moveAfter();
+      } else if (position === Position.BEFORE) {
+        this.moveBefore();
+      } else if (position === Position.INSIDE) {
+        if (node.isFolder() && node.is_open) {
+          this.moveInsideOpenFolder();
+        } else {
+          this.moveInside();
+        }
+      }
+    }
+
+    GhostDropHint.prototype.remove = function() {
+      return this.$ghost.remove();
+    };
+
+    GhostDropHint.prototype.moveAfter = function() {
+      return this.$element.after(this.$ghost);
+    };
+
+    GhostDropHint.prototype.moveBefore = function() {
+      return this.$element.before(this.$ghost);
+    };
+
+    GhostDropHint.prototype.moveInsideOpenFolder = function() {
+      return $(this.node.children[0].element).before(this.$ghost);
+    };
+
+    GhostDropHint.prototype.moveInside = function() {
+      this.$element.after(this.$ghost);
+      return this.$ghost.addClass('jqtree-inside');
+    };
+
+    return GhostDropHint;
+
+  })();
+
+  BorderDropHint = (function() {
+    function BorderDropHint($element) {
+      var $div, width;
+      $div = $element.children('.jqtree-element');
+      width = $element.width() - 4;
+      this.$hint = $('<span class="jqtree-border"></span>');
+      $div.append(this.$hint);
+      this.$hint.css({
+        width: width,
+        height: $div.height() - 4
+      });
+    }
+
+    BorderDropHint.prototype.remove = function() {
+      return this.$hint.remove();
+    };
+
+    return BorderDropHint;
 
   })();
 
