@@ -1,4 +1,5 @@
-﻿###
+﻿
+###
 Copyright 2013 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
+
 class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
@@ -720,3 +722,14 @@ class FolderElement extends NodeElement
             return new BorderDropHint(@$element)
         else
             return new GhostDropHint(@node, @$element, position)
+
+
+# Escape a string for HTML interpolation; copied from underscore js
+html_escape = (string) ->
+    return (''+string)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g,'&#x2F;')
