@@ -172,7 +172,6 @@ class SaveStateHandler
                     node.hasChildren() and
                     (indexOf(open_nodes, node.id) >= 0)
                 )
-                console.log(node.id, node.is_open)
                 return true
             )
 

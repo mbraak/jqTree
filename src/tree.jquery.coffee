@@ -54,10 +54,10 @@ class JqTreeWidget extends MouseWidget
             return
 
         canSelect = =>
-            if not @options.onCanSelectNode
+            if @options.onCanSelectNode
+                return @options.selectable and @options.onCanSelectNode(node)
+            else
                 return @options.selectable
-
-            return @options.selectable and @options.onCanSelectNode(node)
 
         openParents = =>
             parent = node.parent
@@ -72,7 +72,7 @@ class JqTreeWidget extends MouseWidget
         if not node
             # Called with empty node -> deselect current node
             @_deselectCurrentNode()
-            saveState
+            saveState()
             return
 
         if not canSelect()
@@ -81,7 +81,11 @@ class JqTreeWidget extends MouseWidget
         if @select_node_handler.isNodeSelected(node)
             if must_toggle
                 @_deselectCurrentNode()
-                @_triggerEvent('tree.select', node: null)
+                @_triggerEvent(
+                    'tree.select',
+                    node: null,
+                    previous_node: node
+                )
         else
             @_deselectCurrentNode()
             @addToSelection(node)

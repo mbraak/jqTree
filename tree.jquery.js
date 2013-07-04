@@ -830,10 +830,11 @@ limitations under the License.
         return;
       }
       canSelect = function() {
-        if (!_this.options.onCanSelectNode) {
+        if (_this.options.onCanSelectNode) {
+          return _this.options.selectable && _this.options.onCanSelectNode(node);
+        } else {
           return _this.options.selectable;
         }
-        return _this.options.selectable && _this.options.onCanSelectNode(node);
       };
       openParents = function() {
         var parent;
@@ -849,7 +850,7 @@ limitations under the License.
       };
       if (!node) {
         this._deselectCurrentNode();
-        saveState;
+        saveState();
         return;
       }
       if (!canSelect()) {
@@ -859,7 +860,8 @@ limitations under the License.
         if (must_toggle) {
           this._deselectCurrentNode();
           this._triggerEvent('tree.select', {
-            node: null
+            node: null,
+            previous_node: node
           });
         }
       } else {
@@ -1825,7 +1827,6 @@ limitations under the License.
         selected_node_id = state.selected_node;
         this.tree_widget.tree.iterate(function(node) {
           node.is_open = node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0);
-          console.log(node.id, node.is_open);
           return true;
         });
         if (selected_node_id && this.tree_widget.select_node_handler) {
