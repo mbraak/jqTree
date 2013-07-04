@@ -97,18 +97,20 @@ class SaveStateHandler
         @tree_widget = tree_widget
 
     saveState: ->
+        state = JSON.stringify(@getState())
+
         if @tree_widget.options.onSetStateFromStorage
-            @tree_widget.options.onSetStateFromStorage(@getState())
+            @tree_widget.options.onSetStateFromStorage(state)
         else if localStorage?
             localStorage.setItem(
                 @getCookieName(),
-                @getState()
+                state
             )
         else if $.cookie
             $.cookie.raw = true
             $.cookie(
                 @getCookieName(),
-                @getState(),
+                state,
                 {path: '/'}
             )
 
@@ -116,7 +118,7 @@ class SaveStateHandler
         state = @getStateFromStorage()
 
         if state
-            @setState(state)
+            @setState($.parseJSON(state))
             return true
         else
             return false
@@ -154,29 +156,28 @@ class SaveStateHandler
         else
             selected_node_id = ''
 
-        return JSON.stringify(
+        return {
             open_nodes: open_nodes,
             selected_node: selected_node_id
-        )
+        }
 
     setState: (state) ->
-        data = $.parseJSON(state)
-        if data
-            open_nodes = data.open_nodes
-            selected_node_id = data.selected_node
+        if state
+            open_nodes = state.open_nodes
+            selected_node_id = state.selected_node
 
             @tree_widget.tree.iterate((node) =>
-                if (
+                node.is_open = (
                     node.id and
                     node.hasChildren() and
                     (indexOf(open_nodes, node.id) >= 0)
                 )
-                    node.is_open = true
-
+                console.log(node.id, node.is_open)
                 return true
             )
 
-            if selected_node_id
+            if selected_node_id and @tree_widget.select_node_handler
+                @tree_widget.select_node_handler.clear()
                 selected_node = @tree_widget.getNodeById(selected_node_id)
 
                 if selected_node

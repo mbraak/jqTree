@@ -326,6 +326,13 @@ class JqTreeWidget extends MouseWidget
 
         @scroll_handler.scrollTo(top)
 
+    getState: ->
+        return @save_state_handler.getState()
+
+    setState: (state) ->
+        @save_state_handler.setState(state)
+        @_refreshElements()
+
     _init: ->
         super()
 

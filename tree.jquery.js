@@ -1155,6 +1155,15 @@ limitations under the License.
       return this.scroll_handler.scrollTo(top);
     };
 
+    JqTreeWidget.prototype.getState = function() {
+      return this.save_state_handler.getState();
+    };
+
+    JqTreeWidget.prototype.setState = function(state) {
+      this.save_state_handler.setState(state);
+      return this._refreshElements();
+    };
+
     JqTreeWidget.prototype._init = function() {
       JqTreeWidget.__super__._init.call(this);
       this.element = this.$el;
@@ -1748,13 +1757,15 @@ limitations under the License.
     }
 
     SaveStateHandler.prototype.saveState = function() {
+      var state;
+      state = JSON.stringify(this.getState());
       if (this.tree_widget.options.onSetStateFromStorage) {
-        return this.tree_widget.options.onSetStateFromStorage(this.getState());
+        return this.tree_widget.options.onSetStateFromStorage(state);
       } else if (typeof localStorage !== "undefined" && localStorage !== null) {
-        return localStorage.setItem(this.getCookieName(), this.getState());
+        return localStorage.setItem(this.getCookieName(), state);
       } else if ($.cookie) {
         $.cookie.raw = true;
-        return $.cookie(this.getCookieName(), this.getState(), {
+        return $.cookie(this.getCookieName(), state, {
           path: '/'
         });
       }
@@ -1764,7 +1775,7 @@ limitations under the License.
       var state;
       state = this.getStateFromStorage();
       if (state) {
-        this.setState(state);
+        this.setState($.parseJSON(state));
         return true;
       } else {
         return false;
@@ -1800,26 +1811,25 @@ limitations under the License.
       } else {
         selected_node_id = '';
       }
-      return JSON.stringify({
+      return {
         open_nodes: open_nodes,
         selected_node: selected_node_id
-      });
+      };
     };
 
     SaveStateHandler.prototype.setState = function(state) {
-      var data, open_nodes, selected_node, selected_node_id,
+      var open_nodes, selected_node, selected_node_id,
         _this = this;
-      data = $.parseJSON(state);
-      if (data) {
-        open_nodes = data.open_nodes;
-        selected_node_id = data.selected_node;
+      if (state) {
+        open_nodes = state.open_nodes;
+        selected_node_id = state.selected_node;
         this.tree_widget.tree.iterate(function(node) {
-          if (node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0)) {
-            node.is_open = true;
-          }
+          node.is_open = node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0);
+          console.log(node.id, node.is_open);
           return true;
         });
-        if (selected_node_id) {
+        if (selected_node_id && this.tree_widget.select_node_handler) {
+          this.tree_widget.select_node_handler.clear();
           selected_node = this.tree_widget.getNodeById(selected_node_id);
           if (selected_node) {
             return this.tree_widget.select_node_handler.addToSelection(selected_node);

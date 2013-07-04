@@ -90,6 +90,8 @@
                 <li><a href="#functions-movenode">moveNode</a></li>
                 <li><a href="#functions-toggle">toggle</a></li>
                 <li><a href="#functions-scrolltonode">scrollToNode</a></li>
+                <li><a href="#functions-getstate">getState</a></li>
+                <li><a href="#functions-setstate">setState</a></li>
             </ul>
         </li>
         <li>
@@ -282,6 +284,7 @@ $.getJSON(
         <li>Issue 159: Cannot reselect node after unselecting it (thanks to Comanche)</li>
         <li>Issue 162: Added getPreviousSibling and getNextSibling functions (thanks to Dimaninc)</li>
         <li>Issue 169: Added touch support (thanks to Comanche)</li>
+        <li>Issue 171: Added functions getState and setState</li>
     </ul>
 
     <h5>0.16 (may 17 2013)</h5>
@@ -1104,7 +1107,7 @@ $tree.tree('moveNode', node, target_node, 'after');
     <p>
         Open or close a node.
         <br />
-        Parameter <strong>slide</strong>: a slide animation (default is true).
+        Parameter <strong>slide</strong>: use a slide animation (default is true).
     </p>
 
 <pre><code class="language-javascript">
@@ -1126,6 +1129,26 @@ $tree.tree('toggle', node);
 var node = $tree.tree('getNodeBydId', 1);
 $tree.tree('scrollToNode', node);
 </code></pre>
+
+    <h5 id="functions-getstate">getState</h5>
+
+    <p>
+        <strong>function getState();</strong>
+    </p>
+
+    <p>
+        Get the state of tree: which nodes are open and which one is selected?
+    </p>
+
+    <h5 id="functions-setstate">setState</h5>
+
+    <p>
+        <strong>function setState(state);</strong>
+    </p>
+
+    <p>
+        Set the state of the tree: which nodes are open and which one is selected?
+    </p>
 
     <h4 id="events">Events</h4>
 
