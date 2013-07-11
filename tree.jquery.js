@@ -1378,9 +1378,6 @@ limitations under the License.
 
     JqTreeWidget.prototype._click = function(e) {
       var $button, $el, $target, event, node;
-      if (e.ctrlKey) {
-        return;
-      }
       $target = $(e.target);
       $button = $target.closest('.jqtree-toggler');
       if ($button.length) {

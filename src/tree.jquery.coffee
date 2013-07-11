@@ -537,9 +537,6 @@ class JqTreeWidget extends MouseWidget
         @_triggerEvent('tree.refresh')
 
     _click: (e) ->
-        if e.ctrlKey
-            return
-
         $target = $(e.target)
 
         $button = $target.closest('.jqtree-toggler')
