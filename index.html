@@ -11,10 +11,10 @@
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Corben:bold&amp;v1' rel='stylesheet' type='text/css'>
     <!--[if lt IE 9]>
-        <script src="extra/js/jquery-1.9.1.min.js"></script>
+        <script src="extra/js/jquery-1.10.2.min.js"></script>
     <![endif]-->
     <!--[if gte IE 9]><!-->
-        <script src="extra/js/jquery-2.0.0.min.js"></script>
+        <script src="extra/js/jquery-2.0.3.min.js"></script>
     <!--<![endif]-->
     <script src="extra/prism/prism.js"></script>
     <script src="tree.jquery.js"></script>
@@ -90,6 +90,9 @@
                 <li><a href="#functions-movenode">moveNode</a></li>
                 <li><a href="#functions-toggle">toggle</a></li>
                 <li><a href="#functions-scrolltonode">scrollToNode</a></li>
+                <li><a href="#functions-getstate">getState</a></li>
+                <li><a href="#functions-setstate">setState</a></li>
+                <li><a href="#functions-gettree">getTree</a></li>
             </ul>
         </li>
         <li>
@@ -111,6 +114,17 @@
                 <li><a href="#multiple-selection-get-selected-nodes">getSelectedNodes</a></li>
                 <li><a href="#multiple-selection-is-node-selected">isNodeSelected</a></li>
                 <li><a href="#multiple-selection-remove-from-selection">remove&shy;From&shy;Selection</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#node-functions">Node functions</a>
+            <ul>
+                <li><a href="#node-functions-parent">parent</a></li>
+                <li><a href="#node-functions-children">children</a></li>
+                <li><a href="#node-functions-getlevel">getLevel</a></li>
+                <li><a href="#node-functions-getprevioussibling">getPreviousSibling</a></li>
+                <li><a href="#node-functions-getnextsibling">getNextSibling</a></li>
+                <li><a href="#node-functions-getdata">getData</a></li>
             </ul>
         </li>
     </ul>
@@ -176,7 +190,7 @@ $('#tree1').tree({
     </ul>
     <h4 id="downloads">Downloads</h4>
     <ul>
-        <li>All (version 0.16): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+        <li>All (version 0.17): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
         <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
         <li>Css: <a href="jqtree.css">jqtree.css</a></li>
         <li>Image: <a href="jqtree-circle.png">jqtree-circle.png</a></li>
@@ -262,6 +276,18 @@ $.getJSON(
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.17 (july 14 2013)</h5>
+    <ul>
+        <li>Issue 132: Added keyboard support</li>
+        <li>Issue 154: Calling loadDataFromUrl should not trigger tree.init event (thanks to Davide Bellini)</li>
+        <li>Issue 158: Index not updated on updateNode (thanks to Sam Mousa)</li>
+        <li>Issue 159: Cannot reselect node after unselecting it (thanks to Comanche)</li>
+        <li>Issue 162: Added getPreviousSibling and getNextSibling functions (thanks to Dimaninc)</li>
+        <li>Issue 169: Added touch support (thanks to Comanche)</li>
+        <li>Issue 171: Added functions getState and setState</li>
+        <li>Issue 175: Make it possible to install jqTree using bower (thanks to Adam Miskiewicz)</li>
+    </ul>
 
     <h5>0.16 (may 17 2013)</h5>
     <ul>
@@ -1083,7 +1109,7 @@ $tree.tree('moveNode', node, target_node, 'after');
     <p>
         Open or close a node.
         <br />
-        Parameter <strong>slide</strong>: a slide animation (default is true).
+        Parameter <strong>slide</strong>: use a slide animation (default is true).
     </p>
 
 <pre><code class="language-javascript">
@@ -1105,6 +1131,36 @@ $tree.tree('toggle', node);
 var node = $tree.tree('getNodeBydId', 1);
 $tree.tree('scrollToNode', node);
 </code></pre>
+
+    <h5 id="functions-getstate">getState</h5>
+
+    <p>
+        <strong>function getState();</strong>
+    </p>
+
+    <p>
+        Get the state of tree: which nodes are open and which one is selected?
+    </p>
+
+    <h5 id="functions-setstate">setState</h5>
+
+    <p>
+        <strong>function setState(state);</strong>
+    </p>
+
+    <p>
+        Set the state of the tree: which nodes are open and which one is selected?
+    </p>
+
+    <h5 id="functions-gettree">getTree</h5>
+
+    <p>
+        <strong>function getTree();</strong>
+    </p>
+
+    <p>
+        Get the root node of the tree.
+    </p>
 
     <h4 id="events">Events</h4>
 
@@ -1167,6 +1223,7 @@ $('#tree1').bind(
         else {
             // event.node is null
             // a node was deselected
+            // e.previous_node contains the deselected node
         }
     }
 );
@@ -1365,11 +1422,84 @@ var node = $('#tree1').tree('getNodeById', 123);
 $('#tree1').tree('removeFromSelection', node);
 </code></pre>
 
+    <h4 id="node-functions">Node functions</h4>
+
+    <p>
+        You can access a node using for example <a href="#functions-getnodebyid">getNodeById</a> function:
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+</code></pre>
+
+    <p>
+        The Node object has the following properties and functions:
+    </p>
+
+    <h5 id="node-functions-parent">parent</h5>
+    <p>
+        You can access the parent of a node using the <strong>parent</strong> property.
+    </p>
+
+<pre><code class="language-javascript">
+var parent_node = node.parent;
+</code></pre>
+
+    <h5 id="node-functions-children">children</h5>
+    <p>
+        You can access the children of a node using the <strong>children</strong> property.
+    </p>
+
+<pre><code class="language-javascript">
+for (var i=0; i < node.children.length; i++) {
+    var child = node.children[i];
+}
+</code></pre>
+
     <p>
         <a href="http://thenounproject.com/noun/tree/#icon-No2141" target="_blank">Tree</a>
         designed by <a href="http://thenounproject.com/hschlosman" target="_blank">Hernan D. Schlosman</a>
         from The Noun Project
     </p>
+
+    <h5 id="node-functions-getlevel">getLevel</h5>
+    <p>
+        Get the level of a node. The level is distance of a node to the root node.
+    </p>
+
+<pre><code class="language-javascript">
+var node = $('#tree1').tree('getNodeById', 123);
+
+// result is e.g. 2
+var level = node.getLevel();
+</code></pre>
+
+    <h5 id="node-functions-getprevioussibling">getPreviousSibling</h5>
+    <p>
+        Get the previous sibling of this node. Returns a node or null.
+    </p>
+
+<pre><code class="language-javascript">
+var level = node.getPreviousSibling();
+</code></pre>
+
+    <h5 id="node-functions-getnextsibling">getNextSibling</h5>
+    <p>
+        Get the next sibling of this node. Returns a node or null.
+    </p>
+
+<pre><code class="language-javascript">
+var level = node.getNextSibling();
+</code></pre>
+
+    <h5 id="node-functions-getdata">getData</h5>
+    <p>
+        Get the subtree of this node.
+    </p>
+
+<pre><code class="language-javascript">
+var data = node.getData();
+</code></pre>
 
 </div>
 <script>

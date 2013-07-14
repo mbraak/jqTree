@@ -847,6 +847,21 @@ test('updateNode', function() {
     equal(formatTitles($tree), 'node1 child1 child2 xyz child3');
     equal(node2.name, 'xyz');
     equal(node2.tag1, 'abc');
+
+    // - update id
+    equal(node2.id, 124);
+
+    $tree.tree('updateNode', node2, {id: 555});
+
+    equal(node2.id, 555);
+    equal(node2.name, 'xyz');
+
+    // get node by id
+    var node_555 = $tree.tree('getNodeById', 555);
+    equal(node_555.name, 'xyz');
+
+    var node_124 = $tree.tree('getNodeById', 124);
+    equal(node_124, undefined);
 });
 
 test('moveNode', function() {
