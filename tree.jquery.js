@@ -798,7 +798,8 @@ limitations under the License.
       closedIcon: '&#x25ba;',
       openedIcon: '&#x25bc;',
       slide: true,
-      nodeClass: Node
+      nodeClass: Node,
+      dataFilter: null
     };
 
     JqTreeWidget.prototype.toggle = function(node, slide) {
@@ -942,6 +943,9 @@ limitations under the License.
             data = response;
           } else {
             data = $.parseJSON(response);
+          }
+          if (_this.options.dataFilter) {
+            data = _this.options.dataFilter(data);
           }
           removeLoadingClass();
           _this._loadData(data, parent_node);

@@ -68,6 +68,7 @@
                 <li><a href="#tree-options-openedIcon">openedIcon</a></li>
                 <li><a href="#tree-options-closedIcon">closedIcon</a></li>
                 <li><a href="#tree-options-usecontextmenu">useContextMenu</a></li>
+                <li><a href="#tree-options-datafilter">dataFilter</a></li>
             </ul>
         </li>
         <li>
@@ -276,6 +277,11 @@ $.getJSON(
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>development version</h5>
+    <ul>
+        <li>Issue 179 and 180: Added dataFilter option to filter the returned data from jQuery.ajax (thanks to Cheton Wu and Tony Dilger)</li>
+    </ul>
 
     <h5>0.17 (july 14 2013)</h5>
     <ul>
@@ -719,6 +725,23 @@ $('#tree1').tree({
         <br>
         A right mouse-click will trigger the native contextmenu of the browser.
     </p>
+
+    <h5 id="tree-options-datafilter">dataFilter</h5>
+
+    <p>
+        Process the tree data from the server.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    url: '/my/data/',
+    dataFilter: function(data) {
+        // Example:
+        // the server puts the tree data in 'my_tree_data'
+        return data['my_tree_data'];
+    }
+});
+</code></pre>
 
     <h4 id="functions">Functions</h4>
     <h5 id="functions-loadData">loadData</h5>

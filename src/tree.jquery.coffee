@@ -36,6 +36,7 @@ class JqTreeWidget extends MouseWidget
         openedIcon: '&#x25bc;'  # The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
         slide: true  # must display slide animation?
         nodeClass: Node
+        dataFilter: null
 
     toggle: (node, slide=true) ->
         if node.is_open
@@ -156,6 +157,9 @@ class JqTreeWidget extends MouseWidget
                     data = response
                 else
                     data = $.parseJSON(response)
+
+                if @options.dataFilter
+                    data = @options.dataFilter(data)
 
                 removeLoadingClass()                
                 @_loadData(data, parent_node)
