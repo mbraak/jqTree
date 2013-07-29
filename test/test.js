@@ -1613,6 +1613,26 @@ test('removeChildren', function() {
     equal(child2.children.length, 0);
 });
 
+test('node with id 0', function() {
+    // - load node with id 0
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData([
+        {
+            id: 0,
+            label: 'mynode'
+        }
+    ]);
+
+    // - get node by id
+    var node = tree.getNodeById(0);
+    equal(node.name, 'mynode');
+
+    // -- remove the node
+    node.remove();
+
+    equal(tree.getNodeById(0), undefined);
+});
+
 module('util');
 
 test('JSON.stringify', function() {

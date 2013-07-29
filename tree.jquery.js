@@ -700,13 +700,13 @@ limitations under the License.
     };
 
     Node.prototype.addNodeToIndex = function(node) {
-      if (node.id) {
+      if (node.id != null) {
         return this.id_mapping[node.id] = node;
       }
     };
 
     Node.prototype.removeNodeFromIndex = function(node) {
-      if (node.id) {
+      if (node.id != null) {
         return delete this.id_mapping[node.id];
       }
     };
