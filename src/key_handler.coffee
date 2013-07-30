@@ -13,6 +13,9 @@ class KeyHandler
         $(document).unbind('keydown.jqtree')
 
     handleKeyDown: (e) ->
+        if $(document.activeElement).is('textarea,input')
+            return true
+
         current_node = @tree_widget.getSelectedNode()
 
         selectNode = (node) =>

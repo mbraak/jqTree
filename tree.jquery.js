@@ -2498,6 +2498,9 @@ limitations under the License.
     KeyHandler.prototype.handleKeyDown = function(e) {
       var current_node, key, moveDown, moveLeft, moveRight, moveUp, selectNode,
         _this = this;
+      if ($(document.activeElement).is('textarea,input')) {
+        return true;
+      }
       current_node = this.tree_widget.getSelectedNode();
       selectNode = function(node) {
         if (node) {
