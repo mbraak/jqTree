@@ -48,7 +48,7 @@ class JqTreeWidget extends MouseWidget
         return @tree
 
     selectNode: (node) ->
-        @_selectNode(node, true)
+        @_selectNode(node, false)
 
     _selectNode: (node, must_toggle=false) ->
         if not @select_node_handler
