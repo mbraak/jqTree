@@ -69,6 +69,7 @@
                 <li><a href="#tree-options-closedIcon">closedIcon</a></li>
                 <li><a href="#tree-options-usecontextmenu">useContextMenu</a></li>
                 <li><a href="#tree-options-datafilter">dataFilter</a></li>
+                <li><a href="#tree-options-keyboardsupport">keyboardSupport</a></li>
             </ul>
         </li>
         <li>
@@ -284,6 +285,7 @@ $.getJSON(
         <li>Issue 179 and 180: Added dataFilter option to filter the returned data from jQuery.ajax (thanks to Cheton Wu and Tony Dilger)</li>
         <li>Issue 184: If the node id is 0, the id mapping is incorrect (thanks to Ika Wu)</li>
         <li>Issue 190: The function selectNode should not toggle (thanks to Gordon Woodhull)</li>
+        <li>Issue 192: Added keyboardSupport option (thanks to Ika Wu)</li>
     </ul>
 
     <h5>0.17 (july 14 2013)</h5>
@@ -743,6 +745,22 @@ $('#tree1').tree({
         // the server puts the tree data in 'my_tree_data'
         return data['my_tree_data'];
     }
+});
+</code></pre>
+
+    <h5 id="tree-options-keyboardsupport">keyboardSupport</h5>
+
+    <p>
+        Enable or disable keyboard support. Default is enabled.
+    </p>
+
+    <p>
+        Example: disable keyboard support.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    keyboardSupport: false
 });
 </code></pre>
 

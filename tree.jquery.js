@@ -799,7 +799,8 @@ limitations under the License.
       openedIcon: '&#x25bc;',
       slide: true,
       nodeClass: Node,
-      dataFilter: null
+      dataFilter: null,
+      keyboardSupport: true
     };
 
     JqTreeWidget.prototype.toggle = function(node, slide) {
@@ -2488,7 +2489,9 @@ limitations under the License.
 
     function KeyHandler(tree_widget) {
       this.tree_widget = tree_widget;
-      $(document).bind('keydown.jqtree', $.proxy(this.handleKeyDown, this));
+      if (tree_widget.options.keyboardSupport) {
+        $(document).bind('keydown.jqtree', $.proxy(this.handleKeyDown, this));
+      }
     }
 
     KeyHandler.prototype.deinit = function() {

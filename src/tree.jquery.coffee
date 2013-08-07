@@ -37,6 +37,7 @@ class JqTreeWidget extends MouseWidget
         slide: true  # must display slide animation?
         nodeClass: Node
         dataFilter: null
+        keyboardSupport: true
 
     toggle: (node, slide=true) ->
         if node.is_open
