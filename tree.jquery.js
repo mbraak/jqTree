@@ -1197,6 +1197,7 @@ limitations under the License.
       }
       this._initData();
       this.element.click($.proxy(this._click, this));
+      this.element.dblclick($.proxy(this._dblclick, this));
       if (this.options.useContextMenu) {
         return this.element.bind('contextmenu', $.proxy(this._contextmenu, this));
       }
@@ -1382,30 +1383,60 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._click = function(e) {
-      var $button, $el, $target, event, node;
-      $target = $(e.target);
+      var click_target, event, node;
+      click_target = this._getClickTarget(e.target);
+      if (click_target) {
+        if (click_target.type === 'button') {
+          this.toggle(click_target.node, this.options.slide);
+          e.preventDefault();
+          return e.stopPropagation();
+        } else if (click_target.type === 'label') {
+          node = click_target.node;
+          event = this._triggerEvent('tree.click', {
+            node: node
+          });
+          if (!event.isDefaultPrevented()) {
+            return this._selectNode(node, true);
+          }
+        }
+      }
+    };
+
+    JqTreeWidget.prototype._dblclick = function(e) {
+      var click_target;
+      click_target = this._getClickTarget(e.target);
+      if (click_target && click_target.type === 'label') {
+        return this._triggerEvent('tree.dblclick', {
+          node: click_target.node
+        });
+      }
+    };
+
+    JqTreeWidget.prototype._getClickTarget = function(element) {
+      var $button, $el, $target, node;
+      $target = $(element);
       $button = $target.closest('.jqtree-toggler');
       if ($button.length) {
         node = this._getNode($button);
         if (node) {
-          this.toggle(node, this.options.slide);
-          e.preventDefault();
-          return e.stopPropagation();
+          return {
+            type: 'button',
+            node: node
+          };
         }
       } else {
         $el = $target.closest('.jqtree-element');
         if ($el.length) {
           node = this._getNode($el);
           if (node) {
-            event = this._triggerEvent('tree.click', {
+            return {
+              type: 'label',
               node: node
-            });
-            if (!event.isDefaultPrevented()) {
-              return this._selectNode(node, true);
-            }
+            };
           }
         }
       }
+      return null;
     };
 
     JqTreeWidget.prototype._getNode = function($element) {

@@ -371,6 +371,8 @@ class JqTreeWidget extends MouseWidget
         @_initData()
 
         @element.click($.proxy(@_click, this))
+        @element.dblclick($.proxy(@_dblclick, this))
+
         if @options.useContextMenu
             @element.bind('contextmenu', $.proxy(@_contextmenu, this))
 
@@ -542,26 +544,51 @@ class JqTreeWidget extends MouseWidget
         @_triggerEvent('tree.refresh')
 
     _click: (e) ->
-        $target = $(e.target)
+        click_target = @_getClickTarget(e.target)
+
+        if click_target
+            if click_target.type == 'button'
+                @toggle(click_target.node, @options.slide)
+
+                e.preventDefault()
+                e.stopPropagation()
+            else if click_target.type == 'label'
+                node = click_target.node
+                event = @_triggerEvent('tree.click', node: node)
+
+                if not event.isDefaultPrevented()
+                    @_selectNode(node, true)
+
+    _dblclick: (e) ->
+        click_target = @_getClickTarget(e.target)
+
+        if click_target and click_target.type == 'label'
+            @_triggerEvent('tree.dblclick', node: click_target.node)
+
+    _getClickTarget: (element) ->
+        $target = $(element)
 
         $button = $target.closest('.jqtree-toggler')
+
         if $button.length
             node = @_getNode($button)
 
             if node
-                @toggle(node, @options.slide)
-
-                e.preventDefault()
-                e.stopPropagation()
+                return {
+                    type: 'button',
+                    node: node
+                }
         else
             $el = $target.closest('.jqtree-element')
             if $el.length
                 node = @_getNode($el)
                 if node
-                    event = @_triggerEvent('tree.click', node: node)
+                    return {
+                        type: 'label',
+                        node: node
+                    }
 
-                    if not event.isDefaultPrevented()
-                        @_selectNode(node, true)
+        return null
 
     _getNode: ($element) ->
         $li = $element.closest('li')
