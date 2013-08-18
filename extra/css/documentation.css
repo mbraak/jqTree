@@ -124,8 +124,14 @@ img {
 
 #page ul {
     list-style-position: outside;
-    margin-left: 1em;
+    margin-left: 1.2em;
 }
+
+/*
+#page li {
+    margin-left: 4px;
+}
+*/
 
 /* tree */
 .jqtree-tree a:hover {
