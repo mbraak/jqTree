@@ -1796,7 +1796,7 @@ limitations under the License.
       state = JSON.stringify(this.getState());
       if (this.tree_widget.options.onSetStateFromStorage) {
         return this.tree_widget.options.onSetStateFromStorage(state);
-      } else if (typeof localStorage !== "undefined" && localStorage !== null) {
+      } else if (this.supportsLocalStorage()) {
         return localStorage.setItem(this.getCookieName(), state);
       } else if ($.cookie) {
         $.cookie.raw = true;
@@ -1820,7 +1820,7 @@ limitations under the License.
     SaveStateHandler.prototype.getStateFromStorage = function() {
       if (this.tree_widget.options.onGetStateFromStorage) {
         return this.tree_widget.options.onGetStateFromStorage();
-      } else if (typeof localStorage !== "undefined" && localStorage !== null) {
+      } else if (this.supportsLocalStorage()) {
         return localStorage.getItem(this.getCookieName());
       } else if ($.cookie) {
         $.cookie.raw = true;
@@ -1878,6 +1878,30 @@ limitations under the License.
       } else {
         return 'tree';
       }
+    };
+
+    SaveStateHandler.prototype.supportsLocalStorage = function() {
+      var testSupport;
+      testSupport = function() {
+        var error, key;
+        if (typeof localStorage === "undefined" || localStorage === null) {
+          return false;
+        } else {
+          try {
+            key = '_storage_test';
+            sessionStorage.setItem(key, true);
+            sessionStorage.removeItem(key);
+          } catch (_error) {
+            error = _error;
+            return false;
+          }
+          return true;
+        }
+      };
+      if (this._supportsLocalStorage == null) {
+        this._supportsLocalStorage = testSupport();
+      }
+      return this._supportsLocalStorage;
     };
 
     return SaveStateHandler;
