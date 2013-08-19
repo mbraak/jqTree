@@ -2111,12 +2111,12 @@ limitations under the License.
         return last_top = top;
       };
       groupPositions = function(handle_group) {
-        var group, position, previous_top, _i, _len;
+        var dimensions, group, position, previous_top, _i, _len;
         previous_top = -1;
         group = [];
         for (_i = 0, _len = positions.length; _i < _len; _i++) {
           position = positions[_i];
-          if (position.top !== previous_top) {
+          if (position.top !== previous_top && group.length) {
             if (group.length) {
               handle_group(group, previous_top, position.top);
             }
@@ -2125,7 +2125,8 @@ limitations under the License.
           }
           group.push(position);
         }
-        return handle_group(group, previous_top, _this.tree_widget.element.offset().top + _this.tree_widget.element.height());
+        dimensions = _this.getTreeDimensions();
+        return handle_group(group, previous_top, dimensions.bottom);
       };
       handleNode = function(node, next_node, $element) {
         var top;
@@ -2241,9 +2242,9 @@ limitations under the License.
     };
 
     DragAndDropHandler.prototype.findHoveredArea = function(x, y) {
-      var area, high, low, mid, tree_offset;
-      tree_offset = this.tree_widget.element.offset();
-      if (x < tree_offset.left || y < tree_offset.top || x > (tree_offset.left + this.tree_widget.element.width()) || y > (tree_offset.top + this.tree_widget.element.height())) {
+      var area, dimensions, high, low, mid;
+      dimensions = this.getTreeDimensions();
+      if (x < dimensions.left || y < dimensions.top || x > dimensions.right || y > dimensions.bottom) {
         return null;
       }
       low = 0;
@@ -2327,6 +2328,17 @@ limitations under the License.
           return doMove();
         }
       }
+    };
+
+    DragAndDropHandler.prototype.getTreeDimensions = function() {
+      var offset;
+      offset = this.tree_widget.element.offset();
+      return {
+        left: offset.left,
+        top: offset.top,
+        right: offset.left + this.tree_widget.element.width(),
+        bottom: offset.top + this.tree_widget.element.height() + 16
+      };
     };
 
     return DragAndDropHandler;

@@ -122,7 +122,7 @@ class DragAndDropHandler
             group = []
 
             for position in positions
-                if position.top != previous_top
+                if position.top != previous_top and group.length
                     if group.length
                         handle_group(group, previous_top, position.top)
 
@@ -131,10 +131,12 @@ class DragAndDropHandler
 
                 group.push(position)
 
+            dimensions = @getTreeDimensions()
+
             handle_group(
                 group,
                 previous_top,
-                @tree_widget.element.offset().top + @tree_widget.element.height()
+                dimensions.bottom
             )
 
         handleNode = (node, next_node, $element) =>
@@ -259,12 +261,13 @@ class DragAndDropHandler
         iterate(@tree_widget.tree)
 
     findHoveredArea: (x, y) ->
-        tree_offset = @tree_widget.element.offset()
+        dimensions = @getTreeDimensions()
+
         if (
-            x < tree_offset.left or
-            y < tree_offset.top or
-            x > (tree_offset.left + @tree_widget.element.width()) or
-            y > (tree_offset.top + @tree_widget.element.height())
+            x < dimensions.left or
+            y < dimensions.top or
+            x > dimensions.right or
+            y > dimensions.bottom
         )
             return null
 
@@ -351,6 +354,18 @@ class DragAndDropHandler
             )
 
             doMove() unless event.isDefaultPrevented()
+
+    getTreeDimensions: ->
+        # Return the dimensions of the tree. Add a margin to the bottom to allow
+        # for some to drag-and-drop the last element.
+        offset = @tree_widget.element.offset()
+
+        return {
+            left: offset.left,
+            top: offset.top,
+            right: offset.left + @tree_widget.element.width(),
+            bottom: offset.top + @tree_widget.element.height() + 16
+        }
 
 
 class DragElement
