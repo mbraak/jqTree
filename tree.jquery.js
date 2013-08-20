@@ -17,7 +17,7 @@ limitations under the License.
 
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str, _indexOf, _ref, _ref1, _ref2,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str, _indexOf, _ref, _ref1, _ref2,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -2095,150 +2095,9 @@ limitations under the License.
     };
 
     DragAndDropHandler.prototype.generateHitAreas = function() {
-      var addPosition, getTop, groupPositions, handleAfterOpenFolder, handleClosedFolder, handleFirstNode, handleNode, handleOpenFolder, hit_areas, last_top, positions,
-        _this = this;
-      positions = [];
-      last_top = 0;
-      getTop = function($element) {
-        return $element.offset().top;
-      };
-      addPosition = function(node, position, top) {
-        positions.push({
-          top: top,
-          node: node,
-          position: position
-        });
-        return last_top = top;
-      };
-      groupPositions = function(handle_group) {
-        var dimensions, group, position, previous_top, _i, _len;
-        previous_top = -1;
-        group = [];
-        for (_i = 0, _len = positions.length; _i < _len; _i++) {
-          position = positions[_i];
-          if (position.top !== previous_top && group.length) {
-            if (group.length) {
-              handle_group(group, previous_top, position.top);
-            }
-            previous_top = position.top;
-            group = [];
-          }
-          group.push(position);
-        }
-        dimensions = _this.getTreeDimensions();
-        return handle_group(group, previous_top, dimensions.bottom);
-      };
-      handleNode = function(node, next_node, $element) {
-        var top;
-        top = getTop($element);
-        if (node === _this.current_item.node) {
-          addPosition(node, Position.NONE, top);
-        } else {
-          addPosition(node, Position.INSIDE, top);
-        }
-        if (next_node === _this.current_item.node || node === _this.current_item.node) {
-          return addPosition(node, Position.NONE, top);
-        } else {
-          return addPosition(node, Position.AFTER, top);
-        }
-      };
-      handleOpenFolder = function(node, $element) {
-        if (node === _this.current_item.node) {
-          return false;
-        }
-        if (node.children[0] !== _this.current_item.node) {
-          addPosition(node, Position.INSIDE, getTop($element));
-        }
-        return true;
-      };
-      handleAfterOpenFolder = function(node, next_node, $element) {
-        if (node === _this.current_item.node || next_node === _this.current_item.node) {
-          return addPosition(node, Position.NONE, last_top);
-        } else {
-          return addPosition(node, Position.AFTER, last_top);
-        }
-      };
-      handleClosedFolder = function(node, next_node, $element) {
-        var top;
-        top = getTop($element);
-        if (node === _this.current_item.node) {
-          return addPosition(node, Position.NONE, top);
-        } else {
-          addPosition(node, Position.INSIDE, top);
-          if (next_node !== _this.current_item.node) {
-            return addPosition(node, Position.AFTER, top);
-          }
-        }
-      };
-      handleFirstNode = function(node, $element) {
-        if (node !== _this.current_item.node) {
-          return addPosition(node, Position.BEFORE, getTop($(node.element)));
-        }
-      };
-      this.iterateVisibleNodes(handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder, handleFirstNode);
-      hit_areas = [];
-      groupPositions(function(positions_in_group, top, bottom) {
-        var area_height, area_top, position, _i, _len;
-        area_height = (bottom - top) / positions_in_group.length;
-        area_top = top;
-        for (_i = 0, _len = positions_in_group.length; _i < _len; _i++) {
-          position = positions_in_group[_i];
-          hit_areas.push({
-            top: area_top,
-            bottom: area_top + area_height,
-            node: position.node,
-            position: position.position
-          });
-          area_top += area_height;
-        }
-        return null;
-      });
-      return this.hit_areas = hit_areas;
-    };
-
-    DragAndDropHandler.prototype.iterateVisibleNodes = function(handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) {
-      var is_first_node, iterate,
-        _this = this;
-      is_first_node = true;
-      iterate = function(node, next_node) {
-        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref3;
-        must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
-        if (node.element) {
-          $element = $(node.element);
-          if (!$element.is(':visible')) {
-            return;
-          }
-          if (is_first_node) {
-            handle_first_node(node, $element);
-            is_first_node = false;
-          }
-          if (!node.hasChildren()) {
-            handle_node(node, next_node, $element);
-          } else if (node.is_open) {
-            if (!handle_open_folder(node, $element)) {
-              must_iterate_inside = false;
-            }
-          } else {
-            handle_closed_folder(node, next_node, $element);
-          }
-        }
-        if (must_iterate_inside) {
-          children_length = node.children.length;
-          _ref3 = node.children;
-          for (i = _i = 0, _len = _ref3.length; _i < _len; i = ++_i) {
-            child = _ref3[i];
-            if (i === (children_length - 1)) {
-              iterate(node.children[i], null);
-            } else {
-              iterate(node.children[i], node.children[i + 1]);
-            }
-          }
-          if (node.is_open) {
-            return handle_after_open_folder(node, next_node, $element);
-          }
-        }
-      };
-      return iterate(this.tree_widget.tree);
+      var hit_areas_generator;
+      hit_areas_generator = new HitAreasGenerator(this.tree_widget.tree, this.current_item.node, this.getTreeDimensions().bottom);
+      return this.hit_areas = hit_areas_generator.generate();
     };
 
     DragAndDropHandler.prototype.findHoveredArea = function(x, y) {
@@ -2344,6 +2203,192 @@ limitations under the License.
     return DragAndDropHandler;
 
   })();
+
+  VisibleNodeIterator = (function() {
+    function VisibleNodeIterator(tree) {
+      this.tree = tree;
+    }
+
+    VisibleNodeIterator.prototype.iterate = function() {
+      var is_first_node, _iterateNode,
+        _this = this;
+      is_first_node = true;
+      _iterateNode = function(node, next_node) {
+        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref3;
+        must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
+        if (node.element) {
+          $element = $(node.element);
+          if (!$element.is(':visible')) {
+            return;
+          }
+          if (is_first_node) {
+            _this.handleFirstNode(node, $element);
+            is_first_node = false;
+          }
+          if (!node.hasChildren()) {
+            _this.handleNode(node, next_node, $element);
+          } else if (node.is_open) {
+            if (!_this.handleOpenFolder(node, $element)) {
+              must_iterate_inside = false;
+            }
+          } else {
+            _this.handleClosedFolder(node, next_node, $element);
+          }
+        }
+        if (must_iterate_inside) {
+          children_length = node.children.length;
+          _ref3 = node.children;
+          for (i = _i = 0, _len = _ref3.length; _i < _len; i = ++_i) {
+            child = _ref3[i];
+            if (i === (children_length - 1)) {
+              _iterateNode(node.children[i], null);
+            } else {
+              _iterateNode(node.children[i], node.children[i + 1]);
+            }
+          }
+          if (node.is_open) {
+            return _this.handleAfterOpenFolder(node, next_node, $element);
+          }
+        }
+      };
+      return _iterateNode(this.tree, null);
+    };
+
+    VisibleNodeIterator.prototype.handleNode = function(node, next_node, $element) {};
+
+    VisibleNodeIterator.prototype.handleOpenFolder = function(node, $element) {};
+
+    VisibleNodeIterator.prototype.handleClosedFolder = function(node, next_node, $element) {};
+
+    VisibleNodeIterator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {};
+
+    VisibleNodeIterator.prototype.handleFirstNode = function(node, $element) {};
+
+    return VisibleNodeIterator;
+
+  })();
+
+  HitAreasGenerator = (function(_super) {
+    __extends(HitAreasGenerator, _super);
+
+    function HitAreasGenerator(tree, current_node, tree_bottom) {
+      HitAreasGenerator.__super__.constructor.call(this, tree);
+      this.current_node = current_node;
+      this.tree_bottom = tree_bottom;
+    }
+
+    HitAreasGenerator.prototype.generate = function() {
+      this.positions = [];
+      this.last_top = 0;
+      this.iterate();
+      return this.generateHitAreas(this.positions);
+    };
+
+    HitAreasGenerator.prototype.getTop = function($element) {
+      return $element.offset().top;
+    };
+
+    HitAreasGenerator.prototype.addPosition = function(node, position, top) {
+      this.positions.push({
+        top: top,
+        node: node,
+        position: position
+      });
+      return this.last_top = top;
+    };
+
+    HitAreasGenerator.prototype.handleNode = function(node, next_node, $element) {
+      var top;
+      top = this.getTop($element);
+      if (node === this.current_node) {
+        this.addPosition(node, Position.NONE, top);
+      } else {
+        this.addPosition(node, Position.INSIDE, top);
+      }
+      if (next_node === this.current_node || node === this.current_node) {
+        return this.addPosition(node, Position.NONE, top);
+      } else {
+        return this.addPosition(node, Position.AFTER, top);
+      }
+    };
+
+    HitAreasGenerator.prototype.handleOpenFolder = function(node, $element) {
+      if (node === this.current_node) {
+        return false;
+      }
+      if (node.children[0] !== this.current_node) {
+        this.addPosition(node, Position.INSIDE, this.getTop($element));
+      }
+      return true;
+    };
+
+    HitAreasGenerator.prototype.handleClosedFolder = function(node, next_node, $element) {
+      var top;
+      top = this.getTop($element);
+      if (node === this.current_node) {
+        return this.addPosition(node, Position.NONE, top);
+      } else {
+        this.addPosition(node, Position.INSIDE, top);
+        if (next_node !== this.current_node) {
+          return this.addPosition(node, Position.AFTER, top);
+        }
+      }
+    };
+
+    HitAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {
+      if (node === this.current_node || next_node === this.current_node) {
+        return this.addPosition(node, Position.NONE, this.last_top);
+      } else {
+        return this.addPosition(node, Position.AFTER, this.last_top);
+      }
+    };
+
+    HitAreasGenerator.prototype.handleFirstNode = function(node, $element) {
+      if (node !== this.current_node) {
+        return this.addPosition(node, Position.BEFORE, this.getTop($(node.element)));
+      }
+    };
+
+    HitAreasGenerator.prototype.generateHitAreas = function(positions) {
+      var group, hit_areas, position, previous_top, _i, _len;
+      previous_top = -1;
+      group = [];
+      hit_areas = [];
+      for (_i = 0, _len = positions.length; _i < _len; _i++) {
+        position = positions[_i];
+        if (position.top !== previous_top && group.length) {
+          if (group.length) {
+            this.generateHitAreasForGroup(hit_areas, group, previous_top, position.top);
+          }
+          previous_top = position.top;
+          group = [];
+        }
+        group.push(position);
+      }
+      this.generateHitAreasForGroup(hit_areas, group, previous_top, this.tree_bottom);
+      return hit_areas;
+    };
+
+    HitAreasGenerator.prototype.generateHitAreasForGroup = function(hit_areas, positions_in_group, top, bottom) {
+      var area_height, area_top, position, _i, _len;
+      area_height = (bottom - top) / positions_in_group.length;
+      area_top = top;
+      for (_i = 0, _len = positions_in_group.length; _i < _len; _i++) {
+        position = positions_in_group[_i];
+        hit_areas.push({
+          top: area_top,
+          bottom: area_top + area_height,
+          node: position.node,
+          position: position.position
+        });
+        area_top += area_height;
+      }
+      return null;
+    };
+
+    return HitAreasGenerator;
+
+  })(VisibleNodeIterator);
 
   DragElement = (function() {
     function DragElement(node, offset_x, offset_y, $tree) {

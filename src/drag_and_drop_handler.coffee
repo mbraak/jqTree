@@ -103,162 +103,12 @@ class DragAndDropHandler
         @hovered_area = null
 
     generateHitAreas: ->
-        positions = []
-        last_top = 0
-
-        getTop = ($element) =>
-            return $element.offset().top
-
-        addPosition = (node, position, top) =>
-            positions.push(
-                top: top,
-                node: node,
-                position: position
-            )
-            last_top = top
-
-        groupPositions = (handle_group) =>
-            previous_top = -1
-            group = []
-
-            for position in positions
-                if position.top != previous_top and group.length
-                    if group.length
-                        handle_group(group, previous_top, position.top)
-
-                    previous_top = position.top
-                    group = []
-
-                group.push(position)
-
-            dimensions = @getTreeDimensions()
-
-            handle_group(
-                group,
-                previous_top,
-                dimensions.bottom
-            )
-
-        handleNode = (node, next_node, $element) =>
-            top = getTop($element)
-
-            if node == @current_item.node
-                # Cannot move inside current item
-                addPosition(node, Position.NONE, top)
-            else
-                addPosition(node, Position.INSIDE, top)
-
-            if (
-                next_node == @current_item.node or
-                node == @current_item.node
-            )
-                # Cannot move before or after current item
-                addPosition(node, Position.NONE, top)
-            else
-                addPosition(node, Position.AFTER, top)
-
-        handleOpenFolder = (node, $element) =>
-            if node == @current_item.node
-                # Cannot move inside current item
-                # Stop iterating
-                return false
-
-            # Cannot move before current item
-            if node.children[0] != @current_item.node
-                addPosition(node, Position.INSIDE, getTop($element))
-
-            # Continue iterating
-            return true
-
-        handleAfterOpenFolder = (node, next_node, $element) =>
-            if (
-                node == @current_item.node or
-                next_node == @current_item.node
-            )
-                # Cannot move before or after current item
-                addPosition(node, Position.NONE, last_top)
-            else
-                addPosition(node, Position.AFTER, last_top)
-
-        handleClosedFolder = (node, next_node, $element) =>
-            top = getTop($element)
-
-            if node == @current_item.node
-                # Cannot move after current item
-                addPosition(node, Position.NONE, top)
-            else
-                addPosition(node, Position.INSIDE, top)
-
-                # Cannot move before current item
-                if next_node != @current_item.node
-                    addPosition(node, Position.AFTER, top)
-
-        handleFirstNode = (node, $element) =>
-            if node != @current_item.node
-                addPosition(node, Position.BEFORE, getTop($(node.element)))
-
-        @iterateVisibleNodes(
-            handleNode, handleOpenFolder, handleClosedFolder, handleAfterOpenFolder, handleFirstNode
+        hit_areas_generator = new HitAreasGenerator(
+            @tree_widget.tree,
+            @current_item.node,            
+            @getTreeDimensions().bottom
         )
-
-        hit_areas = []
-
-        groupPositions((positions_in_group, top, bottom) ->
-            area_height = (bottom - top) / positions_in_group.length
-            area_top = top
-
-            for position in positions_in_group
-                hit_areas.push(
-                    top: area_top,
-                    bottom: area_top + area_height,
-                    node: position.node,
-                    position: position.position
-                )
-
-                area_top += area_height
-            return null
-        )
-
-        @hit_areas = hit_areas
-
-    iterateVisibleNodes: (handle_node, handle_open_folder, handle_closed_folder, handle_after_open_folder, handle_first_node) ->
-        is_first_node = true
-
-        iterate = (node, next_node) =>
-            must_iterate_inside = (
-                (node.is_open or not node.element) and node.hasChildren()
-            )
-
-            if node.element                
-                $element = $(node.element)
-
-                if not $element.is(':visible')
-                    return
-
-                if is_first_node
-                    handle_first_node(node, $element)
-                    is_first_node = false
-
-                if not node.hasChildren()
-                    handle_node(node, next_node, $element)
-                else if node.is_open
-                    if not handle_open_folder(node, $element)
-                        must_iterate_inside = false
-                else
-                    handle_closed_folder(node, next_node, $element)
-
-            if must_iterate_inside
-                children_length = node.children.length
-                for child, i in node.children
-                    if i == (children_length-1)
-                        iterate(node.children[i], null)
-                    else
-                        iterate(node.children[i], node.children[i+1])
-
-                if node.is_open
-                    handle_after_open_folder(node, next_node, $element)
-
-        iterate(@tree_widget.tree)
+        @hit_areas = hit_areas_generator.generate()
 
     findHoveredArea: (x, y) ->
         dimensions = @getTreeDimensions()
@@ -366,6 +216,198 @@ class DragAndDropHandler
             right: offset.left + @tree_widget.element.width(),
             bottom: offset.top + @tree_widget.element.height() + 16
         }
+
+class VisibleNodeIterator
+    constructor: (tree) ->
+        @tree = tree
+
+    iterate: ->
+        is_first_node = true
+
+        _iterateNode = (node, next_node) =>
+            must_iterate_inside = (
+                (node.is_open or not node.element) and node.hasChildren()
+            )
+
+            if node.element                
+                $element = $(node.element)
+
+                if not $element.is(':visible')
+                    return
+
+                if is_first_node
+                    @handleFirstNode(node, $element)
+                    is_first_node = false
+
+                if not node.hasChildren()
+                    @handleNode(node, next_node, $element)
+                else if node.is_open
+                    if not @handleOpenFolder(node, $element)
+                        must_iterate_inside = false
+                else
+                    @handleClosedFolder(node, next_node, $element)
+
+            if must_iterate_inside
+                children_length = node.children.length
+                for child, i in node.children
+                    if i == (children_length - 1)
+                        _iterateNode(node.children[i], null)
+                    else
+                        _iterateNode(node.children[i], node.children[i+1])
+
+                if node.is_open
+                    @handleAfterOpenFolder(node, next_node, $element)
+
+        _iterateNode(@tree, null)
+
+    handleNode: (node, next_node, $element) ->
+        # override
+
+    handleOpenFolder: (node, $element) ->
+        # override
+        # return
+        #   - true: continue iterating
+        #   - false: stop iterating
+
+    handleClosedFolder: (node, next_node, $element) ->
+        # override
+
+    handleAfterOpenFolder: (node, next_node, $element) ->
+        # override
+
+    handleFirstNode: (node, $element) ->
+        # override
+
+
+class HitAreasGenerator extends VisibleNodeIterator
+    constructor: (tree, current_node, tree_bottom) ->
+        super(tree)
+
+        @current_node = current_node
+        @tree_bottom = tree_bottom
+
+    generate: ->
+        @positions = []
+        @last_top = 0
+
+        @iterate()
+
+        return @generateHitAreas(@positions)
+
+    getTop: ($element) ->
+        return $element.offset().top
+
+    addPosition: (node, position, top) ->
+        @positions.push(
+            top: top,
+            node: node,
+            position: position
+        )
+        @last_top = top
+
+    handleNode: (node, next_node, $element) ->
+        top = @getTop($element)
+
+        if node == @current_node
+            # Cannot move inside current item
+            @addPosition(node, Position.NONE, top)
+        else
+            @addPosition(node, Position.INSIDE, top)
+
+        if (
+            next_node == @current_node or
+            node == @current_node
+        )
+            # Cannot move before or after current item
+            @addPosition(node, Position.NONE, top)
+        else
+            @addPosition(node, Position.AFTER, top)
+
+    handleOpenFolder: (node, $element) ->
+        if node == @current_node
+            # Cannot move inside current item
+            # Stop iterating
+            return false
+
+        # Cannot move before current item
+        if node.children[0] != @current_node
+            @addPosition(node, Position.INSIDE, @getTop($element))
+
+        # Continue iterating
+        return true
+
+    handleClosedFolder: (node, next_node, $element) ->
+        top = @getTop($element)
+
+        if node == @current_node
+            # Cannot move after current item
+            @addPosition(node, Position.NONE, top)
+        else
+            @addPosition(node, Position.INSIDE, top)
+
+            # Cannot move before current item
+            if next_node != @current_node
+                @addPosition(node, Position.AFTER, top)
+
+    handleAfterOpenFolder: (node, next_node, $element) ->
+        if (
+            node == @current_node or
+            next_node == @current_node
+        )
+            # Cannot move before or after current item
+            @addPosition(node, Position.NONE, @last_top)
+        else
+            @addPosition(node, Position.AFTER, @last_top)
+
+    handleFirstNode: (node, $element) ->
+        if node != @current_node
+            @addPosition(node, Position.BEFORE, @getTop($(node.element)))
+
+    generateHitAreas: (positions) ->
+        previous_top = -1
+        group = []
+        hit_areas = []
+
+        for position in positions
+            if position.top != previous_top and group.length
+                if group.length
+                    @generateHitAreasForGroup(
+                        hit_areas,
+                        group,
+                        previous_top,
+                        position.top
+                    )
+
+                previous_top = position.top
+                group = []
+
+            group.push(position)
+
+        @generateHitAreasForGroup(
+            hit_areas,
+            group,
+            previous_top,
+            @tree_bottom
+        )
+
+        return hit_areas
+
+    generateHitAreasForGroup: (hit_areas, positions_in_group, top, bottom) ->
+        area_height = (bottom - top) / positions_in_group.length
+        area_top = top
+
+        for position in positions_in_group
+            hit_areas.push(
+                top: area_top,
+                bottom: area_top + area_height,
+                node: position.node,
+                position: position.position
+            )
+
+            area_top += area_height
+        return null
+
+
 
 
 class DragElement
