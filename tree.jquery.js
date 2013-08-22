@@ -1088,13 +1088,13 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.appendNode = function(new_node_info, parent_node) {
-      var is_already_root_node, node;
+      var is_already_folder_node, node;
       if (!parent_node) {
         parent_node = this.tree;
       }
-      is_already_root_node = parent_node.isFolder();
+      is_already_folder_node = parent_node.isFolder();
       node = parent_node.append(new_node_info);
-      if (is_already_root_node) {
+      if (is_already_folder_node) {
         this._refreshElements(parent_node);
       } else {
         this._refreshElements(parent_node.parent);

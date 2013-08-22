@@ -267,12 +267,12 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             parent_node = @tree
 
-        # Is the parent already a root node?
-        is_already_root_node = parent_node.isFolder()
+        # Is the parent already a folder node?
+        is_already_folder_node = parent_node.isFolder()
 
         node = parent_node.append(new_node_info)
 
-        if is_already_root_node
+        if is_already_folder_node
             # Refresh the parent
             @_refreshElements(parent_node)
         else
