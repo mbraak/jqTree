@@ -377,7 +377,6 @@ class JqTreeWidget extends MouseWidget
         if @options.useContextMenu
             @element.bind('contextmenu', $.proxy(@_contextmenu, this))
 
-
     _deinit: ->
         @element.empty()
         @element.unbind()
@@ -395,17 +394,34 @@ class JqTreeWidget extends MouseWidget
     _getDataUrlInfo: (node) ->
         data_url = @options.dataUrl or @element.data('url')
 
+        getUrlFromString = =>
+            url_info = url: data_url
+
+            if node and node.id
+                # Load on demand of a subtree; add node parameter
+                data = node: node.id
+                url_info['data'] = data
+            else
+                # Add selected_node parameter
+                selected_node_id = @_getNodeIdToBeSelected()
+                if selected_node_id
+                    data = selected_node: selected_node_id
+                    url_info['data'] = data
+
+            return url_info
+
         if $.isFunction(data_url)
             return data_url(node)
         else if $.type(data_url) == 'string'
-            url_info = url: data_url
-            if node and node.id
-                data = node: node.id
-                url_info['data'] = data
-
-            return url_info
+            return getUrlFromString()
         else
             return data_url
+
+    _getNodeIdToBeSelected: ->
+        if @options.saveState
+            return @save_state_handler.getNodeIdToBeSelected()
+        else
+            return null
 
     _initTree: (data) ->
         @tree = new @options.nodeClass(null, true, @options.nodeClass)

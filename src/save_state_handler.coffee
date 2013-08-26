@@ -208,3 +208,12 @@ class SaveStateHandler
             @_supportsLocalStorage = testSupport()
 
         return @_supportsLocalStorage
+
+    getNodeIdToBeSelected: ->
+        state_json = @getStateFromStorage()
+
+        if state_json
+            state = $.parseJSON(state_json)
+            return state.selected_node
+        else
+            return null

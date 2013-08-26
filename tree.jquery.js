@@ -1222,11 +1222,11 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._getDataUrlInfo = function(node) {
-      var data, data_url, url_info;
+      var data_url, getUrlFromString,
+        _this = this;
       data_url = this.options.dataUrl || this.element.data('url');
-      if ($.isFunction(data_url)) {
-        return data_url(node);
-      } else if ($.type(data_url) === 'string') {
+      getUrlFromString = function() {
+        var data, selected_node_id, url_info;
         url_info = {
           url: data_url
         };
@@ -1235,10 +1235,31 @@ limitations under the License.
             node: node.id
           };
           url_info['data'] = data;
+        } else {
+          selected_node_id = _this._getNodeIdToBeSelected();
+          if (selected_node_id) {
+            data = {
+              selected_node: selected_node_id
+            };
+            url_info['data'] = data;
+          }
         }
         return url_info;
+      };
+      if ($.isFunction(data_url)) {
+        return data_url(node);
+      } else if ($.type(data_url) === 'string') {
+        return getUrlFromString();
       } else {
         return data_url;
+      }
+    };
+
+    JqTreeWidget.prototype._getNodeIdToBeSelected = function() {
+      if (this.options.saveState) {
+        return this.save_state_handler.getNodeIdToBeSelected();
+      } else {
+        return null;
       }
     };
 
@@ -1904,6 +1925,17 @@ limitations under the License.
         this._supportsLocalStorage = testSupport();
       }
       return this._supportsLocalStorage;
+    };
+
+    SaveStateHandler.prototype.getNodeIdToBeSelected = function() {
+      var state, state_json;
+      state_json = this.getStateFromStorage();
+      if (state_json) {
+        state = $.parseJSON(state_json);
+        return state.selected_node;
+      } else {
+        return null;
+      }
     };
 
     return SaveStateHandler;
