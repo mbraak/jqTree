@@ -821,7 +821,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._selectNode = function(node, must_toggle) {
-      var canSelect, openParents, saveState,
+      var canSelect, deselected_node, openParents, saveState,
         _this = this;
       if (must_toggle == null) {
         must_toggle = false;
@@ -865,10 +865,12 @@ limitations under the License.
           });
         }
       } else {
+        deselected_node = this.getSelectedNode();
         this._deselectCurrentNode();
         this.addToSelection(node);
         this._triggerEvent('tree.select', {
-          node: node
+          node: node,
+          deselected_node: deselected_node
         });
         openParents();
       }
