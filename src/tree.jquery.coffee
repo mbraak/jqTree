@@ -89,9 +89,10 @@ class JqTreeWidget extends MouseWidget
                     previous_node: node
                 )
         else
+            deselected_node = @getSelectedNode()
             @_deselectCurrentNode()
             @addToSelection(node)
-            @_triggerEvent('tree.select', node: node)
+            @_triggerEvent('tree.select', node: node, deselected_node: deselected_node)
             openParents()
 
         saveState()
