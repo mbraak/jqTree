@@ -70,6 +70,7 @@
                 <li><a href="#tree-options-usecontextmenu">useContextMenu</a></li>
                 <li><a href="#tree-options-datafilter">dataFilter</a></li>
                 <li><a href="#tree-options-keyboardsupport">keyboardSupport</a></li>
+                <li><a href="#tree-options-onloadfailed">onLoadFailed</a></li>
             </ul>
         </li>
         <li>
@@ -765,6 +766,21 @@ $('#tree1').tree({
 <pre><code class="language-javascript">
 $('#tree1').tree({
     keyboardSupport: false
+});
+</code></pre>
+
+    <h5 id="tree-options-onloadfailed">onLoadFailed</h5>
+
+    <p>
+        When loading the data by ajax fails, then the option <strong>onLoadFailed</strong> is called.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    url: '/my/data/',
+    onLoadFailed: function(response) {
+        //
+    }
 });
 </code></pre>
 
