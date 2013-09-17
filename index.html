@@ -68,6 +68,9 @@
                 <li><a href="#tree-options-openedIcon">openedIcon</a></li>
                 <li><a href="#tree-options-closedIcon">closedIcon</a></li>
                 <li><a href="#tree-options-usecontextmenu">useContextMenu</a></li>
+                <li><a href="#tree-options-datafilter">dataFilter</a></li>
+                <li><a href="#tree-options-keyboardsupport">keyboardSupport</a></li>
+                <li><a href="#tree-options-onloadfailed">onLoadFailed</a></li>
             </ul>
         </li>
         <li>
@@ -99,6 +102,7 @@
             <a href="#events">Events</a>
             <ul>
                 <li><a href="#event-tree-click">tree.click</a></li>
+                <li><a href="#event-tree-dblclick">tree.dblclick</a></li>
                 <li><a href="#event-tree-select">tree.select</a></li>
                 <li><a href="#event-tree-contextmenu">tree.contextmenu</a></li>
                 <li><a href="#event-tree-move">tree.move</a></li>
@@ -190,7 +194,7 @@ $('#tree1').tree({
     </ul>
     <h4 id="downloads">Downloads</h4>
     <ul>
-        <li>All (version 0.17): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+        <li>All (version 0.18): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
         <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
         <li>Css: <a href="jqtree.css">jqtree.css</a></li>
         <li>Image: <a href="jqtree-circle.png">jqtree-circle.png</a></li>
@@ -198,8 +202,8 @@ $('#tree1').tree({
     <h4 id="tutorial">Tutorial</h4>
     <ul>
         <li>
-            Include <a href="http://code.jquery.com/jquery-1.9.1.min.js">jQuery</a>.
-            <pre><code class="language-markup">&lt;script src="jquery-1.9.1.min.js"&gt;&lt;/script&gt;</code></pre>
+            Include <a href="http://code.jquery.com/jquery.min.js">jQuery</a>.
+            <pre><code class="language-markup">&lt;script src="jquery.min.js"&gt;&lt;/script&gt;</code></pre>
         </li>
         <li>
             Include tree.jquery.js:
@@ -273,9 +277,22 @@ $.getJSON(
         <li><a href="examples/autoescape.html">Example 6 - autoEscape</a></li>
         <li><a href="examples/autoscroll.html">Example 7 - autoscroll</a></li>
         <li><a href="examples/multiple_select.html">Example 8 - multiple select</a></li>
+        <li><a href="examples/custom_html.html">Example 9 - custom html</a></li>
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.18 (september 17 2013)</h5>
+    <ul>
+        <li>Issue 132: Skip keyboard handling if focus is on input element (thanks to Bingeling)</li>
+        <li>Issue 179 and 180: Added dataFilter option to filter the returned data from jQuery.ajax (thanks to Cheton Wu and Tony Dilger)</li>
+        <li>Issue 184: If the node id is 0, the id mapping is incorrect (thanks to Ika Wu)</li>
+        <li>Issue 190: The function selectNode should not toggle (thanks to Gordon Woodhull)</li>
+        <li>Issue 192: Added keyboardSupport option (thanks to Ika Wu)</li>
+        <li>Issue 181: Added tree.dblclick event (thanks to eskaigualker)</li>
+        <li>Issue 196: localStorage doesn't work in Safari private browsing (thanks to thebagg)</li>
+        <li>Issue 203: Adding deselected_node attribute to event object of tree.select event (thanks to tedtoer)</li>
+    </ul>
 
     <h5>0.17 (july 14 2013)</h5>
     <ul>
@@ -720,6 +737,54 @@ $('#tree1').tree({
         A right mouse-click will trigger the native contextmenu of the browser.
     </p>
 
+    <h5 id="tree-options-datafilter">dataFilter</h5>
+
+    <p>
+        Process the tree data from the server.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    url: '/my/data/',
+    dataFilter: function(data) {
+        // Example:
+        // the server puts the tree data in 'my_tree_data'
+        return data['my_tree_data'];
+    }
+});
+</code></pre>
+
+    <h5 id="tree-options-keyboardsupport">keyboardSupport</h5>
+
+    <p>
+        Enable or disable keyboard support. Default is enabled.
+    </p>
+
+    <p>
+        Example: disable keyboard support.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    keyboardSupport: false
+});
+</code></pre>
+
+    <h5 id="tree-options-onloadfailed">onLoadFailed</h5>
+
+    <p>
+        When loading the data by ajax fails, then the option <strong>onLoadFailed</strong> is called.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    url: '/my/data/',
+    onLoadFailed: function(response) {
+        //
+    }
+});
+</code></pre>
+
     <h4 id="functions">Functions</h4>
     <h5 id="functions-loadData">loadData</h5>
     <p>
@@ -1012,7 +1077,7 @@ $('#tree1').tree('removeNode', node);
         <strong>function appendNode(new_node_info, parent_node);</strong>
     </p>
     <p>
-        Add a node to this parent node. If *parent_node* is empty, then the new node becomes a root node.
+        Add a node to this parent node. If <strong>parent_node</strong> is empty, then the new node becomes a root node.
     </p>
 
 <pre><code class="language-javascript">
@@ -1197,6 +1262,22 @@ $('#tree1').bind(
     'tree.click',
     function(event) {
         event.preventDefault();
+    }
+);
+</code></pre>
+
+    <h5 id="event-tree-dblclick">tree.dblclick</h5>
+
+    <p>
+        The <strong>tree.dblclick</strong> is fired when a tree node is double-clicked.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').bind(
+    'tree.dblclick',
+    function(event) {
+        // e.node is the clicked node
+        console.log(e.node);
     }
 );
 </code></pre>
@@ -1456,12 +1537,6 @@ for (var i=0; i < node.children.length; i++) {
 }
 </code></pre>
 
-    <p>
-        <a href="http://thenounproject.com/noun/tree/#icon-No2141" target="_blank">Tree</a>
-        designed by <a href="http://thenounproject.com/hschlosman" target="_blank">Hernan D. Schlosman</a>
-        from The Noun Project
-    </p>
-
     <h5 id="node-functions-getlevel">getLevel</h5>
     <p>
         Get the level of a node. The level is distance of a node to the root node.
@@ -1500,6 +1575,12 @@ var level = node.getNextSibling();
 <pre><code class="language-javascript">
 var data = node.getData();
 </code></pre>
+
+    <p>
+        <a href="http://thenounproject.com/noun/tree/#icon-No2141" target="_blank">Tree icon</a>
+        designed by <a href="http://thenounproject.com/hschlosman" target="_blank">Hernan D. Schlosman</a>
+        from The Noun Project
+    </p>
 
 </div>
 <script>

@@ -5,7 +5,9 @@
 
 {% block previous_url %}autoscroll.html{% endblock %}
 {% block previous_title %}Example 7{% endblock %}
-{% block next %}{% endblock %}
+
+{% block next_url %}custom_html.html{% endblock %}"
+{% block next_title %}Example 9{% endblock %}
 
 {% block contents %}
     <p>
@@ -67,7 +69,7 @@ $(function() {
             var $tree = $('#tree1');
             $tree.tree({
                 data: ExampleData.example_data,
-                autoOpen: true,
+                autoOpen: true
             });
             $tree.bind(
                 'tree.click',

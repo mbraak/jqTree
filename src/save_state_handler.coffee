@@ -101,7 +101,7 @@ class SaveStateHandler
 
         if @tree_widget.options.onSetStateFromStorage
             @tree_widget.options.onSetStateFromStorage(state)
-        else if localStorage?
+        else if @supportsLocalStorage()
             localStorage.setItem(
                 @getCookieName(),
                 state
@@ -126,7 +126,7 @@ class SaveStateHandler
     getStateFromStorage: ->
         if @tree_widget.options.onGetStateFromStorage
             return @tree_widget.options.onGetStateFromStorage()
-        else if localStorage?
+        else if @supportsLocalStorage()
             return localStorage.getItem(
                 @getCookieName()
             )
@@ -187,3 +187,33 @@ class SaveStateHandler
             return @tree_widget.options.saveState
         else
             return 'tree'
+
+    supportsLocalStorage: ->
+        testSupport = ->
+            # Is local storage supported?
+            if not localStorage?
+                return false
+            else
+                # Check if it's possible to store an item. Safari does not allow this in private browsing mode.
+                try
+                    key = '_storage_test'
+                    sessionStorage.setItem(key, true);
+                    sessionStorage.removeItem(key)
+                catch error
+                    return false
+
+                return true
+
+        if not @_supportsLocalStorage?
+            @_supportsLocalStorage = testSupport()
+
+        return @_supportsLocalStorage
+
+    getNodeIdToBeSelected: ->
+        state_json = @getStateFromStorage()
+
+        if state_json
+            state = $.parseJSON(state_json)
+            return state.selected_node
+        else
+            return null

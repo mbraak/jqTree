@@ -7,12 +7,16 @@ class KeyHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
 
-        $(document).bind('keydown.jqtree', $.proxy(@handleKeyDown, this))
+        if tree_widget.options.keyboardSupport
+            $(document).bind('keydown.jqtree', $.proxy(@handleKeyDown, this))
 
     deinit: ->
         $(document).unbind('keydown.jqtree')
 
     handleKeyDown: (e) ->
+        if $(document.activeElement).is('textarea,input')
+            return true
+
         current_node = @tree_widget.getSelectedNode()
 
         selectNode = (node) =>

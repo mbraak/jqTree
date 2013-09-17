@@ -330,11 +330,11 @@ class Node
         return @id_mapping[node_id]
 
     addNodeToIndex: (node) ->
-        if node.id
+        if node.id?
             @id_mapping[node.id] = node
 
     removeNodeFromIndex: (node) ->
-        if node.id
+        if node.id?
             delete @id_mapping[node.id]
 
     removeChildren: ->

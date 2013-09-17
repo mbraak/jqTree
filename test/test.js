@@ -444,6 +444,37 @@ test('selectNode', function() {
     ok($tree.tree('isNodeSelected', node1));
 });
 
+test('selectNode when another node is selected', function() {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data,
+        selectable: true
+    });
+
+    var node1 = $tree.tree('getTree').children[0];
+    var node2 = $tree.tree('getTree').children[1];
+    
+
+    // -- select node 'node2'
+    $tree.tree('selectNode', node2);
+    equal($tree.tree('getSelectedNode').name, 'node2');
+
+    // -- setting event
+    // -- is node 'node2' named 'deselected_node' in object's attributes?
+    stop();
+    $tree.bind('tree.select', function(e) {
+        start();
+        equal(e.deselected_node, node2);
+    });
+
+    // -- select node 'node1'; node 'node2' is selected before it
+    $tree.tree('selectNode', node1);
+    equal($tree.tree('getSelectedNode').name, 'node1');
+
+    ok($tree.tree('isNodeSelected', node1));
+});
+
 test('click toggler', function() {
     // setup
     stop();
@@ -1611,6 +1642,26 @@ test('removeChildren', function() {
     child2.removeChildren();
     equal(tree.getNodeById(128), null);
     equal(child2.children.length, 0);
+});
+
+test('node with id 0', function() {
+    // - load node with id 0
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData([
+        {
+            id: 0,
+            label: 'mynode'
+        }
+    ]);
+
+    // - get node by id
+    var node = tree.getNodeById(0);
+    equal(node.name, 'mynode');
+
+    // -- remove the node
+    node.remove();
+
+    equal(tree.getNodeById(0), undefined);
 });
 
 module('util');

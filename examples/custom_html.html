@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Javascript tree with multiple select</title>
+    <title>Javascript tree with custom html</title>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../extra/css/gridless.css">
     <link rel="stylesheet" href="../extra/prism/prism.css">
@@ -37,39 +37,28 @@
 </head>
 <body>
     <p id="nav">
-        <a href="autoscroll.html">&laquo; Example 7</a>
-        
-            <a href="custom_html.html" class="next">Example 9 &raquo;</a>
+        <a href="multiple_select.html">&laquo; Example 8</a>
         
     </p>
 
-    <h1>Example 8 - multiple select</h1>
+    <h1>Example 9 - custom html</h1>
 
     
+    <style>
+        .jqtree-tree .edit {
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+    </style>
     <p>
-        This example implements multiple select using the following functions and events:
+        This example uses the <strong>onCreateLi</strong> option to create an edit link next to the tree node.
     </p>
-    <ul>
-        <li>
-            <strong>addToSelection</strong>: add node to selections
-        </li>
-        <li>
-            <strong>isNodeSelected</strong>: is this node selected?
-        </li>
-        <li>
-            <strong>removeFromSelection</strong>: unselect this node
-        </li>
-        <li>
-            <strong>tree.click event</strong>: this event is fired when a user clicks on a node
-        </li>
-    </ul>
-
     <div id="tree1"></div>
 
     <h3>html</h3>
 
 <pre><code class="language-markup">
-&lt;div id="tree1" data-url="/nodes/"&gt;&lt;/div&gt;
+&lt;div id="tree1"&gt;&lt;/div&gt;
 </code></pre>
 
     <h3>javascript</h3>
@@ -77,23 +66,33 @@
 <pre><code class="language-javascript">
 $(function() {
     var $tree = $('#tree1');
+
     $tree.tree({
         data: ExampleData.example_data,
-        autoOpen: true,
+        autoOpen: 1,
+        onCreateLi: function(node, $li) {
+            // Append a link to the jqtree-element div.
+            // The link has an url '#node-[id]' and a data property 'node-id'.
+            $li.find('.jqtree-element').append(
+                '&lt;a href="#node-'+ node.id +'" class="edit" data-node-id="'+
+                node.id +'"&gt;edit&lt;/a&gt;'
+            );
+        }
     });
-    $tree.bind(
-        'tree.click',
+
+    // Handle a click on the edit link
+    $tree.on(
+        'click', '.edit',
         function(e) {
-            // Disable single selection
-            e.preventDefault();
+            // Get the id from the 'node-id' data property
+            var node_id = $(e.target).data('node-id');
 
-            var selected_node = e.node;
+            // Get the node from the tree
+            var node = $tree.tree('getNodeById', node_id);
 
-            if ($tree.tree('isNodeSelected', selected_node)) {
-                $tree.tree('removeFromSelection', selected_node);
-            }
-            else {
-                $tree.tree('addToSelection', selected_node);
+            if (node) {
+                // Display the node name
+                alert(node.name);
             }
         }
     );
@@ -103,23 +102,32 @@ $(function() {
     <script>
         $(function() {
             var $tree = $('#tree1');
+
             $tree.tree({
                 data: ExampleData.example_data,
-                autoOpen: true
+                autoOpen: 1,
+                onCreateLi: function(node, $li) {
+                    // Append a link to the jqtree-element div.
+                    // The link has an url '#node-[id]' and a data property 'node-id'.
+                    $li.find('.jqtree-element').append(
+                        '<a href="#node-'+ node.id +'" class="edit" data-node-id="'+ node.id +'">edit</a>'
+                    );
+                }
             });
-            $tree.bind(
-                'tree.click',
+
+            // Handle a click on the edit link
+            $tree.on(
+                'click', '.edit',
                 function(e) {
-                    // Disable single selection
-                    e.preventDefault();
+                    // Get the id from the 'node-id' data property
+                    var node_id = $(e.target).data('node-id');
 
-                    var selected_node = e.node;
+                    // Get the node from the tree
+                    var node = $tree.tree('getNodeById', node_id);
 
-                    if ($tree.tree('isNodeSelected', selected_node)) {
-                        $tree.tree('removeFromSelection', selected_node);
-                    }
-                    else {
-                        $tree.tree('addToSelection', selected_node);
+                    if (node) {
+                        // Display the node name
+                        alert(node.name);
                     }
                 }
             );

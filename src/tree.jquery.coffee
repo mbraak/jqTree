@@ -36,6 +36,8 @@ class JqTreeWidget extends MouseWidget
         openedIcon: '&#x25bc;'  # The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
         slide: true  # must display slide animation?
         nodeClass: Node
+        dataFilter: null
+        keyboardSupport: true
 
     toggle: (node, slide=true) ->
         if node.is_open
@@ -47,7 +49,7 @@ class JqTreeWidget extends MouseWidget
         return @tree
 
     selectNode: (node) ->
-        @_selectNode(node, true)
+        @_selectNode(node, false)
 
     _selectNode: (node, must_toggle=false) ->
         if not @select_node_handler
@@ -87,9 +89,10 @@ class JqTreeWidget extends MouseWidget
                     previous_node: node
                 )
         else
+            deselected_node = @getSelectedNode()
             @_deselectCurrentNode()
             @addToSelection(node)
-            @_triggerEvent('tree.select', node: node)
+            @_triggerEvent('tree.select', node: node, deselected_node: deselected_node)
             openParents()
 
         saveState()
@@ -156,6 +159,9 @@ class JqTreeWidget extends MouseWidget
                     data = response
                 else
                     data = $.parseJSON(response)
+
+                if @options.dataFilter
+                    data = @options.dataFilter(data)
 
                 removeLoadingClass()                
                 @_loadData(data, parent_node)
@@ -262,12 +268,12 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             parent_node = @tree
 
-        # Is the parent already a root node?
-        is_already_root_node = parent_node.isFolder()
+        # Is the parent already a folder node?
+        is_already_folder_node = parent_node.isFolder()
 
         node = parent_node.append(new_node_info)
 
-        if is_already_root_node
+        if is_already_folder_node
             # Refresh the parent
             @_refreshElements(parent_node)
         else
@@ -366,9 +372,10 @@ class JqTreeWidget extends MouseWidget
         @_initData()
 
         @element.click($.proxy(@_click, this))
+        @element.dblclick($.proxy(@_dblclick, this))
+
         if @options.useContextMenu
             @element.bind('contextmenu', $.proxy(@_contextmenu, this))
-
 
     _deinit: ->
         @element.empty()
@@ -387,17 +394,34 @@ class JqTreeWidget extends MouseWidget
     _getDataUrlInfo: (node) ->
         data_url = @options.dataUrl or @element.data('url')
 
+        getUrlFromString = =>
+            url_info = url: data_url
+
+            if node and node.id
+                # Load on demand of a subtree; add node parameter
+                data = node: node.id
+                url_info['data'] = data
+            else
+                # Add selected_node parameter
+                selected_node_id = @_getNodeIdToBeSelected()
+                if selected_node_id
+                    data = selected_node: selected_node_id
+                    url_info['data'] = data
+
+            return url_info
+
         if $.isFunction(data_url)
             return data_url(node)
         else if $.type(data_url) == 'string'
-            url_info = url: data_url
-            if node and node.id
-                data = node: node.id
-                url_info['data'] = data
-
-            return url_info
+            return getUrlFromString()
         else
             return data_url
+
+    _getNodeIdToBeSelected: ->
+        if @options.saveState
+            return @save_state_handler.getNodeIdToBeSelected()
+        else
+            return null
 
     _initTree: (data) ->
         @tree = new @options.nodeClass(null, true, @options.nodeClass)
@@ -537,26 +561,51 @@ class JqTreeWidget extends MouseWidget
         @_triggerEvent('tree.refresh')
 
     _click: (e) ->
-        $target = $(e.target)
+        click_target = @_getClickTarget(e.target)
+
+        if click_target
+            if click_target.type == 'button'
+                @toggle(click_target.node, @options.slide)
+
+                e.preventDefault()
+                e.stopPropagation()
+            else if click_target.type == 'label'
+                node = click_target.node
+                event = @_triggerEvent('tree.click', node: node)
+
+                if not event.isDefaultPrevented()
+                    @_selectNode(node, true)
+
+    _dblclick: (e) ->
+        click_target = @_getClickTarget(e.target)
+
+        if click_target and click_target.type == 'label'
+            @_triggerEvent('tree.dblclick', node: click_target.node)
+
+    _getClickTarget: (element) ->
+        $target = $(element)
 
         $button = $target.closest('.jqtree-toggler')
+
         if $button.length
             node = @_getNode($button)
 
             if node
-                @toggle(node, @options.slide)
-
-                e.preventDefault()
-                e.stopPropagation()
+                return {
+                    type: 'button',
+                    node: node
+                }
         else
             $el = $target.closest('.jqtree-element')
             if $el.length
                 node = @_getNode($el)
                 if node
-                    event = @_triggerEvent('tree.click', node: node)
+                    return {
+                        type: 'label',
+                        node: node
+                    }
 
-                    if not event.isDefaultPrevented()
-                        @_selectNode(node, true)
+        return null
 
     _getNode: ($element) ->
         $li = $element.closest('li')
