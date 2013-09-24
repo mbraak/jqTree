@@ -967,6 +967,9 @@ limitations under the License.
 
     JqTreeWidget.prototype._loadData = function(data, parent_node) {
       var n, selected_nodes_under_parent, _i, _len;
+      if (!data) {
+        return;
+      }
       this._triggerEvent('tree.load_data', {
         tree_data: data
       });

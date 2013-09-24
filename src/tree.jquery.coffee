@@ -176,6 +176,9 @@ class JqTreeWidget extends MouseWidget
         )
 
     _loadData: (data, parent_node) ->
+        if not data
+            return
+
         @_triggerEvent('tree.load_data', tree_data: data)
 
         if not parent_node
