@@ -2251,7 +2251,7 @@ limitations under the License.
         _this = this;
       is_first_node = true;
       _iterateNode = function(node, next_node) {
-        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref3;
+        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref3, _results;
         must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
         if (node.element) {
           $element = $(node.element);
@@ -2275,17 +2275,16 @@ limitations under the License.
         if (must_iterate_inside) {
           children_length = node.children.length;
           _ref3 = node.children;
+          _results = [];
           for (i = _i = 0, _len = _ref3.length; _i < _len; i = ++_i) {
             child = _ref3[i];
             if (i === (children_length - 1)) {
-              _iterateNode(node.children[i], null);
+              _results.push(_iterateNode(node.children[i], null));
             } else {
-              _iterateNode(node.children[i], node.children[i + 1]);
+              _results.push(_iterateNode(node.children[i], node.children[i + 1]));
             }
           }
-          if (node.is_open) {
-            return _this.handleAfterOpenFolder(node, next_node, $element);
-          }
+          return _results;
         }
       };
       return _iterateNode(this.tree, null);
@@ -2296,8 +2295,6 @@ limitations under the License.
     VisibleNodeIterator.prototype.handleOpenFolder = function(node, $element) {};
 
     VisibleNodeIterator.prototype.handleClosedFolder = function(node, next_node, $element) {};
-
-    VisibleNodeIterator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {};
 
     VisibleNodeIterator.prototype.handleFirstNode = function(node, $element) {};
 
@@ -2369,14 +2366,6 @@ limitations under the License.
         if (next_node !== this.current_node) {
           return this.addPosition(node, Position.AFTER, top);
         }
-      }
-    };
-
-    HitAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {
-      if (node === this.current_node || next_node === this.current_node) {
-        return this.addPosition(node, Position.NONE, this.last_top);
-      } else {
-        return this.addPosition(node, Position.AFTER, this.last_top);
       }
     };
 
