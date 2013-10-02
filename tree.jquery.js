@@ -2184,6 +2184,7 @@ limitations under the License.
           return _this.updateDropHint();
         });
       };
+      this.stopOpenFolderTimer();
       return this.open_folder_timer = setTimeout(openFolder, 500);
     };
 

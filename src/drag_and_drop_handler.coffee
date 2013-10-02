@@ -166,6 +166,8 @@ class DragAndDropHandler
                     @updateDropHint()
             )
 
+        @stopOpenFolderTimer()
+
         @open_folder_timer = setTimeout(openFolder, 500)
 
     stopOpenFolderTimer: ->
