@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/mbraak/jqtree.png?label=ready)](https://waffle.io/mbraak/jqtree)  
 [![Travis Status](https://secure.travis-ci.org/mbraak/jqTree.png)](http://travis-ci.org/mbraak/jqTree)
 
 #jqTree
