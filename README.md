@@ -1,5 +1,7 @@
 [![Travis Status](https://secure.travis-ci.org/mbraak/jqTree.png)](http://travis-ci.org/mbraak/jqTree)
 
+[![Stories in Ready](https://badge.waffle.io/mbraak/jqtree.png?label=ready)](https://waffle.io/mbraak/jqtree)
+
 #jqTree
 
 JqTree is a tree widget. Read more in the [documentation](http://mbraak.github.io/jqTree/).
