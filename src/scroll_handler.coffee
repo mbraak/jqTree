@@ -8,12 +8,21 @@ class ScrollHandler
     _initScrollParent: ->
         getParentWithOverflow = =>
             css_values = ['overflow', 'overflow-y']
-            scroll_parent = null
 
-            for parent in @tree_widget.$el.parents()
+            hasOverFlow = (el) ->
                 for css_value in css_values
-                    if $.css(parent, css_value) in ['auto', 'scroll']
-                        return $(parent)
+                    if $.css(el, css_value) in ['auto', 'scroll']
+                        return true
+
+                return false
+
+            if hasOverFlow(@tree_widget.$el[0])
+                return @tree_widget.$el
+
+            for el in @tree_widget.$el.parents()
+                if hasOverFlow(el)
+                    return $(el)
+
             return null
 
         setDocumentAsScrollParent = =>

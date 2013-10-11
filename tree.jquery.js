@@ -2516,17 +2516,26 @@ limitations under the License.
       var $scroll_parent, getParentWithOverflow, setDocumentAsScrollParent,
         _this = this;
       getParentWithOverflow = function() {
-        var css_value, css_values, parent, scroll_parent, _i, _j, _len, _len1, _ref3, _ref4;
+        var css_values, el, hasOverFlow, _i, _len, _ref3;
         css_values = ['overflow', 'overflow-y'];
-        scroll_parent = null;
+        hasOverFlow = function(el) {
+          var css_value, _i, _len, _ref3;
+          for (_i = 0, _len = css_values.length; _i < _len; _i++) {
+            css_value = css_values[_i];
+            if ((_ref3 = $.css(el, css_value)) === 'auto' || _ref3 === 'scroll') {
+              return true;
+            }
+          }
+          return false;
+        };
+        if (hasOverFlow(_this.tree_widget.$el[0])) {
+          return _this.tree_widget.$el;
+        }
         _ref3 = _this.tree_widget.$el.parents();
         for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-          parent = _ref3[_i];
-          for (_j = 0, _len1 = css_values.length; _j < _len1; _j++) {
-            css_value = css_values[_j];
-            if ((_ref4 = $.css(parent, css_value)) === 'auto' || _ref4 === 'scroll') {
-              return $(parent);
-            }
+          el = _ref3[_i];
+          if (hasOverFlow(el)) {
+            return $(el);
           }
         }
         return null;
