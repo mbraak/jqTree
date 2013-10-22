@@ -1995,7 +1995,7 @@ limitations under the License.
         include_children = false;
       }
       if (!node.id) {
-        if (node.element === this.selected_single_node.element) {
+        if (this.selected_single_node && node.element === this.selected_single_node.element) {
           return this.selected_single_node = null;
         }
       } else {
