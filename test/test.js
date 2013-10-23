@@ -28,6 +28,7 @@ var example_data = [
             { label: 'child3', id: 127 }
         ]
     }
+    
 ];
 
 /*
@@ -777,6 +778,18 @@ test('removeNode', function() {
 
     // node is unselected
     equal($tree.tree('getSelectedNode'), false);
+
+    // 4. Remove unselected node without an id
+    $tree.tree('loadData', example_data2);
+
+    var c1 = $tree.tree('getNodeByName', 'c1');
+    
+    $tree.tree('removeNode', c1);
+
+    equal(
+        formatTitles($tree),
+        'main c2'
+    )
 });
 
 test('appendNode', function() {
