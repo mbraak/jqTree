@@ -19,3 +19,7 @@ See index.html for the full documentation. The documentation is also on [github]
 
 The code for the mouse widget is heavily inspired by the mouse widget from jquery ui.
 Tree graphic designed by Hernan D. Schlosman from The Noun Project.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/mbraak/jqtree/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
