@@ -1419,7 +1419,8 @@ limitations under the License.
         } else if (click_target.type === 'label') {
           node = click_target.node;
           event = this._triggerEvent('tree.click', {
-            node: node
+            node: node,
+            click_event: e
           });
           if (!event.isDefaultPrevented()) {
             return this._selectNode(node, true);
@@ -1433,7 +1434,8 @@ limitations under the License.
       click_target = this._getClickTarget(e.target);
       if (click_target && click_target.type === 'label') {
         return this._triggerEvent('tree.dblclick', {
-          node: click_target.node
+          node: click_target.node,
+          click_event: e
         });
       }
     };

@@ -574,7 +574,11 @@ class JqTreeWidget extends MouseWidget
                 e.stopPropagation()
             else if click_target.type == 'label'
                 node = click_target.node
-                event = @_triggerEvent('tree.click', node: node)
+                event = @_triggerEvent(
+                    'tree.click',
+                        node: node
+                        click_event: e
+                )
 
                 if not event.isDefaultPrevented()
                     @_selectNode(node, true)
@@ -583,7 +587,11 @@ class JqTreeWidget extends MouseWidget
         click_target = @_getClickTarget(e.target)
 
         if click_target and click_target.type == 'label'
-            @_triggerEvent('tree.dblclick', node: click_target.node)
+            @_triggerEvent(
+                'tree.dblclick',
+                    node: click_target.node
+                    click_event: e
+            )
 
     _getClickTarget: (element) ->
         $target = $(element)

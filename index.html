@@ -1238,8 +1238,16 @@ $tree.tree('scrollToNode', node);
     <h5 id="event-tree-click">tree.click</h5>
 
     <p>
-        Triggered when a tree node is clicked.
+        Triggered when a tree node is clicked. The event contains the following properties:
     </p>
+    <ul>
+        <li>
+            <strong>node</strong>: the node that is clicked on
+        </li>
+        <li>
+            <strong>click_event</strong>: the original click event
+        </li>
+    </ul>
 
 <pre><code class="language-javascript">
 // create tree
@@ -1275,8 +1283,16 @@ $('#tree1').bind(
     <h5 id="event-tree-dblclick">tree.dblclick</h5>
 
     <p>
-        The <strong>tree.dblclick</strong> is fired when a tree node is double-clicked.
+        The <strong>tree.dblclick</strong> is fired when a tree node is double-clicked. The event contains the following properties:
     </p>
+    <ul>
+        <li>
+            <strong>node</strong>: the node that is clicked on
+        </li>
+        <li>
+            <strong>click_event</strong>: the original click event
+        </li>
+    </ul>
 
 <pre><code class="language-javascript">
 $('#tree1').bind(
