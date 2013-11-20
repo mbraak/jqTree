@@ -168,7 +168,7 @@ class DragAndDropHandler
 
         @stopOpenFolderTimer()
 
-        @open_folder_timer = setTimeout(openFolder, 500)
+        @open_folder_timer = setTimeout(openFolder, @tree_widget.options.openFolderDelay)
 
     stopOpenFolderTimer: ->
         if @open_folder_timer
