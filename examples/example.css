@@ -52,3 +52,11 @@ pre {
     -ms-user-select: none;
     user-select: none;
 }
+
+/* prism syntax highlighting */
+pre[class*="language-"] {
+    padding-top: 0;
+    border-radius: 0;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
