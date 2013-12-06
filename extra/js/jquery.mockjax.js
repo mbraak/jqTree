@@ -1,7 +1,7 @@
 /*!
  * MockJax - jQuery Plugin to Mock Ajax requests
  *
- * Version:  1.5.1
+ * Version:  1.5.3
  * Released:
  * Home:   http://github.com/appendto/jquery-mockjax
  * Author:   Jonathan Sharp (http://jdsharp.com)
@@ -14,6 +14,7 @@
 (function($) {
 	var _ajax = $.ajax,
 		mockHandlers = [],
+		mockedAjaxCalls = [],
 		CALLBACK_REGEX = /=\?(&|$)/,
 		jsc = (new Date()).getTime();
 
@@ -68,10 +69,11 @@
 				identical = false;
 				return identical;
 			} else {
-				if ( typeof live[k] == 'object' ) {
+				// This will allow to compare Arrays
+				if ( typeof live[k] === 'object' && live[k] !== null ) {
 					identical = identical && isMockDataEqual(mock[k], live[k]);
 				} else {
-					if ( $.isFunction( mock[k].test ) ) {
+					if ( mock[k] && $.isFunction( mock[k].test ) ) {
 						identical = identical && mock[k].test(live[k]);
 					} else {
 						identical = identical && ( mock[k] == live[k] );
@@ -82,6 +84,11 @@
 
 		return identical;
 	}
+
+    // See if a mock handler property matches the default settings
+    function isDefaultSetting(handler, property) {
+        return handler[property] === $.mockjaxSettings[property];
+    }
 
 	// Check the given handler should mock the given request
 	function getMockForRequest( handler, requestSettings ) {
@@ -124,24 +131,6 @@
 		return handler;
 	}
 
-	// If logging is enabled, log the mock to the console
-	function logMock( mockHandler, requestSettings ) {
-		if ( window.console && console.log ) {
-			var message = 'MOCK ' + requestSettings.type.toUpperCase() + ': ' + requestSettings.url;
-			var request = $.extend({}, requestSettings);
-
-			if (typeof console.log === 'function') {
-				console.log(message, request);
-			} else {
-				try {
-					console.log( message + ' ' + JSON.stringify(request) );
-				} catch (e) {
-					console.log(message);
-				}
-			}
-		}
-	}
-
 	// Process the xhr objects send operation
 	function _xhrSend(mockHandler, requestSettings, origSettings) {
 
@@ -149,6 +138,8 @@
 		var process = (function(that) {
 			return function() {
 				return (function() {
+					var onReady;
+
 					// The request has returned
 					this.status     = mockHandler.status;
 					this.statusText = mockHandler.statusText;
@@ -166,6 +157,8 @@
 					} else if ( requestSettings.dataType == 'xml' ) {
 						if ( typeof mockHandler.responseXML == 'string' ) {
 							this.responseXML = parseXML(mockHandler.responseXML);
+							//in jQuery 1.9.1+, responseXML is processed differently and relies on responseText
+							this.responseText = mockHandler.responseXML;
 						} else {
 							this.responseXML = mockHandler.responseXML;
 						}
@@ -178,19 +171,15 @@
 					if( typeof mockHandler.statusText === "string") {
 						this.statusText = mockHandler.statusText;
 					}
+					// jQuery 2.0 renamed onreadystatechange to onload
+					onReady = this.onreadystatechange || this.onload;
+
 					// jQuery < 1.4 doesn't have onreadystate change for xhr
-					if ( $.isFunction(this.onreadystatechange) ) {
+					if ( $.isFunction( onReady ) ) {
 						if( mockHandler.isTimeout) {
 							this.status = -1;
 						}
-						this.onreadystatechange( mockHandler.isTimeout ? 'timeout' : undefined );
-					}
-					else if ( $.isFunction(this.onload) ) {
-						// jQuery 2.0
-						if( mockHandler.isTimeout) {
-							this.status = -1;
-						}
-						this.onload( mockHandler.isTimeout ? 'timeout' : undefined );
+						onReady.call( this, mockHandler.isTimeout ? 'timeout' : undefined );
 					} else if ( mockHandler.isTimeout ) {
 						// Fix for 1.3.2 timeout to keep success from firing.
 						this.status = -1;
@@ -210,8 +199,14 @@
 				complete: function(xhr) {
 					mockHandler.responseXML = xhr.responseXML;
 					mockHandler.responseText = xhr.responseText;
-					mockHandler.status = xhr.status;
-					mockHandler.statusText = xhr.statusText;
+                    // Don't override the handler status/statusText if it's specified by the config
+                    if (isDefaultSetting(mockHandler, 'status')) {
+					    mockHandler.status = xhr.status;
+                    }
+                    if (isDefaultSetting(mockHandler, 'statusText')) {
+					    mockHandler.statusText = xhr.statusText;
+                    }
+
 					this.responseTimer = setTimeout(process, mockHandler.responseTime || 0);
 				}
 			});
@@ -395,7 +390,7 @@
 	function jsonpSuccess(requestSettings, callbackContext, mockHandler) {
 		// If a local callback was specified, fire it and pass it the data
 		if ( requestSettings.success ) {
-			requestSettings.success.call( callbackContext, ( mockHandler.response ? mockHandler.response.toString() : mockHandler.responseText || ''), status, {} );
+			requestSettings.success.call( callbackContext, mockHandler.responseText || "", status, {} );
 		}
 
 		// Fire the global callback
@@ -452,8 +447,10 @@
 				continue;
 			}
 
-			// Handle console logging
-			logMock( mockHandler, requestSettings );
+			mockedAjaxCalls.push(requestSettings);
+
+			// If logging is enabled, log the mock to the console
+			$.mockjaxSettings.log( mockHandler, requestSettings );
 
 
 			if ( requestSettings.dataType === "jsonp" ) {
@@ -483,8 +480,13 @@
 			return mockRequest;
 		}
 
-		// We don't have a mock request, trigger a normal request
-		return _ajax.apply($, [origSettings]);
+		// We don't have a mock request
+		if($.mockjaxSettings.throwUnmocked === true) {
+			throw('AJAX not mocked: ' + origSettings.url);
+		}
+		else { // trigger a normal request
+			return _ajax.apply($, [origSettings]);
+		}
 	}
 
 	/**
@@ -494,7 +496,7 @@
 	*/
 	function copyUrlParameters(mockHandler, origSettings) {
 		//parameters aren't captured if the URL isn't a RegExp
-		if (!mockHandler.url instanceof RegExp) {
+		if (!(mockHandler.url instanceof RegExp)) {
 			return;
 		}
 		//if no URL params were defined on the handler, don't attempt a capture
@@ -531,25 +533,41 @@
 	$.mockjaxSettings = {
 		//url:        null,
 		//type:       'GET',
-		log:          function() {
-			if (window.console && window.console.log) {
-				var log = Function.prototype.bind.call(console.log, console);
-				log.apply(console, arguments);
+		log:          function( mockHandler, requestSettings ) {
+			if ( mockHandler.logging === false ||
+				 ( typeof mockHandler.logging === 'undefined' && $.mockjaxSettings.logging === false ) ) {
+				return;
+			}
+			if ( window.console && console.log ) {
+				var message = 'MOCK ' + requestSettings.type.toUpperCase() + ': ' + requestSettings.url;
+				var request = $.extend({}, requestSettings);
+
+				if (typeof console.log === 'function') {
+					console.log(message, request);
+				} else {
+					try {
+						console.log( message + ' ' + JSON.stringify(request) );
+					} catch (e) {
+						console.log(message);
+					}
+				}
 			}
 		},
-		status:       200,
-		statusText:   "OK",
-		responseTime: 500,
-		isTimeout:    false,
-		contentType:  'text/plain',
-		response:     '',
-		responseText: '',
-		responseXML:  '',
-		proxy:        '',
-		proxyType:    'GET',
+		logging:       true,
+		status:        200,
+		statusText:    "OK",
+		responseTime:  500,
+		isTimeout:     false,
+		throwUnmocked: false,
+		contentType:   'text/plain',
+		response:      '',
+		responseText:  '',
+		responseXML:   '',
+		proxy:         '',
+		proxyType:     'GET',
 
-		lastModified: null,
-		etag:         '',
+		lastModified:  null,
+		etag:          '',
 		headers: {
 			etag: 'IJF@H#@923uf8023hFO@I#H#',
 			'content-type' : 'text/plain'
@@ -567,10 +585,14 @@
 		} else {
 			mockHandlers = [];
 		}
+		mockedAjaxCalls = [];
 	};
 	$.mockjax.handler = function(i) {
 		if ( arguments.length == 1 ) {
 			return mockHandlers[i];
 		}
+	};
+	$.mockjax.mockedAjaxCalls = function() {
+		return mockedAjaxCalls;
 	};
 })(jQuery);
