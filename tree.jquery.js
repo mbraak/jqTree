@@ -800,7 +800,8 @@ limitations under the License.
       slide: true,
       nodeClass: Node,
       dataFilter: null,
-      keyboardSupport: true
+      keyboardSupport: true,
+      openFolderDelay: 500
     };
 
     JqTreeWidget.prototype.toggle = function(node, slide) {
@@ -967,6 +968,9 @@ limitations under the License.
 
     JqTreeWidget.prototype._loadData = function(data, parent_node) {
       var n, selected_nodes_under_parent, _i, _len;
+      if (!data) {
+        return;
+      }
       this._triggerEvent('tree.load_data', {
         tree_data: data
       });
@@ -1416,7 +1420,8 @@ limitations under the License.
         } else if (click_target.type === 'label') {
           node = click_target.node;
           event = this._triggerEvent('tree.click', {
-            node: node
+            node: node,
+            click_event: e
           });
           if (!event.isDefaultPrevented()) {
             return this._selectNode(node, true);
@@ -1430,7 +1435,8 @@ limitations under the License.
       click_target = this._getClickTarget(e.target);
       if (click_target && click_target.type === 'label') {
         return this._triggerEvent('tree.dblclick', {
-          node: click_target.node
+          node: click_target.node,
+          click_event: e
         });
       }
     };
@@ -1995,7 +2001,7 @@ limitations under the License.
         include_children = false;
       }
       if (!node.id) {
-        if (node.element === this.selected_single_node.element) {
+        if (this.selected_single_node && node.element === this.selected_single_node.element) {
           return this.selected_single_node = null;
         }
       } else {
@@ -2181,7 +2187,8 @@ limitations under the License.
           return _this.updateDropHint();
         });
       };
-      return this.open_folder_timer = setTimeout(openFolder, 500);
+      this.stopOpenFolderTimer();
+      return this.open_folder_timer = setTimeout(openFolder, this.tree_widget.options.openFolderDelay);
     };
 
     DragAndDropHandler.prototype.stopOpenFolderTimer = function() {
@@ -2248,7 +2255,7 @@ limitations under the License.
         _this = this;
       is_first_node = true;
       _iterateNode = function(node, next_node) {
-        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref3;
+        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref3, _results;
         must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
         if (node.element) {
           $element = $(node.element);
@@ -2272,17 +2279,16 @@ limitations under the License.
         if (must_iterate_inside) {
           children_length = node.children.length;
           _ref3 = node.children;
+          _results = [];
           for (i = _i = 0, _len = _ref3.length; _i < _len; i = ++_i) {
             child = _ref3[i];
             if (i === (children_length - 1)) {
-              _iterateNode(node.children[i], null);
+              _results.push(_iterateNode(node.children[i], null));
             } else {
-              _iterateNode(node.children[i], node.children[i + 1]);
+              _results.push(_iterateNode(node.children[i], node.children[i + 1]));
             }
           }
-          if (node.is_open) {
-            return _this.handleAfterOpenFolder(node, next_node, $element);
-          }
+          return _results;
         }
       };
       return _iterateNode(this.tree, null);
@@ -2293,8 +2299,6 @@ limitations under the License.
     VisibleNodeIterator.prototype.handleOpenFolder = function(node, $element) {};
 
     VisibleNodeIterator.prototype.handleClosedFolder = function(node, next_node, $element) {};
-
-    VisibleNodeIterator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {};
 
     VisibleNodeIterator.prototype.handleFirstNode = function(node, $element) {};
 
@@ -2366,14 +2370,6 @@ limitations under the License.
         if (next_node !== this.current_node) {
           return this.addPosition(node, Position.AFTER, top);
         }
-      }
-    };
-
-    HitAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {
-      if (node === this.current_node || next_node === this.current_node) {
-        return this.addPosition(node, Position.NONE, this.last_top);
-      } else {
-        return this.addPosition(node, Position.AFTER, this.last_top);
       }
     };
 
@@ -2523,17 +2519,26 @@ limitations under the License.
       var $scroll_parent, getParentWithOverflow, setDocumentAsScrollParent,
         _this = this;
       getParentWithOverflow = function() {
-        var css_value, css_values, parent, scroll_parent, _i, _j, _len, _len1, _ref3, _ref4;
+        var css_values, el, hasOverFlow, _i, _len, _ref3;
         css_values = ['overflow', 'overflow-y'];
-        scroll_parent = null;
+        hasOverFlow = function(el) {
+          var css_value, _i, _len, _ref3;
+          for (_i = 0, _len = css_values.length; _i < _len; _i++) {
+            css_value = css_values[_i];
+            if ((_ref3 = $.css(el, css_value)) === 'auto' || _ref3 === 'scroll') {
+              return true;
+            }
+          }
+          return false;
+        };
+        if (hasOverFlow(_this.tree_widget.$el[0])) {
+          return _this.tree_widget.$el;
+        }
         _ref3 = _this.tree_widget.$el.parents();
         for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-          parent = _ref3[_i];
-          for (_j = 0, _len1 = css_values.length; _j < _len1; _j++) {
-            css_value = css_values[_j];
-            if ((_ref4 = $.css(parent, css_value)) === 'auto' || _ref4 === 'scroll') {
-              return $(parent);
-            }
+          el = _ref3[_i];
+          if (hasOverFlow(el)) {
+            return $(el);
           }
         }
         return null;

@@ -38,6 +38,7 @@ class JqTreeWidget extends MouseWidget
         nodeClass: Node
         dataFilter: null
         keyboardSupport: true
+        openFolderDelay: 500  # The delay for opening a folder during drag and drop; the value is in milliseconds
 
     toggle: (node, slide=true) ->
         if node.is_open
@@ -176,6 +177,9 @@ class JqTreeWidget extends MouseWidget
         )
 
     _loadData: (data, parent_node) ->
+        if not data
+            return
+
         @_triggerEvent('tree.load_data', tree_data: data)
 
         if not parent_node
@@ -571,7 +575,11 @@ class JqTreeWidget extends MouseWidget
                 e.stopPropagation()
             else if click_target.type == 'label'
                 node = click_target.node
-                event = @_triggerEvent('tree.click', node: node)
+                event = @_triggerEvent(
+                    'tree.click',
+                        node: node
+                        click_event: e
+                )
 
                 if not event.isDefaultPrevented()
                     @_selectNode(node, true)
@@ -580,7 +588,11 @@ class JqTreeWidget extends MouseWidget
         click_target = @_getClickTarget(e.target)
 
         if click_target and click_target.type == 'label'
-            @_triggerEvent('tree.dblclick', node: click_target.node)
+            @_triggerEvent(
+                'tree.dblclick',
+                    node: click_target.node
+                    click_event: e
+            )
 
     _getClickTarget: (element) ->
         $target = $(element)

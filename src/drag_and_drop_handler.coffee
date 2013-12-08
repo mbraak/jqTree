@@ -166,7 +166,9 @@ class DragAndDropHandler
                     @updateDropHint()
             )
 
-        @open_folder_timer = setTimeout(openFolder, 500)
+        @stopOpenFolderTimer()
+
+        @open_folder_timer = setTimeout(openFolder, @tree_widget.options.openFolderDelay)
 
     stopOpenFolderTimer: ->
         if @open_folder_timer
@@ -255,9 +257,6 @@ class VisibleNodeIterator
                     else
                         _iterateNode(node.children[i], node.children[i+1])
 
-                if node.is_open
-                    @handleAfterOpenFolder(node, next_node, $element)
-
         _iterateNode(@tree, null)
 
     handleNode: (node, next_node, $element) ->
@@ -270,9 +269,6 @@ class VisibleNodeIterator
         #   - false: stop iterating
 
     handleClosedFolder: (node, next_node, $element) ->
-        # override
-
-    handleAfterOpenFolder: (node, next_node, $element) ->
         # override
 
     handleFirstNode: (node, $element) ->
@@ -349,16 +345,6 @@ class HitAreasGenerator extends VisibleNodeIterator
             if next_node != @current_node
                 @addPosition(node, Position.AFTER, top)
 
-    handleAfterOpenFolder: (node, next_node, $element) ->
-        if (
-            node == @current_node or
-            next_node == @current_node
-        )
-            # Cannot move before or after current item
-            @addPosition(node, Position.NONE, @last_top)
-        else
-            @addPosition(node, Position.AFTER, @last_top)
-
     handleFirstNode: (node, $element) ->
         if node != @current_node
             @addPosition(node, Position.BEFORE, @getTop($(node.element)))
@@ -406,8 +392,6 @@ class HitAreasGenerator extends VisibleNodeIterator
 
             area_top += area_height
         return null
-
-
 
 
 class DragElement

@@ -38,7 +38,7 @@ class SelectNodeHandler
 
     removeFromSelection: (node, include_children=false) ->
         if not node.id
-            if node.element == @selected_single_node.element
+            if @selected_single_node && node.element == @selected_single_node.element
                 @selected_single_node = null
         else
             delete @selected_nodes[node.id]

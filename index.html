@@ -71,6 +71,7 @@
                 <li><a href="#tree-options-datafilter">dataFilter</a></li>
                 <li><a href="#tree-options-keyboardsupport">keyboardSupport</a></li>
                 <li><a href="#tree-options-onloadfailed">onLoadFailed</a></li>
+                <li><a href="#tree-options-openfolderdelay">openFolderDelay</a></li>
             </ul>
         </li>
         <li>
@@ -194,7 +195,7 @@ $('#tree1').tree({
     </ul>
     <h4 id="downloads">Downloads</h4>
     <ul>
-        <li>All (version 0.18): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+        <li>All (version 0.19): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
         <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
         <li>Css: <a href="jqtree.css">jqtree.css</a></li>
         <li>Image: <a href="jqtree-circle.png">jqtree-circle.png</a></li>
@@ -203,23 +204,33 @@ $('#tree1').tree({
     <ul>
         <li>
             Include <a href="http://code.jquery.com/jquery.min.js">jQuery</a>.
-            <pre><code class="language-markup">&lt;script src="jquery.min.js"&gt;&lt;/script&gt;</code></pre>
+<pre><code class="language-markup">
+&lt;script src="jquery.min.js"&gt;&lt;/script&gt;
+</code></pre>
         </li>
         <li>
             Include tree.jquery.js:
-            <pre><code class="language-markup">&lt;script src="tree.jquery.js"&gt;&lt;/script&gt;</code></pre>
+<pre><code class="language-markup">
+&lt;script src="tree.jquery.js"&gt;&lt;/script&gt;
+</code></pre>
         </li>
         <li>
             Include jqtree.css:
-            <pre><code class="language-markup">&lt;link rel="stylesheet" href="jqtree.css"&gt;</code></pre>
+<pre><code class="language-markup">
+&lt;link rel="stylesheet" href="jqtree.css"&gt;
+</code></pre>
         </li>
         <li>
             Optionally, for saveState include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>:
-            <pre><code class="language-markup">&lt;script src="jquery.cookie.js"&gt;&lt;/script&gt;</code></pre>
+<pre><code class="language-markup">
+&lt;script src="jquery.cookie.js"&gt;&lt;/script&gt;
+</code></pre>
         </li>
         <li>
             Create a div.
-            <pre><code class="language-markup">&lt;div id="tree1"&gt;&lt;/div&gt;</code></pre>
+<pre><code class="language-markup">
+&lt;div id="tree1"&gt;&lt;/div&gt;
+</code></pre>
         </li>
         <li>
             Create tree data.
@@ -281,6 +292,14 @@ $.getJSON(
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>0.19 (december 8 2013)</h5>
+    <ul>
+        <li>Issue 225: Fixes TypeError when removing nodes without ids that aren't selected (thanks to Marcus McCurdy)</li>
+        <li>Issue 222: scrollToNode does not consider direct parent</li>
+        <li>Issue 228: add property click_event to tree.click and tree.dblclick events (thanks to Gordon Woodhull)</li>
+        <li>Added option openFolderDelay: the delay for opening a folder during drag-and-drop (thanks to Jason Diamond)</li>
+    </ul>
 
     <h5>0.18 (september 17 2013)</h5>
     <ul>
@@ -785,6 +804,19 @@ $('#tree1').tree({
 });
 </code></pre>
 
+    <h5 id="tree-options-openfolderdelay">openFolderDelay</h5>
+
+    <p>
+        Set the delay for opening a folder during drag-and-drop. The delay is in milliseconds. The default is 500 ms.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree({
+    url: '/my/data/',
+    openFolderDelay: 1000
+});
+</code></pre>
+
     <h4 id="functions">Functions</h4>
     <h5 id="functions-loadData">loadData</h5>
     <p>
@@ -1232,8 +1264,16 @@ $tree.tree('scrollToNode', node);
     <h5 id="event-tree-click">tree.click</h5>
 
     <p>
-        Triggered when a tree node is clicked.
+        Triggered when a tree node is clicked. The event contains the following properties:
     </p>
+    <ul>
+        <li>
+            <strong>node</strong>: the node that is clicked on
+        </li>
+        <li>
+            <strong>click_event</strong>: the original click event
+        </li>
+    </ul>
 
 <pre><code class="language-javascript">
 // create tree
@@ -1269,8 +1309,16 @@ $('#tree1').bind(
     <h5 id="event-tree-dblclick">tree.dblclick</h5>
 
     <p>
-        The <strong>tree.dblclick</strong> is fired when a tree node is double-clicked.
+        The <strong>tree.dblclick</strong> is fired when a tree node is double-clicked. The event contains the following properties:
     </p>
+    <ul>
+        <li>
+            <strong>node</strong>: the node that is clicked on
+        </li>
+        <li>
+            <strong>click_event</strong>: the original click event
+        </li>
+    </ul>
 
 <pre><code class="language-javascript">
 $('#tree1').bind(

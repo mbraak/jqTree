@@ -1,5 +1,7 @@
 [![Travis Status](https://secure.travis-ci.org/mbraak/jqTree.png)](http://travis-ci.org/mbraak/jqTree)
 
+[![Stories in Ready](https://badge.waffle.io/mbraak/jqtree.png?label=ready)](https://waffle.io/mbraak/jqtree)
+
 #jqTree
 
 JqTree is a tree widget. Read more in the [documentation](http://mbraak.github.io/jqTree/).
@@ -19,3 +21,7 @@ See index.html for the full documentation. The documentation is also on [github]
 
 The code for the mouse widget is heavily inspired by the mouse widget from jquery ui.
 Tree graphic designed by Hernan D. Schlosman from The Noun Project.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/mbraak/jqtree/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+

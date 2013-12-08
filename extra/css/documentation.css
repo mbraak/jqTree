@@ -127,12 +127,6 @@ img {
     margin-left: 1.2em;
 }
 
-/*
-#page li {
-    margin-left: 4px;
-}
-*/
-
 /* tree */
 .jqtree-tree a:hover {
     border-bottom: none;
@@ -143,19 +137,10 @@ img {
     padding: 1em;
 }
 
-/* code */
-pre {
-    background-color: #333;
-}
-
+/* prism syntax highlighting */
 pre[class*="language-"] {
-    margin: 0 0 2em 0;
-}
-
-pre[class*="language-"].dark {
-    margin: .5em 0 1em 0;
-}
-
-code.dark {
-    font-size: 0.9em;
+    padding-top: 0;
+    border-radius: 0;
+    font-size: 13px;
+    margin-bottom: 16px;
 }
