@@ -14,6 +14,9 @@ class KeyHandler
         $(document).unbind('keydown.jqtree')
 
     handleKeyDown: (e) ->
+        if not @tree_widget.options.keyboardSupport
+            return
+
         if $(document.activeElement).is('textarea,input')
             return true
 

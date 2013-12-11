@@ -347,6 +347,9 @@ class JqTreeWidget extends MouseWidget
         @save_state_handler.setState(state)
         @_refreshElements()
 
+    setOption: (option, value) ->
+        @options[option] = value
+
     _init: ->
         super()
 

@@ -97,6 +97,7 @@
                 <li><a href="#functions-getstate">getState</a></li>
                 <li><a href="#functions-setstate">setState</a></li>
                 <li><a href="#functions-gettree">getTree</a></li>
+                <li><a href="#functions-setoption">setOption</a></li>
             </ul>
         </li>
         <li>
@@ -292,6 +293,11 @@ $.getJSON(
     </ul>
 
     <h4 id="changelog">Changelog</h4>
+
+    <h5>development version</h5>
+    <ul>
+        <li>Issue 235: Added setoption function</li>
+    </ul>
 
     <h5>0.19 (december 8 2013)</h5>
     <ul>
@@ -1258,6 +1264,20 @@ $tree.tree('scrollToNode', node);
     <p>
         Get the root node of the tree.
     </p>
+
+    <h5 id="functions-setoption">setOption</h5>
+
+    <p>
+        <strong>function setOption(option, value);</strong>
+    </p>
+
+    <p>
+        Set a tree option. These are the same options that you can set when creating the tree.
+    </p>
+
+<pre><code class="language-javascript">
+$('#tree1').tree('setOption', 'keyboardSupport', false);
+</code></pre>
 
     <h4 id="events">Events</h4>
 

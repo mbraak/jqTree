@@ -1177,6 +1177,10 @@ limitations under the License.
       return this._refreshElements();
     };
 
+    JqTreeWidget.prototype.setOption = function(option, value) {
+      return this.options[option] = value;
+    };
+
     JqTreeWidget.prototype._init = function() {
       JqTreeWidget.__super__._init.call(this);
       this.element = this.$el;
@@ -2652,6 +2656,9 @@ limitations under the License.
     KeyHandler.prototype.handleKeyDown = function(e) {
       var current_node, key, moveDown, moveLeft, moveRight, moveUp, selectNode,
         _this = this;
+      if (!this.tree_widget.options.keyboardSupport) {
+        return;
+      }
       if ($(document.activeElement).is('textarea,input')) {
         return true;
       }
