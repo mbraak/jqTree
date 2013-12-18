@@ -1,8 +1,17 @@
-/* main layout */
-body, button, input, select, textarea {
+/* general */
+body, button, input, select, textarea, h4, h5, h6 {
     font-family: 'Open Sans', sans-serif;
 }
 
+p {
+    margin-bottom: 8px;
+}
+
+.section {
+    margin: 8px 0 16px 0;
+}
+
+/* main layout */
 #sidebar {
     width: 200px;
     position: fixed;
@@ -62,18 +71,18 @@ body, button, input, select, textarea {
 }
 
 .container-left .inner {
-    margin-right: 0.5em;
+    margin-right: 8px;
 }
 
 .container-right .inner {
-    margin-left: 0.5em;
+    margin-left: 8px;
 }
 
 /* header */
 #main-title {
-    margin: 1em 0 1em 0;
+    margin: 16px 0 16px 0;
     background-color: #F35EA1;
-    padding: 1em 1.5em;
+    padding: 16px 24px;
     float: left;
 }
 
@@ -88,43 +97,42 @@ body, button, input, select, textarea {
 
 #main-title .logo {
     float: left;
-    margin: 0 1.5em 0 0;
+    margin: 0 24px 0 0;
 }
 
 /* general style */
 h4 {
-    font-size: 1.2em;
-    margin: 0.5em 0 0.2em 0;
+    font-size: 19px;
+    margin: 8px 0 4px 0;
     color: #777;
-    font-family: 'Helvetica', Arial, sans-serif;
 }
 
 h5 {
-    font-size: 0.9em;
-    margin: 1em 0 0.5em 0;
+    font-size: 14px;
+    margin: 8px 0 8px 0;
     background-color: #333;
     color: #fff;
     display: inline;
-    padding: 0.2em 0.5em 0.1em 0.5em;
+    padding: 4px 8px 2px 8px;
     font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
 }
 
 h6 {
-    margin: 0.5em 0;
+    margin: 8px 0;
 }
 
-a,
-a:visited {
+a, a:visited {
     color: #b2497e;
 }
 
 img {
-    margin: 0 0.5em;
+    margin: 0 8px;
 }
 
 #page ul {
     list-style-position: outside;
-    margin-left: 1.2em;
+    margin-left: 18px;
+    margin-bottom: 8px;
 }
 
 /* tree */
@@ -134,14 +142,13 @@ img {
 
 #tree1 {
     border: solid 1px #666;
-    padding: 1em;
+    padding: 16px;
 }
 
 /* prism syntax highlighting */
 pre[class*="language-"] {
-    padding-top: 0;
+    padding-top: 13px;
     border-radius: 0;
     font-size: 13px;
-    margin-top: 0;
-    margin-bottom: 16px;
+    margin: 0 0 16px 0;
 }

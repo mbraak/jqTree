@@ -143,24 +143,30 @@
         </div>
     </div>
     <p id="introduction">
-        JqTree is a tree widget.
+        JqTree is a jQuery widget for displaying a <strong>tree structure</strong> in html. It supports
+        <strong>json data</strong>, loading via <strong>ajax</strong> and <strong>drag-and-drop</strong>.
     </p>
-    <h4 id="features">Features</h4>
-    <ul>
-        <li>Create a tree from JSON data</li>
-        <li>Drag and drop</li>
-        <li>Works on ie7+, firefox 3.6+, chrome and safari</li>
-        <li>Written in Coffeescript</li>
-    </ul>
-    <p>
-        The project is <a href="https://github.com/mbraak/jqTree">hosted on github</a>,
-        has a <a href="test/test.html">test suite</a>.
-    </p>
-    <div class="group" id="demo">
+    <div class="section">
+        <h4 id="features">Features</h4>
+        <ul>
+            <li>Create a tree from JSON data</li>
+            <li>Load data using ajax</li>
+            <li>Drag and drop</li>
+            <li>Saves the state</li>
+            <li>Keyboard support</li>
+            <li>Lazy loading</li>
+            <li>Works on ie7+, firefox 3.6+, chrome and safari</li>
+            <li>Written in Coffeescript</li>
+        </ul>
+        <p>
+            The project is <a href="https://github.com/mbraak/jqTree">hosted on github</a>,
+            has a <a href="test/test.html">test suite</a>.
+        </p>
+    </div>
+    <div class="group section" id="demo">
         <div class="container-left">
             <div class="inner">
-<pre><code class="language-javascript">
-var data = [
+<pre><code class="language-javascript">var data = [
     {
         label: 'node1',
         children: [
@@ -190,53 +196,41 @@ $('#tree1').tree({
         </div>
     </div>
 
-    <h4 id="requirements">Requirements</h4>
-    <ul>
-        <li><a href="http://jquery.com">jQuery</a> 1.5+ or 2.0</li>
-    </ul>
-    <h4 id="downloads">Downloads</h4>
-    <ul>
-        <li>All (version 0.19): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
-        <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
-        <li>Css: <a href="jqtree.css">jqtree.css</a></li>
-        <li>Image: <a href="jqtree-circle.png">jqtree-circle.png</a></li>
-    </ul>
-    <h4 id="tutorial">Tutorial</h4>
-    <ul>
-        <li>
+    <div class="section">
+        <h4 id="requirements">Requirements</h4>
+        <ul>
+            <li><a href="http://jquery.com">jQuery</a> 1.5+ or 2.0</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h4 id="downloads">Downloads</h4>
+        <ul>
+            <li>All (version 0.19): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+            <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
+            <li>Css: <a href="jqtree.css">jqtree.css</a></li>
+            <li>Image: <a href="jqtree-circle.png">jqtree-circle.png</a></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h4 id="tutorial">Tutorial</h4>
+        <p>
             Include <a href="http://code.jquery.com/jquery.min.js">jQuery</a>.
-<pre><code class="language-markup">
-&lt;script src="jquery.min.js"&gt;&lt;/script&gt;
-</code></pre>
-        </li>
-        <li>
-            Include tree.jquery.js:
-<pre><code class="language-markup">
-&lt;script src="tree.jquery.js"&gt;&lt;/script&gt;
-</code></pre>
-        </li>
-        <li>
-            Include jqtree.css:
-<pre><code class="language-markup">
-&lt;link rel="stylesheet" href="jqtree.css"&gt;
-</code></pre>
-        </li>
-        <li>
+        </p>
+<pre><code class="language-markup">&lt;script src="jquery.min.js"&gt;&lt;/script&gt;</code></pre>
+        <p>Include tree.jquery.js:</p>
+<pre><code class="language-markup">&lt;script src="tree.jquery.js"&gt;&lt;/script&gt;</code></pre>
+        <p>Include jqtree.css:</p>
+<pre><code class="language-markup">&lt;link rel="stylesheet" href="jqtree.css"&gt;</code></pre>
+        <p>
             Optionally, for saveState include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>:
-<pre><code class="language-markup">
-&lt;script src="jquery.cookie.js"&gt;&lt;/script&gt;
-</code></pre>
-        </li>
-        <li>
-            Create a div.
-<pre><code class="language-markup">
-&lt;div id="tree1"&gt;&lt;/div&gt;
-</code></pre>
-        </li>
-        <li>
-            Create tree data.
-<pre><code class="language-javascript">
-var data = [
+        </p>
+<pre><code class="language-markup">&lt;script src="jquery.cookie.js"&gt;&lt;/script&gt;</code></pre>
+        <p>Create a div.</p>
+<pre><code class="language-markup">&lt;div id="tree1"&gt;&lt;/div&gt;</code></pre>
+     <p>Create tree data.</p>
+<pre><code class="language-javascript">var data = [
     {
         label: 'node1',
         children: [
@@ -252,21 +246,15 @@ var data = [
     }
 ];
 </code></pre>
-            </li>
-            <li>
-                Create tree widget.
-<pre><code class="language-javascript">
-$(function() {
+        <p>Create tree widget.</p>
+<pre><code class="language-javascript">$(function() {
     $('#tree1').tree({
         data: data
     });
 });
 </code></pre>
-            </li>
-            <li>
-                Alternatively, get the data from the server.
-<pre><code class="language-javascript">
-$.getJSON(
+        <p>Alternatively, get the data from the server.</p>
+<pre><code class="language-javascript">$.getJSON(
     '/some_url/',
     function(data) {
         $('#tree1').tree({
@@ -275,183 +263,185 @@ $.getJSON(
     }
 );
 </code></pre>
-        </li>
-    </ul>
+    </div>
+    <div class="section">
+        <h4 id="examples">Examples</h4>
 
-    <h4 id="examples">Examples</h4>
+        <ul>
+            <li><a href="examples/load_json_data.html">Example 1 - load json data</a></li>
+            <li><a href="examples/load_json_data_from_server.html">Example 2 - load json data from the server</a></li>
+            <li><a href="examples/drag_and_drop.html">Example 3 - drag and drop</a></li>
+            <li><a href="examples/save_state.html">Example 4 - save the state</a></li>
+            <li><a href="examples/load_on_demand.html">Example 5 - load nodes on demand from the server</a></li>
+            <li><a href="examples/autoescape.html">Example 6 - autoEscape</a></li>
+            <li><a href="examples/autoscroll.html">Example 7 - autoscroll</a></li>
+            <li><a href="examples/multiple_select.html">Example 8 - multiple select</a></li>
+            <li><a href="examples/custom_html.html">Example 9 - custom html</a></li>
+        </ul>
+    </div>
 
-    <ul>
-        <li><a href="examples/load_json_data.html">Example 1 - load json data</a></li>
-        <li><a href="examples/load_json_data_from_server.html">Example 2 - load json data from the server</a></li>
-        <li><a href="examples/drag_and_drop.html">Example 3 - drag and drop</a></li>
-        <li><a href="examples/save_state.html">Example 4 - save the state</a></li>
-        <li><a href="examples/load_on_demand.html">Example 5 - load nodes on demand from the server</a></li>
-        <li><a href="examples/autoescape.html">Example 6 - autoEscape</a></li>
-        <li><a href="examples/autoscroll.html">Example 7 - autoscroll</a></li>
-        <li><a href="examples/multiple_select.html">Example 8 - multiple select</a></li>
-        <li><a href="examples/custom_html.html">Example 9 - custom html</a></li>
-    </ul>
+    <div class="section">
+        <h4 id="changelog">Changelog</h4>
 
-    <h4 id="changelog">Changelog</h4>
+        <h5>development version</h5>
+        <ul>
+            <li>Issue 235: Added setoption function</li>
+        </ul>
 
-    <h5>development version</h5>
-    <ul>
-        <li>Issue 235: Added setoption function</li>
-    </ul>
+        <h5>0.19 (december 8 2013)</h5>
+        <ul>
+            <li>Issue 225: Fixes TypeError when removing nodes without ids that aren't selected (thanks to Marcus McCurdy)</li>
+            <li>Issue 222: scrollToNode does not consider direct parent</li>
+            <li>Issue 228: add property click_event to tree.click and tree.dblclick events (thanks to Gordon Woodhull)</li>
+            <li>Added option openFolderDelay: the delay for opening a folder during drag-and-drop (thanks to Jason Diamond)</li>
+        </ul>
 
-    <h5>0.19 (december 8 2013)</h5>
-    <ul>
-        <li>Issue 225: Fixes TypeError when removing nodes without ids that aren't selected (thanks to Marcus McCurdy)</li>
-        <li>Issue 222: scrollToNode does not consider direct parent</li>
-        <li>Issue 228: add property click_event to tree.click and tree.dblclick events (thanks to Gordon Woodhull)</li>
-        <li>Added option openFolderDelay: the delay for opening a folder during drag-and-drop (thanks to Jason Diamond)</li>
-    </ul>
+        <h5>0.18 (september 17 2013)</h5>
+        <ul>
+            <li>Issue 132: Skip keyboard handling if focus is on input element (thanks to Bingeling)</li>
+            <li>Issue 179 and 180: Added dataFilter option to filter the returned data from jQuery.ajax (thanks to Cheton Wu and Tony Dilger)</li>
+            <li>Issue 184: If the node id is 0, the id mapping is incorrect (thanks to Ika Wu)</li>
+            <li>Issue 190: The function selectNode should not toggle (thanks to Gordon Woodhull)</li>
+            <li>Issue 192: Added keyboardSupport option (thanks to Ika Wu)</li>
+            <li>Issue 181: Added tree.dblclick event (thanks to eskaigualker)</li>
+            <li>Issue 196: localStorage doesn't work in Safari private browsing (thanks to thebagg)</li>
+            <li>Issue 203: Adding deselected_node attribute to event object of tree.select event (thanks to tedtoer)</li>
+        </ul>
 
-    <h5>0.18 (september 17 2013)</h5>
-    <ul>
-        <li>Issue 132: Skip keyboard handling if focus is on input element (thanks to Bingeling)</li>
-        <li>Issue 179 and 180: Added dataFilter option to filter the returned data from jQuery.ajax (thanks to Cheton Wu and Tony Dilger)</li>
-        <li>Issue 184: If the node id is 0, the id mapping is incorrect (thanks to Ika Wu)</li>
-        <li>Issue 190: The function selectNode should not toggle (thanks to Gordon Woodhull)</li>
-        <li>Issue 192: Added keyboardSupport option (thanks to Ika Wu)</li>
-        <li>Issue 181: Added tree.dblclick event (thanks to eskaigualker)</li>
-        <li>Issue 196: localStorage doesn't work in Safari private browsing (thanks to thebagg)</li>
-        <li>Issue 203: Adding deselected_node attribute to event object of tree.select event (thanks to tedtoer)</li>
-    </ul>
+        <h5>0.17 (july 14 2013)</h5>
+        <ul>
+            <li>Issue 132: Added keyboard support</li>
+            <li>Issue 154: Calling loadDataFromUrl should not trigger tree.init event (thanks to Davide Bellini)</li>
+            <li>Issue 158: Index not updated on updateNode (thanks to Sam Mousa)</li>
+            <li>Issue 159: Cannot reselect node after unselecting it (thanks to Comanche)</li>
+            <li>Issue 162: Added getPreviousSibling and getNextSibling functions (thanks to Dimaninc)</li>
+            <li>Issue 169: Added touch support (thanks to Comanche)</li>
+            <li>Issue 171: Added functions getState and setState</li>
+            <li>Issue 175: Make it possible to install jqTree using bower (thanks to Adam Miskiewicz)</li>
+        </ul>
 
-    <h5>0.17 (july 14 2013)</h5>
-    <ul>
-        <li>Issue 132: Added keyboard support</li>
-        <li>Issue 154: Calling loadDataFromUrl should not trigger tree.init event (thanks to Davide Bellini)</li>
-        <li>Issue 158: Index not updated on updateNode (thanks to Sam Mousa)</li>
-        <li>Issue 159: Cannot reselect node after unselecting it (thanks to Comanche)</li>
-        <li>Issue 162: Added getPreviousSibling and getNextSibling functions (thanks to Dimaninc)</li>
-        <li>Issue 169: Added touch support (thanks to Comanche)</li>
-        <li>Issue 171: Added functions getState and setState</li>
-        <li>Issue 175: Make it possible to install jqTree using bower (thanks to Adam Miskiewicz)</li>
-    </ul>
+        <h5>0.16 (may 17 2013)</h5>
+        <ul>
+            <li>Issue 62: Added functions for multiple select</li>
+            <li>Issue 125: Add option for overriding TRIANGLE_RIGHT and TRIANGLE_DOWN (thanks to Sam D)</li>
+            <li>Issue 126: Event tree.open event fires after first tree.select on top level node</li>
+            <li>Issue 129: Allow native context menu to be display (thanks to Charles Bourasseau)</li>
+            <li>Issue 130: Selectable not implemented (thanks to Sam D)</li>
+            <li>Issue 133: loadDataFromUrl doesn't work when only parent_node and callback are passed in (thanks to Simone Deponti)</li>
+            <li>Issue 134: selectNode from inside tree.init breaks on loadData (thanks to Sam D)</li>
+            <li>Issue 145: Auto-open nodes with drag n drop when drag not enabled for that node (thanks to Daniel Powell)</li>
+            <li>Issue 146: Added function scrollToNode (thanks to Davide Bellini)</li>
+        </ul>
 
-    <h5>0.16 (may 17 2013)</h5>
-    <ul>
-        <li>Issue 62: Added functions for multiple select</li>
-        <li>Issue 125: Add option for overriding TRIANGLE_RIGHT and TRIANGLE_DOWN (thanks to Sam D)</li>
-        <li>Issue 126: Event tree.open event fires after first tree.select on top level node</li>
-        <li>Issue 129: Allow native context menu to be display (thanks to Charles Bourasseau)</li>
-        <li>Issue 130: Selectable not implemented (thanks to Sam D)</li>
-        <li>Issue 133: loadDataFromUrl doesn't work when only parent_node and callback are passed in (thanks to Simone Deponti)</li>
-        <li>Issue 134: selectNode from inside tree.init breaks on loadData (thanks to Sam D)</li>
-        <li>Issue 145: Auto-open nodes with drag n drop when drag not enabled for that node (thanks to Daniel Powell)</li>
-        <li>Issue 146: Added function scrollToNode (thanks to Davide Bellini)</li>
-    </ul>
+        <h5>0.15 (march 16 2013)</h5>
+        <ul>
+            <li>Issue 100: Clicking on the jqtree-element element will trigger click event</li>
+            <li>Issue 102: Add original event to tree.move event</li>
+            <li>Issue 103: Added getLevel function to Node class</li>
+            <li>Issue 104: The addNodeBefore method must return the new node</li>
+            <li>Issue 105: Added nodeClass option</li>
+            <li>Issue 112: Fix call to iterate in removeNode (thanks to Ingemar Ådahl)</li>
+            <li>Issue 113: Added onLoadFailed option (thanks to Shuhei Kondo)</li>
+            <li>Issue 118: Deselect a node when click and already selected</li>
+            <li>Issue 119: Make it easier to reload a subtree</li>
+            <li>Issue 121: Unselect node if it's reloaded by loadDataFromUrl</li>
+        </ul>
 
-    <h5>0.15 (march 16 2013)</h5>
-    <ul>
-        <li>Issue 100: Clicking on the jqtree-element element will trigger click event</li>
-        <li>Issue 102: Add original event to tree.move event</li>
-        <li>Issue 103: Added getLevel function to Node class</li>
-        <li>Issue 104: The addNodeBefore method must return the new node</li>
-        <li>Issue 105: Added nodeClass option</li>
-        <li>Issue 112: Fix call to iterate in removeNode (thanks to Ingemar Ådahl)</li>
-        <li>Issue 113: Added onLoadFailed option (thanks to Shuhei Kondo)</li>
-        <li>Issue 118: Deselect a node when click and already selected</li>
-        <li>Issue 119: Make it easier to reload a subtree</li>
-        <li>Issue 121: Unselect node if it's reloaded by loadDataFromUrl</li>
-    </ul>
+        <h5>0.14 (december 2 2012)</h5>
+        <h6>Api changes</h6>
+        <ul>
+            <li>Removed parameter <strong>must_open_parents</strong> from function <strong>selectNode</strong>.</li>
+            <li>Changed <strong>slide</strong> parameter in functions <strong>openNode</strong> and <strong>closeNode</strong>.</li>
+        </ul>
+        <h6>Issues</h6>
+        <ul>
+            <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method (thanks to Rodrigo Rosenfeld Rosas)</li>
+            <li>Issue 81: getSelectedNode must return false if node is removed</li>
+            <li>Issue 82: Autoscroll for drag-and-drop</li>
+            <li>Issue 84: Fix correct type param in $.ajax() (thanks to Rodrigo Rosenfeld Rosas)</li>
+            <li>Issue 85: Option to turn slide animation on or off</li>
+            <li>Issue 86: The openNode function must automatically open parents</li>
+            <li>Issue 87: Remove the must_open_parents parameter from the selectNode function</li>
+            <li>Issue 88: selectNode must also work if selectable option is false</li>
+            <li>Issue 89: Clicking in title with img or em does not work</li>
+            <li>Issue 96: Added jqtree_common class to avoid css clashes (thanks to Yaniv Iny)</li> 
+        </ul>
 
-    <h5>0.14 (december 2 2012)</h5>
-    <h6>Api changes</h6>
-    <ul>
-        <li>Removed parameter <strong>must_open_parents</strong> from function <strong>selectNode</strong>.</li>
-        <li>Changed <strong>slide</strong> parameter in functions <strong>openNode</strong> and <strong>closeNode</strong>.</li>
-    </ul>
-    <h6>Issues</h6>
-    <ul>
-        <li>Issue 80: Support more options for loading data from the server. E.g. the 'post' method (thanks to Rodrigo Rosenfeld Rosas)</li>
-        <li>Issue 81: getSelectedNode must return false if node is removed</li>
-        <li>Issue 82: Autoscroll for drag-and-drop</li>
-        <li>Issue 84: Fix correct type param in $.ajax() (thanks to Rodrigo Rosenfeld Rosas)</li>
-        <li>Issue 85: Option to turn slide animation on or off</li>
-        <li>Issue 86: The openNode function must automatically open parents</li>
-        <li>Issue 87: Remove the must_open_parents parameter from the selectNode function</li>
-        <li>Issue 88: selectNode must also work if selectable option is false</li>
-        <li>Issue 89: Clicking in title with img or em does not work</li>
-        <li>Issue 96: Added jqtree_common class to avoid css clashes (thanks to Yaniv Iny)</li> 
-    </ul>
+        <h5>0.13 (october 10 2012)</h5>
+        <ul>
+            <li>Issue 54: Added tree.select event</li>
+            <li>Issue 63: Fixed contextmenu event</li>
+            <li>Issue 67: Use unicode characters for triangle buttons (thanks to Younès)</li>
+            <li>Issue 70: Load data from the server using the loadData function</li>
+            <li>Issue 78: Drag and drop is trigger happy</li>
+        </ul>
 
-    <h5>0.13 (october 10 2012)</h5>
-    <ul>
-        <li>Issue 54: Added tree.select event</li>
-        <li>Issue 63: Fixed contextmenu event</li>
-        <li>Issue 67: Use unicode characters for triangle buttons (thanks to Younès)</li>
-        <li>Issue 70: Load data from the server using the loadData function</li>
-        <li>Issue 78: Drag and drop is trigger happy</li>
-    </ul>
+        <h5>0.12 (august 14 2012)</h5>
+        <ul>
+            <li>Issue 46: Added tree.refresh event</li>
+            <li>Issue 47: Function 'selectNode' must properly open the parent nodes</li>
+            <li>Issue 49: Make sure that widget functions can be called in the 'tree.init' event</li>
+            <li>Issue 50: Add namespace to css classes</li>
+            <li>Issue 51: closeNode to collapse tree doesn't work</li>
+            <li>Issue 55: Load-on-demand from the server</li>
+            <li>Issue 58: Added updateNode function</li>
+            <li>Issue 59: Added moveNode function</li>
+            <li>Issue 60: Use native JSON.stringify function</li>
+        </ul>
 
-    <h5>0.12 (august 14 2012)</h5>
-    <ul>
-        <li>Issue 46: Added tree.refresh event</li>
-        <li>Issue 47: Function 'selectNode' must properly open the parent nodes</li>
-        <li>Issue 49: Make sure that widget functions can be called in the 'tree.init' event</li>
-        <li>Issue 50: Add namespace to css classes</li>
-        <li>Issue 51: closeNode to collapse tree doesn't work</li>
-        <li>Issue 55: Load-on-demand from the server</li>
-        <li>Issue 58: Added updateNode function</li>
-        <li>Issue 59: Added moveNode function</li>
-        <li>Issue 60: Use native JSON.stringify function</li>
-    </ul>
+        <h5>0.11 (july 8 2012)</h5>
+        <ul>
+            <li>Autoescape text</li>
+            <li>Added autoEscape option</li>
+            <li>Issue 33: appendNode does not correctly refresh the tree</li>
+            <li>Issue 34: unset internal pointer to previously selected node on DOM deselect</li>
+            <li>Issue 38: Correctly check if browser has support for localstorage</li>
+            <li>Issue 41: Open nodes are not displayed correctly in ie7</li>
+        </ul>
 
-    <h5>0.11 (july 8 2012)</h5>
-    <ul>
-        <li>Autoescape text</li>
-        <li>Added autoEscape option</li>
-        <li>Issue 33: appendNode does not correctly refresh the tree</li>
-        <li>Issue 34: unset internal pointer to previously selected node on DOM deselect</li>
-        <li>Issue 38: Correctly check if browser has support for localstorage</li>
-        <li>Issue 41: Open nodes are not displayed correctly in ie7</li>
-    </ul>
+        <h5>0.10 (june 10 2012)</h5>
+        <ul>
+            <li>Optimized getNodeById</li>
+            <li>Issue #18 and #26: Made comparison in getNodeById less strict</li>
+            <li>Added function prependNode</li>
+            <li>Added 'data-url' option</li>
+            <li>Added removeNode function</li>
+            <li>Issue #24: Tree with jquery ui Dialog: expand causes resize and move problem</li>
+            <li>Added Travis ci support</li>
+            <li>Added addNodeAfter, addNodeBefore and addParentNode</li>
+            <li>Renamed icons.png to jqtree-icons.png</li>
+            <li>selectNode with empty node deselects the current node</li>
+        </ul>
 
-    <h5>0.10 (june 10 2012)</h5>
-    <ul>
-        <li>Optimized getNodeById</li>
-        <li>Issue #18 and #26: Made comparison in getNodeById less strict</li>
-        <li>Added function prependNode</li>
-        <li>Added 'data-url' option</li>
-        <li>Added removeNode function</li>
-        <li>Issue #24: Tree with jquery ui Dialog: expand causes resize and move problem</li>
-        <li>Added Travis ci support</li>
-        <li>Added addNodeAfter, addNodeBefore and addParentNode</li>
-        <li>Renamed icons.png to jqtree-icons.png</li>
-        <li>selectNode with empty node deselects the current node</li>
-    </ul>
+        <h5>0.9 (may 9 2012)</h5>
+        <ul>
+            <li>Issue 15: 'tree.open' event is not triggered when dragging nodes</li>
+            <li>Issue 18: Allow moveNode to be canceled through ev.preventDefault()</li>
+            <li>Use sprite for images</li>
+            <li>Added function closeNode</li>
+            <li>Added support for localstorage</li>
+            <li>Implemented alternative data format</li>
+        </ul>
 
-    <h5>0.9 (may 9 2012)</h5>
-    <ul>
-        <li>Issue 15: 'tree.open' event is not triggered when dragging nodes</li>
-        <li>Issue 18: Allow moveNode to be canceled through ev.preventDefault()</li>
-        <li>Use sprite for images</li>
-        <li>Added function closeNode</li>
-        <li>Added support for localstorage</li>
-        <li>Implemented alternative data format</li>
-    </ul>
+        <h5>0.8 (april 18 2012)</h5>
+        <ul>
+            <li>Replace jquery.ui widget with SimpleWidget</li>
+            <li>Added 'previous_parent' to 'tree.move' event</li>
+            <li>Add posibility to load subtree</li>
+            <li>Added 'tree.open' and 'tree.close' events</li>
+        </ul>
+    </div>
 
-    <h5>0.8 (april 18 2012)</h5>
-    <ul>
-        <li>Replace jquery.ui widget with SimpleWidget</li>
-        <li>Added 'previous_parent' to 'tree.move' event</li>
-        <li>Add posibility to load subtree</li>
-        <li>Added 'tree.open' and 'tree.close' events</li>
-    </ul>
+    <div class="section">
+        <h4 id="tree-options">Tree options</h4>
 
-    <h4 id="tree-options">Tree options</h4>
-
-    <h5 id="tree-options-data">data</h5>
-    <p>
-        Define the contents of the tree. The data is a nested array of objects. This option is required.
-        <br>
-        It looks like this:
-    </p>
-<pre><code class="language-javascript">
-var data = [
+        <h5 id="tree-options-data">data</h5>
+        <p>
+            Define the contents of the tree. The data is a nested array of objects. This option is required.
+            <br>
+            It looks like this:
+        </p>
+<pre><code class="language-javascript">var data = [
     {
         label: 'node1',
         children: [
@@ -468,87 +458,88 @@ var data = [
 ];
 $('#tree1').tree({data: data});
 </code></pre>
-    <ul>
-        <li>label: label of a node (required)</li>
-        <li>children: array of child nodes (optional)</li>
-    </ul>
-    <p>
-        You can also include other data in the objects. You can later access this data.
-        <br>
-        For example, to add an id:
-    </p>
-<pre><code class="language-javascript">
-{
+        <ul>
+            <li>label: label of a node (required)</li>
+            <li>children: array of child nodes (optional)</li>
+        </ul>
+        <p>
+            You can also include other data in the objects. You can later access this data.
+            <br>
+            For example, to add an id:
+        </p>
+<pre><code class="language-javascript">{
     label: 'node1',
     id: 1
 }
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-data-url">dataUrl</h5>
-    <p>
-        Load the node data from this url.
-    </p>
+    <div class="section">
+        <h5 id="tree-options-data-url">dataUrl</h5>
+        <p>
+            Load the node data from this url.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
    dataUrl: '/example_data.json' 
 });
 </code></pre>
 
-    <p>
-        You can also set the <strong>data-url</strong> attribute on the dom element:
-    </p>
+        <p>
+            You can also set the <strong>data-url</strong> attribute on the dom element:
+        </p>
 
-<pre><code class="language-javascript">
-&lt;div id="tree1" data-url="/example_data.json"&gt;&lt;/div&gt;
+<pre><code class="language-javascript">&lt;div id="tree1" data-url="/example_data.json"&gt;&lt;/div&gt;
 &lt;script&gt;
     $('#tree1').tree();
 &lt;/script&gt;
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-autoopen">autoOpen</h5>
-    <p>
-        Open nodes initially.
-    </p>
-    <ul>
-        <li>
-            <strong>true</strong>: open all nodes.
-        </li>
-        <li>
-            <strong>false (default)</strong>: do nothing
-        </li>
-        <li><strong>n</strong>: open n levels</li>
-    </ul>
-    <p>
-        Open all nodes initially:
-    </p>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+    <div class="section">
+        <h5 id="tree-options-autoopen">autoOpen</h5>
+        <p>
+            Open nodes initially.
+        </p>
+        <ul>
+            <li>
+                <strong>true</strong>: open all nodes.
+            </li>
+            <li>
+                <strong>false (default)</strong>: do nothing
+            </li>
+            <li><strong>n</strong>: open n levels</li>
+        </ul>
+        <p>
+            Open all nodes initially:
+        </p>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     autoOpen: true
 });
 </code></pre>
-    <p>
-        Open first level nodes:
-    </p>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+        <p>
+            Open first level nodes:
+        </p>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     autoOpen: 0
 });
 </code></pre>
-    <h5 id="tree-options-savestate">saveState</h5>
-    <p>
-        Save and restore the state of the tree automatically. Saves in a cookie which nodes are opened and selected.
-        <br>
-        The state is saved in localstorage. In browsers that do not support localstorage, the state is saved in a cookie.
-        For this to work, please include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>.
-    </p>
-    <p>
-        For this to work, you should give each node in the tree data an id field:
-    </p>
-<pre><code class="language-javascript">
-{
+    </div>
+
+    <div class="section">
+        <h5 id="tree-options-savestate">saveState</h5>
+        <p>
+            Save and restore the state of the tree automatically. Saves in a cookie which nodes are opened and selected.
+            <br>
+            The state is saved in localstorage. In browsers that do not support localstorage, the state is saved in a cookie.
+            For this to work, please include <a href="https://github.com/carhartl/jquery-cookie">jquery-cookie</a>.
+        </p>
+        <p>
+            For this to work, you should give each node in the tree data an id field:
+        </p>
+<pre><code class="language-javascript">{
     label: 'node1',
     id: 123,
     childen: [
@@ -557,69 +548,72 @@ $('#tree1').tree({
     ]
 }
 </code></pre>
-    <ul>
-        <li><strong>true</strong>: save and restore state in a cookie</li>
-        <li><strong>false (default)</strong>: do nothing</li>
-        <li><strong>string</strong>: save state and use this name to store in a cookie</li>
-    </ul>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+        <ul>
+            <li><strong>true</strong>: save and restore state in a cookie</li>
+            <li><strong>false (default)</strong>: do nothing</li>
+            <li><strong>string</strong>: save state and use this name to store in a cookie</li>
+        </ul>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     saveState: true
 });
 </code></pre>
-    <p>
-        Example: save state in key 'tree1':
-    </p>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+        <p>
+            Example: save state in key 'tree1':
+        </p>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     saveState: 'tree1'
 });
 </code></pre>
-    <h5 id="tree-options-draganddrop">dragAndDrop</h5>
-    <p>
-        Turn on dragging and dropping of nodes.
-    </p>
-    <ul>
-        <li><strong>true</strong>: turn on drag and drop</li>
-        <li><strong>false (default)</strong>: do not allow drag and drop</li>
-    </ul>
-    <p>
-        Example: turn on drag and drop.
-    </p>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+    </div>
+
+    <div class="section">
+        <h5 id="tree-options-draganddrop">dragAndDrop</h5>
+        <p>
+            Turn on dragging and dropping of nodes.
+        </p>
+        <ul>
+            <li><strong>true</strong>: turn on drag and drop</li>
+            <li><strong>false (default)</strong>: do not allow drag and drop</li>
+        </ul>
+        <p>
+            Example: turn on drag and drop.
+        </p>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     dragAndDrop: true
 });
 </code></pre>
-    <h5 id="tree-options-selectable">selectable</h5>
-    <p>
-        Turn on selection of nodes.
-    </p>
-    <ul>
-        <li><strong>true (default)</strong>: turn on selection of nodes</li>
-        <li><strong>false</strong>: turn off selection of nodes</li>
-    </ul>
-    <p>
-        Example: turn off selection of nodes.
-    </p>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+    </div>
+
+    <div class="section">
+        <h5 id="tree-options-selectable">selectable</h5>
+        <p>
+            Turn on selection of nodes.
+        </p>
+        <ul>
+            <li><strong>true (default)</strong>: turn on selection of nodes</li>
+            <li><strong>false</strong>: turn off selection of nodes</li>
+        </ul>
+        <p>
+            Example: turn off selection of nodes.
+        </p>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     selectable: false
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-oncanselectnode">onCanSelectNode</h5>
-    <p>
-        You can set a function to override if a node can be selected. The function gets a node as parameter, and must return true or false.
-        <br />
-        For this to work, the option 'selectable' must be 'true'.
-    </p>
-<pre><code class="language-javascript">
-// Example: nodes with children cannot be selected
+    <div class="section">
+        <h5 id="tree-options-oncanselectnode">onCanSelectNode</h5>
+        <p>
+            You can set a function to override if a node can be selected. The function gets a node as parameter, and must return true or false.
+            <br />
+            For this to work, the option 'selectable' must be 'true'.
+        </p>
+<pre><code class="language-javascript">// Example: nodes with children cannot be selected
 $('#tree1').tree({
     data: data,
     selectable: true
@@ -635,13 +629,14 @@ $('#tree1').tree({
     }
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-oncreateli">onCreateLi</h5>
-    <p>
-        The function is called for each created node. You can use this to define extra html.
-    </p>
-<pre><code class="language-javascript">
-$('#tree1).tree({
+    <div class="section">
+        <h5 id="tree-options-oncreateli">onCreateLi</h5>
+        <p>
+            The function is called for each created node. You can use this to define extra html.
+        </p>
+<pre><code class="language-javascript">$('#tree1).tree({
     data: data,
     onCreateLi: function(node, $li) {
         // Add 'icon' span before title
@@ -649,13 +644,14 @@ $('#tree1).tree({
     }
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-onismovehandle">onIsMoveHandle</h5>
-    <p>
-        You can override this function to determine if a dom element can be used to move a node.
-    </p>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+    <div class="section">
+        <h5 id="tree-options-onismovehandle">onIsMoveHandle</h5>
+        <p>
+            You can override this function to determine if a dom element can be used to move a node.
+        </p>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     onIsMoveHandle: function($element) {
         // Only dom elements with 'jqtree-title' class can be used
@@ -664,13 +660,14 @@ $('#tree1').tree({
     }
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-oncanmove">onCanMove</h5>
-    <p>
-        You can override this function to determine if a node can be moved.
-    </p>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+    <div class="section">
+        <h5 id="tree-options-oncanmove">onCanMove</h5>
+        <p>
+            You can override this function to determine if a node can be moved.
+        </p>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     dragAndDrop: true,
     onCanMove: function(node) {
@@ -684,13 +681,14 @@ $('#tree1').tree({
     }
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-oncanmoveto">onCanMoveTo</h5>
-    <p>
-        You can override this function to determine if a node can be moved to a certain position.
-    </p>
-<pre><code class="language-javascript">
-$('#tree1').tree({
+    <div class="section">
+        <h5 id="tree-options-oncanmoveto">onCanMoveTo</h5>
+        <p>
+            You can override this function to determine if a node can be moved to a certain position.
+        </p>
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     dragAndDrop: true,
     onCanMoveTo: function(moved_node, target_node, position) {
@@ -704,72 +702,80 @@ $('#tree1').tree({
     }
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-autoescape">autoEscape</h5>
-    <p>
-        Determine if text is autoescaped. The default is true.
-    </p>
+    <div class="section">
+        <h5 id="tree-options-autoescape">autoEscape</h5>
+        <p>
+            Determine if text is autoescaped. The default is true.
+        </p>
+    </div>
 
-    <h5 id="tree-options-slide">slide</h5>
+    <div class="section">
+        <h5 id="tree-options-slide">slide</h5>
 
-    <p>
-        Turn slide animation on or off. Default is true.
-    </p>
+        <p>
+            Turn slide animation on or off. Default is true.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     slide: false
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-openedIcon">openedIcon</h5>
+    <div class="section">
+        <h5 id="tree-options-openedIcon">openedIcon</h5>
 
-    <p>
-        A character or symbol to display on opened nodes. The default is '&amp;#x25bc;' (&#x25bc;)
-    </p>
+        <p>
+            A character or symbol to display on opened nodes. The default is '&amp;#x25bc;' (&#x25bc;)
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     openedIcon: '-'
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-closedIcon">closedIcon</h5>
+    <div class="section">
+        <h5 id="tree-options-closedIcon">closedIcon</h5>
 
-    <p>
-        A character or symbol to display on closed nodes. The default is '&amp;#x25ba;' (&#x25ba;)
-    </p>
+        <p>
+            A character or symbol to display on closed nodes. The default is '&amp;#x25ba;' (&#x25ba;)
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     closedIcon: '+'
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-usecontextmenu">useContextMenu</h5>
+    <div class="section">
+        <h5 id="tree-options-usecontextmenu">useContextMenu</h5>
 
-    <p>
-        Bind the context menu event (true/false).
-    </p>
-    <p>
-        <strong>true</strong> (default)
-        <br>
-        A right mouse-click will trigger a <a href="#event-tree-contextmenu">tree.contextmenu</a> event. This overrides the native contextmenu of the browser.
-    </p>
-    <p>
-        <strong>false</strong>
-        <br>
-        A right mouse-click will trigger the native contextmenu of the browser.
-    </p>
+        <p>
+            Bind the context menu event (true/false).
+        </p>
+        <p>
+            <strong>true</strong> (default)
+            <br>
+            A right mouse-click will trigger a <a href="#event-tree-contextmenu">tree.contextmenu</a> event. This overrides the native contextmenu of the browser.
+        </p>
+        <p>
+            <strong>false</strong>
+            <br>
+            A right mouse-click will trigger the native contextmenu of the browser.
+        </p>
+    </div>
 
-    <h5 id="tree-options-datafilter">dataFilter</h5>
+    <div class="section">
+        <h5 id="tree-options-datafilter">dataFilter</h5>
 
-    <p>
-        Process the tree data from the server.
-    </p>
+        <p>
+            Process the tree data from the server.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     url: '/my/data/',
     dataFilter: function(data) {
         // Example:
@@ -778,66 +784,70 @@ $('#tree1').tree({
     }
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-keyboardsupport">keyboardSupport</h5>
+    <div class="section">
+        <h5 id="tree-options-keyboardsupport">keyboardSupport</h5>
 
-    <p>
-        Enable or disable keyboard support. Default is enabled.
-    </p>
+        <p>
+            Enable or disable keyboard support. Default is enabled.
+        </p>
 
-    <p>
-        Example: disable keyboard support.
-    </p>
+        <p>
+            Example: disable keyboard support.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     keyboardSupport: false
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-onloadfailed">onLoadFailed</h5>
+    <div class="section">
+        <h5 id="tree-options-onloadfailed">onLoadFailed</h5>
 
-    <p>
-        When loading the data by ajax fails, then the option <strong>onLoadFailed</strong> is called.
-    </p>
+        <p>
+            When loading the data by ajax fails, then the option <strong>onLoadFailed</strong> is called.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     url: '/my/data/',
     onLoadFailed: function(response) {
         //
     }
 });
 </code></pre>
+    </div>
 
-    <h5 id="tree-options-openfolderdelay">openFolderDelay</h5>
+    <div class="section">
+        <h5 id="tree-options-openfolderdelay">openFolderDelay</h5>
 
-    <p>
-        Set the delay for opening a folder during drag-and-drop. The delay is in milliseconds. The default is 500 ms.
-    </p>
+        <p>
+            Set the delay for opening a folder during drag-and-drop. The delay is in milliseconds. The default is 500 ms.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     url: '/my/data/',
     openFolderDelay: 1000
 });
 </code></pre>
+    </div>
 
-    <h4 id="functions">Functions</h4>
-    <h5 id="functions-loadData">loadData</h5>
-    <p>
-        <strong>function loadData(data);</strong>
-        <br>
-        <strong>function loadData(data, parent_node);</strong>
-        <br>
-    </p>
-    <p>
-        Load data in the tree. The data is array of nodes.
-        <br>
-        You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
-    </p>
-<pre><code class="language-javascript">
-// Assuming the tree exists
+    <div class="section">
+        <h4 id="functions">Functions</h4>
+        <h5 id="functions-loadData">loadData</h5>
+        <p>
+            <strong>function loadData(data);</strong>
+            <br>
+            <strong>function loadData(data, parent_node);</strong>
+            <br>
+        </p>
+        <p>
+            Load data in the tree. The data is array of nodes.
+            <br>
+            You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
+        </p>
+<pre><code class="language-javascript">// Assuming the tree exists
 var new_data = [
     {
         label: 'node1',
@@ -856,12 +866,11 @@ var new_data = [
 $('#tree1').tree('loadData', new_data);
 </code></pre>
 
-    <p>
-        Load a subtree:
-    </p>
+        <p>
+            Load a subtree:
+        </p>
 
-<pre><code class="language-javascript">
-// Get node by id (this assumes that the nodes have an id)
+<pre><code class="language-javascript">// Get node by id (this assumes that the nodes have an id)
 var node = $('#tree1').tree('getNodeById', 100);
 
 // Add new nodes
@@ -871,40 +880,37 @@ var data = [
 ];
 $('#tree1').tree('loadData', data, node);
 </code></pre>
+    </div>
 
+    <div class="section">
+        <h5 id="functions-loaddatafromurl">loadDataFromUrl</h5>
+        <p>
+            <strong>function loadDataFromUrl(url);</strong>
+            <br>
+            <strong>function loadDataFromUrl(url, parent_node);</strong>
+            <br>
+            <strong>function loadDataFromUrl(parent_node);</strong>
+        </p>
 
-    <h5 id="functions-loaddatafromurl">loadDataFromUrl</h5>
-    <p>
-        <strong>function loadDataFromUrl(url);</strong>
-        <br>
-        <strong>function loadDataFromUrl(url, parent_node);</strong>
-        <br>
-        <strong>function loadDataFromUrl(parent_node);</strong>
-    </p>
+        <p>
+            Load data in the tree from an url using ajax. You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
+        </p>
 
-    <p>
-        Load data in the tree from an url using ajax. You can <strong>replace the whole tree</strong> or you can <strong>load a subtree</strong>.
-    </p>
+<pre><code class="language-javascript">$('#tree1').tree('loadDataFromUrl', '/category/tree/');</code></pre>
 
-<pre><code class="language-javascript">
-$('#tree1').tree('loadDataFromUrl', '/category/tree/');
-</code></pre>
+        <p>
+            Load a subtree:
+        </p>
 
-    <p>
-        Load a subtree:
-    </p>
-
-<pre><code class="language-javascript">
-var node = $('#tree1').tree('getNodeById', 123);
+<pre><code class="language-javascript">var node = $('#tree1').tree('getNodeById', 123);
 $('#tree1').tree('loadDataFromUrl', '/category/tree/123', node);
 </code></pre>
 
-    <p>
-        You can also omit the url. In this case jqTree will generate a url for you. This is very useful if you use the load-on-demand feature:
-    </p>
+        <p>
+            You can also omit the url. In this case jqTree will generate a url for you. This is very useful if you use the load-on-demand feature:
+        </p>
 
-<pre><code class="language-javascript">
-var $tree = $('#tree1');
+<pre><code class="language-javascript">var $tree = $('#tree1');
 
 $tree.tree({
     dataUrl: '/my_data/'
@@ -916,14 +922,14 @@ var node = $tree.tree('getNodeById', 456);
 $tree.tree('loadDataFromUrl', node);
 </code></pre>
 
-    <p>
-        You can also add an <strong>on_finished</strong> callback parameter that will be called when the data is loaded:
-    </p>
-    <p>
-        <strong>function loadDataFromUrl(url, parent_node, on_finished);</strong>
-        <br>
-        <strong>function loadDataFromUrl(parent_node, on_finished);</strong>
-    </p>
+        <p>
+            You can also add an <strong>on_finished</strong> callback parameter that will be called when the data is loaded:
+        </p>
+        <p>
+            <strong>function loadDataFromUrl(url, parent_node, on_finished);</strong>
+            <br>
+            <strong>function loadDataFromUrl(parent_node, on_finished);</strong>
+        </p>
 
 <pre><code class="language-javascript">$('#tree1').tree(
     'loadDataFromUrl',
@@ -934,27 +940,29 @@ $tree.tree('loadDataFromUrl', node);
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="functions-tojson">toJson</h5>
-    <p>
-        <strong>function toJson();</strong>
-        <br>
-        Get the tree data as json.
-    </p>
-<pre><code class="language-javascript">
-// Assuming the tree exists
+    <div class="section">
+        <h5 id="functions-tojson">toJson</h5>
+        <p>
+            <strong>function toJson();</strong>
+            <br>
+            Get the tree data as json.
+        </p>
+<pre><code class="language-javascript">// Assuming the tree exists
 $('#tree1').tree('toJson');
 </code></pre>
+    </div>
 
-    <h5 id="functions-getnodebyid">getNodeById</h5>
-    <p>
-        <strong>function getNodeById(id);</strong>
-        <br>
-        Get a tree node by node-id. This assumes that you have given the nodes in the data a unique id.
-    </p>
+    <div class="section">
+        <h5 id="functions-getnodebyid">getNodeById</h5>
+        <p>
+            <strong>function getNodeById(id);</strong>
+            <br>
+            Get a tree node by node-id. This assumes that you have given the nodes in the data a unique id.
+        </p>
 
-<pre><code class="language-javascript">
-var $tree = $('#tree1');
+<pre><code class="language-javascript">var $tree = $('#tree1');
 var data = [
     { id: 10, name: 'n1' },
     { id: 11, name: 'n2' }
@@ -965,20 +973,21 @@ $tree.tree({
 });
 var node = $tree.tree('getNodeById', 10);
 </code></pre>
+    </div>
 
-    <h5 id="functions-selectnode">selectNode</h5>
-    <p>
-        <strong>function selectNode(node);</strong>
-        <br>
-        <strong>function selectNode(null);</strong>
-    </p>
-    <p>
-        Select this node.
-        <br>
-        You can deselect the current node by calling <strong>selectNode(null)</strong>.
-    </p>
-<pre><code class="language-javascript">
-// create tree
+    <div class="section">
+        <h5 id="functions-selectnode">selectNode</h5>
+        <p>
+            <strong>function selectNode(node);</strong>
+            <br>
+            <strong>function selectNode(null);</strong>
+        </p>
+        <p>
+            Select this node.
+            <br>
+            You can deselect the current node by calling <strong>selectNode(null)</strong>.
+        </p>
+<pre><code class="language-javascript">// create tree
 var $tree = $('#tree1');
 $tree.tree({
     data: data,
@@ -988,20 +997,21 @@ $tree.tree({
 var node = $tree.tree('getNodeById', 123);
 $tree.tree('selectNode', node);
 </code></pre>
+    </div>
 
-    <h5 id="functions-opennode">openNode</h5>
-    <p>
-        <strong>function openNode(node);</strong>
-        <br>
-        <strong>function openNode(node, slide);</strong>
-    </p>
-    <p>
-        Open this node. The node must have child nodes.
-        <br>
-        Parameter <strong>slide</strong>: open the node using a slide animation (default is true).
-    </p>
-<pre><code class="language-javascript">
-// create tree
+    <div class="section">
+        <h5 id="functions-opennode">openNode</h5>
+        <p>
+            <strong>function openNode(node);</strong>
+            <br>
+            <strong>function openNode(node, slide);</strong>
+        </p>
+        <p>
+            Open this node. The node must have child nodes.
+            <br>
+            Parameter <strong>slide</strong>: open the node using a slide animation (default is true).
+        </p>
+<pre><code class="language-javascript">// create tree
 var $tree = $('#tree1');
 $tree.tree({
     data: data
@@ -1011,55 +1021,53 @@ var node = $tree.tree('getNodeById', 123);
 $tree.tree('openNode', node);
 </code></pre>
 
-    <p>
-        To open the node without the slide animation, call with <strong>slide</strong> parameter is false.
-    </p>
-<pre><code class="language-javascript">
-$tree.tree('openNode', node, false);
-</code></pre>
+        <p>
+            To open the node without the slide animation, call with <strong>slide</strong> parameter is false.
+        </p>
+<pre><code class="language-javascript">$tree.tree('openNode', node, false);</code></pre>
+    </div>
 
-    <h5 id="functions-closenode">closeNode</h5>
-    <p>
-        <strong>function closeNode(node);</strong>
-        <br>
-        <strong>function closeNode(node, slide);</strong>
-    </p>
-    <p>
-        Close this node. The node must have child nodes.
-        <br>
-        Parameter <strong>slide</strong>: close the node using a slide animation (default is true).
-    </p>
-<pre><code class="language-javascript">
-var node = $tree.tree('getNodeById', 123);
+    <div class="section">
+        <h5 id="functions-closenode">closeNode</h5>
+        <p>
+            <strong>function closeNode(node);</strong>
+            <br>
+            <strong>function closeNode(node, slide);</strong>
+        </p>
+        <p>
+            Close this node. The node must have child nodes.
+            <br>
+            Parameter <strong>slide</strong>: close the node using a slide animation (default is true).
+        </p>
+<pre><code class="language-javascript">var node = $tree.tree('getNodeById', 123);
 $tree.tree('closeNode', node);
 </code></pre>
 
-    <p>
-        To close the node without the slide animation, call with <strong>slide</strong> parameter is false.
-    </p>
-<pre><code class="language-javascript">
-$tree.tree('closeNode', node, false);
-</code></pre>
+        <p>
+            To close the node without the slide animation, call with <strong>slide</strong> parameter is false.
+        </p>
+<pre><code class="language-javascript">$tree.tree('closeNode', node, false);</code></pre>
+    </div>
 
-    <h5 id="functions-getselectednode">getSelectedNode</h5>
-    <p>
-        Get the selected node. Returns the row data or false.
-    </p>
+    <div class="section">
+        <h5 id="functions-getselectednode">getSelectedNode</h5>
+        <p>
+            Get the selected node. Returns the row data or false.
+        </p>
 
-<pre><code class="language-javascript">
-var node = $tree.tree('getSelectedNode');
-</code></pre>
+<pre><code class="language-javascript">var node = $tree.tree('getSelectedNode');</code></pre>
+    </div>
 
-    <h5 id="functions-addnodeafter">addNodeAfter</h5>
-    <p>
-        <strong>function addNodeAfter(new_node_info, existing_node);</strong>
-    </p>
-    <p>
-        Add a new node after this existing node.
-    </p>
+    <div class="section">
+        <h5 id="functions-addnodeafter">addNodeAfter</h5>
+        <p>
+            <strong>function addNodeAfter(new_node_info, existing_node);</strong>
+        </p>
+        <p>
+            Add a new node after this existing node.
+        </p>
 
-<pre><code class="language-javascript">
-var node1 = $('#tree1', 'getNodeByName', 'node1');
+<pre><code class="language-javascript">var node1 = $('#tree1', 'getNodeByName', 'node1');
 $('#tree1').tree(
     'addNodeAfter',
     {
@@ -1069,25 +1077,28 @@ $('#tree1').tree(
     node1
 );
 </code></pre>
+    </div>
 
-    <h5 id="functions-addnodebefore">addNodeBefore</h5>
-    <p>
-        <strong>function addNodeBefore(new_node_info, existing_node);</strong>
-    </p>
-    <p>
-        Add a new node before this existing node.
-    </p>
+    <div class="section">
+        <h5 id="functions-addnodebefore">addNodeBefore</h5>
+        <p>
+            <strong>function addNodeBefore(new_node_info, existing_node);</strong>
+        </p>
+        <p>
+            Add a new node before this existing node.
+        </p>
+    </div>
 
-    <h5 id="functions-addparentnode">addParentNode</h5>
-    <p>
-        <strong>function addParentNode(new_node_info, existing_node);</strong>
-    </p>
-    <p>
-        Add a new node as parent of this existing node.
-    </p>
+    <div class="section">
+        <h5 id="functions-addparentnode">addParentNode</h5>
+        <p>
+            <strong>function addParentNode(new_node_info, existing_node);</strong>
+        </p>
+        <p>
+            Add a new node as parent of this existing node.
+        </p>
 
-<pre><code class="language-javascript">
-var node1 = $('#tree1', 'getNodeByName', 'node1');
+<pre><code class="language-javascript">var node1 = $('#tree1', 'getNodeByName', 'node1');
 $('#tree1').tree(
     'addParentNode',
     {
@@ -1097,29 +1108,30 @@ $('#tree1').tree(
     node1
 );
 </code></pre>
+    </div>
 
-    <h5 id="functions-removenode">removeNode</h5>
-    <p>
-        <strong>function removeNode(node);</strong>
-    </p>
-    <p>
-        Remove node from the tree.
-    </p>
+    <div class="section">
+        <h5 id="functions-removenode">removeNode</h5>
+        <p>
+            <strong>function removeNode(node);</strong>
+        </p>
+        <p>
+            Remove node from the tree.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree('removeNode', node);
-</code></pre>
+<pre><code class="language-javascript">$('#tree1').tree('removeNode', node);</code></pre>
+    </div>
 
-    <h5 id="functions-appendnode">appendNode</h5>
-    <p>
-        <strong>function appendNode(new_node_info, parent_node);</strong>
-    </p>
-    <p>
-        Add a node to this parent node. If <strong>parent_node</strong> is empty, then the new node becomes a root node.
-    </p>
+    <div class="section">
+        <h5 id="functions-appendnode">appendNode</h5>
+        <p>
+            <strong>function appendNode(new_node_info, parent_node);</strong>
+        </p>
+        <p>
+            Add a node to this parent node. If <strong>parent_node</strong> is empty, then the new node becomes a root node.
+        </p>
 
-<pre><code class="language-javascript">
-var parent_node = $tree.tree('getNodeById', 123);
+<pre><code class="language-javascript">var parent_node = $tree.tree('getNodeById', 123);
 
 $tree.tree(
     'appendNode',
@@ -1131,12 +1143,11 @@ $tree.tree(
 );
 </code></pre>
 
-    <p>
-        To add a root node, leave *parent_node* empty:
-    </p>
+        <p>
+            To add a root node, leave *parent_node* empty:
+        </p>
 
-<pre><code class="language-javascript">
-$tree.tree(
+<pre><code class="language-javascript">$tree.tree(
     'appendNode',
     {
         label: 'new_node',
@@ -1144,35 +1155,35 @@ $tree.tree(
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="functions-updatenode">updateNode</h5>
+    <div class="section">
+        <h5 id="functions-updatenode">updateNode</h5>
 
-    <p>
-        <strong>function updateNode(node, label);</strong>
-        <br>
-        <strong>function updateNode(node, data);</strong>
-    </p>
+        <p>
+            <strong>function updateNode(node, label);</strong>
+            <br>
+            <strong>function updateNode(node, data);</strong>
+        </p>
 
-    <p>
-        Update the title of a node. You can also update the data.
-    </p>
+        <p>
+            Update the title of a node. You can also update the data.
+        </p>
 
-    <p>
-        Update the label:
-    </p>
+        <p>
+            Update the label:
+        </p>
 
-<pre><code class="language-javascript">
-var node = $tree.tree('getNodeById', 123);
+<pre><code class="language-javascript">var node = $tree.tree('getNodeById', 123);
 
 $tree.tree('updateNode', node, 'new label');
 </code></pre>
 
-    <p>
-        Update the data (including the label)
-    </p>
+        <p>
+            Update the data (including the label)
+        </p>
 
-<pre><code class="language-javascript">
-var node = $tree.tree('getNodeById', 123);
+<pre><code class="language-javascript">var node = $tree.tree('getNodeById', 123);
 
 $tree.tree(
     'updateNode',
@@ -1183,120 +1194,130 @@ $tree.tree(
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="functions-movenode">moveNode</h5>
+    <div class="section">
+        <h5 id="functions-movenode">moveNode</h5>
 
-    <p>
-        <strong>function moveNode(node, target_node, position);</strong>
-    </p>
+        <p>
+            <strong>function moveNode(node, target_node, position);</strong>
+        </p>
 
-    <p>
-        Move a node. Position can be 'before', 'after' or 'inside'.
-    </p>
+        <p>
+            Move a node. Position can be 'before', 'after' or 'inside'.
+        </p>
 
-<pre><code class="language-javascript">
-var node = $tree.tree('getNodeBydId', 1);
+<pre><code class="language-javascript">var node = $tree.tree('getNodeBydId', 1);
 var target_node = $tree.tree('getNodeBydId', 2);
 
 $tree.tree('moveNode', node, target_node, 'after');
 </code></pre>
+    </div>
 
-    <h5 id="functions-toggle">toggle</h5>
+    <div class="section">
+        <h5 id="functions-toggle">toggle</h5>
 
-    <p>
-        <strong>function toggle(node);</strong>
-        <br />
-        <strong>function toggle(node, slide);</strong>
-    </p>
+        <p>
+            <strong>function toggle(node);</strong>
+            <br />
+            <strong>function toggle(node, slide);</strong>
+        </p>
 
-    <p>
-        Open or close a node.
-        <br />
-        Parameter <strong>slide</strong>: use a slide animation (default is true).
-    </p>
+        <p>
+            Open or close a node.
+            <br />
+            Parameter <strong>slide</strong>: use a slide animation (default is true).
+        </p>
 
-<pre><code class="language-javascript">
-var node = $tree.tree('getNodeBydId', 1);
+<pre><code class="language-javascript">var node = $tree.tree('getNodeBydId', 1);
 $tree.tree('toggle', node);
 </code></pre>
+    </div>
 
-    <h5 id="functions-scrolltonode">scrollToNode</h5>
+    <div class="section">
+        <h5 id="functions-scrolltonode">scrollToNode</h5>
 
-    <p>
-        <strong>function scrollToNode(node);</strong>
-    </p>
+        <p>
+            <strong>function scrollToNode(node);</strong>
+        </p>
 
-    <p>
-        Scroll to this node. This is useful if the tree is in a container div and is scrollable.
-    </p>
+        <p>
+            Scroll to this node. This is useful if the tree is in a container div and is scrollable.
+        </p>
 
-<pre><code class="language-javascript">
-var node = $tree.tree('getNodeBydId', 1);
+<pre><code class="language-javascript">var node = $tree.tree('getNodeBydId', 1);
 $tree.tree('scrollToNode', node);
 </code></pre>
+    </div>
 
-    <h5 id="functions-getstate">getState</h5>
+    <div class="section">
+        <h5 id="functions-getstate">getState</h5>
 
-    <p>
-        <strong>function getState();</strong>
-    </p>
+        <p>
+            <strong>function getState();</strong>
+        </p>
 
-    <p>
-        Get the state of tree: which nodes are open and which one is selected?
-    </p>
+        <p>
+            Get the state of tree: which nodes are open and which one is selected?
+        </p>
+    </div>
 
-    <h5 id="functions-setstate">setState</h5>
+    <div class="section">
+        <h5 id="functions-setstate">setState</h5>
 
-    <p>
-        <strong>function setState(state);</strong>
-    </p>
+        <p>
+            <strong>function setState(state);</strong>
+        </p>
 
-    <p>
-        Set the state of the tree: which nodes are open and which one is selected?
-    </p>
+        <p>
+            Set the state of the tree: which nodes are open and which one is selected?
+        </p>
+    </div>
 
-    <h5 id="functions-gettree">getTree</h5>
+    <div class="section">
+        <h5 id="functions-gettree">getTree</h5>
 
-    <p>
-        <strong>function getTree();</strong>
-    </p>
+        <p>
+            <strong>function getTree();</strong>
+        </p>
 
-    <p>
-        Get the root node of the tree.
-    </p>
+        <p>
+            Get the root node of the tree.
+        </p>
+    </div>
 
-    <h5 id="functions-setoption">setOption</h5>
+    <div class="section">
+        <h5 id="functions-setoption">setOption</h5>
 
-    <p>
-        <strong>function setOption(option, value);</strong>
-    </p>
+        <p>
+            <strong>function setOption(option, value);</strong>
+        </p>
 
-    <p>
-        Set a tree option. These are the same options that you can set when creating the tree.
-    </p>
+        <p>
+            Set a tree option. These are the same options that you can set when creating the tree.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').tree('setOption', 'keyboardSupport', false);
-</code></pre>
+<pre><code class="language-javascript">$('#tree1').tree('setOption', 'keyboardSupport', false);</code></pre>
+    </div>
 
-    <h4 id="events">Events</h4>
+    <div class="section">
+        <h4 id="events">Events</h4>
 
-    <h5 id="event-tree-click">tree.click</h5>
+        <h5 id="event-tree-click">tree.click</h5>
 
-    <p>
-        Triggered when a tree node is clicked. The event contains the following properties:
-    </p>
-    <ul>
-        <li>
-            <strong>node</strong>: the node that is clicked on
-        </li>
-        <li>
-            <strong>click_event</strong>: the original click event
-        </li>
-    </ul>
+        <p>
+            Triggered when a tree node is clicked. The event contains the following properties:
+        </p>
+        <ul>
+            <li>
+                <strong>node</strong>: the node that is clicked on
+            </li>
+            <li>
+                <strong>click_event</strong>: the original click event
+            </li>
+        </ul>
 
-<pre><code class="language-javascript">
-// create tree
+<pre><code class="language-javascript">// create tree
 $('#tree1').tree({
     data: data
 });
@@ -1312,36 +1333,36 @@ $('#tree1').bind(
 );
 </code></pre>
 
-    <p>
-        The default action is to select the node. You can prevent the selection by calling
-        <strong>preventDefault</strong>:
-    </p>
+        <p>
+            The default action is to select the node. You can prevent the selection by calling
+            <strong>preventDefault</strong>:
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.click',
     function(event) {
         event.preventDefault();
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="event-tree-dblclick">tree.dblclick</h5>
+    <div class="section">
+        <h5 id="event-tree-dblclick">tree.dblclick</h5>
 
-    <p>
-        The <strong>tree.dblclick</strong> is fired when a tree node is double-clicked. The event contains the following properties:
-    </p>
-    <ul>
-        <li>
-            <strong>node</strong>: the node that is clicked on
-        </li>
-        <li>
-            <strong>click_event</strong>: the original click event
-        </li>
-    </ul>
+        <p>
+            The <strong>tree.dblclick</strong> is fired when a tree node is double-clicked. The event contains the following properties:
+        </p>
+        <ul>
+            <li>
+                <strong>node</strong>: the node that is clicked on
+            </li>
+            <li>
+                <strong>click_event</strong>: the original click event
+            </li>
+        </ul>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.dblclick',
     function(event) {
         // e.node is the clicked node
@@ -1349,19 +1370,20 @@ $('#tree1').bind(
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="event-tree-select">tree.select</h5>
+    <div class="section">
+        <h5 id="event-tree-select">tree.select</h5>
 
-    <p>
-        Triggered when a tree node is selected or deselected.
-        <br>
-        If a node is selected, then <strong>event.node</strong> contains the selected node.
-        <br>
-        If a node is deselected, then the <strong>event.node</strong> property is null.
-    </p>
+        <p>
+            Triggered when a tree node is selected or deselected.
+            <br>
+            If a node is selected, then <strong>event.node</strong> contains the selected node.
+            <br>
+            If a node is deselected, then the <strong>event.node</strong> property is null.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.select',
     function(event) {
         if (event.node) {
@@ -1377,17 +1399,18 @@ $('#tree1').bind(
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="event-tree-contextmenu">tree.contextmenu</h5>
-    <p>
-        Triggered when the user right-clicks a tree node. The event contains the following properties:
-    </p>
-    <ul>
-        <li><strong>node</strong>: the node that is clicked on</li>
-        <li><strong>click_event</strong>: the original click event</li>
-    </ul>
-<pre><code class="language-javascript">
-// bind 'tree.contextmenu' event
+    <div class="section">
+        <h5 id="event-tree-contextmenu">tree.contextmenu</h5>
+        <p>
+            Triggered when the user right-clicks a tree node. The event contains the following properties:
+        </p>
+        <ul>
+            <li><strong>node</strong>: the node that is clicked on</li>
+            <li><strong>click_event</strong>: the original click event</li>
+        </ul>
+<pre><code class="language-javascript">// bind 'tree.contextmenu' event
 $('#tree1').bind(
     'tree.contextmenu',
     function(event) {
@@ -1397,23 +1420,24 @@ $('#tree1').bind(
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="event-tree-move">tree.move</h5>
-    <p>
-        Triggered when the user moves a node.
-    </p>
-    <p>
-         Event.move_info contains:
-    <p>
-    <ul>
-        <li>moved_node</li>
-        <li>target_node</li>
-        <li>position: (before, after or inside)</li>
-        <li>previous_parent</li>
-    </ul>
+    <div class="section">
+        <h5 id="event-tree-move">tree.move</h5>
+        <p>
+            Triggered when the user moves a node.
+        </p>
+        <p>
+             Event.move_info contains:
+        <p>
+        <ul>
+            <li>moved_node</li>
+            <li>target_node</li>
+            <li>position: (before, after or inside)</li>
+            <li>previous_parent</li>
+        </ul>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     data: data,
     dragAndDrop: true
 });
@@ -1429,12 +1453,11 @@ $('#tree1').bind(
 );
 </code></pre>
 
-    <p>
-        You can prevent the move by calling <strong>event.preventDefault()</strong>
-    </p>
+        <p>
+            You can prevent the move by calling <strong>event.preventDefault()</strong>
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.move',
     function(event) {
         event.preventDefault();
@@ -1442,12 +1465,11 @@ $('#tree1').bind(
 );
 </code></pre>
 
-    <p>
-        You can later call <strong>event.move_info.move_info.do_move()</strong> to move the node. This way you can ask the user before moving the node:
-    </p>
+        <p>
+            You can later call <strong>event.move_info.move_info.do_move()</strong> to move the node. This way you can ask the user before moving the node:
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.move',
     function(event) {
         event.preventDefault();
@@ -1459,12 +1481,11 @@ $('#tree1').bind(
 );
 </code></pre>
 
-    <p>
-        Note that if you want to serialise the tree, for example to POST back to a server, you need to let tree complete the move first:
-    </p>
+        <p>
+            Note that if you want to serialise the tree, for example to POST back to a server, you need to let tree complete the move first:
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.move',
     function(event)
     {
@@ -1475,132 +1496,139 @@ $('#tree1').bind(
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="event-tree-init">tree.init</h5>
-    <p>
-        Called when the tree is initialized. This is particularly useful when the data is loaded from the server.
-    </p>
+    <div class="section">
+        <h5 id="event-tree-init">tree.init</h5>
+        <p>
+            Called when the tree is initialized. This is particularly useful when the data is loaded from the server.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.init',
     function() {
         // initializing code
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="event-tree-open">tree.open</h5>
-    <p>
-        Called when a node is opened.
-    </p>
+    <div class="section">
+        <h5 id="event-tree-open">tree.open</h5>
+        <p>
+            Called when a node is opened.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.open',
     function(e) {
         console.log(e.node);
     }
 );
 </code></pre>
+    </div>
 
-    <h5 id="event-tree-close">tree.close</h5>
-    <p>
-        Called when a node is closed.
-    </p>
+    <div class="section">
+        <h5 id="event-tree-close">tree.close</h5>
+        <p>
+            Called when a node is closed.
+        </p>
 
-<pre><code class="language-javascript">
-$('#tree1').bind(
+<pre><code class="language-javascript">$('#tree1').bind(
     'tree.close',
     function(e) {
         console.log(e.node);
     }
 );
 </code></pre>
+    </div>
 
-    <h4 id="multiple-selection">Multiple selection</h4>
+    <div class="section">
+        <h4 id="multiple-selection">Multiple selection</h4>
 
-    <p>
-        Jqtree has some functions that can help you to implement multiple selection. See
-        <a href="examples/multiple_select.html">Example 8 - multiple select</a>.
-    </p>
-    <p>
-        In order for multiple selection to work, you must give the nodes an id.
-    </p>
+        <p>
+            Jqtree has some functions that can help you to implement multiple selection. See
+            <a href="examples/multiple_select.html">Example 8 - multiple select</a>.
+        </p>
+        <p>
+            In order for multiple selection to work, you must give the nodes an id.
+        </p>
+    </div>
 
-    <h5 id="multiple-selection-add-to-selection">addToSelection</h5>
+    <div class="section">
+        <h5 id="multiple-selection-add-to-selection">addToSelection</h5>
 
-    <p>
-        Add this node to the selection
-    </p>
+        <p>
+            Add this node to the selection
+        </p>
 
-<pre><code class="language-javascript">
-var node = $('#tree1').tree('getNodeById', 123);
+<pre><code class="language-javascript">var node = $('#tree1').tree('getNodeById', 123);
 $('#tree1').tree('addToSelection', node);
 </code></pre>
+    </div>
 
-    <h5 id="multiple-selection-get-selected-nodes">getSelectedNodes</h5>
+    <div class="section">
+        <h5 id="multiple-selection-get-selected-nodes">getSelectedNodes</h5>
 
-    <p>
-        Return a list of selected nodes.
-    </p>
+        <p>
+            Return a list of selected nodes.
+        </p>
 
-<pre><code class="language-javascript">
-var nodes = $('#tree1').tree('getSelectedNodes');
-</code></pre>
+<pre><code class="language-javascript">var nodes = $('#tree1').tree('getSelectedNodes');</code></pre>
+    </div>
 
-    <h5 id="multiple-selection-is-node-selected">isNodeSelected</h5>
+    <div class="section">
+        <h5 id="multiple-selection-is-node-selected">isNodeSelected</h5>
 
-    <p>
-        Return if this node is selected.
-    </p>
+        <p>
+            Return if this node is selected.
+        </p>
 
-<pre><code class="language-javascript">
-var node = $('#tree1').tree('getNodeById', 123);
+<pre><code class="language-javascript">var node = $('#tree1').tree('getNodeById', 123);
 var is_selected = $('#tree1').tree('isNodeSelected', node);
 </code></pre>
+    </div>
 
-    <h5 id="multiple-selection-remove-from-selection">removeFromSelection</h5>
+    <div class="section">
+        <h5 id="multiple-selection-remove-from-selection">removeFromSelection</h5>
 
-    <p>
-        Remove this node from the selection.
-    </p>
+        <p>
+            Remove this node from the selection.
+        </p>
 
-<pre><code class="language-javascript">
-var node = $('#tree1').tree('getNodeById', 123);
+<pre><code class="language-javascript">var node = $('#tree1').tree('getNodeById', 123);
 $('#tree1').tree('removeFromSelection', node);
 </code></pre>
+    </div>
 
-    <h4 id="node-functions">Node functions</h4>
+    <div class="section">
+        <h4 id="node-functions">Node functions</h4>
 
-    <p>
-        You can access a node using for example <a href="#functions-getnodebyid">getNodeById</a> function:
-    </p>
+        <p>
+            You can access a node using for example <a href="#functions-getnodebyid">getNodeById</a> function:
+        </p>
 
-<pre><code class="language-javascript">
-var node = $('#tree1').tree('getNodeById', 123);
-</code></pre>
+<pre><code class="language-javascript">var node = $('#tree1').tree('getNodeById', 123);</code></pre>
 
-    <p>
-        The Node object has the following properties and functions:
-    </p>
+        <p>
+            The Node object has the following properties and functions:
+        </p>
+    </div>
 
-    <h5 id="node-functions-parent">parent</h5>
-    <p>
-        You can access the parent of a node using the <strong>parent</strong> property.
-    </p>
+    <div class="section">
+        <h5 id="node-functions-parent">parent</h5>
+        <p>
+            You can access the parent of a node using the <strong>parent</strong> property.
+        </p>
 
-<pre><code class="language-javascript">
-var parent_node = node.parent;
-</code></pre>
+<pre><code class="language-javascript">var parent_node = node.parent;</code></pre>
 
     <h5 id="node-functions-children">children</h5>
     <p>
         You can access the children of a node using the <strong>children</strong> property.
     </p>
 
-<pre><code class="language-javascript">
-for (var i=0; i < node.children.length; i++) {
+<pre><code class="language-javascript">for (var i=0; i &lt; node.children.length; i++) {
     var child = node.children[i];
 }
 </code></pre>
@@ -1610,8 +1638,7 @@ for (var i=0; i < node.children.length; i++) {
         Get the level of a node. The level is distance of a node to the root node.
     </p>
 
-<pre><code class="language-javascript">
-var node = $('#tree1').tree('getNodeById', 123);
+<pre><code class="language-javascript">var node = $('#tree1').tree('getNodeById', 123);
 
 // result is e.g. 2
 var level = node.getLevel();
@@ -1622,27 +1649,21 @@ var level = node.getLevel();
         Get the previous sibling of this node. Returns a node or null.
     </p>
 
-<pre><code class="language-javascript">
-var level = node.getPreviousSibling();
-</code></pre>
+<pre><code class="language-javascript">var level = node.getPreviousSibling();</code></pre>
 
     <h5 id="node-functions-getnextsibling">getNextSibling</h5>
     <p>
         Get the next sibling of this node. Returns a node or null.
     </p>
 
-<pre><code class="language-javascript">
-var level = node.getNextSibling();
-</code></pre>
+<pre><code class="language-javascript">var level = node.getNextSibling();</code></pre>
 
     <h5 id="node-functions-getdata">getData</h5>
     <p>
         Get the subtree of this node.
     </p>
 
-<pre><code class="language-javascript">
-var data = node.getData();
-</code></pre>
+<pre><code class="language-javascript">var data = node.getData();</code></pre>
 
     <p>
         <a href="http://thenounproject.com/noun/tree/#icon-No2141" target="_blank">Tree icon</a>
