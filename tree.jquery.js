@@ -45,20 +45,32 @@ limitations under the License.
     };
 
     SimpleWidget.register = function(widget_class, widget_name) {
-      var callFunction, createWidget, destroyWidget, getDataKey;
+      var callFunction, createWidget, destroyWidget, getDataKey, getWidgetData;
       getDataKey = function() {
         return "simple_widget_" + widget_name;
       };
+      getWidgetData = function(el, data_key) {
+        var widget;
+        widget = $.data(el, data_key);
+        if (widget && (widget instanceof SimpleWidget)) {
+          return widget;
+        } else {
+          return null;
+        }
+      };
       createWidget = function($el, options) {
-        var data_key, el, widget, _i, _len;
+        var data_key, el, existing_widget, widget, _i, _len;
         data_key = getDataKey();
         for (_i = 0, _len = $el.length; _i < _len; _i++) {
           el = $el[_i];
-          widget = new widget_class(el, options);
-          if (!$.data(el, data_key)) {
-            $.data(el, data_key, widget);
+          existing_widget = getWidgetData(el, data_key);
+          if (!existing_widget) {
+            widget = new widget_class(el, options);
+            if (!$.data(el, data_key)) {
+              $.data(el, data_key, widget);
+            }
+            widget._init();
           }
-          widget._init();
         }
         return $el;
       };
@@ -68,8 +80,8 @@ limitations under the License.
         _results = [];
         for (_i = 0, _len = $el.length; _i < _len; _i++) {
           el = $el[_i];
-          widget = $.data(el, data_key);
-          if (widget && (widget instanceof SimpleWidget)) {
+          widget = getWidgetData(el, data_key);
+          if (widget) {
             widget.destroy();
           }
           _results.push($.removeData(el, data_key));
