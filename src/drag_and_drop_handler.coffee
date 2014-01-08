@@ -379,7 +379,7 @@ class HitAreasGenerator extends VisibleNodeIterator
         return hit_areas
 
     generateHitAreasForGroup: (hit_areas, positions_in_group, top, bottom) ->
-        area_height = (bottom - top) / positions_in_group.length
+        area_height = Math.round((bottom - top) / positions_in_group.length)
         area_top = top
 
         for position in positions_in_group

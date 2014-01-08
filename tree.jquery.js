@@ -2417,7 +2417,7 @@ limitations under the License.
 
     HitAreasGenerator.prototype.generateHitAreasForGroup = function(hit_areas, positions_in_group, top, bottom) {
       var area_height, area_top, position, _i, _len;
-      area_height = (bottom - top) / positions_in_group.length;
+      area_height = Math.round((bottom - top) / positions_in_group.length);
       area_top = top;
       for (_i = 0, _len = positions_in_group.length; _i < _len; _i++) {
         position = positions_in_group[_i];
