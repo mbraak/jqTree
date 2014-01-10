@@ -2271,7 +2271,7 @@ limitations under the License.
         _this = this;
       is_first_node = true;
       _iterateNode = function(node, next_node) {
-        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref3, _results;
+        var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref3;
         must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
         if (node.element) {
           $element = $(node.element);
@@ -2295,16 +2295,17 @@ limitations under the License.
         if (must_iterate_inside) {
           children_length = node.children.length;
           _ref3 = node.children;
-          _results = [];
           for (i = _i = 0, _len = _ref3.length; _i < _len; i = ++_i) {
             child = _ref3[i];
             if (i === (children_length - 1)) {
-              _results.push(_iterateNode(node.children[i], null));
+              _iterateNode(node.children[i], null);
             } else {
-              _results.push(_iterateNode(node.children[i], node.children[i + 1]));
+              _iterateNode(node.children[i], node.children[i + 1]);
             }
           }
-          return _results;
+          if (node.is_open) {
+            return _this.handleAfterOpenFolder(node, next_node, $element);
+          }
         }
       };
       return _iterateNode(this.tree, null);
@@ -2315,6 +2316,8 @@ limitations under the License.
     VisibleNodeIterator.prototype.handleOpenFolder = function(node, $element) {};
 
     VisibleNodeIterator.prototype.handleClosedFolder = function(node, next_node, $element) {};
+
+    VisibleNodeIterator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {};
 
     VisibleNodeIterator.prototype.handleFirstNode = function(node, $element) {};
 
@@ -2343,11 +2346,13 @@ limitations under the License.
     };
 
     HitAreasGenerator.prototype.addPosition = function(node, position, top) {
-      this.positions.push({
+      var area;
+      area = {
         top: top,
         node: node,
         position: position
-      });
+      };
+      this.positions.push(area);
       return this.last_top = top;
     };
 
@@ -2395,6 +2400,14 @@ limitations under the License.
       }
     };
 
+    HitAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {
+      if (node === this.current_node.node || next_node === this.current_node.node) {
+        return this.addPosition(node, Position.NONE, this.last_top);
+      } else {
+        return this.addPosition(node, Position.AFTER, this.last_top);
+      }
+    };
+
     HitAreasGenerator.prototype.generateHitAreas = function(positions) {
       var group, hit_areas, position, previous_top, _i, _len;
       previous_top = -1;
@@ -2416,11 +2429,13 @@ limitations under the License.
     };
 
     HitAreasGenerator.prototype.generateHitAreasForGroup = function(hit_areas, positions_in_group, top, bottom) {
-      var area_height, area_top, position, _i, _len;
-      area_height = Math.round((bottom - top) / positions_in_group.length);
+      var area_height, area_top, i, position, position_count;
+      position_count = Math.min(positions_in_group.length, 4);
+      area_height = Math.round((bottom - top) / position_count);
       area_top = top;
-      for (_i = 0, _len = positions_in_group.length; _i < _len; _i++) {
-        position = positions_in_group[_i];
+      i = 0;
+      while (i < position_count) {
+        position = positions_in_group[i];
         hit_areas.push({
           top: area_top,
           bottom: area_top + area_height,
@@ -2428,6 +2443,7 @@ limitations under the License.
           position: position.position
         });
         area_top += area_height;
+        i += 1;
       }
       return null;
     };
