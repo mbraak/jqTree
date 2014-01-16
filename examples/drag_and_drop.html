@@ -2,38 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Javascript tree with drag and drop</title>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="../extra/css/gridless.css">
-    <link rel="stylesheet" href="../extra/prism/prism.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../extra/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../extra/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../extra/bower_components/prism/themes/prism-okaidia.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <!--[if lt IE 9]>
-        <script src="../extra/js/jquery-1.10.2.min.js"></script>
-    <![endif]-->
-    <!--[if gte IE 9]><!-->
-        <script src="../extra/js/jquery-2.0.3.min.js"></script>
-    <!--<![endif]-->
-    <script src="../extra/prism/prism.js"></script>
-    <script src="../extra/js/jquery.mockjax.js"></script>
-    <script src="../extra/example_data.js"></script>
-    <script src="../extra/js/jquery.cookie.js"></script>
-    <script src="../tree.jquery.js"></script>
-    <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-33742133-1']);
-        _gaq.push(['_trackPageview']);
-
-        (function() {
-            var ga = document.createElement('script');
-            ga.type = 'text/javascript';
-            ga.async = true;
-            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(ga, s);
-        })();
-    </script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 </head>
 <body>
     <p id="nav">
@@ -69,6 +45,35 @@ $tree.tree({
   autoOpen: 0
 });
 </code></pre>
+
+
+<!--[if lt IE 9]>
+    <script src="../extra/jquery-1.10.2.min.js"></script>
+<![endif]-->
+<!--[if gte IE 9]><!-->
+    <script src="../extra/bower_components/jquery/jquery.min.js"></script>
+<!--<![endif]-->
+<script src="../extra/bower_components/prism/prism.js"></script>
+<script src="../extra/bower_components/jquery-mockjax/jquery.mockjax.js"></script>
+<script src="../extra/example_data.js"></script>
+<script src="../extra/bower_components/jquery-cookie/jquery.cookie.js"></script>
+<script src="../tree.jquery.js"></script>
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-33742133-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+
+
     <script>
         $.mockjax({
             url: '*',
@@ -86,6 +91,7 @@ $tree.tree({
             });
         });
     </script>
+
 
 </body>
 </html>
