@@ -14,9 +14,9 @@ h2, h3, body {
 #jqtree h1 {
   margin-bottom: 32px;
   font-weight: bold;
+  color: #0074D9;
 }
 
-#jqtree h1,
 #jqtree p {
   color: #fff;
 }
@@ -24,12 +24,16 @@ h2, h3, body {
 #jqtree .btn-primary {
   background-color: #001F3F;
   background-image: none;
-  border: solid 1px #fff;
-  color: #fff;
+  border: solid 1px #AAAAAA;
+  color: #AAAAAA;
 }
 
 #jqtree .btn-primary:hover {
   background-color: #001F3F;
+}
+
+#jqtree strong {
+  color: #F012BE;
 }
 
 /* sidebar */
@@ -132,4 +136,15 @@ h2, h3, body {
 /* code */
 pre {
   background: #000;
+}
+
+/* demo tree */
+
+#tree1 {
+  background-color: #DDDDDD;
+  padding: 8px 16px;
+}
+
+pre.demo-code {
+  margin-top: 0;
 }
