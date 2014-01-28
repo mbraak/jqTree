@@ -44,7 +44,7 @@ class DragAndDropHandler
         area = @findHoveredArea(position_info.page_x, position_info.page_y)
         can_move_to = @canMoveToArea(area)
 
-        if area
+        if can_move_to and area
             if @hovered_area != area
                 @hovered_area = area
 
@@ -52,8 +52,7 @@ class DragAndDropHandler
                 if @mustOpenFolderTimer(area)
                     @startOpenFolderTimer(area.node)
 
-                if can_move_to
-                    @updateDropHint()
+                @updateDropHint()
         else
             @removeHover()
             @removeDropHint()

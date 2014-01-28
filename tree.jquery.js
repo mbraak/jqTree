@@ -2083,15 +2083,13 @@ limitations under the License.
       this.drag_element.move(position_info.page_x, position_info.page_y);
       area = this.findHoveredArea(position_info.page_x, position_info.page_y);
       can_move_to = this.canMoveToArea(area);
-      if (area) {
+      if (can_move_to && area) {
         if (this.hovered_area !== area) {
           this.hovered_area = area;
           if (this.mustOpenFolderTimer(area)) {
             this.startOpenFolderTimer(area.node);
           }
-          if (can_move_to) {
-            this.updateDropHint();
-          }
+          this.updateDropHint();
         }
       } else {
         this.removeHover();
