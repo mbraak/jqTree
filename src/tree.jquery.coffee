@@ -307,7 +307,7 @@ class JqTreeWidget extends MouseWidget
             @tree.addNodeToIndex(node)
 
         @_refreshElements(node.parent)
-        @._selectCurrentNode()
+        @_selectCurrentNode()
 
     moveNode: (node, target_node, position) ->
         position_index = Position.nameToIndex(position)
