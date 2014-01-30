@@ -13,7 +13,6 @@ h2, h3, body {
 
 #jqtree h1 {
   margin-bottom: 32px;
-  font-weight: bold;
   color: #0074D9;
 }
 
@@ -22,18 +21,25 @@ h2, h3, body {
 }
 
 #jqtree .btn-primary {
-  background-color: #001F3F;
-  background-image: none;
-  border: solid 1px #AAAAAA;
-  color: #AAAAAA;
+  background: #FFDC00;
+  border: solid 1px #FFDC00;
+  color: #001F3F;
 }
 
 #jqtree .btn-primary:hover {
-  background-color: #001F3F;
+  background-color: #FFDC00;
 }
 
 #jqtree strong {
   color: #F012BE;
+}
+
+#jqtree strong.title {
+  color: #0074D9;
+}
+
+#jqtree h1 .second {
+  font-weight: bold;
 }
 
 /* sidebar */

@@ -1,7 +1,12 @@
 $(function() {
     var $menu = $('#menu');
     var $body = $('body');
+    var $h1 = $('#jqtree h1');
 
+    // title
+    $h1.html("<span class=\"first\">jq</span><span class=\"second\">Tree</span>")
+
+    // menu
     $menu.affix({
         offset: {
             top: $menu.offset().top,
@@ -9,6 +14,7 @@ $(function() {
         }
     });
 
+    // demo tree
     var data = [
         {
             label: 'node1',
@@ -33,6 +39,7 @@ $(function() {
         dragAndDrop: true
     });
 
+    // code styling
     Prism.highlightAll(
         false,
         function() {
