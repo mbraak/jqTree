@@ -7,6 +7,7 @@
         "tree.jquery.js"
     ],
     "dependencies": {
-        "jquery": ">=1.5"
+        "jquery": ">=1.5",
+	"laconic": ">=0.2.2"
     }
 }

@@ -67,7 +67,7 @@ class ElementsRenderer
         else
             class_string = ''
 
-        return $("<ul class=\"jqtree_common #{ class_string }\"></ul>")
+        return $($.el.ul('class': "jqtree_common #{ class_string }"))
 
     createLi: (node) ->
         if node.isFolder()
@@ -84,16 +84,12 @@ class ElementsRenderer
         button_classes = @getButtonClasses(node)
         folder_classes = @getFolderClasses(node)
 
-        escaped_name = @escapeIfNecessary(node.name)
-
         if node.is_open
             button_char = @tree_widget.options.openedIcon
         else
             button_char = @tree_widget.options.closedIcon
 
-        return $(
-            "<li class=\"jqtree_common #{ folder_classes }\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
-        )
+        return $($.el.li('class': "jqtree_common #{ folder_classes }", $.el.div('class': 'jqtree-element jqtree_common', $.el.a('class': "jqtree_common #{ button_classes }", button_char), $.el.span('class': "jqtree_common jqtree-title", node.name))))
 
     createNodeLi: (node) ->
         li_classes = ['jqtree_common']
@@ -103,11 +99,7 @@ class ElementsRenderer
 
         class_string = li_classes.join(' ')
 
-        escaped_name = @escapeIfNecessary(node.name)
-
-        return $(
-            "<li class=\"#{ class_string }\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>"
-        )
+        return $($.el.li('class': class_string, $.el.div('class': 'jqtree-element jqtree_common', $.el.span('class': 'jqtree-title jqtree_common', node.name))))
 
     getButtonClasses: (node) ->
         classes = ['jqtree-toggler']
