@@ -32,8 +32,8 @@ class JqTreeWidget extends MouseWidget
         onLoadFailed: null
         autoEscape: true
         dataUrl: null
-        closedIcon: '&#x25ba;'  # The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
-        openedIcon: '&#x25bc;'  # The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
+        closedIcon: String.fromCharCode(0x25ba) # '&#x25ba;'  # The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER  http://www.fileformat.info/info/unicode/char/25ba/index.htm
+        openedIcon: String.fromCharCode(0x25bc) # '&#x25bc;'  # The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE  http://www.fileformat.info/info/unicode/char/25bc/index.htm
         slide: true  # must display slide animation?
         nodeClass: Node
         dataFilter: null
