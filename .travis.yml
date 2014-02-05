@@ -5,4 +5,4 @@ before_script:
   - npm install connect
   - node phantomjs/server.js &
   - sleep 5
-script: phantomjs extra/bower_components/qunit/addons/phantomjs/runner.js http://localhost:8000/test/test.html
+script: phantomjs extra/bower_components/qunit-phantomjs-runner/runner.js http://localhost:8000/test/test.html
