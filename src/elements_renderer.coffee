@@ -2,6 +2,9 @@ class ElementsRenderer
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
 
+        @opened_icon_text = @getHtmlText(tree_widget.options.openedIcon)
+        @closed_icon_text = @getHtmlText(tree_widget.options.closedIcon)
+
     render: (from_node) ->
         if from_node and from_node.parent
             @renderFromNode(from_node)
@@ -34,32 +37,32 @@ class ElementsRenderer
         $element = @tree_widget.element
         $element.empty()
 
-        @createDomElements($element, @tree_widget.tree.children, true, true)
+        @createDomElements($element[0], @tree_widget.tree.children, true, true)
 
     renderFromNode: (from_node) ->
         node_element = @tree_widget._getNodeElementForNode(from_node)
         node_element.getUl().remove()
 
-        @createDomElements(node_element.$element, from_node.children, false, false)
+        @createDomElements(node_element.$element[0], from_node.children, false, false)
 
-    createDomElements: ($element, children, is_root_node, is_open) ->
-        $ul = @createUl(is_root_node)
-        $element.append($ul)
+    createDomElements: (element, children, is_root_node, is_open) ->
+        ul = @createUl(is_root_node)
+        element.appendChild(ul)
 
         for child in children
-            $li = @createLi(child)
-            $ul.append($li)
+            li = @createLi(child)
+            ul.appendChild(li)
 
-            @attachNodeData(child, $li)
+            @attachNodeData(child, li)
 
             if child.hasChildren()
-                @createDomElements($li, child.children, false, child.is_open)
+                @createDomElements(li, child.children, false, child.is_open)
 
         return null
 
-    attachNodeData: (node, $li) ->
-        node.element = $li[0]
-        $li.data('node', node)
+    attachNodeData: (node, li) ->
+        node.element = li
+        $(li).data('node', node)
 
     createUl: (is_root_node) ->
         if is_root_node
@@ -67,18 +70,21 @@ class ElementsRenderer
         else
             class_string = ''
 
-        return $("<ul class=\"jqtree_common #{ class_string }\"></ul>")
+        ul = document.createElement('ul')
+        ul.className = "jqtree_common #{ class_string }"
+
+        return ul
 
     createLi: (node) ->
         if node.isFolder()
-            $li = @createFolderLi(node)
+            li = @createFolderLi(node)
         else
-            $li = @createNodeLi(node)
+            li = @createNodeLi(node)
 
         if @tree_widget.options.onCreateLi
-            @tree_widget.options.onCreateLi(node, $li)
+            @tree_widget.options.onCreateLi(node, $(li))
 
-        return $li
+        return li
 
     createFolderLi: (node) ->
         button_classes = @getButtonClasses(node)
@@ -87,13 +93,41 @@ class ElementsRenderer
         escaped_name = @escapeIfNecessary(node.name)
 
         if node.is_open
-            button_char = @tree_widget.options.openedIcon
+            button_char = @opened_icon_text
         else
-            button_char = @tree_widget.options.closedIcon
+            button_char = @closed_icon_text
 
-        return $(
-            "<li class=\"jqtree_common #{ folder_classes }\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
+        # li
+        li = document.createElement('li')
+        li.className = "jqtree_common #{ folder_classes }"
+
+        # div
+        div = document.createElement('div')
+        div.className = "jqtree-element jqtree_common"
+
+        li.appendChild(div)
+
+        # button link
+        button_link = document.createElement('a')
+        button_link.className = "jqtree_common #{ button_classes }"
+
+        button_link.appendChild(
+            document.createTextNode(button_char)
         )
+
+        div.appendChild(button_link)
+
+        # title span
+        title_span = document.createElement('span')
+        title_span.className = "jqtree_common jqtree-title"
+
+        div.appendChild(title_span)
+
+        title_span.appendChild(
+            document.createTextNode(escaped_name)
+        )
+
+        return li
 
     createNodeLi: (node) ->
         li_classes = ['jqtree_common']
@@ -105,9 +139,27 @@ class ElementsRenderer
 
         escaped_name = @escapeIfNecessary(node.name)
 
-        return $(
-            "<li class=\"#{ class_string }\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>"
+        # li
+        li = document.createElement('li')
+        li.className = class_string
+
+        # div
+        div = document.createElement('div')
+        div.className = "jqtree-element jqtree_common"
+
+        li.appendChild(div)
+
+        # title span
+        title_span = document.createElement('span')
+        title_span.className = "jqtree-title jqtree_common"
+
+        title_span.appendChild(
+            document.createTextNode(escaped_name)
         )
+
+        div.appendChild(title_span)
+
+        return li
 
     getButtonClasses: (node) ->
         classes = ['jqtree-toggler']
@@ -133,3 +185,6 @@ class ElementsRenderer
             return html_escape(value)
         else
             return value
+
+    getHtmlText: (entity_text) ->
+        return $(document.createElement('div')).html(entity_text).text()
