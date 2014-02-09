@@ -480,10 +480,10 @@ class BorderDropHint
         @$hint = $('<span class="jqtree-border"></span>')
         $div.append(@$hint)
 
-        @$hint.css({
-            width: width,
+        @$hint.css(
+            width: width
             height: $div.height() - 4
-        })
+        )
 
     remove: ->
         @$hint.remove()
