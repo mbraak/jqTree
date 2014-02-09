@@ -117,6 +117,9 @@ ul.jqtree-tree span.jqtree-border {
     -moz-border-radius: 6px;
     border-radius: 6px;
     margin: 0;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
 }
 
 ul.jqtree-tree .jqtree-element {
