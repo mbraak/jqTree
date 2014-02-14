@@ -118,6 +118,9 @@ class JqTreeWidget extends MouseWidget
 
         @_loadDataFromUrl(url, parent_node, on_finished)
 
+    reload: ->
+        @loadDataFromUrl()
+
     _loadDataFromUrl: (url_info, parent_node, on_finished) ->
         $el = null
 

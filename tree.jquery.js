@@ -1099,6 +1099,10 @@ limitations under the License.
       return this._loadDataFromUrl(url, parent_node, on_finished);
     };
 
+    JqTreeWidget.prototype.reload = function() {
+      return this.loadDataFromUrl();
+    };
+
     JqTreeWidget.prototype._loadDataFromUrl = function(url_info, parent_node, on_finished) {
       var $el, addLoadingClass, parseUrlInfo, removeLoadingClass;
       $el = null;
