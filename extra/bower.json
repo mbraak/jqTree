@@ -1,7 +1,7 @@
 {
     "name": "simpledatagrid",
     "dependencies": {
-        "bootstrap": "3.1.0",
+        "bootstrap": "3.1.1",
         "jquery": "2.1.0",
         "jquery-cookie": "v1.4.0",
         "jquery-mockjax": "1.5.3",
