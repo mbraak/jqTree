@@ -887,7 +887,7 @@ limitations under the License.
       title_span = document.createElement('span');
       title_span.className = "jqtree_common jqtree-title";
       div.appendChild(title_span);
-      title_span.appendChild(document.createTextNode(escaped_name));
+      title_span.innerHTML = escaped_name;
       return li;
     };
 
@@ -906,7 +906,7 @@ limitations under the License.
       li.appendChild(div);
       title_span = document.createElement('span');
       title_span.className = "jqtree-title jqtree_common";
-      title_span.appendChild(document.createTextNode(escaped_name));
+      title_span.innerHTML = escaped_name;
       div.appendChild(title_span);
       return li;
     };

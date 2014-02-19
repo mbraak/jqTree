@@ -123,9 +123,7 @@ class ElementsRenderer
 
         div.appendChild(title_span)
 
-        title_span.appendChild(
-            document.createTextNode(escaped_name)
-        )
+        title_span.innerHTML = escaped_name
 
         return li
 
@@ -153,9 +151,7 @@ class ElementsRenderer
         title_span = document.createElement('span')
         title_span.className = "jqtree-title jqtree_common"
 
-        title_span.appendChild(
-            document.createTextNode(escaped_name)
-        )
+        title_span.innerHTML = escaped_name
 
         div.appendChild(title_span)
 
