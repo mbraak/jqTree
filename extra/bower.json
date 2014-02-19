@@ -1,6 +1,7 @@
 {
     "name": "simpledatagrid",
     "dependencies": {
+        "blanket": "1.1.5",
         "bootstrap": "3.1.1",
         "jquery": "2.1.0",
         "jquery-cookie": "v1.4.0",
