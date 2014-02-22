@@ -1,4 +1,4 @@
-[![Travis Status](https://secure.travis-ci.org/mbraak/jqTree.png)](http://travis-ci.org/mbraak/jqTree)
+[![Travis Status](https://secure.travis-ci.org/mbraak/jqTree.png)](http://travis-ci.org/mbraak/jqTree) [![Coverage Status](https://coveralls.io/repos/mbraak/jqTree/badge.png?branch=dev)](https://coveralls.io/r/mbraak/jqTree?branch=dev)
 
 #jqTree
 
