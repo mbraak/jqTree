@@ -7,7 +7,6 @@
         "jquery-cookie": "v1.4.0",
         "jquery-mockjax": "1.5.3",
         "prism": "gh-pages",
-        "qunit": "1.14.0",
-        "qunit-phantomjs-runner": "jonkemp/qunit-phantomjs-runner"
+        "qunit": "1.14.0"
     }
 }

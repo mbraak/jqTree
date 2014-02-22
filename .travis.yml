@@ -2,7 +2,10 @@ language: node_js
 node_js:
   - 0.10
 before_script:
-  - npm install connect
+  - npm install connect coveralls
   - node phantomjs/server.js &
   - sleep 5
-script: phantomjs extra/bower_components/qunit-phantomjs-runner/runner.js http://localhost:8000/test/test.html
+script:
+  - rm -f data.lcov 
+  - phantomjs phantomjs/runner.js "http://localhost:8000/test/test.html?gruntReport&coverage"
+  - node node_modules/coveralls/bin/coveralls.js < data.lcov
