@@ -955,7 +955,8 @@ test('load on demand', function() {
                     label: 'child1'
                 }
             ];
-        }
+        },
+        logging: false
     });
 
     // -- open node
