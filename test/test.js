@@ -1479,7 +1479,7 @@ test('addAfter', function() {
 
     equal(formatNodes(tree.children), 'node1 node2');
 
-    // 1. Add 'node_b' after node2
+    // - Add 'node_b' after node2
     var node2 = tree.getNodeByName('node2');
     node2.addAfter('node_b');
 
@@ -1488,13 +1488,13 @@ test('addAfter', function() {
     var node_b = tree.getNodeByName('node_b');
     equal(node_b.name, 'node_b');
 
-    // 2. Add 'node_a' after node1
+    // - Add 'node_a' after node1
     var node1 = tree.getNodeByName('node1');
     node1.addAfter('node_a');
 
     equal(formatNodes(tree.children), 'node1 node_a node2 node_b');
 
-    // 3. Add 'node_c' after node_b; new node is an object
+    // - Add 'node_c' after node_b; new node is an object
     node_b.addAfter({
         label: 'node_c',
         id: 789
@@ -1504,6 +1504,9 @@ test('addAfter', function() {
     equal(node_c.id, 789);
 
     equal(formatNodes(tree.children), 'node1 node_a node2 node_b node_c');
+
+    // - Add after root node; this is not possible
+    equal(tree.addAfter('node_x'), null);
 });
 
 test('addBefore', function() {
@@ -1511,10 +1514,13 @@ test('addBefore', function() {
     var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
-    // 1. Add 'node_0' before node1
+    // - Add 'node_0' before node1
     var node1 = tree.getNodeByName('node1');
     node1.addBefore('node0');
     equal(formatNodes(tree.children), 'node0 node1 node2');
+
+    // - Add before root node; this is not possile
+    equal(tree.addBefore('x'), null);
 });
 
 test('addParent', function() {
@@ -1522,13 +1528,16 @@ test('addParent', function() {
     var tree = new Tree.Node(null, true);
     tree.loadFromData(example_data);
 
-    // 1. Add node 'root' as parent of node1
+    // - Add node 'root' as parent of node1
     // Note that node also becomes a child of 'root'
     var node1 = tree.getNodeByName('node1');
     node1.addParent('root');
 
     var root = tree.getNodeByName('root');
     equal(formatNodes(root.children), 'node1 node2');
+
+    // - Add parent to root node; not possible
+    equal(tree.addParent('x'), null);
 });
 
 test('remove', function() {
@@ -1677,6 +1686,41 @@ test('node with id 0', function() {
 
     equal(tree.getNodeById(0), undefined);
 });
+
+test('getPreviousSibling', function() {
+    // setup
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData(example_data);
+
+    // - getPreviousSibling
+    equal(
+        tree.getNodeByName('child2').getPreviousSibling().name,
+        'child1'
+    );
+    equal(tree.getPreviousSibling(), null);
+    equal(
+        tree.getNodeByName('child1').getPreviousSibling(),
+        null
+    );    
+});
+
+test('getNextSibling', function() {
+    // setup
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData(example_data);
+
+    // - getNextSibling
+    equal(
+        tree.getNodeByName('node1').getNextSibling().name,
+        'node2'
+    );
+    equal(
+        tree.getNodeByName('node2').getNextSibling(),
+        null
+    );
+    equal(tree.getNextSibling(), null);
+});
+
 
 module('util');
 
