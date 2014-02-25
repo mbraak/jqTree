@@ -45,7 +45,7 @@ class JqTreeWidget extends MouseWidget
             @closeNode(node, slide)
         else
             @openNode(node, slide)
-    
+
     getTree: ->
         return @tree
 
@@ -70,7 +70,7 @@ class JqTreeWidget extends MouseWidget
 
         saveState = =>
             if @options.saveState
-                @save_state_handler.saveState()            
+                @save_state_handler.saveState()
 
         if not node
             # Called with empty node -> deselect current node
@@ -164,7 +164,7 @@ class JqTreeWidget extends MouseWidget
                 if @options.dataFilter
                     data = @options.dataFilter(data)
 
-                removeLoadingClass()                
+                removeLoadingClass()
                 @_loadData(data, parent_node)
 
                 if on_finished and $.isFunction(on_finished)
@@ -257,8 +257,8 @@ class JqTreeWidget extends MouseWidget
 
     addParentNode: (new_node_info, existing_node) ->
         new_node = existing_node.addParent(new_node_info)
-        @_refreshElements(new_node.parent)  
-        return new_node    
+        @_refreshElements(new_node.parent)
+        return new_node
 
     removeNode: (node) ->
         parent = node.parent
@@ -285,7 +285,7 @@ class JqTreeWidget extends MouseWidget
             @_refreshElements(parent_node.parent)
 
         return node
- 
+
     prependNode: (new_node_info, parent_node) ->
         if not parent_node
             parent_node = @tree
@@ -469,11 +469,11 @@ class JqTreeWidget extends MouseWidget
 
         createUl = (is_root_node) =>
             if is_root_node
-                class_string = 'jqtree-tree'
+                class_string = 'jqtree-root'
             else
                 class_string = ''
 
-            return $("<ul class=\"jqtree_common #{ class_string }\"></ul>")
+            return $('<ul class="jqtree-tree #{ class_string }"></ul>')
 
         createLi = (node) =>
             if node.isFolder()
@@ -487,7 +487,7 @@ class JqTreeWidget extends MouseWidget
             return $li
 
         createNodeLi = (node) =>
-            li_classes = ['jqtree_common']
+            li_classes = ['jqtree-branch']
 
             if @select_node_handler and @select_node_handler.isNodeSelected(node)
                 li_classes.push('jqtree-selected')
@@ -496,7 +496,7 @@ class JqTreeWidget extends MouseWidget
 
             escaped_name = escapeIfNecessary(node.name)
             return $(
-                "<li class=\"#{ class_string }\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>"
+                '<li class="#{ class_string }"><div class="jqtree-element"><span class="jqtree-title">#{ escaped_name }</span></div></li>'
             )
 
         createFolderLi = (node) =>
@@ -530,7 +530,7 @@ class JqTreeWidget extends MouseWidget
                 button_char = @options.closedIcon
 
             return $(
-                "<li class=\"jqtree_common #{ folder_classes }\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
+                '<li class="jqtree-branch #{ folder_classes }"><div class="jqtree-element"><a class="#{ button_classes }">#{ button_char }</a><span class="jqtree-title">#{ escaped_name }</span></div></li>'
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->
@@ -708,7 +708,7 @@ class JqTreeWidget extends MouseWidget
     _deselectCurrentNode: ->
         node = @getSelectedNode()
         if node
-            @removeFromSelection(node)        
+            @removeFromSelection(node)
 
 SimpleWidget.register(JqTreeWidget, 'tree')
 
@@ -763,7 +763,7 @@ class FolderElement extends NodeElement
                 @getUl().slideDown('fast', doOpen)
             else
                 @getUl().show()
-                doOpen()                
+                doOpen()
 
     close: (slide=true) ->
         if @node.is_open
@@ -782,7 +782,7 @@ class FolderElement extends NodeElement
             else
                 @getUl().hide()
                 doClose()
-                
+
     getButton: ->
         return @$element.children('.jqtree-element').find('a.jqtree-toggler')
 

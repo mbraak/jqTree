@@ -105,7 +105,7 @@ class DragAndDropHandler
     generateHitAreas: ->
         hit_areas_generator = new HitAreasGenerator(
             @tree_widget.tree,
-            @current_item.node,            
+            @current_item.node,
             @getTreeDimensions().bottom
         )
         @hit_areas = hit_areas_generator.generate()
@@ -231,7 +231,7 @@ class VisibleNodeIterator
                 (node.is_open or not node.element) and node.hasChildren()
             )
 
-            if node.element                
+            if node.element
                 $element = $(node.element)
 
                 if not $element.is(':visible')
@@ -418,7 +418,7 @@ class GhostDropHint
         @$element = $element
 
         @node = node
-        @$ghost = $('<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span><span class="jqtree_common jqtree-line"></span></li>')
+        @$ghost = $('<li class="jqtree-branch jqtree-ghost"><span class="jqtree-circle"></span><span class="jqtree-line"></span></li>')
 
         if position == Position.AFTER
             @moveAfter()

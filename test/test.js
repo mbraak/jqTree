@@ -28,7 +28,7 @@ var example_data = [
             { label: 'child3', id: 127 }
         ]
     }
-    
+
 ];
 
 /*
@@ -106,8 +106,8 @@ test("create jqtree from data", function() {
         'number of children on level 0'
     );
     ok(
-        $('#tree1').children().is('ul.jqtree-tree'),
-        'first element is ul.jqtree-tree'
+        $('#tree1').children().is('ul.jqtree-tree.jqtree-root'),
+        'first element is ul.jqtree-tree.jqtree-root'
     );
     equal(
         $('#tree1 ul.jqtree-tree > li').length, 2,
@@ -455,7 +455,7 @@ test('selectNode when another node is selected', function() {
 
     var node1 = $tree.tree('getTree').children[0];
     var node2 = $tree.tree('getTree').children[1];
-    
+
 
     // -- select node 'node2'
     $tree.tree('selectNode', node2);
@@ -783,7 +783,7 @@ test('removeNode', function() {
     $tree.tree('loadData', example_data2);
 
     var c1 = $tree.tree('getNodeByName', 'c1');
-    
+
     $tree.tree('removeNode', c1);
 
     equal(
@@ -1096,7 +1096,7 @@ test('constructor', function() {
     equal(node.label, undefined);
     equal(node.children.length, 0);
     equal(node.parent, null);
-}); 
+});
 
 test("create tree from data", function() {
     function checkData(tree) {
@@ -1407,7 +1407,7 @@ test('moveNode', function() {
 });
 
 test('initFromData', function() {
-    var data = 
+    var data =
         {
             label: 'main',
             children: [
