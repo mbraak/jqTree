@@ -1347,7 +1347,7 @@ limitations under the License.
           } else {
             class_string = '';
           }
-          return $('<ul class="jqtree-tree #{ class_string }"></ul>');
+          return $("<ul class=\"jqtree-tree " + class_string + "\"></ul>");
         };
       })(this);
       createLi = (function(_this) {
@@ -1373,7 +1373,7 @@ limitations under the License.
           }
           class_string = li_classes.join(' ');
           escaped_name = escapeIfNecessary(node.name);
-          return $('<li class="#{ class_string }"><div class="jqtree-element"><span class="jqtree-title">#{ escaped_name }</span></div></li>');
+          return $("<li class=\"" + class_string + "\"><div class=\"jqtree-element\"><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
         };
       })(this);
       createFolderLi = (function(_this) {
@@ -1406,7 +1406,7 @@ limitations under the License.
           } else {
             button_char = _this.options.closedIcon;
           }
-          return $('<li class="jqtree-branch #{ folder_classes }"><div class="jqtree-element"><a class="#{ button_classes }">#{ button_char }</a><span class="jqtree-title">#{ escaped_name }</span></div></li>');
+          return $("<li class=\"jqtree-branch " + folder_classes + "\"><div class=\"jqtree-element\"><a class=\"" + button_classes + "\">" + button_char + "</a><span class=\"jqtree-title\">" + escaped_name + "</span></div></li>");
         };
       })(this);
       doCreateDomElements = function($element, children, is_root_node, is_open) {

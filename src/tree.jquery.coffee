@@ -473,7 +473,7 @@ class JqTreeWidget extends MouseWidget
             else
                 class_string = ''
 
-            return $('<ul class="jqtree-tree #{ class_string }"></ul>')
+            return $("<ul class=\"jqtree-tree #{ class_string }\"></ul>")
 
         createLi = (node) =>
             if node.isFolder()
@@ -496,7 +496,7 @@ class JqTreeWidget extends MouseWidget
 
             escaped_name = escapeIfNecessary(node.name)
             return $(
-                '<li class="#{ class_string }"><div class="jqtree-element"><span class="jqtree-title">#{ escaped_name }</span></div></li>'
+                "<li class=\"#{ class_string }\"><div class=\"jqtree-element\"><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         createFolderLi = (node) =>
@@ -530,7 +530,7 @@ class JqTreeWidget extends MouseWidget
                 button_char = @options.closedIcon
 
             return $(
-                '<li class="jqtree-branch #{ folder_classes }"><div class="jqtree-element"><a class="#{ button_classes }">#{ button_char }</a><span class="jqtree-title">#{ escaped_name }</span></div></li>'
+                "<li class=\"jqtree-branch #{ folder_classes }\"><div class=\"jqtree-element\"><a class=\"#{ button_classes }\">#{ button_char }</a><span class=\"jqtree-title\">#{ escaped_name }</span></div></li>"
             )
 
         doCreateDomElements = ($element, children, is_root_node, is_open) ->

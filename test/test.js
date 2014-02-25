@@ -110,7 +110,7 @@ test("create jqtree from data", function() {
         'first element is ul.jqtree-tree.jqtree-root'
     );
     equal(
-        $('#tree1 ul.jqtree-tree > li').length, 2,
+        $('#tree1 ul.jqtree-root > li').length, 2,
         'number of children on level 1'
     );
     ok(
