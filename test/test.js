@@ -1073,6 +1073,41 @@ test('multiple select', function() {
     );
 });
 
+test('keyboard', function() {
+    // setup
+    var $tree = $('#tree1');
+
+    function keyDown(key) {
+        $tree.trigger(
+            $.Event('keydown', { which: key })
+        );
+    }
+
+    $tree.tree({ data: example_data });
+
+    var node1 = $tree.tree('getNodeByName', 'node1');
+    $tree.tree('selectNode', node1);
+    equal(node1.is_open, undefined);
+
+    // - move down
+    keyDown(40);
+    equal($tree.tree('getSelectedNode').name, 'node2');
+
+    // - move up
+    keyDown(38);
+    equal($tree.tree('getSelectedNode').name, 'node1');
+
+    // - move right
+    keyDown(39);
+    equal(node1.is_open, true);
+    equal($tree.tree('getSelectedNode').name, 'node1');
+
+    // - move left
+    keyDown(37);
+    equal(node1.is_open, false);
+    equal($tree.tree('getSelectedNode').name, 'node1');
+});
+
 module("Tree");
 test('constructor', function() {
     // 1. Create node from string
