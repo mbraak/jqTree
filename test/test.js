@@ -1086,23 +1086,35 @@ test('keyboard', function() {
     $tree.tree({ data: example_data });
 
     var node1 = $tree.tree('getNodeByName', 'node1');
+
+    // select node1
     $tree.tree('selectNode', node1);
     equal(node1.is_open, undefined);
 
-    // - move down
+    // - move down; -> node2
     keyDown(40);
     equal($tree.tree('getSelectedNode').name, 'node2');
 
-    // - move up
+    // - move up; -> back to node1
     keyDown(38);
     equal($tree.tree('getSelectedNode').name, 'node1');
 
-    // - move right
+    // - move right; open node1
     keyDown(39);
     equal(node1.is_open, true);
     equal($tree.tree('getSelectedNode').name, 'node1');
 
-    // - move left
+    // - select child3 and move up -> node2
+    $tree.tree('selectNode', $tree.tree('getNodeByName', 'child3'));
+    keyDown(38);
+    equal($tree.tree('getSelectedNode').name, 'node2');
+
+    // - move up -> child2
+    keyDown(38);
+    equal($tree.tree('getSelectedNode').name, 'child2');
+
+    // - select node1 and move left ->  close
+    $tree.tree('selectNode', node1);
     keyDown(37);
     equal(node1.is_open, false);
     equal($tree.tree('getSelectedNode').name, 'node1');
