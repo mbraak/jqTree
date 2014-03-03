@@ -33,6 +33,7 @@ ul.jqtree-tree .jqtree-toggler {
     font-family: arial;  /* fix for ie9 */
     border-bottom: none;
     color: #333;
+    text-decoration: none;
 }
 
 ul.jqtree-tree .jqtree-toggler:hover {
