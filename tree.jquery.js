@@ -2828,7 +2828,7 @@ limitations under the License.
       })(this);
       moveRight = (function(_this) {
         return function() {
-          if (current_node.hasChildren() && !current_node.is_open) {
+          if (current_node.isFolder() && !current_node.is_open) {
             _this.tree_widget.openNode(current_node);
             return false;
           } else {
@@ -2838,7 +2838,7 @@ limitations under the License.
       })(this);
       moveLeft = (function(_this) {
         return function() {
-          if (current_node.hasChildren() && current_node.is_open) {
+          if (current_node.isFolder() && current_node.is_open) {
             _this.tree_widget.closeNode(current_node);
             return false;
           } else {

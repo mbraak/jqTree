@@ -43,14 +43,14 @@ class KeyHandler
             return selectNode(@getPreviousNode(current_node))
 
         moveRight = =>
-            if current_node.hasChildren() and not current_node.is_open
+            if current_node.isFolder() and not current_node.is_open
                 @tree_widget.openNode(current_node)
                 return false
             else
                 return true
 
         moveLeft = =>
-            if current_node.hasChildren() and current_node.is_open
+            if current_node.isFolder() and current_node.is_open
                 @tree_widget.closeNode(current_node)
                 return false
             else
