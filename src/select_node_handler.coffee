@@ -24,6 +24,22 @@ class SelectNodeHandler
 
             return selected_nodes
 
+    getSelectedNodesUnder: (parent) ->
+        if @selected_single_node
+            if parent.isParentOf(selected_single_node)
+                return @selected_single_node
+            else
+                return null
+        else
+            selected_nodes = []
+
+            for id of @selected_nodes
+                node = @tree_widget.getNodeById(id)
+                if node and parent.isParentOf(node)
+                    selected_nodes.push(node)
+
+            return selected_nodes
+
     isNodeSelected: (node) ->
         if node.id
             return @selected_nodes[node.id]

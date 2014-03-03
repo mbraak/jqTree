@@ -1188,7 +1188,7 @@ limitations under the License.
       if (!parent_node) {
         this._initTree(data);
       } else {
-        selected_nodes_under_parent = this.select_node_handler.getSelectedNodes(parent_node);
+        selected_nodes_under_parent = this.select_node_handler.getSelectedNodesUnder(parent_node);
         for (_i = 0, _len = selected_nodes_under_parent.length; _i < _len; _i++) {
           n = selected_nodes_under_parent[_i];
           this.select_node_handler.removeFromSelection(n);
@@ -2097,6 +2097,26 @@ limitations under the License.
         for (id in this.selected_nodes) {
           node = this.tree_widget.getNodeById(id);
           if (node) {
+            selected_nodes.push(node);
+          }
+        }
+        return selected_nodes;
+      }
+    };
+
+    SelectNodeHandler.prototype.getSelectedNodesUnder = function(parent) {
+      var id, node, selected_nodes;
+      if (this.selected_single_node) {
+        if (parent.isParentOf(selected_single_node)) {
+          return this.selected_single_node;
+        } else {
+          return null;
+        }
+      } else {
+        selected_nodes = [];
+        for (id in this.selected_nodes) {
+          node = this.tree_widget.getNodeById(id);
+          if (node && parent.isParentOf(node)) {
             selected_nodes.push(node);
           }
         }

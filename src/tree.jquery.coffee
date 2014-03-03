@@ -188,7 +188,7 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data)
         else
-            selected_nodes_under_parent = @select_node_handler.getSelectedNodes(parent_node)
+            selected_nodes_under_parent = @select_node_handler.getSelectedNodesUnder(parent_node)
             for n in selected_nodes_under_parent
                 @select_node_handler.removeFromSelection(n)
 
