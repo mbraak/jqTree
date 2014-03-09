@@ -33,10 +33,12 @@ ul.jqtree-tree .jqtree-toggler {
     font-family: arial;  /* fix for ie9 */
     border-bottom: none;
     color: #333;
+    text-decoration: none;
 }
 
 ul.jqtree-tree .jqtree-toggler:hover {
     color: #000;
+    text-decoration: none;
 }
 
 ul.jqtree-tree .jqtree-element {
@@ -116,6 +118,9 @@ ul.jqtree-tree span.jqtree-border {
     -moz-border-radius: 6px;
     border-radius: 6px;
     margin: 0;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
 }
 
 ul.jqtree-tree .jqtree-element {

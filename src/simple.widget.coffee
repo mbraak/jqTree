@@ -37,17 +37,28 @@ class SimpleWidget
         getDataKey = ->
             return "simple_widget_#{widget_name}"
 
+        getWidgetData = (el, data_key) ->
+            widget = $.data(el, data_key)
+
+            if widget and (widget instanceof SimpleWidget)
+                return widget
+            else
+                return null
+
         createWidget = ($el, options) ->
             data_key = getDataKey()
 
             for el in $el
-                widget = new widget_class(el, options)
+                existing_widget = getWidgetData(el, data_key)
 
-                if not $.data(el, data_key)
-                    $.data(el, data_key, widget)
+                if not existing_widget
+                    widget = new widget_class(el, options)
 
-                # Call init after setting data, so we can call methods
-                widget._init()
+                    if not $.data(el, data_key)
+                        $.data(el, data_key, widget)
+
+                    # Call init after setting data, so we can call methods
+                    widget._init()
 
             return $el
 
@@ -55,9 +66,9 @@ class SimpleWidget
             data_key = getDataKey()
 
             for el in $el
-                widget = $.data(el, data_key)
+                widget = getWidgetData(el, data_key)
 
-                if widget and (widget instanceof SimpleWidget)
+                if widget
                     widget.destroy()
 
                 $.removeData(el, data_key)

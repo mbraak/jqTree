@@ -32,14 +32,11 @@
 
     <h3>html</h3>
 
-<pre><code class="language-markup">
-&lt;div id="tree1" data-url="/nodes/"&gt;&lt;/div&gt;
-</code></pre>
+<pre><code class="language-markup">&lt;div id="tree1" data-url="/nodes/"&gt;&lt;/div&gt;</code></pre>
 
     <h3>javascript</h3>
 
-<pre><code class="language-javascript">
-$(function() {
+<pre><code class="language-javascript">$(function() {
     var $tree = $('#tree1');
     $tree.tree({
         data: ExampleData.example_data,
@@ -53,6 +50,10 @@ $(function() {
 
             var selected_node = e.node;
 
+            if (selected_node.id == undefined) {
+                console.log('The multiple selection functions require that nodes have an id');
+            }
+
             if ($tree.tree('isNodeSelected', selected_node)) {
                 $tree.tree('removeFromSelection', selected_node);
             }
@@ -63,7 +64,9 @@ $(function() {
     );
 });
 </code></pre>
+{% endblock %}
 
+{% block script %}
     <script>
         $(function() {
             var $tree = $('#tree1');
@@ -78,6 +81,10 @@ $(function() {
                     e.preventDefault();
 
                     var selected_node = e.node;
+
+                    if (selected_node.id == undefined) {
+                        console.log('The multiple selection functions require that nodes have an id');
+                    }
 
                     if ($tree.tree('isNodeSelected', selected_node)) {
                         $tree.tree('removeFromSelection', selected_node);

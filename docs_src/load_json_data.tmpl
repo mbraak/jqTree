@@ -23,14 +23,11 @@
 
     <h3>html<h3>
 
-<pre><code class="language-markup">
-&lt;div id="tree1"&gt;&lt;/div&gt;
-</code></pre>
+<pre><code class="language-markup">&lt;div id="tree1"&gt;&lt;/div&gt;</code></pre>
 
     <h3>javascript</h3>
 
-<pre><code class="language-javascript">
-var data = [
+<pre><code class="language-javascript">var data = [
     {
         label: 'node1',
         children: [
@@ -51,6 +48,9 @@ $('#tree1').tree({
 });
 </code></pre>
 
+{% endblock %}
+
+{% block script %}
     <script>
         $(function() {
             var data = [

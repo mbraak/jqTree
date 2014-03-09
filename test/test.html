@@ -3,23 +3,21 @@
 <head>
     <meta charset="utf-8">
     <title>jqTree - Test</title>
-    <link rel="stylesheet" href="../extra/qunit/qunit.css">
+    <link rel="stylesheet" href="../extra/bower_components/qunit/qunit/qunit.css">
     <link rel="stylesheet" href="../jqtree.css">
     <!--[if lt IE 9]>
-        <script src="../extra/js/jquery-1.10.2.min.js"></script>
+        <script src="../extra/jquery-1.11.0.min.js"></script>
     <![endif]-->
     <!--[if gte IE 9]><!-->
-        <script src="../extra/js/jquery-2.0.3.min.js"></script>
+        <script src="../extra/bower_components/jquery/jquery.min.js"></script>
     <!--<![endif]-->
-    <script src="../extra/qunit/qunit.js"></script>
-    <script src="../tree.jquery.js"></script>
-    <script src="../extra/js/jquery.mockjax.js"></script>
+    <script src="../extra/bower_components/qunit/qunit/qunit.js"></script>
+    <script src="../extra/bower_components/blanket/dist/qunit/blanket.js"></script>
+    <script src="../tree.jquery.js" data-cover></script>
+    <script src="../extra/bower_components/jquery-mockjax/jquery.mockjax.js"></script>
     <script src="test.js"></script>
 </head>
 <body>
-    <h1 id="qunit-header">QUnit tests of jqTree</h1>
-    <h2 id="qunit-banner"></h2>
-    <h2 id="qunit-userAgent"></h2>
-    <ol id="qunit-tests"></ol>
+    <div id="qunit"></div>
 </body>
 </html>

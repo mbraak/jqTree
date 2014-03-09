@@ -1,6 +1,4 @@
-[![Travis Status](https://secure.travis-ci.org/mbraak/jqTree.png)](http://travis-ci.org/mbraak/jqTree)
-
-[![Stories in Ready](https://badge.waffle.io/mbraak/jqtree.png?label=ready)](https://waffle.io/mbraak/jqtree)
+[![Travis Status](https://secure.travis-ci.org/mbraak/jqTree.png)](http://travis-ci.org/mbraak/jqTree) [![Coverage Status](https://coveralls.io/repos/mbraak/jqTree/badge.png?branch=dev)](https://coveralls.io/r/mbraak/jqTree?branch=dev) [![Bower version](https://badge.fury.io/bo/jqtree.png)](http://badge.fury.io/bo/jqtree)
 
 #jqTree
 

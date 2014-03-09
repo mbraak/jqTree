@@ -36,35 +36,42 @@
     </ul>
 
     <h3>first level of data</h3>
-<pre><code class="language-javascript">
-[
-  {
-    label: 'Saurischia',
-    id: 1,
-    load_on_demand: true
-  },
-  {
-    label: 'Ornithischians',
-    id: 23,
-    load_on_demand: true
-  }
+<pre><code class="language-javascript">[
+    {
+        "label": "node1",
+        "children": [
+            {
+                "label": "child1"
+            },
+            {
+                "label": "child2"
+            }
+        ]
+    },
+    {
+        "label": "node2",
+        "children": [
+            {
+                "label": "child3"
+            }
+        ]
+    }
 ]
 </code></pre>
 
     <h3>html</h3>
 
-<pre><code class="language-markup">
-&lt;div id="tree1" data-url="/nodes/"&gt;&lt;/div&gt;
-</code></pre>
+<pre><code class="language-markup">&lt;div id="tree1" data-url="/nodes/"&gt;&lt;/div&gt;</code></pre>
 
     <h3>javascript</h3>
 
-<pre><code class="language-javascript">
-$('#tree1').tree({
+<pre><code class="language-javascript">$('#tree1').tree({
     dragAndDrop: true
 });
 </code></pre>
+{% endblock %}
 
+{% block script %}
     <script>
         $.mockjax({
             url: '*',

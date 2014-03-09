@@ -118,6 +118,9 @@ class JqTreeWidget extends MouseWidget
 
         @_loadDataFromUrl(url, parent_node, on_finished)
 
+    reload: ->
+        @loadDataFromUrl()
+
     _loadDataFromUrl: (url_info, parent_node, on_finished) ->
         $el = null
 
@@ -185,7 +188,7 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data)
         else
-            selected_nodes_under_parent = @select_node_handler.getSelectedNodes(parent_node)
+            selected_nodes_under_parent = @select_node_handler.getSelectedNodesUnder(parent_node)
             for n in selected_nodes_under_parent
                 @select_node_handler.removeFromSelection(n)
 
@@ -306,8 +309,8 @@ class JqTreeWidget extends MouseWidget
         if id_is_changed
             @tree.addNodeToIndex(node)
 
-        @_refreshElements(node.parent)
-        @._selectCurrentNode()
+        @renderer.renderNode(node)
+        @_selectCurrentNode()
 
     moveNode: (node, target_node, position) ->
         position_index = Position.nameToIndex(position)
@@ -347,12 +350,17 @@ class JqTreeWidget extends MouseWidget
         @save_state_handler.setState(state)
         @_refreshElements()
 
+    setOption: (option, value) ->
+        @options[option] = value
+
     _init: ->
         super()
 
         @element = @$el
         @mouse_delay = 300
         @is_initialized = false
+
+        @renderer = new ElementsRenderer(this)
 
         if SaveStateHandler?
             @save_state_handler = new SaveStateHandler(this)
@@ -461,106 +469,7 @@ class JqTreeWidget extends MouseWidget
         )
 
     _refreshElements: (from_node=null) ->
-        escapeIfNecessary = (value) =>
-            if @options.autoEscape
-                return html_escape(value)
-            else
-                return value
-
-        createUl = (is_root_node) =>
-            if is_root_node
-                class_string = 'jqtree-tree'
-            else
-                class_string = ''
-
-            return $("<ul class=\"jqtree_common #{ class_string }\"></ul>")
-
-        createLi = (node) =>
-            if node.isFolder()
-                $li = createFolderLi(node)
-            else
-                $li = createNodeLi(node)
-
-            if @options.onCreateLi
-                @options.onCreateLi(node, $li)
-
-            return $li
-
-        createNodeLi = (node) =>
-            li_classes = ['jqtree_common']
-
-            if @select_node_handler and @select_node_handler.isNodeSelected(node)
-                li_classes.push('jqtree-selected')
-
-            class_string = li_classes.join(' ')
-
-            escaped_name = escapeIfNecessary(node.name)
-            return $(
-                "<li class=\"#{ class_string }\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">#{ escaped_name }</span></div></li>"
-            )
-
-        createFolderLi = (node) =>
-            getButtonClasses = ->
-                classes = ['jqtree-toggler']
-
-                if not node.is_open
-                    classes.push('jqtree-closed')
-
-                return classes.join(' ')
-
-            getFolderClasses = =>
-                classes = ['jqtree-folder']
-
-                if not node.is_open
-                    classes.push('jqtree-closed')
-
-                if @select_node_handler and @select_node_handler.isNodeSelected(node)
-                    classes.push('jqtree-selected')
-
-                return classes.join(' ')
-
-            button_classes = getButtonClasses()
-            folder_classes = getFolderClasses()
-
-            escaped_name = escapeIfNecessary(node.name)
-
-            if node.is_open
-                button_char = @options.openedIcon
-            else
-                button_char = @options.closedIcon
-
-            return $(
-                "<li class=\"jqtree_common #{ folder_classes }\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common #{ button_classes }\">#{ button_char }</a><span class=\"jqtree_common jqtree-title\">#{ escaped_name }</span></div></li>"
-            )
-
-        doCreateDomElements = ($element, children, is_root_node, is_open) ->
-            $ul = createUl(is_root_node)
-            $element.append($ul)
-
-            for child in children
-                $li = createLi(child)
-                $ul.append($li)
-
-                child.element = $li[0]
-                $li.data('node', child)
-
-                if child.hasChildren()
-                    doCreateDomElements($li, child.children, false, child.is_open)
-
-            return null
-
-        if from_node and from_node.parent
-            is_root_node = false
-            node_element = @_getNodeElementForNode(from_node)
-            node_element.getUl().remove()
-            $element = node_element.$element
-        else
-            from_node = @tree
-            $element = @element
-            $element.empty()
-            is_root_node = true
-
-        doCreateDomElements($element, from_node.children, is_root_node, is_root_node)
+        @renderer.render(from_node)
 
         @_triggerEvent('tree.refresh')
 
