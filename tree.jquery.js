@@ -1591,7 +1591,7 @@ limitations under the License.
 
     JqTreeWidget.prototype._getNode = function($element) {
       var $li;
-      $li = $element.closest('li');
+      $li = $element.closest('li.jqtree_common');
       if ($li.length === 0) {
         return null;
       } else {

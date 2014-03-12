@@ -529,7 +529,7 @@ class JqTreeWidget extends MouseWidget
         return null
 
     _getNode: ($element) ->
-        $li = $element.closest('li')
+        $li = $element.closest('li.jqtree_common')
         if $li.length == 0
             return null
         else
