@@ -629,6 +629,10 @@ class NodeElement
     init: (node, tree_widget) ->
         @node = node
         @tree_widget = tree_widget
+
+        if not node.element
+            node.element = @tree_widget.element
+
         @$element = $(node.element)
 
     getUl: ->

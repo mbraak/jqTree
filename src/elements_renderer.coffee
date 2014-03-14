@@ -17,7 +17,6 @@ class ElementsRenderer
 
         # create element
         parent_node_element = new NodeElement(node.parent, @tree_widget)
-        $parent_ul = parent_node_element.getUl()
 
         $li = @createLi(node)
         @attachNodeData(node, $li)

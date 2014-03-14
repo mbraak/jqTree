@@ -788,10 +788,9 @@ limitations under the License.
     };
 
     ElementsRenderer.prototype.renderNode = function(node) {
-      var $li, $parent_ul, parent_node_element, previous_node;
+      var $li, parent_node_element, previous_node;
       $(node.element).remove();
       parent_node_element = new NodeElement(node.parent, this.tree_widget);
-      $parent_ul = parent_node_element.getUl();
       $li = this.createLi(node);
       this.attachNodeData(node, $li);
       previous_node = node.getPreviousSibling();
@@ -1724,6 +1723,9 @@ limitations under the License.
     NodeElement.prototype.init = function(node, tree_widget) {
       this.node = node;
       this.tree_widget = tree_widget;
+      if (!node.element) {
+        node.element = this.tree_widget.element;
+      }
       return this.$element = $(node.element);
     };
 
