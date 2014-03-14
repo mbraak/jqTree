@@ -4,6 +4,8 @@
 
 JqTree is a tree widget. Read more in the [documentation](http://mbraak.github.io/jqTree/).
 
+![screenshot](https://raw.github.com/mbraak/jqTree/master/screenshot.png)
+
 ##Features
 
 * Create a tree from JSON data
