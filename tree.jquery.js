@@ -2653,12 +2653,12 @@ limitations under the License.
     function BorderDropHint($element) {
       var $div, width;
       $div = $element.children('.jqtree-element');
-      width = $element.width() - 4;
+      width = $element.width();
       this.$hint = $('<span class="jqtree-border"></span>');
       $div.append(this.$hint);
       this.$hint.css({
         width: width,
-        height: $div.height() - 4
+        height: $div.height() + 3
       });
     }
 
