@@ -884,7 +884,7 @@ limitations under the License.
       button_link.appendChild(document.createTextNode(button_char));
       div.appendChild(button_link);
       title_span = document.createElement('span');
-      title_span.className = "jqtree_common jqtree-title";
+      title_span.className = "jqtree_common jqtree-title jqtree-title-folder";
       div.appendChild(title_span);
       title_span.innerHTML = escaped_name;
       return li;

@@ -1,5 +1,5 @@
 ul.jqtree-tree {
-    margin-left: 12px;
+    margin-left: 0;
 }
 
 ul.jqtree-tree,
@@ -23,17 +23,10 @@ ul.jqtree-tree li.jqtree_common {
     list-style-type: none;
 }
 ul.jqtree-tree .jqtree-toggler {
-    display: block;
-    position: absolute;
-    left: -1.5em;
-    top: 30%;
-    *top: 0;  /* fix for ie7 */
-    font-size: 12px;
-    line-height: 12px;
-    font-family: arial;  /* fix for ie9 */
     border-bottom: none;
     color: #333;
     text-decoration: none;
+    margin-right: 0.5em;
 }
 
 ul.jqtree-tree .jqtree-toggler:hover {
@@ -45,9 +38,14 @@ ul.jqtree-tree .jqtree-element {
     cursor: pointer;
 }
 
-ul.jqtree-tree .jqtree-title {
+.jqtree-tree .jqtree-title {
     color: #1C4257;
     vertical-align: middle;
+    margin-left: 1.5em;
+}
+
+.jqtree-tree .jqtree-title.jqtree-title-folder {
+    margin-left: 0;
 }
 
 ul.jqtree-tree li.jqtree-folder {
@@ -56,10 +54,6 @@ ul.jqtree-tree li.jqtree-folder {
 
 ul.jqtree-tree li.jqtree-folder.jqtree-closed {
     margin-bottom: 1px;
-}
-
-ul.jqtree-tree li.jqtree-folder .jqtree-title {
-    margin-left: 0;
 }
 
 ul.jqtree-tree .jqtree-toggler.jqtree-closed {
@@ -114,18 +108,12 @@ ul.jqtree-tree span.jqtree-border {
     left: -2px;
     top: 0;
     border: solid 2px #0000ff;
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
     margin: 0;
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
     box-sizing: content-box;
 }
 
 ul.jqtree-tree .jqtree-element {
-    width: 100%; /* todo: why is this in here? */
-    *width: auto; /* ie7 fix; issue 41 */
     position: relative;
 }
 
