@@ -663,7 +663,8 @@ class FolderElement extends NodeElement
             @node.is_open = true
             $button = @getButton()
             $button.removeClass('jqtree-closed')
-            $button.html(@tree_widget.options.openedIcon)
+            $button.html('')
+            $button.append(@tree_widget.renderer.opened_icon_element.cloneNode())
 
             doOpen = =>
                 @getLi().removeClass('jqtree-closed')
@@ -683,7 +684,8 @@ class FolderElement extends NodeElement
             @node.is_open = false
             $button = @getButton()
             $button.addClass('jqtree-closed')
-            $button.html(@tree_widget.options.closedIcon)
+            $button.html('')
+            $button.append(@tree_widget.renderer.closed_icon_element.cloneNode())
 
             doClose = =>
                 @getLi().addClass('jqtree-closed')

@@ -775,8 +775,8 @@ limitations under the License.
   ElementsRenderer = (function() {
     function ElementsRenderer(tree_widget) {
       this.tree_widget = tree_widget;
-      this.opened_icon_text = this.getHtmlText(tree_widget.options.openedIcon);
-      this.closed_icon_text = this.getHtmlText(tree_widget.options.closedIcon);
+      this.opened_icon_element = this.createButtonElement(tree_widget.options.openedIcon);
+      this.closed_icon_element = this.createButtonElement(tree_widget.options.closedIcon);
     }
 
     ElementsRenderer.prototype.render = function(from_node) {
@@ -788,16 +788,16 @@ limitations under the License.
     };
 
     ElementsRenderer.prototype.renderNode = function(node) {
-      var $li, parent_node_element, previous_node;
+      var li, parent_node_element, previous_node;
       $(node.element).remove();
       parent_node_element = new NodeElement(node.parent, this.tree_widget);
-      $li = this.createLi(node);
-      this.attachNodeData(node, $li);
+      li = this.createLi(node);
+      this.attachNodeData(node, li);
       previous_node = node.getPreviousSibling();
       if (previous_node) {
-        $(previous_node.element).after($li);
+        $(previous_node.element).after(li);
       } else {
-        parent_node_element.getUl().prepend($li);
+        parent_node_element.getUl().prepend(li);
       }
       if (node.children) {
         return this.renderFromNode(node);
@@ -865,14 +865,14 @@ limitations under the License.
     };
 
     ElementsRenderer.prototype.createFolderLi = function(node) {
-      var button_char, button_classes, button_link, div, escaped_name, folder_classes, li, title_span;
+      var button_classes, button_link, div, escaped_name, folder_classes, icon_element, li, title_span;
       button_classes = this.getButtonClasses(node);
       folder_classes = this.getFolderClasses(node);
       escaped_name = this.escapeIfNecessary(node.name);
       if (node.is_open) {
-        button_char = this.opened_icon_text;
+        icon_element = this.opened_icon_element;
       } else {
-        button_char = this.closed_icon_text;
+        icon_element = this.closed_icon_element;
       }
       li = document.createElement('li');
       li.className = "jqtree_common " + folder_classes;
@@ -881,7 +881,7 @@ limitations under the License.
       li.appendChild(div);
       button_link = document.createElement('a');
       button_link.className = "jqtree_common " + button_classes;
-      button_link.appendChild(document.createTextNode(button_char));
+      button_link.appendChild(icon_element.cloneNode());
       div.appendChild(button_link);
       title_span = document.createElement('span');
       title_span.className = "jqtree_common jqtree-title jqtree-title-folder";
@@ -939,8 +939,15 @@ limitations under the License.
       }
     };
 
-    ElementsRenderer.prototype.getHtmlText = function(entity_text) {
-      return $(document.createElement('div')).html(entity_text).text();
+    ElementsRenderer.prototype.createButtonElement = function(value) {
+      var div;
+      if (typeof value === 'string') {
+        div = document.createElement('div');
+        div.innerHTML = value;
+        return document.createTextNode(div.innerHTML);
+      } else {
+        return $(value)[0];
+      }
     };
 
     return ElementsRenderer;
@@ -1777,7 +1784,8 @@ limitations under the License.
         this.node.is_open = true;
         $button = this.getButton();
         $button.removeClass('jqtree-closed');
-        $button.html(this.tree_widget.options.openedIcon);
+        $button.html('');
+        $button.append(this.tree_widget.renderer.opened_icon_element.cloneNode());
         doOpen = (function(_this) {
           return function() {
             _this.getLi().removeClass('jqtree-closed');
@@ -1807,7 +1815,8 @@ limitations under the License.
         this.node.is_open = false;
         $button = this.getButton();
         $button.addClass('jqtree-closed');
-        $button.html(this.tree_widget.options.closedIcon);
+        $button.html('');
+        $button.append(this.tree_widget.renderer.closed_icon_element.cloneNode());
         doClose = (function(_this) {
           return function() {
             _this.getLi().addClass('jqtree-closed');
