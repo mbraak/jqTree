@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../extra/bower_components/prism/themes/prism-okaidia.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
+    {% block css %}{% endblock %}
 </head>
 <body>
     <div class="container">

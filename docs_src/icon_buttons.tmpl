@@ -1,0 +1,46 @@
+{% extends "base" %}
+
+{% block title %}Use icon toggle buttons{% endblock %}
+{% block h1 %}Example 10 - use icon toggle buttons{% endblock %}
+
+{% block previous_url %}custom_html.html{% endblock %}
+{% block previous_title %}Example 9{% endblock %}
+{% block next %}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="../extra/bower_components/fontawesome/css/font-awesome.min.css">
+{% endblock %}
+
+{% block contents %}
+    <p>
+        You can use the <strong>openedIcon</strong> and <strong>closedIcon</strong> options to use html for
+        the toggle buttons. You can for example use <a href="http://fortawesome.github.io/Font-Awesome/">Fontawesome icons</a>.
+    </p>
+    <div id="tree1" data-url="/example_data/"></div>
+
+    <h3>javascript</h3>
+<pre><code class="language-javascript">$('#tree1').tree({
+    closedIcon: $('&lt;i class="fa fa-arrow-circle-right"&gt;&lt;/i&gt;'),
+    openedIcon: $('&lt;i class="fa fa-arrow-circle-down"&gt;&lt;/i&gt;')
+});</code></pre>
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        $.mockjax({
+            url: '*',
+            response: function(options) {
+                this.responseText = ExampleData.example_data;
+            },
+            responseTime: 0
+        });
+
+        $(function() {
+            $('#tree1').tree({
+                closedIcon: $('<i class="fa fa-arrow-circle-right"></i>'),
+                openedIcon: $('<i class="fa fa-arrow-circle-down"></i>')
+            });
+        });
+    </script>
+{% endblock %}
