@@ -1772,17 +1772,22 @@ test('getNextSibling', function() {
 module('util');
 
 test('JSON.stringify', function() {
-    equal(JSON.stringify('abc'), '"abc"');
-    equal(JSON.stringify(123), '123');
-    equal(JSON.stringify(true), 'true');
-    equal(JSON.stringify({abc: 'def'}), '{"abc":"def"}');
-    equal(JSON.stringify({}), '{}');
-    equal(JSON.stringify([1, 2, 3]), '[1,2,3]');
-    equal(JSON.stringify(null), 'null');
-    equal(JSON.stringify(Number.NEGATIVE_INFINITY), 'null');
+    function test_stringify(stringify) {
+        equal(stringify('abc'), '"abc"');
+        equal(stringify(123), '123');
+        equal(stringify(true), 'true');
+        equal(stringify({abc: 'def'}), '{"abc":"def"}');
+        equal(stringify({}), '{}');
+        equal(stringify([1, 2, 3]), '[1,2,3]');
+        equal(stringify(null), 'null');
+        equal(stringify(Number.NEGATIVE_INFINITY), 'null');
 
-    // test escapable
-    JSON.stringify("\u200c");
+        // test escapable
+        JSON.stringify("\u200c");
+    }
+
+    test_stringify(JSON.stringify);
+    test_stringify(Tree.get_json_stringify_function());
 });
 
 test('indexOf', function() {

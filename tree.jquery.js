@@ -17,7 +17,7 @@ limitations under the License.
  */
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str, _indexOf,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1877,7 +1877,8 @@ limitations under the License.
 
   this.Tree._indexOf = _indexOf;
 
-  if (!((this.JSON != null) && (this.JSON.stringify != null) && typeof this.JSON.stringify === 'function')) {
+  get_json_stringify_function = function() {
+    var json_escapable, json_meta, json_quote, json_str, stringify;
     json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
     json_meta = {
       '\b': '\\b',
@@ -1938,14 +1939,21 @@ limitations under the License.
           return (partial.length === 0 ? '{}' : '{' + partial.join(',') + '}');
       }
     };
-    if (this.JSON == null) {
-      this.JSON = {};
-    }
-    this.JSON.stringify = function(value) {
+    stringify = function(value) {
       return json_str('', {
         '': value
       });
     };
+    return stringify;
+  };
+
+  this.Tree.get_json_stringify_function = get_json_stringify_function;
+
+  if (!((this.JSON != null) && (this.JSON.stringify != null) && typeof this.JSON.stringify === 'function')) {
+    if (this.JSON == null) {
+      this.JSON = {};
+    }
+    this.JSON.stringify = get_json_stringify_function();
   }
 
   SaveStateHandler = (function() {

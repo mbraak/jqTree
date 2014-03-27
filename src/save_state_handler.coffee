@@ -18,7 +18,7 @@ indexOf = (array, item) ->
 
 
 # JSON.stringify function; copied from json2
-if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
+get_json_stringify_function = ->
     json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
     json_meta = {
         '\b': '\\b',
@@ -82,14 +82,22 @@ if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
                     else '{' + partial.join(',') + '}'
                 )
 
-    if not @JSON?
-        @JSON = {}
-
-    @JSON.stringify = (value) ->
+    stringify = (value) ->
         return json_str(
             '',
             {'': value}
         )
+
+    return stringify
+
+
+@Tree.get_json_stringify_function = get_json_stringify_function
+
+if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
+    if not @JSON?
+        @JSON = {}
+
+    @JSON.stringify = get_json_stringify_function()
 
 
 class SaveStateHandler
