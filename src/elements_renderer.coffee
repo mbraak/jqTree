@@ -24,8 +24,10 @@ class ElementsRenderer
         # add element to dom
         previous_node = node.getPreviousSibling()
         if previous_node
+            # Add node after previous node
             $(previous_node.element).after(li)
         else
+            # There is no previous node; add node as first child of parent
             parent_node_element.getUl().prepend(li)
 
         # render children

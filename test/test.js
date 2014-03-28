@@ -906,6 +906,19 @@ test('updateNode', function() {
 
     var node_124 = $tree.tree('getNodeById', 124);
     equal(node_124, undefined);
+
+    // update child1
+    var child1 = $tree.tree('getNodeByName', 'child1');
+
+    $tree.tree('updateNode', child1, 'child1a');
+
+    equal(formatTitles($tree), 'node1 child1a child2 xyz child3');
+
+    // select child1
+    $tree.tree('selectNode', child1);
+    $tree.tree('updateNode', child1, 'child1b');
+
+    ok($(child1.element).hasClass('jqtree-selected'));
 });
 
 test('moveNode', function() {
