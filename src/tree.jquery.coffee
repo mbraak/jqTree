@@ -188,6 +188,7 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data)
         else
+            # Node is loaded; unselect all nodes under this node.
             selected_nodes_under_parent = @select_node_handler.getSelectedNodesUnder(parent_node)
             for n in selected_nodes_under_parent
                 @select_node_handler.removeFromSelection(n)
@@ -322,9 +323,10 @@ class JqTreeWidget extends MouseWidget
         return @save_state_handler.getStateFromStorage()
 
     addToSelection: (node) ->
-        @select_node_handler.addToSelection(node)
+        if node
+            @select_node_handler.addToSelection(node)
 
-        @_getNodeElementForNode(node).select()
+            @_getNodeElementForNode(node).select()
 
     getSelectedNodes: ->
         return @select_node_handler.getSelectedNodes()

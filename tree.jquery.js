@@ -1363,8 +1363,10 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.addToSelection = function(node) {
-      this.select_node_handler.addToSelection(node);
-      return this._getNodeElementForNode(node).select();
+      if (node) {
+        this.select_node_handler.addToSelection(node);
+        return this._getNodeElementForNode(node).select();
+      }
     };
 
     JqTreeWidget.prototype.getSelectedNodes = function() {
