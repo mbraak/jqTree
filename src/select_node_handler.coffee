@@ -26,8 +26,8 @@ class SelectNodeHandler
 
     getSelectedNodesUnder: (parent) ->
         if @selected_single_node
-            if parent.isParentOf(selected_single_node)
-                return @selected_single_node
+            if parent.isParentOf(@selected_single_node)
+                return [@selected_single_node]
             else
                 return null
         else

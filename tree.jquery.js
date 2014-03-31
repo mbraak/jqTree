@@ -2126,8 +2126,8 @@ limitations under the License.
     SelectNodeHandler.prototype.getSelectedNodesUnder = function(parent) {
       var id, node, selected_nodes;
       if (this.selected_single_node) {
-        if (parent.isParentOf(selected_single_node)) {
-          return this.selected_single_node;
+        if (parent.isParentOf(this.selected_single_node)) {
+          return [this.selected_single_node];
         } else {
           return null;
         }
