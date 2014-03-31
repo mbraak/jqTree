@@ -29,7 +29,7 @@ class SelectNodeHandler
             if parent.isParentOf(@selected_single_node)
                 return [@selected_single_node]
             else
-                return null
+                return []
         else
             selected_nodes = []
 

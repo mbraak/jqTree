@@ -2129,7 +2129,7 @@ limitations under the License.
         if (parent.isParentOf(this.selected_single_node)) {
           return [this.selected_single_node];
         } else {
-          return null;
+          return [];
         }
       } else {
         selected_nodes = [];
