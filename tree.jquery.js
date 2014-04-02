@@ -1110,7 +1110,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._loadDataFromUrl = function(url_info, parent_node, on_finished) {
-      var $el, addLoadingClass, parseUrlInfo, removeLoadingClass;
+      var $el, addLoadingClass, handeLoadData, loadDataFromUrlInfo, parseUrlInfo, removeLoadingClass;
       $el = null;
       addLoadingClass = (function(_this) {
         return function() {
@@ -1143,44 +1143,56 @@ limitations under the License.
           }
         };
       })(this);
-      addLoadingClass();
+      handeLoadData = (function(_this) {
+        return function(data) {
+          removeLoadingClass();
+          _this._loadData(data, parent_node);
+          if (on_finished && $.isFunction(on_finished)) {
+            return on_finished();
+          }
+        };
+      })(this);
+      loadDataFromUrlInfo = (function(_this) {
+        return function() {
+          parseUrlInfo();
+          return $.ajax({
+            url: url_info.url,
+            data: url_info.data,
+            type: url_info.method.toUpperCase(),
+            cache: false,
+            dataType: 'json',
+            success: function(response) {
+              var data;
+              if ($.isArray(response) || typeof response === 'object') {
+                data = response;
+              } else {
+                data = $.parseJSON(response);
+              }
+              if (_this.options.dataFilter) {
+                data = _this.options.dataFilter(data);
+              }
+              return handeLoadData(data);
+            },
+            error: function(response) {
+              removeLoadingClass();
+              if (_this.options.onLoadFailed) {
+                return _this.options.onLoadFailed(response);
+              }
+            }
+          });
+        };
+      })(this);
       if (!url_info) {
         url_info = this._getDataUrlInfo(parent_node);
       }
-      parseUrlInfo();
-      return $.ajax({
-        url: url_info.url,
-        data: url_info.data,
-        type: url_info.method.toUpperCase(),
-        cache: false,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(response) {
-            var data;
-            if ($.isArray(response) || typeof response === 'object') {
-              data = response;
-            } else {
-              data = $.parseJSON(response);
-            }
-            if (_this.options.dataFilter) {
-              data = _this.options.dataFilter(data);
-            }
-            removeLoadingClass();
-            _this._loadData(data, parent_node);
-            if (on_finished && $.isFunction(on_finished)) {
-              return on_finished();
-            }
-          };
-        })(this),
-        error: (function(_this) {
-          return function(response) {
-            removeLoadingClass();
-            if (_this.options.onLoadFailed) {
-              return _this.options.onLoadFailed(response);
-            }
-          };
-        })(this)
-      });
+      addLoadingClass();
+      if (url_info === false) {
+        removeLoadingClass();
+      } else if ($.isArray(url_info)) {
+        handeLoadData(url_info);
+      } else {
+        return loadDataFromUrlInfo();
+      }
     };
 
     JqTreeWidget.prototype._loadData = function(data, parent_node) {

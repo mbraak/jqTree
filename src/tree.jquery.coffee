@@ -144,40 +144,53 @@ class JqTreeWidget extends MouseWidget
             if not url_info.method
                 url_info.method = 'get'
 
-        addLoadingClass()
+        handeLoadData = (data) =>
+            removeLoadingClass()                
+            @_loadData(data, parent_node)
+
+            if on_finished and $.isFunction(on_finished)
+                on_finished()
+
+        loadDataFromUrlInfo = =>
+            parseUrlInfo()
+
+            $.ajax(
+                url: url_info.url
+                data: url_info.data
+                type: url_info.method.toUpperCase()
+                cache: false
+                dataType: 'json'
+                success: (response) =>
+                    if $.isArray(response) or typeof response == 'object'
+                        data = response
+                    else
+                        data = $.parseJSON(response)
+
+                    if @options.dataFilter
+                        data = @options.dataFilter(data)
+
+                    handeLoadData(data)
+                error: (response) =>
+                    removeLoadingClass()
+
+                    if @options.onLoadFailed
+                        @options.onLoadFailed(response)
+            )
 
         if not url_info
             # Generate url for node
             url_info = @_getDataUrlInfo(parent_node)
 
-        parseUrlInfo()
+        addLoadingClass()
 
-        $.ajax(
-            url: url_info.url
-            data: url_info.data
-            type: url_info.method.toUpperCase()
-            cache: false
-            dataType: 'json'
-            success: (response) =>
-                if $.isArray(response) or typeof response == 'object'
-                    data = response
-                else
-                    data = $.parseJSON(response)
-
-                if @options.dataFilter
-                    data = @options.dataFilter(data)
-
-                removeLoadingClass()                
-                @_loadData(data, parent_node)
-
-                if on_finished and $.isFunction(on_finished)
-                    on_finished()
-            error: (response) =>
-                removeLoadingClass()
-
-                if @options.onLoadFailed
-                    @options.onLoadFailed(response)
-        )
+        if url_info == false or url_info == null
+            removeLoadingClass()
+            return
+        else if $.isArray(url_info)
+            handeLoadData(url_info)
+            return
+        else
+            loadDataFromUrlInfo()
 
     _loadData: (data, parent_node) ->
         if not data
