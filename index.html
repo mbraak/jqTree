@@ -1301,8 +1301,8 @@ $('#tree1').bind(
 <pre><code class="language-javascript">$('#tree1').bind(
     'tree.dblclick',
     function(event) {
-        // e.node is the clicked node
-        console.log(e.node);
+        // event.node is the clicked node
+        console.log(event.node);
     }
 );
 </code></pre>
