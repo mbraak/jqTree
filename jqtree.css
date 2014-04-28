@@ -93,7 +93,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     width: 8px;
     position: absolute;
     top: -4px;
-    left: 2px;
+    left: -6px;
 }
 
 /* IE 6, 7, 8 */
@@ -110,7 +110,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     padding: 0;
     position: absolute;
     top: -1px;
-    left: 10px;
+    left: 2px;
     width: 100%;
 }
 
