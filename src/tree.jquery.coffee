@@ -210,8 +210,8 @@ class JqTreeWidget extends MouseWidget
             parent_node.load_on_demand = false
             @_refreshElements(parent_node.parent)
 
-        if @is_dragging
-            @dnd_handler.refreshHitAreas()
+        if @isDragging()
+            @dnd_handler.refresh()
 
     getNodeById: (node_id) ->
         return @tree.getNodeById(node_id)
@@ -257,10 +257,13 @@ class JqTreeWidget extends MouseWidget
             @_saveState()
 
     isDragging: ->
-        return @is_dragging
+        if @dnd_handler
+            return @dnd_handler.is_dragging
+        else
+            return false
 
     refreshHitAreas: ->
-        @dnd_handler.refreshHitAreas()
+        @dnd_handler.refresh()
 
     addNodeAfter: (new_node_info, existing_node) ->
         new_node = existing_node.addAfter(new_node_info)

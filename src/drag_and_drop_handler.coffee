@@ -6,6 +6,7 @@ class DragAndDropHandler
         @$ghost = null
         @hit_areas = []
         @is_dragging = false
+        @current_item = null
 
     mouseCapture: (position_info) ->
         $element = $(position_info.target)
@@ -23,7 +24,7 @@ class DragAndDropHandler
         return (@current_item != null)
 
     mouseStart: (position_info) ->
-        @refreshHitAreas()
+        @refresh()
 
         offset = $(position_info.target).offset()
 
@@ -79,13 +80,20 @@ class DragAndDropHandler
 
         if @current_item
             @current_item.$element.removeClass('jqtree-moving')
+            @current_item = null
 
         @is_dragging = false
         return false
 
-    refreshHitAreas: ->
+    refresh: ->
         @removeHitAreas()
         @generateHitAreas()
+
+        if @current_item
+            @current_item = @tree_widget._getNodeElementForNode(@current_item.node)
+
+            if @is_dragging
+                @current_item.$element.addClass('jqtree-moving')
 
     removeHitAreas: ->
         @hit_areas = []
@@ -161,7 +169,7 @@ class DragAndDropHandler
                 folder,
                 @tree_widget.options.slide,
                 =>
-                    @refreshHitAreas()
+                    @refresh()
                     @updateDropHint()
             )
 
@@ -217,6 +225,7 @@ class DragAndDropHandler
             right: offset.left + @tree_widget.element.width(),
             bottom: offset.top + @tree_widget.element.height() + 16
         }
+
 
 class VisibleNodeIterator
     constructor: (tree) ->

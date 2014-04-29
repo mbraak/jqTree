@@ -1186,7 +1186,7 @@ limitations under the License.
         url_info = this._getDataUrlInfo(parent_node);
       }
       addLoadingClass();
-      if (url_info === false) {
+      if (url_info === false || url_info === null) {
         removeLoadingClass();
       } else if ($.isArray(url_info)) {
         handeLoadData(url_info);
@@ -1215,8 +1215,8 @@ limitations under the License.
         parent_node.load_on_demand = false;
         this._refreshElements(parent_node.parent);
       }
-      if (this.is_dragging) {
-        return this.dnd_handler.refreshHitAreas();
+      if (this.isDragging()) {
+        return this.dnd_handler.refresh();
       }
     };
 
@@ -1286,11 +1286,15 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.isDragging = function() {
-      return this.is_dragging;
+      if (this.dnd_handler) {
+        return this.dnd_handler.is_dragging;
+      } else {
+        return false;
+      }
     };
 
     JqTreeWidget.prototype.refreshHitAreas = function() {
-      return this.dnd_handler.refreshHitAreas();
+      return this.dnd_handler.refresh();
     };
 
     JqTreeWidget.prototype.addNodeAfter = function(new_node_info, existing_node) {
@@ -2212,6 +2216,7 @@ limitations under the License.
       this.$ghost = null;
       this.hit_areas = [];
       this.is_dragging = false;
+      this.current_item = null;
     }
 
     DragAndDropHandler.prototype.mouseCapture = function(position_info) {
@@ -2232,7 +2237,7 @@ limitations under the License.
 
     DragAndDropHandler.prototype.mouseStart = function(position_info) {
       var offset;
-      this.refreshHitAreas();
+      this.refresh();
       offset = $(position_info.target).offset();
       this.drag_element = new DragElement(this.current_item.node, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
       this.is_dragging = true;
@@ -2281,14 +2286,21 @@ limitations under the License.
       this.removeHitAreas();
       if (this.current_item) {
         this.current_item.$element.removeClass('jqtree-moving');
+        this.current_item = null;
       }
       this.is_dragging = false;
       return false;
     };
 
-    DragAndDropHandler.prototype.refreshHitAreas = function() {
+    DragAndDropHandler.prototype.refresh = function() {
       this.removeHitAreas();
-      return this.generateHitAreas();
+      this.generateHitAreas();
+      if (this.current_item) {
+        this.current_item = this.tree_widget._getNodeElementForNode(this.current_item.node);
+        if (this.is_dragging) {
+          return this.current_item.$element.addClass('jqtree-moving');
+        }
+      }
     };
 
     DragAndDropHandler.prototype.removeHitAreas = function() {
@@ -2359,7 +2371,7 @@ limitations under the License.
       openFolder = (function(_this) {
         return function() {
           return _this.tree_widget._openNode(folder, _this.tree_widget.options.slide, function() {
-            _this.refreshHitAreas();
+            _this.refresh();
             return _this.updateDropHint();
           });
         };
