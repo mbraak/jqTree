@@ -5,7 +5,7 @@
         "bootstrap": "3.1.1",
         "fontawesome": "4.0.3",
         "jquery": "2.1.1",
-        "jquery-cookie": "v1.4.0",
+        "jquery-cookie": "v1.4.1",
         "jquery-mockjax": "1.5.3",
         "prism": "gh-pages",
         "qunit": "1.14.0"
