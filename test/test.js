@@ -1811,6 +1811,16 @@ test('getNextSibling', function() {
     equal(tree.getNextSibling(), null);
 });
 
+test('getNodesByProperty', function() {
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData(example_data);
+
+    nodes = tree.getNodesByProperty('name', 'child1');
+
+    equal(nodes.length, 1);
+    equal(nodes[0].name, 'child1');
+});
+
 
 module('util');
 

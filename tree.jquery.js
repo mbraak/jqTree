@@ -766,6 +766,24 @@ limitations under the License.
       }
     };
 
+    Node.prototype.getNodesByProperty = function(key, value) {
+      return this.filter(function(node) {
+        return node[key] === value;
+      });
+    };
+
+    Node.prototype.filter = function(f) {
+      var result;
+      result = [];
+      this.iterate(function(node) {
+        if (f(node)) {
+          result.push(node);
+        }
+        return true;
+      });
+      return result;
+    };
+
     return Node;
 
   })();
