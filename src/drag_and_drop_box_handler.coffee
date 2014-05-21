@@ -30,6 +30,19 @@ class DragAndDropBoxHandler extends DragAndDropHandler
         @is_dragging = true
         return true
 
+    generateHitAreas: ->
+        hit_areas_generator = new BoxAreasGenerator(
+            @tree_widget.tree,
+            @current_item.node,
+            @getTreeDimensions().bottom,
+            @dragging_cursor
+        )
+        @hit_areas = hit_areas_generator.generate()
+
+    refresh: ->
+        @removeHitAreas()
+        @generateHitAreas()
+
 class DragBoxElement extends DragElement
     constructor: (element, offset_x, offset_y, $tree) ->
         @offset_x = offset_x
@@ -41,11 +54,44 @@ class DragBoxElement extends DragElement
         @$element.css("position", "absolute")
         $tree.append(@$element)
 
+
+class BoxAreasGenerator extends HitAreasGenerator
+    constructor: (tree, current_node, tree_bottom, cursor) ->
+        super(tree)
+        @cursor = cursor
+        @current_node = current_node
+        @tree_bottom = tree_bottom
+
+    generate: ->
+        @positions = []
+        @last_top = 0
+
+        @iterate()
+        @addCursor()
+        return @generateHitAreas(@positions)
+
+    addCursor: () ->
+        cursor_area = @cursor.area()
+        if cursor_area
+            for i in [0..@positions.length - 1] by 1
+                position = @positions[i]
+                if cursor_area.top < position.top
+                    @positions.splice(i, 0 , @cursor.area())
+                    break
+
 class DraggingCursor
-	constructor: (element, position) ->
+    constructor: (element, position) ->
         @$element = element.$element
+        @node = element.node
         height = @$element.height()
         @$ghost = $('<li style = "height:'+height+'px;" class="jqtree_common jqtree-ghost"></li>')
 
-	swapGhost: ->
-		@$element.replaceWith(@$ghost)
+    swapGhost: ->
+        @$element.replaceWith(@$ghost)
+
+    area: ->
+        area = {
+            top: @$ghost.offset().top
+            node: @node
+            position: Position.NONE
+        }

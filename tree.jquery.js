@@ -17,7 +17,7 @@ limitations under the License.
  */
 
 (function() {
-  var $, BorderDropHint, DragAndDropBoxHandler, DragAndDropHandler, DragBoxElement, DragElement, DraggingCursor, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, _indexOf,
+  var $, BorderDropHint, BoxAreasGenerator, DragAndDropBoxHandler, DragAndDropHandler, DragBoxElement, DragElement, DraggingCursor, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3033,6 +3033,17 @@ limitations under the License.
       return true;
     };
 
+    DragAndDropBoxHandler.prototype.generateHitAreas = function() {
+      var hit_areas_generator;
+      hit_areas_generator = new BoxAreasGenerator(this.tree_widget.tree, this.current_item.node, this.getTreeDimensions().bottom, this.dragging_cursor);
+      return this.hit_areas = hit_areas_generator.generate();
+    };
+
+    DragAndDropBoxHandler.prototype.refresh = function() {
+      this.removeHitAreas();
+      return this.generateHitAreas();
+    };
+
     return DragAndDropBoxHandler;
 
   })(DragAndDropHandler);
@@ -3053,16 +3064,66 @@ limitations under the License.
 
   })(DragElement);
 
+  BoxAreasGenerator = (function(_super) {
+    __extends(BoxAreasGenerator, _super);
+
+    function BoxAreasGenerator(tree, current_node, tree_bottom, cursor) {
+      BoxAreasGenerator.__super__.constructor.call(this, tree);
+      this.cursor = cursor;
+      this.current_node = current_node;
+      this.tree_bottom = tree_bottom;
+    }
+
+    BoxAreasGenerator.prototype.generate = function() {
+      this.positions = [];
+      this.last_top = 0;
+      this.iterate();
+      this.addCursor();
+      return this.generateHitAreas(this.positions);
+    };
+
+    BoxAreasGenerator.prototype.addCursor = function() {
+      var cursor_area, i, position, _i, _ref, _results;
+      cursor_area = this.cursor.area();
+      if (cursor_area) {
+        _results = [];
+        for (i = _i = 0, _ref = this.positions.length - 1; _i <= _ref; i = _i += 1) {
+          position = this.positions[i];
+          if (cursor_area.top < position.top) {
+            this.positions.splice(i, 0, this.cursor.area());
+            break;
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      }
+    };
+
+    return BoxAreasGenerator;
+
+  })(HitAreasGenerator);
+
   DraggingCursor = (function() {
     function DraggingCursor(element, position) {
       var height;
       this.$element = element.$element;
+      this.node = element.node;
       height = this.$element.height();
       this.$ghost = $('<li style = "height:' + height + 'px;" class="jqtree_common jqtree-ghost"></li>');
     }
 
     DraggingCursor.prototype.swapGhost = function() {
       return this.$element.replaceWith(this.$ghost);
+    };
+
+    DraggingCursor.prototype.area = function() {
+      var area;
+      return area = {
+        top: this.$ghost.offset().top,
+        node: this.node,
+        position: Position.NONE
+      };
     };
 
     return DraggingCursor;
