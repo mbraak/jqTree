@@ -3020,6 +3020,8 @@ limitations under the License.
       this.is_dragging = false;
       this.current_item = null;
       this.dragging_cursor = null;
+      this.previousY = null;
+      this.previousX = null;
     }
 
     DragAndDropBoxHandler.prototype.mouseStart = function(position_info) {
@@ -3031,6 +3033,41 @@ limitations under the License.
       this.refresh();
       this.is_dragging = true;
       return true;
+    };
+
+    DragAndDropBoxHandler.prototype.mouseDrag = function(position_info) {
+      var current_x, current_y, horizontal_direction, vertical_direction, _ref;
+      current_y = position_info.page_y;
+      current_x = position_info.page_x;
+      _ref = this.getCurrentDirections(current_x, current_y), horizontal_direction = _ref[0], vertical_direction = _ref[1];
+      return this.drag_element.move(current_x, current_y);
+    };
+
+    DragAndDropBoxHandler.prototype.getCurrentDirections = function(current_x, current_y) {
+      var horizontal_direction, vertical_direction;
+      if (this.previousY === null) {
+        vertical_direction = DragAndDropBoxHandler.NEUTRAL;
+      } else if (this.previousY > current_y) {
+        vertical_direction = DragAndDropBoxHandler.UP;
+      } else if (this.previousY < current_y) {
+        vertical_direction = DragAndDropBoxHandler.DOWN;
+      } else {
+        horizontal_direction = DragAndDropBoxHandler.NEUTRAL;
+      }
+      this.previousY = current_y;
+      if (this.previousX === null) {
+        horizontal_direction = DragAndDropBoxHandler.NEUTRAL;
+        this.previousX = current_x;
+      } else if (current_x > (this.previousX + 20)) {
+        this.previousX = current_x;
+        horizontal_direction = DragAndDropBoxHandler.RIGHT;
+      } else if (current_x < (this.previousX - 20)) {
+        this.previousX = current_x;
+        horizontal_direction = DragAndDropBoxHandler.LEFT;
+      } else {
+        horizontal_direction = DragAndDropBoxHandler.NEUTRAL;
+      }
+      return [horizontal_direction, vertical_direction];
     };
 
     DragAndDropBoxHandler.prototype.generateHitAreas = function() {
@@ -3047,6 +3084,16 @@ limitations under the License.
     return DragAndDropBoxHandler;
 
   })(DragAndDropHandler);
+
+  DragAndDropBoxHandler.UP = 1;
+
+  DragAndDropBoxHandler.DOWN = -1;
+
+  DragAndDropBoxHandler.RIGHT = 1;
+
+  DragAndDropBoxHandler.LEFT = -1;
+
+  DragAndDropBoxHandler.NEUTRAL = 0;
 
   DragBoxElement = (function(_super) {
     __extends(DragBoxElement, _super);
