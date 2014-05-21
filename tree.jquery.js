@@ -1450,7 +1450,9 @@ limitations under the License.
       if (typeof SelectNodeHandler !== "undefined" && SelectNodeHandler !== null) {
         this.select_node_handler = new SelectNodeHandler(this);
       }
-      if (typeof DragAndDropHandler !== "undefined" && DragAndDropHandler !== null) {
+      if ((typeof DragAndDropBoxHandler !== "undefined" && DragAndDropBoxHandler !== null) && this.options.dragAndDrop === 'box') {
+        this.dnd_handler = new DragAndDropBoxHandler(this);
+      } else if (typeof DragAndDropHandler !== "undefined" && DragAndDropHandler !== null) {
         this.dnd_handler = new DragAndDropHandler(this);
       } else {
         this.options.dragAndDrop = false;

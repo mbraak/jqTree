@@ -19,7 +19,7 @@ class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
         saveState: false  # true / false / string (cookie name)
-        dragAndDrop: false
+        dragAndDrop: false # true / false / string (drag and drop type: 'box' or 'line')
         selectable: true
         useContextMenu: true
         onCanSelectNode: null
@@ -388,7 +388,9 @@ class JqTreeWidget extends MouseWidget
         if SelectNodeHandler?
             @select_node_handler = new SelectNodeHandler(this)
 
-        if DragAndDropHandler?
+        if DragAndDropBoxHandler? && @options.dragAndDrop == 'box'
+            @dnd_handler = new DragAndDropBoxHandler(this)
+        else if DragAndDropHandler?
             @dnd_handler = new DragAndDropHandler(this)
         else
             @options.dragAndDrop = false
