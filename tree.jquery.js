@@ -17,7 +17,7 @@ limitations under the License.
  */
 
 (function() {
-  var $, BorderDropHint, DragAndDropBoxHandler, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, _indexOf,
+  var $, BorderDropHint, DragAndDropBoxHandler, DragAndDropHandler, DragBoxElement, DragElement, DraggingCursor, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3009,10 +3009,63 @@ limitations under the License.
 
   })();
 
-  DragAndDropBoxHandler = (function() {
-    function DragAndDropBoxHandler() {}
+  DragAndDropBoxHandler = (function(_super) {
+    __extends(DragAndDropBoxHandler, _super);
+
+    function DragAndDropBoxHandler(tree_widget) {
+      this.tree_widget = tree_widget;
+      this.hovered_area = null;
+      this.$ghost = null;
+      this.hit_areas = [];
+      this.is_dragging = false;
+      this.current_item = null;
+      this.dragging_cursor = null;
+    }
+
+    DragAndDropBoxHandler.prototype.mouseStart = function(position_info) {
+      var offset;
+      offset = $(position_info.target).offset();
+      this.dragging_cursor = new DraggingCursor(this.current_item, Position.NONE);
+      this.drag_element = new DragBoxElement(this.current_item.$element, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
+      this.dragging_cursor.swapGhost();
+      this.refresh();
+      this.is_dragging = true;
+      return true;
+    };
 
     return DragAndDropBoxHandler;
+
+  })(DragAndDropHandler);
+
+  DragBoxElement = (function(_super) {
+    __extends(DragBoxElement, _super);
+
+    function DragBoxElement(element, offset_x, offset_y, $tree) {
+      this.offset_x = offset_x;
+      this.offset_y = offset_y;
+      this.$element = $("<div class=\"jqtree-title jqtree-dragging\"></div>");
+      this.$element.append($(element).clone());
+      this.$element.css("position", "absolute");
+      $tree.append(this.$element);
+    }
+
+    return DragBoxElement;
+
+  })(DragElement);
+
+  DraggingCursor = (function() {
+    function DraggingCursor(element, position) {
+      var height;
+      this.$element = element.$element;
+      height = this.$element.height();
+      this.$ghost = $('<li style = "height:' + height + 'px;" class="jqtree_common jqtree-ghost"></li>');
+    }
+
+    DraggingCursor.prototype.swapGhost = function() {
+      return this.$element.replaceWith(this.$ghost);
+    };
+
+    return DraggingCursor;
 
   })();
 
