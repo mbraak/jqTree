@@ -36,6 +36,13 @@ class DragAndDropBoxHandler extends DragAndDropHandler
         current_x = position_info.page_x
         [horizontal_direction, vertical_direction] = @getCurrentDirections(current_x, current_y)
         @drag_element.move(current_x, current_y)
+        leaving = @leavingCursorVertically(current_y)
+        if leaving && vertical_direction && leaving == vertical_direction
+
+            @hovered_area = @findAreaWhenLeaving(vertical_direction)
+            if (@hovered_area)
+                @dragging_cursor.moveTo(@hovered_area)
+                @refresh()
 
     getCurrentDirections: (current_x, current_y) ->
         if (@previousY == null)
@@ -44,8 +51,7 @@ class DragAndDropBoxHandler extends DragAndDropHandler
             vertical_direction = DragAndDropBoxHandler.UP
         else if (@previousY < current_y)
             vertical_direction = DragAndDropBoxHandler.DOWN
-        else
-            horizontal_direction = DragAndDropBoxHandler.NEUTRAL
+
         @previousY = current_y
 
         if (@previousX == null)
@@ -69,6 +75,41 @@ class DragAndDropBoxHandler extends DragAndDropHandler
             @dragging_cursor
         )
         @hit_areas = hit_areas_generator.generate()
+
+    findAreaWhenLeaving: (direction) ->
+        cursor_area = @findHoveredArea(@getTreeDimensions.left, @dragging_cursor.area().top)
+        index = @hit_areas.lastIndexOf(cursor_area)
+
+        if direction == DragAndDropBoxHandler.UP
+            decrement = (dnd, index) ->
+                index--
+                previous = dnd.hit_areas[index]
+                [previous,index]
+
+            [previous, index] = decrement(this, index)
+            while index > 0 && (previous.position != Position.AFTER || previous.bottom > cursor_area.top)
+                [previous, index] = decrement(this, index)
+            return previous
+
+        if direction == DragAndDropBoxHandler.DOWN
+            increment = (dnd, index) ->
+                index++
+                next = dnd.hit_areas[index]
+                [next, index]
+            [next, index] = increment(this, index)
+            while index < @hit_areas.length && next.position != Position.AFTER
+                [next, index] = increment(this, index)
+            return next
+
+    leavingCursorVertically: (y) ->
+        return false unless @dragging_cursor
+        buffer = 15
+        cursor = @dragging_cursor.$ghost
+        top =  cursor.offset().top
+        bottom = cursor.offset().top + cursor.height()
+        return DragAndDropBoxHandler.DOWN  if y > bottom + buffer
+        return DragAndDropBoxHandler.UP  if y < top - buffer
+        return false
 
     refresh: ->
         @removeHitAreas()
@@ -107,6 +148,34 @@ class BoxAreasGenerator extends HitAreasGenerator
         @addCursor()
         return @generateHitAreas(@positions)
 
+    handleNode: (node, next_node, $element) ->
+        top = @getTop($element)
+
+        if node == @current_node
+            # Cannot move inside current item
+            @addPosition(node, Position.NONE, top)
+        else
+            @addPosition(node, Position.INSIDE, top)
+            @addPosition(node, Position.AFTER, top)
+
+    handleClosedFolder: (node, next_node, $element) ->
+        top = @getTop($element)
+
+        if node == @current_node
+            # Cannot move after current item
+            @addPosition(node, Position.NONE, top)
+        else
+            @addPosition(node, Position.INSIDE, top)
+
+        @addPosition(node, Position.AFTER, top)
+
+    handleAfterOpenFolder: (node, next_node, $element) ->
+        if node == @current_node.node
+            # Cannot move after current item
+            @addPosition(node, Position.NONE, @last_top)
+        else
+            @addPosition(node, Position.AFTER, @last_top)
+
     addCursor: () ->
         cursor_area = @cursor.area()
         if cursor_area
@@ -132,3 +201,12 @@ class DraggingCursor
             node: @node
             position: Position.NONE
         }
+
+    moveTo: (area) ->
+        element = $(area.node.element)
+        if area.position is Position.AFTER
+            element.after(@$ghost)
+        else if area.position is Position.BEFORE
+            element.before(@$ghost)
+
+
