@@ -17,7 +17,7 @@ limitations under the License.
  */
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, _indexOf,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, isInt, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1913,6 +1913,10 @@ limitations under the License.
 
   this.Tree._indexOf = _indexOf;
 
+  isInt = function(n) {
+    return typeof n === 'number' && n % 1 === 0;
+  };
+
   get_json_stringify_function = function() {
     var json_escapable, json_meta, json_quote, json_str, stringify;
     json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
@@ -2037,45 +2041,68 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.getState = function() {
-      var open_nodes, selected_node, selected_node_id;
-      open_nodes = [];
-      this.tree_widget.tree.iterate((function(_this) {
-        return function(node) {
-          if (node.is_open && node.id && node.hasChildren()) {
-            open_nodes.push(node.id);
-          }
-          return true;
+      var getOpenNodeIds, getSelectedNodeIds;
+      getOpenNodeIds = (function(_this) {
+        return function() {
+          var open_nodes;
+          open_nodes = [];
+          _this.tree_widget.tree.iterate(function(node) {
+            if (node.is_open && node.id && node.hasChildren()) {
+              open_nodes.push(node.id);
+            }
+            return true;
+          });
+          return open_nodes;
         };
-      })(this));
-      selected_node = this.tree_widget.getSelectedNode();
-      if (selected_node) {
-        selected_node_id = selected_node.id;
-      } else {
-        selected_node_id = '';
-      }
+      })(this);
+      getSelectedNodeIds = (function(_this) {
+        return function() {
+          var n;
+          return (function() {
+            var _i, _len, _ref, _results;
+            _ref = this.tree_widget.getSelectedNodes();
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              n = _ref[_i];
+              _results.push(n.id);
+            }
+            return _results;
+          }).call(_this);
+        };
+      })(this);
       return {
-        open_nodes: open_nodes,
-        selected_node: selected_node_id
+        open_nodes: getOpenNodeIds(),
+        selected_node: getSelectedNodeIds()
       };
     };
 
     SaveStateHandler.prototype.setState = function(state) {
-      var open_nodes, selected_node, selected_node_id;
+      var node_id, open_nodes, selected_node, selected_node_ids, _i, _len, _results;
       if (state) {
         open_nodes = state.open_nodes;
-        selected_node_id = state.selected_node;
+        selected_node_ids = state.selected_node;
+        if (isInt(selected_node_ids)) {
+          selected_node_ids = [selected_node_ids];
+        }
         this.tree_widget.tree.iterate((function(_this) {
           return function(node) {
             node.is_open = node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0);
             return true;
           };
         })(this));
-        if (selected_node_id && this.tree_widget.select_node_handler) {
+        if (selected_node_ids && this.tree_widget.select_node_handler) {
           this.tree_widget.select_node_handler.clear();
-          selected_node = this.tree_widget.getNodeById(selected_node_id);
-          if (selected_node) {
-            return this.tree_widget.select_node_handler.addToSelection(selected_node);
+          _results = [];
+          for (_i = 0, _len = selected_node_ids.length; _i < _len; _i++) {
+            node_id = selected_node_ids[_i];
+            selected_node = this.tree_widget.getNodeById(node_id);
+            if (selected_node) {
+              _results.push(this.tree_widget.select_node_handler.addToSelection(selected_node));
+            } else {
+              _results.push(void 0);
+            }
           }
+          return _results;
         }
       }
     };
