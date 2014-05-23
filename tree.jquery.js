@@ -1399,7 +1399,8 @@ limitations under the License.
     JqTreeWidget.prototype.addToSelection = function(node) {
       if (node) {
         this.select_node_handler.addToSelection(node);
-        return this._getNodeElementForNode(node).select();
+        this._getNodeElementForNode(node).select();
+        return this._saveState();
       }
     };
 
@@ -1413,7 +1414,8 @@ limitations under the License.
 
     JqTreeWidget.prototype.removeFromSelection = function(node) {
       this.select_node_handler.removeFromSelection(node);
-      return this._getNodeElementForNode(node).deselect();
+      this._getNodeElementForNode(node).deselect();
+      return this._saveState();
     };
 
     JqTreeWidget.prototype.scrollToNode = function(node) {
