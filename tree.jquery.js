@@ -17,7 +17,7 @@ limitations under the License.
  */
 
 (function() {
-  var $, BorderDropHint, BoxAreasGenerator, DragAndDropBoxHandler, DragAndDropHandler, DragBoxElement, DragElement, DraggingCursor, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, _indexOf,
+  var $, BorderDropHint, BoxAreasGenerator, DragAndDropBoxHandler, DragAndDropHandler, DragBoxElement, DragElement, DraggingCursor, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, HorizontalOptions, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3035,6 +3035,11 @@ limitations under the License.
       return true;
     };
 
+    DragAndDropBoxHandler.prototype.resetHorizontal = function(current_x) {
+      this.previousX = current_x;
+      return this.horizontal_options = null;
+    };
+
     DragAndDropBoxHandler.prototype.mouseDrag = function(position_info) {
       var current_x, current_y, horizontal_direction, leaving, vertical_direction, _ref;
       current_y = position_info.page_y;
@@ -3046,8 +3051,14 @@ limitations under the License.
         this.hovered_area = this.findAreaWhenLeaving(vertical_direction);
         if (this.hovered_area) {
           this.dragging_cursor.moveTo(this.hovered_area);
-          return this.refresh();
+          this.refresh();
+          return this.resetHorizontal(current_x);
         }
+      } else if (horizontal_direction === DragAndDropBoxHandler.RIGHT) {
+        return this.rightMove();
+      } else if (horizontal_direction === DragAndDropBoxHandler.LEFT) {
+        this.leftMove();
+        return this.refresh();
       }
     };
 
@@ -3076,16 +3087,121 @@ limitations under the License.
       return [horizontal_direction, vertical_direction];
     };
 
+    DragAndDropBoxHandler.prototype.rightMove = function(current_x) {
+      var rightMoveArea;
+      rightMoveArea = this.getRightMoveArea();
+      if (rightMoveArea) {
+        this.hovered_area = rightMoveArea;
+        if (rightMoveArea && rightMoveArea.position === Position.INSIDE) {
+          this.dragging_cursor.bump();
+        } else {
+          this.dragging_cursor.moveTo(this.hovered_area);
+        }
+      }
+      return false;
+    };
+
+    DragAndDropBoxHandler.prototype.getRightMoveArea = function() {
+      var right;
+      if (!this.horizontal_options) {
+        this.horizontal_options = this.generateHorizontalMoveOptions();
+      }
+      if (this.horizontal_options.hasRight()) {
+        right = this.horizontal_options.shiftRight();
+        return right;
+      }
+      return null;
+    };
+
+    DragAndDropBoxHandler.prototype.leftMove = function() {
+      var leftMoveArea;
+      leftMoveArea = this.getLeftMoveArea();
+      if (leftMoveArea) {
+        this.hovered_area = leftMoveArea;
+        this.dragging_cursor.moveTo(this.hovered_area);
+        return true;
+      }
+      return false;
+    };
+
+    DragAndDropBoxHandler.prototype.getLeftMoveArea = function() {
+      var left;
+      if (!this.horizontal_options) {
+        this.horizontal_options = this.generateHorizontalMoveOptions();
+      }
+      if (this.horizontal_options.hasLeft()) {
+        left = this.horizontal_options.shiftLeft();
+        return left;
+      }
+      return null;
+    };
+
+    DragAndDropBoxHandler.prototype.generateHorizontalMoveOptions = function() {
+      var area, current, index, next, options, previous, previousIsFolder, previousIsOpen, _ref;
+      this.refresh;
+      options = new HorizontalOptions();
+      _ref = this.findCursor(), area = _ref[0], index = _ref[1];
+      current = area;
+      options.setCurrent(current);
+      index--;
+      previous = this.hit_areas[index];
+      previousIsFolder = previous.node.hasChildren();
+      previousIsOpen = previousIsFolder && !previous.node.element.classList.contains('jqtree-closed');
+      if (previous && previous.position === Position.AFTER && this.dragging_cursor.inCursor(previous)) {
+        index--;
+        previous = this.hit_areas[index];
+      }
+      if (previous && !(previousIsFolder && previousIsOpen && previous.position === Position.INSIDE)) {
+        while (previous && previous.position === Position.AFTER) {
+          options.rightPush(previous);
+          index--;
+          previous = this.hit_areas[index];
+        }
+        if (previous && previous.position === Position.INSIDE) {
+          options.rightPush(previous);
+        }
+      }
+      index = this.hit_areas.lastIndexOf(current);
+      index++;
+      next = this.hit_areas[index];
+      if (next && this.dragging_cursor.inCursor(next)) {
+        index++;
+        next = this.hit_areas[index];
+      }
+      while (next && next.position === Position.AFTER) {
+        index++;
+        options.leftPush(next);
+        next = this.hit_areas[index++];
+      }
+      return options;
+    };
+
     DragAndDropBoxHandler.prototype.generateHitAreas = function() {
       var hit_areas_generator;
       hit_areas_generator = new BoxAreasGenerator(this.tree_widget.tree, this.current_item.node, this.getTreeDimensions().bottom, this.dragging_cursor);
       return this.hit_areas = hit_areas_generator.generate();
     };
 
+    DragAndDropBoxHandler.prototype.findCursor = function() {
+      var area, index;
+      index = this.dragging_cursor.index;
+      area = this.hit_areas[index];
+      return [area, index];
+    };
+
+    DragAndDropBoxHandler.prototype.clear = function() {
+      this.drag_element.remove();
+      this.drag_element = null;
+      this.dragging_cursor.remove();
+      this.dragging_cursor = null;
+      this.previousX = null;
+      this.previousY = null;
+      return this.horizontal_options = null;
+    };
+
     DragAndDropBoxHandler.prototype.findAreaWhenLeaving = function(direction) {
-      var cursor_area, decrement, increment, index, next, previous, _ref, _ref1, _ref2, _ref3;
-      cursor_area = this.findHoveredArea(this.getTreeDimensions.left, this.dragging_cursor.area().top);
-      index = this.hit_areas.lastIndexOf(cursor_area);
+      var cursor, decrement, increment, index, next, previous, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+      _ref = this.findCursor(), cursor = _ref[0], index = _ref[1];
       if (direction === DragAndDropBoxHandler.UP) {
         decrement = function(dnd, index) {
           var previous;
@@ -3093,9 +3209,9 @@ limitations under the License.
           previous = dnd.hit_areas[index];
           return [previous, index];
         };
-        _ref = decrement(this, index), previous = _ref[0], index = _ref[1];
-        while (index > 0 && (previous.position !== Position.AFTER || previous.bottom > cursor_area.top)) {
-          _ref1 = decrement(this, index), previous = _ref1[0], index = _ref1[1];
+        _ref1 = decrement(this, index), previous = _ref1[0], index = _ref1[1];
+        while (index > 0 && (previous.position !== Position.AFTER || previous.bottom > cursor.top)) {
+          _ref2 = decrement(this, index), previous = _ref2[0], index = _ref2[1];
         }
         return previous;
       }
@@ -3106,9 +3222,12 @@ limitations under the License.
           next = dnd.hit_areas[index];
           return [next, index];
         };
-        _ref2 = increment(this, index), next = _ref2[0], index = _ref2[1];
+        _ref3 = increment(this, index), next = _ref3[0], index = _ref3[1];
+        if (this.dragging_cursor.inCursor(next)) {
+          _ref4 = increment(this, index), next = _ref4[0], index = _ref4[1];
+        }
         while (index < this.hit_areas.length && next.position !== Position.AFTER) {
-          _ref3 = increment(this, index), next = _ref3[0], index = _ref3[1];
+          _ref5 = increment(this, index), next = _ref5[0], index = _ref5[1];
         }
         return next;
       }
@@ -3178,11 +3297,13 @@ limitations under the License.
     }
 
     BoxAreasGenerator.prototype.generate = function() {
+      var hit_areas;
       this.positions = [];
       this.last_top = 0;
       this.iterate();
-      this.addCursor();
-      return this.generateHitAreas(this.positions);
+      hit_areas = this.generateHitAreas(this.positions);
+      this.addCursor(hit_areas);
+      return hit_areas;
     };
 
     BoxAreasGenerator.prototype.handleNode = function(node, next_node, $element) {
@@ -3207,6 +3328,14 @@ limitations under the License.
       return this.addPosition(node, Position.AFTER, top);
     };
 
+    BoxAreasGenerator.prototype.handleOpenFolder = function(node, $element) {
+      if (node === this.current_node) {
+        return false;
+      }
+      this.addPosition(node, Position.INSIDE, this.getTop($element));
+      return true;
+    };
+
     BoxAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {
       if (node === this.current_node.node) {
         return this.addPosition(node, Position.NONE, this.last_top);
@@ -3215,21 +3344,20 @@ limitations under the License.
       }
     };
 
-    BoxAreasGenerator.prototype.addCursor = function() {
-      var cursor_area, i, position, _i, _ref, _results;
+    BoxAreasGenerator.prototype.addCursor = function(hit_areas) {
+      var cursor_area, i, position;
       cursor_area = this.cursor.area();
       if (cursor_area) {
-        _results = [];
-        for (i = _i = 0, _ref = this.positions.length - 1; _i <= _ref; i = _i += 1) {
-          position = this.positions[i];
+        i = 0;
+        while (i < hit_areas.length) {
+          position = hit_areas[i];
           if (cursor_area.top < position.top) {
-            this.positions.splice(i, 0, this.cursor.area());
             break;
-          } else {
-            _results.push(void 0);
           }
+          i++;
         }
-        return _results;
+        this.cursor.index = i;
+        return hit_areas.splice(i, 0, cursor_area);
       }
     };
 
@@ -3250,18 +3378,26 @@ limitations under the License.
       return this.$element.replaceWith(this.$ghost);
     };
 
+    DraggingCursor.prototype.setIndex = function(index) {
+      return this.index = index;
+    };
+
     DraggingCursor.prototype.area = function() {
       var area;
       return area = {
         top: this.$ghost.offset().top,
         node: this.node,
-        position: Position.NONE
+        position: Position.NONE,
+        bottom: this.$ghost.offset().top + this.$ghost.height()
       };
     };
 
     DraggingCursor.prototype.moveTo = function(area) {
       var element;
       element = $(area.node.element);
+      if (this.bumped) {
+        this.deBump();
+      }
       if (area.position === Position.AFTER) {
         return element.after(this.$ghost);
       } else if (area.position === Position.BEFORE) {
@@ -3269,7 +3405,111 @@ limitations under the License.
       }
     };
 
+    DraggingCursor.prototype.bump = function() {
+      this.bumped = true;
+      return this.$ghost.addClass('bumped');
+    };
+
+    DraggingCursor.prototype.deBump = function() {
+      this.bumped = false;
+      return this.$ghost.removeClass('bumped');
+    };
+
+    DraggingCursor.prototype.remove = function() {
+      return this.$ghost.remove();
+    };
+
+    DraggingCursor.prototype.inCursor = function(area) {
+      var offset;
+      offset = this.$ghost.offset();
+      return area.bottom > offset.top && (offset.left === $(area.node.element).offset().left);
+    };
+
     return DraggingCursor;
+
+  })();
+
+  HorizontalOptions = (function() {
+    function HorizontalOptions() {
+      this.right_arr = [];
+      this.left_arr = [];
+      this.current = null;
+    }
+
+    HorizontalOptions.prototype.setCurrent = function(area) {
+      return this.current = area;
+    };
+
+    HorizontalOptions.prototype.shiftLeft = function() {
+      var new_current_item;
+      if (this.hasLeft) {
+        new_current_item = this.left_arr.shift();
+        this.right_arr.unshift(this.current);
+        this.setCurrent(new_current_item);
+        return new_current_item;
+      } else {
+        return false;
+      }
+    };
+
+    HorizontalOptions.prototype.shiftRight = function() {
+      var new_current_item;
+      if (this.hasRight) {
+        new_current_item = this.right_arr.shift();
+        this.left_arr.unshift(this.current);
+        this.setCurrent(new_current_item);
+        return new_current_item;
+      } else {
+        return false;
+      }
+    };
+
+    HorizontalOptions.prototype.rightPush = function(area) {
+      return this.right_arr.push(area);
+    };
+
+    HorizontalOptions.prototype.leftPush = function(area) {
+      return this.left_arr.push(area);
+    };
+
+    HorizontalOptions.prototype.hasLeft = function() {
+      if (this.left_arr.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    HorizontalOptions.prototype.hasRight = function() {
+      if (this.right_arr.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    HorizontalOptions.prototype.print = function() {
+      var i, _i, _j, _ref, _ref1, _results;
+      for (i = _i = _ref = this.left_arr.length - 1; _i >= 0; i = _i += -1) {
+        if (i === 0) {
+          console.log("-1", this.left_arr[i]);
+        } else {
+          console.log("-" + (i - 1), this.left_arr[i]);
+        }
+      }
+      console.log('Current', this.current);
+      _results = [];
+      for (i = _j = 0, _ref1 = this.right_arr.length; _j <= _ref1; i = _j += 1) {
+        if (this.right_arr[i]) {
+          _results.push(console.log("+" + (i + 1), this.right_arr[i]));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    return HorizontalOptions;
 
   })();
 
