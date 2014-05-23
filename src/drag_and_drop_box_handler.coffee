@@ -35,6 +35,24 @@ class DragAndDropBoxHandler extends DragAndDropHandler
         @previousX = current_x
         @horizontal_options = null
 
+    mouseStop: (position_info) ->
+        if !@hovered_area || @hovered_area.position == Position.NONE
+            @dragging_cursor.unSwapGhost()
+            @tree_widget._refreshElements()
+        else
+            @moveItem(position_info)
+        @clear()
+        @removeHover()
+        @removeDropHint()
+        @removeHitAreas()
+
+        if @current_item
+            @current_item.$element.removeClass('jqtree-moving')
+            @current_item = null
+
+        @is_dragging = false
+        return false
+
     mouseDrag: (position_info) ->
         current_y = position_info.page_y
         current_x = position_info.page_x
@@ -244,8 +262,6 @@ class DragBoxElement extends DragElement
         $tree.append(@$element)
 
 
-
-
 class BoxAreasGenerator extends HitAreasGenerator
     constructor: (tree, current_node, tree_bottom, cursor) ->
         super(tree)
@@ -323,6 +339,9 @@ class DraggingCursor
 
     swapGhost: ->
         @$element.replaceWith(@$ghost)
+
+    unSwapGhost: ->
+        @$ghost.replaceWith(@$element)
 
     setIndex: (index) ->
         @index = index

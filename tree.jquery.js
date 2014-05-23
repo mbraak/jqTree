@@ -3040,6 +3040,25 @@ limitations under the License.
       return this.horizontal_options = null;
     };
 
+    DragAndDropBoxHandler.prototype.mouseStop = function(position_info) {
+      if (!this.hovered_area || this.hovered_area.position === Position.NONE) {
+        this.dragging_cursor.unSwapGhost();
+        this.tree_widget._refreshElements();
+      } else {
+        this.moveItem(position_info);
+      }
+      this.clear();
+      this.removeHover();
+      this.removeDropHint();
+      this.removeHitAreas();
+      if (this.current_item) {
+        this.current_item.$element.removeClass('jqtree-moving');
+        this.current_item = null;
+      }
+      this.is_dragging = false;
+      return false;
+    };
+
     DragAndDropBoxHandler.prototype.mouseDrag = function(position_info) {
       var current_x, current_y, horizontal_direction, leaving, vertical_direction, _ref;
       current_y = position_info.page_y;
@@ -3376,6 +3395,10 @@ limitations under the License.
 
     DraggingCursor.prototype.swapGhost = function() {
       return this.$element.replaceWith(this.$ghost);
+    };
+
+    DraggingCursor.prototype.unSwapGhost = function() {
+      return this.$ghost.replaceWith(this.$element);
     };
 
     DraggingCursor.prototype.setIndex = function(index) {
