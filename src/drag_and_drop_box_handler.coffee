@@ -31,6 +31,21 @@ class DragAndDropBoxHandler extends DragAndDropHandler
         @is_dragging = true
         return true
 
+    printHitAreas: ->
+        for hit_area in @hit_areas
+            console.log(hit_area.top, hit_area.bottom, hit_area.node.name, @convertPosition(hit_area.position), hit_area.depth)
+
+    convertPosition: (position) ->
+        switch position
+            when 1
+                return "BEFORE"
+            when 2
+                return "AFTER"
+            when 3
+                return "INSIDE"
+            when 4
+                return "NONE"
+
     resetHorizontal: (current_x) ->
         @previousX = current_x
         @horizontal_options = null
@@ -73,7 +88,6 @@ class DragAndDropBoxHandler extends DragAndDropHandler
 
         else if horizontal_direction == DragAndDropBoxHandler.LEFT
             @leftMove()
-            @refresh()
 
 
     getCurrentDirections: (current_x, current_y) ->
@@ -140,32 +154,32 @@ class DragAndDropBoxHandler extends DragAndDropHandler
     generateHorizontalMoveOptions: () ->
         @refresh
         options = new HorizontalOptions()
+
         [area, index] = @findCursor()
-        #if we are already as nested as far right as possible
+
         current = area
         options.setCurrent(current)
 
-        #get areas to the right
+        #get to bottom of cursor so that we can capture any afters that would lie in the cursor
+        while (@dragging_cursor.inCursor(this.hit_areas[index+1]))
+            index++
+            area = this.hit_areas[index]
+
+        #skip over the first element that is an AFTER in the same area as the cursor
         index--
         previous = @hit_areas[index]
         previousIsFolder = previous.node.hasChildren()
         previousIsOpen =  previousIsFolder && !previous.node.element.classList.contains('jqtree-closed')
 
-        if previous && previous.position == Position.AFTER && @dragging_cursor.inCursor(previous)
-            #skip over element that is in the same area as the cursor
-            index--
-            previous = @hit_areas[index]
-
+        #make sure we are not the first element in an open folder
         if previous && !(previousIsFolder && previousIsOpen && previous.position == Position.INSIDE)
-           #the cursor is not the first element in an open tree so it can nest
-            while previous && previous.position == Position.AFTER
-                options.rightPush(previous)
+            while previous && previous.position != Position.INSIDE
+                options.rightPush(previous) unless previous.position == Position.NONE
                 index--
                 previous = @hit_areas[index]
-            if previous && previous.position == Position.INSIDE
-                options.rightPush(previous)
+            options.rightPush(previous)
 
-        #get areas to left
+       #get areas to left
         index = @hit_areas.lastIndexOf(current)
         index++
         next = @hit_areas[index]
@@ -214,7 +228,12 @@ class DragAndDropBoxHandler extends DragAndDropHandler
                 [previous,index]
 
             [previous, index] = decrement(this, index)
-            while index > 0 && (previous.position != Position.AFTER || previous.bottom > cursor.top)
+            while index > 0
+                if (previous.position == Position.INSIDE && @hit_areas[index-1].position == Position.INSIDE)
+                    [previous, index] = decrement(this, index)
+                    break;
+                if (previous.position == Position.AFTER && previous.bottom < cursor.top)
+                    break;
                 [previous, index] = decrement(this, index)
             return previous
 
@@ -224,9 +243,13 @@ class DragAndDropBoxHandler extends DragAndDropHandler
                 next = dnd.hit_areas[index]
                 [next, index]
             [next, index] = increment(this, index)
-            if (@dragging_cursor.inCursor(next))
+            while (next && @dragging_cursor.inCursor(next))
                 [next, index] = increment(this, index)
-            while index < @hit_areas.length && next.position != Position.AFTER
+            while index < @hit_areas.length
+                if (next.position == Position.INSIDE && @hit_areas[index+1].position == Position.INSIDE)
+                    break
+                if next.position == Position.AFTER
+                    break
                 [next, index] = increment(this, index)
             return next
 
@@ -250,6 +273,7 @@ DragAndDropBoxHandler.RIGHT = 1
 DragAndDropBoxHandler.LEFT = -1
 DragAndDropBoxHandler.NEUTRAL = 0
 
+
 class DragBoxElement extends DragElement
     constructor: (element, offset_x, offset_y, $tree) ->
         @offset_x = offset_x
@@ -269,6 +293,46 @@ class BoxAreasGenerator extends HitAreasGenerator
         @current_node = current_node
         @tree_bottom = tree_bottom
 
+    iterate: ->
+        is_first_node = true
+
+        _iterateNode = (node, next_node, depth) =>
+
+            must_iterate_inside = (
+                (node.is_open or not node.element) and node.hasChildren()
+            )
+
+            if node.element
+                $element = $(node.element)
+
+                if not $element.is(':visible')
+                    return
+
+                if is_first_node
+                    @handleFirstNode(node, $element, depth)
+                    is_first_node = false
+
+                if not node.hasChildren()
+                    @handleNode(node, next_node, $element, depth)
+                else if node.is_open
+                    if not @handleOpenFolder(node, $element, depth)
+                        must_iterate_inside = false
+                else
+                    @handleClosedFolder(node, next_node, $element, depth)
+
+            if must_iterate_inside
+                children_length = node.children.length
+                for child, i in node.children
+                    if i == (children_length - 1)
+                        _iterateNode(node.children[i], null, depth + 1)
+                    else
+                        _iterateNode(node.children[i], node.children[i+1], depth + 1)
+
+                if node.is_open
+                    @handleAfterOpenFolder(node, next_node, $element, depth)
+
+        _iterateNode(@tree, null, 0)
+
     generate: ->
         @positions = []
         @last_top = 0
@@ -279,44 +343,55 @@ class BoxAreasGenerator extends HitAreasGenerator
         @addCursor(hit_areas)
         return hit_areas
 
-    handleNode: (node, next_node, $element) ->
+    addPosition: (node, position, top, depth) ->
+        area = {
+            top: top
+            node: node
+            position: position
+            depth: depth
+        }
+
+        @positions.push(area)
+        @last_top = top
+
+    handleNode: (node, next_node, $element, depth) ->
         top = @getTop($element)
 
         if node == @current_node
             # Cannot move inside current item
-            @addPosition(node, Position.NONE, top)
+            @addPosition(node, Position.NONE, top, depth)
         else
-            @addPosition(node, Position.INSIDE, top)
-            @addPosition(node, Position.AFTER, top)
+            @addPosition(node, Position.INSIDE, top, depth)
+            @addPosition(node, Position.AFTER, top, depth)
 
-    handleClosedFolder: (node, next_node, $element) ->
+    handleClosedFolder: (node, next_node, $element, depth) ->
         top = @getTop($element)
 
         if node == @current_node
             # Cannot move after current item
-            @addPosition(node, Position.NONE, top)
+            @addPosition(node, Position.NONE, top, depth)
         else
-            @addPosition(node, Position.INSIDE, top)
+            @addPosition(node, Position.INSIDE, top, depth)
 
-        @addPosition(node, Position.AFTER, top)
+        @addPosition(node, Position.AFTER, top, depth)
 
-    handleOpenFolder: (node, $element) ->
+    handleOpenFolder: (node, $element, depth) ->
         if node == @current_node
             # Cannot move inside current item
             # Stop iterating
             return false
 
-        @addPosition(node, Position.INSIDE, @getTop($element))
+        @addPosition(node, Position.INSIDE, @getTop($element), depth)
 
         # Continue iterating
         return true
 
-    handleAfterOpenFolder: (node, next_node, $element) ->
+    handleAfterOpenFolder: (node, next_node, $element, depth) ->
         if node == @current_node.node
             # Cannot move after current item
-            @addPosition(node, Position.NONE, @last_top)
+            @addPosition(node, Position.NONE, @last_top, depth)
         else
-            @addPosition(node, Position.AFTER, @last_top)
+            @addPosition(node, Position.AFTER, @last_top, depth)
 
     addCursor: (hit_areas) ->
         cursor_area = @cursor.area()
@@ -329,6 +404,30 @@ class BoxAreasGenerator extends HitAreasGenerator
                 i++
             @cursor.index = i
             hit_areas.splice(i, 0 , cursor_area)
+
+    generateHitAreasForGroup: (hit_areas, positions_in_group, top, bottom) ->
+        # limit positions in group
+
+        position_count = Math.min(positions_in_group.length, 4)
+        area_height = Math.round((bottom - top) / position_count)
+        area_top = top
+
+        i = 0
+        while (i < position_count)
+            position = positions_in_group[i]
+
+            hit_areas.push(
+                top: area_top,
+                bottom: area_top + area_height,
+                node: position.node,
+                position: position.position
+                depth: position.depth
+            )
+
+            area_top += area_height
+            i += 1
+
+        return null
 
 class DraggingCursor
     constructor: (element, position) ->
@@ -362,6 +461,9 @@ class DraggingCursor
             element.after(@$ghost)
         else if area.position is Position.BEFORE
             element.before(@$ghost)
+        else if area.position is Position.INSIDE
+            element.find('.jqtree-element').first().after(@$ghost)
+            @bump()
 
     bump: ->
         @bumped = true
@@ -376,7 +478,10 @@ class DraggingCursor
 
     inCursor: (area) ->
         offset = @$ghost.offset()
-        area.bottom > offset.top && (offset.left == $(area.node.element).offset().left)
+        top = offset.top
+        bottom = @$ghost.height() + top
+        left = offset.left
+        area.top >= top && area.top < bottom && (left <= $(area.node.element).offset().left)
 
 
 

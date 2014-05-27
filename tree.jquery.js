@@ -3035,6 +3035,30 @@ limitations under the License.
       return true;
     };
 
+    DragAndDropBoxHandler.prototype.printHitAreas = function() {
+      var hit_area, _i, _len, _ref, _results;
+      _ref = this.hit_areas;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        hit_area = _ref[_i];
+        _results.push(console.log(hit_area.top, hit_area.bottom, hit_area.node.name, this.convertPosition(hit_area.position), hit_area.depth));
+      }
+      return _results;
+    };
+
+    DragAndDropBoxHandler.prototype.convertPosition = function(position) {
+      switch (position) {
+        case 1:
+          return "BEFORE";
+        case 2:
+          return "AFTER";
+        case 3:
+          return "INSIDE";
+        case 4:
+          return "NONE";
+      }
+    };
+
     DragAndDropBoxHandler.prototype.resetHorizontal = function(current_x) {
       this.previousX = current_x;
       return this.horizontal_options = null;
@@ -3076,8 +3100,7 @@ limitations under the License.
       } else if (horizontal_direction === DragAndDropBoxHandler.RIGHT) {
         return this.rightMove();
       } else if (horizontal_direction === DragAndDropBoxHandler.LEFT) {
-        this.leftMove();
-        return this.refresh();
+        return this.leftMove();
       }
     };
 
@@ -3162,23 +3185,23 @@ limitations under the License.
       _ref = this.findCursor(), area = _ref[0], index = _ref[1];
       current = area;
       options.setCurrent(current);
+      while (this.dragging_cursor.inCursor(this.hit_areas[index + 1])) {
+        index++;
+        area = this.hit_areas[index];
+      }
       index--;
       previous = this.hit_areas[index];
       previousIsFolder = previous.node.hasChildren();
       previousIsOpen = previousIsFolder && !previous.node.element.classList.contains('jqtree-closed');
-      if (previous && previous.position === Position.AFTER && this.dragging_cursor.inCursor(previous)) {
-        index--;
-        previous = this.hit_areas[index];
-      }
       if (previous && !(previousIsFolder && previousIsOpen && previous.position === Position.INSIDE)) {
-        while (previous && previous.position === Position.AFTER) {
-          options.rightPush(previous);
+        while (previous && previous.position !== Position.INSIDE) {
+          if (previous.position !== Position.NONE) {
+            options.rightPush(previous);
+          }
           index--;
           previous = this.hit_areas[index];
         }
-        if (previous && previous.position === Position.INSIDE) {
-          options.rightPush(previous);
-        }
+        options.rightPush(previous);
       }
       index = this.hit_areas.lastIndexOf(current);
       index++;
@@ -3219,7 +3242,7 @@ limitations under the License.
     };
 
     DragAndDropBoxHandler.prototype.findAreaWhenLeaving = function(direction) {
-      var cursor, decrement, increment, index, next, previous, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+      var cursor, decrement, increment, index, next, previous, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
       _ref = this.findCursor(), cursor = _ref[0], index = _ref[1];
       if (direction === DragAndDropBoxHandler.UP) {
         decrement = function(dnd, index) {
@@ -3229,8 +3252,15 @@ limitations under the License.
           return [previous, index];
         };
         _ref1 = decrement(this, index), previous = _ref1[0], index = _ref1[1];
-        while (index > 0 && (previous.position !== Position.AFTER || previous.bottom > cursor.top)) {
-          _ref2 = decrement(this, index), previous = _ref2[0], index = _ref2[1];
+        while (index > 0) {
+          if (previous.position === Position.INSIDE && this.hit_areas[index - 1].position === Position.INSIDE) {
+            _ref2 = decrement(this, index), previous = _ref2[0], index = _ref2[1];
+            break;
+          }
+          if (previous.position === Position.AFTER && previous.bottom < cursor.top) {
+            break;
+          }
+          _ref3 = decrement(this, index), previous = _ref3[0], index = _ref3[1];
         }
         return previous;
       }
@@ -3241,12 +3271,18 @@ limitations under the License.
           next = dnd.hit_areas[index];
           return [next, index];
         };
-        _ref3 = increment(this, index), next = _ref3[0], index = _ref3[1];
-        if (this.dragging_cursor.inCursor(next)) {
-          _ref4 = increment(this, index), next = _ref4[0], index = _ref4[1];
-        }
-        while (index < this.hit_areas.length && next.position !== Position.AFTER) {
+        _ref4 = increment(this, index), next = _ref4[0], index = _ref4[1];
+        while (next && this.dragging_cursor.inCursor(next)) {
           _ref5 = increment(this, index), next = _ref5[0], index = _ref5[1];
+        }
+        while (index < this.hit_areas.length) {
+          if (next.position === Position.INSIDE && this.hit_areas[index + 1].position === Position.INSIDE) {
+            break;
+          }
+          if (next.position === Position.AFTER) {
+            break;
+          }
+          _ref6 = increment(this, index), next = _ref6[0], index = _ref6[1];
         }
         return next;
       }
@@ -3315,6 +3351,52 @@ limitations under the License.
       this.tree_bottom = tree_bottom;
     }
 
+    BoxAreasGenerator.prototype.iterate = function() {
+      var is_first_node, _iterateNode;
+      is_first_node = true;
+      _iterateNode = (function(_this) {
+        return function(node, next_node, depth) {
+          var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref;
+          must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
+          if (node.element) {
+            $element = $(node.element);
+            if (!$element.is(':visible')) {
+              return;
+            }
+            if (is_first_node) {
+              _this.handleFirstNode(node, $element, depth);
+              is_first_node = false;
+            }
+            if (!node.hasChildren()) {
+              _this.handleNode(node, next_node, $element, depth);
+            } else if (node.is_open) {
+              if (!_this.handleOpenFolder(node, $element, depth)) {
+                must_iterate_inside = false;
+              }
+            } else {
+              _this.handleClosedFolder(node, next_node, $element, depth);
+            }
+          }
+          if (must_iterate_inside) {
+            children_length = node.children.length;
+            _ref = node.children;
+            for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+              child = _ref[i];
+              if (i === (children_length - 1)) {
+                _iterateNode(node.children[i], null, depth + 1);
+              } else {
+                _iterateNode(node.children[i], node.children[i + 1], depth + 1);
+              }
+            }
+            if (node.is_open) {
+              return _this.handleAfterOpenFolder(node, next_node, $element, depth);
+            }
+          }
+        };
+      })(this);
+      return _iterateNode(this.tree, null, 0);
+    };
+
     BoxAreasGenerator.prototype.generate = function() {
       var hit_areas;
       this.positions = [];
@@ -3325,41 +3407,53 @@ limitations under the License.
       return hit_areas;
     };
 
-    BoxAreasGenerator.prototype.handleNode = function(node, next_node, $element) {
+    BoxAreasGenerator.prototype.addPosition = function(node, position, top, depth) {
+      var area;
+      area = {
+        top: top,
+        node: node,
+        position: position,
+        depth: depth
+      };
+      this.positions.push(area);
+      return this.last_top = top;
+    };
+
+    BoxAreasGenerator.prototype.handleNode = function(node, next_node, $element, depth) {
       var top;
       top = this.getTop($element);
       if (node === this.current_node) {
-        return this.addPosition(node, Position.NONE, top);
+        return this.addPosition(node, Position.NONE, top, depth);
       } else {
-        this.addPosition(node, Position.INSIDE, top);
-        return this.addPosition(node, Position.AFTER, top);
+        this.addPosition(node, Position.INSIDE, top, depth);
+        return this.addPosition(node, Position.AFTER, top, depth);
       }
     };
 
-    BoxAreasGenerator.prototype.handleClosedFolder = function(node, next_node, $element) {
+    BoxAreasGenerator.prototype.handleClosedFolder = function(node, next_node, $element, depth) {
       var top;
       top = this.getTop($element);
       if (node === this.current_node) {
-        this.addPosition(node, Position.NONE, top);
+        this.addPosition(node, Position.NONE, top, depth);
       } else {
-        this.addPosition(node, Position.INSIDE, top);
+        this.addPosition(node, Position.INSIDE, top, depth);
       }
-      return this.addPosition(node, Position.AFTER, top);
+      return this.addPosition(node, Position.AFTER, top, depth);
     };
 
-    BoxAreasGenerator.prototype.handleOpenFolder = function(node, $element) {
+    BoxAreasGenerator.prototype.handleOpenFolder = function(node, $element, depth) {
       if (node === this.current_node) {
         return false;
       }
-      this.addPosition(node, Position.INSIDE, this.getTop($element));
+      this.addPosition(node, Position.INSIDE, this.getTop($element), depth);
       return true;
     };
 
-    BoxAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {
+    BoxAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element, depth) {
       if (node === this.current_node.node) {
-        return this.addPosition(node, Position.NONE, this.last_top);
+        return this.addPosition(node, Position.NONE, this.last_top, depth);
       } else {
-        return this.addPosition(node, Position.AFTER, this.last_top);
+        return this.addPosition(node, Position.AFTER, this.last_top, depth);
       }
     };
 
@@ -3378,6 +3472,27 @@ limitations under the License.
         this.cursor.index = i;
         return hit_areas.splice(i, 0, cursor_area);
       }
+    };
+
+    BoxAreasGenerator.prototype.generateHitAreasForGroup = function(hit_areas, positions_in_group, top, bottom) {
+      var area_height, area_top, i, position, position_count;
+      position_count = Math.min(positions_in_group.length, 4);
+      area_height = Math.round((bottom - top) / position_count);
+      area_top = top;
+      i = 0;
+      while (i < position_count) {
+        position = positions_in_group[i];
+        hit_areas.push({
+          top: area_top,
+          bottom: area_top + area_height,
+          node: position.node,
+          position: position.position,
+          depth: position.depth
+        });
+        area_top += area_height;
+        i += 1;
+      }
+      return null;
     };
 
     return BoxAreasGenerator;
@@ -3425,6 +3540,9 @@ limitations under the License.
         return element.after(this.$ghost);
       } else if (area.position === Position.BEFORE) {
         return element.before(this.$ghost);
+      } else if (area.position === Position.INSIDE) {
+        element.find('.jqtree-element').first().after(this.$ghost);
+        return this.bump();
       }
     };
 
@@ -3443,9 +3561,12 @@ limitations under the License.
     };
 
     DraggingCursor.prototype.inCursor = function(area) {
-      var offset;
+      var bottom, left, offset, top;
       offset = this.$ghost.offset();
-      return area.bottom > offset.top && (offset.left === $(area.node.element).offset().left);
+      top = offset.top;
+      bottom = this.$ghost.height() + top;
+      left = offset.left;
+      return area.top >= top && area.top < bottom && (left <= $(area.node.element).offset().left);
     };
 
     return DraggingCursor;
