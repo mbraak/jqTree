@@ -293,46 +293,6 @@ class BoxAreasGenerator extends HitAreasGenerator
         @current_node = current_node
         @tree_bottom = tree_bottom
 
-    iterate: ->
-        is_first_node = true
-
-        _iterateNode = (node, next_node, depth) =>
-
-            must_iterate_inside = (
-                (node.is_open or not node.element) and node.hasChildren()
-            )
-
-            if node.element
-                $element = $(node.element)
-
-                if not $element.is(':visible')
-                    return
-
-                if is_first_node
-                    @handleFirstNode(node, $element, depth)
-                    is_first_node = false
-
-                if not node.hasChildren()
-                    @handleNode(node, next_node, $element, depth)
-                else if node.is_open
-                    if not @handleOpenFolder(node, $element, depth)
-                        must_iterate_inside = false
-                else
-                    @handleClosedFolder(node, next_node, $element, depth)
-
-            if must_iterate_inside
-                children_length = node.children.length
-                for child, i in node.children
-                    if i == (children_length - 1)
-                        _iterateNode(node.children[i], null, depth + 1)
-                    else
-                        _iterateNode(node.children[i], node.children[i+1], depth + 1)
-
-                if node.is_open
-                    @handleAfterOpenFolder(node, next_node, $element, depth)
-
-        _iterateNode(@tree, null, 0)
-
     generate: ->
         @positions = []
         @last_top = 0
@@ -343,55 +303,54 @@ class BoxAreasGenerator extends HitAreasGenerator
         @addCursor(hit_areas)
         return hit_areas
 
-    addPosition: (node, position, top, depth) ->
+    addPosition: (node, position, top) ->
         area = {
             top: top
             node: node
             position: position
-            depth: depth
         }
 
         @positions.push(area)
         @last_top = top
 
-    handleNode: (node, next_node, $element, depth) ->
+    handleNode: (node, next_node, $element) ->
         top = @getTop($element)
 
         if node == @current_node
             # Cannot move inside current item
-            @addPosition(node, Position.NONE, top, depth)
+            @addPosition(node, Position.NONE, top)
         else
-            @addPosition(node, Position.INSIDE, top, depth)
-            @addPosition(node, Position.AFTER, top, depth)
+            @addPosition(node, Position.INSIDE, top)
+            @addPosition(node, Position.AFTER, top)
 
-    handleClosedFolder: (node, next_node, $element, depth) ->
+    handleClosedFolder: (node, next_node, $element) ->
         top = @getTop($element)
 
         if node == @current_node
             # Cannot move after current item
-            @addPosition(node, Position.NONE, top, depth)
+            @addPosition(node, Position.NONE, top)
         else
-            @addPosition(node, Position.INSIDE, top, depth)
+            @addPosition(node, Position.INSIDE, top)
 
-        @addPosition(node, Position.AFTER, top, depth)
+        @addPosition(node, Position.AFTER, top)
 
-    handleOpenFolder: (node, $element, depth) ->
+    handleOpenFolder: (node, $element) ->
         if node == @current_node
             # Cannot move inside current item
             # Stop iterating
             return false
 
-        @addPosition(node, Position.INSIDE, @getTop($element), depth)
+        @addPosition(node, Position.INSIDE, @getTop($element))
 
         # Continue iterating
         return true
 
-    handleAfterOpenFolder: (node, next_node, $element, depth) ->
+    handleAfterOpenFolder: (node, next_node, $element) ->
         if node == @current_node.node
             # Cannot move after current item
-            @addPosition(node, Position.NONE, @last_top, depth)
+            @addPosition(node, Position.NONE, @last_top)
         else
-            @addPosition(node, Position.AFTER, @last_top, depth)
+            @addPosition(node, Position.AFTER, @last_top)
 
     addCursor: (hit_areas) ->
         cursor_area = @cursor.area()
@@ -405,29 +364,6 @@ class BoxAreasGenerator extends HitAreasGenerator
             @cursor.index = i
             hit_areas.splice(i, 0 , cursor_area)
 
-    generateHitAreasForGroup: (hit_areas, positions_in_group, top, bottom) ->
-        # limit positions in group
-
-        position_count = Math.min(positions_in_group.length, 4)
-        area_height = Math.round((bottom - top) / position_count)
-        area_top = top
-
-        i = 0
-        while (i < position_count)
-            position = positions_in_group[i]
-
-            hit_areas.push(
-                top: area_top,
-                bottom: area_top + area_height,
-                node: position.node,
-                position: position.position
-                depth: position.depth
-            )
-
-            area_top += area_height
-            i += 1
-
-        return null
 
 class DraggingCursor
     constructor: (element, position) ->

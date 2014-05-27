@@ -3351,52 +3351,6 @@ limitations under the License.
       this.tree_bottom = tree_bottom;
     }
 
-    BoxAreasGenerator.prototype.iterate = function() {
-      var is_first_node, _iterateNode;
-      is_first_node = true;
-      _iterateNode = (function(_this) {
-        return function(node, next_node, depth) {
-          var $element, child, children_length, i, must_iterate_inside, _i, _len, _ref;
-          must_iterate_inside = (node.is_open || !node.element) && node.hasChildren();
-          if (node.element) {
-            $element = $(node.element);
-            if (!$element.is(':visible')) {
-              return;
-            }
-            if (is_first_node) {
-              _this.handleFirstNode(node, $element, depth);
-              is_first_node = false;
-            }
-            if (!node.hasChildren()) {
-              _this.handleNode(node, next_node, $element, depth);
-            } else if (node.is_open) {
-              if (!_this.handleOpenFolder(node, $element, depth)) {
-                must_iterate_inside = false;
-              }
-            } else {
-              _this.handleClosedFolder(node, next_node, $element, depth);
-            }
-          }
-          if (must_iterate_inside) {
-            children_length = node.children.length;
-            _ref = node.children;
-            for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-              child = _ref[i];
-              if (i === (children_length - 1)) {
-                _iterateNode(node.children[i], null, depth + 1);
-              } else {
-                _iterateNode(node.children[i], node.children[i + 1], depth + 1);
-              }
-            }
-            if (node.is_open) {
-              return _this.handleAfterOpenFolder(node, next_node, $element, depth);
-            }
-          }
-        };
-      })(this);
-      return _iterateNode(this.tree, null, 0);
-    };
-
     BoxAreasGenerator.prototype.generate = function() {
       var hit_areas;
       this.positions = [];
@@ -3407,53 +3361,52 @@ limitations under the License.
       return hit_areas;
     };
 
-    BoxAreasGenerator.prototype.addPosition = function(node, position, top, depth) {
+    BoxAreasGenerator.prototype.addPosition = function(node, position, top) {
       var area;
       area = {
         top: top,
         node: node,
-        position: position,
-        depth: depth
+        position: position
       };
       this.positions.push(area);
       return this.last_top = top;
     };
 
-    BoxAreasGenerator.prototype.handleNode = function(node, next_node, $element, depth) {
+    BoxAreasGenerator.prototype.handleNode = function(node, next_node, $element) {
       var top;
       top = this.getTop($element);
       if (node === this.current_node) {
-        return this.addPosition(node, Position.NONE, top, depth);
+        return this.addPosition(node, Position.NONE, top);
       } else {
-        this.addPosition(node, Position.INSIDE, top, depth);
-        return this.addPosition(node, Position.AFTER, top, depth);
+        this.addPosition(node, Position.INSIDE, top);
+        return this.addPosition(node, Position.AFTER, top);
       }
     };
 
-    BoxAreasGenerator.prototype.handleClosedFolder = function(node, next_node, $element, depth) {
+    BoxAreasGenerator.prototype.handleClosedFolder = function(node, next_node, $element) {
       var top;
       top = this.getTop($element);
       if (node === this.current_node) {
-        this.addPosition(node, Position.NONE, top, depth);
+        this.addPosition(node, Position.NONE, top);
       } else {
-        this.addPosition(node, Position.INSIDE, top, depth);
+        this.addPosition(node, Position.INSIDE, top);
       }
-      return this.addPosition(node, Position.AFTER, top, depth);
+      return this.addPosition(node, Position.AFTER, top);
     };
 
-    BoxAreasGenerator.prototype.handleOpenFolder = function(node, $element, depth) {
+    BoxAreasGenerator.prototype.handleOpenFolder = function(node, $element) {
       if (node === this.current_node) {
         return false;
       }
-      this.addPosition(node, Position.INSIDE, this.getTop($element), depth);
+      this.addPosition(node, Position.INSIDE, this.getTop($element));
       return true;
     };
 
-    BoxAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element, depth) {
+    BoxAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {
       if (node === this.current_node.node) {
-        return this.addPosition(node, Position.NONE, this.last_top, depth);
+        return this.addPosition(node, Position.NONE, this.last_top);
       } else {
-        return this.addPosition(node, Position.AFTER, this.last_top, depth);
+        return this.addPosition(node, Position.AFTER, this.last_top);
       }
     };
 
@@ -3472,27 +3425,6 @@ limitations under the License.
         this.cursor.index = i;
         return hit_areas.splice(i, 0, cursor_area);
       }
-    };
-
-    BoxAreasGenerator.prototype.generateHitAreasForGroup = function(hit_areas, positions_in_group, top, bottom) {
-      var area_height, area_top, i, position, position_count;
-      position_count = Math.min(positions_in_group.length, 4);
-      area_height = Math.round((bottom - top) / position_count);
-      area_top = top;
-      i = 0;
-      while (i < position_count) {
-        position = positions_in_group[i];
-        hit_areas.push({
-          top: area_top,
-          bottom: area_top + area_height,
-          node: position.node,
-          position: position.position,
-          depth: position.depth
-        });
-        area_top += area_height;
-        i += 1;
-      }
-      return null;
     };
 
     return BoxAreasGenerator;
