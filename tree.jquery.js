@@ -3494,6 +3494,9 @@ limitations under the License.
 
     DraggingCursor.prototype.inCursor = function(area) {
       var bottom, left, offset, top;
+      if (!area) {
+        return false;
+      }
       offset = this.$ghost.offset();
       top = offset.top;
       bottom = this.$ghost.height() + top;

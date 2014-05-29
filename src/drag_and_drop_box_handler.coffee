@@ -413,6 +413,7 @@ class DraggingCursor
         @$ghost.remove()
 
     inCursor: (area) ->
+        return false unless area
         offset = @$ghost.offset()
         top = offset.top
         bottom = @$ghost.height() + top
