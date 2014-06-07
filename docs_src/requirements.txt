@@ -1,2 +1,2 @@
 Jinja2==2.7.2
-MarkupSafe==0.19
+MarkupSafe==0.21

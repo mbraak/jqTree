@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Load json data in javascript tree</title>
+    <title>Use icon toggle buttons</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../extra/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../extra/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
@@ -10,56 +10,30 @@
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
     
+    <link rel="stylesheet" href="../extra/bower_components/fontawesome/css/font-awesome.min.css">
+
 </head>
 <body>
     <div class="container">
         <p id="nav">
-            <a href="../index.html">&laquo; Documentation</a>
-            
-                <a href="load_json_data_from_server.html" class="next">Example 2 &raquo;</a>
+            <a href="custom_html.html">&laquo; Example 9</a>
             
         </p>
 
-        <h1>Example 1 - load json data</h1>
+        <h1>Example 10 - use icon toggle buttons</h1>
 
         
-    <div id="tree1"></div>
-
     <p>
-        In this example we load the data using the <strong>data</strong> option.
-        As you can see, the data is an array of objects.
+        You can use the <strong>openedIcon</strong> and <strong>closedIcon</strong> options to use html for
+        the toggle buttons. You can for example use <a href="http://fortawesome.github.io/Font-Awesome/">Fontawesome icons</a>.
     </p>
-    <ul>
-        <li>The <strong>label</strong> property defines the label of the node.</li>
-        <li>The <strong>children</strong> property is an array of nodes.
-    </ul>
-
-    <h3>html<h3>
-
-<pre><code class="language-markup">&lt;div id="tree1"&gt;&lt;/div&gt;</code></pre>
+    <div id="tree1" data-url="/example_data/"></div>
 
     <h3>javascript</h3>
-
-<pre><code class="language-javascript">var data = [
-    {
-        label: 'node1',
-        children: [
-            { label: 'child1' },
-            { label: 'child2' }
-        ]
-    },
-    {
-        label: 'node2',
-        children: [
-            { label: 'child3' }
-        ]
-    }
-];
-
-$('#tree1').tree({
-    data: data
-});
-</code></pre>
+<pre><code class="language-javascript">$('#tree1').tree({
+    closedIcon: $('&lt;i class="fa fa-arrow-circle-right"&gt;&lt;/i&gt;'),
+    openedIcon: $('&lt;i class="fa fa-arrow-circle-down"&gt;&lt;/i&gt;')
+});</code></pre>
 
 
     </div>
@@ -88,25 +62,18 @@ $('#tree1').tree({
 
 
     <script>
-        $(function() {
-            var data = [
-                {
-                    label: 'node1',
-                    children: [
-                        { label: 'child1' },
-                        { label: 'child2' }
-                    ]
-                },
-                {
-                    label: 'node2',
-                    children: [
-                        { label: 'child3' }
-                    ]
-                }
-            ];
+        $.mockjax({
+            url: '*',
+            response: function(options) {
+                this.responseText = ExampleData.example_data;
+            },
+            responseTime: 0
+        });
 
+        $(function() {
             $('#tree1').tree({
-                data: data
+                closedIcon: $('<i class="fa fa-arrow-circle-right"></i>'),
+                openedIcon: $('<i class="fa fa-arrow-circle-down"></i>')
             });
         });
     </script>

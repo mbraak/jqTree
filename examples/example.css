@@ -1,13 +1,3 @@
-body {
-    width: 960px;
-    margin: 8px auto;
-    padding-bottom: 16px;
-}
-
-body, button, input, select, textarea, h1, h2, h3 {
-    font-family: 'Open Sans', sans-serif;
-}
-
 h1 {
     font-size: 20px;
     margin-bottom: 16px;

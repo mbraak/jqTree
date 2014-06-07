@@ -9,22 +9,24 @@
     <link rel="stylesheet" href="../extra/bower_components/prism/themes/prism-okaidia.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    {% block css %}{% endblock %}
 </head>
 <body>
-    <p id="nav">
-        <a href="{% block previous_url %}{% endblock %}">&laquo; {% block previous_title %}{% endblock %}</a>
-        {% block next %}
-            <a href="{% block next_url %}{% endblock %}" class="next">{% block next_title %}{% endblock %} &raquo;</a>
-        {% endblock %}
-    </p>
+    <div class="container">
+        <p id="nav">
+            <a href="{% block previous_url %}{% endblock %}">&laquo; {% block previous_title %}{% endblock %}</a>
+            {% block next %}
+                <a href="{% block next_url %}{% endblock %}" class="next">{% block next_title %}{% endblock %} &raquo;</a>
+            {% endblock %}
+        </p>
 
-    <h1>{% block h1 %}{% endblock %}</h1>
+        <h1>{% block h1 %}{% endblock %}</h1>
 
-    {% block contents %}{% endblock %}
+        {% block contents %}{% endblock %}
+    </div>
 
 <!--[if lt IE 9]>
-    <script src="../extra/jquery-1.11.0.min.js"></script>
+    <script src="../extra/jquery-1.11.1.min.js"></script>
 <![endif]-->
 <!--[if gte IE 9]><!-->
     <script src="../extra/bower_components/jquery/dist/jquery.min.js"></script>
@@ -34,19 +36,15 @@
 <script src="../extra/example_data.js"></script>
 <script src="../extra/bower_components/jquery-cookie/jquery.cookie.js"></script>
 <script src="../tree.jquery.js"></script>
-<script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-33742133-1']);
-    _gaq.push(['_trackPageview']);
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    (function() {
-        var ga = document.createElement('script');
-        ga.type = 'text/javascript';
-        ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(ga, s);
-    })();
+  ga('create', 'UA-33742133-1', 'auto');
+  ga('require', 'linkid', 'linkid.js')
+  ga('send', 'pageview');
 </script>
 
 {% block script %}{% endblock %}

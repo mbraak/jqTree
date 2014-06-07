@@ -328,7 +328,7 @@ test('loadData', function() {
         'node1'
     );
 
-    // 1. load new data
+    // - load new data
     $tree.tree('loadData', example_data2);
 
     // first node is 'main'
@@ -337,19 +337,17 @@ test('loadData', function() {
         'main'
     );
 
-    // 2. add new nodes to child3
+    // - load new data under node 'child3'
     $tree.tree('loadData', example_data);
 
-    var node2 = $tree.tree('getNodeById', 124);
-    var child3 = node2.children[0];
-    equal(child3.name, 'child3');
+    var child3 = $tree.tree('getNodeByName', 'child3');
 
     var data = [
-        { label: 'c4' },
+        { label: 'c4', id: 200 },
         {
-            label: 'c5',
+            label: 'c5', id: 201,
             children: [
-                { label: 'c6' }
+                { label: 'c6', id: 202 }
             ]
         }
     ];
@@ -371,6 +369,38 @@ test('loadData', function() {
 
     // Node 'child3' must have toggler button
     ok($child3.prev().is('a.jqtree-toggler'));
+
+    // - select node 'c5' and load new data under 'child3'
+    var c5 = $tree.tree('getNodeByName', 'c5');
+    $tree.tree('selectNode', c5);
+
+    equal($tree.tree('getSelectedNode').name, 'c5');
+
+    var data2 = [
+        { label: 'c7' },
+        { label: 'c8' }
+    ];
+    $tree.tree('loadData', data2, child3);
+
+    // c5 must be deselected
+    equal($tree.tree('getSelectedNode'), false);
+
+    // - select c7; load new data under child3; note that c7 has no id
+    $tree.tree('selectNode', $tree.tree('getNodeByName', 'c7'));
+
+    equal($tree.tree('getSelectedNode').name, 'c7');
+
+    $tree.tree('loadData', [ 'c9' ], child3);
+
+    equal($tree.tree('getSelectedNode'), false);
+
+    // - select c9 (which has no id); load new nodes under child2
+    $tree.tree('selectNode', $tree.tree('getNodeByName', 'c9'));
+
+    var child2 = $tree.tree('getNodeByName', 'child2');
+    $tree.tree('loadData', [ 'c10' ], child2);
+
+    equal($tree.tree('getSelectedNode').name, 'c9');
 });
 
 test('openNode and closeNode', function() {
@@ -906,6 +936,19 @@ test('updateNode', function() {
 
     var node_124 = $tree.tree('getNodeById', 124);
     equal(node_124, undefined);
+
+    // update child1
+    var child1 = $tree.tree('getNodeByName', 'child1');
+
+    $tree.tree('updateNode', child1, 'child1a');
+
+    equal(formatTitles($tree), 'node1 child1a child2 xyz child3');
+
+    // select child1
+    $tree.tree('selectNode', child1);
+    $tree.tree('updateNode', child1, 'child1b');
+
+    ok($(child1.element).hasClass('jqtree-selected'));
 });
 
 test('moveNode', function() {
@@ -1768,21 +1811,36 @@ test('getNextSibling', function() {
     equal(tree.getNextSibling(), null);
 });
 
+test('getNodesByProperty', function() {
+    var tree = new Tree.Node(null, true);
+    tree.loadFromData(example_data);
+
+    nodes = tree.getNodesByProperty('name', 'child1');
+
+    equal(nodes.length, 1);
+    equal(nodes[0].name, 'child1');
+});
+
 
 module('util');
 
 test('JSON.stringify', function() {
-    equal(JSON.stringify('abc'), '"abc"');
-    equal(JSON.stringify(123), '123');
-    equal(JSON.stringify(true), 'true');
-    equal(JSON.stringify({abc: 'def'}), '{"abc":"def"}');
-    equal(JSON.stringify({}), '{}');
-    equal(JSON.stringify([1, 2, 3]), '[1,2,3]');
-    equal(JSON.stringify(null), 'null');
-    equal(JSON.stringify(Number.NEGATIVE_INFINITY), 'null');
+    function test_stringify(stringify) {
+        equal(stringify('abc'), '"abc"');
+        equal(stringify(123), '123');
+        equal(stringify(true), 'true');
+        equal(stringify({abc: 'def'}), '{"abc":"def"}');
+        equal(stringify({}), '{}');
+        equal(stringify([1, 2, 3]), '[1,2,3]');
+        equal(stringify(null), 'null');
+        equal(stringify(Number.NEGATIVE_INFINITY), 'null');
 
-    // test escapable
-    JSON.stringify("\u200c");
+        // test escapable
+        JSON.stringify("\u200c");
+    }
+
+    test_stringify(JSON.stringify);
+    test_stringify(Tree.get_json_stringify_function());
 });
 
 test('indexOf', function() {

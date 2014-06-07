@@ -366,4 +366,24 @@ class Node
             else
                 return null                
 
+    getNodesByProperty: (key, value) ->
+        return @filter(
+            (node) ->
+                return node[key] == value
+        )
+
+    filter: (f) ->
+        result = []
+
+        @iterate(
+            (node) ->
+                if f(node)
+                    result.push(node)
+
+                return true
+        )
+
+        return result
+
+
 @Tree.Node = Node
