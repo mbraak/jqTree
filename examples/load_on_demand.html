@@ -9,19 +9,20 @@
     <link rel="stylesheet" href="../extra/bower_components/prism/themes/prism-okaidia.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    
 </head>
 <body>
-    <p id="nav">
-        <a href="save_state.html">&laquo; Example 4</a>
-        
-            <a href="autoescape.html" class="next">Example 6 &raquo;</a>
-        
-    </p>
+    <div class="container">
+        <p id="nav">
+            <a href="save_state.html">&laquo; Example 4</a>
+            
+                <a href="autoescape.html" class="next">Example 6 &raquo;</a>
+            
+        </p>
 
-    <h1>Example 5 - Load nodes on demand from the server</h1>
+        <h1>Example 5 - Load nodes on demand from the server</h1>
 
-    
+        
     <div id="tree1" data-url="/nodes/"></div>
 
     <p>
@@ -50,23 +51,14 @@
     <h3>first level of data</h3>
 <pre><code class="language-javascript">[
     {
-        "label": "node1",
-        "children": [
-            {
-                "label": "child1"
-            },
-            {
-                "label": "child2"
-            }
-        ]
+        "label": "Saurischia",
+        "id": 1,
+        "load_on_demand": true
     },
     {
-        "label": "node2",
-        "children": [
-            {
-                "label": "child3"
-            }
-        ]
+        "label": "Ornithischians",
+        "id": 23,
+        "load_on_demand": true
     }
 ]
 </code></pre>
@@ -82,9 +74,10 @@
 });
 </code></pre>
 
+    </div>
 
 <!--[if lt IE 9]>
-    <script src="../extra/jquery-1.11.0.min.js"></script>
+    <script src="../extra/jquery-1.11.1.min.js"></script>
 <![endif]-->
 <!--[if gte IE 9]><!-->
     <script src="../extra/bower_components/jquery/dist/jquery.min.js"></script>

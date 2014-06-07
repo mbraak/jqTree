@@ -17,7 +17,7 @@ class KeyHandler
         if not @tree_widget.options.keyboardSupport
             return
 
-        if $(document.activeElement).is('textarea,input')
+        if $(document.activeElement).is('textarea,input,select')
             return true
 
         current_node = @tree_widget.getSelectedNode()

@@ -17,7 +17,7 @@ limitations under the License.
  */
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, html_escape, indexOf, json_escapable, json_meta, json_quote, json_str, _indexOf,
+  var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, isInt, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -766,6 +766,24 @@ limitations under the License.
       }
     };
 
+    Node.prototype.getNodesByProperty = function(key, value) {
+      return this.filter(function(node) {
+        return node[key] === value;
+      });
+    };
+
+    Node.prototype.filter = function(f) {
+      var result;
+      result = [];
+      this.iterate(function(node) {
+        if (f(node)) {
+          result.push(node);
+        }
+        return true;
+      });
+      return result;
+    };
+
     return Node;
 
   })();
@@ -775,8 +793,8 @@ limitations under the License.
   ElementsRenderer = (function() {
     function ElementsRenderer(tree_widget) {
       this.tree_widget = tree_widget;
-      this.opened_icon_text = this.getHtmlText(tree_widget.options.openedIcon);
-      this.closed_icon_text = this.getHtmlText(tree_widget.options.closedIcon);
+      this.opened_icon_element = this.createButtonElement(tree_widget.options.openedIcon);
+      this.closed_icon_element = this.createButtonElement(tree_widget.options.closedIcon);
     }
 
     ElementsRenderer.prototype.render = function(from_node) {
@@ -788,17 +806,16 @@ limitations under the License.
     };
 
     ElementsRenderer.prototype.renderNode = function(node) {
-      var $li, $parent_ul, parent_node_element, previous_node;
+      var li, parent_node_element, previous_node;
       $(node.element).remove();
       parent_node_element = new NodeElement(node.parent, this.tree_widget);
-      $parent_ul = parent_node_element.getUl();
-      $li = this.createLi(node);
-      this.attachNodeData(node, $li);
+      li = this.createLi(node);
+      this.attachNodeData(node, li);
       previous_node = node.getPreviousSibling();
       if (previous_node) {
-        $(previous_node.element).after($li);
+        $(previous_node.element).after(li);
       } else {
-        parent_node_element.getUl().prepend($li);
+        parent_node_element.getUl().prepend(li);
       }
       if (node.children) {
         return this.renderFromNode(node);
@@ -866,14 +883,14 @@ limitations under the License.
     };
 
     ElementsRenderer.prototype.createFolderLi = function(node) {
-      var button_char, button_classes, button_link, div, escaped_name, folder_classes, li, title_span;
+      var button_classes, button_link, div, escaped_name, folder_classes, icon_element, li, title_span;
       button_classes = this.getButtonClasses(node);
       folder_classes = this.getFolderClasses(node);
       escaped_name = this.escapeIfNecessary(node.name);
       if (node.is_open) {
-        button_char = this.opened_icon_text;
+        icon_element = this.opened_icon_element;
       } else {
-        button_char = this.closed_icon_text;
+        icon_element = this.closed_icon_element;
       }
       li = document.createElement('li');
       li.className = "jqtree_common " + folder_classes;
@@ -882,10 +899,10 @@ limitations under the License.
       li.appendChild(div);
       button_link = document.createElement('a');
       button_link.className = "jqtree_common " + button_classes;
-      button_link.appendChild(document.createTextNode(button_char));
+      button_link.appendChild(icon_element.cloneNode());
       div.appendChild(button_link);
       title_span = document.createElement('span');
-      title_span.className = "jqtree_common jqtree-title";
+      title_span.className = "jqtree_common jqtree-title jqtree-title-folder";
       div.appendChild(title_span);
       title_span.innerHTML = escaped_name;
       return li;
@@ -940,8 +957,15 @@ limitations under the License.
       }
     };
 
-    ElementsRenderer.prototype.getHtmlText = function(entity_text) {
-      return $(document.createElement('div')).html(entity_text).text();
+    ElementsRenderer.prototype.createButtonElement = function(value) {
+      var div;
+      if (typeof value === 'string') {
+        div = document.createElement('div');
+        div.innerHTML = value;
+        return document.createTextNode(div.innerHTML);
+      } else {
+        return $(value)[0];
+      }
     };
 
     return ElementsRenderer;
@@ -1104,7 +1128,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._loadDataFromUrl = function(url_info, parent_node, on_finished) {
-      var $el, addLoadingClass, parseUrlInfo, removeLoadingClass;
+      var $el, addLoadingClass, handeLoadData, loadDataFromUrlInfo, parseUrlInfo, removeLoadingClass;
       $el = null;
       addLoadingClass = (function(_this) {
         return function() {
@@ -1137,44 +1161,56 @@ limitations under the License.
           }
         };
       })(this);
-      addLoadingClass();
+      handeLoadData = (function(_this) {
+        return function(data) {
+          removeLoadingClass();
+          _this._loadData(data, parent_node);
+          if (on_finished && $.isFunction(on_finished)) {
+            return on_finished();
+          }
+        };
+      })(this);
+      loadDataFromUrlInfo = (function(_this) {
+        return function() {
+          parseUrlInfo();
+          return $.ajax({
+            url: url_info.url,
+            data: url_info.data,
+            type: url_info.method.toUpperCase(),
+            cache: false,
+            dataType: 'json',
+            success: function(response) {
+              var data;
+              if ($.isArray(response) || typeof response === 'object') {
+                data = response;
+              } else {
+                data = $.parseJSON(response);
+              }
+              if (_this.options.dataFilter) {
+                data = _this.options.dataFilter(data);
+              }
+              return handeLoadData(data);
+            },
+            error: function(response) {
+              removeLoadingClass();
+              if (_this.options.onLoadFailed) {
+                return _this.options.onLoadFailed(response);
+              }
+            }
+          });
+        };
+      })(this);
       if (!url_info) {
         url_info = this._getDataUrlInfo(parent_node);
       }
-      parseUrlInfo();
-      return $.ajax({
-        url: url_info.url,
-        data: url_info.data,
-        type: url_info.method.toUpperCase(),
-        cache: false,
-        dataType: 'json',
-        success: (function(_this) {
-          return function(response) {
-            var data;
-            if ($.isArray(response) || typeof response === 'object') {
-              data = response;
-            } else {
-              data = $.parseJSON(response);
-            }
-            if (_this.options.dataFilter) {
-              data = _this.options.dataFilter(data);
-            }
-            removeLoadingClass();
-            _this._loadData(data, parent_node);
-            if (on_finished && $.isFunction(on_finished)) {
-              return on_finished();
-            }
-          };
-        })(this),
-        error: (function(_this) {
-          return function(response) {
-            removeLoadingClass();
-            if (_this.options.onLoadFailed) {
-              return _this.options.onLoadFailed(response);
-            }
-          };
-        })(this)
-      });
+      addLoadingClass();
+      if (url_info === false || url_info === null) {
+        removeLoadingClass();
+      } else if ($.isArray(url_info)) {
+        handeLoadData(url_info);
+      } else {
+        return loadDataFromUrlInfo();
+      }
     };
 
     JqTreeWidget.prototype._loadData = function(data, parent_node) {
@@ -1197,8 +1233,8 @@ limitations under the License.
         parent_node.load_on_demand = false;
         this._refreshElements(parent_node.parent);
       }
-      if (this.is_dragging) {
-        return this.dnd_handler.refreshHitAreas();
+      if (this.isDragging()) {
+        return this.dnd_handler.refresh();
       }
     };
 
@@ -1268,11 +1304,15 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.isDragging = function() {
-      return this.is_dragging;
+      if (this.dnd_handler) {
+        return this.dnd_handler.is_dragging;
+      } else {
+        return false;
+      }
     };
 
     JqTreeWidget.prototype.refreshHitAreas = function() {
-      return this.dnd_handler.refreshHitAreas();
+      return this.dnd_handler.refresh();
     };
 
     JqTreeWidget.prototype.addNodeAfter = function(new_node_info, existing_node) {
@@ -1357,8 +1397,11 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.addToSelection = function(node) {
-      this.select_node_handler.addToSelection(node);
-      return this._getNodeElementForNode(node).select();
+      if (node) {
+        this.select_node_handler.addToSelection(node);
+        this._getNodeElementForNode(node).select();
+        return this._saveState();
+      }
     };
 
     JqTreeWidget.prototype.getSelectedNodes = function() {
@@ -1371,7 +1414,8 @@ limitations under the License.
 
     JqTreeWidget.prototype.removeFromSelection = function(node) {
       this.select_node_handler.removeFromSelection(node);
-      return this._getNodeElementForNode(node).deselect();
+      this._getNodeElementForNode(node).deselect();
+      return this._saveState();
     };
 
     JqTreeWidget.prototype.scrollToNode = function(node) {
@@ -1591,7 +1635,7 @@ limitations under the License.
 
     JqTreeWidget.prototype._getNode = function($element) {
       var $li;
-      $li = $element.closest('li');
+      $li = $element.closest('li.jqtree_common');
       if ($li.length === 0) {
         return null;
       } else {
@@ -1724,6 +1768,9 @@ limitations under the License.
     NodeElement.prototype.init = function(node, tree_widget) {
       this.node = node;
       this.tree_widget = tree_widget;
+      if (!node.element) {
+        node.element = this.tree_widget.element;
+      }
       return this.$element = $(node.element);
     };
 
@@ -1775,7 +1822,8 @@ limitations under the License.
         this.node.is_open = true;
         $button = this.getButton();
         $button.removeClass('jqtree-closed');
-        $button.html(this.tree_widget.options.openedIcon);
+        $button.html('');
+        $button.append(this.tree_widget.renderer.opened_icon_element.cloneNode());
         doOpen = (function(_this) {
           return function() {
             _this.getLi().removeClass('jqtree-closed');
@@ -1805,7 +1853,8 @@ limitations under the License.
         this.node.is_open = false;
         $button = this.getButton();
         $button.addClass('jqtree-closed');
-        $button.html(this.tree_widget.options.closedIcon);
+        $button.html('');
+        $button.append(this.tree_widget.renderer.closed_icon_element.cloneNode());
         doClose = (function(_this) {
           return function() {
             _this.getLi().addClass('jqtree-closed');
@@ -1866,7 +1915,12 @@ limitations under the License.
 
   this.Tree._indexOf = _indexOf;
 
-  if (!((this.JSON != null) && (this.JSON.stringify != null) && typeof this.JSON.stringify === 'function')) {
+  isInt = function(n) {
+    return typeof n === 'number' && n % 1 === 0;
+  };
+
+  get_json_stringify_function = function() {
+    var json_escapable, json_meta, json_quote, json_str, stringify;
     json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
     json_meta = {
       '\b': '\\b',
@@ -1927,14 +1981,21 @@ limitations under the License.
           return (partial.length === 0 ? '{}' : '{' + partial.join(',') + '}');
       }
     };
-    if (this.JSON == null) {
-      this.JSON = {};
-    }
-    this.JSON.stringify = function(value) {
+    stringify = function(value) {
       return json_str('', {
         '': value
       });
     };
+    return stringify;
+  };
+
+  this.Tree.get_json_stringify_function = get_json_stringify_function;
+
+  if (!((this.JSON != null) && (this.JSON.stringify != null) && typeof this.JSON.stringify === 'function')) {
+    if (this.JSON == null) {
+      this.JSON = {};
+    }
+    this.JSON.stringify = get_json_stringify_function();
   }
 
   SaveStateHandler = (function() {
@@ -1982,45 +2043,68 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.getState = function() {
-      var open_nodes, selected_node, selected_node_id;
-      open_nodes = [];
-      this.tree_widget.tree.iterate((function(_this) {
-        return function(node) {
-          if (node.is_open && node.id && node.hasChildren()) {
-            open_nodes.push(node.id);
-          }
-          return true;
+      var getOpenNodeIds, getSelectedNodeIds;
+      getOpenNodeIds = (function(_this) {
+        return function() {
+          var open_nodes;
+          open_nodes = [];
+          _this.tree_widget.tree.iterate(function(node) {
+            if (node.is_open && node.id && node.hasChildren()) {
+              open_nodes.push(node.id);
+            }
+            return true;
+          });
+          return open_nodes;
         };
-      })(this));
-      selected_node = this.tree_widget.getSelectedNode();
-      if (selected_node) {
-        selected_node_id = selected_node.id;
-      } else {
-        selected_node_id = '';
-      }
+      })(this);
+      getSelectedNodeIds = (function(_this) {
+        return function() {
+          var n;
+          return (function() {
+            var _i, _len, _ref, _results;
+            _ref = this.tree_widget.getSelectedNodes();
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              n = _ref[_i];
+              _results.push(n.id);
+            }
+            return _results;
+          }).call(_this);
+        };
+      })(this);
       return {
-        open_nodes: open_nodes,
-        selected_node: selected_node_id
+        open_nodes: getOpenNodeIds(),
+        selected_node: getSelectedNodeIds()
       };
     };
 
     SaveStateHandler.prototype.setState = function(state) {
-      var open_nodes, selected_node, selected_node_id;
+      var node_id, open_nodes, selected_node, selected_node_ids, _i, _len, _results;
       if (state) {
         open_nodes = state.open_nodes;
-        selected_node_id = state.selected_node;
+        selected_node_ids = state.selected_node;
+        if (isInt(selected_node_ids)) {
+          selected_node_ids = [selected_node_ids];
+        }
         this.tree_widget.tree.iterate((function(_this) {
           return function(node) {
             node.is_open = node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0);
             return true;
           };
         })(this));
-        if (selected_node_id && this.tree_widget.select_node_handler) {
+        if (selected_node_ids && this.tree_widget.select_node_handler) {
           this.tree_widget.select_node_handler.clear();
-          selected_node = this.tree_widget.getNodeById(selected_node_id);
-          if (selected_node) {
-            return this.tree_widget.select_node_handler.addToSelection(selected_node);
+          _results = [];
+          for (_i = 0, _len = selected_node_ids.length; _i < _len; _i++) {
+            node_id = selected_node_ids[_i];
+            selected_node = this.tree_widget.getNodeById(node_id);
+            if (selected_node) {
+              _results.push(this.tree_widget.select_node_handler.addToSelection(selected_node));
+            } else {
+              _results.push(void 0);
+            }
           }
+          return _results;
         }
       }
     };
@@ -2107,10 +2191,10 @@ limitations under the License.
     SelectNodeHandler.prototype.getSelectedNodesUnder = function(parent) {
       var id, node, selected_nodes;
       if (this.selected_single_node) {
-        if (parent.isParentOf(selected_single_node)) {
-          return this.selected_single_node;
+        if (parent.isParentOf(this.selected_single_node)) {
+          return [this.selected_single_node];
         } else {
-          return null;
+          return [];
         }
       } else {
         selected_nodes = [];
@@ -2179,11 +2263,15 @@ limitations under the License.
       this.$ghost = null;
       this.hit_areas = [];
       this.is_dragging = false;
+      this.current_item = null;
     }
 
     DragAndDropHandler.prototype.mouseCapture = function(position_info) {
       var $element, node_element;
       $element = $(position_info.target);
+      if (!this.mustCaptureElement($element)) {
+        return null;
+      }
       if (this.tree_widget.options.onIsMoveHandle && !this.tree_widget.options.onIsMoveHandle($element)) {
         return null;
       }
@@ -2199,7 +2287,7 @@ limitations under the License.
 
     DragAndDropHandler.prototype.mouseStart = function(position_info) {
       var offset;
-      this.refreshHitAreas();
+      this.refresh();
       offset = $(position_info.target).offset();
       this.drag_element = new DragElement(this.current_item.node, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
       this.is_dragging = true;
@@ -2228,6 +2316,10 @@ limitations under the License.
       return true;
     };
 
+    DragAndDropHandler.prototype.mustCaptureElement = function($element) {
+      return !$element.is('input,select');
+    };
+
     DragAndDropHandler.prototype.canMoveToArea = function(area) {
       var position_name;
       if (!area) {
@@ -2248,14 +2340,21 @@ limitations under the License.
       this.removeHitAreas();
       if (this.current_item) {
         this.current_item.$element.removeClass('jqtree-moving');
+        this.current_item = null;
       }
       this.is_dragging = false;
       return false;
     };
 
-    DragAndDropHandler.prototype.refreshHitAreas = function() {
+    DragAndDropHandler.prototype.refresh = function() {
       this.removeHitAreas();
-      return this.generateHitAreas();
+      this.generateHitAreas();
+      if (this.current_item) {
+        this.current_item = this.tree_widget._getNodeElementForNode(this.current_item.node);
+        if (this.is_dragging) {
+          return this.current_item.$element.addClass('jqtree-moving');
+        }
+      }
     };
 
     DragAndDropHandler.prototype.removeHitAreas = function() {
@@ -2326,7 +2425,7 @@ limitations under the License.
       openFolder = (function(_this) {
         return function() {
           return _this.tree_widget._openNode(folder, _this.tree_widget.options.slide, function() {
-            _this.refreshHitAreas();
+            _this.refresh();
             return _this.updateDropHint();
           });
         };
@@ -2819,7 +2918,7 @@ limitations under the License.
       if (!this.tree_widget.options.keyboardSupport) {
         return;
       }
-      if ($(document.activeElement).is('textarea,input')) {
+      if ($(document.activeElement).is('textarea,input,select')) {
         return true;
       }
       current_node = this.tree_widget.getSelectedNode();

@@ -2,8 +2,8 @@ class ElementsRenderer
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
 
-        @opened_icon_text = @getHtmlText(tree_widget.options.openedIcon)
-        @closed_icon_text = @getHtmlText(tree_widget.options.closedIcon)
+        @opened_icon_element = @createButtonElement(tree_widget.options.openedIcon)
+        @closed_icon_element = @createButtonElement(tree_widget.options.closedIcon)
 
     render: (from_node) ->
         if from_node and from_node.parent
@@ -17,17 +17,18 @@ class ElementsRenderer
 
         # create element
         parent_node_element = new NodeElement(node.parent, @tree_widget)
-        $parent_ul = parent_node_element.getUl()
 
-        $li = @createLi(node)
-        @attachNodeData(node, $li)
+        li = @createLi(node)
+        @attachNodeData(node, li)
 
         # add element to dom
         previous_node = node.getPreviousSibling()
         if previous_node
-            $(previous_node.element).after($li)
+            # Add node after previous node
+            $(previous_node.element).after(li)
         else
-            parent_node_element.getUl().prepend($li)
+            # There is no previous node; add node as first child of parent
+            parent_node_element.getUl().prepend(li)
 
         # render children
         if node.children
@@ -93,9 +94,9 @@ class ElementsRenderer
         escaped_name = @escapeIfNecessary(node.name)
 
         if node.is_open
-            button_char = @opened_icon_text
+            icon_element = @opened_icon_element
         else
-            button_char = @closed_icon_text
+            icon_element = @closed_icon_element
 
         # li
         li = document.createElement('li')
@@ -112,14 +113,14 @@ class ElementsRenderer
         button_link.className = "jqtree_common #{ button_classes }"
 
         button_link.appendChild(
-            document.createTextNode(button_char)
+            icon_element.cloneNode()
         )
 
         div.appendChild(button_link)
 
         # title span
         title_span = document.createElement('span')
-        title_span.className = "jqtree_common jqtree-title"
+        title_span.className = "jqtree_common jqtree-title jqtree-title-folder"
 
         div.appendChild(title_span)
 
@@ -182,5 +183,12 @@ class ElementsRenderer
         else
             return value
 
-    getHtmlText: (entity_text) ->
-        return $(document.createElement('div')).html(entity_text).text()
+    createButtonElement: (value) ->
+        if typeof value == 'string'
+            # convert value to html
+            div = document.createElement('div')
+            div.innerHTML = value
+
+            return document.createTextNode(div.innerHTML)
+        else
+            return $(value)[0]

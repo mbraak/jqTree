@@ -9,22 +9,24 @@
     <link rel="stylesheet" href="../extra/bower_components/prism/themes/prism-okaidia.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    {% block css %}{% endblock %}
 </head>
 <body>
-    <p id="nav">
-        <a href="{% block previous_url %}{% endblock %}">&laquo; {% block previous_title %}{% endblock %}</a>
-        {% block next %}
-            <a href="{% block next_url %}{% endblock %}" class="next">{% block next_title %}{% endblock %} &raquo;</a>
-        {% endblock %}
-    </p>
+    <div class="container">
+        <p id="nav">
+            <a href="{% block previous_url %}{% endblock %}">&laquo; {% block previous_title %}{% endblock %}</a>
+            {% block next %}
+                <a href="{% block next_url %}{% endblock %}" class="next">{% block next_title %}{% endblock %} &raquo;</a>
+            {% endblock %}
+        </p>
 
-    <h1>{% block h1 %}{% endblock %}</h1>
+        <h1>{% block h1 %}{% endblock %}</h1>
 
-    {% block contents %}{% endblock %}
+        {% block contents %}{% endblock %}
+    </div>
 
 <!--[if lt IE 9]>
-    <script src="../extra/jquery-1.11.0.min.js"></script>
+    <script src="../extra/jquery-1.11.1.min.js"></script>
 <![endif]-->
 <!--[if gte IE 9]><!-->
     <script src="../extra/bower_components/jquery/dist/jquery.min.js"></script>

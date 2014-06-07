@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="jqtree.css">
     <link rel="stylesheet" href="extra/bower_components/prism/themes/prism-okaidia.css">
     <link rel="stylesheet" href="extra/documentation.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 </head>
 <body>
 <div class="jumbotron" id="jqtree">
@@ -154,7 +153,7 @@
                 <li>Saves the state</li>
                 <li>Keyboard support</li>
                 <li>Lazy loading</li>
-                <li>Works on ie7+, firefox 3.6+, chrome and safari</li>
+                <li>Works on ie8+, firefox 3.6+, chrome and safari</li>
                 <li>Written in Coffeescript</li>
             </ul>
             <p>
@@ -199,7 +198,7 @@ $('#tree1').tree({
 
             <h4 id="downloads">Downloads</h4>
             <ul>
-                <li>All (version 0.20): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
+                <li>All (version 0.21): <a href="https://github.com/mbraak/jqTree/tarball/master">jqTree.tar.gz</a></li>
                 <li>Javascript: <a href="tree.jquery.js">tree.jquery.js</a></li>
                 <li>Css: <a href="jqtree.css">jqtree.css</a></li>
                 <li>Image: <a href="jqtree-circle.png">jqtree-circle.png</a></li>
@@ -267,9 +266,24 @@ $('#tree1').tree({
                 <li><a href="examples/autoscroll.html">Example 7 - autoscroll</a></li>
                 <li><a href="examples/multiple_select.html">Example 8 - multiple select</a></li>
                 <li><a href="examples/custom_html.html">Example 9 - custom html</a></li>
+                <li><a href="examples/icon_buttons.html">Example 10 - use icon toggle buttons</a></li>
             </ul>
 
             <h4 id="changelog">Changelog</h4>
+
+            <h4>0.21 (june 7 2014) version</h4>
+            <ul>
+                <li>Issue 263: Improve styling of toggle button</li>
+                <li>Issue 266: Make it possible to use html for toggle buttons</li>
+                <li>Issue 262: updateNode on first level makes node disappear (thanks to Miloš Đekić)</li>
+                <li>Issue 260: Exempt 'select' elements from keyboard navigation (thanks to Eli Flanagan)</li>
+                <li>Issue 270: Fixed error 'selected_single_node is not defined' (thanks to Bryan Smith)</li>
+                <li>Issue 279: .jqtree-moving removed when loading subtree (thanks to Marc-Stefan Cassola)</li>
+                <li>Issue 280: CSS3 Circle and style optimization (thanks to Marc-Stefan Cassola)</li>
+                <li>Issue 283: Added function getNodesByProperty (thanks to Cedrik Vanderhaegen)</li>
+                <li>Issue 292: Save state if multiple nodes are selected (thanks to MykhailoP)</li>
+                <li>Issue 294: Handle click on input element in tree (thanks to Naeco33)</li>
+            </ul>
 
             <h4>0.20 (march 9 2014)</h4>
             <ul>
@@ -1160,6 +1174,15 @@ $tree.tree('scrollToNode', node);
                 Set the state of the tree: which nodes are open and which one is selected?
             </p>
 
+            <h4 id="functions-toggle">toggle</h4>
+            <p>
+                <strong>function toggle(node);</strong>
+            </p>
+
+            <p>
+                Open or close the tree node.
+            </p>
+
             <h4 id="functions-tojson">toJson</h4>
             <p>
                 <strong>function toJson();</strong>
@@ -1547,7 +1570,7 @@ var level = node.getLevel();
 </div>
 
 <!--[if lt IE 9]>
-    <script src="extra/jquery-1.11.0.min.js"></script>
+    <script src="extra/jquery-1.11.1.min.js"></script>
 <![endif]-->
 <!--[if gte IE 9]><!-->
     <script src="extra/bower_components/jquery/dist/jquery.min.js"></script>

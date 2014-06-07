@@ -9,19 +9,20 @@
     <link rel="stylesheet" href="../extra/bower_components/prism/themes/prism-okaidia.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    
 </head>
 <body>
-    <p id="nav">
-        <a href="load_json_data.html">&laquo; Example 1</a>
-        
-            <a href="drag_and_drop.html" class="next">Example 3 &raquo;</a>
-        
-    </p>
+    <div class="container">
+        <p id="nav">
+            <a href="load_json_data.html">&laquo; Example 1</a>
+            
+                <a href="drag_and_drop.html" class="next">Example 3 &raquo;</a>
+            
+        </p>
 
-    <h1>Example 2 - load json data from the server</h1>
+        <h1>Example 2 - load json data from the server</h1>
 
-    
+        
     <div id="tree1" data-url="/example_data/"></div>
 
     <p>
@@ -29,14 +30,15 @@
     </p>
 
     <h3>html</h3>
-<pre><code class="language-markup">&lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;</code></pre>
+    <pre><code class="language-markup">&lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;</code></pre>
 
     <h3>javascript</h3>
-<pre><code class="language-javascript">$('#tree1').tree();</code></pre>
+    <pre><code class="language-javascript">$('#tree1').tree();</code></pre>
 
+    </div>
 
 <!--[if lt IE 9]>
-    <script src="../extra/jquery-1.11.0.min.js"></script>
+    <script src="../extra/jquery-1.11.1.min.js"></script>
 <![endif]-->
 <!--[if gte IE 9]><!-->
     <script src="../extra/bower_components/jquery/dist/jquery.min.js"></script>
