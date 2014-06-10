@@ -49,6 +49,9 @@ class DragAndDropHandler
         can_move_to = @canMoveToArea(area)
 
         if can_move_to and area
+            if !area.node.isFolder()
+                @stopOpenFolderTimer();
+
             if @hovered_area != area
                 @hovered_area = area
 
@@ -118,7 +121,7 @@ class DragAndDropHandler
     generateHitAreas: ->
         hit_areas_generator = new HitAreasGenerator(
             @tree_widget.tree,
-            @current_item.node,            
+            @current_item.node,
             @getTreeDimensions().bottom
         )
         @hit_areas = hit_areas_generator.generate()
@@ -245,7 +248,7 @@ class VisibleNodeIterator
                 (node.is_open or not node.element) and node.hasChildren()
             )
 
-            if node.element                
+            if node.element
                 $element = $(node.element)
 
                 if not $element.is(':visible')
@@ -317,7 +320,7 @@ class HitAreasGenerator extends VisibleNodeIterator
         area = {
             top: top
             node: node
-            position: position            
+            position: position
         }
 
         @positions.push(area)
