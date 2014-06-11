@@ -2301,6 +2301,9 @@ limitations under the License.
       area = this.findHoveredArea(position_info.page_x, position_info.page_y);
       can_move_to = this.canMoveToArea(area);
       if (can_move_to && area) {
+        if (!area.node.isFolder()) {
+          this.stopOpenFolderTimer();
+        }
         if (this.hovered_area !== area) {
           this.hovered_area = area;
           if (this.mustOpenFolderTimer(area)) {
