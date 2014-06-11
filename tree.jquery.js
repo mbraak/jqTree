@@ -2523,8 +2523,11 @@ limitations under the License.
   HitAreasGenerator = (function(_super) {
     __extends(HitAreasGenerator, _super);
 
-    function HitAreasGenerator(tree, current_node, tree_bottom) {
+    function HitAreasGenerator(tree, current_node, tree_bottom, group_size_max) {
       HitAreasGenerator.__super__.constructor.call(this, tree);
+      this.group_size_max = group_size_max != null ? group_size_max : {
+        group_size_max: 4
+      };
       this.current_node = current_node;
       this.tree_bottom = tree_bottom;
     }
@@ -2625,7 +2628,7 @@ limitations under the License.
 
     HitAreasGenerator.prototype.generateHitAreasForGroup = function(hit_areas, positions_in_group, top, bottom) {
       var area_height, area_top, i, position, position_count;
-      position_count = Math.min(positions_in_group.length, 4);
+      position_count = Math.min(positions_in_group.length, this.group_size_max);
       area_height = Math.round((bottom - top) / position_count);
       area_top = top;
       i = 0;
@@ -3180,7 +3183,7 @@ limitations under the License.
 
     DragAndDropBoxHandler.prototype.generateHorizontalMoveOptions = function() {
       var area, current, index, next, options, previous, previousIsFolder, previousIsOpen, _ref;
-      this.refresh;
+      this.refresh();
       options = new HorizontalOptions();
       _ref = this.findCursor(), area = _ref[0], index = _ref[1];
       current = area;
@@ -3344,8 +3347,11 @@ limitations under the License.
   BoxAreasGenerator = (function(_super) {
     __extends(BoxAreasGenerator, _super);
 
-    function BoxAreasGenerator(tree, current_node, tree_bottom, cursor) {
-      BoxAreasGenerator.__super__.constructor.call(this, tree);
+    function BoxAreasGenerator(tree, current_node, tree_bottom, cursor, group_size_max) {
+      if (group_size_max == null) {
+        group_size_max = 12;
+      }
+      BoxAreasGenerator.__super__.constructor.call(this, tree, current_node, tree_bottom, group_size_max);
       this.cursor = cursor;
       this.current_node = current_node;
       this.tree_bottom = tree_bottom;

@@ -152,7 +152,7 @@ class DragAndDropBoxHandler extends DragAndDropHandler
         return null
 
     generateHorizontalMoveOptions: () ->
-        @refresh
+        @refresh()
         options = new HorizontalOptions()
 
         [area, index] = @findCursor()
@@ -287,8 +287,9 @@ class DragBoxElement extends DragElement
 
 
 class BoxAreasGenerator extends HitAreasGenerator
-    constructor: (tree, current_node, tree_bottom, cursor) ->
-        super(tree)
+    constructor: (tree, current_node, tree_bottom, cursor, group_size_max) ->
+        group_size_max ?= 12
+        super(tree, current_node, tree_bottom, group_size_max)
         @cursor = cursor
         @current_node = current_node
         @tree_bottom = tree_bottom
