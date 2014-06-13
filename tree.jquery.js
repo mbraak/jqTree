@@ -1023,7 +1023,10 @@ limitations under the License.
 
     JqTreeWidget.prototype.toggle = function(node, slide) {
       if (slide == null) {
-        slide = true;
+        slide = null;
+      }
+      if (slide === null) {
+        slide = this.options.slide;
       }
       if (node.is_open) {
         return this.closeNode(node, slide);
@@ -1248,7 +1251,10 @@ limitations under the License.
 
     JqTreeWidget.prototype.openNode = function(node, slide) {
       if (slide == null) {
-        slide = true;
+        slide = null;
+      }
+      if (slide === null) {
+        slide = this.options.slide;
       }
       return this._openNode(node, slide);
     };
@@ -1295,7 +1301,10 @@ limitations under the License.
 
     JqTreeWidget.prototype.closeNode = function(node, slide) {
       if (slide == null) {
-        slide = true;
+        slide = null;
+      }
+      if (slide === null) {
+        slide = this.options.slide;
       }
       if (node.isFolder()) {
         new FolderElement(node, this).close(slide);
