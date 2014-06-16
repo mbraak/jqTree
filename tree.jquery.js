@@ -3245,7 +3245,7 @@ limitations under the License.
     };
 
     DragAndDropBoxHandler.prototype.findAreaWhenLeaving = function(direction) {
-      var cursor, decrement, increment, index, next, previous, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+      var area, cursor, decrement, increment, index, next, previous, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
       _ref = this.findCursor(), cursor = _ref[0], index = _ref[1];
       if (direction === DragAndDropBoxHandler.UP) {
         decrement = function(dnd, index) {
@@ -3287,7 +3287,17 @@ limitations under the License.
           }
           _ref6 = increment(this, index), next = _ref6[0], index = _ref6[1];
         }
-        return next;
+        if (!next && index >= this.hit_areas.length - 1) {
+          index = this.hit_areas.length - 1;
+          area = this.hit_areas[index];
+          if (area.position === Position.NONE) {
+            return this.hit_areas[index - 1];
+          } else {
+            return area;
+          }
+        } else {
+          return next;
+        }
       }
     };
 

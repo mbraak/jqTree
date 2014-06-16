@@ -242,16 +242,24 @@ class DragAndDropBoxHandler extends DragAndDropHandler
                 index++
                 next = dnd.hit_areas[index]
                 [next, index]
-            [next, index] = increment(this, index)
-            while (next && @dragging_cursor.inCursor(next))
-                [next, index] = increment(this, index)
-            while index < @hit_areas.length
-                if (next.position == Position.INSIDE && @hit_areas[index+1].position == Position.INSIDE)
-                    break
-                if next.position == Position.AFTER
-                    break
-                [next, index] = increment(this, index)
-            return next
+              [next, index] = increment(this, index)
+              while (next && @dragging_cursor.inCursor(next))
+                  [next, index] = increment(this, index)
+              while index < @hit_areas.length
+                  if (next.position == Position.INSIDE && @hit_areas[index+1].position == Position.INSIDE)
+                      break
+                  if next.position == Position.AFTER
+                      break
+                  [next, index] = increment(this, index)
+            if (!next && index >= @hit_areas.length - 1)
+              index = @hit_areas.length - 1
+              area = @hit_areas[index]
+              if area.position == Position.NONE
+                return @hit_areas[index-1]
+              else
+                return area
+            else
+              return next
 
     leavingCursorVertically: (y) ->
         return false unless @dragging_cursor
