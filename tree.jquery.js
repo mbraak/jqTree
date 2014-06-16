@@ -3096,7 +3096,7 @@ limitations under the License.
       if (leaving && vertical_direction && leaving === vertical_direction) {
         this.hovered_area = this.findAreaWhenLeaving(vertical_direction);
         if (this.hovered_area) {
-          this.dragging_cursor.moveTo(this.hovered_area);
+          this.dragging_cursor.moveTo(this.hovered_area, this.hit_areas.lastIndexOf(this.hovered_area));
           this.refresh();
           return this.resetHorizontal(current_x);
         }
@@ -3468,9 +3468,12 @@ limitations under the License.
       };
     };
 
-    DraggingCursor.prototype.moveTo = function(area) {
+    DraggingCursor.prototype.moveTo = function(area, index) {
       var element;
       element = $(area.node.element);
+      if (index) {
+        this.setIndex(index);
+      }
       if (this.bumped) {
         this.deBump();
       }

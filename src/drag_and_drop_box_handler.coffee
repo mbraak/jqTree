@@ -79,7 +79,7 @@ class DragAndDropBoxHandler extends DragAndDropHandler
             @hovered_area = @findAreaWhenLeaving(vertical_direction)
             #we have to be on a hovered element so move and refresh everything
             if (@hovered_area)
-                @dragging_cursor.moveTo(@hovered_area)
+                @dragging_cursor.moveTo(@hovered_area, @hit_areas.lastIndexOf(@hovered_area))
                 @refresh()
                 @resetHorizontal(current_x)
 
@@ -390,8 +390,9 @@ class DraggingCursor
             bottom: @$ghost.offset().top + @$ghost.height()
         }
 
-    moveTo: (area) ->
+    moveTo: (area, index) ->
         element = $(area.node.element)
+        @setIndex(index) if index
         if (@bumped)
             @deBump()
         if area.position is Position.AFTER
