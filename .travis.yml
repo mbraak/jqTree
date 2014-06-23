@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - 0.10
 before_script:
-  - npm install connect coveralls
+  - npm install connect coveralls serve-static
   - node phantomjs/server.js &
   - sleep 5
 script:
