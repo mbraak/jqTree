@@ -2031,7 +2031,7 @@ limitations under the License.
       var state;
       state = this.getStateFromStorage();
       if (state) {
-        this.setState($.parseJSON(state));
+        this.setState(state);
         return true;
       } else {
         return false;
@@ -2039,6 +2039,25 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.getStateFromStorage = function() {
+      var json_data;
+      json_data = this._loadFromStorage();
+      if (json_data) {
+        return this._parseState(json_data);
+      } else {
+        return null;
+      }
+    };
+
+    SaveStateHandler.prototype._parseState = function(json_data) {
+      var state;
+      state = $.parseJSON(json_data);
+      if (state && state.selected_node && isInt(state.selected_node)) {
+        state.selected_node = [state.selected_node];
+      }
+      return state;
+    };
+
+    SaveStateHandler.prototype._loadFromStorage = function() {
       if (this.tree_widget.options.onGetStateFromStorage) {
         return this.tree_widget.options.onGetStateFromStorage();
       } else if (this.supportsLocalStorage()) {
@@ -2092,9 +2111,6 @@ limitations under the License.
       if (state) {
         open_nodes = state.open_nodes;
         selected_node_ids = state.selected_node;
-        if (isInt(selected_node_ids)) {
-          selected_node_ids = [selected_node_ids];
-        }
         this.tree_widget.tree.iterate((function(_this) {
           return function(node) {
             node.is_open = node.id && node.hasChildren() && (indexOf(open_nodes, node.id) >= 0);
@@ -2151,11 +2167,10 @@ limitations under the License.
     };
 
     SaveStateHandler.prototype.getNodeIdToBeSelected = function() {
-      var state, state_json;
-      state_json = this.getStateFromStorage();
-      if (state_json) {
-        state = $.parseJSON(state_json);
-        return state.selected_node;
+      var state;
+      state = this.getStateFromStorage();
+      if (state && state.selected_node) {
+        return state.selected_node[0];
       } else {
         return null;
       }
