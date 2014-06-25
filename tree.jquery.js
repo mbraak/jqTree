@@ -1207,7 +1207,7 @@ limitations under the License.
         url_info = this._getDataUrlInfo(parent_node);
       }
       addLoadingClass();
-      if (url_info === false || url_info === null) {
+      if (!url_info) {
         removeLoadingClass();
       } else if ($.isArray(url_info)) {
         handeLoadData(url_info);

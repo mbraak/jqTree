@@ -186,7 +186,7 @@ class JqTreeWidget extends MouseWidget
 
         addLoadingClass()
 
-        if url_info == false or url_info == null
+        if not url_info
             removeLoadingClass()
             return
         else if $.isArray(url_info)
