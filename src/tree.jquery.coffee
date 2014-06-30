@@ -19,7 +19,7 @@ class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
         saveState: false  # true / false / string (cookie name)
-        dragAndDrop: false
+        dragAndDrop: false # true / false / string (drag and drop type: 'box' or 'line')
         selectable: true
         useContextMenu: true
         onCanSelectNode: null
@@ -45,7 +45,7 @@ class JqTreeWidget extends MouseWidget
             @closeNode(node, slide)
         else
             @openNode(node, slide)
-    
+
     getTree: ->
         return @tree
 
@@ -70,7 +70,7 @@ class JqTreeWidget extends MouseWidget
 
         saveState = =>
             if @options.saveState
-                @save_state_handler.saveState()            
+                @save_state_handler.saveState()
 
         if not node
             # Called with empty node -> deselect current node
@@ -145,7 +145,7 @@ class JqTreeWidget extends MouseWidget
                 url_info.method = 'get'
 
         handeLoadData = (data) =>
-            removeLoadingClass()                
+            removeLoadingClass()
             @_loadData(data, parent_node)
 
             if on_finished and $.isFunction(on_finished)
@@ -277,8 +277,8 @@ class JqTreeWidget extends MouseWidget
 
     addParentNode: (new_node_info, existing_node) ->
         new_node = existing_node.addParent(new_node_info)
-        @_refreshElements(new_node.parent)  
-        return new_node    
+        @_refreshElements(new_node.parent)
+        return new_node
 
     removeNode: (node) ->
         parent = node.parent
@@ -305,7 +305,7 @@ class JqTreeWidget extends MouseWidget
             @_refreshElements(parent_node.parent)
 
         return node
- 
+
     prependNode: (new_node_info, parent_node) ->
         if not parent_node
             parent_node = @tree
@@ -390,7 +390,9 @@ class JqTreeWidget extends MouseWidget
         if SelectNodeHandler?
             @select_node_handler = new SelectNodeHandler(this)
 
-        if DragAndDropHandler?
+        if DragAndDropBoxHandler? && @options.dragAndDrop == 'box'
+            @dnd_handler = new DragAndDropBoxHandler(this)
+        else if DragAndDropHandler?
             @dnd_handler = new DragAndDropHandler(this)
         else
             @options.dragAndDrop = false
@@ -637,7 +639,7 @@ class JqTreeWidget extends MouseWidget
     _deselectCurrentNode: ->
         node = @getSelectedNode()
         if node
-            @removeFromSelection(node)        
+            @removeFromSelection(node)
 
 SimpleWidget.register(JqTreeWidget, 'tree')
 
@@ -697,7 +699,7 @@ class FolderElement extends NodeElement
                 @getUl().slideDown('fast', doOpen)
             else
                 @getUl().show()
-                doOpen()                
+                doOpen()
 
     close: (slide=true) ->
         if @node.is_open
@@ -717,7 +719,7 @@ class FolderElement extends NodeElement
             else
                 @getUl().hide()
                 doClose()
-                
+
     getButton: ->
         return @$element.children('.jqtree-element').find('a.jqtree-toggler')
 

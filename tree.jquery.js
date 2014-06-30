@@ -17,7 +17,7 @@ limitations under the License.
  */
 
 (function() {
-  var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, isInt, _indexOf,
+  var $, BorderDropHint, BoxAreasGenerator, DragAndDropBoxHandler, DragAndDropHandler, DragBoxElement, DragElement, DraggingCursor, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, HorizontalOptions, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, VisibleNodeIterator, get_json_stringify_function, html_escape, indexOf, isInt, _indexOf,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1452,7 +1452,9 @@ limitations under the License.
       if (typeof SelectNodeHandler !== "undefined" && SelectNodeHandler !== null) {
         this.select_node_handler = new SelectNodeHandler(this);
       }
-      if (typeof DragAndDropHandler !== "undefined" && DragAndDropHandler !== null) {
+      if ((typeof DragAndDropBoxHandler !== "undefined" && DragAndDropBoxHandler !== null) && this.options.dragAndDrop === 'box') {
+        this.dnd_handler = new DragAndDropBoxHandler(this);
+      } else if (typeof DragAndDropHandler !== "undefined" && DragAndDropHandler !== null) {
         this.dnd_handler = new DragAndDropHandler(this);
       } else {
         this.options.dragAndDrop = false;
@@ -2557,8 +2559,11 @@ limitations under the License.
   HitAreasGenerator = (function(_super) {
     __extends(HitAreasGenerator, _super);
 
-    function HitAreasGenerator(tree, current_node, tree_bottom) {
+    function HitAreasGenerator(tree, current_node, tree_bottom, group_size_max) {
       HitAreasGenerator.__super__.constructor.call(this, tree);
+      this.group_size_max = group_size_max != null ? group_size_max : {
+        group_size_max: 4
+      };
       this.current_node = current_node;
       this.tree_bottom = tree_bottom;
     }
@@ -2659,7 +2664,7 @@ limitations under the License.
 
     HitAreasGenerator.prototype.generateHitAreasForGroup = function(hit_areas, positions_in_group, top, bottom) {
       var area_height, area_top, i, position, position_count;
-      position_count = Math.min(positions_in_group.length, 4);
+      position_count = Math.min(positions_in_group.length, this.group_size_max);
       area_height = Math.round((bottom - top) / position_count);
       area_top = top;
       i = 0;
@@ -3040,6 +3045,605 @@ limitations under the License.
     };
 
     return KeyHandler;
+
+  })();
+
+  DragAndDropBoxHandler = (function(_super) {
+    __extends(DragAndDropBoxHandler, _super);
+
+    function DragAndDropBoxHandler(tree_widget) {
+      this.tree_widget = tree_widget;
+      this.hovered_area = null;
+      this.$ghost = null;
+      this.hit_areas = [];
+      this.is_dragging = false;
+      this.current_item = null;
+      this.dragging_cursor = null;
+      this.previousY = null;
+      this.previousX = null;
+    }
+
+    DragAndDropBoxHandler.prototype.mouseStart = function(position_info) {
+      var offset;
+      offset = $(position_info.target).offset();
+      this.dragging_cursor = new DraggingCursor(this.current_item, Position.NONE);
+      this.drag_element = new DragBoxElement(this.current_item.$element, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
+      this.dragging_cursor.swapGhost();
+      this.refresh();
+      this.is_dragging = true;
+      return true;
+    };
+
+    DragAndDropBoxHandler.prototype.printHitAreas = function() {
+      var hit_area, _i, _len, _ref, _results;
+      _ref = this.hit_areas;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        hit_area = _ref[_i];
+        _results.push(console.log(hit_area.top, hit_area.bottom, hit_area.node.name, this.convertPosition(hit_area.position), hit_area.depth));
+      }
+      return _results;
+    };
+
+    DragAndDropBoxHandler.prototype.convertPosition = function(position) {
+      switch (position) {
+        case 1:
+          return "BEFORE";
+        case 2:
+          return "AFTER";
+        case 3:
+          return "INSIDE";
+        case 4:
+          return "NONE";
+      }
+    };
+
+    DragAndDropBoxHandler.prototype.resetHorizontal = function(current_x) {
+      this.previousX = current_x;
+      return this.horizontal_options = null;
+    };
+
+    DragAndDropBoxHandler.prototype.mouseStop = function(position_info) {
+      if (!this.hovered_area || this.hovered_area.position === Position.NONE) {
+        this.dragging_cursor.unSwapGhost();
+        this.tree_widget._refreshElements();
+      } else {
+        this.moveItem(position_info);
+      }
+      this.clear();
+      this.removeHover();
+      this.removeDropHint();
+      this.removeHitAreas();
+      if (this.current_item) {
+        this.current_item.$element.removeClass('jqtree-moving');
+        this.current_item = null;
+      }
+      this.is_dragging = false;
+      return false;
+    };
+
+    DragAndDropBoxHandler.prototype.mouseDrag = function(position_info) {
+      var current_x, current_y, horizontal_direction, leaving, vertical_direction, _ref;
+      current_y = position_info.page_y;
+      current_x = position_info.page_x;
+      _ref = this.getCurrentDirections(current_x, current_y), horizontal_direction = _ref[0], vertical_direction = _ref[1];
+      this.drag_element.move(current_x, current_y);
+      leaving = this.leavingCursorVertically(current_y);
+      if (leaving && vertical_direction && leaving === vertical_direction) {
+        this.hovered_area = this.findAreaWhenLeaving(vertical_direction);
+        if (this.hovered_area) {
+          this.dragging_cursor.moveTo(this.hovered_area, this.hit_areas.lastIndexOf(this.hovered_area));
+          this.refresh();
+          return this.resetHorizontal(current_x);
+        }
+      } else if (horizontal_direction === DragAndDropBoxHandler.RIGHT) {
+        return this.rightMove();
+      } else if (horizontal_direction === DragAndDropBoxHandler.LEFT) {
+        return this.leftMove();
+      }
+    };
+
+    DragAndDropBoxHandler.prototype.getCurrentDirections = function(current_x, current_y) {
+      var horizontal_direction, vertical_direction;
+      if (this.previousY === null) {
+        vertical_direction = DragAndDropBoxHandler.NEUTRAL;
+      } else if (this.previousY > current_y) {
+        vertical_direction = DragAndDropBoxHandler.UP;
+      } else if (this.previousY < current_y) {
+        vertical_direction = DragAndDropBoxHandler.DOWN;
+      }
+      this.previousY = current_y;
+      if (this.previousX === null) {
+        horizontal_direction = DragAndDropBoxHandler.NEUTRAL;
+        this.previousX = current_x;
+      } else if (current_x > (this.previousX + 20)) {
+        this.previousX = current_x;
+        horizontal_direction = DragAndDropBoxHandler.RIGHT;
+      } else if (current_x < (this.previousX - 20)) {
+        this.previousX = current_x;
+        horizontal_direction = DragAndDropBoxHandler.LEFT;
+      } else {
+        horizontal_direction = DragAndDropBoxHandler.NEUTRAL;
+      }
+      return [horizontal_direction, vertical_direction];
+    };
+
+    DragAndDropBoxHandler.prototype.rightMove = function(current_x) {
+      var rightMoveArea;
+      rightMoveArea = this.getRightMoveArea();
+      if (rightMoveArea) {
+        this.hovered_area = rightMoveArea;
+        if (rightMoveArea && rightMoveArea.position === Position.INSIDE) {
+          this.dragging_cursor.bump();
+        } else {
+          this.dragging_cursor.moveTo(this.hovered_area);
+        }
+      }
+      return false;
+    };
+
+    DragAndDropBoxHandler.prototype.getRightMoveArea = function() {
+      var right;
+      if (!this.horizontal_options) {
+        this.horizontal_options = this.generateHorizontalMoveOptions();
+      }
+      if (this.horizontal_options.hasRight()) {
+        right = this.horizontal_options.shiftRight();
+        return right;
+      }
+      return null;
+    };
+
+    DragAndDropBoxHandler.prototype.leftMove = function() {
+      var leftMoveArea;
+      leftMoveArea = this.getLeftMoveArea();
+      if (leftMoveArea) {
+        this.hovered_area = leftMoveArea;
+        this.dragging_cursor.moveTo(this.hovered_area);
+        return true;
+      }
+      return false;
+    };
+
+    DragAndDropBoxHandler.prototype.getLeftMoveArea = function() {
+      var left;
+      if (!this.horizontal_options) {
+        this.horizontal_options = this.generateHorizontalMoveOptions();
+      }
+      if (this.horizontal_options.hasLeft()) {
+        left = this.horizontal_options.shiftLeft();
+        return left;
+      }
+      return null;
+    };
+
+    DragAndDropBoxHandler.prototype.generateHorizontalMoveOptions = function() {
+      var area, current, index, next, options, previous, previousIsFolder, previousIsOpen, _ref;
+      this.refresh();
+      options = new HorizontalOptions();
+      _ref = this.findCursor(), area = _ref[0], index = _ref[1];
+      current = area;
+      options.setCurrent(current);
+      while (this.dragging_cursor.inCursor(this.hit_areas[index + 1])) {
+        index++;
+        area = this.hit_areas[index];
+      }
+      index--;
+      previous = this.hit_areas[index];
+      previousIsFolder = previous.node.hasChildren();
+      previousIsOpen = previousIsFolder && !previous.node.element.classList.contains('jqtree-closed');
+      if (previous && !(previousIsFolder && previousIsOpen && previous.position === Position.INSIDE)) {
+        while (previous && previous.position !== Position.INSIDE) {
+          if (previous.position !== Position.NONE) {
+            options.rightPush(previous);
+          }
+          index--;
+          previous = this.hit_areas[index];
+        }
+        options.rightPush(previous);
+      }
+      index = this.hit_areas.lastIndexOf(current);
+      index++;
+      next = this.hit_areas[index];
+      if (next && this.dragging_cursor.inCursor(next)) {
+        index++;
+        next = this.hit_areas[index];
+      }
+      while (next && next.position === Position.AFTER) {
+        index++;
+        options.leftPush(next);
+        next = this.hit_areas[index++];
+      }
+      return options;
+    };
+
+    DragAndDropBoxHandler.prototype.generateHitAreas = function() {
+      var hit_areas_generator;
+      hit_areas_generator = new BoxAreasGenerator(this.tree_widget.tree, this.current_item.node, this.getTreeDimensions().bottom, this.dragging_cursor);
+      return this.hit_areas = hit_areas_generator.generate();
+    };
+
+    DragAndDropBoxHandler.prototype.findCursor = function() {
+      var area, index;
+      index = this.dragging_cursor.index;
+      area = this.hit_areas[index];
+      return [area, index];
+    };
+
+    DragAndDropBoxHandler.prototype.clear = function() {
+      this.drag_element.remove();
+      this.drag_element = null;
+      this.dragging_cursor.remove();
+      this.dragging_cursor = null;
+      this.previousX = null;
+      this.previousY = null;
+      return this.horizontal_options = null;
+    };
+
+    DragAndDropBoxHandler.prototype.findAreaWhenLeaving = function(direction) {
+      var area, cursor, decrement, increment, index, next, previous, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+      _ref = this.findCursor(), cursor = _ref[0], index = _ref[1];
+      if (direction === DragAndDropBoxHandler.UP) {
+        decrement = function(dnd, index) {
+          var previous;
+          index--;
+          previous = dnd.hit_areas[index];
+          return [previous, index];
+        };
+        _ref1 = decrement(this, index), previous = _ref1[0], index = _ref1[1];
+        while (index > 0) {
+          if (previous.position === Position.INSIDE && this.hit_areas[index - 1].position === Position.INSIDE) {
+            _ref2 = decrement(this, index), previous = _ref2[0], index = _ref2[1];
+            break;
+          }
+          if (previous.position === Position.AFTER && previous.bottom < cursor.top) {
+            break;
+          }
+          _ref3 = decrement(this, index), previous = _ref3[0], index = _ref3[1];
+        }
+        return previous;
+      }
+      if (direction === DragAndDropBoxHandler.DOWN) {
+        increment = function(dnd, index) {
+          var next;
+          index++;
+          next = dnd.hit_areas[index];
+          return [next, index];
+        };
+        _ref4 = increment(this, index), next = _ref4[0], index = _ref4[1];
+        while (next && this.dragging_cursor.inCursor(next)) {
+          _ref5 = increment(this, index), next = _ref5[0], index = _ref5[1];
+        }
+        while (index < this.hit_areas.length) {
+          if (next.position === Position.INSIDE && this.hit_areas[index + 1].position === Position.INSIDE) {
+            break;
+          }
+          if (next.position === Position.AFTER) {
+            break;
+          }
+          _ref6 = increment(this, index), next = _ref6[0], index = _ref6[1];
+        }
+        if (!next && index >= this.hit_areas.length - 1) {
+          index = this.hit_areas.length - 1;
+          area = this.hit_areas[index];
+          if (area.position === Position.NONE) {
+            return this.hit_areas[index - 1];
+          } else {
+            return area;
+          }
+        } else {
+          return next;
+        }
+      }
+    };
+
+    DragAndDropBoxHandler.prototype.leavingCursorVertically = function(y) {
+      var bottom, buffer, cursor, top;
+      if (!this.dragging_cursor) {
+        return false;
+      }
+      buffer = 15;
+      cursor = this.dragging_cursor.$ghost;
+      top = cursor.offset().top;
+      bottom = cursor.offset().top + cursor.height();
+      if (y > bottom + buffer) {
+        return DragAndDropBoxHandler.DOWN;
+      }
+      if (y < top - buffer) {
+        return DragAndDropBoxHandler.UP;
+      }
+      return false;
+    };
+
+    DragAndDropBoxHandler.prototype.refresh = function() {
+      this.removeHitAreas();
+      return this.generateHitAreas();
+    };
+
+    return DragAndDropBoxHandler;
+
+  })(DragAndDropHandler);
+
+  DragAndDropBoxHandler.UP = 1;
+
+  DragAndDropBoxHandler.DOWN = -1;
+
+  DragAndDropBoxHandler.RIGHT = 1;
+
+  DragAndDropBoxHandler.LEFT = -1;
+
+  DragAndDropBoxHandler.NEUTRAL = 0;
+
+  DragBoxElement = (function(_super) {
+    __extends(DragBoxElement, _super);
+
+    function DragBoxElement(element, offset_x, offset_y, $tree) {
+      this.offset_x = offset_x;
+      this.offset_y = offset_y;
+      this.$element = $("<div class=\"jqtree-title jqtree-dragging\"></div>");
+      this.$element.append($(element).clone());
+      this.$element.css("position", "absolute");
+      $tree.append(this.$element);
+    }
+
+    return DragBoxElement;
+
+  })(DragElement);
+
+  BoxAreasGenerator = (function(_super) {
+    __extends(BoxAreasGenerator, _super);
+
+    function BoxAreasGenerator(tree, current_node, tree_bottom, cursor, group_size_max) {
+      if (group_size_max == null) {
+        group_size_max = 12;
+      }
+      BoxAreasGenerator.__super__.constructor.call(this, tree, current_node, tree_bottom, group_size_max);
+      this.cursor = cursor;
+      this.current_node = current_node;
+      this.tree_bottom = tree_bottom;
+    }
+
+    BoxAreasGenerator.prototype.generate = function() {
+      var hit_areas;
+      this.positions = [];
+      this.last_top = 0;
+      this.iterate();
+      hit_areas = this.generateHitAreas(this.positions);
+      this.addCursor(hit_areas);
+      return hit_areas;
+    };
+
+    BoxAreasGenerator.prototype.addPosition = function(node, position, top) {
+      var area;
+      area = {
+        top: top,
+        node: node,
+        position: position
+      };
+      this.positions.push(area);
+      return this.last_top = top;
+    };
+
+    BoxAreasGenerator.prototype.handleNode = function(node, next_node, $element) {
+      var top;
+      top = this.getTop($element);
+      if (node === this.current_node) {
+        return this.addPosition(node, Position.NONE, top);
+      } else {
+        this.addPosition(node, Position.INSIDE, top);
+        return this.addPosition(node, Position.AFTER, top);
+      }
+    };
+
+    BoxAreasGenerator.prototype.handleClosedFolder = function(node, next_node, $element) {
+      var top;
+      top = this.getTop($element);
+      if (node === this.current_node) {
+        this.addPosition(node, Position.NONE, top);
+      } else {
+        this.addPosition(node, Position.INSIDE, top);
+      }
+      return this.addPosition(node, Position.AFTER, top);
+    };
+
+    BoxAreasGenerator.prototype.handleOpenFolder = function(node, $element) {
+      if (node === this.current_node) {
+        return false;
+      }
+      this.addPosition(node, Position.INSIDE, this.getTop($element));
+      return true;
+    };
+
+    BoxAreasGenerator.prototype.handleAfterOpenFolder = function(node, next_node, $element) {
+      if (node === this.current_node.node) {
+        return this.addPosition(node, Position.NONE, this.last_top);
+      } else {
+        return this.addPosition(node, Position.AFTER, this.last_top);
+      }
+    };
+
+    BoxAreasGenerator.prototype.addCursor = function(hit_areas) {
+      var cursor_area, i, position;
+      cursor_area = this.cursor.area();
+      if (cursor_area) {
+        i = 0;
+        while (i < hit_areas.length) {
+          position = hit_areas[i];
+          if (cursor_area.top < position.top) {
+            break;
+          }
+          i++;
+        }
+        this.cursor.index = i;
+        return hit_areas.splice(i, 0, cursor_area);
+      }
+    };
+
+    return BoxAreasGenerator;
+
+  })(HitAreasGenerator);
+
+  DraggingCursor = (function() {
+    function DraggingCursor(element, position) {
+      var height;
+      this.$element = element.$element;
+      this.node = element.node;
+      height = this.$element.height();
+      this.$ghost = $('<li style = "height:' + height + 'px;" class="jqtree_common jqtree-ghost"></li>');
+    }
+
+    DraggingCursor.prototype.swapGhost = function() {
+      return this.$element.replaceWith(this.$ghost);
+    };
+
+    DraggingCursor.prototype.unSwapGhost = function() {
+      return this.$ghost.replaceWith(this.$element);
+    };
+
+    DraggingCursor.prototype.setIndex = function(index) {
+      return this.index = index;
+    };
+
+    DraggingCursor.prototype.area = function() {
+      var area;
+      return area = {
+        top: this.$ghost.offset().top,
+        node: this.node,
+        position: Position.NONE,
+        bottom: this.$ghost.offset().top + this.$ghost.height()
+      };
+    };
+
+    DraggingCursor.prototype.moveTo = function(area, index) {
+      var element;
+      element = $(area.node.element);
+      if (index) {
+        this.setIndex(index);
+      }
+      if (this.bumped) {
+        this.deBump();
+      }
+      if (area.position === Position.AFTER) {
+        return element.after(this.$ghost);
+      } else if (area.position === Position.BEFORE) {
+        return element.before(this.$ghost);
+      } else if (area.position === Position.INSIDE) {
+        element.find('.jqtree-element').first().after(this.$ghost);
+        return this.bump();
+      }
+    };
+
+    DraggingCursor.prototype.bump = function() {
+      this.bumped = true;
+      return this.$ghost.addClass('bumped');
+    };
+
+    DraggingCursor.prototype.deBump = function() {
+      this.bumped = false;
+      return this.$ghost.removeClass('bumped');
+    };
+
+    DraggingCursor.prototype.remove = function() {
+      return this.$ghost.remove();
+    };
+
+    DraggingCursor.prototype.inCursor = function(area) {
+      var bottom, left, offset, top;
+      if (!area) {
+        return false;
+      }
+      offset = this.$ghost.offset();
+      top = offset.top;
+      bottom = this.$ghost.height() + top;
+      left = offset.left;
+      return area.top >= top && area.top < bottom && (left <= $(area.node.element).offset().left);
+    };
+
+    return DraggingCursor;
+
+  })();
+
+  HorizontalOptions = (function() {
+    function HorizontalOptions() {
+      this.right_arr = [];
+      this.left_arr = [];
+      this.current = null;
+    }
+
+    HorizontalOptions.prototype.setCurrent = function(area) {
+      return this.current = area;
+    };
+
+    HorizontalOptions.prototype.shiftLeft = function() {
+      var new_current_item;
+      if (this.hasLeft) {
+        new_current_item = this.left_arr.shift();
+        this.right_arr.unshift(this.current);
+        this.setCurrent(new_current_item);
+        return new_current_item;
+      } else {
+        return false;
+      }
+    };
+
+    HorizontalOptions.prototype.shiftRight = function() {
+      var new_current_item;
+      if (this.hasRight) {
+        new_current_item = this.right_arr.shift();
+        this.left_arr.unshift(this.current);
+        this.setCurrent(new_current_item);
+        return new_current_item;
+      } else {
+        return false;
+      }
+    };
+
+    HorizontalOptions.prototype.rightPush = function(area) {
+      return this.right_arr.push(area);
+    };
+
+    HorizontalOptions.prototype.leftPush = function(area) {
+      return this.left_arr.push(area);
+    };
+
+    HorizontalOptions.prototype.hasLeft = function() {
+      if (this.left_arr.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    HorizontalOptions.prototype.hasRight = function() {
+      if (this.right_arr.length === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    HorizontalOptions.prototype.print = function() {
+      var i, _i, _j, _ref, _ref1, _results;
+      for (i = _i = _ref = this.left_arr.length - 1; _i >= 0; i = _i += -1) {
+        if (i === 0) {
+          console.log("-1", this.left_arr[i]);
+        } else {
+          console.log("-" + (i - 1), this.left_arr[i]);
+        }
+      }
+      console.log('Current', this.current);
+      _results = [];
+      for (i = _j = 0, _ref1 = this.right_arr.length; _j <= _ref1; i = _j += 1) {
+        if (this.right_arr[i]) {
+          _results.push(console.log("+" + (i + 1), this.right_arr[i]));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    return HorizontalOptions;
 
   })();
 

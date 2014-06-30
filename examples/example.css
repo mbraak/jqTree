@@ -22,6 +22,10 @@ ul {
     padding: 8px 16px;
     margin-bottom: 16px;
 }
+#tree1.box{
+  background-color: #d6d6d6;
+  padding: 25px;
+}
 
 #nav {
     margin-bottom: 16px;
@@ -58,4 +62,208 @@ pre[class*="language-"] {
     border-radius: 0;
     font-size: 13px;
     margin: 0 0 16px 0;
+}
+
+
+.box ul.jqtree-tree {
+  margin: 0;
+  padding: 0 30px 30px 30px;
+}
+
+.box ul.jqtree_common {
+  list-style: none outside;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.container .box ul.jqtree_common {
+  display: block;
+  margin-left: 30px;
+  margin-right: 0;
+}
+.box ul.jqtree_common
+.box ul.jqtree_common ul.jqtree_common, ul.jqtree_common ul.jqtree_common ul.jqtree_common
+.box ul.jqtree_common ul.jqtree_common ul.jqtree_common ul.jqtree_common
+.box ul.jqtree_common ul.jqtree_common ul.jqtree_common ul.jqtree_common ul.jqtree_common {
+  margin-left: 50px;
+}
+
+.box li.jqtree-closed > ul.jqtree_common {
+  display: none;
+}
+
+.box li.jqtree_common {
+  clear: both;
+  list-style-type: none;
+}
+
+.box .jqtree-toggler {
+  display: block;
+  position: absolute;
+  left: -1.6em;
+  top: 37%;
+  *top: 0;
+  /* fix for ie7 */
+  border-bottom: none;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 12px;
+  color: #9b9b9b;
+  cursor: pointer;
+}
+.box .jqtree-toggler:hover {
+  color: #333333;
+}
+.box .jqtree-toggler span {
+  display: block;
+}
+
+.box .jqtree-toggler:hover {
+  color: #000;
+  text-decoration: none;
+}
+
+.box .jqtree-title {
+  font-size: 14px;
+  color: #C2C2C2;
+  vertical-align: middle;
+}
+.box .jqtree-title > a {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+  max-width: 310px;
+  text-decoration: none;
+  vertical-align: middle;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+}
+.box .jqtree-title > a:hover {
+  text-decoration: underline;
+}
+
+.box li.jqtree-folder {
+  margin-bottom: 4px;
+}
+
+.box li.jqtree-folder.jqtree-closed {
+  margin-bottom: 1px;
+}
+
+.box li.jqtree-folder .jqtree-title {
+  margin-left: 0;
+}
+
+.box li.jqtree-ghost span {
+  display: block;
+}
+
+.box li.jqtree-ghost.jqtree-inside {
+  margin-left: 48px;
+}
+
+.box li.jqtree_common {
+  display: block;
+}
+
+.box span.jqtree-border {
+  position: absolute;
+  display: block;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: auto !important;
+  height: auto !important;
+  background: rgba(51, 51, 51, 0.1);
+  margin: 0;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+.box .jqtree-ghost {
+  width: 510px;
+  border: 2px dashed #a8a8a8;
+  margin-bottom: 13px;
+}
+
+.container .box .jqtree-element,
+.container .box .jqtree-dragging .jqtree-element {
+  width: 470px;
+  position: relative;
+  padding: 15px 20px;
+  margin-bottom: 13px;
+  background: #FFF;
+  cursor: move;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.box .jqtree-element:hover {
+  -webkit-box-shadow: inset 0 0 0 3px #666;
+  -moz-box-shadow: inset 0 0 0 3px #666;
+  box-shadow: inset 0 0 0 3px #666;
+}
+
+.box li.jqtree-moving.jqtree_common {
+  width: 510px;
+  margin-bottom: 13px;
+  border: 3px dashed #666;
+}
+.box li.jqtree-moving.jqtree_common .jqtree-element {
+  position: relative;
+  background: transparent;
+  padding: 15px 20px;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.box li.jqtree-moving.jqtree_common .jqtree-element a, 
+.box li.jqtree-moving.jqtree_common .jqtree-element span {
+  visibility: hidden;
+}
+.box li.jqtree-moving.jqtree_common > .jqtree-element {
+  padding: 7px 20px 6px 20px;
+}
+
+.container .box ul.jqtree-tree li.jqtree-selected > .jqtree-element, 
+.container .box ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover{
+  -webkit-box-shadow: inset 0 0 0 3px green;
+  -moz-box-shadow: inset 0 0 0 3px green;
+  box-shadow: inset 0 0 0 3px green;
+  background:white;
+}
+
+.box .jqtree-dragging {
+  position: absolute;
+}
+.box .jqtree-dragging .jqtree-toggler {
+  display: none;
+}
+.box .jqtree-dragging .jqtree-element {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333333;
+  text-decoration: none;
+  cursor: default;
+  -webkit-box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 3px #a8a8a8;
+  -moz-box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 3px #a8a8a8;
+  box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 3px #a8a8a8;
+}
+
+.box li.jqtree-selected > .jqtree-element {
+  -webkit-box-shadow: inset 0 0 0 3px #a8a8a8;
+  -moz-box-shadow: inset 0 0 0 3px #a8a8a8;
+  box-shadow: inset 0 0 0 3px #a8a8a8;
+}
+
+.box .bumped {
+  margin-left: 50px;
 }
