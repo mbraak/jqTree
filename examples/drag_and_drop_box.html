@@ -9,41 +9,35 @@
     <link rel="stylesheet" href="../extra/bower_components/prism/themes/prism-okaidia.css">
     <link rel="stylesheet" href="example.css">
     <link rel="stylesheet" href="../jqtree.css">
-    
+
 </head>
 <body>
     <div class="container">
         <p id="nav">
-            <a href="load_json_data_from_server.html">&laquo; Example 2</a>
-            
-                <a href="save_state.html" class="next">Example 4 &raquo;</a>
-            
+            <a href="icon_buttons.html">&laquo; Example 10</a>
         </p>
 
-        <h1>Example 3 - Drag and drop</h1>
+        <h1>Example 11 - Drag and drop with box dragging</h1>
 
-        
+
     <div id="tree1" class='box' data-url="/example_data/"></div>
 
     <p>
-       Let's add drag-and-drop support by setting the option <strong>dragAndDrop</strong> to true.
-       You can now drag tree nodes to another position.
+       Jqtree also supports a different "box" style method of drag and drop.
+	   Let's add this type of drag-and-drop support by setting the option
+	   <strong>dragAndDrop</strong> to 'box'. Additionally you will need styling
+	   that works with 'boxed' items. You can find an example in
+	   <strong>example.css</strong> . You can now drag tree nodes to another position with this box style.
     </p>
-    <p>
-        Other options:
-    </p>
-    <ul>
-        <li>The option <strong>autoOpen</strong> is set to 0 to open the first level of nodes.</li>
-    </ul>
 
     <h3>html</h3>
-<pre><code class="language-markup">&lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;</code></pre>
+<pre><code class="language-markup">&lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;
+</code></pre>
 
     <h3>javascript</h3>
 <pre><code class="language-javascript">var $tree = $('#tree1');
 $tree.tree({
-  dragAndDrop: true,
-  autoOpen: 0
+  dragAndDrop: 'box'
 });
 </code></pre>
 
@@ -84,7 +78,7 @@ $tree.tree({
         $(function() {
             var $tree = $('#tree1');
             $tree.tree({
-                dragAndDrop: true,
+                dragAndDrop: 'box',
                 autoOpen: 0
             });
         });

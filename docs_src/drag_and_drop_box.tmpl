@@ -1,0 +1,50 @@
+{% extends "base" %}
+
+{% block title %}Javascript tree with box drag and drop{% endblock %}
+{% block h1 %}Example 11 - Drag and drop with box dragging {% endblock %}
+{% block previous_url %}icon_buttons.html{% endblock %}
+{% block previous_title %}Example 10{% endblock %}
+
+{% block next %}{% endblock %}
+
+{% block contents %}
+    <div id="tree1" data-url="/example_data/"></div>
+
+    <p>
+       Jqtree also supports a different "box" style method of drag and drop.
+	   Let's add this type of drag-and-drop support by setting the option
+	   <strong>dragAndDrop</strong> to 'box'. Additionally you will need styling
+	   that works with 'boxed' items. You can find an example in
+	   <strong>example.css</strong>. You can now drag tree nodes to another position with this box style.
+
+    </p>
+
+    <h3>html</h3>
+<pre><code class="language-markup">&lt;div id="tree1" data-url="/example_data/"&gt;&lt;/div&gt;</code></pre>
+
+    <h3>javascript</h3>
+<pre><code class="language-javascript">var $tree = $('#tree1');
+$tree.tree({
+  dragAndDrop: 'box',
+});
+</code></pre>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $.mockjax({
+            url: '*',
+            response: function(options) {
+                this.responseText = ExampleData.example_data;
+            },
+            responseTime: 0
+        });
+
+        $(function() {
+            var $tree = $('#tree1');
+            $tree.tree({
+                dragAndDrop: 'box',
+            });
+        });
+    </script>
+{% endblock %}
