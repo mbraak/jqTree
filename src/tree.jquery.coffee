@@ -343,6 +343,7 @@ class JqTreeWidget extends MouseWidget
             @select_node_handler.addToSelection(node)
 
             @_getNodeElementForNode(node).select()
+            @_saveState()
 
     getSelectedNodes: ->
         return @select_node_handler.getSelectedNodes()
@@ -354,6 +355,7 @@ class JqTreeWidget extends MouseWidget
         @select_node_handler.removeFromSelection(node)
 
         @_getNodeElementForNode(node).deselect()
+        @_saveState()
 
     scrollToNode: (node) ->
         $element = $(node.element)

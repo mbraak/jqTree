@@ -16,6 +16,9 @@ indexOf = (array, item) ->
 @Tree.indexOf = indexOf
 @Tree._indexOf = _indexOf
 
+isInt = (n) ->
+    return typeof n is 'number' and n % 1 == 0
+
 
 # JSON.stringify function; copied from json2
 get_json_stringify_function = ->
@@ -145,34 +148,36 @@ class SaveStateHandler
             return null
 
     getState: ->
-        open_nodes = []
+        getOpenNodeIds = =>
+            open_nodes = []
 
-        @tree_widget.tree.iterate((node) =>
-            if (
-                node.is_open and
-                node.id and
-                node.hasChildren()
+            @tree_widget.tree.iterate((node) =>
+                if (
+                    node.is_open and
+                    node.id and
+                    node.hasChildren()
+                )
+                    open_nodes.push(node.id)
+                return true
             )
-                open_nodes.push(node.id)
-            return true
-        )
 
-        # todo : multiple nodes
-        selected_node = @tree_widget.getSelectedNode()
-        if selected_node
-            selected_node_id = selected_node.id
-        else
-            selected_node_id = ''
+            return open_nodes
+
+        getSelectedNodeIds = =>
+            return (n.id for n in @tree_widget.getSelectedNodes())
 
         return {
-            open_nodes: open_nodes,
-            selected_node: selected_node_id
+            open_nodes: getOpenNodeIds(),
+            selected_node: getSelectedNodeIds()
         }
 
     setState: (state) ->
         if state
             open_nodes = state.open_nodes
-            selected_node_id = state.selected_node
+            selected_node_ids = state.selected_node
+
+            if isInt(selected_node_ids)
+                selected_node_ids = [selected_node_ids]
 
             @tree_widget.tree.iterate((node) =>
                 node.is_open = (
@@ -183,12 +188,13 @@ class SaveStateHandler
                 return true
             )
 
-            if selected_node_id and @tree_widget.select_node_handler
+            if selected_node_ids and @tree_widget.select_node_handler
                 @tree_widget.select_node_handler.clear()
-                selected_node = @tree_widget.getNodeById(selected_node_id)
+                for node_id in selected_node_ids
+                    selected_node = @tree_widget.getNodeById(node_id)
 
-                if selected_node
-                    @tree_widget.select_node_handler.addToSelection(selected_node)
+                    if selected_node
+                        @tree_widget.select_node_handler.addToSelection(selected_node)
 
     getCookieName: ->
         if typeof @tree_widget.options.saveState is 'string'

@@ -11,6 +11,9 @@ class DragAndDropHandler
     mouseCapture: (position_info) ->
         $element = $(position_info.target)
 
+        if not @mustCaptureElement($element)
+            return null
+
         if @tree_widget.options.onIsMoveHandle and not @tree_widget.options.onIsMoveHandle($element)
             return null
 
@@ -60,6 +63,9 @@ class DragAndDropHandler
             @stopOpenFolderTimer()
 
         return true
+
+    mustCaptureElement: ($element) ->
+        return not $element.is('input,select')
 
     canMoveToArea: (area) ->
         if not area
