@@ -1,2 +1,2 @@
 # Build and watch coffeescript
-coffee -w -j tree.jquery.js -c src/simple.widget.coffee src/mouse.widget.coffee src/node.coffee src/elements_renderer.coffee src/tree.jquery.coffee src/save_state_handler.coffee src/select_node_handler.coffee src/drag_and_drop_handler.coffee src/scroll_handler.coffee src/key_handler.coffee
+coffee -w -j tree.jquery.js -c src/version.coffee src/simple.widget.coffee src/mouse.widget.coffee src/node.coffee src/elements_renderer.coffee src/tree.jquery.coffee src/save_state_handler.coffee src/select_node_handler.coffee src/drag_and_drop_handler.coffee src/scroll_handler.coffee src/key_handler.coffee

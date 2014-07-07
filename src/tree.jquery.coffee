@@ -382,6 +382,9 @@ class JqTreeWidget extends MouseWidget
     setOption: (option, value) ->
         @options[option] = value
 
+    getVersion: ->
+        return __version__
+
     _init: ->
         super()
 
