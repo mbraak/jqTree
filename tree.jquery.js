@@ -2306,6 +2306,9 @@ limitations under the License.
           if (this.mustOpenFolderTimer(area)) {
             this.startOpenFolderTimer(area.node);
           }
+		  else {
+		    this.stopOpenFolderTimer();
+		  }
           this.updateDropHint();
         }
       } else {
