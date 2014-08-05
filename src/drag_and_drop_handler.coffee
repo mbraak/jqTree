@@ -58,6 +58,8 @@ class DragAndDropHandler
                 # If this is a closed folder, start timer to open it
                 if @mustOpenFolderTimer(area)
                     @startOpenFolderTimer(area.node)
+                else
+                    @stopOpenFolderTimer()
 
                 @updateDropHint()
         else

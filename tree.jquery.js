@@ -2338,6 +2338,8 @@
           this.hovered_area = area;
           if (this.mustOpenFolderTimer(area)) {
             this.startOpenFolderTimer(area.node);
+          } else {
+            this.stopOpenFolderTimer();
           }
           this.updateDropHint();
         }
