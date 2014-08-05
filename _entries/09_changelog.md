@@ -8,6 +8,7 @@ name: changelog
 * Issue 291: Dragging Item - do not open node if you don't stay over it (thanks to Roman Klos)
 * Issue 300: Toggle function should get default slide value from options (thanks to Tazle)
 * Issue 303: Correctly set selected_node parameter in query string
+* Issue 315: Fix for issue when moving node over closed folder (thanks to terrybr)
 
 ##### 0.21 (june 7 2014) version
 
