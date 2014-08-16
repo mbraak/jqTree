@@ -69,8 +69,10 @@
 				identical = false;
 				return identical;
 			} else {
-				// This will allow to compare Arrays
 				if ( typeof live[k] === 'object' && live[k] !== null ) {
+					if ( identical && $.isArray( live[k] ) ) {
+						identical = $.isArray( mock[k] ) && live[k].length === mock[k].length;
+					}
 					identical = identical && isMockDataEqual(mock[k], live[k]);
 				} else {
 					if ( mock[k] && $.isFunction( mock[k].test ) ) {
@@ -115,8 +117,8 @@
 		}
 
 		// Inspect the data submitted in the request (either POST body or GET query string)
-		if ( handler.data && requestSettings.data ) {
-			if ( !isMockDataEqual(handler.data, requestSettings.data) ) {
+		if ( handler.data ) {
+			if ( ! requestSettings.data || !isMockDataEqual(handler.data, requestSettings.data) ) {
 				// They're not identical, do not mock this request
 				return null;
 			}
@@ -428,6 +430,7 @@
 			url = undefined;
 		} else {
 			// work around to support 1.5 signature
+			origSettings = origSettings || {};
 			origSettings.url = url;
 		}
 
@@ -453,7 +456,7 @@
 			$.mockjaxSettings.log( mockHandler, requestSettings );
 
 
-			if ( requestSettings.dataType === "jsonp" ) {
+			if ( requestSettings.dataType && requestSettings.dataType.toUpperCase() === 'JSONP' ) {
 				if ((mockRequest = processJsonpMock( requestSettings, mockHandler, origSettings ))) {
 					// This mock will handle the JSONP request
 					return mockRequest;

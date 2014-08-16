@@ -6,8 +6,8 @@
         "fontawesome": "4.1.0",
         "jquery": "2.1.1",
         "jquery-cookie": "v1.4.1",
-        "jquery-mockjax": "1.5.3",
+        "jquery-mockjax": "1.5.4",
         "pygments": "1.6.1",
-        "qunit": "1.14.0"
+        "qunit": "1.15.0"
     }
 }
