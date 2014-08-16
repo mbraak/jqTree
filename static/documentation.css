@@ -50,7 +50,7 @@ body {
 
 #menu h2 {
   background: #001F3F;
-  margin: 0;
+  margin: 0 0 10px 0;
   color: #fff;
   font-size: 18px;
   padding: 8px 10px;
@@ -96,6 +96,10 @@ body {
   color: #000;
   background-color: transparent;
 }
+.bs-sidebar .nav > li > a:first-child {
+  padding-top: 0;
+}
+
 
 /* Nav: second level (shown on .active) */
 .bs-sidebar .nav .nav {
@@ -150,4 +154,9 @@ pre {
 #tree1 {
   background-color: #DDDDDD;
   padding: 8px 16px;
+}
+
+/* introduction */
+#introduction {
+  margin-top: 0;
 }
