@@ -35,12 +35,12 @@ css: documentation.css
     </div>
     <div class="col-md-9" id="main">
         {% for entry in site.entries %}
-            {% if entry.hide_title != true %}
-                {% if entry.section %}
-                    <h3 id="{{ entry.name }}">{{ entry.title }}</h3>
-                {% else %}
-                    <h4 id="{{ entry.name }}">{{ entry.title }}</h4>
-                {% endif %}
+            {% if entry.hide_title %}
+                <div id="{{ entry.name }}"></div>
+            {% elsif entry.section %}
+                <h3 id="{{ entry.name }}">{{ entry.title }}</h3>
+            {% else %}
+                <h4 id="{{ entry.name }}">{{ entry.title }}</h4>
             {% endif %}
             {{ entry.output }}
         {% endfor %}
