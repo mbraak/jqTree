@@ -17,6 +17,12 @@ $(function() {
     $body.scrollspy({
         target: '#menu'
     });
+    var scrollspy = $body.data('bs.scrollspy');
+
+    // If no menu item is active, then activate first item
+    if (! scrollspy.activeTarget) {
+        scrollspy.activate('#general');
+    }
 
     // demo tree
     var data = [
