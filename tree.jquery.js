@@ -1020,7 +1020,9 @@
       nodeClass: Node,
       dataFilter: null,
       keyboardSupport: true,
-      openFolderDelay: 500
+      openFolderDelay: 500,
+      onDragMove: null,
+      onDragStop: null
     };
 
     JqTreeWidget.prototype.toggle = function(node, slide) {
@@ -2348,6 +2350,11 @@
         this.removeDropHint();
         this.stopOpenFolderTimer();
       }
+      if (!area) {
+        if (this.tree_widget.options.onDragMove != null) {
+          this.tree_widget.options.onDragMove(this.current_item.node, position_info.original_event);
+        }
+      }
       return true;
     };
 
@@ -2368,16 +2375,23 @@
     };
 
     DragAndDropHandler.prototype.mouseStop = function(position_info) {
+      var current_item;
       this.moveItem(position_info);
       this.clear();
       this.removeHover();
       this.removeDropHint();
       this.removeHitAreas();
+      current_item = this.current_item;
       if (this.current_item) {
         this.current_item.$element.removeClass('jqtree-moving');
         this.current_item = null;
       }
       this.is_dragging = false;
+      if (!this.hovered_area && current_item) {
+        if (this.tree_widget.options.onDragStop != null) {
+          this.tree_widget.options.onDragStop(current_item.node, position_info.original_event);
+        }
+      }
       return false;
     };
 
