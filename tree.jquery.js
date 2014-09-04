@@ -2383,8 +2383,8 @@
 
     DragAndDropHandler.prototype.refresh = function() {
       this.removeHitAreas();
-      this.generateHitAreas();
       if (this.current_item) {
+        this.generateHitAreas();
         this.current_item = this.tree_widget._getNodeElementForNode(this.current_item.node);
         if (this.is_dragging) {
           return this.current_item.$element.addClass('jqtree-moving');

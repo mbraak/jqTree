@@ -98,9 +98,10 @@ class DragAndDropHandler
 
     refresh: ->
         @removeHitAreas()
-        @generateHitAreas()
 
         if @current_item
+            @generateHitAreas()
+
             @current_item = @tree_widget._getNodeElementForNode(@current_item.node)
 
             if @is_dragging
