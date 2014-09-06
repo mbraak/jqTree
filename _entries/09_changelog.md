@@ -9,6 +9,7 @@ name: changelog
 * Issue 300: Toggle function should get default slide value from options (thanks to Tazle)
 * Issue 303: Correctly set selected_node parameter in query string
 * Issue 315: Fix for issue when moving node over closed folder (thanks to terrybr)
+* Issue 320: Fixed error in drag and drop (thanks to Jerry Wu)
 
 ##### 0.21 (june 7 2014) version
 
