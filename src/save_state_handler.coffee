@@ -129,12 +129,30 @@ class SaveStateHandler
         state = @getStateFromStorage()
 
         if state
-            @setState($.parseJSON(state))
+            @setState(state)
             return true
         else
             return false
 
     getStateFromStorage: ->
+        json_data = @_loadFromStorage()
+
+        if json_data
+            return @_parseState(json_data)
+        else
+            return null
+
+    _parseState: (json_data) ->
+        state = $.parseJSON(json_data)
+
+        # Check if selected_node is an int (instead of an array)
+        if state and state.selected_node and isInt(state.selected_node)
+            # Convert to array
+            state.selected_node = [state.selected_node]
+
+        return state
+
+    _loadFromStorage: ->
         if @tree_widget.options.onGetStateFromStorage
             return @tree_widget.options.onGetStateFromStorage()
         else if @supportsLocalStorage()
@@ -175,9 +193,6 @@ class SaveStateHandler
         if state
             open_nodes = state.open_nodes
             selected_node_ids = state.selected_node
-
-            if isInt(selected_node_ids)
-                selected_node_ids = [selected_node_ids]
 
             @tree_widget.tree.iterate((node) =>
                 node.is_open = (
@@ -224,10 +239,9 @@ class SaveStateHandler
         return @_supportsLocalStorage
 
     getNodeIdToBeSelected: ->
-        state_json = @getStateFromStorage()
+        state = @getStateFromStorage()
 
-        if state_json
-            state = $.parseJSON(state_json)
-            return state.selected_node
+        if state and state.selected_node
+            return state.selected_node[0]
         else
             return null

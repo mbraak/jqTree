@@ -1,0 +1,16 @@
+# Site settings
+title: jqTree
+email: your-email@domain.com
+description: "JqTree docs"
+baseurl: "/jqTree"
+url: "http://mbraak.github.io/jqTree/"
+
+collections:
+  entries:
+    output: false
+  examples:
+    output: true
+
+# Build settings
+markdown: kramdown
+permalink: pretty

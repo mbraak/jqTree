@@ -40,7 +40,10 @@ class JqTreeWidget extends MouseWidget
         keyboardSupport: true
         openFolderDelay: 500  # The delay for opening a folder during drag and drop; the value is in milliseconds
 
-    toggle: (node, slide=true) ->
+    toggle: (node, slide=null) ->
+        if slide == null
+            slide = @options.slide
+
         if node.is_open
             @closeNode(node, slide)
         else
@@ -183,7 +186,7 @@ class JqTreeWidget extends MouseWidget
 
         addLoadingClass()
 
-        if url_info == false or url_info == null
+        if not url_info
             removeLoadingClass()
             return
         else if $.isArray(url_info)
@@ -219,7 +222,10 @@ class JqTreeWidget extends MouseWidget
     getNodeByName: (name) ->
         return @tree.getNodeByName(name)
 
-    openNode: (node, slide=true) ->
+    openNode: (node, slide=null) ->
+        if slide == null
+            slide = @options.slide
+
         @_openNode(node, slide)
 
     _openNode: (node, slide=true, on_finished) ->
@@ -250,7 +256,10 @@ class JqTreeWidget extends MouseWidget
                 @_openNode(node, slide, on_finished)
         )
 
-    closeNode: (node, slide=true) ->
+    closeNode: (node, slide=null) ->
+        if slide == null
+            slide = @options.slide
+
         if node.isFolder()
             new FolderElement(node, this).close(slide)
 
@@ -372,6 +381,9 @@ class JqTreeWidget extends MouseWidget
 
     setOption: (option, value) ->
         @options[option] = value
+
+    getVersion: ->
+        return __version__
 
     _init: ->
         super()

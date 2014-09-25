@@ -3,6 +3,7 @@ http://mbraak.github.io/jqTree/examples/autoescape.html
 http://mbraak.github.io/jqTree/examples/autoscroll.html
 http://mbraak.github.io/jqTree/examples/custom_html.html
 http://mbraak.github.io/jqTree/examples/drag_and_drop.html
+http://mbraak.github.io/jqTree/examples/icon_buttons.html
 http://mbraak.github.io/jqTree/examples/load_json_data.html
 http://mbraak.github.io/jqTree/examples/load_json_data_from_server.html
 http://mbraak.github.io/jqTree/examples/load_on_demand.html
