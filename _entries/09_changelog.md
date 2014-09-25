@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 0.22 (september 25 2014)
 
 * Issue 291: Dragging Item - do not open node if you don't stay over it (thanks to Roman Klos)
 * Issue 300: Toggle function should get default slide value from options (thanks to Tazle)
@@ -11,7 +11,7 @@ name: changelog
 * Issue 315: Fix for issue when moving node over closed folder (thanks to terrybr)
 * Issue 320: Fixed error in drag and drop (thanks to Jerry Wu)
 
-##### 0.21 (june 7 2014) version
+##### 0.21 (june 7 2014)
 
 * Issue 263: Improve styling of toggle button
 * Issue 266: Make it possible to use html for toggle buttons
