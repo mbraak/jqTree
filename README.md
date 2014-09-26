@@ -20,4 +20,3 @@ See index.html for the full documentation. The documentation is also on [github]
 ##Thanks
 
 The code for the mouse widget is heavily inspired by the mouse widget from jquery ui.
-Tree graphic designed by Hernan D. Schlosman from The Noun Project.
