@@ -1,6 +1,3 @@
-@Tree = {}
-$ = @jQuery
-
 Position =
     getName: (position) ->
         return Position.strings[position - 1]
@@ -17,8 +14,6 @@ Position.INSIDE = 3
 Position.NONE = 4
 
 Position.strings = ['before', 'after', 'inside', 'none']
-
-@Tree.Position = Position
 
 class Node
     constructor: (o, is_root=false, node_class=Node) ->
@@ -386,4 +381,6 @@ class Node
         return result
 
 
-@Tree.Node = Node
+module.exports =
+    Node: Node
+    Position: Position

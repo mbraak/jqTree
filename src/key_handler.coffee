@@ -118,3 +118,6 @@ class KeyHandler
                 return last_child
             else
                 return @getLastChild(last_child)
+
+
+module.exports = KeyHandler

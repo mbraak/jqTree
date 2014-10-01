@@ -1,3 +1,10 @@
+node_element = require './node_element'
+NodeElement = node_element.NodeElement
+
+util = require './util'
+html_escape = util.html_escape
+
+
 class ElementsRenderer
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
@@ -192,3 +199,6 @@ class ElementsRenderer
             return document.createTextNode(div.innerHTML)
         else
             return $(value)[0]
+
+
+module.exports = ElementsRenderer

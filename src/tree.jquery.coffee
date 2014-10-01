@@ -1,5 +1,4 @@
-﻿
-###
+﻿###
 Copyright 2013 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ###
+
+__version__ = require './version'
+DragAndDropHandler = require './drag_and_drop_handler'
+ElementsRenderer = require './elements_renderer'
+KeyHandler = require './key_handler'
+MouseWidget = require './mouse.widget'
+SaveStateHandler = require './save_state_handler'
+ScrollHandler = require './scroll_handler'
+SelectNodeHandler = require './select_node_handler'
+SimpleWidget = require './simple.widget'
+
+node = require './node'
+Node = node.Node
+Position = node.Position
+
+node_element = require './node_element'
+NodeElement = node_element.NodeElement
+FolderElement = node_element.FolderElement
+
 
 class JqTreeWidget extends MouseWidget
     defaults:
@@ -102,7 +120,10 @@ class JqTreeWidget extends MouseWidget
         saveState()
 
     getSelectedNode: ->
-        return @select_node_handler.getSelectedNode()
+        if @select_node_handler
+            return @select_node_handler.getSelectedNode()
+        else
+            return null
 
     toJson: ->
         return JSON.stringify(
@@ -205,9 +226,10 @@ class JqTreeWidget extends MouseWidget
             @_initTree(data)
         else
             # Node is loaded; unselect all nodes under this node.
-            selected_nodes_under_parent = @select_node_handler.getSelectedNodesUnder(parent_node)
-            for n in selected_nodes_under_parent
-                @select_node_handler.removeFromSelection(n)
+            if @select_node_handler
+                selected_nodes_under_parent = @select_node_handler.getSelectedNodesUnder(parent_node)
+                for n in selected_nodes_under_parent
+                    @select_node_handler.removeFromSelection(n)
 
             parent_node.loadFromData(data)
             parent_node.load_on_demand = false
@@ -424,7 +446,10 @@ class JqTreeWidget extends MouseWidget
     _deinit: ->
         @element.empty()
         @element.unbind()
-        @key_handler.deinit()
+
+        if @key_handler
+            @key_handler.deinit()
+
         @tree = null
 
         super()
@@ -652,100 +677,3 @@ class JqTreeWidget extends MouseWidget
             @removeFromSelection(node)        
 
 SimpleWidget.register(JqTreeWidget, 'tree')
-
-
-class NodeElement
-    constructor: (node, tree_widget) ->
-        @init(node, tree_widget)
-
-    init: (node, tree_widget) ->
-        @node = node
-        @tree_widget = tree_widget
-
-        if not node.element
-            node.element = @tree_widget.element
-
-        @$element = $(node.element)
-
-    getUl: ->
-        return @$element.children('ul:first')
-
-    getSpan: ->
-        return @$element.children('.jqtree-element').find('span.jqtree-title')
-
-    getLi: ->
-        return @$element
-
-    addDropHint: (position) ->
-        if position == Position.INSIDE
-            return new BorderDropHint(@$element)
-        else
-            return new GhostDropHint(@node, @$element, position)
-
-    select: ->
-        @getLi().addClass('jqtree-selected')
-
-    deselect: ->
-        @getLi().removeClass('jqtree-selected')
-
-
-class FolderElement extends NodeElement
-    open: (on_finished, slide=true) ->
-        if not @node.is_open
-            @node.is_open = true
-            $button = @getButton()
-            $button.removeClass('jqtree-closed')
-            $button.html('')
-            $button.append(@tree_widget.renderer.opened_icon_element.cloneNode())
-
-            doOpen = =>
-                @getLi().removeClass('jqtree-closed')
-                if on_finished
-                    on_finished()
-
-                @tree_widget._triggerEvent('tree.open', node: @node)
-
-            if slide
-                @getUl().slideDown('fast', doOpen)
-            else
-                @getUl().show()
-                doOpen()                
-
-    close: (slide=true) ->
-        if @node.is_open
-            @node.is_open = false
-            $button = @getButton()
-            $button.addClass('jqtree-closed')
-            $button.html('')
-            $button.append(@tree_widget.renderer.closed_icon_element.cloneNode())
-
-            doClose = =>
-                @getLi().addClass('jqtree-closed')
-
-                @tree_widget._triggerEvent('tree.close', node: @node)
-
-            if slide
-                @getUl().slideUp('fast', doClose)
-            else
-                @getUl().hide()
-                doClose()
-                
-    getButton: ->
-        return @$element.children('.jqtree-element').find('a.jqtree-toggler')
-
-    addDropHint: (position) ->
-        if not @node.is_open and position == Position.INSIDE
-            return new BorderDropHint(@$element)
-        else
-            return new GhostDropHint(@node, @$element, position)
-
-
-# Escape a string for HTML interpolation; copied from underscore js
-html_escape = (string) ->
-    return (''+string)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;')
-        .replace(/\//g,'&#x2F;')

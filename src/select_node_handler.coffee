@@ -71,3 +71,6 @@ class SelectNodeHandler
             @selected_nodes[node.id] = true
         else
             @selected_single_node = node
+
+
+module.exports = SelectNodeHandler

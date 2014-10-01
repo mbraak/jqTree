@@ -95,3 +95,6 @@ class ScrollHandler
             element_bottom = element_top + $element.height()
 
         return (element_bottom <= view_bottom) and (element_top >= view_top)
+
+
+module.exports = ScrollHandler
