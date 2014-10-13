@@ -75,13 +75,14 @@ class DragAndDropBoxHandler extends DragAndDropHandler
         @drag_element.move(current_x, current_y)
         leaving = @leavingCursorVertically(current_y)
         #vertically leaving the cursor takes precedence over horizontal nesting
-        if leaving && vertical_direction && leaving == vertical_direction
-            @hovered_area = @findAreaWhenLeaving(vertical_direction)
-            #we have to be on a hovered element so move and refresh everything
-            if (@hovered_area)
-                @dragging_cursor.moveTo(@hovered_area, @hit_areas.lastIndexOf(@hovered_area))
-                @refresh()
-                @resetHorizontal(current_x)
+        if vertical_direction && leaving && leaving == vertical_direction
+            verticalArea = @findAreaWhenLeaving(vertical_direction)
+            if verticalArea
+              @hovered_area = verticalArea
+              @dragging_cursor.moveTo(@hovered_area)
+              @refresh()
+              @resetHorizontal(current_x)
+              #we have to be on a hovered element so move and refresh everything
 
         else if horizontal_direction == DragAndDropBoxHandler.RIGHT
             @rightMove()
@@ -115,7 +116,7 @@ class DragAndDropBoxHandler extends DragAndDropHandler
 
     rightMove: (current_x) ->
         rightMoveArea = @getRightMoveArea()
-        if rightMoveArea
+        if rightMoveArea && @canMoveToArea(rightMoveArea)
             @hovered_area = rightMoveArea
             if rightMoveArea && rightMoveArea.position == Position.INSIDE
                 @dragging_cursor.bump()
@@ -136,7 +137,7 @@ class DragAndDropBoxHandler extends DragAndDropHandler
 
     leftMove: () ->
         leftMoveArea = @getLeftMoveArea()
-        if leftMoveArea
+        if leftMoveArea && @canMoveToArea(leftMoveArea)
             @hovered_area = leftMoveArea
             @dragging_cursor.moveTo(@hovered_area)
             return true
@@ -229,10 +230,12 @@ class DragAndDropBoxHandler extends DragAndDropHandler
 
             [previous, index] = decrement(this, index)
             while index > 0
-                if (previous.position == Position.INSIDE && @hit_areas[index-1].position == Position.INSIDE)
-                    [previous, index] = decrement(this, index)
-                    break;
-                if (previous.position == Position.AFTER && previous.bottom < cursor.top)
+                if previous.position == Position.INSIDE
+                    previous_parent = @hit_areas[index-1]
+                    if previous_parent.position == Position.INSIDE && @canMoveToArea(@hit_areas[index-1])
+                        [previous, index] = decrement(this, index)
+                        break;
+                if (previous.position == Position.AFTER && previous.bottom < cursor.top && @canMoveToArea(previous))
                     break;
                 [previous, index] = decrement(this, index)
             return previous
@@ -246,10 +249,11 @@ class DragAndDropBoxHandler extends DragAndDropHandler
               while (next && @dragging_cursor.inCursor(next))
                   [next, index] = increment(this, index)
               while index < @hit_areas.length
-                  if (next.position == Position.INSIDE && @hit_areas[index+1].position == Position.INSIDE)
-                      break
-                  if next.position == Position.AFTER
-                      break
+                  if (@canMoveToArea(next))
+                      if (next.position == Position.INSIDE && @hit_areas[index+1].position == Position.INSIDE)
+                          break
+                      if next.position == Position.AFTER
+                          break
                   [next, index] = increment(this, index)
             if (!next && index >= @hit_areas.length - 1)
               index = @hit_areas.length - 1
@@ -387,9 +391,6 @@ class DraggingCursor
     unSwapGhost: ->
         @$ghost.replaceWith(@$element)
 
-    setIndex: (index) ->
-        @index = index
-
     area: ->
         area = {
             top: @$ghost.offset().top
@@ -398,9 +399,8 @@ class DraggingCursor
             bottom: @$ghost.offset().top + @$ghost.height()
         }
 
-    moveTo: (area, index) ->
+    moveTo: (area) ->
         element = $(area.node.element)
-        @setIndex(index) if index
         if (@bumped)
             @deBump()
         if area.position is Position.AFTER
@@ -429,8 +429,6 @@ class DraggingCursor
         bottom = @$ghost.height() + top
         left = offset.left
         area.top >= top && area.top < bottom && (left <= $(area.node.element).offset().left)
-
-
 
 class HorizontalOptions
     constructor: () ->

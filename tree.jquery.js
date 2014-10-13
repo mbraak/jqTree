@@ -406,7 +406,7 @@ limitations under the License.
 
     /*
     Create tree from data.
-    
+
     Structure of data is:
     [
         {
@@ -439,7 +439,7 @@ limitations under the License.
 
     /*
     Add child.
-    
+
     tree.addChild(
         new Node('child1')
     );
@@ -453,7 +453,7 @@ limitations under the License.
 
     /*
     Add child at position. Index starts at 0.
-    
+
     tree.addChildAtPosition(
         new Node('abc'),
         1
@@ -474,7 +474,7 @@ limitations under the License.
 
     /*
     Remove child. This also removes the children of the node.
-    
+
     tree.removeChild(tree.children[0]);
      */
 
@@ -491,7 +491,7 @@ limitations under the License.
 
     /*
     Get child index.
-    
+
     var index = getChildIndex(node);
      */
 
@@ -502,7 +502,7 @@ limitations under the License.
 
     /*
     Does the tree have children?
-    
+
     if (tree.hasChildren()) {
         //
     }
@@ -519,15 +519,15 @@ limitations under the License.
 
     /*
     Iterate over all the nodes in the tree.
-    
+
     Calls callback with (node, level).
-    
+
     The callback must return true to continue the iteration on current node.
-    
+
     tree.iterate(
         function(node, level) {
            console.log(node.name);
-    
+
            // stop iteration after level 2
            return (level <= 2);
         }
@@ -559,9 +559,9 @@ limitations under the License.
 
     /*
     Move node relative to another node.
-    
+
     Argument position: Position.BEFORE, Position.AFTER or Position.Inside
-    
+
     // move node1 after node2
     tree.moveNode(node1, node2, Position.AFTER);
      */
@@ -975,13 +975,13 @@ limitations under the License.
 
   /*
   Copyright 2013 Marco Braak
-  
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-  
+
       http://www.apache.org/licenses/LICENSE-2.0
-  
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -3123,16 +3123,17 @@ limitations under the License.
     };
 
     DragAndDropBoxHandler.prototype.mouseDrag = function(position_info) {
-      var current_x, current_y, horizontal_direction, leaving, vertical_direction, _ref;
+      var current_x, current_y, horizontal_direction, leaving, verticalArea, vertical_direction, _ref;
       current_y = position_info.page_y;
       current_x = position_info.page_x;
       _ref = this.getCurrentDirections(current_x, current_y), horizontal_direction = _ref[0], vertical_direction = _ref[1];
       this.drag_element.move(current_x, current_y);
       leaving = this.leavingCursorVertically(current_y);
-      if (leaving && vertical_direction && leaving === vertical_direction) {
-        this.hovered_area = this.findAreaWhenLeaving(vertical_direction);
-        if (this.hovered_area) {
-          this.dragging_cursor.moveTo(this.hovered_area, this.hit_areas.lastIndexOf(this.hovered_area));
+      if (vertical_direction && leaving && leaving === vertical_direction) {
+        verticalArea = this.findAreaWhenLeaving(vertical_direction);
+        if (verticalArea) {
+          this.hovered_area = verticalArea;
+          this.dragging_cursor.moveTo(this.hovered_area);
           this.refresh();
           return this.resetHorizontal(current_x);
         }
@@ -3171,7 +3172,7 @@ limitations under the License.
     DragAndDropBoxHandler.prototype.rightMove = function(current_x) {
       var rightMoveArea;
       rightMoveArea = this.getRightMoveArea();
-      if (rightMoveArea) {
+      if (rightMoveArea && this.canMoveToArea(rightMoveArea)) {
         this.hovered_area = rightMoveArea;
         if (rightMoveArea && rightMoveArea.position === Position.INSIDE) {
           this.dragging_cursor.bump();
@@ -3197,7 +3198,7 @@ limitations under the License.
     DragAndDropBoxHandler.prototype.leftMove = function() {
       var leftMoveArea;
       leftMoveArea = this.getLeftMoveArea();
-      if (leftMoveArea) {
+      if (leftMoveArea && this.canMoveToArea(leftMoveArea)) {
         this.hovered_area = leftMoveArea;
         this.dragging_cursor.moveTo(this.hovered_area);
         return true;
@@ -3281,7 +3282,7 @@ limitations under the License.
     };
 
     DragAndDropBoxHandler.prototype.findAreaWhenLeaving = function(direction) {
-      var area, cursor, decrement, increment, index, next, previous, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+      var area, cursor, decrement, increment, index, next, previous, previous_parent, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
       _ref = this.findCursor(), cursor = _ref[0], index = _ref[1];
       if (direction === DragAndDropBoxHandler.UP) {
         decrement = function(dnd, index) {
@@ -3292,11 +3293,14 @@ limitations under the License.
         };
         _ref1 = decrement(this, index), previous = _ref1[0], index = _ref1[1];
         while (index > 0) {
-          if (previous.position === Position.INSIDE && this.hit_areas[index - 1].position === Position.INSIDE) {
-            _ref2 = decrement(this, index), previous = _ref2[0], index = _ref2[1];
-            break;
+          if (previous.position === Position.INSIDE) {
+            previous_parent = this.hit_areas[index - 1];
+            if (previous_parent.position === Position.INSIDE && this.canMoveToArea(this.hit_areas[index - 1])) {
+              _ref2 = decrement(this, index), previous = _ref2[0], index = _ref2[1];
+              break;
+            }
           }
-          if (previous.position === Position.AFTER && previous.bottom < cursor.top) {
+          if (previous.position === Position.AFTER && previous.bottom < cursor.top && this.canMoveToArea(previous)) {
             break;
           }
           _ref3 = decrement(this, index), previous = _ref3[0], index = _ref3[1];
@@ -3315,11 +3319,13 @@ limitations under the License.
           _ref5 = increment(this, index), next = _ref5[0], index = _ref5[1];
         }
         while (index < this.hit_areas.length) {
-          if (next.position === Position.INSIDE && this.hit_areas[index + 1].position === Position.INSIDE) {
-            break;
-          }
-          if (next.position === Position.AFTER) {
-            break;
+          if (this.canMoveToArea(next)) {
+            if (next.position === Position.INSIDE && this.hit_areas[index + 1].position === Position.INSIDE) {
+              break;
+            }
+            if (next.position === Position.AFTER) {
+              break;
+            }
           }
           _ref6 = increment(this, index), next = _ref6[0], index = _ref6[1];
         }
@@ -3500,10 +3506,6 @@ limitations under the License.
       return this.$ghost.replaceWith(this.$element);
     };
 
-    DraggingCursor.prototype.setIndex = function(index) {
-      return this.index = index;
-    };
-
     DraggingCursor.prototype.area = function() {
       var area;
       return area = {
@@ -3514,12 +3516,9 @@ limitations under the License.
       };
     };
 
-    DraggingCursor.prototype.moveTo = function(area, index) {
+    DraggingCursor.prototype.moveTo = function(area) {
       var element;
       element = $(area.node.element);
-      if (index) {
-        this.setIndex(index);
-      }
       if (this.bumped) {
         this.deBump();
       }
