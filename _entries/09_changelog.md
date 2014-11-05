@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue 332: openNode should open parent nodes (thanks to Kitano Yoshitomo)
+
 ##### 0.22 (september 25 2014)
 
 * Issue 291: Dragging Item - do not open node if you don't stay over it (thanks to Roman Klos)
