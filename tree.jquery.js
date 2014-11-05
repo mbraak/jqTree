@@ -1009,7 +1009,7 @@ limitations under the License.
           return this._loadFolderOnDemand(node, slide, on_finished);
         } else {
           parent = node.parent;
-          while (parent && !parent.is_open) {
+          while (parent) {
             if (parent.parent) {
               doOpenNode(parent, false, null);
             }
