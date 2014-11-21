@@ -6,6 +6,7 @@ name: changelog
 ##### development version
 
 * Issue 332: openNode should open parent nodes (thanks to Kitano Yoshitomo)
+* Issue 335: Add cloneNode missing argument for Gecko <13.0 (thanks to Tvinky)
 
 ##### 0.22 (september 25 2014)
 
