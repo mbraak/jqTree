@@ -120,7 +120,7 @@ class ElementsRenderer
         button_link.className = "jqtree_common #{ button_classes }"
 
         button_link.appendChild(
-            icon_element.cloneNode()
+            icon_element.cloneNode(false)
         )
 
         div.appendChild(button_link)

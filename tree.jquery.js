@@ -586,7 +586,7 @@
       li.appendChild(div);
       button_link = document.createElement('a');
       button_link.className = "jqtree_common " + button_classes;
-      button_link.appendChild(icon_element.cloneNode());
+      button_link.appendChild(icon_element.cloneNode(false));
       div.appendChild(button_link);
       title_span = document.createElement('span');
       title_span.className = "jqtree_common jqtree-title jqtree-title-folder";
@@ -2417,7 +2417,7 @@ This widget does the same a the mouse widget in jqueryui.
         $button = this.getButton();
         $button.removeClass('jqtree-closed');
         $button.html('');
-        $button.append(this.tree_widget.renderer.opened_icon_element.cloneNode());
+        $button.append(this.tree_widget.renderer.opened_icon_element.cloneNode(false));
         doOpen = (function(_this) {
           return function() {
             _this.getLi().removeClass('jqtree-closed');
@@ -2448,7 +2448,7 @@ This widget does the same a the mouse widget in jqueryui.
         $button = this.getButton();
         $button.addClass('jqtree-closed');
         $button.html('');
-        $button.append(this.tree_widget.renderer.closed_icon_element.cloneNode());
+        $button.append(this.tree_widget.renderer.closed_icon_element.cloneNode(false));
         doClose = (function(_this) {
           return function() {
             _this.getLi().addClass('jqtree-closed');
