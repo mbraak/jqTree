@@ -24,4 +24,7 @@ gulp.task 'jekyll', (cb) ->
         console.log(stderr)
         cb(err)
 
+gulp.task 'watch', ['default'], ->
+    gulp.watch ['./src/*.coffee', './src/test.js'], ['default']
+
 gulp.task 'default', ['jqtree', 'build_test', 'lib']
