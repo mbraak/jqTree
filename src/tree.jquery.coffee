@@ -232,7 +232,10 @@ class JqTreeWidget extends MouseWidget
                     @select_node_handler.removeFromSelection(n)
 
             parent_node.loadFromData(data)
+
             parent_node.load_on_demand = false
+            parent_node.is_loading = false
+
             @_refreshElements(parent_node.parent)
 
         if @isDragging()
@@ -271,6 +274,8 @@ class JqTreeWidget extends MouseWidget
                 @_saveState()
 
     _loadFolderOnDemand: (node, slide=true, on_finished) ->
+        node.is_loading = true
+
         @_loadDataFromUrl(
             null,
             node,
@@ -398,7 +403,7 @@ class JqTreeWidget extends MouseWidget
         return @save_state_handler.getState()
 
     setState: (state) ->
-        @save_state_handler.setState(state)
+        @save_state_handler.setInitialState(state)
         @_refreshElements()
 
     setOption: (option, value) ->
@@ -500,30 +505,106 @@ class JqTreeWidget extends MouseWidget
 
         @tree.loadFromData(data)
 
-        @_openNodes()
+        must_load_on_demand = @_setInitialState()
+
         @_refreshElements()
+
+        if must_load_on_demand
+            @_setInitialStateOnDemand()
 
         if not @is_initialized
             @is_initialized = true
             @_triggerEvent('tree.init')
 
-    _openNodes: ->
-        if @options.saveState
-            if @save_state_handler.restoreState()
-                return
+    # Set initial state, either by restoring the state or auto-opening nodes
+    # result: must load nodes on demand?
+    _setInitialState: ->
+        restoreState = =>
+            # result: is state restored, must load on demand?
+            if not (@options.saveState and @save_state_handler)
+                return [false, false]
+            else
+                state = @save_state_handler.getStateFromStorage()
 
-        if @options.autoOpen is false
-            return
-        else if @options.autoOpen is true
-            max_level = -1
+                if not state
+                    return [false, false]
+                else
+                    must_load_on_demand = @save_state_handler.setInitialState(state)
+
+                    # return true: the state is restored
+                    return [true, must_load_on_demand]
+
+        autoOpenNodes = =>
+            # result: must load on demand?
+            if @options.autoOpen is false
+                return false
+
+            max_level = @_getAutoOpenMaxLevel()
+            must_load_on_demand = false
+
+            @tree.iterate (node, level) ->
+                if node.load_on_demand
+                    must_load_on_demand = true
+                    return false
+                else if not node.hasChildren()
+                    return false
+                else
+                    node.is_open = true
+                    return (level != max_level)
+    
+            return must_load_on_demand
+
+        [is_restored, must_load_on_demand] = restoreState()
+
+        if not is_restored
+            must_load_on_demand = autoOpenNodes()
+
+        return must_load_on_demand
+
+    # Set the initial state for nodes that are loaded on demand
+    _setInitialStateOnDemand: ->
+        restoreState = =>
+            if not (@options.saveState and @save_state_handler)
+                return false
+            else
+                state = @save_state_handler.getStateFromStorage()
+
+                if not state
+                    return false
+                else
+                    @save_state_handler.setInitialStateOnDemand(state)
+
+                    return true
+
+        autoOpenNodes = =>
+            max_level = @_getAutoOpenMaxLevel()
+            loading_ids = []
+
+            loadAndOpenNode = (node) =>
+                @_openNode(node, false, openNodes)
+
+            openNodes = =>
+                @tree.iterate (node, level) =>
+                    if node.load_on_demand
+                        if not node.is_loading
+                            loadAndOpenNode(node)
+
+                        return false                        
+                    else
+                        @_openNode(node, false)
+
+                        return (level != max_level)
+
+            openNodes()
+
+        if not restoreState()
+            autoOpenNodes()
+
+    _getAutoOpenMaxLevel: ->
+        if @options.autoOpen is true
+            return -1
         else
-            max_level = parseInt(@options.autoOpen)
-
-        @tree.iterate((node, level) ->
-            if node.hasChildren()
-                node.is_open = true
-            return (level != max_level)
-        )
+            return parseInt(@options.autoOpen)
 
     _refreshElements: (from_node=null) ->
         @renderer.render(from_node)

@@ -15,6 +15,6 @@ $(function() {
     var $tree = $('#tree1');
 
     $tree.tree({
-        dragAndDrop: true
+        saveState: true
     });
 });

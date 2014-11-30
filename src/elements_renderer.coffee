@@ -182,6 +182,9 @@ class ElementsRenderer
         if @tree_widget.select_node_handler and @tree_widget.select_node_handler.isNodeSelected(node)
             classes.push('jqtree-selected')
 
+        if node.is_loading
+            classes.push('jqtree-loading')
+
         return classes.join(' ')
 
     escapeIfNecessary: (value) ->
