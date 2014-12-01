@@ -380,6 +380,51 @@ class Node
 
         return result
 
+    getNextNode: (include_children=true) ->
+        if include_children and @hasChildren() and @is_open
+            # First child
+            return @children[0]
+        else
+            if not @parent
+                return null
+            else
+                next_sibling = @getNextSibling()
+                if next_sibling
+                    # Next sibling
+                    return next_sibling
+                else
+                    # Next node of parent
+                    return @parent.getNextNode(false)
+
+    getPreviousNode: ->
+        if not @parent
+            return null
+        else
+            previous_sibling = @getPreviousSibling()
+            if previous_sibling
+                if not previous_sibling.hasChildren() or not previous_sibling.is_open
+                    # Previous sibling
+                    return previous_sibling
+                else
+                    # Last child of previous sibling
+                    return previous_sibling.getLastChild()
+            else
+                # Parent
+                if @parent.parent
+                    return @parent
+                else
+                    return null
+
+    getLastChild: ->
+        if not @hasChildren()
+            return null
+        else
+            last_child = @children[@children.length - 1]
+            if not last_child.hasChildren() or not last_child.is_open
+                return last_child
+            else
+                return last_child.getLastChild()
+
 
 module.exports =
     Node: Node

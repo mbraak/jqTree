@@ -409,6 +409,22 @@ class JqTreeWidget extends MouseWidget
     setOption: (option, value) ->
         @options[option] = value
 
+    moveDown: ->
+        if @key_handler
+            @key_handler.moveDown()
+
+    moveUp: ->
+        if @key_handler
+            @key_handler.moveUp()
+
+    moveRight: ->
+        if @key_handler
+            @key_handler.moveRight()
+
+    moveLeft: ->
+        if @key_handler
+            @key_handler.moveLeft()
+
     getVersion: ->
         return __version__
 

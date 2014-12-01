@@ -2343,6 +2343,63 @@ test('Position.nameToIndex', function() {
       return result;
     };
 
+    Node.prototype.getNextNode = function(include_children) {
+      var next_sibling;
+      if (include_children == null) {
+        include_children = true;
+      }
+      if (include_children && this.hasChildren() && this.is_open) {
+        return this.children[0];
+      } else {
+        if (!this.parent) {
+          return null;
+        } else {
+          next_sibling = this.getNextSibling();
+          if (next_sibling) {
+            return next_sibling;
+          } else {
+            return this.parent.getNextNode(false);
+          }
+        }
+      }
+    };
+
+    Node.prototype.getPreviousNode = function() {
+      var previous_sibling;
+      if (!this.parent) {
+        return null;
+      } else {
+        previous_sibling = this.getPreviousSibling();
+        if (previous_sibling) {
+          if (!previous_sibling.hasChildren() || !previous_sibling.is_open) {
+            return previous_sibling;
+          } else {
+            return previous_sibling.getLastChild();
+          }
+        } else {
+          if (this.parent.parent) {
+            return this.parent;
+          } else {
+            return null;
+          }
+        }
+      }
+    };
+
+    Node.prototype.getLastChild = function() {
+      var last_child;
+      if (!this.hasChildren()) {
+        return null;
+      } else {
+        last_child = this.children[this.children.length - 1];
+        if (!last_child.hasChildren() || !last_child.is_open) {
+          return last_child;
+        } else {
+          return last_child.getLastChild();
+        }
+      }
+    };
+
     return Node;
 
   })();
