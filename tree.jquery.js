@@ -1184,30 +1184,6 @@ limitations under the License.
       return this.options[option] = value;
     };
 
-    JqTreeWidget.prototype.moveDown = function() {
-      if (this.key_handler) {
-        return this.key_handler.moveDown();
-      }
-    };
-
-    JqTreeWidget.prototype.moveUp = function() {
-      if (this.key_handler) {
-        return this.key_handler.moveUp();
-      }
-    };
-
-    JqTreeWidget.prototype.moveRight = function() {
-      if (this.key_handler) {
-        return this.key_handler.moveRight();
-      }
-    };
-
-    JqTreeWidget.prototype.moveLeft = function() {
-      if (this.key_handler) {
-        return this.key_handler.moveLeft();
-      }
-    };
-
     JqTreeWidget.prototype.getVersion = function() {
       return __version__;
     };
