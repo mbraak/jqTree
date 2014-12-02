@@ -376,7 +376,10 @@ test('loadData', function() {
     );
 
     // Node 'child3' must have toggler button
-    ok($child3.prev().is('a.jqtree-toggler'));
+    ok(
+        $child3.prev().is('a.jqtree-toggler'),
+        "node 'child3' must have toggler button"
+    );
 
     // - select node 'c5' and load new data under 'child3'
     var c5 = $tree.tree('getNodeByName', 'c5');
