@@ -18,9 +18,15 @@ class ElementsRenderer
         else
             @renderFromRoot()
 
-    renderNode: (node) ->
-        # remove element
-        $(node.element).remove()
+    renderFromRoot: ->
+        $element = @tree_widget.element
+        $element.empty()
+
+        @createDomElements($element[0], @tree_widget.tree.children, true, true)
+
+    renderFromNode: (node) ->
+        # remember current li
+        $previous_li = $(node.element)
 
         # create element
         parent_node_element = new NodeElement(node.parent, @tree_widget)
@@ -29,29 +35,14 @@ class ElementsRenderer
         @attachNodeData(node, li)
 
         # add element to dom
-        previous_node = node.getPreviousSibling()
-        if previous_node
-            # Add node after previous node
-            $(previous_node.element).after(li)
-        else
-            # There is no previous node; add node as first child of parent
-            parent_node_element.getUl().prepend(li)
+        $previous_li.after(li)
 
-        # render children
+        # remove previous li
+        $previous_li.remove()
+
+        # create children
         if node.children
-            @renderFromNode(node)
-
-    renderFromRoot: ->
-        $element = @tree_widget.element
-        $element.empty()
-
-        @createDomElements($element[0], @tree_widget.tree.children, true, true)
-
-    renderFromNode: (from_node) ->
-        node_element = @tree_widget._getNodeElementForNode(from_node)
-        node_element.getUl().remove()
-
-        @createDomElements(node_element.$element[0], from_node.children, false, false)
+            @createDomElements(li, node.children, false, false)
 
     createDomElements: (element, children, is_root_node, is_open) ->
         ul = @createUl(is_root_node)

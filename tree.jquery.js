@@ -493,23 +493,6 @@
       }
     };
 
-    ElementsRenderer.prototype.renderNode = function(node) {
-      var li, parent_node_element, previous_node;
-      $(node.element).remove();
-      parent_node_element = new NodeElement(node.parent, this.tree_widget);
-      li = this.createLi(node);
-      this.attachNodeData(node, li);
-      previous_node = node.getPreviousSibling();
-      if (previous_node) {
-        $(previous_node.element).after(li);
-      } else {
-        parent_node_element.getUl().prepend(li);
-      }
-      if (node.children) {
-        return this.renderFromNode(node);
-      }
-    };
-
     ElementsRenderer.prototype.renderFromRoot = function() {
       var $element;
       $element = this.tree_widget.element;
@@ -517,10 +500,17 @@
       return this.createDomElements($element[0], this.tree_widget.tree.children, true, true);
     };
 
-    ElementsRenderer.prototype.renderFromNode = function(from_node) {
-      node_element = this.tree_widget._getNodeElementForNode(from_node);
-      node_element.getUl().remove();
-      return this.createDomElements(node_element.$element[0], from_node.children, false, false);
+    ElementsRenderer.prototype.renderFromNode = function(node) {
+      var $previous_li, li, parent_node_element;
+      $previous_li = $(node.element);
+      parent_node_element = new NodeElement(node.parent, this.tree_widget);
+      li = this.createLi(node);
+      this.attachNodeData(node, li);
+      $previous_li.after(li);
+      $previous_li.remove();
+      if (node.children) {
+        return this.createDomElements(li, node.children, false, false);
+      }
     };
 
     ElementsRenderer.prototype.createDomElements = function(element, children, is_root_node, is_open) {
@@ -951,7 +941,31 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._loadData = function(data, parent_node) {
-      var n, selected_nodes_under_parent, _i, _len;
+      var deselectNodes, loadSubtree;
+      if (parent_node == null) {
+        parent_node = null;
+      }
+      deselectNodes = (function(_this) {
+        return function() {
+          var n, selected_nodes_under_parent, _i, _len;
+          if (_this.select_node_handler) {
+            selected_nodes_under_parent = _this.select_node_handler.getSelectedNodesUnder(parent_node);
+            for (_i = 0, _len = selected_nodes_under_parent.length; _i < _len; _i++) {
+              n = selected_nodes_under_parent[_i];
+              _this.select_node_handler.removeFromSelection(n);
+            }
+          }
+          return null;
+        };
+      })(this);
+      loadSubtree = (function(_this) {
+        return function() {
+          parent_node.loadFromData(data);
+          parent_node.load_on_demand = false;
+          parent_node.is_loading = false;
+          return _this._refreshElements(parent_node);
+        };
+      })(this);
       if (!data) {
         return;
       }
@@ -961,17 +975,8 @@ limitations under the License.
       if (!parent_node) {
         this._initTree(data);
       } else {
-        if (this.select_node_handler) {
-          selected_nodes_under_parent = this.select_node_handler.getSelectedNodesUnder(parent_node);
-          for (_i = 0, _len = selected_nodes_under_parent.length; _i < _len; _i++) {
-            n = selected_nodes_under_parent[_i];
-            this.select_node_handler.removeFromSelection(n);
-          }
-        }
-        parent_node.loadFromData(data);
-        parent_node.load_on_demand = false;
-        parent_node.is_loading = false;
-        this._refreshElements(parent_node.parent);
+        deselectNodes();
+        loadSubtree();
       }
       if (this.isDragging()) {
         return this.dnd_handler.refresh();
@@ -1127,7 +1132,7 @@ limitations under the License.
       if (id_is_changed) {
         this.tree.addNodeToIndex(node);
       }
-      this.renderer.renderNode(node);
+      this.renderer.renderFromNode(node);
       return this._selectCurrentNode();
     };
 
@@ -1401,6 +1406,12 @@ limitations under the License.
         return parseInt(this.options.autoOpen);
       }
     };
+
+
+    /*
+    Redraw the tree or part of the tree.
+     * from_node: redraw this subtree
+     */
 
     JqTreeWidget.prototype._refreshElements = function(from_node) {
       if (from_node == null) {

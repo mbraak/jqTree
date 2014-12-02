@@ -216,7 +216,23 @@ class JqTreeWidget extends MouseWidget
         else
             loadDataFromUrlInfo()
 
-    _loadData: (data, parent_node) ->
+    _loadData: (data, parent_node=null) ->
+        deselectNodes = =>
+            if @select_node_handler
+                selected_nodes_under_parent = @select_node_handler.getSelectedNodesUnder(parent_node)
+                for n in selected_nodes_under_parent
+                    @select_node_handler.removeFromSelection(n)
+
+            return null
+
+        loadSubtree = =>
+            parent_node.loadFromData(data)
+
+            parent_node.load_on_demand = false
+            parent_node.is_loading = false
+
+            @_refreshElements(parent_node)
+
         if not data
             return
 
@@ -225,18 +241,8 @@ class JqTreeWidget extends MouseWidget
         if not parent_node
             @_initTree(data)
         else
-            # Node is loaded; unselect all nodes under this node.
-            if @select_node_handler
-                selected_nodes_under_parent = @select_node_handler.getSelectedNodesUnder(parent_node)
-                for n in selected_nodes_under_parent
-                    @select_node_handler.removeFromSelection(n)
-
-            parent_node.loadFromData(data)
-
-            parent_node.load_on_demand = false
-            parent_node.is_loading = false
-
-            @_refreshElements(parent_node.parent)
+            deselectNodes()
+            loadSubtree()
 
         if @isDragging()
             @dnd_handler.refresh()
@@ -362,7 +368,7 @@ class JqTreeWidget extends MouseWidget
         if id_is_changed
             @tree.addNodeToIndex(node)
 
-        @renderer.renderNode(node)
+        @renderer.renderFromNode(node)
         @_selectCurrentNode()
 
     moveNode: (node, target_node, position) ->
@@ -606,6 +612,10 @@ class JqTreeWidget extends MouseWidget
         else
             return parseInt(@options.autoOpen)
 
+    ###
+    Redraw the tree or part of the tree.
+    # from_node: redraw this subtree
+    ###
     _refreshElements: (from_node=null) ->
         @renderer.render(from_node)
 
