@@ -318,7 +318,7 @@ class JqTreeWidget extends MouseWidget
 
     addParentNode: (new_node_info, existing_node) ->
         new_node = existing_node.addParent(new_node_info)
-        @_refreshElements(new_node.parent)  
+        @_refreshElements(new_node.parent)
         return new_node    
 
     removeNode: (node) ->
@@ -327,23 +327,14 @@ class JqTreeWidget extends MouseWidget
             @select_node_handler.removeFromSelection(node, true)  # including children
 
             node.remove()
-            @_refreshElements(parent.parent)
+            @_refreshElements(parent)
 
     appendNode: (new_node_info, parent_node) ->
-        if not parent_node
-            parent_node = @tree
-
-        # Is the parent already a folder node?
-        is_already_folder_node = parent_node.isFolder()
+        parent_node = parent_node or @tree
 
         node = parent_node.append(new_node_info)
 
-        if is_already_folder_node
-            # Refresh the parent
-            @_refreshElements(parent_node)
-        else
-            # Refresh the parent of the parent. This must be done so the parent gets a toggler button
-            @_refreshElements(parent_node.parent)
+        @_refreshElements(parent_node)
 
         return node
  
@@ -354,6 +345,7 @@ class JqTreeWidget extends MouseWidget
         node = parent_node.prepend(new_node_info)
 
         @_refreshElements(parent_node)
+
         return node
 
     updateNode: (node, data) ->

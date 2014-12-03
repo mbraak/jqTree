@@ -1092,22 +1092,14 @@ limitations under the License.
       if (parent) {
         this.select_node_handler.removeFromSelection(node, true);
         node.remove();
-        return this._refreshElements(parent.parent);
+        return this._refreshElements(parent);
       }
     };
 
     JqTreeWidget.prototype.appendNode = function(new_node_info, parent_node) {
-      var is_already_folder_node;
-      if (!parent_node) {
-        parent_node = this.tree;
-      }
-      is_already_folder_node = parent_node.isFolder();
+      parent_node = parent_node || this.tree;
       node = parent_node.append(new_node_info);
-      if (is_already_folder_node) {
-        this._refreshElements(parent_node);
-      } else {
-        this._refreshElements(parent_node.parent);
-      }
+      this._refreshElements(parent_node);
       return node;
     };
 
