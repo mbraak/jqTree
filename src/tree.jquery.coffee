@@ -149,11 +149,10 @@ class JqTreeWidget extends MouseWidget
         $el = null
 
         addLoadingClass = =>
-            if not parent_node
-                $el = @element
+            if parent_node
+                $el = $(parent_node.element)
             else
-                folder_element = new FolderElement(parent_node, this)
-                $el = folder_element.getLi()
+                $el = @element
 
             $el.addClass('jqtree-loading')
 
@@ -414,6 +413,14 @@ class JqTreeWidget extends MouseWidget
 
     setOption: (option, value) ->
         @options[option] = value
+
+    moveDown: ->
+        if @key_handler
+            @key_handler.moveDown()
+
+    moveUp: ->
+        if @key_handler
+            @key_handler.moveUp()
 
     getVersion: ->
         return __version__

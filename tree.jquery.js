@@ -859,12 +859,10 @@ limitations under the License.
       $el = null;
       addLoadingClass = (function(_this) {
         return function() {
-          var folder_element;
-          if (!parent_node) {
-            $el = _this.element;
+          if (parent_node) {
+            $el = $(parent_node.element);
           } else {
-            folder_element = new FolderElement(parent_node, _this);
-            $el = folder_element.getLi();
+            $el = _this.element;
           }
           return $el.addClass('jqtree-loading');
         };
@@ -1187,6 +1185,18 @@ limitations under the License.
 
     JqTreeWidget.prototype.setOption = function(option, value) {
       return this.options[option] = value;
+    };
+
+    JqTreeWidget.prototype.moveDown = function() {
+      if (this.key_handler) {
+        return this.key_handler.moveDown();
+      }
+    };
+
+    JqTreeWidget.prototype.moveUp = function() {
+      if (this.key_handler) {
+        return this.key_handler.moveUp();
+      }
     };
 
     JqTreeWidget.prototype.getVersion = function() {
