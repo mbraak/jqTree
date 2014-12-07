@@ -1,11 +1,11 @@
-var node = require('./node')
+var node = require('./node');
 var Node = node.Node;
 var Position = node.Position;
 
-var util = require('./util')
-_indexOf = util._indexOf
-indexOf = util.indexOf
-get_json_stringify_function = util.get_json_stringify_function
+var util = require('./util');
+_indexOf = util._indexOf;
+indexOf = util.indexOf;
+get_json_stringify_function = util.get_json_stringify_function;
 
 QUnit.config.testTimeout = 5000;
 
