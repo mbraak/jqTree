@@ -53,7 +53,10 @@
                     console.error('No tests were executed. Are you loading tests asynchronously?');
                 }
 
-                phantom.exit(failed ? 1 : 0);
+                // Work-around to avoid "Unsafe JavaScript attempt to access frame" warning in PhantomJS 1.9.8.
+                // See: https://github.com/ariya/phantomjs/issues/12697
+                page.close();
+                setTimeout(function () { phantom.exit(failed ? 1 : 0) }, 0);
             }
             else if (message.name == 'Blanket.done') {
                 console.log('Saving coverage data to data.lcov.');
@@ -63,6 +66,7 @@
                 f.write(message.data);
                 f.close();
             }
+
         }
     };
 
