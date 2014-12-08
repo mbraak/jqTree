@@ -989,6 +989,10 @@ limitations under the License.
       return this.tree.getNodeByName(name);
     };
 
+    JqTreeWidget.prototype.getNodesByProperty = function(key, value) {
+      return this.tree.getNodesByProperty(key, value);
+    };
+
     JqTreeWidget.prototype.openNode = function(node, slide) {
       if (slide == null) {
         slide = null;
