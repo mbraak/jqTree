@@ -23,19 +23,22 @@ var example_data = [
     {
         label: 'node1',
         id: 123,  // extra data
+        int_property: 1,
+        str_property: '1',
         children: [
-            { label: 'child1', id: 125 },
+            { label: 'child1', id: 125, int_property: 2 },
             { label: 'child2', id: 126 }
         ]
     },
     {
         label: 'node2',
         id: 124,
+        int_property: 3,
+        str_property: '3',
         children: [
             { label: 'child3', id: 127 }
         ]
     }
-    
 ];
 
 /*
@@ -309,9 +312,10 @@ test("toJson", function() {
     // 1. call toJson
     equal(
         $tree.tree('toJson'),
-        '[{"name":"node1","id":123,"children":'+
-        '[{"name":"child1","id":125},{"name":"child2","id":126}]},'+
-        '{"name":"node2","id":124,"children":[{"name":"child3","id":127}]}]'
+        '[{"name":"node1","id":123,"int_property":1,"str_property":"1",'+
+        '"children":[{"name":"child1","id":125,"int_property":2},{"name":'+
+        '"child2","id":126}]},{"name":"node2","id":124,"int_property":3,'+
+        '"str_property":"3","children":[{"name":"child3","id":127}]}]'
     );
 
     // Check that properties 'children', 'parent' and 'element' still exist.
@@ -1171,6 +1175,73 @@ test('keyboard', function() {
     keyDown(37);
     equal(node1.is_open, false);
     equal($tree.tree('getSelectedNode').name, 'node1');
+});
+
+test('getNodesByProperty', function(){
+  // setup
+  var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+    var node2 = $tree.tree('getNodeByName', 'node2');
+
+    // 1. get 'node1' by property
+    equal(
+        $tree.tree('getNodesByProperty', 'int_property', 1)[0].name,
+        'node1'
+    );
+
+    // 2. get property that does not exist in any node
+    equal($tree.tree('getNodesByProperty', 'int_property', 123).length, 0);
+
+    // 3. get string property
+    equal(
+        $tree.tree('getNodesByProperty', 'str_property', '1')[0].name,
+        'node1'
+    );
+
+    // 4. add node with string id; search by int
+    $tree.tree(
+        'appendNode',
+        {
+            label: 'abc',
+            id: '234',
+            str_property: '111',
+            int_property: 111
+        }
+    );
+
+    equal(
+        $tree.tree('getNodesByProperty', 'int_property', 111)[0].name,
+        'abc'
+    );
+    equal(
+        $tree.tree('getNodesByProperty', 'str_property', '111')[0].name,
+        'abc'
+    );
+
+    // 5. load subtree in node2
+    var subtree_data = [
+        {
+            label: 'sub1',
+            id: 200,
+            int_property: 222,
+            children: [
+                {label: 'sub2', id: 201, int_property: 444}
+            ]
+        }
+    ];
+    $tree.tree('loadData',  subtree_data, node2);
+    var t = $tree.tree('getTree');
+
+    equal(
+        $tree.tree('getNodesByProperty', 'int_property', 222)[0].name,
+        'sub1'
+    );
+    equal(
+        $tree.tree('getNodesByProperty', 'int_property', 444)[0].name,
+        'sub2'
+    );
 });
 
 QUnit.module("Tree");
