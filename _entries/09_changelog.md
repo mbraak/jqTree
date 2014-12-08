@@ -6,6 +6,7 @@ name: changelog
 ##### development version
 
 * Issues 273 and 304: autoOpen and saveState now works for nodes that are loaded on demand
+* Issue 283: added getNodesByProperty function (thanks to Neeraj)
 * Issue 332: openNode should open parent nodes (thanks to Kitano Yoshitomo)
 * Issue 335: Add cloneNode missing argument for Gecko <13.0 (thanks to Tvinky)
 * Issue 337: Added functions for moving up and down
