@@ -2146,22 +2146,20 @@ This widget does the same a the mouse widget in jqueryui.
 
     Node.prototype.iterate = function(callback) {
       var _iterate;
-      _iterate = (function(_this) {
-        return function(node, level) {
-          var child, result, _i, _len, _ref;
-          if (node.children) {
-            _ref = node.children;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              child = _ref[_i];
-              result = callback(child, level);
-              if (_this.hasChildren() && result) {
-                _iterate(child, level + 1);
-              }
+      _iterate = function(node, level) {
+        var child, result, _i, _len, _ref;
+        if (node.children) {
+          _ref = node.children;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            child = _ref[_i];
+            result = callback(child, level);
+            if (result && child.hasChildren()) {
+              _iterate(child, level + 1);
             }
-            return null;
           }
-        };
-      })(this);
+          return null;
+        }
+      };
       _iterate(this, 0);
       return null;
     };

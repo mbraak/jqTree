@@ -170,12 +170,12 @@ class Node
 
     ###
     iterate: (callback) ->
-        _iterate = (node, level) =>
+        _iterate = (node, level) ->
             if node.children
                 for child in node.children
                     result = callback(child, level)
 
-                    if @hasChildren() and result
+                    if result and child.hasChildren()
                         _iterate(child, level + 1)
                 return null
 
