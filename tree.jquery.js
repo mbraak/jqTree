@@ -867,25 +867,21 @@ limitations under the License.
           return $el.addClass('jqtree-loading');
         };
       })(this);
-      removeLoadingClass = (function(_this) {
-        return function() {
-          if ($el) {
-            return $el.removeClass('jqtree-loading');
-          }
-        };
-      })(this);
-      parseUrlInfo = (function(_this) {
-        return function() {
-          if ($.type(url_info) === 'string') {
-            url_info = {
-              url: url_info
-            };
-          }
-          if (!url_info.method) {
-            return url_info.method = 'get';
-          }
-        };
-      })(this);
+      removeLoadingClass = function() {
+        if ($el) {
+          return $el.removeClass('jqtree-loading');
+        }
+      };
+      parseUrlInfo = function() {
+        if ($.type(url_info) === 'string') {
+          url_info = {
+            url: url_info
+          };
+        }
+        if (!url_info.method) {
+          return url_info.method = 'get';
+        }
+      };
       handeLoadData = (function(_this) {
         return function(data) {
           removeLoadingClass();

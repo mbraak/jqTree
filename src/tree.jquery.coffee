@@ -156,11 +156,11 @@ class JqTreeWidget extends MouseWidget
 
             $el.addClass('jqtree-loading')
 
-        removeLoadingClass = =>
+        removeLoadingClass = ->
             if $el
                 $el.removeClass('jqtree-loading')
 
-        parseUrlInfo = =>
+        parseUrlInfo = ->
             if $.type(url_info) == 'string'
                 url_info = url: url_info
 
