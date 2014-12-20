@@ -8,6 +8,6 @@
         "jquery-cookie": "v1.4.1",
         "jquery-mockjax": "1.6.1",
         "pygments": "2.0.1",
-        "qunit": "1.15.0"
+        "qunit": "1.16.0"
     }
 }
