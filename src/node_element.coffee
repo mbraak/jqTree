@@ -57,7 +57,7 @@ class FolderElement extends NodeElement
                 @getUl().slideDown('fast', doOpen)
             else
                 @getUl().show()
-                doOpen()                
+                doOpen()
 
     close: (slide=true) ->
         if @node.is_open
@@ -77,7 +77,7 @@ class FolderElement extends NodeElement
             else
                 @getUl().hide()
                 doClose()
-                
+
     getButton: ->
         return @$element.children('.jqtree-element').find('a.jqtree-toggler')
 
@@ -98,7 +98,7 @@ class BorderDropHint
 
         @$hint.css(
             width: width
-            height: $div.height() - 4
+            height: $div.outerHeight() - 4
         )
 
     remove: ->

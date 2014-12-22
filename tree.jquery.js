@@ -2603,7 +2603,7 @@ This widget does the same a the mouse widget in jqueryui.
       $div.append(this.$hint);
       this.$hint.css({
         width: width,
-        height: $div.height() - 4
+        height: $div.outerHeight() - 4
       });
     }
 
