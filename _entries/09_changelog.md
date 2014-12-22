@@ -10,6 +10,7 @@ name: changelog
 * Issue 332: openNode should open parent nodes (thanks to Kitano Yoshitomo)
 * Issue 335: Add cloneNode missing argument for Gecko <13.0 (thanks to Tvinky)
 * Issue 337: Added functions for moving up and down
+* Issue 341: Fixed drag-and-drop border when nodes have padding (thanks to Alex Musayev)
 
 ##### 0.22 (september 25 2014)
 
