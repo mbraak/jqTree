@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.0.0 (january 11 2015)
 
 * Issues 273 and 304: autoOpen and saveState now works for nodes that are loaded on demand
 * Issue 283: added getNodesByProperty function (thanks to Neeraj)
