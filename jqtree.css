@@ -27,6 +27,7 @@ ul.jqtree-tree .jqtree-toggler {
     color: #333;
     text-decoration: none;
     margin-right: 0.5em;
+    vertical-align: middle;
 }
 
 ul.jqtree-tree .jqtree-toggler:hover {

@@ -1,106 +1,7 @@
-# Standard javascript indexOf. Implemented here because not all browsers support it.
-_indexOf = (array, item) ->
-    for value, i in array
-        if value == item
-            return i
-    return -1
+util = require './util'
 
-indexOf = (array, item) ->
-    if array.indexOf
-        # The browser supports indexOf
-        return array.indexOf(item)
-    else
-        # Do our own indexOf
-        return _indexOf(array, item)
-
-@Tree.indexOf = indexOf
-@Tree._indexOf = _indexOf
-
-isInt = (n) ->
-    return typeof n is 'number' and n % 1 == 0
-
-
-# JSON.stringify function; copied from json2
-get_json_stringify_function = ->
-    json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
-    json_meta = {
-        '\b': '\\b',
-        '\t': '\\t',
-        '\n': '\\n',
-        '\f': '\\f',
-        '\r': '\\r',
-        '"' : '\\"',
-        '\\': '\\\\'
-    }
-
-    json_quote = (string) ->
-        json_escapable.lastIndex = 0
-
-        if json_escapable.test(string)
-            return '"' + string.replace(json_escapable, (a) ->
-                c = json_meta[a]
-                return (
-                    if typeof c is 'string' then c
-                    else '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4)
-                )
-            ) + '"'
-        else
-            return '"' + string + '"'
-
-    json_str = (key, holder) ->
-        value = holder[key]
-
-        switch typeof value
-            when 'string'
-                return json_quote(value)
-
-            when 'number'
-                return if isFinite(value) then String(value) else 'null'
-
-            when 'boolean', 'null'
-                return String(value)
-
-            when 'object'
-                if not value
-                    return 'null'
-
-                partial = []
-                if Object::toString.apply(value) is '[object Array]'
-                    for v, i in value
-                        partial[i] = json_str(i, value) or 'null'
-
-                    return (
-                        if partial.length is 0 then '[]'
-                        else '[' + partial.join(',') + ']'
-                    )
-
-                for k of value
-                    if Object::hasOwnProperty.call(value, k)
-                        v = json_str(k, value)
-                        if v
-                            partial.push(json_quote(k) + ':' + v)
-
-                return (
-                    if partial.length is 0 then '{}'
-                    else '{' + partial.join(',') + '}'
-                )
-
-    stringify = (value) ->
-        return json_str(
-            '',
-            {'': value}
-        )
-
-    return stringify
-
-
-@Tree.get_json_stringify_function = get_json_stringify_function
-
-if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
-    if not @JSON?
-        @JSON = {}
-
-    @JSON.stringify = get_json_stringify_function()
+indexOf = util.indexOf
+isInt = util.isInt
 
 
 class SaveStateHandler
@@ -124,15 +25,6 @@ class SaveStateHandler
                 state,
                 {path: '/'}
             )
-
-    restoreState: ->
-        state = @getStateFromStorage()
-
-        if state
-            @setState(state)
-            return true
-        else
-            return false
 
     getStateFromStorage: ->
         json_data = @_loadFromStorage()
@@ -189,27 +81,76 @@ class SaveStateHandler
             selected_node: getSelectedNodeIds()
         }
 
-    setState: (state) ->
+    # Set initial state
+    # Don't handle nodes that are loaded on demand
+    #
+    # result: must load on demand
+    setInitialState: (state) ->
+        if not state
+            return false
+        else
+            must_load_on_demand = @_openInitialNodes(state.open_nodes)
+
+            @_selectInitialNodes(state.selected_node)
+
+            return must_load_on_demand
+
+    _openInitialNodes: (node_ids) ->
+        must_load_on_demand = false
+
+        for node_id in node_ids
+            node = @tree_widget.getNodeById(node_id)
+
+            if node
+                if not node.load_on_demand
+                    node.is_open = true
+                else
+                    must_load_on_demand = true
+
+        return must_load_on_demand
+
+    _selectInitialNodes: (node_ids) ->
+        select_count = 0
+
+        for node_id in node_ids
+            node = @tree_widget.getNodeById(node_id)
+
+            if node
+                select_count += 1
+
+                @tree_widget.select_node_handler.addToSelection(node)
+
+        return select_count != 0
+
+    setInitialStateOnDemand: (state) ->
         if state
-            open_nodes = state.open_nodes
-            selected_node_ids = state.selected_node
+            @_setInitialStateOnDemand(state.open_nodes, state.selected_node)
 
-            @tree_widget.tree.iterate((node) =>
-                node.is_open = (
-                    node.id and
-                    node.hasChildren() and
-                    (indexOf(open_nodes, node.id) >= 0)
-                )
-                return true
-            )
+    _setInitialStateOnDemand: (node_ids, selected_nodes) ->
+        openNodes = =>
+            new_nodes_ids = []
 
-            if selected_node_ids and @tree_widget.select_node_handler
-                @tree_widget.select_node_handler.clear()
-                for node_id in selected_node_ids
-                    selected_node = @tree_widget.getNodeById(node_id)
+            for node_id in node_ids
+                node = @tree_widget.getNodeById(node_id)
 
-                    if selected_node
-                        @tree_widget.select_node_handler.addToSelection(selected_node)
+                if not node
+                    new_nodes_ids.push(node_id)
+                else
+                    if not node.is_loading
+                        if node.load_on_demand
+                            loadAndOpenNode(node)
+                        else
+                            @tree_widget._openNode(node, false)
+
+            node_ids = new_nodes_ids
+
+            if @_selectInitialNodes(selected_nodes)
+                @tree_widget._refreshElements()
+
+        loadAndOpenNode = (node) =>
+            @tree_widget._openNode(node, false, openNodes)
+
+        openNodes()
 
     getCookieName: ->
         if typeof @tree_widget.options.saveState is 'string'
@@ -245,3 +186,6 @@ class SaveStateHandler
             return state.selected_node[0]
         else
             return null
+
+
+module.exports = SaveStateHandler

@@ -10,8 +10,11 @@
 .cp { color: #75715e } /* Comment.Preproc */
 .c1 { color: #75715e } /* Comment.Single */
 .cs { color: #75715e } /* Comment.Special */
+.gd { color: #f92672 } /* Generic.Deleted */
 .ge { font-style: italic } /* Generic.Emph */
+.gi { color: #a6e22e } /* Generic.Inserted */
 .gs { font-weight: bold } /* Generic.Strong */
+.gu { color: #75715e } /* Generic.Subheading */
 .kc { color: #66d9ef } /* Keyword.Constant */
 .kd { color: #66d9ef } /* Keyword.Declaration */
 .kn { color: #f92672 } /* Keyword.Namespace */
@@ -37,6 +40,7 @@
 .nv { color: #f8f8f2 } /* Name.Variable */
 .ow { color: #f92672 } /* Operator.Word */
 .w { color: #f8f8f2 } /* Text.Whitespace */
+.mb { color: #ae81ff } /* Literal.Number.Bin */
 .mf { color: #ae81ff } /* Literal.Number.Float */
 .mh { color: #ae81ff } /* Literal.Number.Hex */
 .mi { color: #ae81ff } /* Literal.Number.Integer */

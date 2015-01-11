@@ -1,3 +1,10 @@
+node_element = require './node_element'
+NodeElement = node_element.NodeElement
+
+util = require './util'
+html_escape = util.html_escape
+
+
 class ElementsRenderer
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
@@ -11,9 +18,15 @@ class ElementsRenderer
         else
             @renderFromRoot()
 
-    renderNode: (node) ->
-        # remove element
-        $(node.element).remove()
+    renderFromRoot: ->
+        $element = @tree_widget.element
+        $element.empty()
+
+        @createDomElements($element[0], @tree_widget.tree.children, true, true)
+
+    renderFromNode: (node) ->
+        # remember current li
+        $previous_li = $(node.element)
 
         # create element
         parent_node_element = new NodeElement(node.parent, @tree_widget)
@@ -22,29 +35,14 @@ class ElementsRenderer
         @attachNodeData(node, li)
 
         # add element to dom
-        previous_node = node.getPreviousSibling()
-        if previous_node
-            # Add node after previous node
-            $(previous_node.element).after(li)
-        else
-            # There is no previous node; add node as first child of parent
-            parent_node_element.getUl().prepend(li)
+        $previous_li.after(li)
 
-        # render children
+        # remove previous li
+        $previous_li.remove()
+
+        # create children
         if node.children
-            @renderFromNode(node)
-
-    renderFromRoot: ->
-        $element = @tree_widget.element
-        $element.empty()
-
-        @createDomElements($element[0], @tree_widget.tree.children, true, true)
-
-    renderFromNode: (from_node) ->
-        node_element = @tree_widget._getNodeElementForNode(from_node)
-        node_element.getUl().remove()
-
-        @createDomElements(node_element.$element[0], from_node.children, false, false)
+            @createDomElements(li, node.children, false, false)
 
     createDomElements: (element, children, is_root_node, is_open) ->
         ul = @createUl(is_root_node)
@@ -113,7 +111,7 @@ class ElementsRenderer
         button_link.className = "jqtree_common #{ button_classes }"
 
         button_link.appendChild(
-            icon_element.cloneNode()
+            icon_element.cloneNode(false)
         )
 
         div.appendChild(button_link)
@@ -175,6 +173,9 @@ class ElementsRenderer
         if @tree_widget.select_node_handler and @tree_widget.select_node_handler.isNodeSelected(node)
             classes.push('jqtree-selected')
 
+        if node.is_loading
+            classes.push('jqtree-loading')
+
         return classes.join(' ')
 
     escapeIfNecessary: (value) ->
@@ -192,3 +193,6 @@ class ElementsRenderer
             return document.createTextNode(div.innerHTML)
         else
             return $(value)[0]
+
+
+module.exports = ElementsRenderer

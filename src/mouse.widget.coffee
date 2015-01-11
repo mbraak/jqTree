@@ -2,6 +2,9 @@
 This widget does the same a the mouse widget in jqueryui.
 ###
 
+SimpleWidget = require './simple.widget'
+
+
 class MouseWidget extends SimpleWidget
     @is_mouse_handled = false
 
@@ -174,3 +177,5 @@ class MouseWidget extends SimpleWidget
         return @_handleMouseUp(
             @_getPositionInfo(touch)
         )
+
+module.exports = MouseWidget

@@ -3,6 +3,15 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.0.0 (january 11 2015)
+
+* Issues 273 and 304: autoOpen and saveState now works for nodes that are loaded on demand
+* Issue 283: added getNodesByProperty function (thanks to Neeraj)
+* Issue 332: openNode should open parent nodes (thanks to Kitano Yoshitomo)
+* Issue 335: Add cloneNode missing argument for Gecko <13.0 (thanks to Tvinky)
+* Issue 337: Added functions for moving up and down
+* Issue 341: Fixed drag-and-drop border when nodes have padding (thanks to Alex Musayev)
+
 ##### 0.22 (september 25 2014)
 
 * Issue 291: Dragging Item - do not open node if you don't stay over it (thanks to Roman Klos)

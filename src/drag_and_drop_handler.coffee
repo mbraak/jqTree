@@ -1,3 +1,7 @@
+node_module = require './node'
+Position = node_module.Position
+
+
 class DragAndDropHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
@@ -459,52 +463,4 @@ class DragElement
         @$element.remove()
 
 
-class GhostDropHint
-    constructor: (node, $element, position) ->
-        @$element = $element
-
-        @node = node
-        @$ghost = $('<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span><span class="jqtree_common jqtree-line"></span></li>')
-
-        if position == Position.AFTER
-            @moveAfter()
-        else if position == Position.BEFORE
-            @moveBefore()
-        else if position == Position.INSIDE
-            if node.isFolder() and node.is_open
-                @moveInsideOpenFolder()
-            else
-                @moveInside()
-
-    remove: ->
-        @$ghost.remove()
-
-    moveAfter: ->
-        @$element.after(@$ghost)
-
-    moveBefore: ->
-        @$element.before(@$ghost)
-
-    moveInsideOpenFolder: ->
-        $(@node.children[0].element).before(@$ghost)
-
-    moveInside: ->
-        @$element.after(@$ghost)
-        @$ghost.addClass('jqtree-inside')
-
-
-class BorderDropHint
-    constructor: ($element) ->
-        $div = $element.children('.jqtree-element')
-        width = $element.width() - 4
-
-        @$hint = $('<span class="jqtree-border"></span>')
-        $div.append(@$hint)
-
-        @$hint.css(
-            width: width
-            height: $div.height() - 4
-        )
-
-    remove: ->
-        @$hint.remove()
+module.exports = DragAndDropHandler
