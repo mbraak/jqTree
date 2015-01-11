@@ -1,6 +1,3 @@
-@Tree = {}
-$ = @jQuery
-
 Position =
     getName: (position) ->
         return Position.strings[position - 1]
@@ -17,8 +14,6 @@ Position.INSIDE = 3
 Position.NONE = 4
 
 Position.strings = ['before', 'after', 'inside', 'none']
-
-@Tree.Position = Position
 
 class Node
     constructor: (o, is_root=false, node_class=Node) ->
@@ -175,12 +170,12 @@ class Node
 
     ###
     iterate: (callback) ->
-        _iterate = (node, level) =>
+        _iterate = (node, level) ->
             if node.children
                 for child in node.children
                     result = callback(child, level)
 
-                    if @hasChildren() and result
+                    if result and child.hasChildren()
                         _iterate(child, level + 1)
                 return null
 
@@ -385,5 +380,52 @@ class Node
 
         return result
 
+    getNextNode: (include_children=true) ->
+        if include_children and @hasChildren() and @is_open
+            # First child
+            return @children[0]
+        else
+            if not @parent
+                return null
+            else
+                next_sibling = @getNextSibling()
+                if next_sibling
+                    # Next sibling
+                    return next_sibling
+                else
+                    # Next node of parent
+                    return @parent.getNextNode(false)
 
-@Tree.Node = Node
+    getPreviousNode: ->
+        if not @parent
+            return null
+        else
+            previous_sibling = @getPreviousSibling()
+            if previous_sibling
+                if not previous_sibling.hasChildren() or not previous_sibling.is_open
+                    # Previous sibling
+                    return previous_sibling
+                else
+                    # Last child of previous sibling
+                    return previous_sibling.getLastChild()
+            else
+                # Parent
+                if @parent.parent
+                    return @parent
+                else
+                    return null
+
+    getLastChild: ->
+        if not @hasChildren()
+            return null
+        else
+            last_child = @children[@children.length - 1]
+            if not last_child.hasChildren() or not last_child.is_open
+                return last_child
+            else
+                return last_child.getLastChild()
+
+
+module.exports =
+    Node: Node
+    Position: Position

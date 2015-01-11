@@ -11,6 +11,8 @@ collections:
   examples:
     output: true
 
+jqtree_version: 1.0.0
+
 # Build settings
 markdown: kramdown
 permalink: pretty

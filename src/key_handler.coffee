@@ -13,108 +13,80 @@ class KeyHandler
     deinit: ->
         $(document).unbind('keydown.jqtree')
 
+    moveDown: ->
+        node = @tree_widget.getSelectedNode()
+
+        if node
+            return @selectNode(node.getNextNode())
+        else
+            return false
+
+    moveUp: ->
+        node = @tree_widget.getSelectedNode()
+
+        if node
+            return @selectNode(node.getPreviousNode())
+        else
+            return false
+
+    moveRight: ->
+        node = @tree_widget.getSelectedNode()
+
+        if node and node.isFolder() and not node.is_open
+            @tree_widget.openNode(node)
+            return false
+        else
+            return true
+
+    moveLeft: ->
+        node = @tree_widget.getSelectedNode()
+
+        if node and node.isFolder() and node.is_open
+            @tree_widget.closeNode(node)
+            return false
+        else
+            return true
+
     handleKeyDown: (e) ->
         if not @tree_widget.options.keyboardSupport
-            return
+            return true
 
         if $(document.activeElement).is('textarea,input,select')
             return true
 
-        current_node = @tree_widget.getSelectedNode()
+        if not @tree_widget.getSelectedNode()
+            return true
 
-        selectNode = (node) =>
-            if node
-                @tree_widget.selectNode(node)
+        key = e.which
 
-                if (
-                    @tree_widget.scroll_handler and
-                    (not @tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element')))
-                )
-                    @tree_widget.scrollToNode(node)
+        switch key
+            when DOWN
+                return @moveDown()
 
-                return false
-            else
-                return true
+            when UP
+                return @moveUp()
 
-        moveDown = =>
-            return selectNode(@getNextNode(current_node))
+            when RIGHT
+                return @moveRight()
 
-        moveUp = =>
-            return selectNode(@getPreviousNode(current_node))
+            when LEFT
+                return @moveLeft()
 
-        moveRight = =>
-            if current_node.isFolder() and not current_node.is_open
-                @tree_widget.openNode(current_node)
-                return false
-            else
-                return true
+        return true
 
-        moveLeft = =>
-            if current_node.isFolder() and current_node.is_open
-                @tree_widget.closeNode(current_node)
-                return false
-            else
-                return true
-
-        if not current_node
+    selectNode: (node) =>
+        if not node
             return true
         else
-            key = e.which
+            @tree_widget.selectNode(node)
 
-            switch key
-                when DOWN
-                    return moveDown()
+            if (
+                @tree_widget.scroll_handler and
+                (not @tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element')))
+            )
+                @tree_widget.scrollToNode(node)
 
-                when UP
-                    return moveUp()
+            return false
 
-                when RIGHT
-                    return moveRight()
 
-                when LEFT
-                    return moveLeft()
-
-    getNextNode: (node, include_children=true) ->
-        if include_children and node.hasChildren() and node.is_open
-            # First child
-            return node.children[0]
-        else
-            if not node.parent
-                return null
-            else
-                next_sibling = node.getNextSibling()
-                if next_sibling
-                    # Next sibling
-                    return next_sibling
-                else
-                    # Next node of parent
-                    return @getNextNode(node.parent, false)
-
-    getPreviousNode: (node) ->
-        if not node.parent
-            return null
-        else
-            previous_sibling = node.getPreviousSibling()
-            if previous_sibling
-                if not previous_sibling.hasChildren() or not previous_sibling.is_open
-                    # Previous sibling
-                    return previous_sibling
-                else
-                    # Last child of previous sibling
-                    return @getLastChild(previous_sibling)
-            else
-                # Parent
-                if node.parent.parent
-                    return node.parent
-                else
-                    return null
-
-    getLastChild: (node) ->
-        if not node.hasChildren()
-            return null
-        else
-            last_child = node.children[node.children.length - 1]
-            if not last_child.hasChildren() or not last_child.is_open
-                return last_child
-            else
-                return @getLastChild(last_child)
+module.exports = KeyHandler

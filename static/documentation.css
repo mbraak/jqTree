@@ -3,6 +3,10 @@ body {
   margin-bottom: 32px;
 }
 
+h4 {
+  margin-top: 32px;
+}
+
 /* jumbotron */
 
 #jqtree {
@@ -99,7 +103,6 @@ body {
 .bs-sidebar .nav > li > a:first-child {
   padding-top: 0;
 }
-
 
 /* Nav: second level (shown on .active) */
 .bs-sidebar .nav .nav {
