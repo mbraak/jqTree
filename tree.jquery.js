@@ -3381,7 +3381,7 @@ limitations under the License.
 
 },{}],13:[function(require,module,exports){
 (function() {
-  module.exports = '0.22.0';
+  module.exports = '1.0.0';
 
 }).call(this);
 
