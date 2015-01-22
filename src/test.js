@@ -1,5 +1,7 @@
 var Node, Position, util, _indexOf, indexOf, get_json_stringify_function;
 
+require('jquery-mockjax');
+
 
 QUnit.begin(function() {
     // Load classes and modules here to make sure code coverage works
@@ -158,8 +160,6 @@ test('toggle', function() {
     $tree.bind(
         'tree.open',
         function(e) {
-            start();
-
             ok(! isNodeClosed($node1), 'node1 is open');
 
             // 2. close node1
@@ -187,8 +187,6 @@ test('toggle', function() {
 
     // 1. open node1
     $tree.tree('toggle', node1);
-
-    stop();
 });
 
 test("click event", function() {

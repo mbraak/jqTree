@@ -18,6 +18,7 @@
     "coffee-script": "1.8.0",
     "gulp": "3.8.10",
     "gulp-coffee": "2.2.0",
-    "gulp-coffeeify": "0.1.2"
+    "gulp-coffeeify": "0.1.2",
+    "jquery-mockjax": "^1.6.1"
   }
 }
