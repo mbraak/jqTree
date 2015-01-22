@@ -675,7 +675,7 @@ limitations under the License.
  */
 
 (function() {
-  var DragAndDropHandler, ElementsRenderer, FolderElement, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, node, node_element, __version__,
+  var DragAndDropHandler, ElementsRenderer, FolderElement, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, node_element, node_module, util_module, __version__,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -697,11 +697,13 @@ limitations under the License.
 
   SimpleWidget = require('./simple.widget');
 
-  node = require('./node');
+  node_module = require('./node');
 
-  Node = node.Node;
+  Node = node_module.Node;
 
-  Position = node.Position;
+  Position = node_module.Position;
+
+  util_module = require('./util');
 
   node_element = require('./node_element');
 
@@ -1097,6 +1099,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.appendNode = function(new_node_info, parent_node) {
+      var node;
       parent_node = parent_node || this.tree;
       node = parent_node.append(new_node_info);
       this._refreshElements(parent_node);
@@ -1104,6 +1107,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype.prependNode = function(new_node_info, parent_node) {
+      var node;
       if (!parent_node) {
         parent_node = this.tree;
       }
@@ -1424,7 +1428,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._click = function(e) {
-      var click_target, event;
+      var click_target, event, node;
       click_target = this._getClickTarget(e.target);
       if (click_target) {
         if (click_target.type === 'button') {
@@ -1456,7 +1460,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._getClickTarget = function(element) {
-      var $button, $el, $target;
+      var $button, $el, $target, node;
       $target = $(element);
       $button = $target.closest('.jqtree-toggler');
       if ($button.length) {
@@ -1501,6 +1505,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._getNodeElement = function($element) {
+      var node;
       node = this._getNode($element);
       if (node) {
         return this._getNodeElementForNode(node);
@@ -1510,7 +1515,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._contextmenu = function(e) {
-      var $div;
+      var $div, node;
       $div = $(e.target).closest('ul.jqtree-tree .jqtree-element');
       if ($div.length) {
         node = this._getNode($div);
@@ -1584,6 +1589,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._selectCurrentNode = function() {
+      var node;
       node = this.getSelectedNode();
       if (node) {
         node_element = this._getNodeElementForNode(node);
@@ -1594,6 +1600,7 @@ limitations under the License.
     };
 
     JqTreeWidget.prototype._deselectCurrentNode = function() {
+      var node;
       node = this.getSelectedNode();
       if (node) {
         return this.removeFromSelection(node);
@@ -1604,11 +1611,20 @@ limitations under the License.
 
   })(MouseWidget);
 
+  JqTreeWidget.getModule = function(name) {
+    var modules;
+    modules = {
+      'node': node_module,
+      'util': util_module
+    };
+    return modules[name];
+  };
+
   SimpleWidget.register(JqTreeWidget, 'tree');
 
 }).call(this);
 
-},{"./drag_and_drop_handler":1,"./elements_renderer":2,"./key_handler":4,"./mouse.widget":5,"./node":6,"./node_element":7,"./save_state_handler":8,"./scroll_handler":9,"./select_node_handler":10,"./simple.widget":11,"./version":13}],4:[function(require,module,exports){
+},{"./drag_and_drop_handler":1,"./elements_renderer":2,"./key_handler":4,"./mouse.widget":5,"./node":6,"./node_element":7,"./save_state_handler":8,"./scroll_handler":9,"./select_node_handler":10,"./simple.widget":11,"./util":12,"./version":13}],4:[function(require,module,exports){
 (function() {
   var KeyHandler,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -3246,6 +3262,8 @@ limitations under the License.
           function_name = argument1;
           if (function_name === 'destroy') {
             return destroyWidget($el);
+          } else if (function_name === 'get_widget_class') {
+            return widget_class;
           } else {
             return callFunction($el, function_name, args);
           }
