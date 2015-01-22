@@ -91,11 +91,11 @@ get_json_stringify_function = ->
     return stringify
 
 
-if not (@JSON? and @JSON.stringify? and typeof @JSON.stringify == 'function')
-    if not @JSON?
-        @JSON = {}
+if not (window.JSON? and window.JSON.stringify? and typeof window.JSON.stringify == 'function')
+    if not window.JSON?
+        window.JSON = {}
 
-    @JSON.stringify = get_json_stringify_function()
+    window.JSON.stringify = get_json_stringify_function()
 
 
 # Escape a string for HTML interpolation; copied from underscore js
