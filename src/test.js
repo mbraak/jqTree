@@ -1,4 +1,4 @@
-var Node, Position, util, _indexOf, indexOf, get_json_stringify_function;
+var Node, Position, util, _indexOf, indexOf;
 
 require('jquery-mockjax');
 
@@ -14,7 +14,6 @@ QUnit.begin(function() {
     util = JqTreeWidget.getModule('util');
     _indexOf = util._indexOf;
     indexOf = util.indexOf;
-    get_json_stringify_function = util.get_json_stringify_function;
 });
 
 QUnit.config.testTimeout = 5000;
@@ -1910,25 +1909,6 @@ test('getNodesByProperty', function() {
 
 
 QUnit.module('util');
-
-test('JSON.stringify', function() {
-    function test_stringify(stringify) {
-        equal(stringify('abc'), '"abc"');
-        equal(stringify(123), '123');
-        equal(stringify(true), 'true');
-        equal(stringify({abc: 'def'}), '{"abc":"def"}');
-        equal(stringify({}), '{}');
-        equal(stringify([1, 2, 3]), '[1,2,3]');
-        equal(stringify(null), 'null');
-        equal(stringify(Number.NEGATIVE_INFINITY), 'null');
-
-        // test escapable
-        JSON.stringify("\u200c");
-    }
-
-    test_stringify(JSON.stringify);
-    test_stringify(get_json_stringify_function());
-});
 
 test('indexOf', function() {
     equal(indexOf([3, 2, 1], 1), 2);

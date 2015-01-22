@@ -3281,7 +3281,7 @@ limitations under the License.
 
 },{}],12:[function(require,module,exports){
 (function() {
-  var get_json_stringify_function, html_escape, indexOf, isInt, _indexOf;
+  var html_escape, indexOf, isInt, _indexOf;
 
   _indexOf = function(array, item) {
     var i, value, _i, _len;
@@ -3306,90 +3306,12 @@ limitations under the License.
     return typeof n === 'number' && n % 1 === 0;
   };
 
-  get_json_stringify_function = function() {
-    var json_escapable, json_meta, json_quote, json_str, stringify;
-    json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
-    json_meta = {
-      '\b': '\\b',
-      '\t': '\\t',
-      '\n': '\\n',
-      '\f': '\\f',
-      '\r': '\\r',
-      '"': '\\"',
-      '\\': '\\\\'
-    };
-    json_quote = function(string) {
-      json_escapable.lastIndex = 0;
-      if (json_escapable.test(string)) {
-        return '"' + string.replace(json_escapable, function(a) {
-          var c;
-          c = json_meta[a];
-          return (typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4));
-        }) + '"';
-      } else {
-        return '"' + string + '"';
-      }
-    };
-    json_str = function(key, holder) {
-      var i, k, partial, v, value, _i, _len;
-      value = holder[key];
-      switch (typeof value) {
-        case 'string':
-          return json_quote(value);
-        case 'number':
-          if (isFinite(value)) {
-            return String(value);
-          } else {
-            return 'null';
-          }
-        case 'boolean':
-        case 'null':
-          return String(value);
-        case 'object':
-          if (!value) {
-            return 'null';
-          }
-          partial = [];
-          if (Object.prototype.toString.apply(value) === '[object Array]') {
-            for (i = _i = 0, _len = value.length; _i < _len; i = ++_i) {
-              v = value[i];
-              partial[i] = json_str(i, value) || 'null';
-            }
-            return (partial.length === 0 ? '[]' : '[' + partial.join(',') + ']');
-          }
-          for (k in value) {
-            if (Object.prototype.hasOwnProperty.call(value, k)) {
-              v = json_str(k, value);
-              if (v) {
-                partial.push(json_quote(k) + ':' + v);
-              }
-            }
-          }
-          return (partial.length === 0 ? '{}' : '{' + partial.join(',') + '}');
-      }
-    };
-    stringify = function(value) {
-      return json_str('', {
-        '': value
-      });
-    };
-    return stringify;
-  };
-
-  if (!((this.JSON != null) && (this.JSON.stringify != null) && typeof this.JSON.stringify === 'function')) {
-    if (this.JSON == null) {
-      this.JSON = {};
-    }
-    this.JSON.stringify = get_json_stringify_function();
-  }
-
   html_escape = function(string) {
     return ('' + string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g, '&#x2F;');
   };
 
   module.exports = {
     _indexOf: _indexOf,
-    get_json_stringify_function: get_json_stringify_function,
     html_escape: html_escape,
     indexOf: indexOf,
     isInt: isInt

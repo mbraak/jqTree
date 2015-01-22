@@ -13,8 +13,8 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            //'tests/**/*.coffee'
-            'src/karma-test.js'
+            'src/karma-test.js',
+            'static/bower_components/json3/lib/json3.js'
         ],
 
         // list of files to exclude
@@ -50,7 +50,7 @@ module.exports = function(config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome', 'Firefox', 'PhantomJS'],
+        browsers: ['Chrome', 'Firefox', 'PhantomJS', 'IE7 - WinXP'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
