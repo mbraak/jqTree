@@ -1,11 +1,19 @@
-var node = require('./node');
-var Node = node.Node;
-var Position = node.Position;
+var Node, Position, util, _indexOf, indexOf, get_json_stringify_function;
 
-var util = require('./util');
-_indexOf = util._indexOf;
-indexOf = util.indexOf;
-get_json_stringify_function = util.get_json_stringify_function;
+
+QUnit.begin(function() {
+    // Load classes and modules here to make sure code coverage works
+    var JqTreeWidget = $('').tree('get_widget_class');
+    var node = JqTreeWidget.getModule('node');
+
+    Node = node.Node;
+    Position = node.Position;
+
+    util = JqTreeWidget.getModule('util');
+    _indexOf = util._indexOf;
+    indexOf = util.indexOf;
+    get_json_stringify_function = util.get_json_stringify_function;
+});
 
 QUnit.config.testTimeout = 5000;
 
@@ -499,7 +507,7 @@ test('selectNode when another node is selected', function() {
 
     var node1 = $tree.tree('getTree').children[0];
     var node2 = $tree.tree('getTree').children[1];
-    
+
 
     // -- select node 'node2'
     $tree.tree('selectNode', node2);
@@ -827,7 +835,7 @@ test('removeNode', function() {
     $tree.tree('loadData', example_data2);
 
     var c1 = $tree.tree('getNodeByName', 'c1');
-    
+
     $tree.tree('removeNode', c1);
 
     equal(
@@ -1268,7 +1276,7 @@ test('constructor', function() {
     equal(node.label, undefined);
     equal(node.children.length, 0);
     equal(node.parent, null);
-}); 
+});
 
 test("create tree from data", function() {
     function checkData(tree) {
@@ -1579,7 +1587,7 @@ test('moveNode', function() {
 });
 
 test('initFromData', function() {
-    var data = 
+    var data =
         {
             label: 'main',
             children: [
@@ -1872,7 +1880,7 @@ test('getPreviousSibling', function() {
     equal(
         tree.getNodeByName('child1').getPreviousSibling(),
         null
-    );    
+    );
 });
 
 test('getNextSibling', function() {
