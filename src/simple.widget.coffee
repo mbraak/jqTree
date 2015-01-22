@@ -95,6 +95,8 @@ class SimpleWidget
 
                 if function_name == 'destroy'
                     return destroyWidget($el)
+                else if function_name == 'get_widget_class'
+                    return widget_class
                 else
                     return callFunction($el, function_name, args)
 
