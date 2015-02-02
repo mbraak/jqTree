@@ -89,6 +89,9 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     position: absolute;
     top: -4px;
     left: -6px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /* IE 6, 7, 8 */
