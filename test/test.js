@@ -886,25 +886,44 @@ test('toggle', function() {
 test("click event", function() {
     stop();
 
+    var select_count = 0;
+
     // create tree
     var $tree = $('#tree1');
+
     $tree.tree({
         data: example_data,
         selectable: true
     });
+
+    var $node1 = $tree.find('ul.jqtree-tree li:first');
+    var $text_span = $node1.find('span:first');
 
     $tree.bind('tree.click', function(e) {
         equal(e.node.name, 'node1');
     });
 
     $tree.bind('tree.select', function(e) {
-        start();
-        equal(e.node.name, 'node1');
+        select_count += 1;
+
+        if (select_count == 1) {
+            equal(e.node.name, 'node1');
+
+            equal($tree.tree('getSelectedNode').name, 'node1');
+
+            // deselect
+            $text_span.click();
+        }
+        else {
+            equal(e.node, null);
+            equal(e.previous_node.name, 'node1');
+            equal($tree.tree('getSelectedNode'), false);
+
+            start();
+        }
     });
 
     // click on node1
-    var $node1 = $tree.find('ul.jqtree-tree li:first');
-    var $text_span = $node1.find('span:first');
     $text_span.click();
 });
 
@@ -1187,6 +1206,10 @@ test('selectNode', function() {
 
     // -- is 'node1' selected?
     ok($tree.tree('isNodeSelected', node1));
+
+    // -- deselect
+    $tree.tree('selectNode', null);
+    equal($tree.tree('getSelectedNode'), false);
 });
 
 test('selectNode when another node is selected', function() {
