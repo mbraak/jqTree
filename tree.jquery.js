@@ -501,9 +501,8 @@
     };
 
     ElementsRenderer.prototype.renderFromNode = function(node) {
-      var $previous_li, li, parent_node_element;
+      var $previous_li, li;
       $previous_li = $(node.element);
-      parent_node_element = new NodeElement(node.parent, this.tree_widget);
       li = this.createLi(node);
       this.attachNodeData(node, li);
       $previous_li.after(li);
