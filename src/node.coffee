@@ -38,6 +38,8 @@ class Node
                 else
                     @[key] = value
 
+        return null
+
     # Init Node from data without making it the root of the tree
     initFromData: (data) ->
         addNode = (node_data) =>
@@ -129,7 +131,7 @@ class Node
             @getChildIndex(node),
             1
         )
-        @tree.removeNodeFromIndex(node)        
+        @tree.removeNodeFromIndex(node)
 
     ###
     Get child index.
@@ -359,7 +361,7 @@ class Node
             if next_index < @parent.children.length
                 return @parent.children[next_index]
             else
-                return null                
+                return null
 
     getNodesByProperty: (key, value) ->
         return @filter(
