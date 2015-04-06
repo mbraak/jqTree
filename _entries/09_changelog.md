@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.1.0 (april 6 2015)
 
 * Issue 348: Circle for drag-and-drop is not positioned correctly for content box-sizing
 * Issue 356: Fixed drag-and-drop after nodeUpdate (thanks to Iker Vázquez)
