@@ -1,12 +1,715 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var node = require('./node');
-var Node = node.Node;
-var Position = node.Position;
+/*!
+ * MockJax - jQuery Plugin to Mock Ajax requests
+ *
+ * Version:  1.6.1
+ * Released:
+ * Home:   https://github.com/jakerella/jquery-mockjax
+ * Author:   Jonathan Sharp (http://jdsharp.com)
+ * License:  MIT,GPL
+ *
+ * Copyright (c) 2014 appendTo, Jordan Kasper
+ * NOTE: This repository was taken over by Jordan Kasper (@jakerella) October, 2014
+ * 
+ * Dual licensed under the MIT or GPL licenses.
+ * http://opensource.org/licenses/MIT OR http://www.gnu.org/licenses/gpl-2.0.html
+ */
+(function($) {
+	var _ajax = $.ajax,
+		mockHandlers = [],
+		mockedAjaxCalls = [],
+		unmockedAjaxCalls = [],
+		CALLBACK_REGEX = /=\?(&|$)/,
+		jsc = (new Date()).getTime();
 
-var util = require('./util');
-_indexOf = util._indexOf;
-indexOf = util.indexOf;
-get_json_stringify_function = util.get_json_stringify_function;
+
+	// Parse the given XML string.
+	function parseXML(xml) {
+		if ( window.DOMParser == undefined && window.ActiveXObject ) {
+			DOMParser = function() { };
+			DOMParser.prototype.parseFromString = function( xmlString ) {
+				var doc = new ActiveXObject('Microsoft.XMLDOM');
+				doc.async = 'false';
+				doc.loadXML( xmlString );
+				return doc;
+			};
+		}
+
+		try {
+			var xmlDoc = ( new DOMParser() ).parseFromString( xml, 'text/xml' );
+			if ( $.isXMLDoc( xmlDoc ) ) {
+				var err = $('parsererror', xmlDoc);
+				if ( err.length == 1 ) {
+					throw new Error('Error: ' + $(xmlDoc).text() );
+				}
+			} else {
+				throw new Error('Unable to parse XML');
+			}
+			return xmlDoc;
+		} catch( e ) {
+			var msg = ( e.name == undefined ? e : e.name + ': ' + e.message );
+			$(document).trigger('xmlParseError', [ msg ]);
+			return undefined;
+		}
+	}
+
+	// Check if the data field on the mock handler and the request match. This
+	// can be used to restrict a mock handler to being used only when a certain
+	// set of data is passed to it.
+	function isMockDataEqual( mock, live ) {
+		var identical = true;
+		// Test for situations where the data is a querystring (not an object)
+		if (typeof live === 'string') {
+			// Querystring may be a regex
+			return $.isFunction( mock.test ) ? mock.test(live) : mock == live;
+		}
+		$.each(mock, function(k) {
+			if ( live[k] === undefined ) {
+				identical = false;
+				return identical;
+			} else {
+				if ( typeof live[k] === 'object' && live[k] !== null ) {
+					if ( identical && $.isArray( live[k] ) ) {
+						identical = $.isArray( mock[k] ) && live[k].length === mock[k].length;
+					}
+					identical = identical && isMockDataEqual(mock[k], live[k]);
+				} else {
+					if ( mock[k] && $.isFunction( mock[k].test ) ) {
+						identical = identical && mock[k].test(live[k]);
+					} else {
+						identical = identical && ( mock[k] == live[k] );
+					}
+				}
+			}
+		});
+
+		return identical;
+	}
+
+    // See if a mock handler property matches the default settings
+    function isDefaultSetting(handler, property) {
+        return handler[property] === $.mockjaxSettings[property];
+    }
+
+	// Check the given handler should mock the given request
+	function getMockForRequest( handler, requestSettings ) {
+		// If the mock was registered with a function, let the function decide if we
+		// want to mock this request
+		if ( $.isFunction(handler) ) {
+			return handler( requestSettings );
+		}
+
+		// Inspect the URL of the request and check if the mock handler's url
+		// matches the url for this ajax request
+		if ( $.isFunction(handler.url.test) ) {
+			// The user provided a regex for the url, test it
+			if ( !handler.url.test( requestSettings.url ) ) {
+				return null;
+			}
+		} else {
+			// Look for a simple wildcard '*' or a direct URL match
+			var star = handler.url.indexOf('*');
+			if (handler.url !== requestSettings.url && star === -1 ||
+					!new RegExp(handler.url.replace(/[-[\]{}()+?.,\\^$|#\s]/g, "\\$&").replace(/\*/g, '.+')).test(requestSettings.url)) {
+				return null;
+			}
+		}
+
+		// Inspect the data submitted in the request (either POST body or GET query string)
+		if ( handler.data ) {
+			if ( ! requestSettings.data || !isMockDataEqual(handler.data, requestSettings.data) ) {
+				// They're not identical, do not mock this request
+				return null;
+			}
+		}
+		// Inspect the request type
+		if ( handler && handler.type &&
+				handler.type.toLowerCase() != requestSettings.type.toLowerCase() ) {
+			// The request type doesn't match (GET vs. POST)
+			return null;
+		}
+
+		return handler;
+	}
+
+	function parseResponseTimeOpt(responseTime) {
+		if ($.isArray(responseTime)) {
+			var min = responseTime[0];
+			var max = responseTime[1];
+			return (typeof min === 'number' && typeof max === 'number') ? Math.floor(Math.random() * (max - min)) + min : null;
+		} else {
+			return (typeof responseTime === 'number') ? responseTime: null;
+		}
+	}
+
+	// Process the xhr objects send operation
+	function _xhrSend(mockHandler, requestSettings, origSettings) {
+
+		// This is a substitute for < 1.4 which lacks $.proxy
+		var process = (function(that) {
+			return function() {
+				return (function() {
+					// The request has returned
+					this.status     = mockHandler.status;
+					this.statusText = mockHandler.statusText;
+					this.readyState	= 1;
+
+					var finishRequest = function () {
+						this.readyState	= 4;
+
+						var onReady;
+						// Copy over our mock to our xhr object before passing control back to
+						// jQuery's onreadystatechange callback
+						if ( requestSettings.dataType == 'json' && ( typeof mockHandler.responseText == 'object' ) ) {
+							this.responseText = JSON.stringify(mockHandler.responseText);
+						} else if ( requestSettings.dataType == 'xml' ) {
+							if ( typeof mockHandler.responseXML == 'string' ) {
+								this.responseXML = parseXML(mockHandler.responseXML);
+								//in jQuery 1.9.1+, responseXML is processed differently and relies on responseText
+								this.responseText = mockHandler.responseXML;
+							} else {
+								this.responseXML = mockHandler.responseXML;
+							}
+						} else if (typeof mockHandler.responseText === 'object' && mockHandler.responseText !== null) {
+							// since jQuery 1.9 responseText type has to match contentType
+							mockHandler.contentType = 'application/json';
+							this.responseText = JSON.stringify(mockHandler.responseText);
+						} else {
+							this.responseText = mockHandler.responseText;
+						}
+						if( typeof mockHandler.status == 'number' || typeof mockHandler.status == 'string' ) {
+							this.status = mockHandler.status;
+						}
+						if( typeof mockHandler.statusText === "string") {
+							this.statusText = mockHandler.statusText;
+						}
+						// jQuery 2.0 renamed onreadystatechange to onload
+						onReady = this.onreadystatechange || this.onload;
+
+						// jQuery < 1.4 doesn't have onreadystate change for xhr
+						if ( $.isFunction( onReady ) ) {
+							if( mockHandler.isTimeout) {
+								this.status = -1;
+							}
+							onReady.call( this, mockHandler.isTimeout ? 'timeout' : undefined );
+						} else if ( mockHandler.isTimeout ) {
+							// Fix for 1.3.2 timeout to keep success from firing.
+							this.status = -1;
+						}
+					};
+
+					// We have an executable function, call it to give
+					// the mock handler a chance to update it's data
+					if ( $.isFunction(mockHandler.response) ) {
+						// Wait for it to finish
+						if ( mockHandler.response.length === 2 ) {
+							mockHandler.response(origSettings, function () {
+								finishRequest.call(that);
+							});
+							return;
+						} else {
+							mockHandler.response(origSettings);
+						}
+					}
+
+					finishRequest.call(that);
+				}).apply(that);
+			};
+		})(this);
+
+		if ( mockHandler.proxy ) {
+			// We're proxying this request and loading in an external file instead
+			_ajax({
+				global: false,
+				url: mockHandler.proxy,
+				type: mockHandler.proxyType,
+				data: mockHandler.data,
+				dataType: requestSettings.dataType === "script" ? "text/plain" : requestSettings.dataType,
+				complete: function(xhr) {
+					mockHandler.responseXML = xhr.responseXML;
+					mockHandler.responseText = xhr.responseText;
+                    // Don't override the handler status/statusText if it's specified by the config
+                    if (isDefaultSetting(mockHandler, 'status')) {
+					    mockHandler.status = xhr.status;
+                    }
+                    if (isDefaultSetting(mockHandler, 'statusText')) {
+					    mockHandler.statusText = xhr.statusText;
+                    }
+					this.responseTimer = setTimeout(process, parseResponseTimeOpt(mockHandler.responseTime) || 0);
+				}
+			});
+		} else {
+			// type == 'POST' || 'GET' || 'DELETE'
+			if ( requestSettings.async === false ) {
+				// TODO: Blocking delay
+				process();
+			} else {
+				this.responseTimer = setTimeout(process, parseResponseTimeOpt(mockHandler.responseTime) || 50);
+			}
+		}
+	}
+
+	// Construct a mocked XHR Object
+	function xhr(mockHandler, requestSettings, origSettings, origHandler) {
+		// Extend with our default mockjax settings
+		mockHandler = $.extend(true, {}, $.mockjaxSettings, mockHandler);
+
+		if (typeof mockHandler.headers === 'undefined') {
+			mockHandler.headers = {};
+		}
+		if (typeof requestSettings.headers === 'undefined') {
+			requestSettings.headers = {};
+		}
+		if ( mockHandler.contentType ) {
+			mockHandler.headers['content-type'] = mockHandler.contentType;
+		}
+
+		return {
+			status: mockHandler.status,
+			statusText: mockHandler.statusText,
+			readyState: 1,
+			open: function() { },
+			send: function() {
+				origHandler.fired = true;
+				_xhrSend.call(this, mockHandler, requestSettings, origSettings);
+			},
+			abort: function() {
+				clearTimeout(this.responseTimer);
+			},
+			setRequestHeader: function(header, value) {
+				requestSettings.headers[header] = value;
+			},
+			getResponseHeader: function(header) {
+				// 'Last-modified', 'Etag', 'content-type' are all checked by jQuery
+				if ( mockHandler.headers && mockHandler.headers[header] ) {
+					// Return arbitrary headers
+					return mockHandler.headers[header];
+				} else if ( header.toLowerCase() == 'last-modified' ) {
+					return mockHandler.lastModified || (new Date()).toString();
+				} else if ( header.toLowerCase() == 'etag' ) {
+					return mockHandler.etag || '';
+				} else if ( header.toLowerCase() == 'content-type' ) {
+					return mockHandler.contentType || 'text/plain';
+				}
+			},
+			getAllResponseHeaders: function() {
+				var headers = '';
+				// since jQuery 1.9 responseText type has to match contentType
+				if (mockHandler.contentType) {
+					mockHandler.headers['Content-Type'] = mockHandler.contentType;
+				}
+				$.each(mockHandler.headers, function(k, v) {
+					headers += k + ': ' + v + "\n";
+				});
+				return headers;
+			}
+		};
+	}
+
+	// Process a JSONP mock request.
+	function processJsonpMock( requestSettings, mockHandler, origSettings ) {
+		// Handle JSONP Parameter Callbacks, we need to replicate some of the jQuery core here
+		// because there isn't an easy hook for the cross domain script tag of jsonp
+
+		processJsonpUrl( requestSettings );
+
+		requestSettings.dataType = "json";
+		if(requestSettings.data && CALLBACK_REGEX.test(requestSettings.data) || CALLBACK_REGEX.test(requestSettings.url)) {
+			createJsonpCallback(requestSettings, mockHandler, origSettings);
+
+			// We need to make sure
+			// that a JSONP style response is executed properly
+
+			var rurl = /^(\w+:)?\/\/([^\/?#]+)/,
+				parts = rurl.exec( requestSettings.url ),
+				remote = parts && (parts[1] && parts[1] !== location.protocol || parts[2] !== location.host);
+
+			requestSettings.dataType = "script";
+			if(requestSettings.type.toUpperCase() === "GET" && remote ) {
+				var newMockReturn = processJsonpRequest( requestSettings, mockHandler, origSettings );
+
+				// Check if we are supposed to return a Deferred back to the mock call, or just
+				// signal success
+				if(newMockReturn) {
+					return newMockReturn;
+				} else {
+					return true;
+				}
+			}
+		}
+		return null;
+	}
+
+	// Append the required callback parameter to the end of the request URL, for a JSONP request
+	function processJsonpUrl( requestSettings ) {
+		if ( requestSettings.type.toUpperCase() === "GET" ) {
+			if ( !CALLBACK_REGEX.test( requestSettings.url ) ) {
+				requestSettings.url += (/\?/.test( requestSettings.url ) ? "&" : "?") +
+					(requestSettings.jsonp || "callback") + "=?";
+			}
+		} else if ( !requestSettings.data || !CALLBACK_REGEX.test(requestSettings.data) ) {
+			requestSettings.data = (requestSettings.data ? requestSettings.data + "&" : "") + (requestSettings.jsonp || "callback") + "=?";
+		}
+	}
+
+	// Process a JSONP request by evaluating the mocked response text
+	function processJsonpRequest( requestSettings, mockHandler, origSettings ) {
+		// Synthesize the mock request for adding a script tag
+		var callbackContext = origSettings && origSettings.context || requestSettings,
+			newMock = null;
+
+
+		// If the response handler on the moock is a function, call it
+		if ( mockHandler.response && $.isFunction(mockHandler.response) ) {
+			mockHandler.response(origSettings);
+		} else {
+
+			// Evaluate the responseText javascript in a global context
+			if( typeof mockHandler.responseText === 'object' ) {
+				$.globalEval( '(' + JSON.stringify( mockHandler.responseText ) + ')');
+			} else {
+				$.globalEval( '(' + mockHandler.responseText + ')');
+			}
+		}
+
+		// Successful response
+		setTimeout(function() {
+			jsonpSuccess( requestSettings, callbackContext, mockHandler );
+			jsonpComplete( requestSettings, callbackContext, mockHandler );
+		}, parseResponseTimeOpt(mockHandler.responseTime) || 0);
+
+		// If we are running under jQuery 1.5+, return a deferred object
+		if($.Deferred){
+			newMock = new $.Deferred();
+			if(typeof mockHandler.responseText == "object"){
+				newMock.resolveWith( callbackContext, [mockHandler.responseText] );
+			}
+			else{
+				newMock.resolveWith( callbackContext, [$.parseJSON( mockHandler.responseText )] );
+			}
+		}
+		return newMock;
+	}
+
+
+	// Create the required JSONP callback function for the request
+	function createJsonpCallback( requestSettings, mockHandler, origSettings ) {
+		var callbackContext = origSettings && origSettings.context || requestSettings;
+		var jsonp = requestSettings.jsonpCallback || ("jsonp" + jsc++);
+
+		// Replace the =? sequence both in the query string and the data
+		if ( requestSettings.data ) {
+			requestSettings.data = (requestSettings.data + "").replace(CALLBACK_REGEX, "=" + jsonp + "$1");
+		}
+
+		requestSettings.url = requestSettings.url.replace(CALLBACK_REGEX, "=" + jsonp + "$1");
+
+
+		// Handle JSONP-style loading
+		window[ jsonp ] = window[ jsonp ] || function( tmp ) {
+			data = tmp;
+			jsonpSuccess( requestSettings, callbackContext, mockHandler );
+			jsonpComplete( requestSettings, callbackContext, mockHandler );
+			// Garbage collect
+			window[ jsonp ] = undefined;
+
+			try {
+				delete window[ jsonp ];
+			} catch(e) {}
+
+			if ( head ) {
+				head.removeChild( script );
+			}
+		};
+	}
+
+	// The JSONP request was successful
+	function jsonpSuccess(requestSettings, callbackContext, mockHandler) {
+		// If a local callback was specified, fire it and pass it the data
+		if ( requestSettings.success ) {
+			requestSettings.success.call( callbackContext, mockHandler.responseText || "", status, {} );
+		}
+
+		// Fire the global callback
+		if ( requestSettings.global ) {
+			(requestSettings.context ? $(requestSettings.context) : $.event).trigger("ajaxSuccess", [{}, requestSettings]);
+		}
+	}
+
+	// The JSONP request was completed
+	function jsonpComplete(requestSettings, callbackContext) {
+		// Process result
+		if ( requestSettings.complete ) {
+			requestSettings.complete.call( callbackContext, {} , status );
+		}
+
+		// The request was completed
+		if ( requestSettings.global ) {
+			(requestSettings.context ? $(requestSettings.context) : $.event).trigger("ajaxComplete", [{}, requestSettings]);
+		}
+
+		// Handle the global AJAX counter
+		if ( requestSettings.global && ! --$.active ) {
+			$.event.trigger( "ajaxStop" );
+		}
+	}
+
+
+	// The core $.ajax replacement.
+	function handleAjax( url, origSettings ) {
+		var mockRequest, requestSettings, mockHandler, overrideCallback;
+
+		// If url is an object, simulate pre-1.5 signature
+		if ( typeof url === "object" ) {
+			origSettings = url;
+			url = undefined;
+		} else {
+			// work around to support 1.5 signature
+			origSettings = origSettings || {};
+			origSettings.url = url;
+		}
+
+		// Extend the original settings for the request
+		requestSettings = $.extend(true, {}, $.ajaxSettings, origSettings);
+
+		// Generic function to override callback methods for use with
+		// callback options (onAfterSuccess, onAfterError, onAfterComplete)
+		overrideCallback = function(action, mockHandler) {
+			var origHandler = origSettings[action.toLowerCase()];
+			return function() {
+				if ( $.isFunction(origHandler) ) {
+					origHandler.apply(this, [].slice.call(arguments));
+				}
+				mockHandler['onAfter' + action]();
+			};
+		};
+
+		// Iterate over our mock handlers (in registration order) until we find
+		// one that is willing to intercept the request
+		for(var k = 0; k < mockHandlers.length; k++) {
+			if ( !mockHandlers[k] ) {
+				continue;
+			}
+
+			mockHandler = getMockForRequest( mockHandlers[k], requestSettings );
+			if(!mockHandler) {
+				// No valid mock found for this request
+				continue;
+			}
+
+			mockedAjaxCalls.push(requestSettings);
+
+			// If logging is enabled, log the mock to the console
+			$.mockjaxSettings.log( mockHandler, requestSettings );
+
+
+			if ( requestSettings.dataType && requestSettings.dataType.toUpperCase() === 'JSONP' ) {
+				if ((mockRequest = processJsonpMock( requestSettings, mockHandler, origSettings ))) {
+					// This mock will handle the JSONP request
+					return mockRequest;
+				}
+			}
+
+
+			// Removed to fix #54 - keep the mocking data object intact
+			//mockHandler.data = requestSettings.data;
+
+			mockHandler.cache = requestSettings.cache;
+			mockHandler.timeout = requestSettings.timeout;
+			mockHandler.global = requestSettings.global;
+
+			// In the case of a timeout, we just need to ensure
+			// an actual jQuery timeout (That is, our reponse won't)
+			// return faster than the timeout setting.
+			if ( mockHandler.isTimeout ) {
+				if ( mockHandler.responseTime > 1 ) {
+					origSettings.timeout = mockHandler.responseTime - 1;
+				} else {
+					mockHandler.responseTime = 2;
+					origSettings.timeout = 1;
+				}
+				mockHandler.isTimeout = false;
+			}
+
+			// Set up onAfter[X] callback functions
+			if ( $.isFunction( mockHandler.onAfterSuccess ) ) {
+				origSettings.success = overrideCallback('Success', mockHandler);
+			}
+			if ( $.isFunction( mockHandler.onAfterError ) ) {
+				origSettings.error = overrideCallback('Error', mockHandler);
+			}
+			if ( $.isFunction( mockHandler.onAfterComplete ) ) {
+				origSettings.complete = overrideCallback('Complete', mockHandler);
+			}
+
+			copyUrlParameters(mockHandler, origSettings);
+
+			(function(mockHandler, requestSettings, origSettings, origHandler) {
+
+				mockRequest = _ajax.call($, $.extend(true, {}, origSettings, {
+					// Mock the XHR object
+					xhr: function() { return xhr( mockHandler, requestSettings, origSettings, origHandler ); }
+				}));
+			})(mockHandler, requestSettings, origSettings, mockHandlers[k]);
+
+			return mockRequest;
+		}
+
+		// We don't have a mock request
+		unmockedAjaxCalls.push(origSettings);
+		if($.mockjaxSettings.throwUnmocked === true) {
+			throw new Error('AJAX not mocked: ' + origSettings.url);
+		}
+		else { // trigger a normal request
+			return _ajax.apply($, [origSettings]);
+		}
+	}
+
+	/**
+	* Copies URL parameter values if they were captured by a regular expression
+	* @param {Object} mockHandler
+	* @param {Object} origSettings
+	*/
+	function copyUrlParameters(mockHandler, origSettings) {
+		//parameters aren't captured if the URL isn't a RegExp
+		if (!(mockHandler.url instanceof RegExp)) {
+			return;
+		}
+		//if no URL params were defined on the handler, don't attempt a capture
+		if (!mockHandler.hasOwnProperty('urlParams')) {
+			return;
+		}
+		var captures = mockHandler.url.exec(origSettings.url);
+		//the whole RegExp match is always the first value in the capture results
+		if (captures.length === 1) {
+			return;
+		}
+		captures.shift();
+		//use handler params as keys and capture resuts as values
+		var i = 0,
+		capturesLength = captures.length,
+		paramsLength = mockHandler.urlParams.length,
+		//in case the number of params specified is less than actual captures
+		maxIterations = Math.min(capturesLength, paramsLength),
+		paramValues = {};
+		for (i; i < maxIterations; i++) {
+			var key = mockHandler.urlParams[i];
+			paramValues[key] = captures[i];
+		}
+		origSettings.urlParams = paramValues;
+	}
+
+
+	// Public
+
+	$.extend({
+		ajax: handleAjax
+	});
+
+	$.mockjaxSettings = {
+		//url:        null,
+		//type:       'GET',
+		log:          function( mockHandler, requestSettings ) {
+			if ( mockHandler.logging === false ||
+				 ( typeof mockHandler.logging === 'undefined' && $.mockjaxSettings.logging === false ) ) {
+				return;
+			}
+			if ( window.console && console.log ) {
+				var message = 'MOCK ' + requestSettings.type.toUpperCase() + ': ' + requestSettings.url;
+				var request = $.extend({}, requestSettings);
+
+				if (typeof console.log === 'function') {
+					console.log(message, request);
+				} else {
+					try {
+						console.log( message + ' ' + JSON.stringify(request) );
+					} catch (e) {
+						console.log(message);
+					}
+				}
+			}
+		},
+		logging:       true,
+		status:        200,
+		statusText:    "OK",
+		responseTime:  500,
+		isTimeout:     false,
+		throwUnmocked: false,
+		contentType:   'text/plain',
+		response:      '',
+		responseText:  '',
+		responseXML:   '',
+		proxy:         '',
+		proxyType:     'GET',
+
+		lastModified:  null,
+		etag:          '',
+		headers: {
+			etag: 'IJF@H#@923uf8023hFO@I#H#',
+			'content-type' : 'text/plain'
+		}
+	};
+
+	$.mockjax = function(settings) {
+		var i = mockHandlers.length;
+		mockHandlers[i] = settings;
+		return i;
+	};
+	$.mockjax.clear = function(i) {
+		if ( arguments.length == 1 ) {
+			mockHandlers[i] = null;
+		} else {
+			mockHandlers = [];
+		}
+		mockedAjaxCalls = [];
+		unmockedAjaxCalls = [];
+	};
+	// support older, deprecated version
+	$.mockjaxClear = function(i) {
+		window.console && window.console.warn && window.console.warn( 'DEPRECATED: The $.mockjaxClear() method has been deprecated in 1.6.0. Please use $.mockjax.clear() as the older function will be removed soon!' );
+		$.mockjax.clear();
+	};
+	$.mockjax.handler = function(i) {
+		if ( arguments.length == 1 ) {
+			return mockHandlers[i];
+		}
+	};
+	$.mockjax.mockedAjaxCalls = function() {
+		return mockedAjaxCalls;
+	};
+	$.mockjax.unfiredHandlers = function() {
+		var results = [];
+		for (var i=0, len=mockHandlers.length; i<len; i++) {
+			var handler = mockHandlers[i];
+            if (handler !== null && !handler.fired) {
+				results.push(handler);
+			}
+		}
+		return results;
+	};
+	$.mockjax.unmockedAjaxCalls = function() {
+		return unmockedAjaxCalls;
+	};
+})(jQuery);
+
+},{}],2:[function(require,module,exports){
+var Node, Position, util, _indexOf, indexOf;
+
+require('jquery-mockjax');
+
+
+QUnit.begin(function() {
+    // Load classes and modules here to make sure code coverage works
+    var JqTreeWidget = $('').tree('get_widget_class');
+    var node = JqTreeWidget.getModule('node');
+
+    Node = node.Node;
+    Position = node.Position;
+
+    util = JqTreeWidget.getModule('util');
+    _indexOf = util._indexOf;
+    indexOf = util.indexOf;
+});
 
 QUnit.config.testTimeout = 5000;
 
@@ -151,8 +854,6 @@ test('toggle', function() {
     $tree.bind(
         'tree.open',
         function(e) {
-            start();
-
             ok(! isNodeClosed($node1), 'node1 is open');
 
             // 2. close node1
@@ -180,32 +881,49 @@ test('toggle', function() {
 
     // 1. open node1
     $tree.tree('toggle', node1);
-
-    stop();
 });
 
 test("click event", function() {
     stop();
 
+    var select_count = 0;
+
     // create tree
     var $tree = $('#tree1');
+
     $tree.tree({
         data: example_data,
         selectable: true
     });
+
+    var $node1 = $tree.find('ul.jqtree-tree li:first');
+    var $text_span = $node1.find('span:first');
 
     $tree.bind('tree.click', function(e) {
         equal(e.node.name, 'node1');
     });
 
     $tree.bind('tree.select', function(e) {
-        start();
-        equal(e.node.name, 'node1');
+        select_count += 1;
+
+        if (select_count == 1) {
+            equal(e.node.name, 'node1');
+
+            equal($tree.tree('getSelectedNode').name, 'node1');
+
+            // deselect
+            $text_span.click();
+        }
+        else {
+            equal(e.node, null);
+            equal(e.previous_node.name, 'node1');
+            equal($tree.tree('getSelectedNode'), false);
+
+            start();
+        }
     });
 
     // click on node1
-    var $node1 = $tree.find('ul.jqtree-tree li:first');
-    var $text_span = $node1.find('span:first');
     $text_span.click();
 });
 
@@ -488,6 +1206,10 @@ test('selectNode', function() {
 
     // -- is 'node1' selected?
     ok($tree.tree('isNodeSelected', node1));
+
+    // -- deselect
+    $tree.tree('selectNode', null);
+    equal($tree.tree('getSelectedNode'), false);
 });
 
 test('selectNode when another node is selected', function() {
@@ -500,7 +1222,7 @@ test('selectNode when another node is selected', function() {
 
     var node1 = $tree.tree('getTree').children[0];
     var node2 = $tree.tree('getTree').children[1];
-    
+
 
     // -- select node 'node2'
     $tree.tree('selectNode', node2);
@@ -828,7 +1550,7 @@ test('removeNode', function() {
     $tree.tree('loadData', example_data2);
 
     var c1 = $tree.tree('getNodeByName', 'c1');
-    
+
     $tree.tree('removeNode', c1);
 
     equal(
@@ -1269,7 +1991,7 @@ test('constructor', function() {
     equal(node.label, undefined);
     equal(node.children.length, 0);
     equal(node.parent, null);
-}); 
+});
 
 test("create tree from data", function() {
     function checkData(tree) {
@@ -1580,7 +2302,7 @@ test('moveNode', function() {
 });
 
 test('initFromData', function() {
-    var data = 
+    var data =
         {
             label: 'main',
             children: [
@@ -1873,7 +2595,7 @@ test('getPreviousSibling', function() {
     equal(
         tree.getNodeByName('child1').getPreviousSibling(),
         null
-    );    
+    );
 });
 
 test('getNextSibling', function() {
@@ -1906,25 +2628,6 @@ test('getNodesByProperty', function() {
 
 QUnit.module('util');
 
-test('JSON.stringify', function() {
-    function test_stringify(stringify) {
-        equal(stringify('abc'), '"abc"');
-        equal(stringify(123), '123');
-        equal(stringify(true), 'true');
-        equal(stringify({abc: 'def'}), '{"abc":"def"}');
-        equal(stringify({}), '{}');
-        equal(stringify([1, 2, 3]), '[1,2,3]');
-        equal(stringify(null), 'null');
-        equal(stringify(Number.NEGATIVE_INFINITY), 'null');
-
-        // test escapable
-        JSON.stringify("\u200c");
-    }
-
-    test_stringify(JSON.stringify);
-    test_stringify(get_json_stringify_function());
-});
-
 test('indexOf', function() {
     equal(indexOf([3, 2, 1], 1), 2);
     equal(_indexOf([3, 2, 1], 1), 2);
@@ -1945,660 +2648,4 @@ test('Position.nameToIndex', function() {
     equal(Position.nameToIndex(''), 0);
 });
 
-},{"./node":2,"./util":3}],2:[function(require,module,exports){
-(function() {
-  var Node, Position;
-
-  Position = {
-    getName: function(position) {
-      return Position.strings[position - 1];
-    },
-    nameToIndex: function(name) {
-      var i, _i, _ref;
-      for (i = _i = 1, _ref = Position.strings.length; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
-        if (Position.strings[i - 1] === name) {
-          return i;
-        }
-      }
-      return 0;
-    }
-  };
-
-  Position.BEFORE = 1;
-
-  Position.AFTER = 2;
-
-  Position.INSIDE = 3;
-
-  Position.NONE = 4;
-
-  Position.strings = ['before', 'after', 'inside', 'none'];
-
-  Node = (function() {
-    function Node(o, is_root, node_class) {
-      if (is_root == null) {
-        is_root = false;
-      }
-      if (node_class == null) {
-        node_class = Node;
-      }
-      this.setData(o);
-      this.children = [];
-      this.parent = null;
-      if (is_root) {
-        this.id_mapping = {};
-        this.tree = this;
-        this.node_class = node_class;
-      }
-    }
-
-    Node.prototype.setData = function(o) {
-      var key, value, _results;
-      if (typeof o !== 'object') {
-        return this.name = o;
-      } else {
-        _results = [];
-        for (key in o) {
-          value = o[key];
-          if (key === 'label') {
-            _results.push(this.name = value);
-          } else {
-            _results.push(this[key] = value);
-          }
-        }
-        return _results;
-      }
-    };
-
-    Node.prototype.initFromData = function(data) {
-      var addChildren, addNode;
-      addNode = (function(_this) {
-        return function(node_data) {
-          _this.setData(node_data);
-          if (node_data.children) {
-            return addChildren(node_data.children);
-          }
-        };
-      })(this);
-      addChildren = (function(_this) {
-        return function(children_data) {
-          var child, node, _i, _len;
-          for (_i = 0, _len = children_data.length; _i < _len; _i++) {
-            child = children_data[_i];
-            node = new _this.tree.node_class('');
-            node.initFromData(child);
-            _this.addChild(node);
-          }
-          return null;
-        };
-      })(this);
-      addNode(data);
-      return null;
-    };
-
-
-    /*
-    Create tree from data.
-    
-    Structure of data is:
-    [
-        {
-            label: 'node1',
-            children: [
-                { label: 'child1' },
-                { label: 'child2' }
-            ]
-        },
-        {
-            label: 'node2'
-        }
-    ]
-     */
-
-    Node.prototype.loadFromData = function(data) {
-      var node, o, _i, _len;
-      this.removeChildren();
-      for (_i = 0, _len = data.length; _i < _len; _i++) {
-        o = data[_i];
-        node = new this.tree.node_class(o);
-        this.addChild(node);
-        if (typeof o === 'object' && o.children) {
-          node.loadFromData(o.children);
-        }
-      }
-      return null;
-    };
-
-
-    /*
-    Add child.
-    
-    tree.addChild(
-        new Node('child1')
-    );
-     */
-
-    Node.prototype.addChild = function(node) {
-      this.children.push(node);
-      return node._setParent(this);
-    };
-
-
-    /*
-    Add child at position. Index starts at 0.
-    
-    tree.addChildAtPosition(
-        new Node('abc'),
-        1
-    );
-     */
-
-    Node.prototype.addChildAtPosition = function(node, index) {
-      this.children.splice(index, 0, node);
-      return node._setParent(this);
-    };
-
-    Node.prototype._setParent = function(parent) {
-      this.parent = parent;
-      this.tree = parent.tree;
-      return this.tree.addNodeToIndex(this);
-    };
-
-
-    /*
-    Remove child. This also removes the children of the node.
-    
-    tree.removeChild(tree.children[0]);
-     */
-
-    Node.prototype.removeChild = function(node) {
-      node.removeChildren();
-      return this._removeChild(node);
-    };
-
-    Node.prototype._removeChild = function(node) {
-      this.children.splice(this.getChildIndex(node), 1);
-      return this.tree.removeNodeFromIndex(node);
-    };
-
-
-    /*
-    Get child index.
-    
-    var index = getChildIndex(node);
-     */
-
-    Node.prototype.getChildIndex = function(node) {
-      return $.inArray(node, this.children);
-    };
-
-
-    /*
-    Does the tree have children?
-    
-    if (tree.hasChildren()) {
-        //
-    }
-     */
-
-    Node.prototype.hasChildren = function() {
-      return this.children.length !== 0;
-    };
-
-    Node.prototype.isFolder = function() {
-      return this.hasChildren() || this.load_on_demand;
-    };
-
-
-    /*
-    Iterate over all the nodes in the tree.
-    
-    Calls callback with (node, level).
-    
-    The callback must return true to continue the iteration on current node.
-    
-    tree.iterate(
-        function(node, level) {
-           console.log(node.name);
-    
-           // stop iteration after level 2
-           return (level <= 2);
-        }
-    );
-     */
-
-    Node.prototype.iterate = function(callback) {
-      var _iterate;
-      _iterate = function(node, level) {
-        var child, result, _i, _len, _ref;
-        if (node.children) {
-          _ref = node.children;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            child = _ref[_i];
-            result = callback(child, level);
-            if (result && child.hasChildren()) {
-              _iterate(child, level + 1);
-            }
-          }
-          return null;
-        }
-      };
-      _iterate(this, 0);
-      return null;
-    };
-
-
-    /*
-    Move node relative to another node.
-    
-    Argument position: Position.BEFORE, Position.AFTER or Position.Inside
-    
-    // move node1 after node2
-    tree.moveNode(node1, node2, Position.AFTER);
-     */
-
-    Node.prototype.moveNode = function(moved_node, target_node, position) {
-      if (moved_node.isParentOf(target_node)) {
-        return;
-      }
-      moved_node.parent._removeChild(moved_node);
-      if (position === Position.AFTER) {
-        return target_node.parent.addChildAtPosition(moved_node, target_node.parent.getChildIndex(target_node) + 1);
-      } else if (position === Position.BEFORE) {
-        return target_node.parent.addChildAtPosition(moved_node, target_node.parent.getChildIndex(target_node));
-      } else if (position === Position.INSIDE) {
-        return target_node.addChildAtPosition(moved_node, 0);
-      }
-    };
-
-
-    /*
-    Get the tree as data.
-     */
-
-    Node.prototype.getData = function() {
-      var getDataFromNodes;
-      getDataFromNodes = (function(_this) {
-        return function(nodes) {
-          var data, k, node, tmp_node, v, _i, _len;
-          data = [];
-          for (_i = 0, _len = nodes.length; _i < _len; _i++) {
-            node = nodes[_i];
-            tmp_node = {};
-            for (k in node) {
-              v = node[k];
-              if ((k !== 'parent' && k !== 'children' && k !== 'element' && k !== 'tree') && Object.prototype.hasOwnProperty.call(node, k)) {
-                tmp_node[k] = v;
-              }
-            }
-            if (node.hasChildren()) {
-              tmp_node.children = getDataFromNodes(node.children);
-            }
-            data.push(tmp_node);
-          }
-          return data;
-        };
-      })(this);
-      return getDataFromNodes(this.children);
-    };
-
-    Node.prototype.getNodeByName = function(name) {
-      var result;
-      result = null;
-      this.iterate(function(node) {
-        if (node.name === name) {
-          result = node;
-          return false;
-        } else {
-          return true;
-        }
-      });
-      return result;
-    };
-
-    Node.prototype.addAfter = function(node_info) {
-      var child_index, node;
-      if (!this.parent) {
-        return null;
-      } else {
-        node = new this.tree.node_class(node_info);
-        child_index = this.parent.getChildIndex(this);
-        this.parent.addChildAtPosition(node, child_index + 1);
-        return node;
-      }
-    };
-
-    Node.prototype.addBefore = function(node_info) {
-      var child_index, node;
-      if (!this.parent) {
-        return null;
-      } else {
-        node = new this.tree.node_class(node_info);
-        child_index = this.parent.getChildIndex(this);
-        this.parent.addChildAtPosition(node, child_index);
-        return node;
-      }
-    };
-
-    Node.prototype.addParent = function(node_info) {
-      var child, new_parent, original_parent, _i, _len, _ref;
-      if (!this.parent) {
-        return null;
-      } else {
-        new_parent = new this.tree.node_class(node_info);
-        new_parent._setParent(this.tree);
-        original_parent = this.parent;
-        _ref = original_parent.children;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          child = _ref[_i];
-          new_parent.addChild(child);
-        }
-        original_parent.children = [];
-        original_parent.addChild(new_parent);
-        return new_parent;
-      }
-    };
-
-    Node.prototype.remove = function() {
-      if (this.parent) {
-        this.parent.removeChild(this);
-        return this.parent = null;
-      }
-    };
-
-    Node.prototype.append = function(node_info) {
-      var node;
-      node = new this.tree.node_class(node_info);
-      this.addChild(node);
-      return node;
-    };
-
-    Node.prototype.prepend = function(node_info) {
-      var node;
-      node = new this.tree.node_class(node_info);
-      this.addChildAtPosition(node, 0);
-      return node;
-    };
-
-    Node.prototype.isParentOf = function(node) {
-      var parent;
-      parent = node.parent;
-      while (parent) {
-        if (parent === this) {
-          return true;
-        }
-        parent = parent.parent;
-      }
-      return false;
-    };
-
-    Node.prototype.getLevel = function() {
-      var level, node;
-      level = 0;
-      node = this;
-      while (node.parent) {
-        level += 1;
-        node = node.parent;
-      }
-      return level;
-    };
-
-    Node.prototype.getNodeById = function(node_id) {
-      return this.id_mapping[node_id];
-    };
-
-    Node.prototype.addNodeToIndex = function(node) {
-      if (node.id != null) {
-        return this.id_mapping[node.id] = node;
-      }
-    };
-
-    Node.prototype.removeNodeFromIndex = function(node) {
-      if (node.id != null) {
-        return delete this.id_mapping[node.id];
-      }
-    };
-
-    Node.prototype.removeChildren = function() {
-      this.iterate((function(_this) {
-        return function(child) {
-          _this.tree.removeNodeFromIndex(child);
-          return true;
-        };
-      })(this));
-      return this.children = [];
-    };
-
-    Node.prototype.getPreviousSibling = function() {
-      var previous_index;
-      if (!this.parent) {
-        return null;
-      } else {
-        previous_index = this.parent.getChildIndex(this) - 1;
-        if (previous_index >= 0) {
-          return this.parent.children[previous_index];
-        } else {
-          return null;
-        }
-      }
-    };
-
-    Node.prototype.getNextSibling = function() {
-      var next_index;
-      if (!this.parent) {
-        return null;
-      } else {
-        next_index = this.parent.getChildIndex(this) + 1;
-        if (next_index < this.parent.children.length) {
-          return this.parent.children[next_index];
-        } else {
-          return null;
-        }
-      }
-    };
-
-    Node.prototype.getNodesByProperty = function(key, value) {
-      return this.filter(function(node) {
-        return node[key] === value;
-      });
-    };
-
-    Node.prototype.filter = function(f) {
-      var result;
-      result = [];
-      this.iterate(function(node) {
-        if (f(node)) {
-          result.push(node);
-        }
-        return true;
-      });
-      return result;
-    };
-
-    Node.prototype.getNextNode = function(include_children) {
-      var next_sibling;
-      if (include_children == null) {
-        include_children = true;
-      }
-      if (include_children && this.hasChildren() && this.is_open) {
-        return this.children[0];
-      } else {
-        if (!this.parent) {
-          return null;
-        } else {
-          next_sibling = this.getNextSibling();
-          if (next_sibling) {
-            return next_sibling;
-          } else {
-            return this.parent.getNextNode(false);
-          }
-        }
-      }
-    };
-
-    Node.prototype.getPreviousNode = function() {
-      var previous_sibling;
-      if (!this.parent) {
-        return null;
-      } else {
-        previous_sibling = this.getPreviousSibling();
-        if (previous_sibling) {
-          if (!previous_sibling.hasChildren() || !previous_sibling.is_open) {
-            return previous_sibling;
-          } else {
-            return previous_sibling.getLastChild();
-          }
-        } else {
-          if (this.parent.parent) {
-            return this.parent;
-          } else {
-            return null;
-          }
-        }
-      }
-    };
-
-    Node.prototype.getLastChild = function() {
-      var last_child;
-      if (!this.hasChildren()) {
-        return null;
-      } else {
-        last_child = this.children[this.children.length - 1];
-        if (!last_child.hasChildren() || !last_child.is_open) {
-          return last_child;
-        } else {
-          return last_child.getLastChild();
-        }
-      }
-    };
-
-    return Node;
-
-  })();
-
-  module.exports = {
-    Node: Node,
-    Position: Position
-  };
-
-}).call(this);
-
-},{}],3:[function(require,module,exports){
-(function() {
-  var get_json_stringify_function, html_escape, indexOf, isInt, _indexOf;
-
-  _indexOf = function(array, item) {
-    var i, value, _i, _len;
-    for (i = _i = 0, _len = array.length; _i < _len; i = ++_i) {
-      value = array[i];
-      if (value === item) {
-        return i;
-      }
-    }
-    return -1;
-  };
-
-  indexOf = function(array, item) {
-    if (array.indexOf) {
-      return array.indexOf(item);
-    } else {
-      return _indexOf(array, item);
-    }
-  };
-
-  isInt = function(n) {
-    return typeof n === 'number' && n % 1 === 0;
-  };
-
-  get_json_stringify_function = function() {
-    var json_escapable, json_meta, json_quote, json_str, stringify;
-    json_escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
-    json_meta = {
-      '\b': '\\b',
-      '\t': '\\t',
-      '\n': '\\n',
-      '\f': '\\f',
-      '\r': '\\r',
-      '"': '\\"',
-      '\\': '\\\\'
-    };
-    json_quote = function(string) {
-      json_escapable.lastIndex = 0;
-      if (json_escapable.test(string)) {
-        return '"' + string.replace(json_escapable, function(a) {
-          var c;
-          c = json_meta[a];
-          return (typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4));
-        }) + '"';
-      } else {
-        return '"' + string + '"';
-      }
-    };
-    json_str = function(key, holder) {
-      var i, k, partial, v, value, _i, _len;
-      value = holder[key];
-      switch (typeof value) {
-        case 'string':
-          return json_quote(value);
-        case 'number':
-          if (isFinite(value)) {
-            return String(value);
-          } else {
-            return 'null';
-          }
-        case 'boolean':
-        case 'null':
-          return String(value);
-        case 'object':
-          if (!value) {
-            return 'null';
-          }
-          partial = [];
-          if (Object.prototype.toString.apply(value) === '[object Array]') {
-            for (i = _i = 0, _len = value.length; _i < _len; i = ++_i) {
-              v = value[i];
-              partial[i] = json_str(i, value) || 'null';
-            }
-            return (partial.length === 0 ? '[]' : '[' + partial.join(',') + ']');
-          }
-          for (k in value) {
-            if (Object.prototype.hasOwnProperty.call(value, k)) {
-              v = json_str(k, value);
-              if (v) {
-                partial.push(json_quote(k) + ':' + v);
-              }
-            }
-          }
-          return (partial.length === 0 ? '{}' : '{' + partial.join(',') + '}');
-      }
-    };
-    stringify = function(value) {
-      return json_str('', {
-        '': value
-      });
-    };
-    return stringify;
-  };
-
-  if (!((this.JSON != null) && (this.JSON.stringify != null) && typeof this.JSON.stringify === 'function')) {
-    if (this.JSON == null) {
-      this.JSON = {};
-    }
-    this.JSON.stringify = get_json_stringify_function();
-  }
-
-  html_escape = function(string) {
-    return ('' + string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g, '&#x2F;');
-  };
-
-  module.exports = {
-    _indexOf: _indexOf,
-    get_json_stringify_function: get_json_stringify_function,
-    html_escape: html_escape,
-    indexOf: indexOf,
-    isInt: isInt
-  };
-
-}).call(this);
-
-},{}]},{},[1])
+},{"jquery-mockjax":1}]},{},[2])

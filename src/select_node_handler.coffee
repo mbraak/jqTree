@@ -9,7 +9,7 @@ class SelectNodeHandler
         if selected_nodes.length
             return selected_nodes[0]
         else
-            return  false
+            return false
 
     getSelectedNodes: ->
         if @selected_single_node

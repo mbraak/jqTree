@@ -2,10 +2,10 @@ language: node_js
 node_js:
   - 0.10
 before_script:
-  - npm install connect coveralls serve-static
+  - npm install
   - node phantomjs/server.js &
   - sleep 5
 script:
-  - rm -f data.lcov 
+  - rm -f data.lcov
   - phantomjs phantomjs/runner.js "http://localhost:8000/test/test.html?gruntReport&coverage"
   - node node_modules/coveralls/bin/coveralls.js < data.lcov

@@ -7,7 +7,7 @@ Set the delay for opening a folder during drag-and-drop. The delay is in millise
 
 {% highlight js %}
 $('#tree1').tree({
-    url: '/my/data/',
+    dataUrl: '/my/data/',
     openFolderDelay: 1000
 });
 {% endhighlight %}

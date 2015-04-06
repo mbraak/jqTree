@@ -7,7 +7,7 @@ Process the tree data from the server.
 
 {% highlight js %}
 $('#tree1').tree({
-    url: '/my/data/',
+    dataUrl: '/my/data/',
     dataFilter: function(data) {
         // Example:
         // the server puts the tree data in 'my_tree_data'

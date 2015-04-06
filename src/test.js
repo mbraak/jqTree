@@ -1,11 +1,20 @@
-var node = require('./node');
-var Node = node.Node;
-var Position = node.Position;
+var Node, Position, util, _indexOf, indexOf;
 
-var util = require('./util');
-_indexOf = util._indexOf;
-indexOf = util.indexOf;
-get_json_stringify_function = util.get_json_stringify_function;
+require('jquery-mockjax');
+
+
+QUnit.begin(function() {
+    // Load classes and modules here to make sure code coverage works
+    var JqTreeWidget = $('').tree('get_widget_class');
+    var node = JqTreeWidget.getModule('node');
+
+    Node = node.Node;
+    Position = node.Position;
+
+    util = JqTreeWidget.getModule('util');
+    _indexOf = util._indexOf;
+    indexOf = util.indexOf;
+});
 
 QUnit.config.testTimeout = 5000;
 
@@ -150,8 +159,6 @@ test('toggle', function() {
     $tree.bind(
         'tree.open',
         function(e) {
-            start();
-
             ok(! isNodeClosed($node1), 'node1 is open');
 
             // 2. close node1
@@ -179,32 +186,49 @@ test('toggle', function() {
 
     // 1. open node1
     $tree.tree('toggle', node1);
-
-    stop();
 });
 
 test("click event", function() {
     stop();
 
+    var select_count = 0;
+
     // create tree
     var $tree = $('#tree1');
+
     $tree.tree({
         data: example_data,
         selectable: true
     });
+
+    var $node1 = $tree.find('ul.jqtree-tree li:first');
+    var $text_span = $node1.find('span:first');
 
     $tree.bind('tree.click', function(e) {
         equal(e.node.name, 'node1');
     });
 
     $tree.bind('tree.select', function(e) {
-        start();
-        equal(e.node.name, 'node1');
+        select_count += 1;
+
+        if (select_count == 1) {
+            equal(e.node.name, 'node1');
+
+            equal($tree.tree('getSelectedNode').name, 'node1');
+
+            // deselect
+            $text_span.click();
+        }
+        else {
+            equal(e.node, null);
+            equal(e.previous_node.name, 'node1');
+            equal($tree.tree('getSelectedNode'), false);
+
+            start();
+        }
     });
 
     // click on node1
-    var $node1 = $tree.find('ul.jqtree-tree li:first');
-    var $text_span = $node1.find('span:first');
     $text_span.click();
 });
 
@@ -487,6 +511,10 @@ test('selectNode', function() {
 
     // -- is 'node1' selected?
     ok($tree.tree('isNodeSelected', node1));
+
+    // -- deselect
+    $tree.tree('selectNode', null);
+    equal($tree.tree('getSelectedNode'), false);
 });
 
 test('selectNode when another node is selected', function() {
@@ -499,7 +527,7 @@ test('selectNode when another node is selected', function() {
 
     var node1 = $tree.tree('getTree').children[0];
     var node2 = $tree.tree('getTree').children[1];
-    
+
 
     // -- select node 'node2'
     $tree.tree('selectNode', node2);
@@ -827,7 +855,7 @@ test('removeNode', function() {
     $tree.tree('loadData', example_data2);
 
     var c1 = $tree.tree('getNodeByName', 'c1');
-    
+
     $tree.tree('removeNode', c1);
 
     equal(
@@ -1268,7 +1296,7 @@ test('constructor', function() {
     equal(node.label, undefined);
     equal(node.children.length, 0);
     equal(node.parent, null);
-}); 
+});
 
 test("create tree from data", function() {
     function checkData(tree) {
@@ -1579,7 +1607,7 @@ test('moveNode', function() {
 });
 
 test('initFromData', function() {
-    var data = 
+    var data =
         {
             label: 'main',
             children: [
@@ -1872,7 +1900,7 @@ test('getPreviousSibling', function() {
     equal(
         tree.getNodeByName('child1').getPreviousSibling(),
         null
-    );    
+    );
 });
 
 test('getNextSibling', function() {
@@ -1904,25 +1932,6 @@ test('getNodesByProperty', function() {
 
 
 QUnit.module('util');
-
-test('JSON.stringify', function() {
-    function test_stringify(stringify) {
-        equal(stringify('abc'), '"abc"');
-        equal(stringify(123), '123');
-        equal(stringify(true), 'true');
-        equal(stringify({abc: 'def'}), '{"abc":"def"}');
-        equal(stringify({}), '{}');
-        equal(stringify([1, 2, 3]), '[1,2,3]');
-        equal(stringify(null), 'null');
-        equal(stringify(Number.NEGATIVE_INFINITY), 'null');
-
-        // test escapable
-        JSON.stringify("\u200c");
-    }
-
-    test_stringify(JSON.stringify);
-    test_stringify(get_json_stringify_function());
-});
 
 test('indexOf', function() {
     equal(indexOf([3, 2, 1], 1), 2);

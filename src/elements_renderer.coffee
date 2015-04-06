@@ -29,8 +29,6 @@ class ElementsRenderer
         $previous_li = $(node.element)
 
         # create element
-        parent_node_element = new NodeElement(node.parent, @tree_widget)
-
         li = @createLi(node)
         @attachNodeData(node, li)
 

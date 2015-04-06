@@ -24,9 +24,11 @@ ScrollHandler = require './scroll_handler'
 SelectNodeHandler = require './select_node_handler'
 SimpleWidget = require './simple.widget'
 
-node = require './node'
-Node = node.Node
-Position = node.Position
+node_module = require './node'
+Node = node_module.Node
+Position = node_module.Position
+
+util_module = require './util'
 
 node_element = require './node_element'
 NodeElement = node_element.NodeElement
@@ -66,7 +68,7 @@ class JqTreeWidget extends MouseWidget
             @closeNode(node, slide)
         else
             @openNode(node, slide)
-    
+
     getTree: ->
         return @tree
 
@@ -91,7 +93,7 @@ class JqTreeWidget extends MouseWidget
 
         saveState = =>
             if @options.saveState
-                @save_state_handler.saveState()            
+                @save_state_handler.saveState()
 
         if not node
             # Called with empty node -> deselect current node
@@ -168,7 +170,7 @@ class JqTreeWidget extends MouseWidget
                 url_info.method = 'get'
 
         handeLoadData = (data) =>
-            removeLoadingClass()                
+            removeLoadingClass()
             @_loadData(data, parent_node)
 
             if on_finished and $.isFunction(on_finished)
@@ -322,7 +324,7 @@ class JqTreeWidget extends MouseWidget
     addParentNode: (new_node_info, existing_node) ->
         new_node = existing_node.addParent(new_node_info)
         @_refreshElements(new_node.parent)
-        return new_node    
+        return new_node
 
     removeNode: (node) ->
         parent = node.parent
@@ -340,7 +342,7 @@ class JqTreeWidget extends MouseWidget
         @_refreshElements(parent_node)
 
         return node
- 
+
     prependNode: (new_node_info, parent_node) ->
         if not parent_node
             parent_node = @tree
@@ -559,7 +561,7 @@ class JqTreeWidget extends MouseWidget
                 else
                     node.is_open = true
                     return (level != max_level)
-    
+
             return must_load_on_demand
 
         [is_restored, must_load_on_demand] = restoreState()
@@ -597,7 +599,7 @@ class JqTreeWidget extends MouseWidget
                         if not node.is_loading
                             loadAndOpenNode(node)
 
-                        return false                        
+                        return false
                     else
                         @_openNode(node, false)
 
@@ -767,6 +769,15 @@ class JqTreeWidget extends MouseWidget
     _deselectCurrentNode: ->
         node = @getSelectedNode()
         if node
-            @removeFromSelection(node)        
+            @removeFromSelection(node)
+
+
+JqTreeWidget.getModule = (name) ->
+    modules =
+        'node': node_module
+        'util': util_module
+
+    return modules[name]
+
 
 SimpleWidget.register(JqTreeWidget, 'tree')

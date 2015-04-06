@@ -3,6 +3,12 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.1.0 (april 6 2015)
+
+* Issue 348: Circle for drag-and-drop is not positioned correctly for content box-sizing
+* Issue 356: Fixed drag-and-drop after nodeUpdate (thanks to Iker Vázquez)
+* Issue 360: Add a trailing semicolon to tree.jquery.js (thanks to David Thenon)
+
 ##### 1.0.0 (january 11 2015)
 
 * Issues 273 and 304: autoOpen and saveState now works for nodes that are loaded on demand
