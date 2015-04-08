@@ -2,13 +2,13 @@
 
 [![Bower version](https://badge.fury.io/bo/jqtree.svg)](http://badge.fury.io/bo/jqtree) [![NPM version](https://badge.fury.io/js/jqtree.svg)](http://badge.fury.io/js/jqtree)
 
-#jqTree
+# jqTree
 
 JqTree is a tree widget. Read more in the [documentation](http://mbraak.github.io/jqTree/).
 
 ![screenshot](https://raw.github.com/mbraak/jqTree/master/screenshot.png)
 
-##Features
+## Features
 
 * Create a tree from JSON data
 * Drag and drop
@@ -58,6 +58,6 @@ $('#tree1').tree({
 
 The documentation is on http://mbraak.github.io/jqTree/.
 
-##Thanks
+## Thanks
 
 The code for the mouse widget is heavily inspired by the mouse widget from jquery ui.
