@@ -17,7 +17,17 @@ JqTree is a tree widget. Read more in the [documentation](http://mbraak.github.i
 
 The project is hosted on [github](https://github.com/mbraak/jqTree), has a [test suite](http://mbraak.github.io/jqTree/test/test.html).
 
-## Example
+## Examples
+
+Example with ajax data:
+
+```html
+<div id="tree1" data-url="/example_data/"></div>
+```
+
+```js
+$('#tree1').tree();
+```
 
 Example with static data:
 
@@ -42,16 +52,6 @@ $('#tree1').tree({
     autoOpen: true,
     dragAndDrop: true
 });
-```
-
-Example with ajax data:
-
-```html
-<div id="tree1" data-url="/example_data/"></div>
-```
-
-```js
-$('#tree1').tree();
 ```
 
 ## Documentation
