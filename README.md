@@ -17,7 +17,46 @@ JqTree is a tree widget. Read more in the [documentation](http://mbraak.github.i
 
 The project is hosted on [github](https://github.com/mbraak/jqTree), has a [test suite](http://mbraak.github.io/jqTree/test/test.html).
 
-See index.html for the full documentation. The documentation is also on [github](http://mbraak.github.io/jqTree/)
+## Example
+
+Example with static data:
+
+```js
+var data = [
+    {
+        label: 'node1', id: 1,
+        children: [
+            { label: 'child1', id: 2 },
+            { label: 'child2', id: 3 }
+        ]
+    },
+    {
+        label: 'node2', id: 4,
+        children: [
+            { label: 'child3', id: 5 }
+        ]
+    }
+];
+$('#tree1').tree({
+    data: data,
+    autoOpen: true,
+    dragAndDrop: true
+});
+```
+
+Example with ajax data:
+
+```html
+<div id="tree1" data-url="/example_data/"></div>
+```
+
+```js
+$('#tree1').tree();
+```
+
+## Documentation
+
+The documentation is on http://mbraak.github.io/jqTree/.
 
 ##Thanks
 
