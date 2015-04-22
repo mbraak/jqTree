@@ -531,10 +531,13 @@ ElementsRenderer = (function() {
 
   ElementsRenderer.prototype.createUl = function(is_root_node) {
     var class_string, ul;
-    if (is_root_node) {
-      class_string = 'jqtree-tree';
-    } else {
+    if (!is_root_node) {
       class_string = '';
+    } else {
+      class_string = 'jqtree-tree';
+      if (this.tree_widget.options.rtl) {
+        class_string += ' jqtree-rtl';
+      }
     }
     ul = document.createElement('ul');
     ul.className = "jqtree_common " + class_string;
@@ -2353,13 +2356,14 @@ JqTreeWidget = (function(superClass) {
     onLoadFailed: null,
     autoEscape: true,
     dataUrl: null,
-    closedIcon: '&#x25ba;',
+    closedIcon: null,
     openedIcon: '&#x25bc;',
     slide: true,
     nodeClass: Node,
     dataFilter: null,
     keyboardSupport: true,
-    openFolderDelay: 500
+    openFolderDelay: 500,
+    rtl: null
   };
 
   JqTreeWidget.prototype.toggle = function(node, slide) {
@@ -2823,6 +2827,10 @@ JqTreeWidget = (function(superClass) {
     this.element = this.$el;
     this.mouse_delay = 300;
     this.is_initialized = false;
+    this.options.rtl = this._getRtlOption();
+    if (!this.options.closedIcon) {
+      this.options.closedIcon = this._getDefaultClosedIcon();
+    }
     this.renderer = new ElementsRenderer(this);
     if (SaveStateHandler != null) {
       this.save_state_handler = new SaveStateHandler(this);
@@ -3226,6 +3234,28 @@ JqTreeWidget = (function(superClass) {
     }
   };
 
+  JqTreeWidget.prototype._getDefaultClosedIcon = function() {
+    if (this.options.rtl) {
+      return '&#x25c0;';
+    } else {
+      return '&#x25ba;';
+    }
+  };
+
+  JqTreeWidget.prototype._getRtlOption = function() {
+    var data_rtl;
+    if (this.options.rtl !== null) {
+      return this.options.rtl;
+    } else {
+      data_rtl = this.element.data('rtl');
+      if ((data_rtl != null) && data_rtl !== false) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
   return JqTreeWidget;
 
 })(MouseWidget);
@@ -3279,6 +3309,6 @@ module.exports = {
 };
 
 },{}],13:[function(require,module,exports){
-module.exports = '1.0.0';
+module.exports = '1.1.0';
 
 },{}]},{},[11]);

@@ -62,10 +62,13 @@ class ElementsRenderer
         $(li).data('node', node)
 
     createUl: (is_root_node) ->
-        if is_root_node
-            class_string = 'jqtree-tree'
-        else
+        if !is_root_node
             class_string = ''
+        else
+            class_string = 'jqtree-tree'
+
+            if @tree_widget.options.rtl
+                class_string += ' jqtree-rtl'
 
         ul = document.createElement('ul')
         ul.className = "jqtree_common #{ class_string }"

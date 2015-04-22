@@ -1,8 +1,8 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
  * MockJax - jQuery Plugin to Mock Ajax requests
  *
- * Version:  1.6.1
+ * Version:  1.6.2
  * Released:
  * Home:   https://github.com/jakerella/jquery-mockjax
  * Author:   Jonathan Sharp (http://jdsharp.com)
@@ -10,7 +10,7 @@
  *
  * Copyright (c) 2014 appendTo, Jordan Kasper
  * NOTE: This repository was taken over by Jordan Kasper (@jakerella) October, 2014
- * 
+ *
  * Dual licensed under the MIT or GPL licenses.
  * http://opensource.org/licenses/MIT OR http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -417,9 +417,6 @@
 				delete window[ jsonp ];
 			} catch(e) {}
 
-			if ( head ) {
-				head.removeChild( script );
-			}
 		};
 	}
 
@@ -2648,4 +2645,4 @@ test('Position.nameToIndex', function() {
     equal(Position.nameToIndex(''), 0);
 });
 
-},{"jquery-mockjax":1}]},{},[2])
+},{"jquery-mockjax":1}]},{},[2]);

@@ -2,6 +2,10 @@ ul.jqtree-tree {
     margin-left: 0;
 }
 
+ul.jqtree-tree.jqtree-rtl {
+    direction: rtl;
+}
+
 ul.jqtree-tree,
 ul.jqtree-tree ul.jqtree_common {
     list-style: none outside;
@@ -14,6 +18,12 @@ ul.jqtree-tree ul.jqtree_common {
     margin-left: 12px;
     margin-right: 0;
 }
+
+ul.jqtree-tree.jqtree-rtl ul.jqtree_common {
+    margin-left: 0;
+    margin-right: 12px;
+}
+
 ul.jqtree-tree li.jqtree-closed > ul.jqtree_common {
     display: none;
 }
@@ -28,6 +38,11 @@ ul.jqtree-tree .jqtree-toggler {
     text-decoration: none;
     margin-right: 0.5em;
     vertical-align: middle;
+}
+
+ul.jqtree-tree.jqtree-rtl .jqtree-toggler {
+    margin-left: 0.5em;
+    margin-right: 0;
 }
 
 ul.jqtree-tree .jqtree-toggler:hover {
@@ -45,8 +60,17 @@ ul.jqtree-tree .jqtree-element {
     margin-left: 1.5em;
 }
 
+.jqtree-tree.jqtree-rtl .jqtree-title {
+    margin-left: 0;
+    margin-right: 1.5em;
+}
+
 .jqtree-tree .jqtree-title.jqtree-title-folder {
     margin-left: 0;
+}
+
+.jqtree-tree.jqtree-rtl .jqtree-title.jqtree-title-folder {
+    margin-right: 0;
 }
 
 ul.jqtree-tree li.jqtree-folder {
@@ -75,6 +99,11 @@ ul.jqtree-tree li.jqtree-ghost {
     margin-right: 10px;
 }
 
+ul.jqtree-tree.jqtree-rtl li.jqtree-ghost {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
 ul.jqtree-tree li.jqtree-ghost span {
     display: block;
 }
@@ -92,6 +121,10 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+
+ul.jqtree-tree.jqtree-rtl li.jqtree-ghost span.jqtree-circle {
+    right: -6px;
 }
 
 /* IE 6, 7, 8 */
@@ -112,8 +145,17 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
     width: 100%;
 }
 
+ul.jqtree-tree.jqtree-rtl li.jqtree-ghost span.jqtree-line {
+    right: 2px;
+}
+
 ul.jqtree-tree li.jqtree-ghost.jqtree-inside {
     margin-left: 48px;
+}
+
+ul.jqtree-tree.jqtree-rtl li.jqtree-ghost.jqtree-inside {
+    margin-left: 0;
+    margin-right: 48px;
 }
 
 ul.jqtree-tree span.jqtree-border {
@@ -125,6 +167,10 @@ ul.jqtree-tree span.jqtree-border {
     border-radius: 6px;
     margin: 0;
     box-sizing: content-box;
+}
+
+ul.jqtree-tree.jqtree-rtl span.jqtree-border {
+    right: -2px;
 }
 
 ul.jqtree-tree .jqtree-element {
