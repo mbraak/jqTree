@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### Development version
+
+* Issue 48: Added right-to-left support (thanks to Mohamed Ouederni, Ashraf Fayad and Udi Oron)
+
 ##### 1.1.0 (april 6 2015)
 
 * Issue 348: Circle for drag-and-drop is not positioned correctly for content box-sizing
