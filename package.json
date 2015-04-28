@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "coffee-script": "1.9.2",
-    "coffeeify": "^1.0.0",
+    "coffeeify": "^1.1.0",
     "connect": "^3.3.5",
     "coveralls": "^2.11.2",
     "gulp": "3.8.11",
