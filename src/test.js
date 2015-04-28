@@ -1661,6 +1661,21 @@ test('getData', function() {
             }
         ]
     );
+
+    // 3. get data including parent
+    var n1 = node.getNodeByName('n1');
+
+    deepEqual(
+        n1.getData(true),
+        [
+            {
+                name: 'n1',
+                children: [
+                    { name: 'c1'}
+                ]
+            }
+        ]
+    );
 });
 
 test('addAfter', function() {

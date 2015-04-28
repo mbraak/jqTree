@@ -215,7 +215,7 @@ class Node
     ###
     Get the tree as data.
     ###
-    getData: ->
+    getData: (include_parent=false) ->
         getDataFromNodes = (nodes) =>
             data = []
 
@@ -236,7 +236,10 @@ class Node
 
             return data
 
-        return getDataFromNodes(@children)
+        if include_parent
+            return getDataFromNodes([this])
+        else
+            return getDataFromNodes(@children)
 
     getNodeByName: (name) ->
         result = null

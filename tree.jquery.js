@@ -1224,8 +1224,11 @@ Node = (function() {
   Get the tree as data.
    */
 
-  Node.prototype.getData = function() {
+  Node.prototype.getData = function(include_parent) {
     var getDataFromNodes;
+    if (include_parent == null) {
+      include_parent = false;
+    }
     getDataFromNodes = (function(_this) {
       return function(nodes) {
         var data, j, k, len, node, tmp_node, v;
@@ -1247,7 +1250,11 @@ Node = (function() {
         return data;
       };
     })(this);
-    return getDataFromNodes(this.children);
+    if (include_parent) {
+      return getDataFromNodes([this]);
+    } else {
+      return getDataFromNodes(this.children);
+    }
   };
 
   Node.prototype.getNodeByName = function(name) {
