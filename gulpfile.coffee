@@ -1,8 +1,9 @@
-gulp      = require 'gulp'
-coffee    = require 'gulp-coffee'
-coffeeify = require 'gulp-coffeeify'
-exec      = require('child_process').exec
-sass      = require('gulp-sass')
+gulp       = require 'gulp'
+coffee     = require 'gulp-coffee'
+coffeeify  = require 'gulp-coffeeify'
+coffeelint = require 'gulp-coffeelint'
+exec       = require('child_process').exec
+sass       = require('gulp-sass')
 
 gulp.task 'jqtree', ->
     gulp.src './src/tree.jquery.coffee'
@@ -29,6 +30,11 @@ gulp.task 'sass', ->
     gulp.src './jqtree.scss'
         .pipe sass(errLogToConsole: true)
         .pipe gulp.dest('./')
+
+gulp.task 'lint', ->
+    gulp.src './src/*.coffee'
+        .pipe coffeelint()
+        .pipe coffeelint.reporter()
 
 gulp.task 'watch', ['default'], ->
     gulp.watch ['./src/*.coffee', './src/test.js', './jqtree.scss'], ['default']
