@@ -54,7 +54,7 @@ class DragAndDropHandler
 
         if can_move_to and area
             if !area.node.isFolder()
-                @stopOpenFolderTimer();
+                @stopOpenFolderTimer()
 
             if @hovered_area != area
                 @hovered_area = area

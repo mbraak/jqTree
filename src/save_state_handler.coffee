@@ -61,7 +61,7 @@ class SaveStateHandler
         getOpenNodeIds = =>
             open_nodes = []
 
-            @tree_widget.tree.iterate((node) =>
+            @tree_widget.tree.iterate((node) ->
                 if (
                     node.is_open and
                     node.id and
@@ -167,7 +167,7 @@ class SaveStateHandler
                 # Check if it's possible to store an item. Safari does not allow this in private browsing mode.
                 try
                     key = '_storage_test'
-                    sessionStorage.setItem(key, true);
+                    sessionStorage.setItem(key, true)
                     sessionStorage.removeItem(key)
                 catch error
                     return false

@@ -216,7 +216,7 @@ class Node
     Get the tree as data.
     ###
     getData: (include_parent=false) ->
-        getDataFromNodes = (nodes) =>
+        getDataFromNodes = (nodes) ->
             data = []
 
             for node in nodes
