@@ -2,6 +2,9 @@ node_module = require './node'
 Position = node_module.Position
 
 
+$ = jQuery
+
+
 class DragAndDropHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget

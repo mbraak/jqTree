@@ -1,11 +1,13 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var DragAndDropHandler, DragElement, HitAreasGenerator, Position, VisibleNodeIterator, node_module,
+var $, DragAndDropHandler, DragElement, HitAreasGenerator, Position, VisibleNodeIterator, node_module,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
 node_module = require('./node');
 
 Position = node_module.Position;
+
+$ = jQuery;
 
 DragAndDropHandler = (function() {
   function DragAndDropHandler(tree_widget) {
@@ -464,7 +466,7 @@ DragElement = (function() {
 module.exports = DragAndDropHandler;
 
 },{"./node":5}],2:[function(require,module,exports){
-var ElementsRenderer, NodeElement, html_escape, node_element, util;
+var $, ElementsRenderer, NodeElement, html_escape, node_element, util;
 
 node_element = require('./node_element');
 
@@ -473,6 +475,8 @@ NodeElement = node_element.NodeElement;
 util = require('./util');
 
 html_escape = util.html_escape;
+
+$ = jQuery;
 
 ElementsRenderer = (function() {
   function ElementsRenderer(tree_widget) {
@@ -653,8 +657,10 @@ ElementsRenderer = (function() {
 module.exports = ElementsRenderer;
 
 },{"./node_element":6,"./util":12}],3:[function(require,module,exports){
-var KeyHandler,
+var $, KeyHandler,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+$ = jQuery;
 
 KeyHandler = (function() {
   var DOWN, LEFT, RIGHT, UP;
@@ -769,11 +775,13 @@ module.exports = KeyHandler;
 /*
 This widget does the same a the mouse widget in jqueryui.
  */
-var MouseWidget, SimpleWidget,
+var $, MouseWidget, SimpleWidget,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
 SimpleWidget = require('./simple.widget');
+
+$ = jQuery;
 
 MouseWidget = (function(superClass) {
   extend(MouseWidget, superClass);
@@ -956,7 +964,9 @@ MouseWidget = (function(superClass) {
 module.exports = MouseWidget;
 
 },{"./simple.widget":10}],5:[function(require,module,exports){
-var Node, Position;
+var $, Node, Position;
+
+$ = jQuery;
 
 Position = {
   getName: function(position) {
@@ -1229,27 +1239,25 @@ Node = (function() {
     if (include_parent == null) {
       include_parent = false;
     }
-    getDataFromNodes = (function(_this) {
-      return function(nodes) {
-        var data, j, k, len, node, tmp_node, v;
-        data = [];
-        for (j = 0, len = nodes.length; j < len; j++) {
-          node = nodes[j];
-          tmp_node = {};
-          for (k in node) {
-            v = node[k];
-            if ((k !== 'parent' && k !== 'children' && k !== 'element' && k !== 'tree') && Object.prototype.hasOwnProperty.call(node, k)) {
-              tmp_node[k] = v;
-            }
+    getDataFromNodes = function(nodes) {
+      var data, j, k, len, node, tmp_node, v;
+      data = [];
+      for (j = 0, len = nodes.length; j < len; j++) {
+        node = nodes[j];
+        tmp_node = {};
+        for (k in node) {
+          v = node[k];
+          if ((k !== 'parent' && k !== 'children' && k !== 'element' && k !== 'tree') && Object.prototype.hasOwnProperty.call(node, k)) {
+            tmp_node[k] = v;
           }
-          if (node.hasChildren()) {
-            tmp_node.children = getDataFromNodes(node.children);
-          }
-          data.push(tmp_node);
         }
-        return data;
-      };
-    })(this);
+        if (node.hasChildren()) {
+          tmp_node.children = getDataFromNodes(node.children);
+        }
+        data.push(tmp_node);
+      }
+      return data;
+    };
     if (include_parent) {
       return getDataFromNodes([this]);
     } else {
@@ -1497,13 +1505,15 @@ module.exports = {
 };
 
 },{}],6:[function(require,module,exports){
-var BorderDropHint, FolderElement, GhostDropHint, NodeElement, Position, node,
+var $, BorderDropHint, FolderElement, GhostDropHint, NodeElement, Position, node,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
 node = require('./node');
 
 Position = node.Position;
+
+$ = jQuery;
 
 NodeElement = (function() {
   function NodeElement(node, tree_widget) {
@@ -1703,13 +1713,15 @@ module.exports = {
 };
 
 },{"./node":5}],7:[function(require,module,exports){
-var SaveStateHandler, indexOf, isInt, util;
+var $, SaveStateHandler, indexOf, isInt, util;
 
 util = require('./util');
 
 indexOf = util.indexOf;
 
 isInt = util.isInt;
+
+$ = jQuery;
 
 SaveStateHandler = (function() {
   function SaveStateHandler(tree_widget) {
@@ -1931,7 +1943,9 @@ SaveStateHandler = (function() {
 module.exports = SaveStateHandler;
 
 },{"./util":12}],8:[function(require,module,exports){
-var ScrollHandler;
+var $, ScrollHandler;
+
+$ = jQuery;
 
 ScrollHandler = (function() {
   function ScrollHandler(tree_widget) {
@@ -2058,7 +2072,9 @@ ScrollHandler = (function() {
 module.exports = ScrollHandler;
 
 },{}],9:[function(require,module,exports){
-var SelectNodeHandler;
+var $, SelectNodeHandler;
+
+$ = jQuery;
 
 SelectNodeHandler = (function() {
   function SelectNodeHandler(tree_widget) {
@@ -2179,8 +2195,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var SimpleWidget,
+var $, SimpleWidget,
   slice = [].slice;
+
+$ = jQuery;
 
 SimpleWidget = (function() {
   SimpleWidget.prototype.defaults = {};
@@ -2304,7 +2322,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-var DragAndDropHandler, ElementsRenderer, FolderElement, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, __version__, node_element, node_module, util_module,
+var $, DragAndDropHandler, ElementsRenderer, FolderElement, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, __version__, node_element, node_module, util_module,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
@@ -2339,6 +2357,8 @@ node_element = require('./node_element');
 NodeElement = node_element.NodeElement;
 
 FolderElement = node_element.FolderElement;
+
+$ = jQuery;
 
 JqTreeWidget = (function(superClass) {
   extend(JqTreeWidget, superClass);

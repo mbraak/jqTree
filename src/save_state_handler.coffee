@@ -4,6 +4,9 @@ indexOf = util.indexOf
 isInt = util.isInt
 
 
+$ = jQuery
+
+
 class SaveStateHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget

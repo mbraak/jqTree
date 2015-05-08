@@ -35,6 +35,9 @@ NodeElement = node_element.NodeElement
 FolderElement = node_element.FolderElement
 
 
+$ = jQuery
+
+
 class JqTreeWidget extends MouseWidget
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)

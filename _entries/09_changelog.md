@@ -7,6 +7,7 @@ name: changelog
 
 * Issue 48: Added right-to-left support (thanks to Mohamed Ouederni, Ashraf Fayad and Udi Oron)
 * Issue 371: Added include_parent parameter to getData function
+* Issue 375: Fix conflict with prototype.js (thanks to Henry de Guzman)
 
 ##### 1.1.0 (april 6 2015)
 

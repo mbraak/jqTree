@@ -1,3 +1,6 @@
+$ = jQuery
+
+
 Position =
     getName: (position) ->
         return Position.strings[position - 1]

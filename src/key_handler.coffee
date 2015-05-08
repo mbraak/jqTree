@@ -1,3 +1,6 @@
+$ = jQuery
+
+
 class KeyHandler
     LEFT = 37
     UP = 38

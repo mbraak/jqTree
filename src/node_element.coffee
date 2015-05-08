@@ -2,6 +2,9 @@ node = require './node'
 Position = node.Position
 
 
+$ = jQuery
+
+
 class NodeElement
     constructor: (node, tree_widget) ->
         @init(node, tree_widget)

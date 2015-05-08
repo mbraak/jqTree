@@ -5,6 +5,9 @@ util = require './util'
 html_escape = util.html_escape
 
 
+$ = jQuery
+
+
 class ElementsRenderer
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
