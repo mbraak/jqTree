@@ -22,19 +22,19 @@
     "gulp": "3.8.11",
     "gulp-coffee": "2.3.1",
     "gulp-coffeeify": "0.1.8",
-    "gulp-coffeelint": "^0.4.0",
-    "gulp-sass": "^1.3.3",
+    "gulp-coffeelint": "^0.5.0",
+    "gulp-sass": "^2.0.1",
     "ie-version": "^0.1.0",
     "jquery-mockjax": "^1.6.2",
-    "karma": "^0.12.31",
-    "karma-browserify": "^4.1.2",
-    "karma-chrome-launcher": "^0.1.8",
+    "karma": "^0.12.33",
+    "karma-browserify": "^4.2.1",
+    "karma-chrome-launcher": "^0.1.12",
     "karma-cli": "0.0.4",
-    "karma-firefox-launcher": "^0.1.4",
+    "karma-firefox-launcher": "^0.1.6",
     "karma-jquery-new": "0.0.4",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-qunit": "^0.1.4",
     "qunitjs": "^1.18.0",
-    "serve-static": "^1.9.2"
+    "serve-static": "^1.9.3"
   }
 }

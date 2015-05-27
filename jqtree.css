@@ -78,7 +78,8 @@ ul.jqtree-tree {
     border-radius: 6px;
     margin: 0;
     box-sizing: content-box; }
-  ul.jqtree-tree li.jqtree-selected > .jqtree-element, ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
+  ul.jqtree-tree li.jqtree-selected > .jqtree-element,
+  ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
     background-color: #97BDD6;
     background: -webkit-gradient(linear, left top, left bottom, from(#BEE0F5), to(#89AFCA));
     background: -moz-linear-gradient(top, #BEE0F5, #89AFCA);
