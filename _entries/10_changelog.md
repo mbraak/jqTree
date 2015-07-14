@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### Development version
+##### 1.2.0 (july 14 2015)
 
 * Issue 48: Added right-to-left support (thanks to Mohamed Ouederni, Ashraf Fayad and Udi Oron)
 * Issue 371: Added include_parent parameter to getData function
