@@ -1,6 +1,6 @@
 var Node, Position, util, _indexOf, indexOf;
 
-require('jquery-mockjax');
+var mockjax = require('jquery-mockjax')(jQuery, window);
 
 
 QUnit.begin(function() {
@@ -1028,7 +1028,7 @@ test('load on demand', function() {
         dataUrl: '/tree/'
     });
 
-    $.mockjax({
+    mockjax({
         url: '*',
         response: function(options) {
             equal(options.url, '/tree/', '2');
