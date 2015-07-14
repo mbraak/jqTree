@@ -5,6 +5,9 @@ This widget does the same a the mouse widget in jqueryui.
 SimpleWidget = require './simple.widget'
 
 
+$ = jQuery
+
+
 class MouseWidget extends SimpleWidget
     @is_mouse_handled = false
 

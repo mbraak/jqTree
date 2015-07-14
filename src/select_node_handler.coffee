@@ -1,3 +1,6 @@
+$ = jQuery
+
+
 class SelectNodeHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget

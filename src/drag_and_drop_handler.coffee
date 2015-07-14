@@ -2,6 +2,9 @@ node_module = require './node'
 Position = node_module.Position
 
 
+$ = jQuery
+
+
 class DragAndDropHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
@@ -54,7 +57,7 @@ class DragAndDropHandler
 
         if can_move_to and area
             if !area.node.isFolder()
-                @stopOpenFolderTimer();
+                @stopOpenFolderTimer()
 
             if @hovered_area != area
                 @hovered_area = area

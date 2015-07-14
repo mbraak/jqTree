@@ -3,6 +3,12 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.2.0 (july 14 2015)
+
+* Issue 48: Added right-to-left support (thanks to Mohamed Ouederni, Ashraf Fayad and Udi Oron)
+* Issue 371: Added include_parent parameter to getData function
+* Issue 375: Fix conflict with prototype.js (thanks to Henry de Guzman)
+
 ##### 1.1.0 (april 6 2015)
 
 * Issue 348: Circle for drag-and-drop is not positioned correctly for content box-sizing

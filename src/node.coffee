@@ -1,3 +1,6 @@
+$ = jQuery
+
+
 Position =
     getName: (position) ->
         return Position.strings[position - 1]
@@ -215,8 +218,8 @@ class Node
     ###
     Get the tree as data.
     ###
-    getData: ->
-        getDataFromNodes = (nodes) =>
+    getData: (include_parent=false) ->
+        getDataFromNodes = (nodes) ->
             data = []
 
             for node in nodes
@@ -236,7 +239,10 @@ class Node
 
             return data
 
-        return getDataFromNodes(@children)
+        if include_parent
+            return getDataFromNodes([this])
+        else
+            return getDataFromNodes(@children)
 
     getNodeByName: (name) ->
         result = null

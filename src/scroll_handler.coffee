@@ -1,3 +1,6 @@
+$ = jQuery
+
+
 class ScrollHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
