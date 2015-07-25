@@ -1,6 +1,6 @@
 [![Travis Status](https://api.travis-ci.org/mbraak/jqTree.svg)](http://travis-ci.org/mbraak/jqTree) [![Coverage Status](https://img.shields.io/coveralls/mbraak/jqTree.svg)](https://coveralls.io/r/mbraak/jqTree)
 
-[![Bower version](https://badge.fury.io/bo/jqtree.svg)](https://github.com/mbraak/jqTree) [![NPM version](https://badge.fury.io/js/jqtree.svg)](https://www.npmjs.com/package/jqtree)
+[![Bower version](https://img.shields.io/bower/v/jqtree.svg)](https://mbraak.github.io/jqTree/) [![NPM version](https://img.shields.io/npm/v/jqtree.svg)](https://www.npmjs.com/package/jqtree)
 
 # jqTree
 
