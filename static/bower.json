@@ -5,6 +5,7 @@
         "bootstrap": "3.3.5",
         "fontawesome": "4.3.0",
         "jquery": "2.1.4",
+        "jquery-legacy": "jquery#1.11.3",
         "jquery-cookie": "v1.4.1",
         "jquery-mockjax": "2.0.1",
         "json3": "3.3.2",
