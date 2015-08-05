@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### dev
+
+* Issue 394: Label displays 'null' in UI when the label key is null (thanks to Carlos Ponce)
+
 ##### 1.2.1 (july 14 2015)
 
 * Issue 48: Added right-to-left support (thanks to Mohamed Ouederni, Ashraf Fayad and Udi Oron)
