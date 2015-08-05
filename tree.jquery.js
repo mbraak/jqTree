@@ -1001,6 +1001,7 @@ Node = (function() {
     if (node_class == null) {
       node_class = Node;
     }
+    this.name = '';
     this.setData(o);
     this.children = [];
     this.parent = null;
@@ -1012,14 +1013,21 @@ Node = (function() {
   }
 
   Node.prototype.setData = function(o) {
-    var key, value;
+    var key, setName, value;
+    setName = (function(_this) {
+      return function(name) {
+        if (name !== null) {
+          return _this.name = name;
+        }
+      };
+    })(this);
     if (typeof o !== 'object') {
-      this.name = o;
+      setName(o);
     } else {
       for (key in o) {
         value = o[key];
         if (key === 'label') {
-          this.name = value;
+          setName(value);
         } else {
           this[key] = value;
         }

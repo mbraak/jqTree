@@ -20,6 +20,8 @@ Position.strings = ['before', 'after', 'inside', 'none']
 
 class Node
     constructor: (o, is_root=false, node_class=Node) ->
+        @name = ''
+
         @setData(o)
 
         @children = []
@@ -31,13 +33,16 @@ class Node
             @node_class = node_class
 
     setData: (o) ->
+        setName = (name) =>
+            if name != null
+                @name = name
+
         if typeof o != 'object'
-            @name = o
+            setName(o)
         else
             for key, value of o
                 if key == 'label'
-                    # todo: node property is 'name', but we use 'label' here
-                    @name = value
+                    setName(value)
                 else
                     @[key] = value
 
