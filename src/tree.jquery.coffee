@@ -519,6 +519,11 @@ class JqTreeWidget extends MouseWidget
             return null
 
     _initTree: (data) ->
+        doInit = =>
+            if not @is_initialized
+                @is_initialized = true
+                @_triggerEvent('tree.init')
+
         @tree = new @options.nodeClass(null, true, @options.nodeClass)
 
         if @select_node_handler
@@ -530,12 +535,11 @@ class JqTreeWidget extends MouseWidget
 
         @_refreshElements()
 
-        if must_load_on_demand
-            @_setInitialStateOnDemand()
-
-        if not @is_initialized
-            @is_initialized = true
-            @_triggerEvent('tree.init')
+        if not must_load_on_demand
+            doInit()
+        else
+            # Load data on demand and then init the tree
+            @_setInitialStateOnDemand(doInit)
 
     # Set initial state, either by restoring the state or auto-opening nodes
     # result: must load nodes on demand?
@@ -583,7 +587,8 @@ class JqTreeWidget extends MouseWidget
         return must_load_on_demand
 
     # Set the initial state for nodes that are loaded on demand
-    _setInitialStateOnDemand: ->
+    # Call cb_finished when done
+    _setInitialStateOnDemand: (cb_finished) ->
         restoreState = =>
             if not (@options.saveState and @save_state_handler)
                 return false
@@ -593,16 +598,23 @@ class JqTreeWidget extends MouseWidget
                 if not state
                     return false
                 else
-                    @save_state_handler.setInitialStateOnDemand(state)
+                    @save_state_handler.setInitialStateOnDemand(state, cb_finished)
 
                     return true
 
         autoOpenNodes = =>
             max_level = @_getAutoOpenMaxLevel()
-            loading_ids = []
+            loading_count = 0
 
             loadAndOpenNode = (node) =>
-                @_openNode(node, false, openNodes)
+                loading_count += 1
+                @_openNode(
+                    node,
+                    false,
+                    =>
+                        loading_count -= 1
+                        openNodes()
+                )
 
             openNodes = =>
                 @tree.iterate (node, level) =>
@@ -615,6 +627,9 @@ class JqTreeWidget extends MouseWidget
                         @_openNode(node, false)
 
                         return (level != max_level)
+
+                if loading_count == 0
+                    cb_finished()
 
             openNodes()
 

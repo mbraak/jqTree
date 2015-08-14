@@ -125,11 +125,15 @@ class SaveStateHandler
 
         return select_count != 0
 
-    setInitialStateOnDemand: (state) ->
+    setInitialStateOnDemand: (state, cb_finished) ->
         if state
-            @_setInitialStateOnDemand(state.open_nodes, state.selected_node)
+            @_setInitialStateOnDemand(state.open_nodes, state.selected_node, cb_finished)
+        else
+            cb_finished()
 
-    _setInitialStateOnDemand: (node_ids, selected_nodes) ->
+    _setInitialStateOnDemand: (node_ids, selected_nodes, cb_finished) ->
+        loading_count = 0
+
         openNodes = =>
             new_nodes_ids = []
 
@@ -150,8 +154,18 @@ class SaveStateHandler
             if @_selectInitialNodes(selected_nodes)
                 @tree_widget._refreshElements()
 
+            if loading_count == 0
+                cb_finished()
+
         loadAndOpenNode = (node) =>
-            @tree_widget._openNode(node, false, openNodes)
+            loading_count += 1
+            @tree_widget._openNode(
+                node,
+                false,
+                =>
+                    loading_count -= 1
+                    openNodes()
+            )
 
         openNodes()
 

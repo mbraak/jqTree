@@ -1873,14 +1873,17 @@ SaveStateHandler = (function() {
     return select_count !== 0;
   };
 
-  SaveStateHandler.prototype.setInitialStateOnDemand = function(state) {
+  SaveStateHandler.prototype.setInitialStateOnDemand = function(state, cb_finished) {
     if (state) {
-      return this._setInitialStateOnDemand(state.open_nodes, state.selected_node);
+      return this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cb_finished);
+    } else {
+      return cb_finished();
     }
   };
 
-  SaveStateHandler.prototype._setInitialStateOnDemand = function(node_ids, selected_nodes) {
-    var loadAndOpenNode, openNodes;
+  SaveStateHandler.prototype._setInitialStateOnDemand = function(node_ids, selected_nodes, cb_finished) {
+    var loadAndOpenNode, loading_count, openNodes;
+    loading_count = 0;
     openNodes = (function(_this) {
       return function() {
         var i, len, new_nodes_ids, node, node_id;
@@ -1902,13 +1905,20 @@ SaveStateHandler = (function() {
         }
         node_ids = new_nodes_ids;
         if (_this._selectInitialNodes(selected_nodes)) {
-          return _this.tree_widget._refreshElements();
+          _this.tree_widget._refreshElements();
+        }
+        if (loading_count === 0) {
+          return cb_finished();
         }
       };
     })(this);
     loadAndOpenNode = (function(_this) {
       return function(node) {
-        return _this.tree_widget._openNode(node, false, openNodes);
+        loading_count += 1;
+        return _this.tree_widget._openNode(node, false, function() {
+          loading_count -= 1;
+          return openNodes();
+        });
       };
     })(this);
     return openNodes();
@@ -2970,7 +2980,15 @@ JqTreeWidget = (function(superClass) {
   };
 
   JqTreeWidget.prototype._initTree = function(data) {
-    var must_load_on_demand;
+    var doInit, must_load_on_demand;
+    doInit = (function(_this) {
+      return function() {
+        if (!_this.is_initialized) {
+          _this.is_initialized = true;
+          return _this._triggerEvent('tree.init');
+        }
+      };
+    })(this);
     this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
     if (this.select_node_handler) {
       this.select_node_handler.clear();
@@ -2978,12 +2996,10 @@ JqTreeWidget = (function(superClass) {
     this.tree.loadFromData(data);
     must_load_on_demand = this._setInitialState();
     this._refreshElements();
-    if (must_load_on_demand) {
-      this._setInitialStateOnDemand();
-    }
-    if (!this.is_initialized) {
-      this.is_initialized = true;
-      return this._triggerEvent('tree.init');
+    if (!must_load_on_demand) {
+      return doInit();
+    } else {
+      return this._setInitialStateOnDemand(doInit);
     }
   };
 
@@ -3034,7 +3050,7 @@ JqTreeWidget = (function(superClass) {
     return must_load_on_demand;
   };
 
-  JqTreeWidget.prototype._setInitialStateOnDemand = function() {
+  JqTreeWidget.prototype._setInitialStateOnDemand = function(cb_finished) {
     var autoOpenNodes, restoreState;
     restoreState = (function(_this) {
       return function() {
@@ -3046,7 +3062,7 @@ JqTreeWidget = (function(superClass) {
           if (!state) {
             return false;
           } else {
-            _this.save_state_handler.setInitialStateOnDemand(state);
+            _this.save_state_handler.setInitialStateOnDemand(state, cb_finished);
             return true;
           }
         }
@@ -3054,14 +3070,18 @@ JqTreeWidget = (function(superClass) {
     })(this);
     autoOpenNodes = (function(_this) {
       return function() {
-        var loadAndOpenNode, loading_ids, max_level, openNodes;
+        var loadAndOpenNode, loading_count, max_level, openNodes;
         max_level = _this._getAutoOpenMaxLevel();
-        loading_ids = [];
+        loading_count = 0;
         loadAndOpenNode = function(node) {
-          return _this._openNode(node, false, openNodes);
+          loading_count += 1;
+          return _this._openNode(node, false, function() {
+            loading_count -= 1;
+            return openNodes();
+          });
         };
         openNodes = function() {
-          return _this.tree.iterate(function(node, level) {
+          _this.tree.iterate(function(node, level) {
             if (node.load_on_demand) {
               if (!node.is_loading) {
                 loadAndOpenNode(node);
@@ -3072,6 +3092,9 @@ JqTreeWidget = (function(superClass) {
               return level !== max_level;
             }
           });
+          if (loading_count === 0) {
+            return cb_finished();
+          }
         };
         return openNodes();
       };
