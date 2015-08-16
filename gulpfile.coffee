@@ -7,12 +7,15 @@ fs         = require 'fs'
 header     = require 'gulp-header'
 sass       = require 'gulp-sass'
 
+pkg = require './package.json'
+
+
 gulp.task 'jqtree', ->
     banner = fs.readFileSync('src/header.txt')
 
     gulp.src './src/tree.jquery.coffee'
         .pipe coffeeify()
-        .pipe header(banner)
+        .pipe header(banner, pkg: pkg)
         .pipe gulp.dest('./')
 
 gulp.task 'lib', ->
