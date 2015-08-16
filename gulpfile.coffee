@@ -3,11 +3,16 @@ coffee     = require 'gulp-coffee'
 coffeeify  = require 'gulp-coffeeify'
 coffeelint = require 'gulp-coffeelint'
 exec       = require('child_process').exec
-sass       = require('gulp-sass')
+fs         = require 'fs'
+header     = require 'gulp-header'
+sass       = require 'gulp-sass'
 
 gulp.task 'jqtree', ->
+    banner = fs.readFileSync('src/header.txt')
+
     gulp.src './src/tree.jquery.coffee'
         .pipe coffeeify()
+        .pipe header(banner)
         .pipe gulp.dest('./')
 
 gulp.task 'lib', ->
