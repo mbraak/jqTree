@@ -611,7 +611,7 @@ class JqTreeWidget extends MouseWidget
                 @_openNode(
                     node,
                     false,
-                    =>
+                    ->
                         loading_count -= 1
                         openNodes()
                 )

@@ -162,7 +162,7 @@ class SaveStateHandler
             @tree_widget._openNode(
                 node,
                 false,
-                =>
+                ->
                     loading_count -= 1
                     openNodes()
             )
