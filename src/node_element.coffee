@@ -34,10 +34,22 @@ class NodeElement
             return new GhostDropHint(@node, @$element, position)
 
     select: ->
-        @getLi().addClass('jqtree-selected')
+        $li = @getLi()
+
+        $li.addClass('jqtree-selected')
+        $li.attr('aria-selected', 'true')
+
+        $span = @getSpan()
+        $span.attr('tabindex', 0)
 
     deselect: ->
-        @getLi().removeClass('jqtree-selected')
+        $li = @getLi()
+
+        $li.removeClass('jqtree-selected')
+        $li.attr('aria-selected', 'false')
+
+        $span = @getSpan()
+        $span.attr('tabindex', -1)
 
 
 class FolderElement extends NodeElement
@@ -50,7 +62,10 @@ class FolderElement extends NodeElement
             $button.append(@tree_widget.renderer.opened_icon_element.cloneNode(false))
 
             doOpen = =>
-                @getLi().removeClass('jqtree-closed')
+                $li = @getLi()
+                $li.removeClass('jqtree-closed')
+                $li.attr('aria-expanded', 'true')
+
                 if on_finished
                     on_finished()
 
@@ -71,7 +86,9 @@ class FolderElement extends NodeElement
             $button.append(@tree_widget.renderer.closed_icon_element.cloneNode(false))
 
             doClose = =>
-                @getLi().addClass('jqtree-closed')
+                $li = @getLi()
+                $li.addClass('jqtree-closed')
+                $li.attr('aria-expanded', 'false')
 
                 @tree_widget._triggerEvent('tree.close', node: @node)
 

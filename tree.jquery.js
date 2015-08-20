@@ -526,7 +526,7 @@ ElementsRenderer = (function() {
     var $element;
     $element = this.tree_widget.element;
     $element.empty();
-    return this.createDomElements($element[0], this.tree_widget.tree.children, true, true);
+    return this.createDomElements($element[0], this.tree_widget.tree.children, true, true, 1);
   };
 
   ElementsRenderer.prototype.renderFromNode = function(node) {
@@ -537,21 +537,21 @@ ElementsRenderer = (function() {
     $previous_li.after(li);
     $previous_li.remove();
     if (node.children) {
-      return this.createDomElements(li, node.children, false, false);
+      return this.createDomElements(li, node.children, false, false, node.getLevel());
     }
   };
 
-  ElementsRenderer.prototype.createDomElements = function(element, children, is_root_node, is_open) {
+  ElementsRenderer.prototype.createDomElements = function(element, children, is_root_node, is_open, level) {
     var child, i, len, li, ul;
     ul = this.createUl(is_root_node);
     element.appendChild(ul);
     for (i = 0, len = children.length; i < len; i++) {
       child = children[i];
-      li = this.createLi(child);
+      li = this.createLi(child, level);
       ul.appendChild(li);
       this.attachNodeData(child, li);
       if (child.hasChildren()) {
-        this.createDomElements(li, child.children, false, child.is_open);
+        this.createDomElements(li, child.children, false, child.is_open, level + 1);
       }
     }
     return null;
@@ -563,26 +563,30 @@ ElementsRenderer = (function() {
   };
 
   ElementsRenderer.prototype.createUl = function(is_root_node) {
-    var class_string, ul;
+    var class_string, role, ul;
     if (!is_root_node) {
       class_string = '';
+      role = 'group';
     } else {
       class_string = 'jqtree-tree';
+      role = 'tree';
       if (this.tree_widget.options.rtl) {
         class_string += ' jqtree-rtl';
       }
     }
     ul = document.createElement('ul');
     ul.className = "jqtree_common " + class_string;
+    ul.setAttribute('role', role);
     return ul;
   };
 
-  ElementsRenderer.prototype.createLi = function(node) {
-    var li;
+  ElementsRenderer.prototype.createLi = function(node, level) {
+    var is_selected, li;
+    is_selected = this.tree_widget.select_node_handler && this.tree_widget.select_node_handler.isNodeSelected(node);
     if (node.isFolder()) {
-      li = this.createFolderLi(node);
+      li = this.createFolderLi(node, level, is_selected);
     } else {
-      li = this.createNodeLi(node);
+      li = this.createNodeLi(node, level, is_selected);
     }
     if (this.tree_widget.options.onCreateLi) {
       this.tree_widget.options.onCreateLi(node, $(li));
@@ -590,11 +594,10 @@ ElementsRenderer = (function() {
     return li;
   };
 
-  ElementsRenderer.prototype.createFolderLi = function(node) {
-    var button_classes, button_link, div, escaped_name, folder_classes, icon_element, li, title_span;
+  ElementsRenderer.prototype.createFolderLi = function(node, level, is_selected) {
+    var button_classes, button_link, div, folder_classes, icon_element, is_folder, li;
     button_classes = this.getButtonClasses(node);
-    folder_classes = this.getFolderClasses(node);
-    escaped_name = this.escapeIfNecessary(node.name);
+    folder_classes = this.getFolderClasses(node, is_selected);
     if (node.is_open) {
       icon_element = this.opened_icon_element;
     } else {
@@ -602,38 +605,56 @@ ElementsRenderer = (function() {
     }
     li = document.createElement('li');
     li.className = "jqtree_common " + folder_classes;
+    li.setAttribute('role', 'presentation');
     div = document.createElement('div');
     div.className = "jqtree-element jqtree_common";
+    div.setAttribute('role', 'presentation');
     li.appendChild(div);
     button_link = document.createElement('a');
     button_link.className = "jqtree_common " + button_classes;
     button_link.appendChild(icon_element.cloneNode(false));
+    button_link.setAttribute('role', 'presentation');
+    button_link.setAttribute('aria-hidden', 'true');
     div.appendChild(button_link);
-    title_span = document.createElement('span');
-    title_span.className = "jqtree_common jqtree-title jqtree-title-folder";
-    div.appendChild(title_span);
-    title_span.innerHTML = escaped_name;
+    div.appendChild(this.createTitleSpan(node.name, level, is_selected, node.is_open, is_folder = true));
     return li;
   };
 
-  ElementsRenderer.prototype.createNodeLi = function(node) {
-    var class_string, div, escaped_name, li, li_classes, title_span;
+  ElementsRenderer.prototype.createNodeLi = function(node, level, is_selected) {
+    var class_string, div, is_folder, li, li_classes;
     li_classes = ['jqtree_common'];
-    if (this.tree_widget.select_node_handler && this.tree_widget.select_node_handler.isNodeSelected(node)) {
+    if (is_selected) {
       li_classes.push('jqtree-selected');
     }
     class_string = li_classes.join(' ');
-    escaped_name = this.escapeIfNecessary(node.name);
     li = document.createElement('li');
     li.className = class_string;
+    li.setAttribute('role', 'presentation');
     div = document.createElement('div');
     div.className = "jqtree-element jqtree_common";
+    div.setAttribute('role', 'presentation');
     li.appendChild(div);
-    title_span = document.createElement('span');
-    title_span.className = "jqtree-title jqtree_common";
-    title_span.innerHTML = escaped_name;
-    div.appendChild(title_span);
+    div.appendChild(this.createTitleSpan(node.name, level, is_selected, node.is_open, is_folder = false));
     return li;
+  };
+
+  ElementsRenderer.prototype.createTitleSpan = function(node_name, level, is_selected, is_open, is_folder) {
+    var classes, title_span;
+    title_span = document.createElement('span');
+    classes = "jqtree-title jqtree_common";
+    if (is_folder) {
+      classes += " jqtree-title-folder";
+    }
+    title_span.className = classes;
+    title_span.setAttribute('role', 'treeitem');
+    title_span.setAttribute('aria-level', level);
+    title_span.setAttribute('aria-selected', util.getBoolString(is_selected));
+    title_span.setAttribute('aria-expanded', util.getBoolString(is_open));
+    if (is_selected) {
+      title_span.setAttribute('tabindex', 0);
+    }
+    title_span.innerHTML = this.escapeIfNecessary(node_name);
+    return title_span;
   };
 
   ElementsRenderer.prototype.getButtonClasses = function(node) {
@@ -645,13 +666,13 @@ ElementsRenderer = (function() {
     return classes.join(' ');
   };
 
-  ElementsRenderer.prototype.getFolderClasses = function(node) {
+  ElementsRenderer.prototype.getFolderClasses = function(node, is_selected) {
     var classes;
     classes = ['jqtree-folder'];
     if (!node.is_open) {
       classes.push('jqtree-closed');
     }
-    if (this.tree_widget.select_node_handler && this.tree_widget.select_node_handler.isNodeSelected(node)) {
+    if (is_selected) {
       classes.push('jqtree-selected');
     }
     if (node.is_loading) {
@@ -737,22 +758,30 @@ KeyHandler = (function() {
   KeyHandler.prototype.moveRight = function() {
     var node;
     node = this.tree_widget.getSelectedNode();
-    if (node && node.isFolder() && !node.is_open) {
-      this.tree_widget.openNode(node);
-      return false;
-    } else {
+    if (!node) {
       return true;
+    } else if (!node.isFolder()) {
+      return true;
+    } else {
+      if (node.is_open) {
+        return this.selectNode(node.getNextNode());
+      } else {
+        this.tree_widget.openNode(node);
+        return false;
+      }
     }
   };
 
   KeyHandler.prototype.moveLeft = function() {
     var node;
     node = this.tree_widget.getSelectedNode();
-    if (node && node.isFolder() && node.is_open) {
+    if (!node) {
+      return true;
+    } else if (node.isFolder() && node.is_open) {
       this.tree_widget.closeNode(node);
       return false;
     } else {
-      return true;
+      return this.selectNode(node.getParent());
     }
   };
 
@@ -1509,12 +1538,18 @@ Node = (function() {
           return previous_sibling.getLastChild();
         }
       } else {
-        if (this.parent.parent) {
-          return this.parent;
-        } else {
-          return null;
-        }
+        return this.getParent();
       }
+    }
+  };
+
+  Node.prototype.getParent = function() {
+    if (!this.parent) {
+      return null;
+    } else if (!this.parent.parent) {
+      return null;
+    } else {
+      return this.parent;
     }
   };
 
@@ -1587,11 +1622,21 @@ NodeElement = (function() {
   };
 
   NodeElement.prototype.select = function() {
-    return this.getLi().addClass('jqtree-selected');
+    var $li, $span;
+    $li = this.getLi();
+    $li.addClass('jqtree-selected');
+    $li.attr('aria-selected', 'true');
+    $span = this.getSpan();
+    return $span.attr('tabindex', 0);
   };
 
   NodeElement.prototype.deselect = function() {
-    return this.getLi().removeClass('jqtree-selected');
+    var $li, $span;
+    $li = this.getLi();
+    $li.removeClass('jqtree-selected');
+    $li.attr('aria-selected', 'false');
+    $span = this.getSpan();
+    return $span.attr('tabindex', -1);
   };
 
   return NodeElement;
@@ -1618,7 +1663,10 @@ FolderElement = (function(superClass) {
       $button.append(this.tree_widget.renderer.opened_icon_element.cloneNode(false));
       doOpen = (function(_this) {
         return function() {
-          _this.getLi().removeClass('jqtree-closed');
+          var $li;
+          $li = _this.getLi();
+          $li.removeClass('jqtree-closed');
+          $li.attr('aria-expanded', 'true');
           if (on_finished) {
             on_finished();
           }
@@ -1649,7 +1697,10 @@ FolderElement = (function(superClass) {
       $button.append(this.tree_widget.renderer.closed_icon_element.cloneNode(false));
       doClose = (function(_this) {
         return function() {
-          _this.getLi().addClass('jqtree-closed');
+          var $li;
+          $li = _this.getLi();
+          $li.addClass('jqtree-closed');
+          $li.attr('aria-expanded', 'false');
           return _this.tree_widget._triggerEvent('tree.close', {
             node: _this.node
           });
@@ -3345,7 +3396,7 @@ JqTreeWidget.getModule = function(name) {
 SimpleWidget.register(JqTreeWidget, 'tree');
 
 },{"./drag_and_drop_handler":1,"./elements_renderer":2,"./key_handler":3,"./mouse.widget":4,"./node":5,"./node_element":6,"./save_state_handler":7,"./scroll_handler":8,"./select_node_handler":9,"./simple.widget":10,"./util":12,"./version":13}],12:[function(require,module,exports){
-var _indexOf, html_escape, indexOf, isInt;
+var _indexOf, getBoolString, html_escape, indexOf, isInt;
 
 _indexOf = function(array, item) {
   var i, j, len, value;
@@ -3374,8 +3425,17 @@ html_escape = function(string) {
   return ('' + string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g, '&#x2F;');
 };
 
+getBoolString = function(value) {
+  if (value) {
+    return 'true';
+  } else {
+    return 'false';
+  }
+};
+
 module.exports = {
   _indexOf: _indexOf,
+  getBoolString: getBoolString,
   html_escape: html_escape,
   indexOf: indexOf,
   isInt: isInt

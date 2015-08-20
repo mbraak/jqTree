@@ -422,11 +422,17 @@ class Node
                     # Last child of previous sibling
                     return previous_sibling.getLastChild()
             else
-                # Parent
-                if @parent.parent
-                    return @parent
-                else
-                    return null
+                return @getParent()
+
+    getParent: ->
+        # Return parent except if it is the root node
+        if not @parent
+            return null
+        else if not @parent.parent
+            # Root node -> null
+            return null
+        else
+            return @parent
 
     getLastChild: ->
         if not @hasChildren()
