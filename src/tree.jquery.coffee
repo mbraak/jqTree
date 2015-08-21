@@ -59,11 +59,14 @@ class JqTreeWidget extends MouseWidget
         else
             @openNode(node, slide)
 
+        return @element
+
     getTree: ->
         return @tree
 
     selectNode: (node) ->
         @_selectNode(node, false)
+        return @element
 
     _selectNode: (node, must_toggle=false) ->
         if not @select_node_handler
@@ -124,6 +127,7 @@ class JqTreeWidget extends MouseWidget
 
     loadData: (data, parent_node) ->
         @_loadData(data, parent_node)
+        return @element
 
     loadDataFromUrl: (url, parent_node, on_finished) ->
         if $.type(url) != 'string'
@@ -133,9 +137,11 @@ class JqTreeWidget extends MouseWidget
             url = null
 
         @_loadDataFromUrl(url, parent_node, on_finished)
+        return @element
 
     reload: ->
         @loadDataFromUrl()
+        return @element
 
     _loadDataFromUrl: (url_info, parent_node, on_finished) ->
         $el = null
@@ -252,6 +258,7 @@ class JqTreeWidget extends MouseWidget
             slide = @options.slide
 
         @_openNode(node, slide)
+        return @element
 
     _openNode: (node, slide=true, on_finished) ->
         doOpenNode = (_node, _slide, _on_finished) =>
@@ -292,6 +299,8 @@ class JqTreeWidget extends MouseWidget
 
             @_saveState()
 
+        return @element
+
     isDragging: ->
         if @dnd_handler
             return @dnd_handler.is_dragging
@@ -300,6 +309,7 @@ class JqTreeWidget extends MouseWidget
 
     refreshHitAreas: ->
         @dnd_handler.refresh()
+        return @element
 
     addNodeAfter: (new_node_info, existing_node) ->
         new_node = existing_node.addAfter(new_node_info)
@@ -323,6 +333,8 @@ class JqTreeWidget extends MouseWidget
 
             node.remove()
             @_refreshElements(parent)
+
+        return @element
 
     appendNode: (new_node_info, parent_node) ->
         parent_node = parent_node or @tree
@@ -357,11 +369,14 @@ class JqTreeWidget extends MouseWidget
         @renderer.renderFromNode(node)
         @_selectCurrentNode()
 
+        return @element
+
     moveNode: (node, target_node, position) ->
         position_index = Position.nameToIndex(position)
 
         @tree.moveNode(node, target_node, position_index)
         @_refreshElements()
+        return @element
 
     getStateFromStorage: ->
         return @save_state_handler.getStateFromStorage()
@@ -372,6 +387,8 @@ class JqTreeWidget extends MouseWidget
 
             @_getNodeElementForNode(node).select()
             @_saveState()
+
+        return @element
 
     getSelectedNodes: ->
         return @select_node_handler.getSelectedNodes()
@@ -384,12 +401,14 @@ class JqTreeWidget extends MouseWidget
 
         @_getNodeElementForNode(node).deselect()
         @_saveState()
+        return @element
 
     scrollToNode: (node) ->
         $element = $(node.element)
         top = $element.offset().top - @$el.offset().top
 
         @scroll_handler.scrollTo(top)
+        return @element
 
     getState: ->
         return @save_state_handler.getState()
@@ -397,17 +416,23 @@ class JqTreeWidget extends MouseWidget
     setState: (state) ->
         @save_state_handler.setInitialState(state)
         @_refreshElements()
+        return @element
 
     setOption: (option, value) ->
         @options[option] = value
+        return @element
 
     moveDown: ->
         if @key_handler
             @key_handler.moveDown()
 
+        return @element
+
     moveUp: ->
         if @key_handler
             @key_handler.moveUp()
+
+        return @element
 
     getVersion: ->
         return __version__
