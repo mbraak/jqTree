@@ -64,7 +64,9 @@ class FolderElement extends NodeElement
             doOpen = =>
                 $li = @getLi()
                 $li.removeClass('jqtree-closed')
-                $li.attr('aria-expanded', 'true')
+
+                $span = @getSpan()
+                $span.attr('aria-expanded', 'true')
 
                 if on_finished
                     on_finished()
@@ -88,7 +90,9 @@ class FolderElement extends NodeElement
             doClose = =>
                 $li = @getLi()
                 $li.addClass('jqtree-closed')
-                $li.attr('aria-expanded', 'false')
+
+                $span = @getSpan()
+                $span.attr('aria-expanded', 'false')
 
                 @tree_widget._triggerEvent('tree.close', node: @node)
 

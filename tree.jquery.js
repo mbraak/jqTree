@@ -1663,10 +1663,11 @@ FolderElement = (function(superClass) {
       $button.append(this.tree_widget.renderer.opened_icon_element.cloneNode(false));
       doOpen = (function(_this) {
         return function() {
-          var $li;
+          var $li, $span;
           $li = _this.getLi();
           $li.removeClass('jqtree-closed');
-          $li.attr('aria-expanded', 'true');
+          $span = _this.getSpan();
+          $span.attr('aria-expanded', 'true');
           if (on_finished) {
             on_finished();
           }
@@ -1697,10 +1698,11 @@ FolderElement = (function(superClass) {
       $button.append(this.tree_widget.renderer.closed_icon_element.cloneNode(false));
       doClose = (function(_this) {
         return function() {
-          var $li;
+          var $li, $span;
           $li = _this.getLi();
           $li.addClass('jqtree-closed');
-          $li.attr('aria-expanded', 'false');
+          $span = _this.getSpan();
+          $span.attr('aria-expanded', 'false');
           return _this.tree_widget._triggerEvent('tree.close', {
             node: _this.node
           });
