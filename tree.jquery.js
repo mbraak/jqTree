@@ -2005,7 +2005,7 @@ SaveStateHandler = (function() {
   SaveStateHandler.prototype.supportsLocalStorage = function() {
     var testSupport;
     testSupport = function() {
-      var error, key;
+      var error, error1, key;
       if (typeof localStorage === "undefined" || localStorage === null) {
         return false;
       } else {
@@ -2013,8 +2013,8 @@ SaveStateHandler = (function() {
           key = '_storage_test';
           sessionStorage.setItem(key, true);
           sessionStorage.removeItem(key);
-        } catch (_error) {
-          error = _error;
+        } catch (error1) {
+          error = error1;
           return false;
         }
         return true;
@@ -2582,18 +2582,33 @@ JqTreeWidget = (function(superClass) {
     return this.element;
   };
 
-  JqTreeWidget.prototype.loadDataFromUrl = function(url, parent_node, on_finished) {
-    if ($.type(url) !== 'string') {
-      on_finished = parent_node;
-      parent_node = url;
-      url = null;
+
+  /*
+  signatures:
+  - loadDataFromUrl(url, parent_node=null, on_finished=null)
+      loadDataFromUrl('/my_data');
+      loadDataFromUrl('/my_data', node1);
+      loadDataFromUrl('/my_data', node1, function() { console.log('finished'); });
+      loadDataFromUrl('/my_data', null, function() { console.log('finished'); });
+  
+  - loadDataFromUrl(parent_node=null, on_finished=null)
+      loadDataFromUrl();
+      loadDataFromUrl(node1);
+      loadDataFromUrl(null, function() { console.log('finished'); });
+      loadDataFromUrl(node1, function() { console.log('finished'); });
+   */
+
+  JqTreeWidget.prototype.loadDataFromUrl = function(param1, param2, param3) {
+    if ($.type(param1) === 'string') {
+      this._loadDataFromUrl(param1, param2, param3);
+    } else {
+      this._loadDataFromUrl(null, param1, param2);
     }
-    this._loadDataFromUrl(url, parent_node, on_finished);
     return this.element;
   };
 
-  JqTreeWidget.prototype.reload = function() {
-    this.loadDataFromUrl();
+  JqTreeWidget.prototype.reload = function(on_finished) {
+    this._loadDataFromUrl(null, null, on_finished);
     return this.element;
   };
 
@@ -2673,7 +2688,7 @@ JqTreeWidget = (function(superClass) {
     } else if ($.isArray(url_info)) {
       handeLoadData(url_info);
     } else {
-      return loadDataFromUrlInfo();
+      loadDataFromUrlInfo();
     }
   };
 

@@ -129,18 +129,32 @@ class JqTreeWidget extends MouseWidget
         @_loadData(data, parent_node)
         return @element
 
-    loadDataFromUrl: (url, parent_node, on_finished) ->
-        if $.type(url) != 'string'
-            # Url parameter is omitted
-            on_finished = parent_node
-            parent_node = url
-            url = null
+    ###
+    signatures:
+    - loadDataFromUrl(url, parent_node=null, on_finished=null)
+        loadDataFromUrl('/my_data');
+        loadDataFromUrl('/my_data', node1);
+        loadDataFromUrl('/my_data', node1, function() { console.log('finished'); });
+        loadDataFromUrl('/my_data', null, function() { console.log('finished'); });
 
-        @_loadDataFromUrl(url, parent_node, on_finished)
+    - loadDataFromUrl(parent_node=null, on_finished=null)
+        loadDataFromUrl();
+        loadDataFromUrl(node1);
+        loadDataFromUrl(null, function() { console.log('finished'); });
+        loadDataFromUrl(node1, function() { console.log('finished'); });
+    ###
+    loadDataFromUrl: (param1, param2, param3) ->
+        if $.type(param1) == 'string'
+            # first parameter is url
+            @_loadDataFromUrl(param1, param2, param3)
+        else
+            # first parameter is not url
+            @_loadDataFromUrl(null, param1, param2)
+
         return @element
 
-    reload: ->
-        @loadDataFromUrl()
+    reload: (on_finished) ->
+        @_loadDataFromUrl(null, null, on_finished)
         return @element
 
     _loadDataFromUrl: (url_info, parent_node, on_finished) ->
@@ -212,6 +226,7 @@ class JqTreeWidget extends MouseWidget
             return
         else
             loadDataFromUrlInfo()
+            return
 
     _loadData: (data, parent_node=null) ->
         deselectNodes = =>
