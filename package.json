@@ -15,7 +15,7 @@
     "jquery": ">1.5"
   },
   "devDependencies": {
-    "coffee-script": "1.9.3",
+    "coffee-script": "1.10.0",
     "coffeeify": "^1.1.0",
     "connect": "^3.4.0",
     "coveralls": "^2.11.4",
@@ -23,7 +23,7 @@
     "gulp-coffee": "2.3.1",
     "gulp-coffeeify": "0.1.8",
     "gulp-coffeelint": "^0.5.0",
-    "gulp-header": "^1.5.0",
+    "gulp-header": "^1.7.1",
     "gulp-sass": "^2.0.4",
     "ie-version": "^0.1.0",
     "jquery-mockjax": "^2.0.1",
@@ -34,7 +34,7 @@
     "karma-firefox-launcher": "^0.1.6",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-qunit": "^0.1.5",
-    "qunitjs": "^1.18.0",
+    "qunitjs": "^1.19.0",
     "serve-static": "^1.10.0"
   }
 }

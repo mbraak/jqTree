@@ -10,6 +10,6 @@
         "jquery-mockjax": "2.0.1",
         "json3": "3.3.2",
         "pygments": "2.0.2",
-        "qunit": "1.18.0"
+        "qunit": "1.19.0"
     }
 }
