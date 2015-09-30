@@ -11,6 +11,7 @@ name: changelog
 * Issue 397: Aria accessibility support (thanks to Rich Caloggero)
 * Issue 398: Functions should return the `jquery` element
 * Issue 400: Added on_finished parameter to reload function
+* Issue 402: Fix autoscroll when tree element is created outside the dom (thanks to hbaptiste)
 
 ##### 1.2.1 (july 14 2015)
 

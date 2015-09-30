@@ -2051,6 +2051,7 @@ ScrollHandler = (function() {
   function ScrollHandler(tree_widget) {
     this.tree_widget = tree_widget;
     this.previous_top = -1;
+    this.is_initialized = false;
     this._initScrollParent();
   }
 
@@ -2095,14 +2096,22 @@ ScrollHandler = (function() {
     $scroll_parent = getParentWithOverflow();
     if ($scroll_parent && $scroll_parent.length && $scroll_parent[0].tagName !== 'HTML') {
       this.$scroll_parent = $scroll_parent;
-      return this.scroll_parent_top = this.$scroll_parent.offset().top;
+      this.scroll_parent_top = this.$scroll_parent.offset().top;
     } else {
-      return setDocumentAsScrollParent();
+      setDocumentAsScrollParent();
+    }
+    return this.is_initialized = true;
+  };
+
+  ScrollHandler.prototype._ensureInit = function() {
+    if (!this.is_initialized) {
+      return this._initScrollParent();
     }
   };
 
   ScrollHandler.prototype.checkScrolling = function() {
     var hovered_area;
+    this._ensureInit();
     hovered_area = this.tree_widget.dnd_handler.hovered_area;
     if (hovered_area && hovered_area.top !== this.previous_top) {
       this.previous_top = hovered_area.top;
@@ -2140,6 +2149,7 @@ ScrollHandler = (function() {
 
   ScrollHandler.prototype.scrollTo = function(top) {
     var tree_top;
+    this._ensureInit();
     if (this.$scroll_parent) {
       return this.$scroll_parent[0].scrollTop = top;
     } else {
@@ -2150,6 +2160,7 @@ ScrollHandler = (function() {
 
   ScrollHandler.prototype.isScrolledIntoView = function(element) {
     var $element, element_bottom, element_top, view_bottom, view_top;
+    this._ensureInit();
     $element = $(element);
     if (this.$scroll_parent) {
       view_top = 0;
