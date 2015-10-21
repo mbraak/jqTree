@@ -492,7 +492,10 @@ DragElement = (function() {
 
 })();
 
-module.exports = DragAndDropHandler;
+module.exports = {
+  DragAndDropHandler: DragAndDropHandler,
+  HitAreasGenerator: HitAreasGenerator
+};
 
 },{"./node":5}],2:[function(require,module,exports){
 var $, ElementsRenderer, NodeElement, html_escape, node_element, util;
@@ -1799,7 +1802,8 @@ GhostDropHint = (function() {
 
 module.exports = {
   FolderElement: FolderElement,
-  NodeElement: NodeElement
+  NodeElement: NodeElement,
+  BorderDropHint: BorderDropHint
 };
 
 },{"./node":5}],7:[function(require,module,exports){
@@ -2417,13 +2421,13 @@ SimpleWidget = (function() {
 module.exports = SimpleWidget;
 
 },{}],11:[function(require,module,exports){
-var $, DragAndDropHandler, ElementsRenderer, FolderElement, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, __version__, node_element, node_module, util_module,
+var $, BorderDropHint, DragAndDropHandler, ElementsRenderer, FolderElement, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, __version__, node_module, ref, ref1, util_module,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
 __version__ = require('./version');
 
-DragAndDropHandler = require('./drag_and_drop_handler');
+ref = require('./drag_and_drop_handler'), DragAndDropHandler = ref.DragAndDropHandler, HitAreasGenerator = ref.HitAreasGenerator;
 
 ElementsRenderer = require('./elements_renderer');
 
@@ -2447,11 +2451,7 @@ Position = node_module.Position;
 
 util_module = require('./util');
 
-node_element = require('./node_element');
-
-NodeElement = node_element.NodeElement;
-
-FolderElement = node_element.FolderElement;
+ref1 = require('./node_element'), NodeElement = ref1.NodeElement, FolderElement = ref1.FolderElement, BorderDropHint = ref1.BorderDropHint;
 
 $ = jQuery;
 
@@ -2461,6 +2461,10 @@ JqTreeWidget = (function(superClass) {
   function JqTreeWidget() {
     return JqTreeWidget.__super__.constructor.apply(this, arguments);
   }
+
+  JqTreeWidget.prototype.BorderDropHint = BorderDropHint;
+
+  JqTreeWidget.prototype.HitAreasGenerator = HitAreasGenerator;
 
   JqTreeWidget.prototype.defaults = {
     autoOpen: false,
@@ -3102,7 +3106,7 @@ JqTreeWidget = (function(superClass) {
   };
 
   JqTreeWidget.prototype._setInitialState = function() {
-    var autoOpenNodes, is_restored, must_load_on_demand, ref, restoreState;
+    var autoOpenNodes, is_restored, must_load_on_demand, ref2, restoreState;
     restoreState = (function(_this) {
       return function() {
         var must_load_on_demand, state;
@@ -3141,7 +3145,7 @@ JqTreeWidget = (function(superClass) {
         return must_load_on_demand;
       };
     })(this);
-    ref = restoreState(), is_restored = ref[0], must_load_on_demand = ref[1];
+    ref2 = restoreState(), is_restored = ref2[0], must_load_on_demand = ref2[1];
     if (!is_restored) {
       must_load_on_demand = autoOpenNodes();
     }
@@ -3386,7 +3390,7 @@ JqTreeWidget = (function(superClass) {
   };
 
   JqTreeWidget.prototype._selectCurrentNode = function() {
-    var node;
+    var node, node_element;
     node = this.getSelectedNode();
     if (node) {
       node_element = this._getNodeElementForNode(node);

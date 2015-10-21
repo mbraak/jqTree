@@ -477,4 +477,6 @@ class DragElement
         @$element.remove()
 
 
-module.exports = DragAndDropHandler
+module.exports =
+    DragAndDropHandler: DragAndDropHandler
+    HitAreasGenerator: HitAreasGenerator

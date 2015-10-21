@@ -166,3 +166,4 @@ class GhostDropHint
 module.exports =
     FolderElement: FolderElement
     NodeElement: NodeElement
+    BorderDropHint: BorderDropHint
