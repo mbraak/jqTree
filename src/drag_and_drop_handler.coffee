@@ -479,4 +479,5 @@ class DragElement
 
 module.exports =
     DragAndDropHandler: DragAndDropHandler
+    DragElement: DragElement
     HitAreasGenerator: HitAreasGenerator

@@ -1,5 +1,5 @@
 __version__ = require './version'
-{DragAndDropHandler, HitAreasGenerator} = require './drag_and_drop_handler'
+{DragAndDropHandler, DragElement, HitAreasGenerator} = require './drag_and_drop_handler'
 ElementsRenderer = require './elements_renderer'
 KeyHandler = require './key_handler'
 MouseWidget = require './mouse.widget'
@@ -14,7 +14,7 @@ Position = node_module.Position
 
 util_module = require './util'
 
-{NodeElement,FolderElement,BorderDropHint} = require './node_element'
+{BorderDropHint,FolderElement,GhostDropHint,NodeElement} = require './node_element'
 
 
 $ = jQuery
@@ -22,7 +22,15 @@ $ = jQuery
 
 class JqTreeWidget extends MouseWidget
     BorderDropHint: BorderDropHint
+    DragElement: DragElement
+    DragAndDropHandler: DragAndDropHandler
+    ElementsRenderer: ElementsRenderer
+    GhostDropHint: GhostDropHint
     HitAreasGenerator: HitAreasGenerator
+    Node: Node
+    SaveStateHandler: SaveStateHandler
+    ScrollHandler: ScrollHandler
+    SelectNodeHandler: SelectNodeHandler
 
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
