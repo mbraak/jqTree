@@ -40,3 +40,19 @@ pre {
   /* ie7 fix */
   -ms-user-select: none;
   user-select: none; }
+
+.block-style ul.jqtree-tree {
+  margin-left: 0; }
+  .block-style ul.jqtree-tree ul.jqtree_common {
+    margin-left: 2em; }
+  .block-style ul.jqtree-tree .jqtree-element {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    background-color: #ddd;
+    padding: 8px; }
+    .block-style ul.jqtree-tree .jqtree-element .jqtree-title {
+      margin-left: 0; }
+  .block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element,
+  .block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
+    background: #97BDD6;
+    text-shadow: none; }

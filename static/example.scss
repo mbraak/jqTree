@@ -51,3 +51,32 @@ pre {
     -ms-user-select: none;
     user-select: none;
 }
+
+.block-style {
+    ul.jqtree-tree {
+        margin-left: 0;
+
+        ul.jqtree_common {
+            margin-left: 2em;
+        }
+
+        .jqtree-element {
+            margin-top: 4px;
+            margin-bottom: 4px;
+            background-color: #ddd;
+            padding: 8px;
+
+            .jqtree-title {
+                margin-left: 0;
+            }
+        }
+
+        li.jqtree-selected {
+            > .jqtree-element,
+            > .jqtree-element:hover {
+                background: #97BDD6;
+                text-shadow: none;
+            }
+        }
+    }
+}
