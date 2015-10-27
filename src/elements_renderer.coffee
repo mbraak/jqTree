@@ -118,7 +118,7 @@ class ElementsRenderer
 
         # button link
         button_link = document.createElement('a')
-        button_link.className = "jqtree_common #{ button_classes }"
+        button_link.className = button_classes
 
         button_link.appendChild(
             icon_element.cloneNode(false)
@@ -127,12 +127,16 @@ class ElementsRenderer
         button_link.setAttribute('role', 'presentation')
         button_link.setAttribute('aria-hidden', 'true')
 
-        div.appendChild(button_link)
+        if @tree_widget.options.buttonLeft
+            div.appendChild(button_link)
 
         # title span
         div.appendChild(
             @createTitleSpan(node.name, level, is_selected, node.is_open, is_folder=true)
         )
+
+        if not @tree_widget.options.buttonLeft
+            div.appendChild(button_link)
 
         return li
 
@@ -187,10 +191,15 @@ class ElementsRenderer
         return title_span
 
     getButtonClasses: (node) ->
-        classes = ['jqtree-toggler']
+        classes = ['jqtree-toggler', 'jqtree_common']
 
         if not node.is_open
             classes.push('jqtree-closed')
+
+        if @tree_widget.options.buttonLeft
+            classes.push('jqtree-toggler-left')
+        else
+            classes.push('jqtree-toggler-right')
 
         return classes.join(' ')
 

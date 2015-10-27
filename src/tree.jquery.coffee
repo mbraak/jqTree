@@ -58,6 +58,7 @@ class JqTreeWidget extends MouseWidget
         rtl: null  # right-to-left support; true / false (default)
         onDragMove: null
         onDragStop: null
+        buttonLeft: true
 
     toggle: (node, slide=null) ->
         if slide == null

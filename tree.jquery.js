@@ -615,12 +615,17 @@ ElementsRenderer = (function() {
     div.setAttribute('role', 'presentation');
     li.appendChild(div);
     button_link = document.createElement('a');
-    button_link.className = "jqtree_common " + button_classes;
+    button_link.className = button_classes;
     button_link.appendChild(icon_element.cloneNode(false));
     button_link.setAttribute('role', 'presentation');
     button_link.setAttribute('aria-hidden', 'true');
-    div.appendChild(button_link);
+    if (this.tree_widget.options.buttonLeft) {
+      div.appendChild(button_link);
+    }
     div.appendChild(this.createTitleSpan(node.name, level, is_selected, node.is_open, is_folder = true));
+    if (!this.tree_widget.options.buttonLeft) {
+      div.appendChild(button_link);
+    }
     return li;
   };
 
@@ -663,9 +668,14 @@ ElementsRenderer = (function() {
 
   ElementsRenderer.prototype.getButtonClasses = function(node) {
     var classes;
-    classes = ['jqtree-toggler'];
+    classes = ['jqtree-toggler', 'jqtree_common'];
     if (!node.is_open) {
       classes.push('jqtree-closed');
+    }
+    if (this.tree_widget.options.buttonLeft) {
+      classes.push('jqtree-toggler-left');
+    } else {
+      classes.push('jqtree-toggler-right');
     }
     return classes.join(' ');
   };
@@ -2509,7 +2519,8 @@ JqTreeWidget = (function(superClass) {
     openFolderDelay: 500,
     rtl: null,
     onDragMove: null,
-    onDragStop: null
+    onDragStop: null,
+    buttonLeft: true
   };
 
   JqTreeWidget.prototype.toggle = function(node, slide) {
