@@ -46,8 +46,7 @@ pre {
   .block-style ul.jqtree-tree ul.jqtree_common {
     margin-left: 2em; }
   .block-style ul.jqtree-tree .jqtree-element {
-    margin-top: 4px;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     background-color: #ddd;
     padding: 8px; }
     .block-style ul.jqtree-tree .jqtree-element .jqtree-title {
