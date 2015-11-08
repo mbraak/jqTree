@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version (1.3.0)
+##### 1.3.0 (november 8 2015)
 
 * Issue 234: Added onDragMove and onDragStop callbacks
 * Issue 394: Label displays 'null' in UI when the label key is null (thanks to Carlos Ponce)
