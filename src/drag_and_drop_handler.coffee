@@ -74,6 +74,10 @@ class DragAndDropHandler
             @removeDropHint()
             @stopOpenFolderTimer()
 
+        if not area
+            if @tree_widget.options.onDragMove?
+                @tree_widget.options.onDragMove(@current_item.node, position_info.original_event)
+
         return true
 
     mustCaptureElement: ($element) ->
@@ -96,11 +100,18 @@ class DragAndDropHandler
         @removeDropHint()
         @removeHitAreas()
 
+        current_item = @current_item
+
         if @current_item
             @current_item.$element.removeClass('jqtree-moving')
             @current_item = null
 
         @is_dragging = false
+
+        if not @hovered_area and current_item
+            if @tree_widget.options.onDragStop?
+                @tree_widget.options.onDragStop(current_item.node, position_info.original_event)
+
         return false
 
     refresh: ->
@@ -466,4 +477,7 @@ class DragElement
         @$element.remove()
 
 
-module.exports = DragAndDropHandler
+module.exports =
+    DragAndDropHandler: DragAndDropHandler
+    DragElement: DragElement
+    HitAreasGenerator: HitAreasGenerator

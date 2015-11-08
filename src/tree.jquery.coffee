@@ -1,21 +1,5 @@
-﻿###
-Copyright 2013 Marco Braak
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-###
-
 __version__ = require './version'
-DragAndDropHandler = require './drag_and_drop_handler'
+{DragAndDropHandler, DragElement, HitAreasGenerator} = require './drag_and_drop_handler'
 ElementsRenderer = require './elements_renderer'
 KeyHandler = require './key_handler'
 MouseWidget = require './mouse.widget'
@@ -30,15 +14,24 @@ Position = node_module.Position
 
 util_module = require './util'
 
-node_element = require './node_element'
-NodeElement = node_element.NodeElement
-FolderElement = node_element.FolderElement
+{BorderDropHint,FolderElement,GhostDropHint,NodeElement} = require './node_element'
 
 
 $ = jQuery
 
 
 class JqTreeWidget extends MouseWidget
+    BorderDropHint: BorderDropHint
+    DragElement: DragElement
+    DragAndDropHandler: DragAndDropHandler
+    ElementsRenderer: ElementsRenderer
+    GhostDropHint: GhostDropHint
+    HitAreasGenerator: HitAreasGenerator
+    Node: Node
+    SaveStateHandler: SaveStateHandler
+    ScrollHandler: ScrollHandler
+    SelectNodeHandler: SelectNodeHandler
+
     defaults:
         autoOpen: false  # true / false / int (open n levels starting at 0)
         saveState: false  # true / false / string (cookie name)
@@ -63,6 +56,9 @@ class JqTreeWidget extends MouseWidget
         keyboardSupport: true
         openFolderDelay: 500  # The delay for opening a folder during drag and drop; the value is in milliseconds
         rtl: null  # right-to-left support; true / false (default)
+        onDragMove: null
+        onDragStop: null
+        buttonLeft: true
 
     toggle: (node, slide=null) ->
         if slide == null
@@ -73,11 +69,14 @@ class JqTreeWidget extends MouseWidget
         else
             @openNode(node, slide)
 
+        return @element
+
     getTree: ->
         return @tree
 
     selectNode: (node) ->
         @_selectNode(node, false)
+        return @element
 
     _selectNode: (node, must_toggle=false) ->
         if not @select_node_handler
@@ -138,18 +137,35 @@ class JqTreeWidget extends MouseWidget
 
     loadData: (data, parent_node) ->
         @_loadData(data, parent_node)
+        return @element
 
-    loadDataFromUrl: (url, parent_node, on_finished) ->
-        if $.type(url) != 'string'
-            # Url parameter is omitted
-            on_finished = parent_node
-            parent_node = url
-            url = null
+    ###
+    signatures:
+    - loadDataFromUrl(url, parent_node=null, on_finished=null)
+        loadDataFromUrl('/my_data');
+        loadDataFromUrl('/my_data', node1);
+        loadDataFromUrl('/my_data', node1, function() { console.log('finished'); });
+        loadDataFromUrl('/my_data', null, function() { console.log('finished'); });
 
-        @_loadDataFromUrl(url, parent_node, on_finished)
+    - loadDataFromUrl(parent_node=null, on_finished=null)
+        loadDataFromUrl();
+        loadDataFromUrl(node1);
+        loadDataFromUrl(null, function() { console.log('finished'); });
+        loadDataFromUrl(node1, function() { console.log('finished'); });
+    ###
+    loadDataFromUrl: (param1, param2, param3) ->
+        if $.type(param1) == 'string'
+            # first parameter is url
+            @_loadDataFromUrl(param1, param2, param3)
+        else
+            # first parameter is not url
+            @_loadDataFromUrl(null, param1, param2)
 
-    reload: ->
-        @loadDataFromUrl()
+        return @element
+
+    reload: (on_finished) ->
+        @_loadDataFromUrl(null, null, on_finished)
+        return @element
 
     _loadDataFromUrl: (url_info, parent_node, on_finished) ->
         $el = null
@@ -220,6 +236,7 @@ class JqTreeWidget extends MouseWidget
             return
         else
             loadDataFromUrlInfo()
+            return
 
     _loadData: (data, parent_node=null) ->
         deselectNodes = =>
@@ -266,6 +283,7 @@ class JqTreeWidget extends MouseWidget
             slide = @options.slide
 
         @_openNode(node, slide)
+        return @element
 
     _openNode: (node, slide=true, on_finished) ->
         doOpenNode = (_node, _slide, _on_finished) =>
@@ -306,6 +324,8 @@ class JqTreeWidget extends MouseWidget
 
             @_saveState()
 
+        return @element
+
     isDragging: ->
         if @dnd_handler
             return @dnd_handler.is_dragging
@@ -314,6 +334,7 @@ class JqTreeWidget extends MouseWidget
 
     refreshHitAreas: ->
         @dnd_handler.refresh()
+        return @element
 
     addNodeAfter: (new_node_info, existing_node) ->
         new_node = existing_node.addAfter(new_node_info)
@@ -337,6 +358,8 @@ class JqTreeWidget extends MouseWidget
 
             node.remove()
             @_refreshElements(parent)
+
+        return @element
 
     appendNode: (new_node_info, parent_node) ->
         parent_node = parent_node or @tree
@@ -371,11 +394,14 @@ class JqTreeWidget extends MouseWidget
         @renderer.renderFromNode(node)
         @_selectCurrentNode()
 
+        return @element
+
     moveNode: (node, target_node, position) ->
         position_index = Position.nameToIndex(position)
 
         @tree.moveNode(node, target_node, position_index)
         @_refreshElements()
+        return @element
 
     getStateFromStorage: ->
         return @save_state_handler.getStateFromStorage()
@@ -386,6 +412,8 @@ class JqTreeWidget extends MouseWidget
 
             @_getNodeElementForNode(node).select()
             @_saveState()
+
+        return @element
 
     getSelectedNodes: ->
         return @select_node_handler.getSelectedNodes()
@@ -398,12 +426,14 @@ class JqTreeWidget extends MouseWidget
 
         @_getNodeElementForNode(node).deselect()
         @_saveState()
+        return @element
 
     scrollToNode: (node) ->
         $element = $(node.element)
         top = $element.offset().top - @$el.offset().top
 
         @scroll_handler.scrollTo(top)
+        return @element
 
     getState: ->
         return @save_state_handler.getState()
@@ -411,17 +441,23 @@ class JqTreeWidget extends MouseWidget
     setState: (state) ->
         @save_state_handler.setInitialState(state)
         @_refreshElements()
+        return @element
 
     setOption: (option, value) ->
         @options[option] = value
+        return @element
 
     moveDown: ->
         if @key_handler
             @key_handler.moveDown()
 
+        return @element
+
     moveUp: ->
         if @key_handler
             @key_handler.moveUp()
+
+        return @element
 
     getVersion: ->
         return __version__
@@ -517,6 +553,11 @@ class JqTreeWidget extends MouseWidget
             return null
 
     _initTree: (data) ->
+        doInit = =>
+            if not @is_initialized
+                @is_initialized = true
+                @_triggerEvent('tree.init')
+
         @tree = new @options.nodeClass(null, true, @options.nodeClass)
 
         if @select_node_handler
@@ -528,12 +569,11 @@ class JqTreeWidget extends MouseWidget
 
         @_refreshElements()
 
-        if must_load_on_demand
-            @_setInitialStateOnDemand()
-
-        if not @is_initialized
-            @is_initialized = true
-            @_triggerEvent('tree.init')
+        if not must_load_on_demand
+            doInit()
+        else
+            # Load data on demand and then init the tree
+            @_setInitialStateOnDemand(doInit)
 
     # Set initial state, either by restoring the state or auto-opening nodes
     # result: must load nodes on demand?
@@ -581,7 +621,8 @@ class JqTreeWidget extends MouseWidget
         return must_load_on_demand
 
     # Set the initial state for nodes that are loaded on demand
-    _setInitialStateOnDemand: ->
+    # Call cb_finished when done
+    _setInitialStateOnDemand: (cb_finished) ->
         restoreState = =>
             if not (@options.saveState and @save_state_handler)
                 return false
@@ -591,16 +632,23 @@ class JqTreeWidget extends MouseWidget
                 if not state
                     return false
                 else
-                    @save_state_handler.setInitialStateOnDemand(state)
+                    @save_state_handler.setInitialStateOnDemand(state, cb_finished)
 
                     return true
 
         autoOpenNodes = =>
             max_level = @_getAutoOpenMaxLevel()
-            loading_ids = []
+            loading_count = 0
 
             loadAndOpenNode = (node) =>
-                @_openNode(node, false, openNodes)
+                loading_count += 1
+                @_openNode(
+                    node,
+                    false,
+                    ->
+                        loading_count -= 1
+                        openNodes()
+                )
 
             openNodes = =>
                 @tree.iterate (node, level) =>
@@ -613,6 +661,9 @@ class JqTreeWidget extends MouseWidget
                         @_openNode(node, false)
 
                         return (level != max_level)
+
+                if loading_count == 0
+                    cb_finished()
 
             openNodes()
 

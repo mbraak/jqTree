@@ -35,20 +35,32 @@ class KeyHandler
     moveRight: ->
         node = @tree_widget.getSelectedNode()
 
-        if node and node.isFolder() and not node.is_open
-            @tree_widget.openNode(node)
-            return false
-        else
+        if not node
             return true
+        else if not node.isFolder()
+            return true
+        else
+            # folder node
+            if node.is_open
+                # Right moves to the first child of an open node
+                return @selectNode(node.getNextNode())
+            else
+                # Right expands a closed node
+                @tree_widget.openNode(node)
+                return false
 
     moveLeft: ->
         node = @tree_widget.getSelectedNode()
 
-        if node and node.isFolder() and node.is_open
+        if not node
+            return true
+        else if node.isFolder() and node.is_open
+            # Left on an open node closes the node
             @tree_widget.closeNode(node)
             return false
         else
-            return true
+            # Left on a closed or end node moves focus to the node's parent
+            return @selectNode(node.getParent())
 
     handleKeyDown: (e) ->
         if not @tree_widget.options.keyboardSupport

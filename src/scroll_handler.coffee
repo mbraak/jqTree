@@ -5,6 +5,7 @@ class ScrollHandler
     constructor: (tree_widget) ->
         @tree_widget = tree_widget
         @previous_top = -1
+        @is_initialized = false
 
         @_initScrollParent()
 
@@ -43,7 +44,15 @@ class ScrollHandler
         else
             setDocumentAsScrollParent()
 
+        @is_initialized = true
+
+    _ensureInit: ->
+        if not @is_initialized
+            @_initScrollParent()
+
     checkScrolling: ->
+        @_ensureInit()
+
         hovered_area = @tree_widget.dnd_handler.hovered_area
 
         if hovered_area and hovered_area.top != @previous_top
@@ -75,6 +84,8 @@ class ScrollHandler
             $(document).scrollTop($(document).scrollTop() + 20)
 
     scrollTo: (top) ->
+        @_ensureInit()
+
         if @$scroll_parent
             @$scroll_parent[0].scrollTop = top
         else
@@ -82,6 +93,8 @@ class ScrollHandler
             $(document).scrollTop(top + tree_top)
 
     isScrolledIntoView: (element) ->
+        @_ensureInit()
+
         $element = $(element)
 
         if @$scroll_parent

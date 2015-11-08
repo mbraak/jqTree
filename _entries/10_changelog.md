@@ -3,6 +3,16 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.3.0 (november 8 2015)
+
+* Issue 234: Added onDragMove and onDragStop callbacks
+* Issue 394: Label displays 'null' in UI when the label key is null (thanks to Carlos Ponce)
+* Issue 396: Trigger init.tree correctly for load on demand (thanks to jmashore)
+* Issue 397: Aria accessibility support (thanks to Rich Caloggero)
+* Issue 398: Functions should return the `jquery` element
+* Issue 400: Added on_finished parameter to reload function
+* Issue 402: Fix autoscroll when tree element is created outside the dom (thanks to hbaptiste)
+
 ##### 1.2.1 (july 14 2015)
 
 * Issue 48: Added right-to-left support (thanks to Mohamed Ouederni, Ashraf Fayad and Udi Oron)
@@ -18,7 +28,7 @@ name: changelog
 ##### 1.0.0 (january 11 2015)
 
 * Issues 273 and 304: autoOpen and saveState now works for nodes that are loaded on demand
-* Issue 283: added getNodesByProperty function (thanks to Neeraj)
+* Issue 283: Added getNodesByProperty function (thanks to Neeraj)
 * Issue 332: openNode should open parent nodes (thanks to Kitano Yoshitomo)
 * Issue 335: Add cloneNode missing argument for Gecko <13.0 (thanks to Tvinky)
 * Issue 337: Added functions for moving up and down

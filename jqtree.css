@@ -19,13 +19,16 @@ ul.jqtree-tree {
     border-bottom: none;
     color: #333;
     text-decoration: none;
-    margin-right: 0.5em;
     vertical-align: middle; }
     ul.jqtree-tree .jqtree-toggler:hover {
       color: #000;
       text-decoration: none; }
     ul.jqtree-tree .jqtree-toggler.jqtree-closed {
       background-position: 0 0; }
+    ul.jqtree-tree .jqtree-toggler.jqtree-toggler-left {
+      margin-right: 0.5em; }
+    ul.jqtree-tree .jqtree-toggler.jqtree-toggler-right {
+      margin-left: 0.5em; }
   ul.jqtree-tree .jqtree-element {
     cursor: pointer;
     position: relative; }

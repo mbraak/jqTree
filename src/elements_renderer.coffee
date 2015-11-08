@@ -25,7 +25,7 @@ class ElementsRenderer
         $element = @tree_widget.element
         $element.empty()
 
-        @createDomElements($element[0], @tree_widget.tree.children, true, true)
+        @createDomElements($element[0], @tree_widget.tree.children, true, true, 1)
 
     renderFromNode: (node) ->
         # remember current li
@@ -43,20 +43,20 @@ class ElementsRenderer
 
         # create children
         if node.children
-            @createDomElements(li, node.children, false, false)
+            @createDomElements(li, node.children, false, false, node.getLevel())
 
-    createDomElements: (element, children, is_root_node, is_open) ->
+    createDomElements: (element, children, is_root_node, is_open, level) ->
         ul = @createUl(is_root_node)
         element.appendChild(ul)
 
         for child in children
-            li = @createLi(child)
+            li = @createLi(child, level)
             ul.appendChild(li)
 
             @attachNodeData(child, li)
 
             if child.hasChildren()
-                @createDomElements(li, child.children, false, child.is_open)
+                @createDomElements(li, child.children, false, child.is_open, level + 1)
 
         return null
 
@@ -67,8 +67,10 @@ class ElementsRenderer
     createUl: (is_root_node) ->
         if !is_root_node
             class_string = ''
+            role = 'group'
         else
             class_string = 'jqtree-tree'
+            role = 'tree'
 
             if @tree_widget.options.rtl
                 class_string += ' jqtree-rtl'
@@ -76,24 +78,26 @@ class ElementsRenderer
         ul = document.createElement('ul')
         ul.className = "jqtree_common #{ class_string }"
 
+        ul.setAttribute('role', role)
+
         return ul
 
-    createLi: (node) ->
+    createLi: (node, level) ->
+        is_selected = @tree_widget.select_node_handler and @tree_widget.select_node_handler.isNodeSelected(node)
+
         if node.isFolder()
-            li = @createFolderLi(node)
+            li = @createFolderLi(node, level, is_selected)
         else
-            li = @createNodeLi(node)
+            li = @createNodeLi(node, level, is_selected)
 
         if @tree_widget.options.onCreateLi
             @tree_widget.options.onCreateLi(node, $(li))
 
         return li
 
-    createFolderLi: (node) ->
+    createFolderLi: (node, level, is_selected) ->
         button_classes = @getButtonClasses(node)
-        folder_classes = @getFolderClasses(node)
-
-        escaped_name = @escapeIfNecessary(node.name)
+        folder_classes = @getFolderClasses(node, is_selected)
 
         if node.is_open
             icon_element = @opened_icon_element
@@ -103,78 +107,109 @@ class ElementsRenderer
         # li
         li = document.createElement('li')
         li.className = "jqtree_common #{ folder_classes }"
+        li.setAttribute('role', 'presentation')
 
         # div
         div = document.createElement('div')
         div.className = "jqtree-element jqtree_common"
+        div.setAttribute('role', 'presentation')
 
         li.appendChild(div)
 
         # button link
         button_link = document.createElement('a')
-        button_link.className = "jqtree_common #{ button_classes }"
+        button_link.className = button_classes
 
         button_link.appendChild(
             icon_element.cloneNode(false)
         )
 
-        div.appendChild(button_link)
+        button_link.setAttribute('role', 'presentation')
+        button_link.setAttribute('aria-hidden', 'true')
+
+        if @tree_widget.options.buttonLeft
+            div.appendChild(button_link)
 
         # title span
-        title_span = document.createElement('span')
-        title_span.className = "jqtree_common jqtree-title jqtree-title-folder"
+        div.appendChild(
+            @createTitleSpan(node.name, level, is_selected, node.is_open, is_folder=true)
+        )
 
-        div.appendChild(title_span)
-
-        title_span.innerHTML = escaped_name
+        if not @tree_widget.options.buttonLeft
+            div.appendChild(button_link)
 
         return li
 
-    createNodeLi: (node) ->
+    createNodeLi: (node, level, is_selected) ->
         li_classes = ['jqtree_common']
 
-        if @tree_widget.select_node_handler and @tree_widget.select_node_handler.isNodeSelected(node)
+        if is_selected
             li_classes.push('jqtree-selected')
 
         class_string = li_classes.join(' ')
 
-        escaped_name = @escapeIfNecessary(node.name)
-
         # li
         li = document.createElement('li')
         li.className = class_string
+        li.setAttribute('role', 'presentation')
 
         # div
         div = document.createElement('div')
         div.className = "jqtree-element jqtree_common"
+        div.setAttribute('role', 'presentation')
 
         li.appendChild(div)
 
         # title span
-        title_span = document.createElement('span')
-        title_span.className = "jqtree-title jqtree_common"
-
-        title_span.innerHTML = escaped_name
-
-        div.appendChild(title_span)
+        div.appendChild(
+            @createTitleSpan(node.name, level, is_selected, node.is_open, is_folder=false)
+        )
 
         return li
 
+    createTitleSpan: (node_name, level, is_selected, is_open, is_folder) ->
+        title_span = document.createElement('span')
+
+        classes = "jqtree-title jqtree_common"
+
+        if is_folder
+            classes += " jqtree-title-folder"
+
+        title_span.className = classes
+
+        title_span.setAttribute('role', 'treeitem')
+        title_span.setAttribute('aria-level', level)
+
+        title_span.setAttribute('aria-selected', util.getBoolString(is_selected))
+        title_span.setAttribute('aria-expanded', util.getBoolString(is_open))
+
+        if is_selected
+            title_span.setAttribute('tabindex', 0)
+
+        title_span.innerHTML = @escapeIfNecessary(node_name)
+
+        return title_span
+
     getButtonClasses: (node) ->
-        classes = ['jqtree-toggler']
+        classes = ['jqtree-toggler', 'jqtree_common']
 
         if not node.is_open
             classes.push('jqtree-closed')
 
+        if @tree_widget.options.buttonLeft
+            classes.push('jqtree-toggler-left')
+        else
+            classes.push('jqtree-toggler-right')
+
         return classes.join(' ')
 
-    getFolderClasses: (node) ->
+    getFolderClasses: (node, is_selected) ->
         classes = ['jqtree-folder']
 
         if not node.is_open
             classes.push('jqtree-closed')
 
-        if @tree_widget.select_node_handler and @tree_widget.select_node_handler.isNodeSelected(node)
+        if is_selected
             classes.push('jqtree-selected')
 
         if node.is_loading
