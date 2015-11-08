@@ -20,6 +20,8 @@ Position.strings = ['before', 'after', 'inside', 'none']
 
 class Node
     constructor: (o, is_root=false, node_class=Node) ->
+        @name = ''
+
         @setData(o)
 
         @children = []
@@ -31,13 +33,16 @@ class Node
             @node_class = node_class
 
     setData: (o) ->
+        setName = (name) =>
+            if name != null
+                @name = name
+
         if typeof o != 'object'
-            @name = o
+            setName(o)
         else
             for key, value of o
                 if key == 'label'
-                    # todo: node property is 'name', but we use 'label' here
-                    @name = value
+                    setName(value)
                 else
                     @[key] = value
 
@@ -417,11 +422,17 @@ class Node
                     # Last child of previous sibling
                     return previous_sibling.getLastChild()
             else
-                # Parent
-                if @parent.parent
-                    return @parent
-                else
-                    return null
+                return @getParent()
+
+    getParent: ->
+        # Return parent except if it is the root node
+        if not @parent
+            return null
+        else if not @parent.parent
+            # Root node -> null
+            return null
+        else
+            return @parent
 
     getLastChild: ->
         if not @hasChildren()

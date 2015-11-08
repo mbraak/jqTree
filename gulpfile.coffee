@@ -3,11 +3,19 @@ coffee     = require 'gulp-coffee'
 coffeeify  = require 'gulp-coffeeify'
 coffeelint = require 'gulp-coffeelint'
 exec       = require('child_process').exec
-sass       = require('gulp-sass')
+fs         = require 'fs'
+header     = require 'gulp-header'
+sass       = require 'gulp-sass'
+
+pkg = require './package.json'
+
 
 gulp.task 'jqtree', ->
+    banner = fs.readFileSync('src/header.txt')
+
     gulp.src './src/tree.jquery.coffee'
         .pipe coffeeify()
+        .pipe header(banner, pkg: pkg)
         .pipe gulp.dest('./')
 
 gulp.task 'lib', ->
@@ -31,12 +39,17 @@ gulp.task 'sass', ->
         .pipe sass(errLogToConsole: true)
         .pipe gulp.dest('./')
 
+gulp.task 'example_sass', ->
+    gulp.src './static/example.scss'
+        .pipe sass(errLogToConsole: true)
+        .pipe gulp.dest('./static')
+
 gulp.task 'lint', ->
     gulp.src './src/*.coffee'
         .pipe coffeelint()
         .pipe coffeelint.reporter()
 
 gulp.task 'watch', ['default'], ->
-    gulp.watch ['./src/*.coffee', './src/test.js', './jqtree.scss'], ['default']
+    gulp.watch ['./src/*.coffee', './src/test.js', './jqtree.scss', './static/example.scss'], ['default']
 
-gulp.task 'default', ['jqtree', 'build_test', 'lib', 'sass']
+gulp.task 'default', ['jqtree', 'build_test', 'lib', 'sass', 'example_sass']

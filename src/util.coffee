@@ -28,8 +28,16 @@ html_escape = (string) ->
         .replace(/\//g,'&#x2F;')
 
 
+getBoolString = (value) ->
+    if value
+        return 'true'
+    else
+        return 'false'
+
+
 module.exports =
-    _indexOf:_indexOf
+    _indexOf: _indexOf
+    getBoolString: getBoolString
     html_escape: html_escape
     indexOf: indexOf
     isInt: isInt
