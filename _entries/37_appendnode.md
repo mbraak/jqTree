@@ -5,7 +5,7 @@ name: functions-appendnode
 
 **function appendNode(new_node_info, parent_node);**
 
-Add a node to this parent node. If **parent_node<** is empty, then the new node becomes a root node.
+Add a node to this parent node. If **parent_node** is empty, then the new node becomes a root node.
 
 {% highlight js %}
 var parent_node = $tree.tree('getNodeById', 123);
