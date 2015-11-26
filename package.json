@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "coffee-script": "1.10.0",
-    "coffeeify": "^1.1.0",
+    "coffeeify": "^1.2.0",
     "connect": "^3.4.0",
     "coveralls": "^2.11.4",
     "gulp": "3.9.0",
@@ -32,10 +32,10 @@
     "karma-browserify": "^4.4.0",
     "karma-chrome-launcher": "^0.2.1",
     "karma-cli": "0.1.1",
-    "karma-firefox-launcher": "^0.1.6",
+    "karma-firefox-launcher": "^0.1.7",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-qunit": "^0.1.7",
-    "phantomjs": "^1.9.18",
+    "phantomjs": "^1.9.19",
     "qunitjs": "^1.20.0",
     "serve-static": "^1.10.0"
   }
