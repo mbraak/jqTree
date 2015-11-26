@@ -3,7 +3,7 @@
     "dependencies": {
         "blanket": "1.1.7",
         "bootstrap": "3.3.5",
-        "fontawesome": "4.4.0",
+        "fontawesome": "4.5.0",
         "jquery": "2.1.4",
         "jquery-legacy": "jquery#1.11.3",
         "jquery-cookie": "v1.4.1",
