@@ -5,6 +5,8 @@ name: event-tree-move
 
 Triggered when the user moves a node.
 
+Note that this event is called **before** the node is moved. See note about `do_move` below.
+
 Event.move_info contains:
 
 * moved_node
