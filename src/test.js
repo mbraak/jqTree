@@ -2,7 +2,6 @@ var Node, Position, util, _indexOf, indexOf;
 
 var mockjax = require('jquery-mockjax')(jQuery, window);
 
-
 QUnit.begin(function() {
     // Load classes and modules here to make sure code coverage works
     var JqTreeWidget = $('').tree('get_widget_class');
@@ -1032,7 +1031,7 @@ test('load on demand', function() {
         url: '*',
         response: function(options) {
             equal(options.url, '/tree/', '2');
-            deepEqual(options.data, { 'node' : 1 }, '3')
+            deepEqual(options.data, { 'node' : 1 }, '3');
 
             this.responseText = [
                 {
