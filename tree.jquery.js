@@ -2706,8 +2706,10 @@ JqTreeWidget = (function(superClass) {
             var data;
             if ($.isArray(response) || typeof response === 'object') {
               data = response;
-            } else {
+            } else if (data != null) {
               data = $.parseJSON(response);
+            } else {
+              data = [];
             }
             if (_this.options.dataFilter) {
               data = _this.options.dataFilter(data);

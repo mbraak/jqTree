@@ -208,8 +208,10 @@ class JqTreeWidget extends MouseWidget
                 success: (response) =>
                     if $.isArray(response) or typeof response == 'object'
                         data = response
-                    else
+                    else if data?
                         data = $.parseJSON(response)
+                    else
+                        data = []
 
                     if @options.dataFilter
                         data = @options.dataFilter(data)
