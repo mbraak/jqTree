@@ -9,3 +9,5 @@ http://mbraak.github.io/jqTree/examples/07_autoscroll.html
 http://mbraak.github.io/jqTree/examples/08_multiple_select.html
 http://mbraak.github.io/jqTree/examples/09_custom_html.html
 http://mbraak.github.io/jqTree/examples/10_icon_buttons.html
+http://mbraak.github.io/jqTree/examples/11_right-to-left.html
+http://mbraak.github.io/jqTree/examples/12_button_on_right.html
