@@ -21,6 +21,10 @@ ul {
     background-color: #ccc;
     padding: 8px 16px;
     margin-bottom: 16px;
+
+    &.block-style {
+        background-color: #fafafa;
+    }
 }
 
 #nav {
@@ -50,6 +54,7 @@ pre {
     position: relative;  /* ie7 fix */
     -ms-user-select: none;
     user-select: none;
+    margin-bottom: 16px;
 }
 
 .block-style {
