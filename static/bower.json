@@ -7,7 +7,7 @@
         "jquery": "2.2.0",
         "jquery-legacy": "jquery#1.12",
         "jquery-cookie": "v1.4.1",
-        "jquery-mockjax": "https://github.com/jakerella/jquery-mockjax.git#0f55c1471c88fcd1a40ed06b2c9227cbf4c3c41a",
+        "jquery-mockjax": "2.1.0",
         "json3": "3.3.2",
         "pygments": "2.0.2",
         "qunit": "1.20.0"
