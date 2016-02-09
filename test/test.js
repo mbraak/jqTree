@@ -586,7 +586,11 @@
 				}
 			}
 
-
+            // We are mocking, so there will be no cross domain request, however, jQuery
+            // aggressively pursues this if the domains don't match, so we need to 
+            // explicitly disallow it. (See #136) 
+            origSettings.crossDomain = false;            
+            
 			// Removed to fix #54 - keep the mocking data object intact
 			//mockHandler.data = requestSettings.data;
 
@@ -908,6 +912,8 @@ QUnit.module("jqtree", {
         var $tree = $('#tree1');
         $tree.tree('destroy');
         $tree.remove();
+
+        $.mockjax.clear();
     }
 });
 
@@ -2001,7 +2007,7 @@ test('keyboard', function() {
     equal($tree.tree('getSelectedNode').name, 'node1');
 });
 
-test('getNodesByProperty', function(){
+test('getNodesByProperty', function() {
   // setup
   var $tree = $('#tree1');
     $tree.tree({
@@ -2066,6 +2072,64 @@ test('getNodesByProperty', function(){
         $tree.tree('getNodesByProperty', 'int_property', 444)[0].name,
         'sub2'
     );
+});
+
+test('dataUrl extra options', function() {
+    var $tree = $('#tree1');
+
+    mockjax({
+        url: '*',
+        response: function(options) {
+            // 2. handle ajax request
+            // expect 'headers' option
+            equal(options.url, '/tree2/');
+            deepEqual(options.headers, {'abc': 'def'});
+
+            start();
+        },
+        logging: false
+    });
+
+    // 1. init tree
+    // dataUrl contains 'headers' option
+    $tree.tree({
+        dataUrl: {
+            'url': '/tree2/',
+            'headers': {'abc': 'def'}
+        }
+    });
+
+    stop();
+});
+
+test('dataUrl is function', function() {
+    var $tree = $('#tree1');
+
+    mockjax({
+        url: '*',
+        response: function(options) {
+            // 2. handle ajax request
+            // expect 'headers' option
+            equal(options.url, '/tree3/');
+            deepEqual(options.headers, {'abc': 'def'});
+
+            start();
+        },
+        logging: false
+    });
+
+    // 1. init tree
+    // dataUrl is a function
+    $tree.tree({
+        dataUrl: function(node) {
+            return {
+                'url': '/tree3/',
+                'headers': {'abc': 'def'}
+            };
+        }
+    });
+
+    stop();
 });
 
 QUnit.module("Tree");
