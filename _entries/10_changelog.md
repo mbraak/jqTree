@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue 412: Set ajax parameters in dataUrl option (thanks to Atul Bajpai)
+
 ##### 1.3.0 (november 8 2015)
 
 * Issue 234: Added onDragMove and onDragStop callbacks
