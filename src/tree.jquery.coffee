@@ -184,10 +184,12 @@ class JqTreeWidget extends MouseWidget
 
         parseUrlInfo = ->
             if $.type(url_info) == 'string'
-                url_info = url: url_info
+                return url: url_info
 
             if not url_info.method
                 url_info.method = 'get'
+
+            return url_info
 
         handeLoadData = (data) =>
             removeLoadingClass()
@@ -196,32 +198,40 @@ class JqTreeWidget extends MouseWidget
             if on_finished and $.isFunction(on_finished)
                 on_finished()
 
+        handleSuccess = (response) =>
+            if $.isArray(response) or typeof response == 'object'
+                data = response
+            else if data?
+                data = $.parseJSON(response)
+            else
+                data = []
+
+            if @options.dataFilter
+                data = @options.dataFilter(data)
+
+            handeLoadData(data)
+
+        handleError = (response) =>
+            removeLoadingClass()
+
+            if @options.onLoadFailed
+                @options.onLoadFailed(response)
+
         loadDataFromUrlInfo = =>
-            parseUrlInfo()
+            url_info = parseUrlInfo()
 
             $.ajax(
-                url: url_info.url
-                data: url_info.data
-                type: url_info.method.toUpperCase()
-                cache: false
-                dataType: 'json'
-                success: (response) =>
-                    if $.isArray(response) or typeof response == 'object'
-                        data = response
-                    else if data?
-                        data = $.parseJSON(response)
-                    else
-                        data = []
-
-                    if @options.dataFilter
-                        data = @options.dataFilter(data)
-
-                    handeLoadData(data)
-                error: (response) =>
-                    removeLoadingClass()
-
-                    if @options.onLoadFailed
-                        @options.onLoadFailed(response)
+                $.extend(
+                    {},
+                    url_info,
+                    {
+                        method: if url_info.method? then url_info.method.toUpperCase() else 'GET',
+                        cache: false,
+                        dataType: 'json',
+                        success: handleSuccess,
+                        error: handleError
+                    }
+                )
             )
 
         if not url_info

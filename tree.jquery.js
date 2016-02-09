@@ -2657,7 +2657,7 @@ JqTreeWidget = (function(superClass) {
   };
 
   JqTreeWidget.prototype._loadDataFromUrl = function(url_info, parent_node, on_finished) {
-    var $el, addLoadingClass, handeLoadData, loadDataFromUrlInfo, parseUrlInfo, removeLoadingClass;
+    var $el, addLoadingClass, handeLoadData, handleError, handleSuccess, loadDataFromUrlInfo, parseUrlInfo, removeLoadingClass;
     $el = null;
     addLoadingClass = (function(_this) {
       return function() {
@@ -2676,13 +2676,14 @@ JqTreeWidget = (function(superClass) {
     };
     parseUrlInfo = function() {
       if ($.type(url_info) === 'string') {
-        url_info = {
+        return {
           url: url_info
         };
       }
       if (!url_info.method) {
-        return url_info.method = 'get';
+        url_info.method = 'get';
       }
+      return url_info;
     };
     handeLoadData = (function(_this) {
       return function(data) {
@@ -2693,36 +2694,40 @@ JqTreeWidget = (function(superClass) {
         }
       };
     })(this);
+    handleSuccess = (function(_this) {
+      return function(response) {
+        var data;
+        if ($.isArray(response) || typeof response === 'object') {
+          data = response;
+        } else if (data != null) {
+          data = $.parseJSON(response);
+        } else {
+          data = [];
+        }
+        if (_this.options.dataFilter) {
+          data = _this.options.dataFilter(data);
+        }
+        return handeLoadData(data);
+      };
+    })(this);
+    handleError = (function(_this) {
+      return function(response) {
+        removeLoadingClass();
+        if (_this.options.onLoadFailed) {
+          return _this.options.onLoadFailed(response);
+        }
+      };
+    })(this);
     loadDataFromUrlInfo = (function(_this) {
       return function() {
-        parseUrlInfo();
-        return $.ajax({
-          url: url_info.url,
-          data: url_info.data,
-          type: url_info.method.toUpperCase(),
+        url_info = parseUrlInfo();
+        return $.ajax($.extend({}, url_info, {
+          method: url_info.method != null ? url_info.method.toUpperCase() : 'GET',
           cache: false,
           dataType: 'json',
-          success: function(response) {
-            var data;
-            if ($.isArray(response) || typeof response === 'object') {
-              data = response;
-            } else if (data != null) {
-              data = $.parseJSON(response);
-            } else {
-              data = [];
-            }
-            if (_this.options.dataFilter) {
-              data = _this.options.dataFilter(data);
-            }
-            return handeLoadData(data);
-          },
-          error: function(response) {
-            removeLoadingClass();
-            if (_this.options.onLoadFailed) {
-              return _this.options.onLoadFailed(response);
-            }
-          }
-        });
+          success: handleSuccess,
+          error: handleError
+        }));
       };
     })(this);
     if (!url_info) {
