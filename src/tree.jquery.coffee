@@ -217,7 +217,7 @@ class JqTreeWidget extends MouseWidget
             if @options.onLoadFailed
                 @options.onLoadFailed(response)
 
-        loadDataFromUrlInfo = =>
+        loadDataFromUrlInfo = ->
             url_info = parseUrlInfo()
 
             $.ajax(
