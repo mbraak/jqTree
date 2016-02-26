@@ -7,7 +7,7 @@
         "tree.jquery.js"
     ],
     "dependencies": {
-        "jquery": ">=1.5"
+        "jquery": ">=1.9"
     },
     "license": "Apache-2.0",
     "ignore": [],

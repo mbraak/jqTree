@@ -16,7 +16,7 @@
     "test": "karma start --browsers Chrome --single-run && coffeelint src"
   },
   "dependencies": {
-    "jquery": ">1.8"
+    "jquery": ">=1.9"
   },
   "devDependencies": {
     "browserify": "^13.0.0",
