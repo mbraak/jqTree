@@ -2718,18 +2718,16 @@ JqTreeWidget = (function(superClass) {
         }
       };
     })(this);
-    loadDataFromUrlInfo = (function(_this) {
-      return function() {
-        url_info = parseUrlInfo();
-        return $.ajax($.extend({}, url_info, {
-          method: url_info.method != null ? url_info.method.toUpperCase() : 'GET',
-          cache: false,
-          dataType: 'json',
-          success: handleSuccess,
-          error: handleError
-        }));
-      };
-    })(this);
+    loadDataFromUrlInfo = function() {
+      url_info = parseUrlInfo();
+      return $.ajax($.extend({}, url_info, {
+        method: url_info.method != null ? url_info.method.toUpperCase() : 'GET',
+        cache: false,
+        dataType: 'json',
+        success: handleSuccess,
+        error: handleError
+      }));
+    };
     if (!url_info) {
       url_info = this._getDataUrlInfo(parent_node);
     }

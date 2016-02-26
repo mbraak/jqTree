@@ -126,7 +126,7 @@ span.jqtree-dragging {
   padding: 2px 8px; }
 
 /* IE 6, 7, 8 */
-@media \0screen\,screen\9 {
+@media \0screen\,screen\9  {
   ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
     background: url(jqtree-circle.png) no-repeat;
     border: 0 none; } }
