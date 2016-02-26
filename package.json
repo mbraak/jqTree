@@ -33,14 +33,14 @@
     "ie-version": "^0.1.0",
     "jquery-mockjax": "^2.1.1",
     "karma": "^0.13.21",
-    "karma-browserify": "^5.0.1",
+    "karma-browserify": "^5.0.2",
     "karma-chrome-launcher": "^0.2.1",
     "karma-cli": "0.1.2",
     "karma-firefox-launcher": "^0.1.7",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-qunit": "^0.1.9",
     "phantomjs-prebuilt": "^2.1.4",
-    "qunitjs": "^1.21.0",
+    "qunitjs": "^1.22.0",
     "serve-static": "^1.10.2",
     "watchify": "^3.7.0"
   }
