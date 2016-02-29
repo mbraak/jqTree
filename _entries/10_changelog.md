@@ -6,6 +6,7 @@ name: changelog
 ##### development version
 
 * Issue 412: Set ajax parameters in dataUrl option (thanks to Atul Bajpai)
+* Issue 415: Add onLoading callback parameter
 
 ##### 1.3.0 (november 8 2015)
 
