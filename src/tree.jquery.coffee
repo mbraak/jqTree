@@ -59,6 +59,7 @@ class JqTreeWidget extends MouseWidget
         onDragMove: null
         onDragStop: null
         buttonLeft: true
+        onLoading: null
 
     toggle: (node, slide=null) ->
         if slide == null
@@ -177,10 +178,13 @@ class JqTreeWidget extends MouseWidget
                 $el = @element
 
             $el.addClass('jqtree-loading')
+            @_notifyLoading(true, parent_node, $el)
 
-        removeLoadingClass = ->
+        removeLoadingClass = =>
             if $el
                 $el.removeClass('jqtree-loading')
+
+                @_notifyLoading(false, parent_node, $el)
 
         parseUrlInfo = ->
             if $.type(url_info) == 'string'
@@ -861,6 +865,10 @@ class JqTreeWidget extends MouseWidget
                 return true
             else
                 return false
+
+    _notifyLoading: (is_loading, node, $el) ->
+        if @options.onLoading
+            @options.onLoading(is_loading, node, $el)
 
 
 JqTreeWidget.getModule = (name) ->

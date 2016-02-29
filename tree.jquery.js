@@ -2520,7 +2520,8 @@ JqTreeWidget = (function(superClass) {
     rtl: null,
     onDragMove: null,
     onDragStop: null,
-    buttonLeft: true
+    buttonLeft: true,
+    onLoading: null
   };
 
   JqTreeWidget.prototype.toggle = function(node, slide) {
@@ -2666,14 +2667,18 @@ JqTreeWidget = (function(superClass) {
         } else {
           $el = _this.element;
         }
-        return $el.addClass('jqtree-loading');
+        $el.addClass('jqtree-loading');
+        return _this._notifyLoading(true, parent_node, $el);
       };
     })(this);
-    removeLoadingClass = function() {
-      if ($el) {
-        return $el.removeClass('jqtree-loading');
-      }
-    };
+    removeLoadingClass = (function(_this) {
+      return function() {
+        if ($el) {
+          $el.removeClass('jqtree-loading');
+          return _this._notifyLoading(false, parent_node, $el);
+        }
+      };
+    })(this);
     parseUrlInfo = function() {
       if ($.type(url_info) === 'string') {
         return {
@@ -3461,6 +3466,12 @@ JqTreeWidget = (function(superClass) {
       } else {
         return false;
       }
+    }
+  };
+
+  JqTreeWidget.prototype._notifyLoading = function(is_loading, node, $el) {
+    if (this.options.onLoading) {
+      return this.options.onLoading(is_loading, node, $el);
     }
   };
 
