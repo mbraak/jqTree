@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.3.1 (march 3 2016)
 
 * Issue 412: Set ajax parameters in dataUrl option (thanks to Atul Bajpai)
 * Issue 415: Add onLoading callback parameter
