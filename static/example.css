@@ -17,6 +17,8 @@ ul {
   background-color: #ccc;
   padding: 8px 16px;
   margin-bottom: 16px; }
+  #tree1.block-style {
+    background-color: #fafafa; }
 
 #nav {
   margin: 16px 0; }
@@ -39,7 +41,8 @@ pre {
   position: relative;
   /* ie7 fix */
   -ms-user-select: none;
-  user-select: none; }
+  user-select: none;
+  margin-bottom: 16px; }
 
 .block-style ul.jqtree-tree {
   margin-left: 0; }

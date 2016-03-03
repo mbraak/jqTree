@@ -1,13 +1,13 @@
 {
     "name": "jqTree",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "main": [
         "jqtree.css",
         "jqtree-circle.png",
         "tree.jquery.js"
     ],
     "dependencies": {
-        "jquery": ">=1.5"
+        "jquery": ">=1.9"
     },
     "license": "Apache-2.0",
     "ignore": [],

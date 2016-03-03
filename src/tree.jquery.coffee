@@ -59,6 +59,7 @@ class JqTreeWidget extends MouseWidget
         onDragMove: null
         onDragStop: null
         buttonLeft: true
+        onLoading: null
 
     toggle: (node, slide=null) ->
         if slide == null
@@ -177,17 +178,22 @@ class JqTreeWidget extends MouseWidget
                 $el = @element
 
             $el.addClass('jqtree-loading')
+            @_notifyLoading(true, parent_node, $el)
 
-        removeLoadingClass = ->
+        removeLoadingClass = =>
             if $el
                 $el.removeClass('jqtree-loading')
 
+                @_notifyLoading(false, parent_node, $el)
+
         parseUrlInfo = ->
             if $.type(url_info) == 'string'
-                url_info = url: url_info
+                return url: url_info
 
             if not url_info.method
                 url_info.method = 'get'
+
+            return url_info
 
         handeLoadData = (data) =>
             removeLoadingClass()
@@ -196,30 +202,40 @@ class JqTreeWidget extends MouseWidget
             if on_finished and $.isFunction(on_finished)
                 on_finished()
 
-        loadDataFromUrlInfo = =>
-            parseUrlInfo()
+        handleSuccess = (response) =>
+            if $.isArray(response) or typeof response == 'object'
+                data = response
+            else if data?
+                data = $.parseJSON(response)
+            else
+                data = []
+
+            if @options.dataFilter
+                data = @options.dataFilter(data)
+
+            handeLoadData(data)
+
+        handleError = (response) =>
+            removeLoadingClass()
+
+            if @options.onLoadFailed
+                @options.onLoadFailed(response)
+
+        loadDataFromUrlInfo = ->
+            url_info = parseUrlInfo()
 
             $.ajax(
-                url: url_info.url
-                data: url_info.data
-                type: url_info.method.toUpperCase()
-                cache: false
-                dataType: 'json'
-                success: (response) =>
-                    if $.isArray(response) or typeof response == 'object'
-                        data = response
-                    else
-                        data = $.parseJSON(response)
-
-                    if @options.dataFilter
-                        data = @options.dataFilter(data)
-
-                    handeLoadData(data)
-                error: (response) =>
-                    removeLoadingClass()
-
-                    if @options.onLoadFailed
-                        @options.onLoadFailed(response)
+                $.extend(
+                    {},
+                    url_info,
+                    {
+                        method: if url_info.method? then url_info.method.toUpperCase() else 'GET',
+                        cache: false,
+                        dataType: 'json',
+                        success: handleSuccess,
+                        error: handleError
+                    }
+                )
             )
 
         if not url_info
@@ -849,6 +865,10 @@ class JqTreeWidget extends MouseWidget
                 return true
             else
                 return false
+
+    _notifyLoading: (is_loading, node, $el) ->
+        if @options.onLoading
+            @options.onLoading(is_loading, node, $el)
 
 
 JqTreeWidget.getModule = (name) ->

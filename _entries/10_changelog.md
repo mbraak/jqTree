@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.3.1 (march 3 2016)
+
+* Issue 412: Set ajax parameters in dataUrl option (thanks to Atul Bajpai)
+* Issue 415: Add onLoading callback parameter
+
 ##### 1.3.0 (november 8 2015)
 
 * Issue 234: Added onDragMove and onDragStop callbacks

@@ -6,8 +6,10 @@
 .n { color: #f8f8f2 } /* Name */
 .o { color: #f92672 } /* Operator */
 .p { color: #f8f8f2 } /* Punctuation */
+.ch { color: #75715e } /* Comment.Hashbang */
 .cm { color: #75715e } /* Comment.Multiline */
 .cp { color: #75715e } /* Comment.Preproc */
+.cpf { color: #75715e } /* Comment.PreprocFile */
 .c1 { color: #75715e } /* Comment.Single */
 .cs { color: #75715e } /* Comment.Special */
 .gd { color: #f92672 } /* Generic.Deleted */
