@@ -25,7 +25,7 @@
     "connect": "^3.4.1",
     "coveralls": "^2.11.9",
     "gulp": "^3.9.1",
-    "gulp-coffee": "2.3.1",
+    "gulp-coffee": "2.3.2",
     "gulp-coffeeify": "0.1.8",
     "gulp-coffeelint": "^0.6.0",
     "gulp-header": "^1.7.1",
