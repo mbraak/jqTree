@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue 420: Set the correct aria-level after updating a node (thanks to Fermin Gallego)
+
 ##### 1.3.2 (march 3 2016)
 
 * Issue 412: Set ajax parameters in dataUrl option (thanks to Atul Bajpai)
