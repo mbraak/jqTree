@@ -38,16 +38,16 @@ Create tree data.
 {% highlight js %}
 var data = [
     {
-        label: 'node1',
+        name: 'node1',
         children: [
-            { label: 'child1' },
-            { label: 'child2' }
+            { name: 'child1' },
+            { name: 'child2' }
         ]
     },
     {
-        label: 'node2',
+        name: 'node2',
         children: [
-            { label: 'child3' }
+            { name: 'child3' }
         ]
     }
 ];

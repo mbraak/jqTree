@@ -12,10 +12,10 @@ For this to work, you should give each node in the tree data an id field:
 
 {% highlight js %}
 {
-    label: 'node1',
+    name: 'node1',
     id: 123,
     childen: [
-        label: 'child1',
+        name: 'child1',
         id: 124
     ]
 }
