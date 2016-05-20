@@ -1367,6 +1367,9 @@ Node = (function() {
       node = new this.tree.node_class(node_info);
       child_index = this.parent.getChildIndex(this);
       this.parent.addChildAtPosition(node, child_index + 1);
+      if (typeof node_info === 'object' && node_info.children && node_info.children.length) {
+        node.loadFromData(node_info.children);
+      }
       return node;
     }
   };
@@ -1379,6 +1382,9 @@ Node = (function() {
       node = new this.tree.node_class(node_info);
       child_index = this.parent.getChildIndex(this);
       this.parent.addChildAtPosition(node, child_index);
+      if (typeof node_info === 'object' && node_info.children && node_info.children.length) {
+        node.loadFromData(node_info.children);
+      }
       return node;
     }
   };
