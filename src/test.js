@@ -1838,10 +1838,25 @@ test('append', function() {
 
     var node1 = tree.getNodeByName('node1');
 
-    // 1. Add child3 to node1
+    // 1. Append child3 to node1
     node1.append('child3');
 
     equal(formatNodes(node1.children), 'child1 child2 child3');
+
+    // 2. Append subtree
+    node1.append(
+        {
+            name: 'child4',
+            children: [
+                { name: 'child5' }
+            ]
+        }
+    );
+
+    equal(formatNodes(node1.children), 'child1 child2 child3 child4');
+
+    var child4 = node1.getNodeByName('child4');
+    equal(formatNodes(child4.children), 'child5');
 });
 
 test('prepend', function() {
@@ -1855,6 +1870,19 @@ test('prepend', function() {
     node1.prepend('child0');
 
     equal(formatNodes(node1.children), 'child0 child1 child2');
+
+    // 2. Prepend subtree
+    node1.prepend({
+        name: 'child3',
+        children: [
+            { name: 'child4' }
+        ]
+    });
+
+    equal(formatNodes(node1.children), 'child3 child0 child1 child2');
+
+    var child3 = node1.getNodeByName('child3');
+    equal(formatNodes(child3.children), 'child4');
 });
 
 test('getNodeById', function() {

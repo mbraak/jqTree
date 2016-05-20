@@ -271,6 +271,10 @@ class Node
 
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index + 1)
+
+            if typeof node_info == 'object' and node_info.children and node_info.children.length
+                node.loadFromData(node_info.children)
+
             return node
 
     addBefore: (node_info) ->
@@ -281,6 +285,10 @@ class Node
 
             child_index = @parent.getChildIndex(this)
             @parent.addChildAtPosition(node, child_index)
+
+            if typeof node_info == 'object' and node_info.children and node_info.children.length
+                node.loadFromData(node_info.children)
+
             return node
 
     addParent: (node_info) ->
@@ -306,11 +314,19 @@ class Node
     append: (node_info) ->
         node = new @tree.node_class(node_info)
         @addChild(node)
+
+        if typeof node_info == 'object' and node_info.children and node_info.children.length
+            node.loadFromData(node_info.children)
+
         return node
 
     prepend: (node_info) ->
         node = new @tree.node_class(node_info)
         @addChildAtPosition(node, 0)
+
+        if typeof node_info == 'object' and node_info.children and node_info.children.length
+            node.loadFromData(node_info.children)
+
         return node
 
     isParentOf: (node) ->

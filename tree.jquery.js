@@ -1413,6 +1413,9 @@ Node = (function() {
     var node;
     node = new this.tree.node_class(node_info);
     this.addChild(node);
+    if (typeof node_info === 'object' && node_info.children && node_info.children.length) {
+      node.loadFromData(node_info.children);
+    }
     return node;
   };
 
@@ -1420,6 +1423,9 @@ Node = (function() {
     var node;
     node = new this.tree.node_class(node_info);
     this.addChildAtPosition(node, 0);
+    if (typeof node_info === 'object' && node_info.children && node_info.children.length) {
+      node.loadFromData(node_info.children);
+    }
     return node;
   };
 

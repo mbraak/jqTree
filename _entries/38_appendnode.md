@@ -31,3 +31,20 @@ $tree.tree(
     }
 );
 {% endhighlight %}
+
+It's also possible to append a subtree:
+
+{% highlight js %}
+$tree.tree(
+    'appendNode',
+    {
+        name: 'new_node',
+        id: 456,
+        children: [
+            { name: 'child1', id: 457 },
+            { name: 'child2', id: 458 }
+        ]
+    },
+    parent_node
+);
+{% endhighlight %}
