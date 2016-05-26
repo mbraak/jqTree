@@ -33,6 +33,22 @@ class Node
             @node_class = node_class
 
     setData: (o) ->
+        ###
+        Set the data of this node.
+
+        setData(string): set the name of the node
+        setdata(object): set attributes of the node
+
+        Examples:
+            setdata('node1')
+
+            setData({ name: 'node1', id: 1});
+
+            setData({ name: 'node2', id: 2, color: 'green'});
+
+        * This is an internal function; it is not in the docs
+        * Does not remove existing node values
+        ###
         setName = (name) =>
             if name != null
                 @name = name
@@ -42,8 +58,10 @@ class Node
         else
             for key, value of o
                 if key == 'label'
+                    # You can use the 'label' key instead of 'name'; this is a legacy feature
                     setName(value)
-                else
+                else if key != 'children'
+                    # You can't update the children using this function
                     @[key] = value
 
         return null

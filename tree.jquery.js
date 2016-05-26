@@ -1085,6 +1085,23 @@ Node = (function() {
   }
 
   Node.prototype.setData = function(o) {
+
+    /*
+    Set the data of this node.
+    
+    setData(string): set the name of the node
+    setdata(object): set attributes of the node
+    
+    Examples:
+        setdata('node1')
+    
+        setData({ name: 'node1', id: 1});
+    
+        setData({ name: 'node2', id: 2, color: 'green'});
+    
+    * This is an internal function; it is not in the docs
+    * Does not remove existing node values
+     */
     var key, setName, value;
     setName = (function(_this) {
       return function(name) {
@@ -1100,7 +1117,7 @@ Node = (function() {
         value = o[key];
         if (key === 'label') {
           setName(value);
-        } else {
+        } else if (key !== 'children') {
           this[key] = value;
         }
       }
@@ -2951,6 +2968,10 @@ JqTreeWidget = (function(superClass) {
     node.setData(data);
     if (id_is_changed) {
       this.tree.addNodeToIndex(node);
+    }
+    if (typeof data === 'object' && data.children && data.children.length) {
+      node.removeChildren();
+      node.loadFromData(data.children);
     }
     this.renderer.renderFromNode(node);
     this._selectCurrentNode();
