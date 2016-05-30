@@ -10,24 +10,29 @@ It looks like this:
 {% highlight js %}
 var data = [
     {
-        label: 'node1',
+        name: 'node1',
         children: [
-            { label: 'child1' },
-            { label: 'child2' }
+            { name: 'child1' },
+            { name: 'child2' }
         ]
     },
     {
-        label: 'node2',
+        name: 'node2',
         children: [
-            { label: 'child3' }
+            { name: 'child3' }
         ]
     }
 ];
 $('#tree1').tree({data: data});
 {% endhighlight %}
 
-* label: label of a node (required)
-* children: array of child nodes (optional)
+* **name**: name of a node (required)
+    * Note that you can also use `label` instead of `name`
+* **children**: array of child nodes (optional)
+* **id**: int or string (optional)
+    * Must be an int or a string
+    * Must be unique in the tree
+    * The `id` property is required if you use the multiple selection feature
 
 You can also include other data in the objects. You can later access this data.
 
@@ -35,7 +40,7 @@ For example, to add an id:
 
 {% highlight js %}
 {
-    label: 'node1',
+    name: 'node1',
     id: 1
 }
 {% endhighlight %}

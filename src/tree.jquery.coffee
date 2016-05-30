@@ -407,6 +407,10 @@ class JqTreeWidget extends MouseWidget
         if id_is_changed
             @tree.addNodeToIndex(node)
 
+        if typeof data == 'object' and data.children and data.children.length
+            node.removeChildren()
+            node.loadFromData(data.children)
+
         @renderer.renderFromNode(node)
         @_selectCurrentNode()
 
