@@ -15,16 +15,16 @@ You can **replace the whole tree** or you can **load a subtree**.
 // Assuming the tree exists
 var new_data = [
     {
-        label: 'node1',
+        name: 'node1',
         children: [
-            { label: 'child1' },
-            { label: 'child2' }
+            { name: 'child1' },
+            { name: 'child2' }
         ]
     },
     {
-        label: 'node2',
+        name: 'node2',
         children: [
-            { label: 'child3' }
+            { name: 'child3' }
         ]
     }
 ];
@@ -39,8 +39,8 @@ var node = $('#tree1').tree('getNodeById', 100);
 
 // Add new nodes
 var data = [
-    { label: 'new node' },
-    { label: 'another new node' }
+    { name: 'new node' },
+    { name: 'another new node' }
 ];
 $('#tree1').tree('loadData', data, node);
 {% endhighlight %}

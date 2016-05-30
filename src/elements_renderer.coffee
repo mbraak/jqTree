@@ -32,7 +32,7 @@ class ElementsRenderer
         $previous_li = $(node.element)
 
         # create element
-        li = @createLi(node)
+        li = @createLi(node, node.getLevel())
         @attachNodeData(node, li)
 
         # add element to dom
@@ -43,7 +43,7 @@ class ElementsRenderer
 
         # create children
         if node.children
-            @createDomElements(li, node.children, false, false, node.getLevel())
+            @createDomElements(li, node.children, false, false, node.getLevel() + 1)
 
     createDomElements: (element, children, is_root_node, is_open, level) ->
         ul = @createUl(is_root_node)

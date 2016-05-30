@@ -1,5 +1,5 @@
 /*
-JqTree 1.3.2
+JqTree 1.3.3
 
 Copyright 2015 Marco Braak
 
@@ -536,12 +536,12 @@ ElementsRenderer = (function() {
   ElementsRenderer.prototype.renderFromNode = function(node) {
     var $previous_li, li;
     $previous_li = $(node.element);
-    li = this.createLi(node);
+    li = this.createLi(node, node.getLevel());
     this.attachNodeData(node, li);
     $previous_li.after(li);
     $previous_li.remove();
     if (node.children) {
-      return this.createDomElements(li, node.children, false, false, node.getLevel());
+      return this.createDomElements(li, node.children, false, false, node.getLevel() + 1);
     }
   };
 
@@ -1085,6 +1085,23 @@ Node = (function() {
   }
 
   Node.prototype.setData = function(o) {
+
+    /*
+    Set the data of this node.
+    
+    setData(string): set the name of the node
+    setdata(object): set attributes of the node
+    
+    Examples:
+        setdata('node1')
+    
+        setData({ name: 'node1', id: 1});
+    
+        setData({ name: 'node2', id: 2, color: 'green'});
+    
+    * This is an internal function; it is not in the docs
+    * Does not remove existing node values
+     */
     var key, setName, value;
     setName = (function(_this) {
       return function(name) {
@@ -1100,7 +1117,7 @@ Node = (function() {
         value = o[key];
         if (key === 'label') {
           setName(value);
-        } else {
+        } else if (key !== 'children') {
           this[key] = value;
         }
       }
@@ -1367,6 +1384,9 @@ Node = (function() {
       node = new this.tree.node_class(node_info);
       child_index = this.parent.getChildIndex(this);
       this.parent.addChildAtPosition(node, child_index + 1);
+      if (typeof node_info === 'object' && node_info.children && node_info.children.length) {
+        node.loadFromData(node_info.children);
+      }
       return node;
     }
   };
@@ -1379,6 +1399,9 @@ Node = (function() {
       node = new this.tree.node_class(node_info);
       child_index = this.parent.getChildIndex(this);
       this.parent.addChildAtPosition(node, child_index);
+      if (typeof node_info === 'object' && node_info.children && node_info.children.length) {
+        node.loadFromData(node_info.children);
+      }
       return node;
     }
   };
@@ -1413,6 +1436,9 @@ Node = (function() {
     var node;
     node = new this.tree.node_class(node_info);
     this.addChild(node);
+    if (typeof node_info === 'object' && node_info.children && node_info.children.length) {
+      node.loadFromData(node_info.children);
+    }
     return node;
   };
 
@@ -1420,6 +1446,9 @@ Node = (function() {
     var node;
     node = new this.tree.node_class(node_info);
     this.addChildAtPosition(node, 0);
+    if (typeof node_info === 'object' && node_info.children && node_info.children.length) {
+      node.loadFromData(node_info.children);
+    }
     return node;
   };
 
@@ -2940,6 +2969,10 @@ JqTreeWidget = (function(superClass) {
     if (id_is_changed) {
       this.tree.addNodeToIndex(node);
     }
+    if (typeof data === 'object' && data.children && data.children.length) {
+      node.removeChildren();
+      node.loadFromData(data.children);
+    }
     this.renderer.renderFromNode(node);
     this._selectCurrentNode();
     return this.element;
@@ -3537,6 +3570,6 @@ module.exports = {
 };
 
 },{}],13:[function(require,module,exports){
-module.exports = '1.3.2';
+module.exports = '1.3.3';
 
 },{}]},{},[11]);

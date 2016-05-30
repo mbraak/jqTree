@@ -12,7 +12,7 @@ var node1 = $('#tree1', 'getNodeByName', 'node1');
 $('#tree1').tree(
     'addNodeAfter',
     {
-        label: 'new_node',
+        name: 'new_node',
         id: 456
     },
     node1
