@@ -6,8 +6,8 @@ name: changelog
 ##### development version
 
 * Issue 420: Set the correct aria-level after updating a node (thanks to Fermin Gallego)
-* Issue 426: Make it possible to append a subtree using appendNode
-    * also works for addNodeAfter, addNodeBefore and prependNode
+* Issue 426 and 427: Make it possible to append a subtree using appendNode
+    * also works for addNodeAfter, addNodeBefore, prependNode and updateNode
 
 ##### 1.3.2 (march 3 2016)
 
