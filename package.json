@@ -40,7 +40,7 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-qunit": "^1.0.0",
     "phantomjs-prebuilt": "^2.1.7",
-    "qunitjs": "^1.23.0",
+    "qunitjs": "^1.23.1",
     "serve-static": "^1.10.3",
     "watchify": "^3.7.0"
   }
