@@ -29,9 +29,9 @@
     "gulp-coffeeify": "0.1.8",
     "gulp-coffeelint": "^0.6.0",
     "gulp-header": "^1.8.2",
-    "gulp-sass": "^2.3.1",
+    "gulp-sass": "^2.3.2",
     "ie-version": "^0.1.0",
-    "jquery-mockjax": "^2.1.1",
+    "jquery-mockjax": "^2.2.0",
     "karma": "^0.13.22",
     "karma-browserify": "^5.0.5",
     "karma-chrome-launcher": "^1.0.1",
@@ -41,7 +41,7 @@
     "karma-qunit": "^1.0.0",
     "phantomjs-prebuilt": "^2.1.7",
     "qunitjs": "^1.23.1",
-    "serve-static": "^1.10.3",
+    "serve-static": "^1.11.1",
     "watchify": "^3.7.0"
   }
 }
