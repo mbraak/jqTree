@@ -2830,6 +2830,10 @@ JqTreeWidget = (function(superClass) {
     return this.tree.getNodesByProperty(key, value);
   };
 
+  JqTreeWidget.prototype.getNodeByHtmlElement = function(element) {
+    return this._getNode($(element));
+  };
+
   JqTreeWidget.prototype.openNode = function(node, slide) {
     if (slide == null) {
       slide = null;

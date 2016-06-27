@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue 433: Added getNodeByHtmlElement function.
+
 ##### 1.3.3 (may 30 2016)
 
 * Issue 420: Set the correct aria-level after updating a node (thanks to Fermin Gallego)

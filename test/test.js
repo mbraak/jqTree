@@ -2208,7 +2208,7 @@ test('keyboard', function(assert) {
 
 test('getNodesByProperty', function(assert) {
   // setup
-  var $tree = $('#tree1');
+    var $tree = $('#tree1');
     $tree.tree({
         data: example_data
     });
@@ -2329,6 +2329,23 @@ test('dataUrl is function', function(assert) {
             };
         }
     });
+});
+
+test('getNodeByHtmlElement', function(assert) {
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var $el = $('.jqtree-title');
+
+    // Get node for jquery element
+    var node = $tree.tree('getNodeByHtmlElement', $el);
+    assert.equal(node.name, 'node1');
+
+    // Same for html element
+    node = $tree.tree('getNodeByHtmlElement', $el[0]);
+    assert.equal(node.name, 'node1');
 });
 
 QUnit.module("Tree");

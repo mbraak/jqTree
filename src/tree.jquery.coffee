@@ -294,6 +294,9 @@ class JqTreeWidget extends MouseWidget
     getNodesByProperty: (key, value) ->
         return @tree.getNodesByProperty(key, value)
 
+    getNodeByHtmlElement: (element) ->
+        return @_getNode($(element))
+
     openNode: (node, slide=null) ->
         if slide == null
             slide = @options.slide
