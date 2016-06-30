@@ -268,11 +268,16 @@ class Node
             return getDataFromNodes(@children)
 
     getNodeByName: (name) ->
+        return @getNodeByCallback(
+            (node) -> (node.name == name)
+        )
+
+    getNodeByCallback: (callback) ->
         result = null
 
         @iterate(
             (node) ->
-                if node.name == name
+                if callback(node)
                     result = node
                     return false
                 else
@@ -280,6 +285,7 @@ class Node
         )
 
         return result
+
 
     addAfter: (node_info) ->
         if not @parent

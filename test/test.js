@@ -3049,6 +3049,18 @@ test('getNodesByProperty', function(assert) {
     assert.equal(nodes[0].name, 'child1');
 });
 
+test('getNodeByCallback', function(assert) {
+    var tree = new Node(null, true);
+    tree.loadFromData(example_data);
+
+    node = tree.getNodeByCallback(
+        function(node) {
+            return node.name == 'child1';
+        }
+    );
+
+    assert.equal(node.name, 'child1');
+});
 
 QUnit.module('util');
 

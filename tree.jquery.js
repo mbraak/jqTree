@@ -1363,10 +1363,16 @@ Node = (function() {
   };
 
   Node.prototype.getNodeByName = function(name) {
+    return this.getNodeByCallback(function(node) {
+      return node.name === name;
+    });
+  };
+
+  Node.prototype.getNodeByCallback = function(callback) {
     var result;
     result = null;
     this.iterate(function(node) {
-      if (node.name === name) {
+      if (callback(node)) {
         result = node;
         return false;
       } else {
@@ -2832,6 +2838,10 @@ JqTreeWidget = (function(superClass) {
 
   JqTreeWidget.prototype.getNodeByHtmlElement = function(element) {
     return this._getNode($(element));
+  };
+
+  JqTreeWidget.prototype.getNodeByCallback = function(callback) {
+    return this.tree.getNodeByCallback(callback);
   };
 
   JqTreeWidget.prototype.openNode = function(node, slide) {

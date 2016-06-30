@@ -297,6 +297,9 @@ class JqTreeWidget extends MouseWidget
     getNodeByHtmlElement: (element) ->
         return @_getNode($(element))
 
+    getNodeByCallback: (callback) ->
+        return @tree.getNodeByCallback(callback)
+
     openNode: (node, slide=null) ->
         if slide == null
             slide = @options.slide

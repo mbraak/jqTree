@@ -5,7 +5,8 @@ name: changelog
 
 ##### development version
 
-* Issue 433: Added getNodeByHtmlElement function.
+* Issue 433: Added getNodeByHtmlElement function
+* Issue 435: Added getNodeByCallback function
 
 ##### 1.3.3 (may 30 2016)
 
