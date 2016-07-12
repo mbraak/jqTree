@@ -3,13 +3,15 @@ var utils_for_test = require('./utils_for_test');
 var tree_vars = utils_for_test.getTreeVariables();
 
 var Position = tree_vars.Position;
-var _indexOf = tree_vars._indexOf;
-var indexOf = tree_vars.indexOf;
+var util = tree_vars.util;
 
 
 QUnit.module('util');
 
 test('indexOf', function(assert) {
+    var _indexOf = util._indexOf;
+    var indexOf = util.indexOf;
+
     assert.equal(indexOf([3, 2, 1], 1), 2);
     assert.equal(_indexOf([3, 2, 1], 1), 2);
     assert.equal(indexOf([4, 5, 6], 1), -1);

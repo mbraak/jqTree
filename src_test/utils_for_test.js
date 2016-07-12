@@ -84,13 +84,11 @@ function formatTitles($node) {
 
 function getTreeVariables() {
     var JqTreeWidget = $('').tree('get_widget_class');
-    var node = JqTreeWidget.getModule('node');
 
+    var node = JqTreeWidget.getModule('node');
     var util = JqTreeWidget.getModule('util');
 
     return {
-        _indexOf: util._indexOf,
-        indexOf: util.indexOf,
         Node: node.Node,
         Position: node.Position,
         util: util

@@ -1,5 +1,5 @@
 __version__ = require './version'
-{DragAndDropHandler, DragElement, HitAreasGenerator} = require './drag_and_drop_handler'
+drag_and_drop_handler = require './drag_and_drop_handler'
 ElementsRenderer = require './elements_renderer'
 KeyHandler = require './key_handler'
 MouseWidget = require './mouse.widget'
@@ -15,6 +15,8 @@ Position = node_module.Position
 util_module = require './util'
 
 {BorderDropHint,FolderElement,GhostDropHint,NodeElement} = require './node_element'
+
+{DragAndDropHandler, DragElement, HitAreasGenerator} = drag_and_drop_handler
 
 
 $ = jQuery
@@ -885,6 +887,7 @@ JqTreeWidget.getModule = (name) ->
     modules =
         'node': node_module
         'util': util_module
+        'drag_and_drop_handler': drag_and_drop_handler
 
     return modules[name]
 

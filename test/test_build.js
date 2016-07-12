@@ -993,110 +993,27 @@
 }));
 
 },{}],2:[function(require,module,exports){
-var Node, Position, util, _indexOf, indexOf;
-
-var mockjax = require('jquery-mockjax')(jQuery, window);
-
-var test = QUnit.test;
-
-QUnit.begin(function() {
-    // Load classes and modules here to make sure code coverage works
-    var JqTreeWidget = $('').tree('get_widget_class');
-    var node = JqTreeWidget.getModule('node');
-
-    Node = node.Node;
-    Position = node.Position;
-
-    util = JqTreeWidget.getModule('util');
-    _indexOf = util._indexOf;
-    indexOf = util.indexOf;
-});
+require('./test_util');
+require('./test_tree');
+require('./test_jqtree');
 
 QUnit.config.testTimeout = 5000;
 
-/*
-example data:
+},{"./test_jqtree":3,"./test_tree":4,"./test_util":5}],3:[function(require,module,exports){
+var mockjax = require('jquery-mockjax')(jQuery, window);
 
-node1
----child1
----child2
--node2
----child3
-*/
+var utils_for_test = require('./utils_for_test');
 
-var example_data = [
-    {
-        label: 'node1',
-        id: 123,  // extra data
-        int_property: 1,
-        str_property: '1',
-        children: [
-            { label: 'child1', id: 125, int_property: 2 },
-            { label: 'child2', id: 126 }
-        ]
-    },
-    {
-        label: 'node2',
-        id: 124,
-        int_property: 3,
-        str_property: '3',
-        children: [
-            { label: 'child3', id: 127 }
-        ]
-    }
-];
+var example_data = utils_for_test.example_data;
+var example_data2 = utils_for_test.example_data2;
+var formatNodes = utils_for_test.formatNodes;
+var formatTitles = utils_for_test.formatTitles;
+var isNodeOpen = utils_for_test.isNodeOpen;
+var isNodeClosed = utils_for_test.isNodeClosed;
 
-/*
-example data 2:
+var tree_vars = utils_for_test.getTreeVariables();
 
--main
----c1
----c2
-*/
-
-var example_data2 = [
-    {
-        label: 'main',
-        children: [
-            { label: 'c1' },
-            { label: 'c2' }
-        ]
-    }
-];
-
-function formatNodes(nodes) {
-    var strings = $.map(nodes, function(node) {
-        return node.name;
-    });
-    return strings.join(' ');
-};
-
-function isNodeClosed($node) {
-    return (
-        ($node.is('li.jqtree-folder.jqtree-closed')) &&
-        ($node.find('a:eq(0)').is('a.jqtree-toggler.jqtree-closed')) &&
-        ($node.find('ul:eq(0)').is('ul'))
-    );
-}
-
-function isNodeOpen($node) {
-    return (
-        ($node.is('li.jqtree-folder')) &&
-        ($node.find('a:eq(0)').is('a.jqtree-toggler')) &&
-        ($node.find('ul:eq(0)').is('ul')) &&
-        (! $node.is('li.jqtree-folder.jqtree-closed')) &&
-        (! $node.find('span:eq(0)').is('a.jqtree-toggler.jqtree-closed'))
-    );
-}
-
-function formatTitles($node) {
-    var titles = $node.find('.jqtree-title').map(
-        function(i, el) {
-            return $(el).text();
-        }
-    );
-    return titles.toArray().join(' ');
-}
+var Position = tree_vars.Position;
 
 
 QUnit.module("jqtree", {
@@ -2348,6 +2265,41 @@ test('getNodeByHtmlElement', function(assert) {
     assert.equal(node.name, 'node1');
 });
 
+test('DragElement', function(assert) {
+    // Create drag element for node with html. Expect the text in the drag element to be html encoded.
+    var $tree = $('#tree1');
+
+    $tree.tree({
+        data: [
+            {name: '<img src=x onerror=alert()>child1',id: 1}
+        ]
+    });
+
+    var JqTreeWidget = $tree.tree('get_widget_class');
+    var DragElement = JqTreeWidget.getModule('drag_and_drop_handler').DragElement;
+
+    var DragElement = new DragElement(
+        $tree.tree('getNodeById', 1),
+        0, 0,
+        $tree
+    );
+
+    var span = $tree.find('.jqtree-dragging');
+    assert.equal(span.html(), '&lt;img src=x onerror=alert()&gt;child1');
+});
+
+},{"./utils_for_test":6,"jquery-mockjax":1}],4:[function(require,module,exports){
+var utils_for_test = require('./utils_for_test');
+
+var example_data = utils_for_test.example_data;
+var formatNodes = utils_for_test.formatNodes;
+
+var tree_vars = utils_for_test.getTreeVariables();
+
+var Node = tree_vars.Node;
+var Position = tree_vars.Position;
+
+
 QUnit.module("Tree");
 test('constructor', function(assert) {
     // 1. Create node from string
@@ -3062,9 +3014,21 @@ test('getNodeByCallback', function(assert) {
     assert.equal(node.name, 'child1');
 });
 
+},{"./utils_for_test":6}],5:[function(require,module,exports){
+var utils_for_test = require('./utils_for_test');
+
+var tree_vars = utils_for_test.getTreeVariables();
+
+var Position = tree_vars.Position;
+var util = tree_vars.util;
+
+
 QUnit.module('util');
 
 test('indexOf', function(assert) {
+    var _indexOf = util._indexOf;
+    var indexOf = util.indexOf;
+
     assert.equal(indexOf([3, 2, 1], 1), 2);
     assert.equal(_indexOf([3, 2, 1], 1), 2);
     assert.equal(indexOf([4, 5, 6], 1), -1);
@@ -3084,4 +3048,113 @@ test('Position.nameToIndex', function(assert) {
     assert.equal(Position.nameToIndex(''), 0);
 });
 
-},{"jquery-mockjax":1}]},{},[2]);
+},{"./utils_for_test":6}],6:[function(require,module,exports){
+/*
+example data:
+
+node1
+---child1
+---child2
+-node2
+---child3
+*/
+
+var example_data = [
+    {
+        label: 'node1',
+        id: 123,  // extra data
+        int_property: 1,
+        str_property: '1',
+        children: [
+            { label: 'child1', id: 125, int_property: 2 },
+            { label: 'child2', id: 126 }
+        ]
+    },
+    {
+        label: 'node2',
+        id: 124,
+        int_property: 3,
+        str_property: '3',
+        children: [
+            { label: 'child3', id: 127 }
+        ]
+    }
+];
+
+/*
+example data 2:
+
+-main
+---c1
+---c2
+*/
+
+var example_data2 = [
+    {
+        label: 'main',
+        children: [
+            { label: 'c1' },
+            { label: 'c2' }
+        ]
+    }
+];
+
+function formatNodes(nodes) {
+    var strings = $.map(nodes, function(node) {
+        return node.name;
+    });
+    return strings.join(' ');
+};
+
+function isNodeClosed($node) {
+    return (
+        ($node.is('li.jqtree-folder.jqtree-closed')) &&
+        ($node.find('a:eq(0)').is('a.jqtree-toggler.jqtree-closed')) &&
+        ($node.find('ul:eq(0)').is('ul'))
+    );
+}
+
+function isNodeOpen($node) {
+    return (
+        ($node.is('li.jqtree-folder')) &&
+        ($node.find('a:eq(0)').is('a.jqtree-toggler')) &&
+        ($node.find('ul:eq(0)').is('ul')) &&
+        (! $node.is('li.jqtree-folder.jqtree-closed')) &&
+        (! $node.find('span:eq(0)').is('a.jqtree-toggler.jqtree-closed'))
+    );
+}
+
+function formatTitles($node) {
+    var titles = $node.find('.jqtree-title').map(
+        function(i, el) {
+            return $(el).text();
+        }
+    );
+    return titles.toArray().join(' ');
+}
+
+function getTreeVariables() {
+    var JqTreeWidget = $('').tree('get_widget_class');
+
+    var node = JqTreeWidget.getModule('node');
+    var util = JqTreeWidget.getModule('util');
+
+    return {
+        Node: node.Node,
+        Position: node.Position,
+        util: util
+    };
+}
+
+
+module.exports = {
+    example_data: example_data,
+    example_data2: example_data2,
+    formatNodes: formatNodes,
+    formatTitles: formatTitles,
+    getTreeVariables: getTreeVariables,
+    isNodeClosed: isNodeClosed,
+    isNodeOpen: isNodeOpen
+};
+
+},{}]},{},[2]);

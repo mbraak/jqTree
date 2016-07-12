@@ -1262,3 +1262,26 @@ test('getNodeByHtmlElement', function(assert) {
     node = $tree.tree('getNodeByHtmlElement', $el[0]);
     assert.equal(node.name, 'node1');
 });
+
+test('DragElement', function(assert) {
+    // Create drag element for node with html. Expect the text in the drag element to be html encoded.
+    var $tree = $('#tree1');
+
+    $tree.tree({
+        data: [
+            {name: '<img src=x onerror=alert()>child1',id: 1}
+        ]
+    });
+
+    var JqTreeWidget = $tree.tree('get_widget_class');
+    var DragElement = JqTreeWidget.getModule('drag_and_drop_handler').DragElement;
+
+    var DragElement = new DragElement(
+        $tree.tree('getNodeById', 1),
+        0, 0,
+        $tree
+    );
+
+    var span = $tree.find('.jqtree-dragging');
+    assert.equal(span.html(), '&lt;img src=x onerror=alert()&gt;child1');
+});
