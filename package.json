@@ -29,6 +29,7 @@
     "gulp-coffeeify": "0.1.8",
     "gulp-coffeelint": "^0.6.0",
     "gulp-header": "^1.8.7",
+    "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.3.2",
     "ie-version": "^0.1.0",
     "jquery-mockjax": "^2.2.0",

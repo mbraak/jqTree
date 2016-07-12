@@ -1,4 +1,4 @@
-// Load jquery 1.x for ie <= 8 and jquery 2.x for other browsers
+// Load jquery 1.x for ie <= 8 and jquery 3.x for other browsers
 var ie_version = require('ie-version');
 
 var $;
@@ -13,5 +13,5 @@ else {
 window.$ = $;
 window.jQuery = $;
 
-require('./tree.jquery');
+require('../src/tree.jquery');
 require('./test');
