@@ -7,6 +7,7 @@ name: changelog
 
 * Issue 433: Added getNodeByHtmlElement function
 * Issue 435: Added getNodeByCallback function
+* Issue 437: Fix XSS issue in drag and drop
 
 ##### 1.3.3 (may 30 2016)
 
