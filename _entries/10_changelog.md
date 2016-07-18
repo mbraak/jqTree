@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.3.4 (july 18 2016)
 
 * Issue 433: Added getNodeByHtmlElement function
 * Issue 435: Added getNodeByCallback function
