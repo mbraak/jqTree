@@ -52,6 +52,12 @@ h4 {
   display: none;
 }
 
+@media screen and (max-width: 991px) {
+    #menu h2 {
+        display: none;
+    }
+}
+
 #menu h2 {
   background: #001F3F;
   margin: 0 0 10px 0;

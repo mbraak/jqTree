@@ -5,6 +5,7 @@ coffeelint = require 'gulp-coffeelint'
 exec       = require('child_process').exec
 fs         = require 'fs'
 header     = require 'gulp-header'
+rename     = require 'gulp-rename'
 sass       = require 'gulp-sass'
 
 pkg = require './package.json'
@@ -24,8 +25,9 @@ gulp.task 'lib', ->
         .pipe gulp.dest('./lib')
 
 gulp.task 'build_test', ->
-    gulp.src './src/test.js'
+    gulp.src './src_test/test.js'
         .pipe coffeeify()
+        .pipe rename('test_build.js')
         .pipe gulp.dest('./test')
 
 gulp.task 'jekyll', (cb) ->

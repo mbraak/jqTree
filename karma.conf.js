@@ -13,7 +13,7 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'src/karma-test.js',
+            'src_test/karma-test.js',
             'static/bower_components/json3/lib/json3.js'
         ],
 
@@ -22,7 +22,7 @@ module.exports = function(config) {
         ],
 
         preprocessors: {
-            'src/karma-test.js': ['browserify']
+            'src_test/karma-test.js': ['browserify']
         },
 
         browserify: {
