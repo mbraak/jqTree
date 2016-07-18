@@ -1,6 +1,7 @@
 node_module = require './node'
-Position = node_module.Position
+util = require './util'
 
+Position = node_module.Position
 
 $ = jQuery
 
@@ -463,7 +464,9 @@ class DragElement
         @offset_x = offset_x
         @offset_y = offset_y
 
-        @$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node.name }</span>")
+        node_name = util.html_escape(node.name)
+
+        @$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node_name }</span>")
         @$element.css("position", "absolute")
         $tree.append(@$element)
 

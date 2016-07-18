@@ -1,5 +1,5 @@
 /*
-JqTree 1.3.3
+JqTree 1.3.4
 
 Copyright 2015 Marco Braak
 
@@ -16,11 +16,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var $, DragAndDropHandler, DragElement, HitAreasGenerator, Position, VisibleNodeIterator, node_module,
+var $, DragAndDropHandler, DragElement, HitAreasGenerator, Position, VisibleNodeIterator, node_module, util,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
 node_module = require('./node');
+
+util = require('./util');
 
 Position = node_module.Position;
 
@@ -470,9 +472,11 @@ HitAreasGenerator = (function(superClass) {
 
 DragElement = (function() {
   function DragElement(node, offset_x, offset_y, $tree) {
+    var node_name;
     this.offset_x = offset_x;
     this.offset_y = offset_y;
-    this.$element = $("<span class=\"jqtree-title jqtree-dragging\">" + node.name + "</span>");
+    node_name = util.html_escape(node.name);
+    this.$element = $("<span class=\"jqtree-title jqtree-dragging\">" + node_name + "</span>");
     this.$element.css("position", "absolute");
     $tree.append(this.$element);
   }
@@ -498,7 +502,7 @@ module.exports = {
   HitAreasGenerator: HitAreasGenerator
 };
 
-},{"./node":5}],2:[function(require,module,exports){
+},{"./node":5,"./util":12}],2:[function(require,module,exports){
 var $, ElementsRenderer, NodeElement, html_escape, node_element, util;
 
 node_element = require('./node_element');
@@ -1363,10 +1367,16 @@ Node = (function() {
   };
 
   Node.prototype.getNodeByName = function(name) {
+    return this.getNodeByCallback(function(node) {
+      return node.name === name;
+    });
+  };
+
+  Node.prototype.getNodeByCallback = function(callback) {
     var result;
     result = null;
     this.iterate(function(node) {
-      if (node.name === name) {
+      if (callback(node)) {
         result = node;
         return false;
       } else {
@@ -2462,13 +2472,13 @@ SimpleWidget = (function() {
 module.exports = SimpleWidget;
 
 },{}],11:[function(require,module,exports){
-var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, __version__, node_module, ref, ref1, util_module,
+var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, __version__, drag_and_drop_handler, node_module, ref, util_module,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
 __version__ = require('./version');
 
-ref = require('./drag_and_drop_handler'), DragAndDropHandler = ref.DragAndDropHandler, DragElement = ref.DragElement, HitAreasGenerator = ref.HitAreasGenerator;
+drag_and_drop_handler = require('./drag_and_drop_handler');
 
 ElementsRenderer = require('./elements_renderer');
 
@@ -2492,7 +2502,9 @@ Position = node_module.Position;
 
 util_module = require('./util');
 
-ref1 = require('./node_element'), BorderDropHint = ref1.BorderDropHint, FolderElement = ref1.FolderElement, GhostDropHint = ref1.GhostDropHint, NodeElement = ref1.NodeElement;
+ref = require('./node_element'), BorderDropHint = ref.BorderDropHint, FolderElement = ref.FolderElement, GhostDropHint = ref.GhostDropHint, NodeElement = ref.NodeElement;
+
+DragAndDropHandler = drag_and_drop_handler.DragAndDropHandler, DragElement = drag_and_drop_handler.DragElement, HitAreasGenerator = drag_and_drop_handler.HitAreasGenerator;
 
 $ = jQuery;
 
@@ -2828,6 +2840,14 @@ JqTreeWidget = (function(superClass) {
 
   JqTreeWidget.prototype.getNodesByProperty = function(key, value) {
     return this.tree.getNodesByProperty(key, value);
+  };
+
+  JqTreeWidget.prototype.getNodeByHtmlElement = function(element) {
+    return this._getNode($(element));
+  };
+
+  JqTreeWidget.prototype.getNodeByCallback = function(callback) {
+    return this.tree.getNodeByCallback(callback);
   };
 
   JqTreeWidget.prototype.openNode = function(node, slide) {
@@ -3178,7 +3198,7 @@ JqTreeWidget = (function(superClass) {
   };
 
   JqTreeWidget.prototype._setInitialState = function() {
-    var autoOpenNodes, is_restored, must_load_on_demand, ref2, restoreState;
+    var autoOpenNodes, is_restored, must_load_on_demand, ref1, restoreState;
     restoreState = (function(_this) {
       return function() {
         var must_load_on_demand, state;
@@ -3217,7 +3237,7 @@ JqTreeWidget = (function(superClass) {
         return must_load_on_demand;
       };
     })(this);
-    ref2 = restoreState(), is_restored = ref2[0], must_load_on_demand = ref2[1];
+    ref1 = restoreState(), is_restored = ref1[0], must_load_on_demand = ref1[1];
     if (!is_restored) {
       must_load_on_demand = autoOpenNodes();
     }
@@ -3516,7 +3536,8 @@ JqTreeWidget.getModule = function(name) {
   var modules;
   modules = {
     'node': node_module,
-    'util': util_module
+    'util': util_module,
+    'drag_and_drop_handler': drag_and_drop_handler
   };
   return modules[name];
 };
@@ -3570,6 +3591,6 @@ module.exports = {
 };
 
 },{}],13:[function(require,module,exports){
-module.exports = '1.3.3';
+module.exports = '1.3.4';
 
 },{}]},{},[11]);
