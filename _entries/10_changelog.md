@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue 437: autoEscape option applies to dragged elements
+
 ##### 1.3.4 (july 18 2016)
 
 * Issue 433: Added getNodeByHtmlElement function
