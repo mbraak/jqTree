@@ -13,6 +13,8 @@ var tree_vars = utils_for_test.getTreeVariables();
 
 var Position = tree_vars.Position;
 
+var test = QUnit.test;
+
 
 QUnit.module("jqtree", {
     beforeEach: function() {

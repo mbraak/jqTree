@@ -8,6 +8,8 @@ var tree_vars = utils_for_test.getTreeVariables();
 var Node = tree_vars.Node;
 var Position = tree_vars.Position;
 
+var test = QUnit.test;
+
 
 QUnit.module("Tree");
 test('constructor', function(assert) {
