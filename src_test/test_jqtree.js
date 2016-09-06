@@ -909,6 +909,34 @@ test('updateNode', function(assert) {
     $tree.tree('updateNode', child1, 'child1b');
 
     assert.ok($(child1.element).hasClass('jqtree-selected'));
+
+    // add children to child1
+    $tree.tree(
+        'updateNode',
+        child1,
+        {
+            id: child1.id,
+            name: 'child1',
+            children: [
+                { id: 5, name: 'child1-1' }
+            ]
+        }
+    );
+
+    assert.equal(formatTitles($tree), 'node1 child1 child1-1 child2 xyz child3');
+
+    // remove children
+    $tree.tree(
+        'updateNode',
+        child1,
+        {
+            id: child1.id,
+            name: 'child1',
+            children: []
+        }
+    );
+
+    assert.equal(formatTitles($tree), 'node1 child1 child2 xyz child3');
 });
 
 test('moveNode', function(assert) {
