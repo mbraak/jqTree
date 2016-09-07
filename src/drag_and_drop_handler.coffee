@@ -89,7 +89,7 @@ class DragAndDropHandler
         return true
 
     mustCaptureElement: ($element) ->
-        return not $element.is('input,select')
+        return not $element.is('input,select,textarea')
 
     canMoveToArea: (area) ->
         if not area
