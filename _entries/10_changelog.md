@@ -6,6 +6,7 @@ name: changelog
 ##### development version
 
 * Issue 437: autoEscape option applies to dragged elements
+* Issue 448: calling updateNode with an empty children array should remove the children
 
 ##### 1.3.4 (july 18 2016)
 
