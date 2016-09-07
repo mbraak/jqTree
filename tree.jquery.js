@@ -105,7 +105,7 @@ DragAndDropHandler = (function() {
   };
 
   DragAndDropHandler.prototype.mustCaptureElement = function($element) {
-    return !$element.is('input,select');
+    return !$element.is('input,select,textarea');
   };
 
   DragAndDropHandler.prototype.canMoveToArea = function(area) {
@@ -2993,9 +2993,11 @@ JqTreeWidget = (function(superClass) {
     if (id_is_changed) {
       this.tree.addNodeToIndex(node);
     }
-    if (typeof data === 'object' && data.children && data.children.length) {
+    if (typeof data === 'object' && data.children) {
       node.removeChildren();
-      node.loadFromData(data.children);
+      if (data.children.length) {
+        node.loadFromData(data.children);
+      }
     }
     this.renderer.renderFromNode(node);
     this._selectCurrentNode();
