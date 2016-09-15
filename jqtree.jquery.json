@@ -1,6 +1,6 @@
 {
     "name": "jqtree",
-    "version": "1.3.4",
+    "version": "1.3.5",
     "title": "jqTree",
     "description": "JqTree is a jQuery widget for displaying a tree structure in html. It supports json data, loading via ajax and drag-and-drop",
     "keywords": [

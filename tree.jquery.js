@@ -1,5 +1,5 @@
 /*
-JqTree 1.3.4
+JqTree 1.3.5
 
 Copyright 2015 Marco Braak
 
@@ -3597,6 +3597,6 @@ module.exports = {
 };
 
 },{}],13:[function(require,module,exports){
-module.exports = '1.3.4';
+module.exports = '1.3.5';
 
 },{}]},{},[11]);
