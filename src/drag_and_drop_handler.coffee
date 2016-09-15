@@ -39,8 +39,15 @@ class DragAndDropHandler
 
         offset = $(position_info.target).offset()
 
+        node = @current_item.node
+
+        if @tree_widget.options.autoEscape
+            node_name = util.html_escape(node.name)
+        else
+            node_name = node.name
+
         @drag_element = new DragElement(
-            @current_item.node
+            node_name,
             position_info.page_x - offset.left,
             position_info.page_y - offset.top,
             @tree_widget.element
@@ -82,7 +89,7 @@ class DragAndDropHandler
         return true
 
     mustCaptureElement: ($element) ->
-        return not $element.is('input,select')
+        return not $element.is('input,select,textarea')
 
     canMoveToArea: (area) ->
         if not area
@@ -460,11 +467,9 @@ class HitAreasGenerator extends VisibleNodeIterator
 
 
 class DragElement
-    constructor: (node, offset_x, offset_y, $tree) ->
+    constructor: (node_name, offset_x, offset_y, $tree) ->
         @offset_x = offset_x
         @offset_y = offset_y
-
-        node_name = util.html_escape(node.name)
 
         @$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node_name }</span>")
         @$element.css("position", "absolute")
