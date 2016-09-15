@@ -1,5 +1,5 @@
 /*
-JqTree 1.3.4
+JqTree 1.3.5
 
 Copyright 2015 Marco Braak
 
@@ -58,10 +58,16 @@ DragAndDropHandler = (function() {
   };
 
   DragAndDropHandler.prototype.mouseStart = function(position_info) {
-    var offset;
+    var node, node_name, offset;
     this.refresh();
     offset = $(position_info.target).offset();
-    this.drag_element = new DragElement(this.current_item.node, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
+    node = this.current_item.node;
+    if (this.tree_widget.options.autoEscape) {
+      node_name = util.html_escape(node.name);
+    } else {
+      node_name = node.name;
+    }
+    this.drag_element = new DragElement(node_name, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
     this.is_dragging = true;
     this.current_item.$element.addClass('jqtree-moving');
     return true;
@@ -99,7 +105,7 @@ DragAndDropHandler = (function() {
   };
 
   DragAndDropHandler.prototype.mustCaptureElement = function($element) {
-    return !$element.is('input,select');
+    return !$element.is('input,select,textarea');
   };
 
   DragAndDropHandler.prototype.canMoveToArea = function(area) {
@@ -471,11 +477,9 @@ HitAreasGenerator = (function(superClass) {
 })(VisibleNodeIterator);
 
 DragElement = (function() {
-  function DragElement(node, offset_x, offset_y, $tree) {
-    var node_name;
+  function DragElement(node_name, offset_x, offset_y, $tree) {
     this.offset_x = offset_x;
     this.offset_y = offset_y;
-    node_name = util.html_escape(node.name);
     this.$element = $("<span class=\"jqtree-title jqtree-dragging\">" + node_name + "</span>");
     this.$element.css("position", "absolute");
     $tree.append(this.$element);
@@ -2989,9 +2993,11 @@ JqTreeWidget = (function(superClass) {
     if (id_is_changed) {
       this.tree.addNodeToIndex(node);
     }
-    if (typeof data === 'object' && data.children && data.children.length) {
+    if (typeof data === 'object' && data.children) {
       node.removeChildren();
-      node.loadFromData(data.children);
+      if (data.children.length) {
+        node.loadFromData(data.children);
+      }
     }
     this.renderer.renderFromNode(node);
     this._selectCurrentNode();
@@ -3591,6 +3597,6 @@ module.exports = {
 };
 
 },{}],13:[function(require,module,exports){
-module.exports = '1.3.4';
+module.exports = '1.3.5';
 
 },{}]},{},[11]);

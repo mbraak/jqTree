@@ -5,6 +5,8 @@ var tree_vars = utils_for_test.getTreeVariables();
 var Position = tree_vars.Position;
 var util = tree_vars.util;
 
+var test = QUnit.test;
+
 
 QUnit.module('util');
 

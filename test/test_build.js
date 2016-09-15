@@ -1015,6 +1015,8 @@ var tree_vars = utils_for_test.getTreeVariables();
 
 var Position = tree_vars.Position;
 
+var test = QUnit.test;
+
 
 QUnit.module("jqtree", {
     beforeEach: function() {
@@ -1909,6 +1911,34 @@ test('updateNode', function(assert) {
     $tree.tree('updateNode', child1, 'child1b');
 
     assert.ok($(child1.element).hasClass('jqtree-selected'));
+
+    // add children to child1
+    $tree.tree(
+        'updateNode',
+        child1,
+        {
+            id: child1.id,
+            name: 'child1',
+            children: [
+                { id: 5, name: 'child1-1' }
+            ]
+        }
+    );
+
+    assert.equal(formatTitles($tree), 'node1 child1 child1-1 child2 xyz child3');
+
+    // remove children
+    $tree.tree(
+        'updateNode',
+        child1,
+        {
+            id: child1.id,
+            name: 'child1',
+            children: []
+        }
+    );
+
+    assert.equal(formatTitles($tree), 'node1 child1 child2 xyz child3');
 });
 
 test('moveNode', function(assert) {
@@ -2265,29 +2295,6 @@ test('getNodeByHtmlElement', function(assert) {
     assert.equal(node.name, 'node1');
 });
 
-test('DragElement', function(assert) {
-    // Create drag element for node with html. Expect the text in the drag element to be html encoded.
-    var $tree = $('#tree1');
-
-    $tree.tree({
-        data: [
-            {name: '<img src=x onerror=alert()>child1',id: 1}
-        ]
-    });
-
-    var JqTreeWidget = $tree.tree('get_widget_class');
-    var DragElement = JqTreeWidget.getModule('drag_and_drop_handler').DragElement;
-
-    var DragElement = new DragElement(
-        $tree.tree('getNodeById', 1),
-        0, 0,
-        $tree
-    );
-
-    var span = $tree.find('.jqtree-dragging');
-    assert.equal(span.html(), '&lt;img src=x onerror=alert()&gt;child1');
-});
-
 },{"./utils_for_test":6,"jquery-mockjax":1}],4:[function(require,module,exports){
 var utils_for_test = require('./utils_for_test');
 
@@ -2298,6 +2305,8 @@ var tree_vars = utils_for_test.getTreeVariables();
 
 var Node = tree_vars.Node;
 var Position = tree_vars.Position;
+
+var test = QUnit.test;
 
 
 QUnit.module("Tree");
@@ -3021,6 +3030,8 @@ var tree_vars = utils_for_test.getTreeVariables();
 
 var Position = tree_vars.Position;
 var util = tree_vars.util;
+
+var test = QUnit.test;
 
 
 QUnit.module('util');

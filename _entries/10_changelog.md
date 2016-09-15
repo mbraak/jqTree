@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.3.5 (september 15 2016)
+
+* Issue 437: autoEscape option applies to dragged elements
+* Issue 448: calling updateNode with an empty children array should remove the children
+
 ##### 1.3.4 (july 18 2016)
 
 * Issue 433: Added getNodeByHtmlElement function
