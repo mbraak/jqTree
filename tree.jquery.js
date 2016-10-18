@@ -2064,7 +2064,7 @@ SaveStateHandler = (function() {
   SaveStateHandler.prototype.supportsLocalStorage = function() {
     var testSupport;
     testSupport = function() {
-      var error, error1, key;
+      var error, key;
       if (typeof localStorage === "undefined" || localStorage === null) {
         return false;
       } else {
@@ -2858,10 +2858,12 @@ JqTreeWidget = (function(superClass) {
     if (slide == null) {
       slide = null;
     }
-    if (slide === null) {
-      slide = this.options.slide;
+    if (node) {
+      if (slide === null) {
+        slide = this.options.slide;
+      }
+      this._openNode(node, slide);
     }
-    this._openNode(node, slide);
     return this.element;
   };
 
@@ -3129,10 +3131,16 @@ JqTreeWidget = (function(superClass) {
   };
 
   JqTreeWidget.prototype._initData = function() {
+    var data_url;
     if (this.options.data) {
       return this._loadData(this.options.data);
     } else {
-      return this._loadDataFromUrl(this._getDataUrlInfo());
+      data_url = this._getDataUrlInfo();
+      if (data_url) {
+        return this._loadDataFromUrl();
+      } else {
+        return this._loadData([]);
+      }
     }
   };
 
