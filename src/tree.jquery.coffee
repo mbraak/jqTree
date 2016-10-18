@@ -548,7 +548,12 @@ class JqTreeWidget extends MouseWidget
         if @options.data
             @_loadData(@options.data)
         else
-            @_loadDataFromUrl(@_getDataUrlInfo())
+            data_url = @_getDataUrlInfo()
+
+            if data_url
+                @_loadDataFromUrl()
+            else
+                @_loadData([])
 
     _getDataUrlInfo: (node) ->
         data_url = @options.dataUrl or @element.data('url')
