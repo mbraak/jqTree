@@ -303,10 +303,12 @@ class JqTreeWidget extends MouseWidget
         return @tree.getNodeByCallback(callback)
 
     openNode: (node, slide=null) ->
-        if slide == null
-            slide = @options.slide
+        if node
+            if slide == null
+                slide = @options.slide
 
-        @_openNode(node, slide)
+            @_openNode(node, slide)
+
         return @element
 
     _openNode: (node, slide=true, on_finished) ->
