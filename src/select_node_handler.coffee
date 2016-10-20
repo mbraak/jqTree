@@ -44,8 +44,13 @@ class SelectNodeHandler
             return selected_nodes
 
     isNodeSelected: (node) ->
-        if node.id
-            return @selected_nodes[node.id]
+        if not node
+            return false
+        else if node.id
+            if @selected_nodes[node.id]
+                return true
+            else
+                return false
         else if @selected_single_node
             return @selected_single_node.element == node.element
         else

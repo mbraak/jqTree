@@ -2299,8 +2299,14 @@ SelectNodeHandler = (function() {
   };
 
   SelectNodeHandler.prototype.isNodeSelected = function(node) {
-    if (node.id) {
-      return this.selected_nodes[node.id];
+    if (!node) {
+      return false;
+    } else if (node.id) {
+      if (this.selected_nodes[node.id]) {
+        return true;
+      } else {
+        return false;
+      }
     } else if (this.selected_single_node) {
       return this.selected_single_node.element === node.element;
     } else {

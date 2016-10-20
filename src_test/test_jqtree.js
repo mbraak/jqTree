@@ -426,11 +426,14 @@ test('selectNode', function(assert) {
     assert.equal($tree.tree('getSelectedNode').name, 'node1');
 
     // -- is 'node1' selected?
-    assert.ok($tree.tree('isNodeSelected', node1));
+    assert.equal($tree.tree('isNodeSelected', node1), true);
 
     // -- deselect
     $tree.tree('selectNode', null);
     assert.equal($tree.tree('getSelectedNode'), false);
+
+    // -- is 'node1' selected?
+    assert.equal($tree.tree('isNodeSelected', node1), false);
 });
 
 test('selectNode when another node is selected', function(assert) {
@@ -461,7 +464,7 @@ test('selectNode when another node is selected', function(assert) {
     $tree.tree('selectNode', node1);
     assert.equal($tree.tree('getSelectedNode').name, 'node1');
 
-    assert.ok($tree.tree('isNodeSelected', node1));
+    assert.equal($tree.tree('isNodeSelected', node1), true);
 
     // event was fired
     assert.ok(is_select_event_fired);
