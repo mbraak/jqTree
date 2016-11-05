@@ -13,7 +13,9 @@
     "url": "https://github.com/mbraak/jqtree"
   },
   "scripts": {
-    "test": "karma start --browsers Chrome --single-run && coffeelint src"
+    "test": "karma start --browsers Chrome --single-run && coffeelint src",
+    "build": "gulp",
+    "watch": "gulp watch"
   },
   "dependencies": {
     "jquery": ">=1.9"
