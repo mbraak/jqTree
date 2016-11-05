@@ -303,10 +303,12 @@ class JqTreeWidget extends MouseWidget
         return @tree.getNodeByCallback(callback)
 
     openNode: (node, slide=null) ->
-        if slide == null
-            slide = @options.slide
+        if node
+            if slide == null
+                slide = @options.slide
 
-        @_openNode(node, slide)
+            @_openNode(node, slide)
+
         return @element
 
     _openNode: (node, slide=true, on_finished) ->
@@ -548,7 +550,12 @@ class JqTreeWidget extends MouseWidget
         if @options.data
             @_loadData(@options.data)
         else
-            @_loadDataFromUrl(@_getDataUrlInfo())
+            data_url = @_getDataUrlInfo()
+
+            if data_url
+                @_loadDataFromUrl()
+            else
+                @_loadData([])
 
     _getDataUrlInfo: (node) ->
         data_url = @options.dataUrl or @element.data('url')

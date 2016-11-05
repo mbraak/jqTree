@@ -1,5 +1,5 @@
 /*
-JqTree 1.3.5
+JqTree 1.3.6
 
 Copyright 2015 Marco Braak
 
@@ -2064,7 +2064,7 @@ SaveStateHandler = (function() {
   SaveStateHandler.prototype.supportsLocalStorage = function() {
     var testSupport;
     testSupport = function() {
-      var error, error1, key;
+      var error, key;
       if (typeof localStorage === "undefined" || localStorage === null) {
         return false;
       } else {
@@ -2299,8 +2299,14 @@ SelectNodeHandler = (function() {
   };
 
   SelectNodeHandler.prototype.isNodeSelected = function(node) {
-    if (node.id) {
-      return this.selected_nodes[node.id];
+    if (!node) {
+      return false;
+    } else if (node.id) {
+      if (this.selected_nodes[node.id]) {
+        return true;
+      } else {
+        return false;
+      }
     } else if (this.selected_single_node) {
       return this.selected_single_node.element === node.element;
     } else {
@@ -2858,10 +2864,12 @@ JqTreeWidget = (function(superClass) {
     if (slide == null) {
       slide = null;
     }
-    if (slide === null) {
-      slide = this.options.slide;
+    if (node) {
+      if (slide === null) {
+        slide = this.options.slide;
+      }
+      this._openNode(node, slide);
     }
-    this._openNode(node, slide);
     return this.element;
   };
 
@@ -3129,10 +3137,16 @@ JqTreeWidget = (function(superClass) {
   };
 
   JqTreeWidget.prototype._initData = function() {
+    var data_url;
     if (this.options.data) {
       return this._loadData(this.options.data);
     } else {
-      return this._loadDataFromUrl(this._getDataUrlInfo());
+      data_url = this._getDataUrlInfo();
+      if (data_url) {
+        return this._loadDataFromUrl();
+      } else {
+        return this._loadData([]);
+      }
     }
   };
 
@@ -3597,6 +3611,6 @@ module.exports = {
 };
 
 },{}],13:[function(require,module,exports){
-module.exports = '1.3.5';
+module.exports = '1.3.6';
 
 },{}]},{},[11]);

@@ -21,3 +21,29 @@ css: example.css
     <br />
     Autoscroll will work automatically. There is no option for it.
 </p>
+
+<h3>html</h3>
+
+{% highlight html %}
+<div id="scroll-container">
+    <div id="tree1"></div>
+</div>
+{% endhighlight %}
+
+<h3>css</h3>
+
+{% highlight css %}
+#scroll-container {
+  height: 200px;
+  overflow-y: scroll;
+  user-select: none;
+}
+{% endhighlight %}
+
+<h3>js</h3>
+
+{% highlight js %}
+$('#tree1').tree({
+    data: ExampleData.example_data
+});
+{% endhighlight %}
