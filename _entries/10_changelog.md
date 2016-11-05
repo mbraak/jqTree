@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.3.6 (november 5 2016)
+
+* Issue 453: make it possible to initialize the tree without data
+* Issue 455: isNodeSelected must return boolean (thanks to Joshua Harrison)
+
 ##### 1.3.5 (september 15 2016)
 
 * Issue 437: autoEscape option applies to dragged elements
