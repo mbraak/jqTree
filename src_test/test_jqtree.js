@@ -396,6 +396,49 @@ test('openNode and closeNode', function(assert) {
     assert.equal(child1.is_open, true);
 });
 
+function test_open_node_with_callback(slide, include_slide_param, assert) {
+    // setup
+    var $tree = $('#tree1');
+    $tree.tree({
+        data: example_data
+    });
+
+    var node2 = $tree.tree('getNodeByName', 'node2');
+
+    // open node2
+    var done = assert.async();
+
+    function handleOpenNode(node) {
+      assert.equal(node.name, 'node2');
+      assert.ok(node.is_open);
+
+      done();
+    }
+
+    if (include_slide_param) {
+        $tree.tree('openNode', node2, slide, handleOpenNode);
+    }
+    else {
+        $tree.tree('openNode', node2, handleOpenNode);
+    }
+}
+
+test('openNode with callback with slide true', function(assert) {
+    test_open_node_with_callback(true, true, assert);
+});
+
+test('openNode with callback with slide false', function(assert) {
+    test_open_node_with_callback(false, true, assert);
+});
+
+test('openNode with callback with slide null', function(assert) {
+    test_open_node_with_callback(null, true, assert);
+});
+
+test('openNode with callback without slide param', function(assert) {
+    test_open_node_with_callback(null, false, assert);
+});
+
 test('selectNode', function(assert) {
     // setup
     var $tree = $('#tree1');
@@ -996,16 +1039,17 @@ test('load on demand', function(assert) {
     });
 
     // -- open node
-    $tree.bind('tree.refresh', function(e) {
+    function handleOpenNode(node) {
+        assert.equal(node.name, 'node1');
         assert.equal(formatTitles($tree), 'node1 child1', '4');
 
         done();
-    });
+    }
 
     var node1 = $tree.tree('getNodeByName', 'node1');
     assert.equal(formatTitles($tree), 'node1', '1');
 
-    $tree.tree('openNode', node1, true);
+    $tree.tree('openNode', node1, handleOpenNode);
 });
 
 test('addNodeAfter', function(assert) {

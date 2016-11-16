@@ -17,6 +17,10 @@ isInt = (n) ->
     return typeof n is 'number' and n % 1 == 0
 
 
+isFunction = (v) ->
+    return typeof v == 'function'
+
+
 # Escape a string for HTML interpolation; copied from underscore js
 html_escape = (string) ->
     return (''+string)
@@ -41,3 +45,4 @@ module.exports =
     html_escape: html_escape
     indexOf: indexOf
     isInt: isInt
+    isFunction: isFunction

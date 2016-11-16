@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue 462: add on_finished parameter to openNode function
+
 ##### 1.3.6 (november 5 2016)
 
 * Issue 453: make it possible to initialize the tree without data
