@@ -1726,7 +1726,7 @@ FolderElement = (function(superClass) {
           $span = _this.getSpan();
           $span.attr('aria-expanded', 'true');
           if (on_finished) {
-            on_finished();
+            on_finished(_this.node);
           }
           return _this.tree_widget._triggerEvent('tree.open', {
             node: _this.node
@@ -2482,7 +2482,7 @@ SimpleWidget = (function() {
 module.exports = SimpleWidget;
 
 },{}],11:[function(require,module,exports){
-var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, __version__, drag_and_drop_handler, node_module, ref, util_module,
+var $, BorderDropHint, DragAndDropHandler, DragElement, ElementsRenderer, FolderElement, GhostDropHint, HitAreasGenerator, JqTreeWidget, KeyHandler, MouseWidget, Node, NodeElement, Position, SaveStateHandler, ScrollHandler, SelectNodeHandler, SimpleWidget, __version__, drag_and_drop_handler, isFunction, node_module, ref, util_module,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
@@ -2511,6 +2511,8 @@ Node = node_module.Node;
 Position = node_module.Position;
 
 util_module = require('./util');
+
+isFunction = util_module.isFunction;
 
 ref = require('./node_element'), BorderDropHint = ref.BorderDropHint, FolderElement = ref.FolderElement, GhostDropHint = ref.GhostDropHint, NodeElement = ref.NodeElement;
 
@@ -2860,15 +2862,33 @@ JqTreeWidget = (function(superClass) {
     return this.tree.getNodeByCallback(callback);
   };
 
-  JqTreeWidget.prototype.openNode = function(node, slide) {
-    if (slide == null) {
-      slide = null;
+  JqTreeWidget.prototype.openNode = function(node, slide_param, on_finished_param) {
+    var on_finished, parseParams, ref1, slide;
+    if (slide_param == null) {
+      slide_param = null;
     }
+    if (on_finished_param == null) {
+      on_finished_param = null;
+    }
+    parseParams = (function(_this) {
+      return function() {
+        var on_finished, slide;
+        if (isFunction(slide_param)) {
+          on_finished = slide_param;
+          slide = null;
+        } else {
+          slide = slide_param;
+          on_finished = on_finished_param;
+        }
+        if (slide === null) {
+          slide = _this.options.slide;
+        }
+        return [slide, on_finished];
+      };
+    })(this);
+    ref1 = parseParams(), slide = ref1[0], on_finished = ref1[1];
     if (node) {
-      if (slide === null) {
-        slide = this.options.slide;
-      }
-      this._openNode(node, slide);
+      this._openNode(node, slide, on_finished);
     }
     return this.element;
   };
@@ -3565,7 +3585,7 @@ JqTreeWidget.getModule = function(name) {
 SimpleWidget.register(JqTreeWidget, 'tree');
 
 },{"./drag_and_drop_handler":1,"./elements_renderer":2,"./key_handler":3,"./mouse.widget":4,"./node":5,"./node_element":6,"./save_state_handler":7,"./scroll_handler":8,"./select_node_handler":9,"./simple.widget":10,"./util":12,"./version":13}],12:[function(require,module,exports){
-var _indexOf, getBoolString, html_escape, indexOf, isInt;
+var _indexOf, getBoolString, html_escape, indexOf, isFunction, isInt;
 
 _indexOf = function(array, item) {
   var i, j, len, value;
@@ -3590,6 +3610,10 @@ isInt = function(n) {
   return typeof n === 'number' && n % 1 === 0;
 };
 
+isFunction = function(v) {
+  return typeof v === 'function';
+};
+
 html_escape = function(string) {
   return ('' + string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g, '&#x2F;');
 };
@@ -3607,7 +3631,8 @@ module.exports = {
   getBoolString: getBoolString,
   html_escape: html_escape,
   indexOf: indexOf,
-  isInt: isInt
+  isInt: isInt,
+  isFunction: isFunction
 };
 
 },{}],13:[function(require,module,exports){
