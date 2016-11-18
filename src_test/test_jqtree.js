@@ -881,7 +881,8 @@ test('prependNode', function(assert) {
         'node1 child0 child1 child2'
     );
 });
-test('init event', function(assert) {
+
+test('init event for local data', function(assert) {
     // setup
     var done = assert.async();
 
@@ -894,8 +895,33 @@ test('init event', function(assert) {
         done();
     });
 
+    // init tree
     $tree.tree({
         data: example_data
+    });
+});
+
+test('init event for ajax', function(assert) {
+    // setup
+    var done = assert.async();
+
+    var $tree = $('#tree1');
+
+    mockjax({
+        url: '/tree/',
+        responseText: example_data,
+        logging: false
+    });
+
+    $tree.bind('tree.init', function() {
+        assert.equal($tree.tree('getNodeByName', 'node2').name, 'node2');
+
+        done();
+    });
+
+    // init tree
+    $tree.tree({
+        dataUrl: '/tree/'
     });
 });
 
