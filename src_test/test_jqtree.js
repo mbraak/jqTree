@@ -1339,3 +1339,26 @@ test('getNodeByHtmlElement', function(assert) {
     node = $tree.tree('getNodeByHtmlElement', $el[0]);
     assert.equal(node.name, 'node1');
 });
+
+test('onLoadFailed', function(assert) {
+    mockjax({
+        url: '/tree/',
+        status: 500,
+        responseText: 'test error',
+        logging: false
+    });
+
+    var done = assert.async();
+
+    function handleLoadFailed(e) {
+        assert.equal(e.responseText, 'test error');
+
+        done();
+    }
+
+    var $tree = $('#tree1');
+    $tree.tree({
+        dataUrl: '/tree/',
+        onLoadFailed: handleLoadFailed
+    });
+});
