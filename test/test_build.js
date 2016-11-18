@@ -1883,7 +1883,8 @@ test('prependNode', function(assert) {
         'node1 child0 child1 child2'
     );
 });
-test('init event', function(assert) {
+
+test('init event for local data', function(assert) {
     // setup
     var done = assert.async();
 
@@ -1896,8 +1897,33 @@ test('init event', function(assert) {
         done();
     });
 
+    // init tree
     $tree.tree({
         data: example_data
+    });
+});
+
+test('init event for ajax', function(assert) {
+    // setup
+    var done = assert.async();
+
+    var $tree = $('#tree1');
+
+    mockjax({
+        url: '/tree/',
+        responseText: example_data,
+        logging: false
+    });
+
+    $tree.bind('tree.init', function() {
+        assert.equal($tree.tree('getNodeByName', 'node2').name, 'node2');
+
+        done();
+    });
+
+    // init tree
+    $tree.tree({
+        dataUrl: '/tree/'
     });
 });
 
@@ -2340,6 +2366,29 @@ test('getNodeByHtmlElement', function(assert) {
     // Same for html element
     node = $tree.tree('getNodeByHtmlElement', $el[0]);
     assert.equal(node.name, 'node1');
+});
+
+test('onLoadFailed', function(assert) {
+    mockjax({
+        url: '/tree/',
+        status: 500,
+        responseText: 'test error',
+        logging: false
+    });
+
+    var done = assert.async();
+
+    function handleLoadFailed(e) {
+        assert.equal(e.responseText, 'test error');
+
+        done();
+    }
+
+    var $tree = $('#tree1');
+    $tree.tree({
+        dataUrl: '/tree/',
+        onLoadFailed: handleLoadFailed
+    });
 });
 
 },{"./utils_for_test":6,"jquery-mockjax":1}],4:[function(require,module,exports){
