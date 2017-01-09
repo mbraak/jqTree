@@ -1,12 +1,12 @@
 /*!
- * QUnit 2.1.0
+ * QUnit 2.1.1
  * https://qunitjs.com/
  *
  * Copyright jQuery Foundation and other contributors
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2016-12-06T04:45Z
+ * Date: 2017-01-06T01:52Z
  */
 (function (global$1) {
   'use strict';
@@ -38,78 +38,55 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-  var get$1 = function get$1(object, property, receiver) {
-    if (object === null) object = Function.prototype;
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-
-      if (parent === null) {
-        return undefined;
-      } else {
-        return get$1(parent, property, receiver);
-      }
-    } else if ("value" in desc) {
-      return desc.value;
-    } else {
-      var getter = desc.get;
-
-      if (getter === undefined) {
-        return undefined;
-      }
-
-      return getter.call(receiver);
+  var classCallCheck = function (instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
     }
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  var set$1 = function set$1(object, property, value, receiver) {
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-
-      if (parent !== null) {
-        set$1(parent, property, value, receiver);
-      }
-    } else if ("value" in desc && desc.writable) {
-      desc.value = value;
-    } else {
-      var setter = desc.set;
-
-      if (setter !== undefined) {
-        setter.call(receiver, value);
+  var createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
       }
     }
 
-    return value;
-  };
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -384,7 +361,7 @@
   			return true;
   		},
 
-  		"set": function set(b, a) {
+  		"set": function set$$1(b, a) {
   			var innerEq,
   			    outerEq = true;
 
@@ -1676,278 +1653,316 @@
   	}
   }
 
-  function Assert(testContext) {
-  	this.test = testContext;
-  }
+  var Assert = function () {
+  	function Assert(testContext) {
+  		classCallCheck(this, Assert);
 
-  // Assert helpers
-  Assert.prototype = {
+  		this.test = testContext;
+  	}
+
+  	// Assert helpers
 
   	// Specify the number of expected assertions to guarantee that failed test
   	// (no assertions are run at all) don't slip through.
-  	expect: function expect(asserts) {
-  		if (arguments.length === 1) {
-  			this.test.expected = asserts;
-  		} else {
-  			return this.test.expected;
-  		}
-  	},
 
-  	// Put a hold on processing and return a function that will release it a maximum of once.
-  	async: function async(count) {
-  		var resume,
-  		    test$$1 = this.test,
-  		    popped = false,
-  		    acceptCallCount = count;
 
-  		if (typeof acceptCallCount === "undefined") {
-  			acceptCallCount = 1;
-  		}
-
-  		test$$1.usedAsync = true;
-  		resume = internalStop(test$$1);
-
-  		return function done() {
-
-  			if (popped) {
-  				test$$1.pushFailure("Too many calls to the `assert.async` callback", sourceFromStacktrace(2));
-  				return;
-  			}
-  			acceptCallCount -= 1;
-  			if (acceptCallCount > 0) {
-  				return;
-  			}
-
-  			popped = true;
-  			resume();
-  		};
-  	},
-
-  	// Exports test.push() to the user API
-  	// Alias of pushResult.
-  	push: function push(result, actual, expected, message, negative) {
-  		var currentAssert = this instanceof Assert ? this : config.current.assert;
-  		return currentAssert.pushResult({
-  			result: result,
-  			actual: actual,
-  			expected: expected,
-  			message: message,
-  			negative: negative
-  		});
-  	},
-
-  	pushResult: function pushResult(resultInfo) {
-
-  		// Destructure of resultInfo = { result, actual, expected, message, negative }
-  		var assert = this,
-  		    currentTest = assert instanceof Assert && assert.test || config.current;
-
-  		// Backwards compatibility fix.
-  		// Allows the direct use of global exported assertions and QUnit.assert.*
-  		// Although, it's use is not recommended as it can leak assertions
-  		// to other tests from async tests, because we only get a reference to the current test,
-  		// not exactly the test where assertion were intended to be called.
-  		if (!currentTest) {
-  			throw new Error("assertion outside test context, in " + sourceFromStacktrace(2));
-  		}
-
-  		if (currentTest.usedAsync === true && currentTest.semaphore === 0) {
-  			currentTest.pushFailure("Assertion after the final `assert.async` was resolved", sourceFromStacktrace(2));
-
-  			// Allow this assertion to continue running anyway...
-  		}
-
-  		if (!(assert instanceof Assert)) {
-  			assert = currentTest.assert;
-  		}
-
-  		return assert.test.pushResult(resultInfo);
-  	},
-
-  	ok: function ok(result, message) {
-  		message = message || (result ? "okay" : "failed, expected argument to be truthy, was: " + dump.parse(result));
-  		this.pushResult({
-  			result: !!result,
-  			actual: result,
-  			expected: true,
-  			message: message
-  		});
-  	},
-
-  	notOk: function notOk(result, message) {
-  		message = message || (!result ? "okay" : "failed, expected argument to be falsy, was: " + dump.parse(result));
-  		this.pushResult({
-  			result: !result,
-  			actual: result,
-  			expected: false,
-  			message: message
-  		});
-  	},
-
-  	equal: function equal(actual, expected, message) {
-
-  		// eslint-disable-next-line eqeqeq
-  		var result = expected == actual;
-
-  		this.pushResult({
-  			result: result,
-  			actual: actual,
-  			expected: expected,
-  			message: message
-  		});
-  	},
-
-  	notEqual: function notEqual(actual, expected, message) {
-
-  		// eslint-disable-next-line eqeqeq
-  		var result = expected != actual;
-
-  		this.pushResult({
-  			result: result,
-  			actual: actual,
-  			expected: expected,
-  			message: message,
-  			negative: true
-  		});
-  	},
-
-  	propEqual: function propEqual(actual, expected, message) {
-  		actual = objectValues(actual);
-  		expected = objectValues(expected);
-  		this.pushResult({
-  			result: equiv(actual, expected),
-  			actual: actual,
-  			expected: expected,
-  			message: message
-  		});
-  	},
-
-  	notPropEqual: function notPropEqual(actual, expected, message) {
-  		actual = objectValues(actual);
-  		expected = objectValues(expected);
-  		this.pushResult({
-  			result: !equiv(actual, expected),
-  			actual: actual,
-  			expected: expected,
-  			message: message,
-  			negative: true
-  		});
-  	},
-
-  	deepEqual: function deepEqual(actual, expected, message) {
-  		this.pushResult({
-  			result: equiv(actual, expected),
-  			actual: actual,
-  			expected: expected,
-  			message: message
-  		});
-  	},
-
-  	notDeepEqual: function notDeepEqual(actual, expected, message) {
-  		this.pushResult({
-  			result: !equiv(actual, expected),
-  			actual: actual,
-  			expected: expected,
-  			message: message,
-  			negative: true
-  		});
-  	},
-
-  	strictEqual: function strictEqual(actual, expected, message) {
-  		this.pushResult({
-  			result: expected === actual,
-  			actual: actual,
-  			expected: expected,
-  			message: message
-  		});
-  	},
-
-  	notStrictEqual: function notStrictEqual(actual, expected, message) {
-  		this.pushResult({
-  			result: expected !== actual,
-  			actual: actual,
-  			expected: expected,
-  			message: message,
-  			negative: true
-  		});
-  	},
-
-  	"throws": function throws(block, expected, message) {
-  		var actual,
-  		    expectedType,
-  		    expectedOutput = expected,
-  		    ok = false,
-  		    currentTest = this instanceof Assert && this.test || config.current;
-
-  		// 'expected' is optional unless doing string comparison
-  		if (objectType(expected) === "string") {
-  			if (message == null) {
-  				message = expected;
-  				expected = null;
+  	createClass(Assert, [{
+  		key: "expect",
+  		value: function expect(asserts) {
+  			if (arguments.length === 1) {
+  				this.test.expected = asserts;
   			} else {
-  				throw new Error("throws/raises does not accept a string value for the expected argument.\n" + "Use a non-string object value (e.g. regExp) instead if it's necessary." + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
+  				return this.test.expected;
   			}
   		}
 
-  		currentTest.ignoreGlobalErrors = true;
-  		try {
-  			block.call(currentTest.testEnvironment);
-  		} catch (e) {
-  			actual = e;
-  		}
-  		currentTest.ignoreGlobalErrors = false;
+  		// Put a hold on processing and return a function that will release it a maximum of once.
 
-  		if (actual) {
-  			expectedType = objectType(expected);
+  	}, {
+  		key: "async",
+  		value: function async(count) {
+  			var test$$1 = this.test,
+  			    popped = false,
+  			    acceptCallCount = count;
 
-  			// We don't want to validate thrown error
-  			if (!expected) {
-  				ok = true;
-  				expectedOutput = null;
-
-  				// Expected is a regexp
-  			} else if (expectedType === "regexp") {
-  				ok = expected.test(errorString(actual));
-
-  				// Expected is a constructor, maybe an Error constructor
-  			} else if (expectedType === "function" && actual instanceof expected) {
-  				ok = true;
-
-  				// Expected is an Error object
-  			} else if (expectedType === "object") {
-  				ok = actual instanceof expected.constructor && actual.name === expected.name && actual.message === expected.message;
-
-  				// Expected is a validation function which returns true if validation passed
-  			} else if (expectedType === "function" && expected.call({}, actual) === true) {
-  				expectedOutput = null;
-  				ok = true;
+  			if (typeof acceptCallCount === "undefined") {
+  				acceptCallCount = 1;
   			}
+
+  			test$$1.usedAsync = true;
+  			var resume = internalStop(test$$1);
+
+  			return function done() {
+  				if (popped) {
+  					test$$1.pushFailure("Too many calls to the `assert.async` callback", sourceFromStacktrace(2));
+  					return;
+  				}
+
+  				acceptCallCount -= 1;
+  				if (acceptCallCount > 0) {
+  					return;
+  				}
+
+  				popped = true;
+  				resume();
+  			};
   		}
 
-  		currentTest.assert.pushResult({
-  			result: ok,
-  			actual: actual,
-  			expected: expectedOutput,
-  			message: message
-  		});
-  	}
-  };
+  		// Exports test.push() to the user API
+  		// Alias of pushResult.
+
+  	}, {
+  		key: "push",
+  		value: function push(result, actual, expected, message, negative) {
+  			console.warn("assert.push is deprecated and will be removed in QUnit 3.0." + " Please use assert.pushResult instead (http://api.qunitjs.com/pushResult/).");
+
+  			var currentAssert = this instanceof Assert ? this : config.current.assert;
+  			return currentAssert.pushResult({
+  				result: result,
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: negative
+  			});
+  		}
+  	}, {
+  		key: "pushResult",
+  		value: function pushResult(resultInfo) {
+
+  			// Destructure of resultInfo = { result, actual, expected, message, negative }
+  			var assert = this,
+  			    currentTest = assert instanceof Assert && assert.test || config.current;
+
+  			// Backwards compatibility fix.
+  			// Allows the direct use of global exported assertions and QUnit.assert.*
+  			// Although, it's use is not recommended as it can leak assertions
+  			// to other tests from async tests, because we only get a reference to the current test,
+  			// not exactly the test where assertion were intended to be called.
+  			if (!currentTest) {
+  				throw new Error("assertion outside test context, in " + sourceFromStacktrace(2));
+  			}
+
+  			if (currentTest.usedAsync === true && currentTest.semaphore === 0) {
+  				currentTest.pushFailure("Assertion after the final `assert.async` was resolved", sourceFromStacktrace(2));
+
+  				// Allow this assertion to continue running anyway...
+  			}
+
+  			if (!(assert instanceof Assert)) {
+  				assert = currentTest.assert;
+  			}
+
+  			return assert.test.pushResult(resultInfo);
+  		}
+  	}, {
+  		key: "ok",
+  		value: function ok(result, message) {
+  			if (!message) {
+  				message = result ? "okay" : "failed, expected argument to be truthy, was: " + dump.parse(result);
+  			}
+
+  			this.pushResult({
+  				result: !!result,
+  				actual: result,
+  				expected: true,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notOk",
+  		value: function notOk(result, message) {
+  			if (!message) {
+  				message = !result ? "okay" : "failed, expected argument to be falsy, was: " + dump.parse(result);
+  			}
+
+  			this.pushResult({
+  				result: !result,
+  				actual: result,
+  				expected: false,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "equal",
+  		value: function equal(actual, expected, message) {
+
+  			// eslint-disable-next-line eqeqeq
+  			var result = expected == actual;
+
+  			this.pushResult({
+  				result: result,
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notEqual",
+  		value: function notEqual(actual, expected, message) {
+
+  			// eslint-disable-next-line eqeqeq
+  			var result = expected != actual;
+
+  			this.pushResult({
+  				result: result,
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: true
+  			});
+  		}
+  	}, {
+  		key: "propEqual",
+  		value: function propEqual(actual, expected, message) {
+  			actual = objectValues(actual);
+  			expected = objectValues(expected);
+
+  			this.pushResult({
+  				result: equiv(actual, expected),
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notPropEqual",
+  		value: function notPropEqual(actual, expected, message) {
+  			actual = objectValues(actual);
+  			expected = objectValues(expected);
+
+  			this.pushResult({
+  				result: !equiv(actual, expected),
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: true
+  			});
+  		}
+  	}, {
+  		key: "deepEqual",
+  		value: function deepEqual(actual, expected, message) {
+  			this.pushResult({
+  				result: equiv(actual, expected),
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notDeepEqual",
+  		value: function notDeepEqual(actual, expected, message) {
+  			this.pushResult({
+  				result: !equiv(actual, expected),
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: true
+  			});
+  		}
+  	}, {
+  		key: "strictEqual",
+  		value: function strictEqual(actual, expected, message) {
+  			this.pushResult({
+  				result: expected === actual,
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notStrictEqual",
+  		value: function notStrictEqual(actual, expected, message) {
+  			this.pushResult({
+  				result: expected !== actual,
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: true
+  			});
+  		}
+  	}, {
+  		key: "throws",
+  		value: function throws(block, expected, message) {
+  			var actual = void 0,
+  			    result = false,
+  			    currentTest = this instanceof Assert && this.test || config.current;
+
+  			// 'expected' is optional unless doing string comparison
+  			if (objectType(expected) === "string") {
+  				if (message == null) {
+  					message = expected;
+  					expected = null;
+  				} else {
+  					throw new Error("throws/raises does not accept a string value for the expected argument.\n" + "Use a non-string object value (e.g. regExp) instead if it's necessary.");
+  				}
+  			}
+
+  			currentTest.ignoreGlobalErrors = true;
+  			try {
+  				block.call(currentTest.testEnvironment);
+  			} catch (e) {
+  				actual = e;
+  			}
+  			currentTest.ignoreGlobalErrors = false;
+
+  			if (actual) {
+  				var expectedType = objectType(expected);
+
+  				// We don't want to validate thrown error
+  				if (!expected) {
+  					result = true;
+  					expected = null;
+
+  					// Expected is a regexp
+  				} else if (expectedType === "regexp") {
+  					result = expected.test(errorString(actual));
+
+  					// Expected is a constructor, maybe an Error constructor
+  				} else if (expectedType === "function" && actual instanceof expected) {
+  					result = true;
+
+  					// Expected is an Error object
+  				} else if (expectedType === "object") {
+  					result = actual instanceof expected.constructor && actual.name === expected.name && actual.message === expected.message;
+
+  					// Expected is a validation function which returns true if validation passed
+  				} else if (expectedType === "function" && expected.call({}, actual) === true) {
+  					expected = null;
+  					result = true;
+  				}
+  			}
+
+  			currentTest.assert.pushResult({
+  				result: result,
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}]);
+  	return Assert;
+  }();
 
   // Provide an alternative to assert.throws(), for environments that consider throws a reserved word
   // Known to us are: Closure Compiler, Narwhal
-  (function () {
+  // eslint-disable-next-line dot-notation
 
-  	// eslint-disable-next-line dot-notation
-  	Assert.prototype.raises = Assert.prototype["throws"];
-  })();
 
+  Assert.prototype.raises = Assert.prototype["throws"];
+
+  /**
+   * Converts an error into a simple string for comparisons.
+   *
+   * @param {Error} error
+   * @return {String}
+   */
   function errorString(error) {
-  	var name,
-  	    message,
-  	    resultErrorString = error.toString();
+  	var resultErrorString = error.toString();
+
   	if (resultErrorString.substring(0, 7) === "[object") {
-  		name = error.name ? error.name.toString() : "Error";
-  		message = error.message ? error.message.toString() : "";
+  		var name = error.name ? error.name.toString() : "Error";
+  		var message = error.message ? error.message.toString() : "";
+
   		if (name && message) {
   			return name + ": " + message;
   		} else if (name) {
@@ -1963,36 +1978,7 @@
   }
 
   /* global module, exports, define */
-  function applyDeprecated(name) {
-  	return function () {
-  		throw new Error(name + " is removed in QUnit 2.0.\n" + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
-  	};
-  }
-
   function exportQUnit(QUnit) {
-
-  	Object.keys(Assert.prototype).forEach(function (key) {
-  		QUnit[key] = applyDeprecated("`QUnit." + key + "`");
-  	});
-
-  	QUnit.asyncTest = function () {
-  		throw new Error("asyncTest is removed in QUnit 2.0, use QUnit.test() with assert.async() instead.\n" + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
-  	};
-
-  	QUnit.stop = function () {
-  		throw new Error("QUnit.stop is removed in QUnit 2.0, use QUnit.test() with assert.async() instead.\n" + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
-  	};
-
-  	function resetThrower() {
-  		throw new Error("QUnit.reset is removed in QUnit 2.0 without replacement.\n" + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
-  	}
-
-  	Object.defineProperty(QUnit, "reset", {
-  		get: function get() {
-  			return resetThrower;
-  		},
-  		set: resetThrower
-  	});
 
   	if (defined.document) {
 
@@ -2000,10 +1986,6 @@
   		if (window.QUnit && window.QUnit.version) {
   			throw new Error("QUnit has already been defined.");
   		}
-
-  		["test", "module", "expect", "start", "ok", "notOk", "equal", "notEqual", "propEqual", "notPropEqual", "deepEqual", "notDeepEqual", "strictEqual", "notStrictEqual", "throws", "raises"].forEach(function (key) {
-  			window[key] = applyDeprecated("The global `" + key + "`");
-  		});
 
   		window.QUnit = QUnit;
   	}
@@ -2080,7 +2062,7 @@
   QUnit.isLocal = !(defined.document && window.location.protocol !== "file:");
 
   // Expose the current QUnit version
-  QUnit.version = "2.1.0";
+  QUnit.version = "2.1.1";
 
   extend(QUnit, {
 
@@ -2097,10 +2079,6 @@
   		}
 
   		module = createModule();
-
-  		if (testEnvironment && (testEnvironment.setup || testEnvironment.teardown)) {
-  			console.warn("Module's `setup` and `teardown` are not hooks anymore on QUnit 2.0, use " + "`beforeEach` and `afterEach` instead\n" + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
-  		}
 
   		moduleFns = {
   			before: setHook(module, "before"),
@@ -2168,6 +2146,10 @@
   				throw new Error("Called start() outside of a test context too many times");
   			} else if (config.autostart) {
   				throw new Error("Called start() outside of a test context when " + "QUnit.config.autostart was true");
+  			} else if (!defined.document && !config.pageLoaded) {
+
+  				// Starts from Node even if .load was not previously called
+  				QUnit.load();
   			} else if (!config.pageLoaded) {
 
   				// The page isn't completely loaded yet, so bail out and let `QUnit.load` handle it
@@ -2175,7 +2157,7 @@
   				return;
   			}
   		} else {
-  			throw new Error("QUnit.start cannot be called inside a test context. This feature is removed in " + "QUnit 2.0. For async tests, use QUnit.test() with assert.async() instead.\n" + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
+  			throw new Error("QUnit.start cannot be called inside a test context.");
   		}
 
   		scheduleBegin();
@@ -2220,16 +2202,6 @@
   QUnit.assert = Assert.prototype;
   QUnit.equiv = equiv;
   QUnit.dump = dump;
-
-  // 3.0 TODO: Remove
-  function jsDumpThrower() {
-  	throw new Error("QUnit.jsDump is removed in QUnit 2.0, use QUnit.dump instead.\n" + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
-  }
-
-  Object.defineProperty(QUnit, "jsDump", {
-  	get: jsDumpThrower,
-  	set: jsDumpThrower
-  });
 
   registerLoggingCallbacks(QUnit);
 
@@ -2304,11 +2276,11 @@
   	}
   	config.depth--;
   	if (last && !config.blocking && !config.queue.length && config.depth === 0) {
-  		done$1();
+  		done();
   	}
   }
 
-  function done$1() {
+  function done() {
   	var runtime,
   	    passed,
   	    i,
@@ -2390,6 +2362,100 @@
   	QUnit.testStart(resetFixture);
   })();
 
+  (function () {
+
+  	// Only interact with URLs via window.location
+  	var location = typeof window !== "undefined" && window.location;
+  	if (!location) {
+  		return;
+  	}
+
+  	var urlParams = getUrlParams();
+
+  	QUnit.urlParams = urlParams;
+
+  	// Match module/test by inclusion in an array
+  	QUnit.config.moduleId = [].concat(urlParams.moduleId || []);
+  	QUnit.config.testId = [].concat(urlParams.testId || []);
+
+  	// Exact case-insensitive match of the module name
+  	QUnit.config.module = urlParams.module;
+
+  	// Regular expression or case-insenstive substring match against "moduleName: testName"
+  	QUnit.config.filter = urlParams.filter;
+
+  	// Test order randomization
+  	if (urlParams.seed === true) {
+
+  		// Generate a random seed if the option is specified without a value
+  		QUnit.config.seed = Math.random().toString(36).slice(2);
+  	} else if (urlParams.seed) {
+  		QUnit.config.seed = urlParams.seed;
+  	}
+
+  	// Add URL-parameter-mapped config values with UI form rendering data
+  	QUnit.config.urlConfig.push({
+  		id: "hidepassed",
+  		label: "Hide passed tests",
+  		tooltip: "Only show tests and assertions that fail. Stored as query-strings."
+  	}, {
+  		id: "noglobals",
+  		label: "Check for Globals",
+  		tooltip: "Enabling this will test if any test introduces new properties on the " + "global object (`window` in Browsers). Stored as query-strings."
+  	}, {
+  		id: "notrycatch",
+  		label: "No try-catch",
+  		tooltip: "Enabling this will run tests outside of a try-catch block. Makes debugging " + "exceptions in IE reasonable. Stored as query-strings."
+  	});
+
+  	QUnit.begin(function () {
+  		var i,
+  		    option,
+  		    urlConfig = QUnit.config.urlConfig;
+
+  		for (i = 0; i < urlConfig.length; i++) {
+
+  			// Options can be either strings or objects with nonempty "id" properties
+  			option = QUnit.config.urlConfig[i];
+  			if (typeof option !== "string") {
+  				option = option.id;
+  			}
+
+  			if (QUnit.config[option] === undefined) {
+  				QUnit.config[option] = urlParams[option];
+  			}
+  		}
+  	});
+
+  	function getUrlParams() {
+  		var i, param, name, value;
+  		var urlParams = Object.create(null);
+  		var params = location.search.slice(1).split("&");
+  		var length = params.length;
+
+  		for (i = 0; i < length; i++) {
+  			if (params[i]) {
+  				param = params[i].split("=");
+  				name = decodeQueryParam(param[0]);
+
+  				// Allow just a key to turn on a flag, e.g., test.html?noglobals
+  				value = param.length === 1 || decodeQueryParam(param.slice(1).join("="));
+  				if (name in urlParams) {
+  					urlParams[name] = [].concat(urlParams[name], value);
+  				} else {
+  					urlParams[name] = value;
+  				}
+  			}
+  		}
+
+  		return urlParams;
+  	}
+
+  	function decodeQueryParam(param) {
+  		return decodeURIComponent(param.replace(/\+/g, "%20"));
+  	}
+  })();
+
   // Escape text for attribute or text content.
   function escapeText(s) {
   	if (!s) {
@@ -2420,10 +2486,6 @@
   	if (typeof window === "undefined" || !window.document) {
   		return;
   	}
-
-  	QUnit.init = function () {
-  		throw new Error("QUnit.init is removed in QUnit 2.0, use QUnit.test() with assert.async() instead.\n" + "Details in our upgrade guide at https://qunitjs.com/upgrade-guide-2.x/");
-  	};
 
   	var config = QUnit.config,
   	    document$$1 = window.document,
@@ -2480,6 +2542,16 @@
 
   	function id(name) {
   		return document$$1.getElementById && document$$1.getElementById(name);
+  	}
+
+  	function abortTests() {
+  		var abortButton = id("qunit-abort-tests-button");
+  		if (abortButton) {
+  			abortButton.disabled = true;
+  			abortButton.innerHTML = "Aborting...";
+  		}
+  		QUnit.config.queue.length = 0;
+  		return false;
   	}
 
   	function interceptNavigation(ev) {
@@ -2637,6 +2709,14 @@
   		addEvents(urlConfigContainer.getElementsByTagName("select"), "change", toolbarChanged);
 
   		return urlConfigContainer;
+  	}
+
+  	function abortTestsButton() {
+  		var button = document$$1.createElement("button");
+  		button.id = "qunit-abort-tests-button";
+  		button.innerHTML = "Abort";
+  		addEvent(button, "click", abortTests);
+  		return button;
   	}
 
   	function toolbarLooseFilter() {
@@ -2840,7 +2920,8 @@
 
   	function appendTestResults() {
   		var tests = id("qunit-tests"),
-  		    result = id("qunit-testresult");
+  		    result = id("qunit-testresult"),
+  		    controls;
 
   		if (result) {
   			result.parentNode.removeChild(result);
@@ -2852,7 +2933,12 @@
   			result.id = "qunit-testresult";
   			result.className = "result";
   			tests.parentNode.insertBefore(result, tests);
-  			result.innerHTML = "Running...<br />&#160;";
+  			result.innerHTML = "<div id=\"qunit-testresult-display\">Running...<br />&#160;</div>" + "<div id=\"qunit-testresult-controls\"></div>" + "<div class=\"clearfix\"></div>";
+  			controls = id("qunit-testresult-controls");
+  		}
+
+  		if (controls) {
+  			controls.appendChild(abortTestsButton());
   		}
   	}
 
@@ -2959,14 +3045,39 @@
   	QUnit.done(function (details) {
   		var banner = id("qunit-banner"),
   		    tests = id("qunit-tests"),
-  		    html = ["Tests completed in ", details.runtime, " milliseconds.<br />", "<span class='passed'>", details.passed, "</span> assertions of <span class='total'>", details.total, "</span> passed, <span class='failed'>", details.failed, "</span> failed."].join("");
+  		    abortButton = id("qunit-abort-tests-button"),
+  		    html = ["Tests completed in ", details.runtime, " milliseconds.<br />", "<span class='passed'>", details.passed, "</span> assertions of <span class='total'>", details.total, "</span> passed, <span class='failed'>", details.failed, "</span> failed."].join(""),
+  		    test,
+  		    assertLi,
+  		    assertList;
 
-  		if (banner) {
+  		// Update remaing tests to aborted
+  		if (abortButton && abortButton.disabled) {
+  			html = "Tests aborted after " + details.runtime + " milliseconds.";
+
+  			for (var i = 0; i < tests.children.length; i++) {
+  				test = tests.children[i];
+  				if (test.className === "" || test.className === "running") {
+  					test.className = "aborted";
+  					assertList = test.getElementsByTagName("ol")[0];
+  					assertLi = document$$1.createElement("li");
+  					assertLi.className = "fail";
+  					assertLi.innerHTML = "Test aborted.";
+  					assertList.appendChild(assertLi);
+  				}
+  			}
+  		}
+
+  		if (banner && (!abortButton || abortButton.disabled === false)) {
   			banner.className = details.failed ? "qunit-fail" : "qunit-pass";
   		}
 
+  		if (abortButton) {
+  			abortButton.parentNode.removeChild(abortButton);
+  		}
+
   		if (tests) {
-  			id("qunit-testresult").innerHTML = html;
+  			id("qunit-testresult-display").innerHTML = html;
   		}
 
   		if (config.altertitle && document$$1.title) {
@@ -3006,7 +3117,7 @@
   			appendTest(details.name, details.testId, details.module);
   		}
 
-  		running = id("qunit-testresult");
+  		running = id("qunit-testresult-display");
   		if (running) {
   			bad = QUnit.config.reorder && details.previousFailure;
 
@@ -4251,99 +4362,5 @@
   		return text;
   	};
   }();
-
-  (function () {
-
-  	// Only interact with URLs via window.location
-  	var location = typeof window !== "undefined" && window.location;
-  	if (!location) {
-  		return;
-  	}
-
-  	var urlParams = getUrlParams();
-
-  	QUnit.urlParams = urlParams;
-
-  	// Match module/test by inclusion in an array
-  	QUnit.config.moduleId = [].concat(urlParams.moduleId || []);
-  	QUnit.config.testId = [].concat(urlParams.testId || []);
-
-  	// Exact case-insensitive match of the module name
-  	QUnit.config.module = urlParams.module;
-
-  	// Regular expression or case-insenstive substring match against "moduleName: testName"
-  	QUnit.config.filter = urlParams.filter;
-
-  	// Test order randomization
-  	if (urlParams.seed === true) {
-
-  		// Generate a random seed if the option is specified without a value
-  		QUnit.config.seed = Math.random().toString(36).slice(2);
-  	} else if (urlParams.seed) {
-  		QUnit.config.seed = urlParams.seed;
-  	}
-
-  	// Add URL-parameter-mapped config values with UI form rendering data
-  	QUnit.config.urlConfig.push({
-  		id: "hidepassed",
-  		label: "Hide passed tests",
-  		tooltip: "Only show tests and assertions that fail. Stored as query-strings."
-  	}, {
-  		id: "noglobals",
-  		label: "Check for Globals",
-  		tooltip: "Enabling this will test if any test introduces new properties on the " + "global object (`window` in Browsers). Stored as query-strings."
-  	}, {
-  		id: "notrycatch",
-  		label: "No try-catch",
-  		tooltip: "Enabling this will run tests outside of a try-catch block. Makes debugging " + "exceptions in IE reasonable. Stored as query-strings."
-  	});
-
-  	QUnit.begin(function () {
-  		var i,
-  		    option,
-  		    urlConfig = QUnit.config.urlConfig;
-
-  		for (i = 0; i < urlConfig.length; i++) {
-
-  			// Options can be either strings or objects with nonempty "id" properties
-  			option = QUnit.config.urlConfig[i];
-  			if (typeof option !== "string") {
-  				option = option.id;
-  			}
-
-  			if (QUnit.config[option] === undefined) {
-  				QUnit.config[option] = urlParams[option];
-  			}
-  		}
-  	});
-
-  	function getUrlParams() {
-  		var i, param, name, value;
-  		var urlParams = Object.create(null);
-  		var params = location.search.slice(1).split("&");
-  		var length = params.length;
-
-  		for (i = 0; i < length; i++) {
-  			if (params[i]) {
-  				param = params[i].split("=");
-  				name = decodeQueryParam(param[0]);
-
-  				// Allow just a key to turn on a flag, e.g., test.html?noglobals
-  				value = param.length === 1 || decodeQueryParam(param.slice(1).join("="));
-  				if (name in urlParams) {
-  					urlParams[name] = [].concat(urlParams[name], value);
-  				} else {
-  					urlParams[name] = value;
-  				}
-  			}
-  		}
-
-  		return urlParams;
-  	}
-
-  	function decodeQueryParam(param) {
-  		return decodeURIComponent(param.replace(/\+/g, "%20"));
-  	}
-  })();
 
 }((function() { return this; }())));

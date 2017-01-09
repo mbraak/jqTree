@@ -22,7 +22,7 @@
     "jquery": ">=1.9"
   },
   "devDependencies": {
-    "browserify": "^13.1.1",
+    "browserify": "^13.3.0",
     "coffee-script": "^1.12.2",
     "coffeeify": "^2.1.0",
     "connect": "^3.5.0",
@@ -44,7 +44,7 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-qunit": "^1.2.1",
     "phantomjs-prebuilt": "^2.1.14",
-    "qunitjs": "^2.1.0",
+    "qunitjs": "^2.1.1",
     "serve-static": "^1.11.1",
     "watchify": "^3.8.0"
   }
