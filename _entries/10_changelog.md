@@ -6,6 +6,7 @@ name: changelog
 ##### development version
 
 * Issue 462: add on_finished parameter to openNode function
+* Issue 467: fix autoscroll when tree position changes after tree init (thanks to Themre)
 
 ##### 1.3.6 (november 5 2016)
 
