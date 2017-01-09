@@ -2111,7 +2111,6 @@ ScrollHandler = (function() {
     this.tree_widget = tree_widget;
     this.previous_top = -1;
     this.is_initialized = false;
-    this._initScrollParent();
   }
 
   ScrollHandler.prototype._initScrollParent = function() {
