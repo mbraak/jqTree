@@ -14,6 +14,8 @@ Position = node_module.Position
 
 util_module = require './util'
 
+{isFunction} = util_module
+
 {BorderDropHint,FolderElement,GhostDropHint,NodeElement} = require './node_element'
 
 {DragAndDropHandler, DragElement, HitAreasGenerator} = drag_and_drop_handler
@@ -302,12 +304,24 @@ class JqTreeWidget extends MouseWidget
     getNodeByCallback: (callback) ->
         return @tree.getNodeByCallback(callback)
 
-    openNode: (node, slide=null) ->
-        if node
+    openNode: (node, slide_param=null, on_finished_param=null) ->
+        parseParams = =>
+            if isFunction(slide_param)
+                on_finished = slide_param
+                slide = null
+            else
+                slide = slide_param
+                on_finished = on_finished_param
+
             if slide == null
                 slide = @options.slide
 
-            @_openNode(node, slide)
+            return [slide, on_finished]
+
+        [slide, on_finished] = parseParams()
+
+        if node
+            @_openNode(node, slide, on_finished)
 
         return @element
 

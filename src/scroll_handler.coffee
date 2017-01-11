@@ -7,8 +7,6 @@ class ScrollHandler
         @previous_top = -1
         @is_initialized = false
 
-        @_initScrollParent()
-
     _initScrollParent: ->
         getParentWithOverflow = =>
             css_values = ['overflow', 'overflow-y']
