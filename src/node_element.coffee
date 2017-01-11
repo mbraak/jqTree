@@ -69,7 +69,7 @@ class FolderElement extends NodeElement
                 $span.attr('aria-expanded', 'true')
 
                 if on_finished
-                    on_finished()
+                    on_finished(@node)
 
                 @tree_widget._triggerEvent('tree.open', node: @node)
 

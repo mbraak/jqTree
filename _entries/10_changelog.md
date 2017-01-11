@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.3.7 (january 11 2017)
+
+* Issue 462: add on_finished parameter to openNode function
+* Issue 467: fix autoscroll when tree position changes after tree init (thanks to Themre)
+
 ##### 1.3.6 (november 5 2016)
 
 * Issue 453: make it possible to initialize the tree without data
