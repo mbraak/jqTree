@@ -14,7 +14,12 @@ module.exports = function(debug) {
             var header_template = fs.readFileSync("./src/header.txt", "utf8");
             var package = jsonfile.readFileSync("package.json");
 
-            return template(header_template)(package);
+            var data = {
+                version: package.version,
+                year: new Date().getFullYear()
+            };
+
+            return template(header_template)(data);
         }
     }
 
