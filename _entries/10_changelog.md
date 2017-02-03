@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue #471: use webpack instead of browserify
+* Issue #472: use 'jquery.on' instead of deprecated 'bind'
+
 ##### 1.3.7 (january 11 2017)
 
 * Issue 462: add on_finished parameter to openNode function
