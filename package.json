@@ -16,7 +16,8 @@
     "test": "karma start --browsers Chrome --single-run && coffeelint src",
     "build": "gulp",
     "watch": "gulp watch",
-    "karma": "karma start --browsers Chrome"
+    "karma": "karma start --browsers Chrome",
+    "jekyll": "jekyll build"
   },
   "dependencies": {
     "jquery": ">=1.9"

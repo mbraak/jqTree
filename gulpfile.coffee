@@ -2,7 +2,6 @@ gulp       = require 'gulp'
 coffee     = require 'gulp-coffee'
 coffeeify  = require 'gulp-coffeeify'
 coffeelint = require 'gulp-coffeelint'
-exec       = require('child_process').exec
 fs         = require 'fs'
 header     = require 'gulp-header'
 rename     = require 'gulp-rename'
@@ -29,12 +28,6 @@ gulp.task 'build_test', ->
         .pipe coffeeify()
         .pipe rename('test_build.js')
         .pipe gulp.dest('./test')
-
-gulp.task 'jekyll', (cb) ->
-    exec 'jekyll build', (err, stdout, stderr) ->
-        console.log(stdout)
-        console.log(stderr)
-        cb(err)
 
 gulp.task 'sass', ->
     gulp.src './jqtree.scss'
