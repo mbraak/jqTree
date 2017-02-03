@@ -11,10 +11,10 @@ class KeyHandler
         @tree_widget = tree_widget
 
         if tree_widget.options.keyboardSupport
-            $(document).bind('keydown.jqtree', $.proxy(@handleKeyDown, this))
+            $(document).on('keydown.jqtree', $.proxy(@handleKeyDown, this))
 
     deinit: ->
-        $(document).unbind('keydown.jqtree')
+        $(document).off('keydown.jqtree')
 
     moveDown: ->
         node = @tree_widget.getSelectedNode()

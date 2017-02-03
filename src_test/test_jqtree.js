@@ -74,7 +74,7 @@ test('toggle', function(assert) {
         data: example_data
     });
 
-    $tree.bind(
+    $tree.on(
         'tree.open',
         function(e) {
             assert.ok(! isNodeClosed($node1), 'node1 is open');
@@ -84,7 +84,7 @@ test('toggle', function(assert) {
         }
     );
 
-    $tree.bind(
+    $tree.on(
         'tree.close',
         function(e) {
             assert.ok(isNodeClosed($node1), 'node1 is closed');
@@ -118,13 +118,13 @@ test("click event", function(assert) {
     var $node1 = $tree.find('ul.jqtree-tree li:first');
     var $text_span = $node1.find('span:first');
 
-    $tree.bind('tree.click', function(e) {
+    $tree.on('tree.click', function(e) {
         assert.equal(e.node.name, 'node1');
     });
 
     var done = assert.async();
 
-    $tree.bind('tree.select', function(e) {
+    $tree.on('tree.select', function(e) {
         select_count += 1;
 
         if (select_count == 1) {
@@ -498,7 +498,7 @@ test('selectNode when another node is selected', function(assert) {
     // -- is node 'node2' named 'deselected_node' in object's attributes?
     var is_select_event_fired = false;
 
-    $tree.bind('tree.select', function(e) {
+    $tree.on('tree.select', function(e) {
         assert.equal(e.deselected_node, node2);
         is_select_event_fired = true;
     });
@@ -528,7 +528,7 @@ test('click toggler', function(assert) {
     var $toggler = $title.prev();
     assert.ok($toggler.is('a.jqtree-toggler.jqtree-closed'));
 
-    $tree.bind('tree.open', function(e) {
+    $tree.on('tree.open', function(e) {
         // 2. handle 'open' event
         assert.equal(e.node.name, 'node1');
 
@@ -536,7 +536,7 @@ test('click toggler', function(assert) {
         $toggler.click();
     });
 
-    $tree.bind('tree.close', function(e) {
+    $tree.on('tree.close', function(e) {
         assert.equal(e.node.name, 'node1');
         done();
     });
@@ -888,7 +888,7 @@ test('init event for local data', function(assert) {
 
     var $tree = $('#tree1');
 
-    $tree.bind('tree.init', function() {
+    $tree.on('tree.init', function() {
         // Check that we can call functions in 'tree.init' event
         assert.equal($tree.tree('getNodeByName', 'node2').name, 'node2');
 
@@ -913,7 +913,7 @@ test('init event for ajax', function(assert) {
         logging: false
     });
 
-    $tree.bind('tree.init', function() {
+    $tree.on('tree.init', function() {
         assert.equal($tree.tree('getNodeByName', 'node2').name, 'node2');
 
         done();

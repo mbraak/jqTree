@@ -547,11 +547,11 @@ class JqTreeWidget extends MouseWidget
         @element.dblclick($.proxy(@_dblclick, this))
 
         if @options.useContextMenu
-            @element.bind('contextmenu', $.proxy(@_contextmenu, this))
+            @element.on('contextmenu', $.proxy(@_contextmenu, this))
 
     _deinit: ->
         @element.empty()
-        @element.unbind()
+        @element.off()
 
         if @key_handler
             @key_handler.deinit()

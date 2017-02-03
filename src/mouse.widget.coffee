@@ -12,8 +12,8 @@ class MouseWidget extends SimpleWidget
     @is_mouse_handled = false
 
     _init: ->
-        @$el.bind('mousedown.mousewidget', $.proxy(@_mouseDown, this))
-        @$el.bind('touchstart.mousewidget', $.proxy(@_touchStart, this))
+        @$el.on('mousedown.mousewidget', $.proxy(@_mouseDown, this))
+        @$el.on('touchstart.mousewidget', $.proxy(@_touchStart, this))
 
         @is_mouse_started = false
         @mouse_delay = 0
@@ -22,12 +22,12 @@ class MouseWidget extends SimpleWidget
         @mouse_down_info = null
 
     _deinit: ->
-        @$el.unbind('mousedown.mousewidget')
-        @$el.unbind('touchstart.mousewidget')
+        @$el.off('mousedown.mousewidget')
+        @$el.off('touchstart.mousewidget')
 
         $document = $(document)
-        $document.unbind('mousemove.mousewidget')
-        $document.unbind('mouseup.mousewidget')
+        $document.off('mousemove.mousewidget')
+        $document.off('mouseup.mousewidget')
 
     _mouseDown: (e) ->
         # Is left mouse button?
@@ -65,10 +65,10 @@ class MouseWidget extends SimpleWidget
 
     _handleStartMouse: ->
         $document = $(document)
-        $document.bind('mousemove.mousewidget', $.proxy(@_mouseMove, this))
-        $document.bind('touchmove.mousewidget', $.proxy(@_touchMove, this))
-        $document.bind('mouseup.mousewidget', $.proxy(@_mouseUp, this))
-        $document.bind('touchend.mousewidget', $.proxy(@_touchEnd, this))
+        $document.on('mousemove.mousewidget', $.proxy(@_mouseMove, this))
+        $document.on('touchmove.mousewidget', $.proxy(@_touchMove, this))
+        $document.on('mouseup.mousewidget', $.proxy(@_mouseUp, this))
+        $document.on('touchend.mousewidget', $.proxy(@_touchEnd, this))
 
         if @mouse_delay
             @_startMouseDelayTimer()
@@ -123,10 +123,10 @@ class MouseWidget extends SimpleWidget
 
     _handleMouseUp: (position_info) ->
         $document = $(document)
-        $document.unbind('mousemove.mousewidget')
-        $document.unbind('touchmove.mousewidget')
-        $document.unbind('mouseup.mousewidget')
-        $document.unbind('touchend.mousewidget')
+        $document.off('mousemove.mousewidget')
+        $document.off('touchmove.mousewidget')
+        $document.off('mouseup.mousewidget')
+        $document.off('touchend.mousewidget')
 
         if @is_mouse_started
             @is_mouse_started = false
