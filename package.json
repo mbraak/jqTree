@@ -14,29 +14,30 @@
   },
   "scripts": {
     "test": "karma start --browsers Chrome --single-run && coffeelint src",
-    "build": "gulp",
-    "watch": "gulp watch",
+    "watch": "webpack",
+    "production": "webpack --config webpack.config.production && gulp && cp build/tree.jquery.js .",
     "karma": "karma start --browsers Chrome",
-    "jekyll": "jekyll build"
+    "jekyll-build": "jekyll build",
+    "jekyll-serve": "jekyll serve"
   },
   "dependencies": {
     "jquery": ">=1.9"
   },
   "devDependencies": {
     "browserify": "^14.0.0",
+    "coffee-loader": "^0.7.2",
     "coffee-script": "^1.12.3",
     "coffeeify": "^2.1.0",
     "connect": "^3.5.0",
     "coveralls": "^2.11.15",
     "gulp": "^3.9.1",
     "gulp-coffee": "^2.3.3",
-    "gulp-coffeeify": "0.1.8",
     "gulp-coffeelint": "^0.6.0",
-    "gulp-header": "^1.8.8",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
     "ie-version": "^0.1.0",
     "jquery-mockjax": "^2.2.1",
+    "jsonfile": "^2.4.0",
     "karma": "^1.4.1",
     "karma-browserify": "^5.1.1",
     "karma-chrome-launcher": "^2.0.0",
@@ -44,9 +45,11 @@
     "karma-firefox-launcher": "^1.0.0",
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-qunit": "^1.2.1",
+    "lodash.template": "^4.4.0",
     "phantomjs-prebuilt": "^2.1.14",
     "qunitjs": "^2.1.1",
     "serve-static": "^1.11.2",
-    "watchify": "^3.9.0"
+    "watchify": "^3.9.0",
+    "webpack": "^2.2.1"
   }
 }
