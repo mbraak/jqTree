@@ -33,7 +33,7 @@ module.exports = function(debug) {
             filename: "[name].js"
         },
         resolve: {
-            extensions: [".coffee", ".js"]
+            extensions: [".coffee", ".js", ".ts"]
         },
         module: {
             loaders: [
@@ -41,6 +41,14 @@ module.exports = function(debug) {
                     test: /\.coffee$/,
                     loader: "coffee-loader",
                     exclude: /node_modules/
+                },
+                {
+                    test: /\.ts$/,
+                    loader: "ts-loader",
+                    exclude: /node_modules/,
+                    options: {
+                        transpileOnly: true
+                    }
                 }
             ]
         }

@@ -35,6 +35,7 @@
     "gulp-coffeelint": "^0.6.0",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
+    "gulp-typescript": "^3.1.4",
     "ie-version": "^0.1.0",
     "jquery-mockjax": "^2.2.1",
     "jsonfile": "^2.4.0",
@@ -49,6 +50,8 @@
     "phantomjs-prebuilt": "^2.1.14",
     "qunitjs": "^2.1.1",
     "serve-static": "^1.11.2",
+    "ts-loader": "^2.0.0",
+    "typescript": "^2.1.5",
     "watchify": "^3.9.0",
     "webpack": "^2.2.1"
   }
