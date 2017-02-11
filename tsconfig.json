@@ -1,3 +1,7 @@
 {
-    "compileOnSave": false
+    "compileOnSave": false,
+    "exclude": [
+        "_site",
+        "node_modules"
+    ]
 }

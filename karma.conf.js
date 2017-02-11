@@ -26,8 +26,8 @@ module.exports = function(config) {
         },
 
         browserify: {
-            transform: ['coffeeify'],
-            extensions: ['.js', '.coffee']
+            plugin: ['tsify'],
+            extensions: ['.js', '.ts']
         },
 
         // test results reporter to use

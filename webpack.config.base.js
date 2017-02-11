@@ -40,10 +40,7 @@ module.exports = function(debug) {
                 {
                     test: /\.ts$/,
                     loader: "ts-loader",
-                    exclude: /node_modules/,
-                    options: {
-                        transpileOnly: true
-                    }
+                    exclude: /node_modules/
                 }
             ]
         }
