@@ -13,7 +13,7 @@
     "url": "https://github.com/mbraak/jqtree"
   },
   "scripts": {
-    "test": "karma start --browsers Chrome --single-run && coffeelint src",
+    "test": "karma start --browsers Chrome --single-run",
     "watch": "webpack",
     "production": "webpack --config webpack.config.production && gulp && cp build/tree.jquery.js .",
     "karma": "karma start --browsers Chrome",
@@ -25,14 +25,9 @@
   },
   "devDependencies": {
     "browserify": "^14.0.0",
-    "coffee-loader": "^0.7.2",
-    "coffee-script": "^1.12.3",
-    "coffeeify": "^2.1.0",
     "connect": "^3.5.0",
-    "coveralls": "^2.11.15",
+    "coveralls": "^2.11.16",
     "gulp": "^3.9.1",
-    "gulp-coffee": "^2.3.3",
-    "gulp-coffeelint": "^0.6.0",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
     "gulp-typescript": "^3.1.4",
@@ -51,7 +46,7 @@
     "qunitjs": "^2.1.1",
     "serve-static": "^1.11.2",
     "ts-loader": "^2.0.0",
-    "typescript": "^2.1.5",
+    "typescript": "^2.2.0",
     "watchify": "^3.9.0",
     "webpack": "^2.2.1"
   }

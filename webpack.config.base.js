@@ -25,7 +25,7 @@ module.exports = function(debug) {
 
     var config = {
         entry: {
-            "tree.jquery": ["./src/tree.jquery.coffee"],
+            "tree.jquery": ["./src/tree.jquery.ts"],
             test: ["./src_test/test.js"]
         },
         output: {
@@ -33,15 +33,10 @@ module.exports = function(debug) {
             filename: "[name].js"
         },
         resolve: {
-            extensions: [".coffee", ".js", ".ts"]
+            extensions: [".ts", ".js"]
         },
         module: {
             loaders: [
-                {
-                    test: /\.coffee$/,
-                    loader: "coffee-loader",
-                    exclude: /node_modules/
-                },
                 {
                     test: /\.ts$/,
                     loader: "ts-loader",
