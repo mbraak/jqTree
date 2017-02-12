@@ -1,80 +1,47 @@
 import { indexOf, isInt } from "./util";
 
+// tslint:disable-next-line: no-string-literal
 const $ = window["jQuery"];
 
-
 export default class SaveStateHandler {
-    tree_widget;
-    _supportsLocalStorage: boolean|null;
+    private tree_widget;
+    private _supportsLocalStorage: boolean|null;
 
     constructor(tree_widget) {
         this.tree_widget = tree_widget;
     }
 
-    saveState() {
+    public saveState() {
         const state = JSON.stringify(this.getState());
 
         if (this.tree_widget.options.onSetStateFromStorage) {
             this.tree_widget.options.onSetStateFromStorage(state);
-        }
-        else if (this.supportsLocalStorage()) {
+        } else if (this.supportsLocalStorage()) {
             localStorage.setItem(
                 this.getCookieName(),
                 state
             );
-        }
-        else if ($.cookie) {
+        } else if ($.cookie) {
             $.cookie.raw = true;
             $.cookie(
                 this.getCookieName(),
                 state,
-                {path: '/'}
+                {path: "/"}
             );
         }
     }
 
-    getStateFromStorage() {
+    public getStateFromStorage() {
         const json_data = this._loadFromStorage();
 
         if (json_data) {
             return this._parseState(json_data);
-        }
-        else {
+        } else {
             return null;
         }
     }
 
-    _parseState(json_data) {
-        const state = $.parseJSON(json_data);
-
-        // Check if selected_node is an int (instead of an array)
-        if (state && state.selected_node && isInt(state.selected_node)) {
-            // Convert to array
-            state.selected_node = [state.selected_node];
-        }
-
-        return state;
-    }
-
-    _loadFromStorage() {
-        if (this.tree_widget.options.onGetStateFromStorage) {
-            return this.tree_widget.options.onGetStateFromStorage();
-        }
-        else if (this.supportsLocalStorage()) {
-            return localStorage.getItem(
-                this.getCookieName()
-            );
-        }
-        else if ($.cookie) {
-            $.cookie.raw = true;
-            return $.cookie(this.getCookieName());
-        }
-        else {
-            return null;
-        }
-    }
-
-    getState() {
+    public getState() {
         const getOpenNodeIds = () => {
             const open_nodes = [];
 
@@ -92,7 +59,7 @@ export default class SaveStateHandler {
             );
 
             return open_nodes;
-        }
+        };
 
         const getSelectedNodeIds = () => this.tree_widget.getSelectedNodes().map(n => n.id);
 
@@ -108,11 +75,10 @@ export default class SaveStateHandler {
 
     result: must load on demand
     */
-    setInitialState(state): boolean {
+    public setInitialState(state): boolean {
         if (! state) {
             return false;
-        }
-        else {
+        } else {
             const must_load_on_demand = this._openInitialNodes(state.open_nodes);
 
             this._selectInitialNodes(state.selected_node);
@@ -121,8 +87,53 @@ export default class SaveStateHandler {
         }
     }
 
-    _openInitialNodes(node_ids: Array<any>): boolean {
-        const must_load_on_demand = false;
+    public setInitialStateOnDemand(state, cb_finished: Function) {
+        if (state) {
+            this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cb_finished);
+        } else {
+            cb_finished();
+        }
+    }
+
+    public getNodeIdToBeSelected() {
+        const state = this.getStateFromStorage();
+
+        if (state && state.selected_node) {
+            return state.selected_node[0];
+        } else {
+            return null;
+        }
+    }
+
+    private _parseState(json_data) {
+        const state = $.parseJSON(json_data);
+
+        // Check if selected_node is an int (instead of an array)
+        if (state && state.selected_node && isInt(state.selected_node)) {
+            // Convert to array
+            state.selected_node = [state.selected_node];
+        }
+
+        return state;
+    }
+
+    private _loadFromStorage() {
+        if (this.tree_widget.options.onGetStateFromStorage) {
+            return this.tree_widget.options.onGetStateFromStorage();
+        } else if (this.supportsLocalStorage()) {
+            return localStorage.getItem(
+                this.getCookieName()
+            );
+        } else if ($.cookie) {
+            $.cookie.raw = true;
+            return $.cookie(this.getCookieName());
+        } else {
+            return null;
+        }
+    }
+
+    private _openInitialNodes(node_ids: any[]): boolean {
+        let must_load_on_demand = false;
 
         for (let node_id of node_ids) {
             const node = this.tree_widget.getNodeById(node_id);
@@ -130,9 +141,8 @@ export default class SaveStateHandler {
             if (node) {
                 if (! node.load_on_demand) {
                     node.is_open = true;
-                }
-                else {
-                    const must_load_on_demand = true;
+                } else {
+                    must_load_on_demand = true;
                 }
             }
         }
@@ -140,7 +150,7 @@ export default class SaveStateHandler {
         return must_load_on_demand;
     }
 
-    _selectInitialNodes(node_ids: Array<any>): boolean {
+    private _selectInitialNodes(node_ids: any[]): boolean {
         let select_count = 0;
 
         for (let node_id of node_ids) {
@@ -153,19 +163,10 @@ export default class SaveStateHandler {
             }
         }
 
-        return select_count != 0;
+        return select_count !== 0;
     }
 
-    setInitialStateOnDemand(state, cb_finished: Function) {
-        if (state) {
-            this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cb_finished);
-        }
-        else {
-            cb_finished();
-        }
-    }
-
-    _setInitialStateOnDemand(node_ids_param: Array<any>, selected_nodes, cb_finished: Function) {
+    private _setInitialStateOnDemand(node_ids_param: any[], selected_nodes, cb_finished: Function) {
         let loading_count = 0;
         let node_ids = node_ids_param;
 
@@ -177,13 +178,11 @@ export default class SaveStateHandler {
 
                 if (! node) {
                     new_nodes_ids.push(node_id);
-                }
-                else {
+                } else {
                     if (! node.is_loading) {
                         if (node.load_on_demand) {
                             loadAndOpenNode(node);
-                        }
-                        else {
+                        } else {
                             this.tree_widget._openNode(node, false);
                         }
                     }
@@ -196,10 +195,10 @@ export default class SaveStateHandler {
                 this.tree_widget._refreshElements();
             }
 
-            if (loading_count == 0) {
+            if (loading_count === 0) {
                 cb_finished();
             }
-        }
+        };
 
         const loadAndOpenNode = (node: Node) => {
             loading_count += 1;
@@ -210,57 +209,43 @@ export default class SaveStateHandler {
                     loading_count -= 1;
                     openNodes();
                 }
-            )
-        }
+            );
+        };
 
         openNodes();
     }
 
-    getCookieName(): string {
-        if (typeof this.tree_widget.options.saveState == 'string') {
+    private getCookieName(): string {
+        if (typeof this.tree_widget.options.saveState === "string") {
             return this.tree_widget.options.saveState;
-        }
-        else {
-            return 'tree';
+        } else {
+            return "tree";
         }
     }
 
-    supportsLocalStorage(): boolean {
+    private supportsLocalStorage(): boolean {
         const testSupport = () => {
             // Is local storage supported?
             if (localStorage == null) {
                 return false;
-            }
-            else {
+            } else {
                 // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
                 try {
-                    const key = '_storage_test';
-                    sessionStorage.setItem(key, 'value');
+                    const key = "_storage_test";
+                    sessionStorage.setItem(key, "value");
                     sessionStorage.removeItem(key);
-                }
-                catch (error) {
+                } catch (error) {
                     return false;
                 }
 
                 return true;
             }
-        }
+        };
 
         if (this._supportsLocalStorage == null) {
             this._supportsLocalStorage = testSupport();
         }
 
         return this._supportsLocalStorage;
-    }
-
-    getNodeIdToBeSelected() {
-        const state = this.getStateFromStorage();
-
-        if (state && state.selected_node) {
-            return state.selected_node[0];
-        }
-        else {
-            return null;
-        }
     }
 }

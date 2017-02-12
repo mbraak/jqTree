@@ -13,12 +13,13 @@
     "url": "https://github.com/mbraak/jqtree"
   },
   "scripts": {
-    "test": "karma start --browsers Chrome --single-run",
+    "test": "karma start --browsers Chrome --single-run && tslint src/*.ts",
     "watch": "webpack",
     "production": "webpack --config webpack.config.production && gulp && cp build/tree.jquery.js .",
     "karma": "karma start --browsers Chrome",
     "jekyll-build": "jekyll build",
-    "jekyll-serve": "jekyll serve"
+    "jekyll-serve": "jekyll serve",
+    "lint": "tslint src/*.ts"
   },
   "dependencies": {
     "jquery": ">=1.9"
@@ -47,6 +48,7 @@
     "serve-static": "^1.11.2",
     "ts-loader": "^2.0.0",
     "tsify": "^3.0.1",
+    "tslint": "^4.4.2",
     "typescript": "^2.2.0",
     "watchify": "^3.9.0",
     "webpack": "^2.2.1"

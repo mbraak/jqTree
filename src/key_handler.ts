@@ -1,66 +1,61 @@
 import { Node } from "./node";
 
+// tslint:disable-next-line: no-string-literal
 const $ = window["jQuery"];
 
-
 export default class KeyHandler {
-    tree_widget;
+    private static LEFT = 37;
+    private static UP = 38;
+    private static RIGHT = 39;
+    private static DOWN = 40;
 
-    static LEFT = 37;
-    static UP = 38;
-    static RIGHT = 39;
-    static DOWN = 40;
+    private tree_widget;
 
     constructor(tree_widget) {
         this.tree_widget = tree_widget;
 
         if (tree_widget.options.keyboardSupport) {
-            $(document).on('keydown.jqtree', $.proxy(this.handleKeyDown, this));
+            $(document).on("keydown.jqtree", $.proxy(this.handleKeyDown, this));
         }
     }
 
-    deinit() {
-        $(document).off('keydown.jqtree');
+    public deinit() {
+        $(document).off("keydown.jqtree");
     }
 
-    moveDown() {
+    public moveDown() {
         const node = this.tree_widget.getSelectedNode();
 
         if (node) {
             return this.selectNode(node.getNextNode());
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    moveUp() {
+    public moveUp() {
         const node = this.tree_widget.getSelectedNode();
 
         if (node) {
             return this.selectNode(node.getPreviousNode());
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    moveRight() {
+    public moveRight() {
         const node = this.tree_widget.getSelectedNode();
 
         if (! node) {
             return true;
-        }
-        else if (! node.isFolder()) {
+        } else if (! node.isFolder()) {
             return true;
-        }
-        else {
+        } else {
             // folder node
             if (node.is_open) {
                 // Right moves to the first child of an open node
                 return this.selectNode(node.getNextNode());
-            }
-            else {
+            } else {
                 // Right expands a closed node
                 this.tree_widget.openNode(node);
                 return false;
@@ -68,29 +63,27 @@ export default class KeyHandler {
         }
     }
 
-    moveLeft() {
+    public moveLeft() {
         const node = this.tree_widget.getSelectedNode();
 
         if (! node) {
             return true;
-        }
-        else if (node.isFolder() && node.is_open) {
+        } else if (node.isFolder() && node.is_open) {
             // Left on an open node closes the node
             this.tree_widget.closeNode(node);
             return false;
-        }
-        else {
+        } else {
             /// Left on a closed or end node moves focus to the node's parent
             return this.selectNode(node.getParent());
         }
     }
 
-    handleKeyDown(e) {
+    public handleKeyDown(e) {
         if (! this.tree_widget.options.keyboardSupport) {
             return true;
         }
 
-        if ($(document.activeElement).is('textarea,input,select')) {
+        if ($(document.activeElement).is("textarea,input,select")) {
             return true;
         }
 
@@ -112,21 +105,21 @@ export default class KeyHandler {
 
             case KeyHandler.LEFT:
                 return this.moveLeft();
-        }
 
-        return true;
+            default:
+                return true;
+        }
     }
 
-    selectNode(node: Node) {
+    public selectNode(node: Node) {
         if (! node) {
             return true;
-        }
-        else {
+        } else {
             this.tree_widget.selectNode(node);
 
             if (
                 this.tree_widget.scroll_handler &&
-                (! this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find('.jqtree-element')))
+                (! this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find(".jqtree-element")))
             ) {
                 this.tree_widget.scrollToNode(node);
             }

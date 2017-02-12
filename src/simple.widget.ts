@@ -1,30 +1,8 @@
+// tslint:disable-next-line: no-string-literal
 const $ = window["jQuery"];
 
-
 export default class SimpleWidget {
-    protected static defaults = {};
-
-    $el;
-    options;
-
-    constructor(el, options: Object) {
-        this.$el = $(el);
-
-        const defaults = (<typeof SimpleWidget> this.constructor).defaults;
-        this.options = $.extend({}, defaults, options);
-    }
-
-    destroy() {
-        this._deinit();
-    }
-
-    _init() {
-    }
-
-    _deinit() {
-    }
-
-    static register(widget_class, widget_name: string) {
+    public static register(widget_class, widget_name: string) {
         const getDataKey = () => `simple_widget_${widget_name}`;
 
         function getWidgetData(el, data_key: string) {
@@ -32,14 +10,13 @@ export default class SimpleWidget {
 
             if (widget && (widget instanceof SimpleWidget)) {
                 return widget;
-            }
-            else {
+            } else {
                 return null;
             }
         }
 
         function createWidget($el, options: Object) {
-            const data_key = getDataKey()
+            const data_key = getDataKey();
 
             for (let el of $el) {
                 const existing_widget = getWidgetData(el, data_key);
@@ -73,8 +50,8 @@ export default class SimpleWidget {
             }
         }
 
-        function callFunction($el, function_name: string, args: Array<any>) {
-            let result = null
+        function callFunction($el, function_name: string, args: any[]) {
+            let result = null;
 
             for (let el of $el) {
                 const widget = $.data(el, getDataKey());
@@ -82,7 +59,7 @@ export default class SimpleWidget {
                 if (widget && (widget instanceof SimpleWidget)) {
                     const widget_function = widget[function_name];
 
-                    if (widget_function && (typeof widget_function == "function")) {
+                    if (widget_function && (typeof widget_function === "function")) {
                         result = widget_function.apply(widget, args);
                     }
                 }
@@ -91,26 +68,47 @@ export default class SimpleWidget {
             return result;
         }
 
+        // tslint:disable-next-line: only-arrow-functions
         $.fn[widget_name] = function(argument1, ...args) {
             const $el = this;
 
-            if (argument1 == undefined || typeof argument1 == "object") {
+            if (argument1 === undefined || typeof argument1 === "object") {
                 const options = argument1;
                 return createWidget($el, options);
-            }
-            else if (typeof argument1 == "string" && argument1[0] != "_") {
+            } else if (typeof argument1 === "string" && argument1[0] !== "_") {
                 const function_name = argument1;
 
-                if (function_name == "destroy") {
+                if (function_name === "destroy") {
                     return destroyWidget($el);
-                }
-                else if (function_name == "get_widget_class") {
+                } else if (function_name === "get_widget_class") {
                     return widget_class;
-                }
-                else {
+                } else {
                     return callFunction($el, function_name, args);
                 }
             }
-        }
+        };
+    }
+
+    protected static defaults = {};
+    protected $el;
+    protected options;
+
+    constructor(el, options: Object) {
+        this.$el = $(el);
+
+        const defaults = (<typeof SimpleWidget> this.constructor).defaults;
+        this.options = $.extend({}, defaults, options);
+    }
+
+    public destroy() {
+        this._deinit();
+    }
+
+    protected _init() {
+        //
+    }
+
+    protected _deinit() {
+        //
     }
 }

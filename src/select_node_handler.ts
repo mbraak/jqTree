@@ -1,40 +1,40 @@
+// tslint:disable-next-line: no-string-literal
 const $ = window["jQuery"];
 
 import { Node } from "./node";
 
-
 export default class SelectNodeHandler {
-    tree_widget;
-    selected_nodes: Object;
-    selected_single_node: Node | null;
+    private tree_widget;
+    private selected_nodes: Object;
+    private selected_single_node: Node | null;
 
     constructor(tree_widget) {
         this.tree_widget = tree_widget;
         this.clear();
     }
 
-    getSelectedNode(): Node | false {
+    public getSelectedNode(): Node | false {
         const selected_nodes = this.getSelectedNodes();
 
         if (selected_nodes.length) {
             return selected_nodes[0];
-        }
-        else {
-            return false
+        } else {
+            return false;
         }
     }
 
-    getSelectedNodes(): Array<Node> {
+    public getSelectedNodes(): Node[] {
         if (this.selected_single_node) {
             return [this.selected_single_node];
-        }
-        else {
+        } else {
             const selected_nodes = [];
 
             for (let id in this.selected_nodes) {
-                const node = this.tree_widget.getNodeById(id);
-                if (node) {
-                    selected_nodes.push(node);
+                if (this.selected_nodes.hasOwnProperty(id)) {
+                    const node = this.tree_widget.getNodeById(id);
+                    if (node) {
+                        selected_nodes.push(node);
+                    }
                 }
             }
 
@@ -42,22 +42,22 @@ export default class SelectNodeHandler {
         }
     }
 
-    getSelectedNodesUnder(parent: Node) {
+    public getSelectedNodesUnder(parent: Node) {
         if (this.selected_single_node) {
             if (parent.isParentOf(this.selected_single_node)) {
                 return [this.selected_single_node];
-            }
-            else {
+            } else {
                 return [];
             }
-        }
-        else {
-            const selected_nodes = []
+        } else {
+            const selected_nodes = [];
 
             for (let id in this.selected_nodes) {
-                const node = this.tree_widget.getNodeById(id);
-                if (node && parent.isParentOf(node)) {
-                    selected_nodes.push(node);
+                if (this.selected_nodes.hasOwnProperty(id)) {
+                    const node = this.tree_widget.getNodeById(id);
+                    if (node && parent.isParentOf(node)) {
+                        selected_nodes.push(node);
+                    }
                 }
             }
 
@@ -65,38 +65,33 @@ export default class SelectNodeHandler {
         }
     }
 
-    isNodeSelected(node: Node | null): boolean {
+    public isNodeSelected(node?: Node): boolean {
         if (! node) {
             return false;
-        }
-        else if (node.id != null) {
+        } else if (node.id != null) {
             if (this.selected_nodes[node.id]) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
-        }
-        else if (this.selected_single_node) {
-            return this.selected_single_node.element == node.element;
-        }
-        else {
+        } else if (this.selected_single_node) {
+            return this.selected_single_node.element === node.element;
+        } else {
             return false;
         }
     }
 
-    clear() {
+    public clear() {
         this.selected_nodes = {};
         this.selected_single_node = null;
     }
 
-    removeFromSelection(node: Node, include_children=false) {
+    public removeFromSelection(node: Node, include_children: boolean = false) {
         if (node.id == null) {
-            if (this.selected_single_node && node.element == this.selected_single_node.element) {
-                this.selected_single_node = null
+            if (this.selected_single_node && node.element === this.selected_single_node.element) {
+                this.selected_single_node = null;
             }
-        }
-        else {
+        } else {
             delete this.selected_nodes[node.id];
 
             if (include_children) {
@@ -105,16 +100,15 @@ export default class SelectNodeHandler {
                         delete this.selected_nodes[node.id];
                         return true;
                     }
-                )
+                );
             }
         }
     }
 
-    addToSelection(node: Node) {
+    public addToSelection(node: Node) {
         if (node.id != null) {
             this.selected_nodes[node.id] = true;
-        }
-        else {
+        } else {
             this.selected_single_node = node;
         }
     }

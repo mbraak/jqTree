@@ -1,14 +1,14 @@
+// tslint:disable: no-string-literal
 const $ = window["jQuery"];
 
-
 export const Position = {
-    getName: function(position: number): string {
-        return this.strings[position - 1]
+    getName: (position: number): string => {
+        return Position.strings[position - 1];
     },
 
-    nameToIndex: function(name): number {
-        for (let i=1; i <= this.strings.length; i++) {
-            if (this.strings[i - 1] == name) {
+    nameToIndex: (name): number => {
+        for (let i = 1; i <= Position.strings.length; i++) {
+            if (Position.strings[i - 1] === name) {
                 return i;
             }
         }
@@ -25,19 +25,19 @@ export const Position = {
 };
 
 export class Node {
-    id: any;
-    name: string;
-    children: Array<Node>;
-    parent: Node;
-    id_mapping: Object;
-    tree: Node;
-    node_class;  // todo: type class?
-    load_on_demand: boolean;
-    is_open: boolean;
-    element;
-    is_loading: boolean;
+    public id: any;
+    public name: string;
+    public children: Node[];
+    public parent: Node;
+    public id_mapping: Object;
+    public tree: Node;
+    public node_class;  // todo: type class?
+    public load_on_demand: boolean;
+    public is_open: boolean;
+    public element;
+    public is_loading: boolean;
 
-    constructor(o: Object, is_root: boolean=false, node_class=Node) {
+    constructor(o: Object, is_root: boolean = false, node_class = Node) {
         this.name = "";
 
         this.setData(o);
@@ -68,54 +68,32 @@ export class Node {
     * This is an internal function; it is not in the docs
     * Does not remove existing node values
     */
-    setData(o: Object) {
+    public setData(o: Object) {
         const setName = (name: string) => {
             if (name != null) {
                 this.name = name;
             }
-        }
+        };
 
         if (!o) {
-            return
-        }
-        else if (typeof o != "object") {
+            return;
+        } else if (typeof o !== "object") {
             setName(o);
-        }
-        else {
+        } else {
             for (let key in o) {
-                const value = o[key];
+                if (o.hasOwnProperty(key)) {
+                    const value = o[key];
 
-                if (key == "label") {
-                    // You can use the 'label' key instead of 'name'; this is a legacy feature
-                    setName(value);
+                    if (key === "label") {
+                        // You can use the 'label' key instead of 'name'; this is a legacy feature
+                        setName(value);
+                    } else if (key !== "children") {
+                        // You can't update the children using this function
+                        this[key] = value;
+                    }
                 }
-                else if (key != 'children') {
-                    // You can't update the children using this function
-                    this[key] = value;
-                }
             }
         }
-    }
-
-    // Init Node from data without making it the root of the tree
-    initFromData(data: Array<Object>) {
-        const addNode = (node_data: Object) => {
-            this.setData(node_data);
-
-            if (node_data["children"]) {
-                addChildren(node_data["children"]);
-            }
-        }
-
-        const addChildren = (children_data: Array<Object>) => {
-            for (let child of children_data) {
-                const node = new this.tree.node_class("")
-                node.initFromData(child);
-                this.addChild(node);
-            }
-        }
-
-        addNode(data);
     }
 
     /*
@@ -135,14 +113,16 @@ export class Node {
         }
     ]
     */
-    loadFromData(data: Array<Object>) {
+    public loadFromData(data: Object[]) {
         this.removeChildren();
 
         for (let o of data) {
             const node = new this.tree.node_class(o);
             this.addChild(node);
 
-            if (typeof o == "object" && o["children"]) {
+            // tslint:disable-next-line: no-string-literal
+            if (typeof o === "object" && o["children"]) {
+                // tslint:disable-next-line: no-string-literal
                 node.loadFromData(o["children"]);
             }
         }
@@ -155,7 +135,7 @@ export class Node {
         new Node('child1')
     );
     */
-    addChild(node: Node) {
+    public addChild(node: Node) {
         this.children.push(node);
         node._setParent(this);
     }
@@ -168,15 +148,9 @@ export class Node {
         1
     );
     */
-    addChildAtPosition(node: Node, index: number) {
+    public addChildAtPosition(node: Node, index: number) {
         this.children.splice(index, 0, node);
         node._setParent(this);
-    }
-
-    _setParent(parent: Node) {
-        this.parent = parent;
-        this.tree = parent.tree;
-        this.tree.addNodeToIndex(this);
     }
 
     /*
@@ -184,19 +158,11 @@ export class Node {
 
     tree.removeChild(tree.children[0]);
     */
-    removeChild(node: Node) {
+    public removeChild(node: Node) {
         // remove children from the index
         node.removeChildren();
 
         this._removeChild(node);
-    }
-
-    _removeChild(node: Node) {
-        this.children.splice(
-            this.getChildIndex(node),
-            1
-        );
-        this.tree.removeNodeFromIndex(node);
     }
 
     /*
@@ -204,7 +170,7 @@ export class Node {
 
     var index = getChildIndex(node);
     */
-    getChildIndex(node: Node) {
+    public getChildIndex(node: Node) {
         return $.inArray(node, this.children);
     }
 
@@ -215,11 +181,11 @@ export class Node {
         //
     }
     */
-    hasChildren(): boolean {
-        return this.children.length != 0;
+    public hasChildren(): boolean {
+        return this.children.length !== 0;
     }
 
-    isFolder(): boolean {
+    public isFolder(): boolean {
         return this.hasChildren() || this.load_on_demand;
     }
 
@@ -240,7 +206,7 @@ export class Node {
     );
 
     */
-    iterate(callback: Function) {
+    public iterate(callback: Function) {
         const _iterate = (node: Node, level: number) => {
             if (node.children) {
                 for (let child of node.children) {
@@ -250,9 +216,9 @@ export class Node {
                         _iterate(child, level + 1);
                     }
                 }
-                return null
+                return null;
             }
-        }
+        };
 
         _iterate(this, 0);
     }
@@ -265,26 +231,24 @@ export class Node {
     // move node1 after node2
     tree.moveNode(node1, node2, Position.AFTER);
     */
-    moveNode(moved_node: Node, target_node: Node, position: number) {
+    public moveNode(moved_node: Node, target_node: Node, position: number) {
         if (moved_node.isParentOf(target_node)) {
             // Node is parent of target node. This is an illegal move
-            return
+            return;
         }
 
         moved_node.parent._removeChild(moved_node);
-        if (position == Position.AFTER) {
+        if (position === Position.AFTER) {
             target_node.parent.addChildAtPosition(
                 moved_node,
                 target_node.parent.getChildIndex(target_node) + 1
             );
-        }
-        else if (position == Position.BEFORE) {
+        } else if (position === Position.BEFORE) {
             target_node.parent.addChildAtPosition(
                 moved_node,
                 target_node.parent.getChildIndex(target_node)
             );
-        }
-        else if (position == Position.INSIDE) {
+        } else if (position === Position.INSIDE) {
             // move inside as first child
             target_node.addChildAtPosition(moved_node, 0);
         }
@@ -293,15 +257,15 @@ export class Node {
     /*
     Get the tree as data.
     */
-    getData(include_parent=false): Array<Object> {
-        function getDataFromNodes(nodes: Array<Node>): Array<Object> {
+    public getData(include_parent = false): Object[] {
+        function getDataFromNodes(nodes: Node[]): Object[] {
             return nodes.map(
                 node => {
                     const tmp_node = {};
 
                     for (let k in node) {
                         if (
-                            ['parent', 'children', 'element', 'tree'].indexOf(k) == -1 &&
+                            ["parent", "children", "element", "tree"].indexOf(k) === -1 &&
                             Object.prototype.hasOwnProperty.call(node, k)
                         ) {
                             const v = node[k];
@@ -320,19 +284,18 @@ export class Node {
 
         if (include_parent) {
             return getDataFromNodes([this]);
-        }
-        else {
+        } else {
             return getDataFromNodes(this.children);
         }
     }
 
-    getNodeByName(name: string): Node | null {
+    public getNodeByName(name: string): Node | null {
         return this.getNodeByCallback(
-            node => node.name == name
-        )
+            node => node.name === name
+        );
     }
 
-    getNodeByCallback(callback: Function): Node | null {
+    public getNodeByCallback(callback: Function): Node | null {
         let result = null;
 
         this.iterate(
@@ -340,8 +303,7 @@ export class Node {
                 if (callback(node)) {
                     result = node;
                     return false;
-                }
-                else {
+                } else {
                     return true;
                 }
             }
@@ -350,17 +312,16 @@ export class Node {
         return result;
     }
 
-    addAfter(node_info: Object): Node | null {
+    public addAfter(node_info: Object): Node | null {
         if (! this.parent) {
             return null;
-        }
-        else {
+        } else {
             const node = new this.tree.node_class(node_info);
 
             const child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index + 1);
 
-            if (typeof node_info == 'object' && node_info["children"] && node_info["children"].length) {
+            if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
                 node.loadFromData(node_info["children"]);
             }
 
@@ -368,17 +329,16 @@ export class Node {
         }
     }
 
-    addBefore(node_info: Object): Node | null {
+    public addBefore(node_info: Object): Node | null {
         if (! this.parent) {
             return null;
-        }
-        else {
+        } else {
             const node = new this.tree.node_class(node_info);
 
             const child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index);
 
-            if (typeof node_info == 'object' && node_info["children"] && node_info["children"].length) {
+            if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
                 node.loadFromData(node_info["children"]);
             }
 
@@ -386,11 +346,10 @@ export class Node {
         }
     }
 
-    addParent(node_info: Object): Node | null {
+    public addParent(node_info: Object): Node | null {
         if (! this.parent) {
             return null;
-        }
-        else {
+        } else {
             const new_parent = new this.tree.node_class(node_info);
             new_parent._setParent(this.tree);
             const original_parent = this.parent;
@@ -405,41 +364,40 @@ export class Node {
         }
     }
 
-    remove() {
+    public remove() {
         if (this.parent) {
             this.parent.removeChild(this);
             this.parent = null;
         }
     }
 
-    append(node_info: Object): Node {
+    public append(node_info: Object): Node {
         const node = new this.tree.node_class(node_info);
         this.addChild(node);
 
-        if (typeof node_info == 'object' && node_info["children"] && node_info["children"].length) {
+        if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
             node.loadFromData(node_info["children"]);
         }
 
         return node;
     }
 
-    prepend(node_info: Object): Node {
+    public prepend(node_info: Object): Node {
         const node = new this.tree.node_class(node_info);
         this.addChildAtPosition(node, 0);
 
-        if (typeof node_info == 'object' && node_info["children"] && node_info["children"].length) {
+        if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
             node.loadFromData(node_info["children"]);
         }
 
         return node;
     }
 
-    isParentOf(node: Node): boolean {
+    public isParentOf(node: Node): boolean {
         let parent = node.parent;
 
-
         while (parent) {
-            if (parent == this) {
+            if (parent === this) {
                 return true;
             }
 
@@ -449,7 +407,7 @@ export class Node {
         return false;
     }
 
-    getLevel(): number {
+    public getLevel(): number {
         let level = 0;
         let node: Node = this;
 
@@ -461,23 +419,23 @@ export class Node {
         return level;
     }
 
-    getNodeById(node_id: any): Node | null {
+    public getNodeById(node_id: any): Node | null {
         return this.id_mapping[node_id];
     }
 
-    addNodeToIndex(node: Node) {
+    public addNodeToIndex(node: Node) {
         if (node.id != null) {
             this.id_mapping[node.id] = node;
         }
     }
 
-    removeNodeFromIndex(node: Node) {
+    public removeNodeFromIndex(node: Node) {
         if (node.id != null) {
             delete this.id_mapping[node.id];
         }
     }
 
-    removeChildren() {
+    public removeChildren() {
         this.iterate(
             child => {
                 this.tree.removeNodeFromIndex(child);
@@ -488,44 +446,40 @@ export class Node {
         this.children = [];
     }
 
-    getPreviousSibling(): Node | null {
+    public getPreviousSibling(): Node | null {
         if (! this.parent) {
             return null;
-        }
-        else {
+        } else {
             const previous_index = this.parent.getChildIndex(this) - 1;
             if (previous_index >= 0) {
                 return this.parent.children[previous_index];
-            }
-            else {
+            } else {
                 return null;
             }
         }
     }
 
-    getNextSibling(): Node | null {
+    public getNextSibling(): Node | null {
         if (! this.parent) {
             return null;
-        }
-        else {
+        } else {
             const next_index = this.parent.getChildIndex(this) + 1;
             if (next_index < this.parent.children.length) {
                 return this.parent.children[next_index];
-            }
-            else {
+            } else {
                 return null;
             }
         }
     }
 
-    getNodesByProperty(key: string, value: any): Array<Node> {
+    public getNodesByProperty(key: string, value: any): Node[] {
         return this.filter(
-            node => node[key] == value
+            node => node[key] === value
         );
     }
 
-    filter(f: Function) {
-        const result = []
+    public filter(f: Function) {
+        const result = [];
 
         this.iterate(
             node => {
@@ -535,27 +489,24 @@ export class Node {
 
                 return true;
             }
-        )
+        );
 
         return result;
     }
 
-    getNextNode(include_children=true): Node | null {
+    public getNextNode(include_children = true): Node | null {
         if (include_children && this.hasChildren() && this.is_open) {
             // First child
             return this.children[0];
-        }
-        else {
+        } else {
             if (! this.parent) {
                 return null;
-            }
-            else {
+            } else {
                 const next_sibling = this.getNextSibling();
                 if (next_sibling) {
                     // Next sibling
                     return next_sibling;
-                }
-                else {
+                } else {
                     // Next node of parent
                     return this.parent.getNextNode(false);
                 }
@@ -563,54 +514,82 @@ export class Node {
         }
     }
 
-    getPreviousNode(): Node | null {
+    public getPreviousNode(): Node | null {
         if (! this.parent) {
             return null;
-        }
-        else {
+        } else {
             const previous_sibling = this.getPreviousSibling();
             if (previous_sibling) {
                 if (! previous_sibling.hasChildren() || ! previous_sibling.is_open) {
                     // Previous sibling
                     return previous_sibling;
-                }
-                else {
+                } else {
                     // Last child of previous sibling
                     return previous_sibling.getLastChild();
                 }
-            }
-            else {
+            } else {
                 return this.getParent();
             }
         }
     }
 
-    getParent(): Node | null {
+    public getParent(): Node | null {
         // Return parent except if it is the root node
         if (! this.parent) {
             return null;
-        }
-        else if (! this.parent.parent) {
+        } else if (! this.parent.parent) {
             // Root node -> null
             return null;
-        }
-        else {
+        } else {
             return this.parent;
         }
     }
 
-    getLastChild(): Node | null {
+    public getLastChild(): Node | null {
         if (! this.hasChildren()) {
             return null;
-        }
-        else {
+        } else {
             const last_child = this.children[this.children.length - 1];
             if (! last_child.hasChildren() || ! last_child.is_open) {
                 return last_child;
-            }
-            else {
+            } else {
                 return last_child.getLastChild();
             }
         }
+    }
+
+    // Init Node from data without making it the root of the tree
+    private initFromData(data: Object[]) {
+        const addNode = (node_data: any) => {
+            this.setData(node_data);
+
+            if (node_data["children"]) {
+                addChildren(node_data["children"]);
+            }
+        };
+
+        const addChildren = (children_data: Object[]) => {
+            for (let child of children_data) {
+                const node = new this.tree.node_class("");
+                node.initFromData(child);
+                this.addChild(node);
+            }
+        };
+
+        addNode(data);
+    }
+
+    private _setParent(parent: Node) {
+        this.parent = parent;
+        this.tree = parent.tree;
+        this.tree.addNodeToIndex(this);
+    }
+
+    private _removeChild(node: Node) {
+        this.children.splice(
+            this.getChildIndex(node),
+            1
+        );
+        this.tree.removeNodeFromIndex(node);
     }
 }
