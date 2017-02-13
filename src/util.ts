@@ -1,13 +1,3 @@
-// todo: use native implementation
-export function _indexOf(array: any[], item: any): number {
-    return array.indexOf(item);
-}
-
-// todo: use native implementation
-export function indexOf(array, item): number {
-    return array.indexOf(item);
-}
-
 export function isInt(n: any): boolean {
     return typeof n === "number" && n % 1 === 0;
 }

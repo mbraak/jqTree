@@ -1,5 +1,5 @@
 import * as $ from "jquery";
-import { indexOf, isInt } from "./util";
+import { isInt } from "./util";
 
 export default class SaveStateHandler {
     private tree_widget;
