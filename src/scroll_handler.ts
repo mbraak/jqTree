@@ -1,5 +1,4 @@
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
+import * as $ from "jquery";
 
 export default class ScrollHandler {
     private tree_widget;

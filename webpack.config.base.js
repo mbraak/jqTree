@@ -43,6 +43,9 @@ module.exports = function(debug) {
                     exclude: /node_modules/
                 }
             ]
+        },
+        externals: {
+            "jquery": "jQuery"
         }
     };
 

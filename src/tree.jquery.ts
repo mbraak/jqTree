@@ -1,3 +1,4 @@
+import * as $ from "jquery";
 import __version__ from "./version";
 import * as drag_and_drop_handler from "./drag_and_drop_handler";
 import { DragAndDropHandler, DragElement, HitAreasGenerator } from "./drag_and_drop_handler";
@@ -13,9 +14,6 @@ import { Node, Position }  from "./node";
 import * as util_module from "./util";
 import { isFunction } from "./util";
 import { BorderDropHint, FolderElement, GhostDropHint, NodeElement } from "./node_element";
-
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
 
 class JqTreeWidget extends MouseWidget {
     public static getModule(name) {

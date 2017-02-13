@@ -1,5 +1,5 @@
 // tslint:disable: no-string-literal
-const $ = window["jQuery"];
+import * as $ from "jquery";
 
 export const Position = {
     getName: (position: number): string => {

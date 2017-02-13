@@ -1,11 +1,8 @@
 /*
 This widget does the same a the mouse widget in jqueryui.
 */
-
+import * as $ from "jquery";
 import SimpleWidget from "./simple.widget";
-
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
 
 export default class MouseWidget extends SimpleWidget {
     protected is_mouse_started: boolean;

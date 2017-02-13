@@ -1,7 +1,5 @@
+import * as $ from "jquery";
 import { indexOf, isInt } from "./util";
-
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
 
 export default class SaveStateHandler {
     private tree_widget;

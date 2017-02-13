@@ -1,7 +1,5 @@
+import * as $ from "jquery";
 import { Node } from "./node";
-
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
 
 export default class KeyHandler {
     private static LEFT = 37;

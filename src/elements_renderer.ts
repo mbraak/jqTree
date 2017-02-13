@@ -1,9 +1,7 @@
+import * as $ from "jquery";
 import { NodeElement } from "./node_element";
 import { html_escape, getBoolString } from "./util";
 import { Node } from "./node";
-
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
 
 export default class ElementsRenderer {
     public opened_icon_element;

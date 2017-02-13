@@ -1,4 +1,5 @@
-var mockjax = require('jquery-mockjax')(jQuery, window);
+var $ = require('jquery');
+var mockjax = require('jquery-mockjax')($, window);
 
 var utils_for_test = require('./utils_for_test');
 

@@ -1,6 +1,4 @@
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
-
+import * as $ from "jquery";
 import { Node } from "./node";
 
 export default class SelectNodeHandler {

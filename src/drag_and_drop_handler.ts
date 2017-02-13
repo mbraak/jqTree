@@ -1,8 +1,6 @@
+import * as $ from "jquery";
 import { Position, Node } from "./node";
 import { html_escape } from "./util";
-
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
 
 export class DragAndDropHandler {
     public hit_areas;

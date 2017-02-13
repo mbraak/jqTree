@@ -27,7 +27,8 @@ module.exports = function(config) {
 
         browserify: {
             plugin: ['tsify'],
-            extensions: ['.js', '.ts']
+            extensions: ['.js', '.ts'],
+            external: ['jquery']
         },
 
         // test results reporter to use

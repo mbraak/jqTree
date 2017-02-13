@@ -1,7 +1,5 @@
+import * as $ from "jquery";
 import { Position, Node } from "./node";
-
-// tslint:disable-next-line: no-string-literal
-const $ = window["jQuery"];
 
 export class NodeElement {
     protected node: Node;

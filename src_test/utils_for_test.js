@@ -8,6 +8,8 @@ node1
 ---child3
 */
 
+const $ = require('jquery');
+
 var example_data = [
     {
         label: 'node1',
