@@ -84,26 +84,12 @@ function formatTitles($node) {
     return titles.toArray().join(' ');
 }
 
-function getTreeVariables() {
-    var JqTreeWidget = $('').tree('get_widget_class');
-
-    var node = JqTreeWidget.getModule('node');
-    var util = JqTreeWidget.getModule('util');
-
-    return {
-        Node: node.Node,
-        Position: node.Position,
-        util: util
-    };
-}
-
 
 module.exports = {
     example_data: example_data,
     example_data2: example_data2,
     formatNodes: formatNodes,
     formatTitles: formatTitles,
-    getTreeVariables: getTreeVariables,
     isNodeClosed: isNodeClosed,
     isNodeOpen: isNodeOpen
 };

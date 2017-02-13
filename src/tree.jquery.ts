@@ -16,16 +16,6 @@ import { isFunction } from "./util";
 import { BorderDropHint, FolderElement, GhostDropHint, NodeElement } from "./node_element";
 
 class JqTreeWidget extends MouseWidget {
-    public static getModule(name) {
-        const modules = {
-            node: node_module,
-            util: util_module,
-            drag_and_drop_handler
-        };
-
-        return modules[name];
-    }
-
     protected static defaults = {
         autoOpen: false,  // true / false / int (open n levels starting at 0)
         saveState: false,  // true / false / string (cookie name)

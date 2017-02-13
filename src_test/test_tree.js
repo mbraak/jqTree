@@ -3,10 +3,9 @@ var utils_for_test = require('./utils_for_test');
 var example_data = utils_for_test.example_data;
 var formatNodes = utils_for_test.formatNodes;
 
-var tree_vars = utils_for_test.getTreeVariables();
-
-var Node = tree_vars.Node;
-var Position = tree_vars.Position;
+var node_module = require('../src/node');
+var Node = node_module.Node;
+var Position = node_module.Position;
 
 var test = QUnit.test;
 

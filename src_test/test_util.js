@@ -1,24 +1,14 @@
 var utils_for_test = require('./utils_for_test');
 
-var tree_vars = utils_for_test.getTreeVariables();
+var node_module = require('../src/node');
 
-var Position = tree_vars.Position;
-var util = tree_vars.util;
+var Position = node_module.Position;
+var util = node_module.util;
 
 var test = QUnit.test;
 
 
 QUnit.module('util');
-
-test('indexOf', function(assert) {
-    var _indexOf = util._indexOf;
-    var indexOf = util.indexOf;
-
-    assert.equal(indexOf([3, 2, 1], 1), 2);
-    assert.equal(_indexOf([3, 2, 1], 1), 2);
-    assert.equal(indexOf([4, 5, 6], 1), -1);
-    assert.equal(_indexOf([4, 5, 6], 1), -1);
-});
 
 test('Position.getName', function(assert) {
     assert.equal(Position.getName(Position.BEFORE), 'before');

@@ -10,9 +10,8 @@ var formatTitles = utils_for_test.formatTitles;
 var isNodeOpen = utils_for_test.isNodeOpen;
 var isNodeClosed = utils_for_test.isNodeClosed;
 
-var tree_vars = utils_for_test.getTreeVariables();
-
-var Position = tree_vars.Position;
+var node_module = require('../src/node');
+var Position = node_module.Position;
 
 var test = QUnit.test;
 
