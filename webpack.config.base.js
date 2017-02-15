@@ -26,7 +26,7 @@ module.exports = function(debug) {
     var config = {
         entry: {
             "tree.jquery": ["./src/tree.jquery.ts"],
-            test: ["./src_test/test.js"]
+            test: ["./src_test/test.ts"]
         },
         output: {
             path: path.resolve(__dirname, "build"),

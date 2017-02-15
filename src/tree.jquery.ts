@@ -161,17 +161,17 @@ class JqTreeWidget extends MouseWidget {
         return this.tree.getNodeByCallback(callback);
     }
 
-    public openNode(node: Node, slide_param= null, on_finished_param?: Function) {
+    public openNode(node: Node, param1, param2?) {
         const parseParams = () => {
             let on_finished;
             let slide;
 
-            if (isFunction(slide_param)) {
-                on_finished = slide_param;
+            if (isFunction(param1)) {
+                on_finished = <Function> param1;
                 slide = null;
             } else {
-                slide = slide_param;
-                on_finished = on_finished_param;
+                slide = param1;
+                on_finished = <Function> param2;
             }
 
             if (slide == null) {
@@ -1054,7 +1054,7 @@ class JqTreeWidget extends MouseWidget {
             handeLoadData(data);
         };
 
-        const handleError = (response) => {
+        const handleError = response => {
             removeLoadingClass();
 
             if (this.options.onLoadFailed) {
@@ -1099,7 +1099,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _openNode(node: Node, slide: boolean= true, on_finished?: Function) {
+    private _openNode(node: Node, slide: boolean = true, on_finished?: Function) {
         const doOpenNode = (_node: Node, _slide, _on_finished?: Function) => {
             const folder_element = new FolderElement(_node, this);
             folder_element.open(_on_finished, _slide);
@@ -1125,7 +1125,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _loadFolderOnDemand(node: Node, slide: boolean= true, on_finished?: Function) {
+    private _loadFolderOnDemand(node: Node, slide: boolean = true, on_finished?: Function) {
         node.is_loading = true;
 
         this._loadDataFromUrl(

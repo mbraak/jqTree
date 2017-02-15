@@ -559,7 +559,7 @@ export class Node {
     }
 
     // Init Node from data without making it the root of the tree
-    private initFromData(data: Object[]) {
+    public initFromData(data) {
         const addNode = (node_data: any) => {
             this.setData(node_data);
 

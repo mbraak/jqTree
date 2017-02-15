@@ -13,7 +13,7 @@
     "url": "https://github.com/mbraak/jqtree"
   },
   "scripts": {
-    "test": "karma start --browsers Chrome --single-run && tslint src/*.ts",
+    "test": "karma start --browsers Chrome --single-run && tslint src/*.ts src_test/*.ts",
     "watch": "webpack",
     "production": "webpack --config webpack.config.production && gulp && cp build/tree.jquery.js .",
     "karma": "karma start --browsers Chrome",
@@ -25,8 +25,7 @@
     "jquery": ">=1.9"
   },
   "devDependencies": {
-    "browserify": "^14.0.0",
-    "connect": "^3.5.0",
+    "connect": "^3.5.1",
     "coveralls": "^2.11.16",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
@@ -36,21 +35,19 @@
     "jquery-mockjax": "^2.2.1",
     "jsonfile": "^2.4.0",
     "karma": "^1.4.1",
-    "karma-browserify": "^5.1.1",
     "karma-chrome-launcher": "^2.0.0",
     "karma-cli": "^1.0.1",
     "karma-firefox-launcher": "^1.0.0",
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-qunit": "^1.2.1",
+    "karma-webpack": "^2.0.2",
     "lodash.template": "^4.4.0",
     "phantomjs-prebuilt": "^2.1.14",
     "qunitjs": "^2.1.1",
     "serve-static": "^1.11.2",
     "ts-loader": "^2.0.0",
-    "tsify": "^3.0.1",
     "tslint": "^4.4.2",
     "typescript": "^2.2.0",
-    "watchify": "^3.9.0",
     "webpack": "^2.2.1"
   }
 }
