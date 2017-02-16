@@ -71,9 +71,9 @@ export default class ScrollHandler {
         const getParentWithOverflow = () => {
             const css_values = ["overflow", "overflow-y"];
 
-            const hasOverFlow = (el) => {
+            const hasOverFlow = $el => {
                 for (let css_value of css_values) {
-                    if ($.css(el, css_value) in ["auto", "scroll"]) {
+                    if ($el.css(css_value) in ["auto", "scroll"]) {
                         return true;
                     }
                 }
@@ -81,13 +81,14 @@ export default class ScrollHandler {
                 return false;
             };
 
-            if (hasOverFlow(this.tree_widget.$el[0])) {
+            if (hasOverFlow(this.tree_widget.$el)) {
                 return this.tree_widget.$el;
             }
 
             for (let el of this.tree_widget.$el.parents()) {
-                if (hasOverFlow(el)) {
-                    return $(el);
+                const $el = $(el);
+                if (hasOverFlow($el)) {
+                    return $el;
                 }
             }
 
