@@ -89,7 +89,7 @@ export default class SimpleWidget {
     }
 
     protected static defaults = {};
-    protected $el;
+    protected $el: JQuery;
     protected options;
 
     constructor(el, options: Object) {

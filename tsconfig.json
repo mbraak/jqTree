@@ -3,5 +3,8 @@
     "exclude": [
         "_site",
         "node_modules"
-    ]
+    ],
+    "compilerOptions": {
+        "typeRoots" : ["./typings/globals"]
+    }
 }

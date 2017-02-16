@@ -111,13 +111,13 @@ test("click event", assert =>  {
     const $node1 = $tree.find("ul.jqtree-tree li:first");
     const $text_span = $node1.find("span:first");
 
-    $tree.on("tree.click", e => {
+    $tree.on("tree.click", (e: any) => {
         assert.equal(e.node.name, "node1");
     });
 
     const done = assert.async();
 
-    $tree.on("tree.select", e => {
+    $tree.on("tree.select", (e: any) => {
         select_count += 1;
 
         if (select_count === 1) {
@@ -489,7 +489,7 @@ test("selectNode when another node is selected", assert =>  {
     // -- is node 'node2' named 'deselected_node' in object's attributes?
     let is_select_event_fired = false;
 
-    $tree.on("tree.select", e => {
+    $tree.on("tree.select", (e: any) => {
         assert.equal(e.deselected_node, node2);
         is_select_event_fired = true;
     });
@@ -519,7 +519,7 @@ test("click toggler", assert =>  {
     const $toggler = $title.prev();
     assert.ok($toggler.is("a.jqtree-toggler.jqtree-closed"));
 
-    $tree.on("tree.open", e => {
+    $tree.on("tree.open", (e: any) => {
         // 2. handle 'open' event
         assert.equal(e.node.name, "node1");
 
@@ -527,7 +527,7 @@ test("click toggler", assert =>  {
         $toggler.click();
     });
 
-    $tree.on("tree.close", e => {
+    $tree.on("tree.close", (e: any) => {
         assert.equal(e.node.name, "node1");
         done();
     });

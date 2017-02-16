@@ -52,7 +52,7 @@ class JqTreeWidget extends MouseWidget {
         onLoading: null
     };
 
-    private element;
+    private element: JQuery;
     private tree: Node;
     private is_initialized: boolean;
 
