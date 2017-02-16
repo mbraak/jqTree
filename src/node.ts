@@ -1,6 +1,8 @@
 // tslint:disable: no-string-literal
 import * as $ from "jquery";
 
+export type NodeId = number|string;
+
 export const Position = {
     getName: (position: number): string => {
         return Position.strings[position - 1];
@@ -25,7 +27,7 @@ export const Position = {
 };
 
 export class Node {
-    public id: any;
+    public id: NodeId;
     public name: string;
     public children: Node[];
     public parent: Node;
@@ -289,13 +291,13 @@ export class Node {
         }
     }
 
-    public getNodeByName(name: string): Node | null {
+    public getNodeByName(name: string): Node|null {
         return this.getNodeByCallback(
             node => node.name === name
         );
     }
 
-    public getNodeByCallback(callback: Function): Node | null {
+    public getNodeByCallback(callback: Function): Node|null {
         let result = null;
 
         this.iterate(
@@ -312,7 +314,7 @@ export class Node {
         return result;
     }
 
-    public addAfter(node_info: Object): Node | null {
+    public addAfter(node_info: Object): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -329,7 +331,7 @@ export class Node {
         }
     }
 
-    public addBefore(node_info: Object): Node | null {
+    public addBefore(node_info: Object): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -346,7 +348,7 @@ export class Node {
         }
     }
 
-    public addParent(node_info: Object): Node | null {
+    public addParent(node_info: Object): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -419,7 +421,7 @@ export class Node {
         return level;
     }
 
-    public getNodeById(node_id: any): Node | null {
+    public getNodeById(node_id: NodeId): Node|null {
         return this.id_mapping[node_id];
     }
 
@@ -446,7 +448,7 @@ export class Node {
         this.children = [];
     }
 
-    public getPreviousSibling(): Node | null {
+    public getPreviousSibling(): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -459,7 +461,7 @@ export class Node {
         }
     }
 
-    public getNextSibling(): Node | null {
+    public getNextSibling(): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -494,7 +496,7 @@ export class Node {
         return result;
     }
 
-    public getNextNode(include_children = true): Node | null {
+    public getNextNode(include_children = true): Node|null {
         if (include_children && this.hasChildren() && this.is_open) {
             // First child
             return this.children[0];
@@ -514,7 +516,7 @@ export class Node {
         }
     }
 
-    public getPreviousNode(): Node | null {
+    public getPreviousNode(): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -533,7 +535,7 @@ export class Node {
         }
     }
 
-    public getParent(): Node | null {
+    public getParent(): Node|null {
         // Return parent except if it is the root node
         if (! this.parent) {
             return null;
@@ -545,7 +547,7 @@ export class Node {
         }
     }
 
-    public getLastChild(): Node | null {
+    public getLastChild(): Node|null {
         if (! this.hasChildren()) {
             return null;
         } else {
