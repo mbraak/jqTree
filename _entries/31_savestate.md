@@ -3,10 +3,7 @@ title: saveState
 name: options-savestate
 ---
 
-Save and restore the state of the tree automatically. Saves in a cookie which nodes are opened and selected.
-
-The state is saved in localstorage. In browsers that do not support localstorage, the state is saved in a cookie.
-For this to work, please include [jquery-cookie](https://github.com/carhartl/jquery-cookie).
+Save and restore the state of the tree automatically. The state is saved in localstorage.
 
 For this to work, you should give each node in the tree data an id field:
 
@@ -21,9 +18,9 @@ For this to work, you should give each node in the tree data an id field:
 }
 {% endhighlight %}
 
-* **true**: save and restore state in a cookie
+* **true**: save and restore state in localstorage
 * **false (default)**: do nothing
-* **string**: save state and use this name to store in a cookie
+* **string**: save state and use this name to store
 
 {% highlight js %}
 $('#tree1').tree({

@@ -21,12 +21,6 @@ Include jqtree.css:
 <link rel="stylesheet" href="jqtree.css">
 {% endhighlight %}
 
-Optionally, for saveState include [jquery-cookie](https://github.com/carhartl/jquery-cookie):
-
-{% highlight html %}
-<script src="jquery.cookie.js"></script>
-{% endhighlight %}
-
 Create a div.
 
 {% highlight html %}

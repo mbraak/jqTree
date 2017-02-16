@@ -16,15 +16,8 @@ export default class SaveStateHandler {
             this.tree_widget.options.onSetStateFromStorage(state);
         } else if (this.supportsLocalStorage()) {
             localStorage.setItem(
-                this.getCookieName(),
+                this.getKeyName(),
                 state
-            );
-        } else if ($.cookie) {
-            $.cookie.raw = true;
-            $.cookie(
-                this.getCookieName(),
-                state,
-                {path: "/"}
             );
         }
     }
@@ -120,13 +113,8 @@ export default class SaveStateHandler {
             return this.tree_widget.options.onGetStateFromStorage();
         } else if (this.supportsLocalStorage()) {
             return localStorage.getItem(
-                this.getCookieName()
+                this.getKeyName()
             );
-        } else if ($.cookie) {
-            $.cookie.raw = true;
-            return $.cookie(this.getCookieName());
-        } else {
-            return null;
         }
     }
 
@@ -213,7 +201,7 @@ export default class SaveStateHandler {
         openNodes();
     }
 
-    private getCookieName(): string {
+    private getKeyName(): string {
         if (typeof this.tree_widget.options.saveState === "string") {
             return this.tree_widget.options.saveState;
         } else {

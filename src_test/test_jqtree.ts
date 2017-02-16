@@ -695,17 +695,6 @@ test("save state", assert =>  {
     // setup
     let state = null;
 
-    // Fake $.cookie plugin for browsers that do not support localstorage
-    $.cookie = (key, param2, param3) => {
-        if (typeof param3 === "object") {
-            // set
-            state = param2;
-        } else {
-            // get
-            return state;
-        }
-    };
-
     // Remove state from localstorage
     if (typeof localStorage !== "undefined") {
         localStorage.setItem("my_tree", null);
@@ -736,8 +725,6 @@ test("save state", assert =>  {
     });
 
     assert.equal($tree.tree("getSelectedNode").name, "node1");
-
-    $.cookie = null;
 });
 
 test("generate hit areas", assert =>  {
