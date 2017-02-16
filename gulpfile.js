@@ -5,8 +5,10 @@ const sass = require("gulp-sass");
 const ts = require("gulp-typescript");
 
 gulp.task("lib_ts", function() {
+    const tsProject = ts.createProject('tsconfig.json');
+
     gulp.src("./src/*.ts")
-        .pipe(ts())
+        .pipe(tsProject())
         .pipe(gulp.dest("./lib"));
 });
 
