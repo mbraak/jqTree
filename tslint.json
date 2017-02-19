@@ -1,5 +1,5 @@
 {
-    "extends": "tslint:recommended",
+    "extends": "tslint:latest",
     "rules": {
         "arrow-parens": false,
         "max-classes-per-file": false,

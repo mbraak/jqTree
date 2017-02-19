@@ -1,5 +1,3 @@
-import * as $ from "jquery";
-
 import { Position, Node } from "./node";
 import { html_escape } from "./util";
 import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itree_widget";
@@ -131,7 +129,7 @@ export class DragAndDropHandler {
         this.removeDropHint();
         this.removeHitAreas();
 
-        let current_item = this.current_item;
+        const current_item = this.current_item;
 
         if (this.current_item) {
             this.current_item.$element.removeClass("jqtree-moving");
@@ -443,7 +441,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         let group = [];
         const hit_areas: IHitArea[] = [];
 
-        for (let position of positions) {
+        for (const position of positions) {
             if (position.top !== previous_top && group.length) {
                 if (group.length) {
                     this.generateHitAreasForGroup(

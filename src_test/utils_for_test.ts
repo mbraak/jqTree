@@ -7,8 +7,6 @@ node1
 -node2
 ---child3
 */
-import * as $ from "jquery";
-
 import { Node } from "../src/node";
 
 export const example_data = [
@@ -52,7 +50,7 @@ export const example_data2 = [
 ];
 
 export function formatNodes(nodes: Node[]) {
-    let strings = $.map(nodes, node => node.name);
+    const strings = $.map(nodes, node => node.name);
 
     return strings.join(" ");
 };
@@ -76,7 +74,7 @@ export function isNodeOpen($node: JQuery) {
 }
 
 export function formatTitles($node: JQuery) {
-    let titles = $node.find(".jqtree-title").map(
+    const titles = $node.find(".jqtree-title").map(
         (i, el) => $(el).text()
     );
     return titles.toArray().join(" ");

@@ -1,10 +1,10 @@
-const { module, test } = QUnit;
-
-import * as $ from "jquery";
+import "../src/tree.jquery";
 
 import { example_data, example_data2, formatNodes, formatTitles, isNodeOpen, isNodeClosed } from "./utils_for_test";
 import { Position, Node } from "../src/node";
 import "../src/itree_widget";
+
+const { module, test } = QUnit;
 
 module("jqtree", {
     beforeEach: () => {
@@ -12,7 +12,7 @@ module("jqtree", {
     },
 
     afterEach: () => {
-        let $tree = $("#tree1");
+        const $tree = $("#tree1");
         $tree.tree("destroy");
         $tree.remove();
 
@@ -340,7 +340,7 @@ test("loadData", (assert: Assert) =>  {
     // - select c9 (which has no id); load new nodes under child2
     $tree.tree("selectNode", $tree.tree("getNodeByName", "c9"));
 
-    let child2 = $tree.tree("getNodeByName", "child2");
+    const child2 = $tree.tree("getNodeByName", "child2");
     $tree.tree("loadData", [ "c10" ], child2);
 
     assert.equal($tree.tree("getSelectedNode").name, "c9");
@@ -605,9 +605,9 @@ test("autoOpen", (assert: Assert) =>  {
         $tree.find("li").each(
             // tslint:disable-next-line: only-arrow-functions
             function() {
-                let $li = $(this);
+                const $li = $(this);
                 if ($li.is(".jqtree-folder") && ! $li.is(".jqtree-closed")) {
-                    let label = $li.children(".jqtree-element").find("span").text();
+                    const label = $li.children(".jqtree-element").find("span").text();
                     open_nodes.push(label);
                 }
             }
@@ -677,7 +677,7 @@ test("onCreateLi", (assert: Assert) =>  {
     $tree.tree({
         data: example_data,
         onCreateLi: (node: Node, $li: JQuery) => {
-            let $span = $li.children(".jqtree-element").find("span");
+            const $span = $li.children(".jqtree-element").find("span");
             $span.html(`_${node.name}_`);
         }
     });
@@ -689,9 +689,6 @@ test("onCreateLi", (assert: Assert) =>  {
 });
 
 test("save state", (assert: Assert) =>  {
-    // setup
-    let state = null;
-
     // Remove state from localstorage
     if (typeof localStorage !== "undefined") {
         localStorage.setItem("my_tree", null);
@@ -947,7 +944,7 @@ test("updateNode", (assert: Assert) =>  {
     assert.equal(node_124, undefined);
 
     // update child1
-    let child1 = $tree.tree("getNodeByName", "child1");
+    const child1 = $tree.tree("getNodeByName", "child1");
 
     $tree.tree("updateNode", child1, "child1a");
 
@@ -1123,7 +1120,7 @@ test("mouse events", (assert: Assert) =>  {
     );
 
     // trigger mouse move to child3
-    let child3_offset = $child3.offset();
+    const child3_offset = $child3.offset();
     $tree.trigger(
         $.Event("mousemove", { pageX: child3_offset.left, pageY: child3_offset.top })
     );

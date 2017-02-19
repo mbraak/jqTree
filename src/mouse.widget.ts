@@ -1,8 +1,6 @@
 /*
 This widget does the same a the mouse widget in jqueryui.
 */
-import * as $ from "jquery";
-
 import SimpleWidget from "./simple.widget";
 import { IPositionInfo } from "./imouse_widget";
 

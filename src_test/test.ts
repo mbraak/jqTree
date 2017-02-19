@@ -1,5 +1,3 @@
-import "../src/tree.jquery";
-
 import "./test_util";
 import "./test_tree";
 import "./test_jqtree";

@@ -1,5 +1,3 @@
-import * as $ from "jquery";
-
 import { Node } from "./node";
 import { ITreeWidget } from "./itree_widget";
 

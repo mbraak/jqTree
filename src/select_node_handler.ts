@@ -1,5 +1,3 @@
-import * as $ from "jquery";
-
 import { Node } from "./node";
 import { ITreeWidget } from "./itree_widget";
 
@@ -29,7 +27,7 @@ export default class SelectNodeHandler {
         } else {
             const selected_nodes = [];
 
-            for (let id in this.selected_nodes) {
+            for (const id in this.selected_nodes) {
                 if (this.selected_nodes.hasOwnProperty(id)) {
                     const node = this.tree_widget.getNodeById(id);
                     if (node) {
@@ -52,7 +50,7 @@ export default class SelectNodeHandler {
         } else {
             const selected_nodes = [];
 
-            for (let id in this.selected_nodes) {
+            for (const id in this.selected_nodes) {
                 if (this.selected_nodes.hasOwnProperty(id)) {
                     const node = this.tree_widget.getNodeById(id);
                     if (node && parent.isParentOf(node)) {

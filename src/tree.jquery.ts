@@ -1,4 +1,3 @@
-import * as $ from "jquery";
 import __version__ from "./version";
 import * as drag_and_drop_handler from "./drag_and_drop_handler";
 import { DragAndDropHandler, DragElement, HitAreasGenerator } from "./drag_and_drop_handler";
@@ -11,7 +10,7 @@ import ScrollHandler from "./scroll_handler";
 import SelectNodeHandler from "./select_node_handler";
 import SimpleWidget from "./simple.widget";
 import * as node_module from "./node";
-import { Node, Position, NodeId }  from "./node";
+import { Node, Position, NodeId } from "./node";
 import * as util_module from "./util";
 import { isFunction } from "./util";
 import { BorderDropHint, FolderElement, GhostDropHint, NodeElement } from "./node_element";
@@ -23,38 +22,38 @@ class JqTreeWidget extends MouseWidget {
         dragAndDrop: false,
         selectable: true,
         useContextMenu: true,
-        onCanSelectNode: <Function|null> null,
-        onSetStateFromStorage: <Function|null> null,
-        onGetStateFromStorage: <Function|null> null,
-        onCreateLi: <Function|null> null,
-        onIsMoveHandle: <Function|null> null,
+        onCanSelectNode: null as Function|null,
+        onSetStateFromStorage: null as Function|null,
+        onGetStateFromStorage: null as Function|null,
+        onCreateLi: null as Function|null,
+        onIsMoveHandle: null as Function|null,
 
         // Can this node be moved? function(node)
-        onCanMove: <Function|null> null,
+        onCanMove: null as Function|null,
 
         // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanMoveTo: <Function|null> null,
-        onLoadFailed: <Function|null> null,
+        onCanMoveTo: null as Function|null,
+        onLoadFailed: null as Function|null,
         autoEscape: true,
-        dataUrl: <any> null,
+        dataUrl: null as any,
 
         // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
         // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-        closedIcon: <string|Element|null> null,
+        closedIcon: null as string|Element|null,
 
         // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
         // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-        openedIcon: <string|Element|null> "&#x25bc;",
+        openedIcon: "&#x25bc;" as string|Element|null,
         slide: true,  // must display slide animation?
         nodeClass: Node,
-        dataFilter: <Function|null> null,
+        dataFilter: null as Function|null,
         keyboardSupport: true,
         openFolderDelay: 500,  // The delay for opening a folder during drag and drop; the value is in milliseconds
         rtl: false,  // right-to-left support; true / false (default)
-        onDragMove: <Function|null> null,
-        onDragStop: <Function|null> null,
+        onDragMove: null as Function|null,
+        onDragStop: null as Function|null,
         buttonLeft: true,
-        onLoading: <Function|null> null
+        onLoading: null as Function|null
     };
 
     public element: JQuery;
@@ -171,11 +170,11 @@ class JqTreeWidget extends MouseWidget {
             let slide;
 
             if (isFunction(param1)) {
-                on_finished = <Function> param1;
+                on_finished = param1 as Function;
                 slide = null;
             } else {
                 slide = param1;
-                on_finished = <Function> param2;
+                on_finished = param2 as Function;
             }
 
             if (slide == null) {
@@ -686,6 +685,7 @@ class JqTreeWidget extends MouseWidget {
             return must_load_on_demand;
         };
 
+        // tslint:disable-next-line: prefer-const
         let [is_restored, must_load_on_demand] = restoreState();
 
         if (! is_restored) {
@@ -989,7 +989,7 @@ class JqTreeWidget extends MouseWidget {
         const deselectNodes = () => {
             if (this.select_node_handler) {
                 const selected_nodes_under_parent = this.select_node_handler.getSelectedNodesUnder(parent_node);
-                for (let n of selected_nodes_under_parent) {
+                for (const n of selected_nodes_under_parent) {
                     this.select_node_handler.removeFromSelection(n);
                 }
             }

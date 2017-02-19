@@ -1,5 +1,3 @@
-import * as $ from "jquery";
-
 import { isInt } from "./util";
 import { ITreeWidget } from "./itree_widget";
 import { Node, NodeId } from "./node";
@@ -126,7 +124,7 @@ export default class SaveStateHandler {
     private _openInitialNodes(node_ids: any[]): boolean {
         let must_load_on_demand = false;
 
-        for (let node_id of node_ids) {
+        for (const node_id of node_ids) {
             const node = this.tree_widget.getNodeById(node_id);
 
             if (node) {
@@ -144,7 +142,7 @@ export default class SaveStateHandler {
     private _selectInitialNodes(node_ids: NodeId[]): boolean {
         let select_count = 0;
 
-        for (let node_id of node_ids) {
+        for (const node_id of node_ids) {
             const node = this.tree_widget.getNodeById(node_id);
 
             if (node) {
@@ -164,7 +162,7 @@ export default class SaveStateHandler {
         const openNodes = () => {
             const new_nodes_ids = [];
 
-            for (let node_id of node_ids) {
+            for (const node_id of node_ids) {
                 const node = this.tree_widget.getNodeById(node_id);
 
                 if (! node) {

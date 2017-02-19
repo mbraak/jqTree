@@ -1,4 +1,3 @@
-import * as $ from "jquery";
 import { NodeElement } from "./node_element";
 import { html_escape, getBoolString } from "./util";
 import { Node } from "./node";
@@ -57,7 +56,7 @@ export default class ElementsRenderer {
         const ul = this.createUl(is_root_node);
         element.appendChild(ul);
 
-        for (let child of children) {
+        for (const child of children) {
             const li = this.createLi(child, level);
             ul.appendChild(li);
 

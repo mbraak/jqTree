@@ -1,5 +1,3 @@
-import * as $ from "jquery";
-
 import { ITreeWidget, IHitArea } from "./itree_widget";
 
 export default class ScrollHandler {
@@ -74,7 +72,7 @@ export default class ScrollHandler {
             const css_values = ["overflow", "overflow-y"];
 
             const hasOverFlow = ($el: JQuery) => {
-                for (let css_value of css_values) {
+                for (const css_value of css_values) {
                     if ($el.css(css_value) in ["auto", "scroll"]) {
                         return true;
                     }
@@ -87,7 +85,7 @@ export default class ScrollHandler {
                 return this.tree_widget.$el;
             }
 
-            for (let el of this.tree_widget.$el.parents().get()) {
+            for (const el of this.tree_widget.$el.parents().get()) {
                 const $el = $(el);
                 if (hasOverFlow($el)) {
                     return $el;

@@ -23,8 +23,10 @@ test("constructor", (assert: Assert) => {
 
     assert.equal(node2.name, "n2");
     assert.equal(node2.id, 123);
-    assert.equal(node2.url, "/");
-    assert.equal(node2.label, undefined);
+    // tslint:disable-next-line: no-string-literal
+    assert.equal(node2["url"], "/");
+    // tslint:disable-next-line: no-string-literal
+    assert.equal(node2["label"], undefined);
     assert.equal(node2.children.length, 0);
     assert.equal(node2.parent, null);
 });

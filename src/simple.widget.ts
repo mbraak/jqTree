@@ -1,5 +1,3 @@
-import * as $ from "jquery";
-
 export default class SimpleWidget {
     [key: string]: any;
 
@@ -19,7 +17,7 @@ export default class SimpleWidget {
         function createWidget($el: JQuery, options: Object) {
             const data_key = getDataKey();
 
-            for (let el of $el.get()) {
+            for (const el of $el.get()) {
                 const existing_widget = getWidgetData(el, data_key);
 
                 if (! existing_widget) {
@@ -40,7 +38,7 @@ export default class SimpleWidget {
         function destroyWidget($el: JQuery) {
             const data_key = getDataKey();
 
-            for (let el of $el.get()) {
+            for (const el of $el.get()) {
                 const widget = getWidgetData(el, data_key);
 
                 if (widget) {
@@ -54,7 +52,7 @@ export default class SimpleWidget {
         function callFunction($el: JQuery, function_name: string, args: any[]): any {
             let result = null;
 
-            for (let el of $el.get()) {
+            for (const el of $el.get()) {
                 const widget = $.data(el, getDataKey());
 
                 if (widget && (widget instanceof SimpleWidget)) {
@@ -99,7 +97,7 @@ export default class SimpleWidget {
     constructor(el: Element, options: any) {
         this.$el = $(el);
 
-        const defaults = (<typeof SimpleWidget> this.constructor).defaults;
+        const defaults = (this.constructor as typeof SimpleWidget).defaults;
         this.options = $.extend({}, defaults, options);
     }
 

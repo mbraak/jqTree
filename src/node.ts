@@ -1,6 +1,4 @@
 // tslint:disable: no-string-literal
-import * as $ from "jquery";
-
 export type NodeId = number|string;
 
 export const Position = {
@@ -84,7 +82,7 @@ export class Node {
         } else if (typeof o !== "object") {
             setName(o);
         } else {
-            for (let key in o) {
+            for (const key in o) {
                 if (o.hasOwnProperty(key)) {
                     const value = o[key];
 
@@ -120,7 +118,7 @@ export class Node {
     public loadFromData(data: any[]) {
         this.removeChildren();
 
-        for (let o of data) {
+        for (const o of data) {
             const node = new this.tree.node_class(o);
             this.addChild(node);
 
@@ -211,7 +209,7 @@ export class Node {
     public iterate(callback: Function) {
         const _iterate = (node: Node, level: number) => {
             if (node.children) {
-                for (let child of node.children) {
+                for (const child of node.children) {
                     const result = callback(child, level);
 
                     if (result && child.hasChildren()) {
@@ -264,7 +262,7 @@ export class Node {
                 node => {
                     const tmp_node: any = {};
 
-                    for (let k in node) {
+                    for (const k in node) {
                         if (
                             ["parent", "children", "element", "tree"].indexOf(k) === -1 &&
                             Object.prototype.hasOwnProperty.call(node, k)
@@ -355,7 +353,7 @@ export class Node {
             new_parent._setParent(this.tree);
             const original_parent = this.parent;
 
-            for (let child of original_parent.children) {
+            for (const child of original_parent.children) {
                 new_parent.addChild(child);
             }
 
@@ -570,7 +568,7 @@ export class Node {
         };
 
         const addChildren = (children_data: Object[]) => {
-            for (let child of children_data) {
+            for (const child of children_data) {
                 const node = new this.tree.node_class("");
                 node.initFromData(child);
                 this.addChild(node);
