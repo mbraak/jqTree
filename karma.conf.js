@@ -13,7 +13,8 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            { pattern: 'static/bower_components/jquery/dist/jquery.min.js', watched: false},
+            { pattern: 'static/bower_components/jquery/dist/jquery.min.js', watched: false },
+            { pattern: 'static/bower_components/jquery-mockjax/dist/jquery.mockjax.js', watched: false },
             { pattern: 'src_test/test.ts', watched: false }
         ],
 

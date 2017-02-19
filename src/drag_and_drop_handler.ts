@@ -1,19 +1,23 @@
 import * as $ from "jquery";
+
 import { Position, Node } from "./node";
 import { html_escape } from "./util";
+import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itree_widget";
+import { IPositionInfo } from "./imouse_widget";
 
 export class DragAndDropHandler {
-    public hit_areas;
+    public hit_areas: IHitArea[];
     public is_dragging: boolean;
-    public current_item;
-    private tree_widget;
-    private hovered_area;
-    private $ghost;
-    private drag_element;
-    private previous_ghost;
-    private open_folder_timer;
+    public current_item: INodeElement;
+    public hovered_area: IHitArea|null;
 
-    constructor(tree_widget) {
+    private tree_widget: ITreeWidget;
+    private $ghost: JQuery|null;
+    private drag_element: DragElement;
+    private previous_ghost: IDropHint|null;
+    private open_folder_timer: number|null;
+
+    constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
 
         this.hovered_area = null;
@@ -23,7 +27,7 @@ export class DragAndDropHandler {
         this.current_item = null;
     }
 
-    public mouseCapture(position_info): boolean|null {
+    public mouseCapture(position_info: IPositionInfo): boolean|null {
         const $element = $(position_info.target);
 
         if (! this.mustCaptureElement($element)) {
@@ -55,7 +59,7 @@ export class DragAndDropHandler {
         this.hit_areas = hit_areas_generator.generate();
     }
 
-    public mouseStart(position_info) {
+    public mouseStart(position_info: IPositionInfo) {
         this.refresh();
 
         const offset = $(position_info.target).offset();
@@ -82,7 +86,7 @@ export class DragAndDropHandler {
         return true;
     }
 
-    public mouseDrag(position_info): boolean {
+    public mouseDrag(position_info: IPositionInfo): boolean {
         this.drag_element.move(position_info.page_x, position_info.page_y);
 
         const area = this.findHoveredArea(position_info.page_x, position_info.page_y);
@@ -120,7 +124,7 @@ export class DragAndDropHandler {
         return true;
     }
 
-    public mouseStop(position_info) {
+    public mouseStop(position_info: IPositionInfo) {
         this.moveItem(position_info);
         this.clear();
         this.removeHover();
@@ -159,11 +163,11 @@ export class DragAndDropHandler {
         }
     }
 
-    private mustCaptureElement($element) {
+    private mustCaptureElement($element: JQuery) {
         return ! $element.is("input,select,textarea");
     }
 
-    private canMoveToArea(area): boolean {
+    private canMoveToArea(area: IHitArea): boolean {
         if (! area) {
             return false;
         } else if (this.tree_widget.options.onCanMoveTo) {
@@ -225,7 +229,7 @@ export class DragAndDropHandler {
         return null;
     }
 
-    private mustOpenFolderTimer(area) {
+    private mustOpenFolderTimer(area: IHitArea) {
         const node = area.node;
 
         return (
@@ -248,7 +252,7 @@ export class DragAndDropHandler {
         this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
     }
 
-    private startOpenFolderTimer(folder) {
+    private startOpenFolderTimer(folder: Node) {
         const openFolder = () => {
             this.tree_widget._openNode(
                 folder,
@@ -272,7 +276,7 @@ export class DragAndDropHandler {
         }
     }
 
-    private moveItem(position_info) {
+    private moveItem(position_info: IPositionInfo) {
         if (
             this.hovered_area &&
             this.hovered_area.position !== Position.NONE &&
@@ -328,9 +332,9 @@ export class DragAndDropHandler {
 }
 
 class VisibleNodeIterator {
-    private tree;
+    private tree: Node;
 
-    constructor(tree) {
+    constructor(tree: Node) {
         this.tree = tree;
     }
 
@@ -386,11 +390,11 @@ class VisibleNodeIterator {
         _iterateNode(this.tree, null);
     }
 
-    protected handleNode(node: Node, next_node: Node, $element) {
+    protected handleNode(node: Node, next_node: Node, $element: JQuery) {
         // override
     }
 
-    protected handleOpenFolder(node: Node, $element) {
+    protected handleOpenFolder(node: Node, $element: JQuery) {
         /*
         override
         return
@@ -399,15 +403,15 @@ class VisibleNodeIterator {
          */
     }
 
-    protected handleClosedFolder(node: Node, next_node: Node, $element) {
+    protected handleClosedFolder(node: Node, next_node: Node, $element: JQuery) {
         // override
     }
 
-    protected handleAfterOpenFolder(node: Node, next_node: Node, $element) {
+    protected handleAfterOpenFolder(node: Node, next_node: Node, $element: JQuery) {
         // override
     }
 
-    protected handleFirstNode(node: Node, $element) {
+    protected handleFirstNode(node: Node, $element: JQuery) {
         // override
     }
 }
@@ -415,10 +419,10 @@ class VisibleNodeIterator {
 export class HitAreasGenerator extends VisibleNodeIterator {
     private current_node: Node;
     private tree_bottom: number;
-    private positions;
+    private positions: IHitArea[];
     private last_top: number;
 
-    constructor(tree, current_node: Node, tree_bottom: number) {
+    constructor(tree: Node, current_node: Node, tree_bottom: number) {
         super(tree);
 
         this.current_node = current_node;
@@ -434,10 +438,10 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return this.generateHitAreas(this.positions);
     }
 
-    protected generateHitAreas(positions) {
+    protected generateHitAreas(positions: IHitArea[]) {
         let previous_top = -1;
         let group = [];
-        const hit_areas = [];
+        const hit_areas: IHitArea[] = [];
 
         for (let position of positions) {
             if (position.top !== previous_top && group.length) {
@@ -467,7 +471,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return hit_areas;
     }
 
-    protected handleOpenFolder(node: Node, $element) {
+    protected handleOpenFolder(node: Node, $element: JQuery) {
         if (node === this.current_node) {
             // Cannot move inside current item
             // Stop iterating
@@ -483,7 +487,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return true;
     }
 
-    protected handleClosedFolder(node: Node, next_node: Node, $element) {
+    protected handleClosedFolder(node: Node, next_node: Node, $element: JQuery) {
         const top = this.getTop($element);
 
         if (node === this.current_node) {
@@ -499,13 +503,13 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    protected handleFirstNode(node: Node, $element) {
+    protected handleFirstNode(node: Node, $element: JQuery) {
         if (node !== this.current_node) {
             this.addPosition(node, Position.BEFORE, this.getTop($(node.element)));
         }
     }
 
-    protected handleAfterOpenFolder(node: Node, next_node: Node, $element) {
+    protected handleAfterOpenFolder(node: Node, next_node: Node, $element: JQuery) {
         if (
             node === this.current_node ||
             next_node === this.current_node
@@ -517,7 +521,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    protected handleNode(node: Node, next_node: Node, $element) {
+    protected handleNode(node: Node, next_node: Node, $element: JQuery) {
         const top = this.getTop($element);
 
         if (node === this.current_node) {
@@ -538,13 +542,14 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    private getTop($element): number {
+    private getTop($element: JQuery): number {
         return $element.offset().top;
     }
 
-    private addPosition(node: Node, position, top: number) {
+    private addPosition(node: Node, position: number, top: number) {
         const area = {
             top,
+            bottom: 0,
             node,
             position
         };
@@ -553,7 +558,9 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         this.last_top = top;
     }
 
-    private generateHitAreasForGroup(hit_areas, positions_in_group, top: number, bottom: number) {
+    private generateHitAreasForGroup(
+        hit_areas: IHitArea[], positions_in_group: IHitArea[], top: number, bottom: number
+    ) {
         // limit positions in group
         const position_count = Math.min(positions_in_group.length, 4);
 
@@ -580,9 +587,9 @@ export class HitAreasGenerator extends VisibleNodeIterator {
 export class DragElement {
     private offset_x: number;
     private offset_y: number;
-    private $element;
+    private $element: JQuery;
 
-    constructor(node_name: string, offset_x: number, offset_y: number, $tree) {
+    constructor(node_name: string, offset_x: number, offset_y: number, $tree: JQuery) {
         this.offset_x = offset_x;
         this.offset_y = offset_y;
 
@@ -591,14 +598,14 @@ export class DragElement {
         $tree.append(this.$element);
     }
 
-    private move(page_x: number, page_y: number) {
+    public move(page_x: number, page_y: number) {
         this.$element.offset({
             left: page_x - this.offset_x,
             top: page_y - this.offset_y
         });
     }
 
-    private remove() {
+    public remove() {
         this.$element.remove();
     }
 }

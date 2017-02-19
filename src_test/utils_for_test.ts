@@ -9,6 +9,8 @@ node1
 */
 import * as $ from "jquery";
 
+import { Node } from "../src/node";
+
 export const example_data = [
     {
         label: "node1",
@@ -49,13 +51,13 @@ export const example_data2 = [
     }
 ];
 
-export function formatNodes(nodes) {
+export function formatNodes(nodes: Node[]) {
     let strings = $.map(nodes, node => node.name);
 
     return strings.join(" ");
 };
 
-export function isNodeClosed($node) {
+export function isNodeClosed($node: JQuery) {
     return (
         ($node.is("li.jqtree-folder.jqtree-closed")) &&
         ($node.find("a:eq(0)").is("a.jqtree-toggler.jqtree-closed")) &&
@@ -63,7 +65,7 @@ export function isNodeClosed($node) {
     );
 }
 
-export function isNodeOpen($node) {
+export function isNodeOpen($node: JQuery) {
     return (
         ($node.is("li.jqtree-folder")) &&
         ($node.find("a:eq(0)").is("a.jqtree-toggler")) &&
@@ -73,7 +75,7 @@ export function isNodeOpen($node) {
     );
 }
 
-export function formatTitles($node) {
+export function formatTitles($node: JQuery) {
     let titles = $node.find(".jqtree-title").map(
         (i, el) => $(el).text()
     );

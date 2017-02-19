@@ -1,13 +1,15 @@
 import * as $ from "jquery";
 
+import { ITreeWidget, IHitArea } from "./itree_widget";
+
 export default class ScrollHandler {
-    private tree_widget;
+    private tree_widget: ITreeWidget;
     private previous_top: number;
     private is_initialized: boolean;
-    private $scroll_parent;
+    private $scroll_parent: JQuery|null;
     private scroll_parent_top: number;
 
-    constructor(tree_widget) {
+    constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
         this.previous_top = -1;
         this.is_initialized = false;
@@ -40,7 +42,7 @@ export default class ScrollHandler {
         }
     }
 
-    public isScrolledIntoView(element): boolean {
+    public isScrolledIntoView(element: Element): boolean {
         this._ensureInit();
 
         const $element = $(element);
@@ -71,7 +73,7 @@ export default class ScrollHandler {
         const getParentWithOverflow = () => {
             const css_values = ["overflow", "overflow-y"];
 
-            const hasOverFlow = $el => {
+            const hasOverFlow = ($el: JQuery) => {
                 for (let css_value of css_values) {
                     if ($el.css(css_value) in ["auto", "scroll"]) {
                         return true;
@@ -85,7 +87,7 @@ export default class ScrollHandler {
                 return this.tree_widget.$el;
             }
 
-            for (let el of this.tree_widget.$el.parents()) {
+            for (let el of this.tree_widget.$el.parents().get()) {
                 const $el = $(el);
                 if (hasOverFlow($el)) {
                     return $el;
@@ -122,7 +124,7 @@ export default class ScrollHandler {
         }
     }
 
-    private _handleScrollingWithScrollParent(area) {
+    private _handleScrollingWithScrollParent(area: IHitArea) {
         const distance_bottom = this.scroll_parent_top + this.$scroll_parent[0].offsetHeight - area.bottom;
 
         if (distance_bottom < 20) {
@@ -136,7 +138,7 @@ export default class ScrollHandler {
         }
     }
 
-    private _handleScrollingWithDocument(area) {
+    private _handleScrollingWithDocument(area: IHitArea) {
         const distance_top = area.top - $(document).scrollTop();
 
         if (distance_top < 20) {

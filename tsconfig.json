@@ -5,6 +5,8 @@
         "node_modules"
     ],
     "compilerOptions": {
-        "typeRoots" : ["./typings/globals"]
+        "typeRoots" : ["./typings/globals"],
+        "noImplicitAny": true,
+        "moduleResolution": "node"
     }
 }

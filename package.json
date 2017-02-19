@@ -25,12 +25,12 @@
     "jquery": ">=1.9"
   },
   "devDependencies": {
-    "connect": "^3.5.1",
+    "connect": "^3.6.0",
     "coveralls": "^2.11.16",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
-    "gulp-typescript": "^3.1.4",
+    "gulp-typescript": "^3.1.5",
     "ie-version": "^0.1.0",
     "jquery-mockjax": "^2.2.1",
     "jsonfile": "^2.4.0",

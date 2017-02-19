@@ -1,10 +1,12 @@
 import * as $ from "jquery";
 
 export default class SimpleWidget {
-    public static register(widget_class, widget_name: string) {
+    [key: string]: any;
+
+    public static register(widget_class: any, widget_name: string) {
         const getDataKey = () => `simple_widget_${widget_name}`;
 
-        function getWidgetData(el, data_key: string) {
+        function getWidgetData(el: Element, data_key: string) {
             const widget = $.data(el, data_key);
 
             if (widget && (widget instanceof SimpleWidget)) {
@@ -14,10 +16,10 @@ export default class SimpleWidget {
             }
         }
 
-        function createWidget($el, options: Object) {
+        function createWidget($el: JQuery, options: Object) {
             const data_key = getDataKey();
 
-            for (let el of $el) {
+            for (let el of $el.get()) {
                 const existing_widget = getWidgetData(el, data_key);
 
                 if (! existing_widget) {
@@ -35,10 +37,10 @@ export default class SimpleWidget {
             return $el;
         }
 
-        function destroyWidget($el) {
+        function destroyWidget($el: JQuery) {
             const data_key = getDataKey();
 
-            for (let el of $el) {
+            for (let el of $el.get()) {
                 const widget = getWidgetData(el, data_key);
 
                 if (widget) {
@@ -49,10 +51,10 @@ export default class SimpleWidget {
             }
         }
 
-        function callFunction($el, function_name: string, args: any[]) {
+        function callFunction($el: JQuery, function_name: string, args: any[]): any {
             let result = null;
 
-            for (let el of $el) {
+            for (let el of $el.get()) {
                 const widget = $.data(el, getDataKey());
 
                 if (widget && (widget instanceof SimpleWidget)) {
@@ -68,7 +70,7 @@ export default class SimpleWidget {
         }
 
         // tslint:disable-next-line: only-arrow-functions
-        $.fn[widget_name] = function(argument1, ...args) {
+        $.fn[widget_name] = function(argument1: any, ...args: any[]) {
             const $el = this;
 
             if (argument1 === undefined || typeof argument1 === "object") {
@@ -89,10 +91,12 @@ export default class SimpleWidget {
     }
 
     protected static defaults = {};
-    protected $el: JQuery;
-    protected options;
 
-    constructor(el, options: Object) {
+    public options: any;
+
+    protected $el: JQuery;
+
+    constructor(el: Element, options: any) {
         this.$el = $(el);
 
         const defaults = (<typeof SimpleWidget> this.constructor).defaults;

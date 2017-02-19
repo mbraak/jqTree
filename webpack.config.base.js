@@ -55,7 +55,6 @@ module.exports = function(debug) {
     }
     else {
         config["plugins"] = [
-            new webpack.optimize.UglifyJsPlugin(),
             new webpack.BannerPlugin(getHeader())
         ];
     }

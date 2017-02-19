@@ -1,11 +1,14 @@
 import * as $ from "jquery";
+
 import { isInt } from "./util";
+import { ITreeWidget } from "./itree_widget";
+import { Node, NodeId } from "./node";
 
 export default class SaveStateHandler {
-    private tree_widget;
+    private tree_widget: ITreeWidget;
     private _supportsLocalStorage: boolean|null;
 
-    constructor(tree_widget) {
+    constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
     }
 
@@ -34,10 +37,10 @@ export default class SaveStateHandler {
 
     public getState() {
         const getOpenNodeIds = () => {
-            const open_nodes = [];
+            const open_nodes: NodeId[] = [];
 
             this.tree_widget.tree.iterate(
-                node => {
+                (node: Node) => {
                     if (
                         node.is_open &&
                         node.id &&
@@ -52,7 +55,9 @@ export default class SaveStateHandler {
             return open_nodes;
         };
 
-        const getSelectedNodeIds = () => this.tree_widget.getSelectedNodes().map(n => n.id);
+        const getSelectedNodeIds = () => this.tree_widget.getSelectedNodes().map(
+            (n: Node) => n.id
+        );
 
         return {
             open_nodes: getOpenNodeIds(),
@@ -66,7 +71,7 @@ export default class SaveStateHandler {
 
     result: must load on demand
     */
-    public setInitialState(state): boolean {
+    public setInitialState(state: any): boolean {
         if (! state) {
             return false;
         } else {
@@ -78,7 +83,7 @@ export default class SaveStateHandler {
         }
     }
 
-    public setInitialStateOnDemand(state, cb_finished: Function) {
+    public setInitialStateOnDemand(state: any, cb_finished: Function) {
         if (state) {
             this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cb_finished);
         } else {
@@ -96,7 +101,7 @@ export default class SaveStateHandler {
         }
     }
 
-    private _parseState(json_data) {
+    private _parseState(json_data: any) {
         const state = $.parseJSON(json_data);
 
         // Check if selected_node is an int (instead of an array)
@@ -136,7 +141,7 @@ export default class SaveStateHandler {
         return must_load_on_demand;
     }
 
-    private _selectInitialNodes(node_ids: any[]): boolean {
+    private _selectInitialNodes(node_ids: NodeId[]): boolean {
         let select_count = 0;
 
         for (let node_id of node_ids) {
@@ -152,7 +157,7 @@ export default class SaveStateHandler {
         return select_count !== 0;
     }
 
-    private _setInitialStateOnDemand(node_ids_param: any[], selected_nodes, cb_finished: Function) {
+    private _setInitialStateOnDemand(node_ids_param: NodeId[], selected_nodes: NodeId[], cb_finished: Function) {
         let loading_count = 0;
         let node_ids = node_ids_param;
 

@@ -2,13 +2,14 @@ import * as $ from "jquery";
 import { NodeElement } from "./node_element";
 import { html_escape, getBoolString } from "./util";
 import { Node } from "./node";
+import { ITreeWidget, IconElement } from "./itree_widget";
 
 export default class ElementsRenderer {
-    public opened_icon_element;
-    public closed_icon_element;
-    private tree_widget;
+    public opened_icon_element: IconElement;
+    public closed_icon_element: IconElement;
+    private tree_widget: ITreeWidget;
 
-    constructor(tree_widget) {
+    constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
 
         this.opened_icon_element = this.createButtonElement(tree_widget.options.openedIcon);
@@ -23,14 +24,14 @@ export default class ElementsRenderer {
         }
     }
 
-    public  renderFromRoot() {
+    public renderFromRoot() {
         const $element = this.tree_widget.element;
         $element.empty();
 
         this.createDomElements($element[0], this.tree_widget.tree.children, true, true, 1);
     }
 
-    public  renderFromNode(node: Node) {
+    public renderFromNode(node: Node) {
         // remember current li
         const $previous_li = $(node.element);
 
@@ -50,7 +51,9 @@ export default class ElementsRenderer {
         }
     }
 
-    private createDomElements(element, children: Node[], is_root_node: boolean, is_open: boolean, level: number) {
+    private createDomElements(
+        element: Element, children: Node[], is_root_node: boolean, is_open: boolean, level: number
+    ) {
         const ul = this.createUl(is_root_node);
         element.appendChild(ul);
 
@@ -66,7 +69,7 @@ export default class ElementsRenderer {
         }
     }
 
-    private attachNodeData(node: Node, li) {
+    private attachNodeData(node: Node, li: Element) {
         node.element = li;
         $(li).data("node", node);
     }
@@ -264,7 +267,7 @@ export default class ElementsRenderer {
         }
     }
 
-    private createButtonElement(value) {
+    private createButtonElement(value: string|Element) {
         if (typeof value === "string") {
             // convert value to html
             const div = document.createElement("div");

@@ -1,5 +1,3 @@
-declare var QUnit: any;
-
 import "../src/tree.jquery";
 
 import "./test_util";

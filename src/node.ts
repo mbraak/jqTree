@@ -8,7 +8,7 @@ export const Position = {
         return Position.strings[position - 1];
     },
 
-    nameToIndex: (name): number => {
+    nameToIndex: (name: string): number => {
         for (let i = 1; i <= Position.strings.length; i++) {
             if (Position.strings[i - 1] === name) {
                 return i;
@@ -31,13 +31,15 @@ export class Node {
     public name: string;
     public children: Node[];
     public parent: Node;
-    public id_mapping: Object;
+    public id_mapping: any;
     public tree: Node;
-    public node_class;  // todo: type class?
+    public node_class: any;  // todo: type class?
     public load_on_demand: boolean;
     public is_open: boolean;
-    public element;
+    public element: Element;
     public is_loading: boolean;
+
+    [key: string]: any;
 
     constructor(o: Object, is_root: boolean = false, node_class = Node) {
         this.name = "";
@@ -70,7 +72,7 @@ export class Node {
     * This is an internal function; it is not in the docs
     * Does not remove existing node values
     */
-    public setData(o: Object) {
+    public setData(o: any) {
         const setName = (name: string) => {
             if (name != null) {
                 this.name = name;
@@ -115,16 +117,14 @@ export class Node {
         }
     ]
     */
-    public loadFromData(data: Object[]) {
+    public loadFromData(data: any[]) {
         this.removeChildren();
 
         for (let o of data) {
             const node = new this.tree.node_class(o);
             this.addChild(node);
 
-            // tslint:disable-next-line: no-string-literal
             if (typeof o === "object" && o["children"]) {
-                // tslint:disable-next-line: no-string-literal
                 node.loadFromData(o["children"]);
             }
         }
@@ -218,7 +218,6 @@ export class Node {
                         _iterate(child, level + 1);
                     }
                 }
-                return null;
             }
         };
 
@@ -263,7 +262,7 @@ export class Node {
         function getDataFromNodes(nodes: Node[]): Object[] {
             return nodes.map(
                 node => {
-                    const tmp_node = {};
+                    const tmp_node: any = {};
 
                     for (let k in node) {
                         if (
@@ -293,7 +292,7 @@ export class Node {
 
     public getNodeByName(name: string): Node|null {
         return this.getNodeByCallback(
-            node => node.name === name
+            (node: Node) => node.name === name
         );
     }
 
@@ -301,7 +300,7 @@ export class Node {
         let result = null;
 
         this.iterate(
-            node => {
+            (node: Node) => {
                 if (callback(node)) {
                     result = node;
                     return false;
@@ -314,7 +313,7 @@ export class Node {
         return result;
     }
 
-    public addAfter(node_info: Object): Node|null {
+    public addAfter(node_info: any): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -331,7 +330,7 @@ export class Node {
         }
     }
 
-    public addBefore(node_info: Object): Node|null {
+    public addBefore(node_info: any): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -348,7 +347,7 @@ export class Node {
         }
     }
 
-    public addParent(node_info: Object): Node|null {
+    public addParent(node_info: any): Node|null {
         if (! this.parent) {
             return null;
         } else {
@@ -373,7 +372,7 @@ export class Node {
         }
     }
 
-    public append(node_info: Object): Node {
+    public append(node_info: any): Node {
         const node = new this.tree.node_class(node_info);
         this.addChild(node);
 
@@ -384,7 +383,7 @@ export class Node {
         return node;
     }
 
-    public prepend(node_info: Object): Node {
+    public prepend(node_info: any): Node {
         const node = new this.tree.node_class(node_info);
         this.addChildAtPosition(node, 0);
 
@@ -439,7 +438,7 @@ export class Node {
 
     public removeChildren() {
         this.iterate(
-            child => {
+            (child: Node) => {
                 this.tree.removeNodeFromIndex(child);
                 return true;
             }
@@ -476,15 +475,15 @@ export class Node {
 
     public getNodesByProperty(key: string, value: any): Node[] {
         return this.filter(
-            node => node[key] === value
+            (node: Node) => node[key] === value
         );
     }
 
-    public filter(f: Function) {
-        const result = [];
+    public filter(f: Function): Node[] {
+        const result: Node[] = [];
 
         this.iterate(
-            node => {
+            (node: Node) => {
                 if (f(node)) {
                     result.push(node);
                 }
@@ -561,7 +560,7 @@ export class Node {
     }
 
     // Init Node from data without making it the root of the tree
-    public initFromData(data) {
+    public initFromData(data: any) {
         const addNode = (node_data: any) => {
             this.setData(node_data);
 

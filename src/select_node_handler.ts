@@ -1,12 +1,14 @@
 import * as $ from "jquery";
+
 import { Node } from "./node";
+import { ITreeWidget } from "./itree_widget";
 
 export default class SelectNodeHandler {
-    private tree_widget;
-    private selected_nodes: Object;
+    private tree_widget: ITreeWidget;
+    private selected_nodes: any;
     private selected_single_node: Node | null;
 
-    constructor(tree_widget) {
+    constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
         this.clear();
     }
@@ -94,7 +96,7 @@ export default class SelectNodeHandler {
 
             if (include_children) {
                 node.iterate(
-                    (n) => {
+                    (n: Node) => {
                         delete this.selected_nodes[node.id];
                         return true;
                     }

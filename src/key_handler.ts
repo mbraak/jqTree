@@ -1,5 +1,7 @@
 import * as $ from "jquery";
+
 import { Node } from "./node";
+import { ITreeWidget } from "./itree_widget";
 
 export default class KeyHandler {
     private static LEFT = 37;
@@ -7,9 +9,9 @@ export default class KeyHandler {
     private static RIGHT = 39;
     private static DOWN = 40;
 
-    private tree_widget;
+    private tree_widget: ITreeWidget;
 
-    constructor(tree_widget) {
+    constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
 
         if (tree_widget.options.keyboardSupport) {
@@ -76,7 +78,7 @@ export default class KeyHandler {
         }
     }
 
-    public handleKeyDown(e) {
+    public handleKeyDown(e: JQueryEventObject) {
         if (! this.tree_widget.options.keyboardSupport) {
             return true;
         }

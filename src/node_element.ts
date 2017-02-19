@@ -1,27 +1,29 @@
 import * as $ from "jquery";
+
 import { Position, Node } from "./node";
+import { ITreeWidget, IDropHint, INodeElement } from "./itree_widget";
 
-export class NodeElement {
-    protected node: Node;
-    protected tree_widget;
-    protected $element;
+export class NodeElement implements INodeElement {
+    public node: Node;
+    public $element: JQuery;
+    protected tree_widget: ITreeWidget;
 
-    constructor(node: Node, tree_widget) {
+    constructor(node: Node, tree_widget: ITreeWidget) {
         this.init(node, tree_widget);
     }
 
-    public init(node: Node, tree_widget) {
+    public init(node: Node, tree_widget: ITreeWidget) {
         this.node = node;
         this.tree_widget = tree_widget;
 
         if (! node.element) {
-            node.element = this.tree_widget.element;
+            node.element = this.tree_widget.element.get(0);
         }
 
         this.$element = $(node.element);
     }
 
-    public addDropHint(position) {
+    public addDropHint(position: number): IDropHint {
         if (position === Position.INSIDE) {
             return new BorderDropHint(this.$element);
         } else {
@@ -66,10 +68,13 @@ export class FolderElement extends NodeElement {
     public open(on_finished: Function | null, slide = true) {
         if (! this.node.is_open) {
             this.node.is_open = true;
+
             const $button = this.getButton();
             $button.removeClass("jqtree-closed");
             $button.html("");
-            $button.append(this.tree_widget.renderer.opened_icon_element.cloneNode(false));
+
+            const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+            $button.get(0).appendChild(icon);
 
             const doOpen = () => {
                 const $li = this.getLi();
@@ -100,7 +105,9 @@ export class FolderElement extends NodeElement {
             const $button = this.getButton();
             $button.addClass("jqtree-closed");
             $button.html("");
-            $button.append(this.tree_widget.renderer.closed_icon_element.cloneNode(false));
+
+            const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+            $button.get(0).appendChild(icon);
 
             const doClose = () => {
                 const $li = this.getLi();
@@ -121,7 +128,7 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    public addDropHint(position: Object) {
+    public addDropHint(position: number) {
         if (! this.node.is_open && position === Position.INSIDE) {
             return new BorderDropHint(this.$element);
         } else {
@@ -129,15 +136,15 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    private getButton() {
+    private getButton(): JQuery {
         return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
     }
 }
 
-export class BorderDropHint {
-    private $hint;
+export class BorderDropHint implements IDropHint {
+    private $hint: JQuery;
 
-    constructor($element) {
+    constructor($element: JQuery) {
         const $div = $element.children(".jqtree-element");
         const width = $element.width() - 4;
 
@@ -155,12 +162,12 @@ export class BorderDropHint {
     }
 }
 
-export class GhostDropHint {
-    private $element;
+export class GhostDropHint implements IDropHint {
+    private $element: JQuery;
     private node: Node;
-    private $ghost;
+    private $ghost: JQuery;
 
-    constructor(node: Node, $element, position: Object) {
+    constructor(node: Node, $element: JQuery, position: number) {
         this.$element = $element;
 
         this.node = node;
