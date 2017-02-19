@@ -16,30 +16,4877 @@
  * limitations under the License.
  * 
  */
-!function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,t),o.l=!0,o.exports}var n={};return t.m=e,t.c=n,t.i=function(e){return e},t.d=function(e,n,r){t.o(e,n)||Object.defineProperty(e,n,{configurable:!1,enumerable:!0,get:r})},t.n=function(e){var n=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(n,"a",n),n},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="",t(t.s=22)}([,,function(e,t){function n(e){var t=$.map(e,function(e){return e.name});return t.join(" ")}function r(e){return e.is("li.jqtree-folder.jqtree-closed")&&e.find("a:eq(0)").is("a.jqtree-toggler.jqtree-closed")&&e.find("ul:eq(0)").is("ul")}function o(e){return e.is("li.jqtree-folder")&&e.find("a:eq(0)").is("a.jqtree-toggler")&&e.find("ul:eq(0)").is("ul")&&!e.is("li.jqtree-folder.jqtree-closed")&&!e.find("span:eq(0)").is("a.jqtree-toggler.jqtree-closed")}function i(e){var t=e.find(".jqtree-title").map(function(e,t){return $(t).text()});return t.toArray().join(" ")}function a(){var e=$("").tree("get_widget_class"),t=e.getModule("node"),n=e.getModule("util");return{Node:t.Node,Position:t.Position,util:n}}var l=[{label:"node1",id:123,int_property:1,str_property:"1",children:[{label:"child1",id:125,int_property:2},{label:"child2",id:126}]},{label:"node2",id:124,int_property:3,str_property:"3",children:[{label:"child3",id:127}]}],s=[{label:"main",children:[{label:"c1"},{label:"c2"}]}];e.exports={example_data:l,example_data2:s,formatNodes:n,formatTitles:i,getTreeVariables:a,isNodeClosed:r,isNodeOpen:o}},,,function(e,t){(function(t){e.exports=t}).call(t,{})},,function(e,t,n){n(20),n(19),n(18),QUnit.config.testTimeout=5e3},function(e,t,n){var r,o;!function(i,a){"use strict";n(5)&&n(5).jQuery?(r=[n(9)],o=function(e){return a(e,i)}.apply(t,r),!(void 0!==o&&(e.exports=o))):e.exports=a}(this,function(e,t){"use strict";function n(n){void 0===t.DOMParser&&t.ActiveXObject&&(t.DOMParser=function(){},DOMParser.prototype.parseFromString=function(e){var t=new ActiveXObject("Microsoft.XMLDOM");return t.async="false",t.loadXML(e),t});try{var r=(new DOMParser).parseFromString(n,"text/xml");if(!e.isXMLDoc(r))throw new Error("Unable to parse XML");var o=e("parsererror",r);if(1===o.length)throw new Error("Error: "+e(r).text());return r}catch(t){var i=void 0===t.name?t:t.name+": "+t.message;return void e(document).trigger("xmlParseError",[i])}}function r(t,n){k.debug(t,["Checking mock data against request data",t,n]);var i=!0;if(e.isFunction(t))return!!t(n);if("string"==typeof n){if(e.isFunction(t.test))return t.test(n);if("object"!=typeof t)return t===n;n=o(n)}return e.each(t,function(o){return void 0===n[o]?i=!1:void("object"==typeof n[o]&&null!==n[o]?(i&&e.isArray(n[o])&&(i=e.isArray(t[o])&&n[o].length===t[o].length),i=i&&r(t[o],n[o])):i=t[o]&&e.isFunction(t[o].test)?i&&t[o].test(n[o]):i&&t[o]===n[o])}),i}function o(e){var t,n,r,o,i={},a=String(e).split(/&/);for(t=0,n=a.length;t<n;++t){r=a[t];try{r=decodeURIComponent(r.replace(/\+/g," ")),r=r.split(/=/)}catch(e){continue}i[r[0]]?(i[r[0]].splice||(o=i[r[0]],i[r[0]]=[],i[r[0]].push(o)),i[r[0]].push(r[1])):i[r[0]]=r[1]}return k.debug(null,["Getting query params from string",e,i]),i}function i(t,n){return t[n]===e.mockjaxSettings[n]}function a(t,n){if(e.isFunction(t))return t(n);if(e.isFunction(t.url.test)){if(!t.url.test(n.url))return null}else{var o=t.namespace||e.mockjaxSettings.namespace;if(o){var i=[o,t.url].join("/");i=i.replace(/(\/+)/g,"/"),t.url=i}var a=t.url.indexOf("*");if(t.url!==n.url&&a===-1||!new RegExp(t.url.replace(/[-[\]{}()+?.,\\^$|#\s]/g,"\\$&").replace(/\*/g,".+")).test(n.url))return null}if(t.requestHeaders){if(void 0===n.headers)return null;var l=!1;if(e.each(t.requestHeaders,function(e,t){var r=n.headers[e];if(r!==t)return l=!0,!1}),l)return null}return!t.data||n.data&&r(t.data,n.data)?t&&t.type&&t.type.toLowerCase()!==n.type.toLowerCase()?null:t:null}function l(e){return"number"==typeof e&&e>=0}function s(t){if(e.isArray(t)&&2===t.length){var n=t[0],r=t[1];if(l(n)&&l(r))return Math.floor(Math.random()*(r-n))+n}else if(l(t))return t;return S}function u(t,r,o){k.debug(t,["Sending fake XHR request",t,r,o]);var a=function(i){return function(){return function(){this.status=t.status,this.statusText=t.statusText,this.readyState=1;var a=function(){this.readyState=4;var o;"json"===r.dataType&&"object"==typeof t.responseText?this.responseText=JSON.stringify(t.responseText):"xml"===r.dataType?"string"==typeof t.responseXML?(this.responseXML=n(t.responseXML),this.responseText=t.responseXML):this.responseXML=t.responseXML:"object"==typeof t.responseText&&null!==t.responseText?(t.contentType="application/json",this.responseText=JSON.stringify(t.responseText)):this.responseText=t.responseText,"number"!=typeof t.status&&"string"!=typeof t.status||(this.status=t.status),"string"==typeof t.statusText&&(this.statusText=t.statusText),o=this.onload||this.onreadystatechange,e.isFunction(o)?(t.isTimeout&&(this.status=-1),o.call(this,t.isTimeout?"timeout":void 0)):t.isTimeout&&(this.status=-1)};if(e.isFunction(t.response)){if(2===t.response.length)return void t.response(o,function(){a.call(i)});t.response(o)}a.call(i)}.apply(i)}}(this);t.proxy?(k.info(t,["Retrieving proxy file: "+t.proxy,t]),N({global:!1,url:t.proxy,type:t.proxyType,data:t.data,async:r.async,dataType:"script"===r.dataType?"text/plain":r.dataType,complete:function(e){t.responseXML=t.responseText=e.responseText,i(t,"status")&&(t.status=e.status),i(t,"statusText")&&(t.statusText=e.statusText),r.async===!1?a():this.responseTimer=setTimeout(a,s(t.responseTime))}})):r.async===!1?a():this.responseTimer=setTimeout(a,s(t.responseTime))}function c(t,n,r,o){return k.debug(t,["Creating new mock XHR object",t,n,r,o]),t=e.extend(!0,{},e.mockjaxSettings,t),"undefined"==typeof t.headers&&(t.headers={}),"undefined"==typeof n.headers&&(n.headers={}),t.contentType&&(t.headers["content-type"]=t.contentType),{status:t.status,statusText:t.statusText,readyState:1,open:function(){},send:function(){o.fired=!0,u.call(this,t,n,r)},abort:function(){clearTimeout(this.responseTimer)},setRequestHeader:function(e,t){n.headers[e]=t},getResponseHeader:function(e){return t.headers&&t.headers[e]?t.headers[e]:"last-modified"===e.toLowerCase()?t.lastModified||(new Date).toString():"etag"===e.toLowerCase()?t.etag||"":"content-type"===e.toLowerCase()?t.contentType||"text/plain":void 0},getAllResponseHeaders:function(){var n="";return t.contentType&&(t.headers["Content-Type"]=t.contentType),e.each(t.headers,function(e,t){n+=e+": "+t+"\n"}),n}}}function d(e,t,n){if(f(e),e.dataType="json",e.data&&C.test(e.data)||C.test(e.url)){g(e,t,n);var r=/^(\w+:)?\/\/([^\/?#]+)/,o=r.exec(e.url),i=o&&(o[1]&&o[1]!==location.protocol||o[2]!==location.host);if(e.dataType="script","GET"===e.type.toUpperCase()&&i){var a=p(e,t,n);return!a||a}}return null}function f(e){"GET"===e.type.toUpperCase()?C.test(e.url)||(e.url+=(/\?/.test(e.url)?"&":"?")+(e.jsonp||"callback")+"=?"):e.data&&C.test(e.data)||(e.data=(e.data?e.data+"&":"")+(e.jsonp||"callback")+"=?")}function p(t,n,r){k.debug(n,["Performing JSONP request",n,t,r]);var o=r&&r.context||t,i=e.Deferred?new e.Deferred:null;if(n.response&&e.isFunction(n.response))n.response(r);else if("object"==typeof n.responseText)e.globalEval("("+JSON.stringify(n.responseText)+")");else{if(n.proxy)return k.info(n,["Performing JSONP proxy request: "+n.proxy,n]),N({global:!1,url:n.proxy,type:n.proxyType,data:n.data,dataType:"script"===t.dataType?"text/plain":t.dataType,complete:function(r){e.globalEval("("+r.responseText+")"),h(t,n,o,i)}}),i;e.globalEval("("+("string"==typeof n.responseText?'"'+n.responseText+'"':n.responseText)+")")}return h(t,n,o,i),i}function h(t,n,r,o){var i;setTimeout(function(){if(m(t,r,n),v(t,r),o){try{i=e.parseJSON(n.responseText)}catch(e){}o.resolveWith(r,[i||n.responseText]),k.log(n,["JSONP mock call complete",n,o])}},s(n.responseTime))}function g(e,n,r){var o=r&&r.context||e,i="string"==typeof e.jsonpCallback&&e.jsonpCallback||"jsonp"+j++;e.data&&(e.data=(e.data+"").replace(C,"="+i+"$1")),e.url=e.url.replace(C,"="+i+"$1"),t[i]=t[i]||function(){m(e,o,n),v(e,o),t[i]=void 0;try{delete t[i]}catch(e){}},e.jsonpCallback=i}function m(t,n,r){t.success&&t.success.call(n,r.responseText||"","success",{}),t.global&&(t.context?e(t.context):e.event).trigger("ajaxSuccess",[{},t])}function v(t,n){t.complete&&t.complete.call(n,{statusText:"success",status:200},"success"),t.global&&(t.context?e(t.context):e.event).trigger("ajaxComplete",[{},t]),t.global&&!--e.active&&e.event.trigger("ajaxStop")}function y(t,n){var r,o,i,l;k.debug(null,["Ajax call intercepted",t,n]),"object"==typeof t?(n=t,t=void 0):(n=n||{},n.url=t||n.url),o=e.ajaxSetup({},n),o.type=o.method=o.method||o.type,l=function(t,r){var o=n[t.toLowerCase()];return function(){e.isFunction(o)&&o.apply(this,[].slice.call(arguments)),r["onAfter"+t]()}};for(var s=0;s<q.length;s++)if(q[s]){if(i=a(q[s],o))return e.mockjaxSettings.retainAjaxCalls&&w.push(o),k.info(i,["MOCK "+o.type.toUpperCase()+": "+o.url,e.ajaxSetup({},o)]),o.dataType&&"JSONP"===o.dataType.toUpperCase()&&(r=d(o,i,n))?r:(n.crossDomain=!1,i.cache=o.cache,i.timeout=o.timeout,i.global=o.global,i.isTimeout&&(i.responseTime>1?n.timeout=i.responseTime-1:(i.responseTime=2,n.timeout=1)),e.isFunction(i.onAfterSuccess)&&(n.success=l("Success",i)),e.isFunction(i.onAfterError)&&(n.error=l("Error",i)),e.isFunction(i.onAfterComplete)&&(n.complete=l("Complete",i)),x(i,n),function(t,n,o,i){r=N.call(e,e.extend(!0,{},o,{xhr:function(){return c(t,n,o,i)}}))}(i,o,n,q[s]),r);k.debug(q[s],["Mock does not match request",t,o])}if(k.log(null,["No mock matched to request",t,n]),e.mockjaxSettings.retainAjaxCalls&&T.push(n),e.mockjaxSettings.throwUnmocked===!0)throw new Error("AJAX not mocked: "+n.url);return N.apply(e,[n])}function x(e,t){if(e.url instanceof RegExp&&e.hasOwnProperty("urlParams")){var n=e.url.exec(t.url);if(1!==n.length){n.shift();var r=0,o=n.length,i=e.urlParams.length,a=Math.min(o,i),l={};for(r;r<a;r++){var s=e.urlParams[r];l[s]=n[r]}t.urlParams=l}}}function b(e){var t,n,r,o=[],i=e instanceof RegExp?function(t){return e.test(t)}:function(t){return e===t};for(t=0,n=q.length;t<n;t++)r=q[t],i(r.url)?k.log(r,["Clearing mock: "+(r&&r.url),r]):o.push(r);return o}var N=e.ajax,q=[],w=[],T=[],C=/=\?(&|$)/,j=(new Date).getTime(),S=500;e.extend({ajax:y});var k={_log:function(t,n,r){var o=e.mockjaxSettings.logging;if(t&&"undefined"!=typeof t.logging&&(o=t.logging),r=0===r?r:r||E.LOG,n=n.splice?n:[n],!(o===!1||o<r))return e.mockjaxSettings.log?e.mockjaxSettings.log(t,n[1]||n[0]):e.mockjaxSettings.logger&&e.mockjaxSettings.logger[e.mockjaxSettings.logLevelMethods[r]]?e.mockjaxSettings.logger[e.mockjaxSettings.logLevelMethods[r]].apply(e.mockjaxSettings.logger,n):void 0},debug:function(e,t){return k._log(e,t,E.DEBUG)},log:function(e,t){return k._log(e,t,E.LOG)},info:function(e,t){return k._log(e,t,E.INFO)},warn:function(e,t){return k._log(e,t,E.WARN)},error:function(e,t){return k._log(e,t,E.ERROR)}},E={DEBUG:4,LOG:3,INFO:2,WARN:1,ERROR:0};return e.mockjaxSettings={log:null,logger:t.console,logging:2,logLevelMethods:["error","warn","info","log","debug"],namespace:null,status:200,statusText:"OK",responseTime:S,isTimeout:!1,throwUnmocked:!1,retainAjaxCalls:!0,contentType:"text/plain",response:"",responseText:"",responseXML:"",proxy:"",proxyType:"GET",lastModified:null,etag:"",headers:{etag:"IJF@H#@923uf8023hFO@I#H#","content-type":"text/plain"}},e.mockjax=function(t){if(e.isArray(t))return e.map(t,function(t){return e.mockjax(t)});var n=q.length;return q[n]=t,k.log(t,["Created new mock handler",t]),n},e.mockjax._logger=k,e.mockjax.clear=function(e){"string"==typeof e||e instanceof RegExp?q=b(e):e||0===e?(k.log(q[e],["Clearing mock: "+(q[e]&&q[e].url),q[e]]),q[e]=null):(k.log(null,"Clearing all mocks"),q=[]),w=[],T=[]},e.mockjax.clearRetainedAjaxCalls=function(){w=[],T=[],k.debug(null,"Cleared retained ajax calls")},e.mockjax.handler=function(e){if(1===arguments.length)return q[e]},e.mockjax.mockedAjaxCalls=function(){return w},e.mockjax.unfiredHandlers=function(){for(var e=[],t=0,n=q.length;t<n;t++){var r=q[t];null===r||r.fired||e.push(r)}return e},e.mockjax.unmockedAjaxCalls=function(){return T},e.mockjax})},function(e,t,n){var r,o;/*!
- * jQuery JavaScript Library v3.1.1
- * https://jquery.com/
- *
- * Includes Sizzle.js
- * https://sizzlejs.com/
- *
- * Copyright jQuery Foundation and other contributors
- * Released under the MIT license
- * https://jquery.org/license
- *
- * Date: 2016-09-22T22:30Z
- */
-!function(t,n){"use strict";"object"==typeof e&&"object"==typeof e.exports?e.exports=t.document?n(t,!0):function(e){if(!e.document)throw new Error("jQuery requires a window with a document");return n(e)}:n(t)}("undefined"!=typeof window?window:this,function(n,i){"use strict";function a(e,t){t=t||ie;var n=t.createElement("script");n.text=e,t.head.appendChild(n).parentNode.removeChild(n)}function l(e){var t=!!e&&"length"in e&&e.length,n=ye.type(e);return"function"!==n&&!ye.isWindow(e)&&("array"===n||0===t||"number"==typeof t&&t>0&&t-1 in e)}function s(e,t,n){return ye.isFunction(t)?ye.grep(e,function(e,r){return!!t.call(e,r,e)!==n}):t.nodeType?ye.grep(e,function(e){return e===t!==n}):"string"!=typeof t?ye.grep(e,function(e){return ce.call(t,e)>-1!==n}):ke.test(t)?ye.filter(t,e,n):(t=ye.filter(t,e),ye.grep(e,function(e){return ce.call(t,e)>-1!==n&&1===e.nodeType}))}function u(e,t){for(;(e=e[t])&&1!==e.nodeType;);return e}function c(e){var t={};return ye.each(e.match(Le)||[],function(e,n){t[n]=!0}),t}function d(e){return e}function f(e){throw e}function p(e,t,n){var r;try{e&&ye.isFunction(r=e.promise)?r.call(e).done(t).fail(n):e&&ye.isFunction(r=e.then)?r.call(e,t,n):t.call(void 0,e)}catch(e){n.call(void 0,e)}}function h(){ie.removeEventListener("DOMContentLoaded",h),n.removeEventListener("load",h),ye.ready()}function g(){this.expando=ye.expando+g.uid++}function m(e){return"true"===e||"false"!==e&&("null"===e?null:e===+e+""?+e:Re.test(e)?JSON.parse(e):e)}function v(e,t,n){var r;if(void 0===n&&1===e.nodeType)if(r="data-"+t.replace(Me,"-$&").toLowerCase(),n=e.getAttribute(r),"string"==typeof n){try{n=m(n)}catch(e){}Ie.set(e,t,n)}else n=void 0;return n}function y(e,t,n,r){var o,i=1,a=20,l=r?function(){return r.cur()}:function(){return ye.css(e,t,"")},s=l(),u=n&&n[3]||(ye.cssNumber[t]?"":"px"),c=(ye.cssNumber[t]||"px"!==u&&+s)&&Ue.exec(ye.css(e,t));if(c&&c[3]!==u){u=u||c[3],n=n||[],c=+s||1;do i=i||".5",c/=i,ye.style(e,t,c+u);while(i!==(i=l()/s)&&1!==i&&--a)}return n&&(c=+c||+s||0,o=n[1]?c+(n[1]+1)*n[2]:+n[2],r&&(r.unit=u,r.start=c,r.end=o)),o}function x(e){var t,n=e.ownerDocument,r=e.nodeName,o=Je[r];return o?o:(t=n.body.appendChild(n.createElement(r)),o=ye.css(t,"display"),t.parentNode.removeChild(t),"none"===o&&(o="block"),Je[r]=o,o)}function b(e,t){for(var n,r,o=[],i=0,a=e.length;i<a;i++)r=e[i],r.style&&(n=r.style.display,t?("none"===n&&(o[i]=He.get(r,"display")||null,o[i]||(r.style.display="")),""===r.style.display&&ze(r)&&(o[i]=x(r))):"none"!==n&&(o[i]="none",He.set(r,"display",n)));for(i=0;i<a;i++)null!=o[i]&&(e[i].style.display=o[i]);return e}function N(e,t){var n;return n="undefined"!=typeof e.getElementsByTagName?e.getElementsByTagName(t||"*"):"undefined"!=typeof e.querySelectorAll?e.querySelectorAll(t||"*"):[],void 0===t||t&&ye.nodeName(e,t)?ye.merge([e],n):n}function q(e,t){for(var n=0,r=e.length;n<r;n++)He.set(e[n],"globalEval",!t||He.get(t[n],"globalEval"))}function w(e,t,n,r,o){for(var i,a,l,s,u,c,d=t.createDocumentFragment(),f=[],p=0,h=e.length;p<h;p++)if(i=e[p],i||0===i)if("object"===ye.type(i))ye.merge(f,i.nodeType?[i]:i);else if(Ze.test(i)){for(a=a||d.appendChild(t.createElement("div")),l=(Qe.exec(i)||["",""])[1].toLowerCase(),s=Ke[l]||Ke._default,a.innerHTML=s[1]+ye.htmlPrefilter(i)+s[2],c=s[0];c--;)a=a.lastChild;ye.merge(f,a.childNodes),a=d.firstChild,a.textContent=""}else f.push(t.createTextNode(i));for(d.textContent="",p=0;i=f[p++];)if(r&&ye.inArray(i,r)>-1)o&&o.push(i);else if(u=ye.contains(i.ownerDocument,i),a=N(d.appendChild(i),"script"),u&&q(a),n)for(c=0;i=a[c++];)Ye.test(i.type||"")&&n.push(i);return d}function T(){return!0}function C(){return!1}function j(){try{return ie.activeElement}catch(e){}}function S(e,t,n,r,o,i){var a,l;if("object"==typeof t){"string"!=typeof n&&(r=r||n,n=void 0);for(l in t)S(e,l,n,r,t[l],i);return e}if(null==r&&null==o?(o=n,r=n=void 0):null==o&&("string"==typeof n?(o=r,r=void 0):(o=r,r=n,n=void 0)),o===!1)o=C;else if(!o)return e;return 1===i&&(a=o,o=function(e){return ye().off(e),a.apply(this,arguments)},o.guid=a.guid||(a.guid=ye.guid++)),e.each(function(){ye.event.add(this,t,o,r,n)})}function k(e,t){return ye.nodeName(e,"table")&&ye.nodeName(11!==t.nodeType?t:t.firstChild,"tr")?e.getElementsByTagName("tbody")[0]||e:e}function E(e){return e.type=(null!==e.getAttribute("type"))+"/"+e.type,e}function D(e){var t=lt.exec(e.type);return t?e.type=t[1]:e.removeAttribute("type"),e}function A(e,t){var n,r,o,i,a,l,s,u;if(1===t.nodeType){if(He.hasData(e)&&(i=He.access(e),a=He.set(t,i),u=i.events)){delete a.handle,a.events={};for(o in u)for(n=0,r=u[o].length;n<r;n++)ye.event.add(t,o,u[o][n])}Ie.hasData(e)&&(l=Ie.access(e),s=ye.extend({},l),Ie.set(t,s))}}function B(e,t){var n=t.nodeName.toLowerCase();"input"===n&&Ve.test(e.type)?t.checked=e.checked:"input"!==n&&"textarea"!==n||(t.defaultValue=e.defaultValue)}function F(e,t,n,r){t=se.apply([],t);var o,i,l,s,u,c,d=0,f=e.length,p=f-1,h=t[0],g=ye.isFunction(h);if(g||f>1&&"string"==typeof h&&!me.checkClone&&at.test(h))return e.each(function(o){var i=e.eq(o);g&&(t[0]=h.call(this,o,i.html())),F(i,t,n,r)});if(f&&(o=w(t,e[0].ownerDocument,!1,e,r),i=o.firstChild,1===o.childNodes.length&&(o=i),i||r)){for(l=ye.map(N(o,"script"),E),s=l.length;d<f;d++)u=o,d!==p&&(u=ye.clone(u,!0,!0),s&&ye.merge(l,N(u,"script"))),n.call(e[d],u,d);if(s)for(c=l[l.length-1].ownerDocument,ye.map(l,D),d=0;d<s;d++)u=l[d],Ye.test(u.type||"")&&!He.access(u,"globalEval")&&ye.contains(c,u)&&(u.src?ye._evalUrl&&ye._evalUrl(u.src):a(u.textContent.replace(st,""),c))}return e}function L(e,t,n){for(var r,o=t?ye.filter(t,e):e,i=0;null!=(r=o[i]);i++)n||1!==r.nodeType||ye.cleanData(N(r)),r.parentNode&&(n&&ye.contains(r.ownerDocument,r)&&q(N(r,"script")),r.parentNode.removeChild(r));return e}function O(e,t,n){var r,o,i,a,l=e.style;return n=n||dt(e),n&&(a=n.getPropertyValue(t)||n[t],""!==a||ye.contains(e.ownerDocument,e)||(a=ye.style(e,t)),!me.pixelMarginRight()&&ct.test(a)&&ut.test(t)&&(r=l.width,o=l.minWidth,i=l.maxWidth,l.minWidth=l.maxWidth=l.width=a,a=n.width,l.width=r,l.minWidth=o,l.maxWidth=i)),void 0!==a?a+"":a}function P(e,t){return{get:function(){return e()?void delete this.get:(this.get=t).apply(this,arguments)}}}function $(e){if(e in mt)return e;for(var t=e[0].toUpperCase()+e.slice(1),n=gt.length;n--;)if(e=gt[n]+t,e in mt)return e}function _(e,t,n){var r=Ue.exec(t);return r?Math.max(0,r[2]-(n||0))+(r[3]||"px"):t}function H(e,t,n,r,o){var i,a=0;for(i=n===(r?"border":"content")?4:"width"===t?1:0;i<4;i+=2)"margin"===n&&(a+=ye.css(e,n+Xe[i],!0,o)),r?("content"===n&&(a-=ye.css(e,"padding"+Xe[i],!0,o)),"margin"!==n&&(a-=ye.css(e,"border"+Xe[i]+"Width",!0,o))):(a+=ye.css(e,"padding"+Xe[i],!0,o),"padding"!==n&&(a+=ye.css(e,"border"+Xe[i]+"Width",!0,o)));return a}function I(e,t,n){var r,o=!0,i=dt(e),a="border-box"===ye.css(e,"boxSizing",!1,i);if(e.getClientRects().length&&(r=e.getBoundingClientRect()[t]),r<=0||null==r){if(r=O(e,t,i),(r<0||null==r)&&(r=e.style[t]),ct.test(r))return r;o=a&&(me.boxSizingReliable()||r===e.style[t]),r=parseFloat(r)||0}return r+H(e,t,n||(a?"border":"content"),o,i)+"px"}function R(e,t,n,r,o){return new R.prototype.init(e,t,n,r,o)}function M(){yt&&(n.requestAnimationFrame(M),ye.fx.tick())}function W(){return n.setTimeout(function(){vt=void 0}),vt=ye.now()}function U(e,t){var n,r=0,o={height:e};for(t=t?1:0;r<4;r+=2-t)n=Xe[r],o["margin"+n]=o["padding"+n]=e;return t&&(o.opacity=o.width=e),o}function X(e,t,n){for(var r,o=(J.tweeners[t]||[]).concat(J.tweeners["*"]),i=0,a=o.length;i<a;i++)if(r=o[i].call(n,t,e))return r}function z(e,t,n){var r,o,i,a,l,s,u,c,d="width"in t||"height"in t,f=this,p={},h=e.style,g=e.nodeType&&ze(e),m=He.get(e,"fxshow");n.queue||(a=ye._queueHooks(e,"fx"),null==a.unqueued&&(a.unqueued=0,l=a.empty.fire,a.empty.fire=function(){a.unqueued||l()}),a.unqueued++,f.always(function(){f.always(function(){a.unqueued--,ye.queue(e,"fx").length||a.empty.fire()})}));for(r in t)if(o=t[r],xt.test(o)){if(delete t[r],i=i||"toggle"===o,o===(g?"hide":"show")){if("show"!==o||!m||void 0===m[r])continue;g=!0}p[r]=m&&m[r]||ye.style(e,r)}if(s=!ye.isEmptyObject(t),s||!ye.isEmptyObject(p)){d&&1===e.nodeType&&(n.overflow=[h.overflow,h.overflowX,h.overflowY],u=m&&m.display,null==u&&(u=He.get(e,"display")),c=ye.css(e,"display"),"none"===c&&(u?c=u:(b([e],!0),u=e.style.display||u,c=ye.css(e,"display"),b([e]))),("inline"===c||"inline-block"===c&&null!=u)&&"none"===ye.css(e,"float")&&(s||(f.done(function(){h.display=u}),null==u&&(c=h.display,u="none"===c?"":c)),h.display="inline-block")),n.overflow&&(h.overflow="hidden",f.always(function(){h.overflow=n.overflow[0],h.overflowX=n.overflow[1],h.overflowY=n.overflow[2]})),s=!1;for(r in p)s||(m?"hidden"in m&&(g=m.hidden):m=He.access(e,"fxshow",{display:u}),i&&(m.hidden=!g),g&&b([e],!0),f.done(function(){g||b([e]),He.remove(e,"fxshow");for(r in p)ye.style(e,r,p[r])})),s=X(g?m[r]:0,r,f),r in m||(m[r]=s.start,g&&(s.end=s.start,s.start=0))}}function G(e,t){var n,r,o,i,a;for(n in e)if(r=ye.camelCase(n),o=t[r],i=e[n],ye.isArray(i)&&(o=i[1],i=e[n]=i[0]),n!==r&&(e[r]=i,delete e[n]),a=ye.cssHooks[r],a&&"expand"in a){i=a.expand(i),delete e[r];for(n in i)n in e||(e[n]=i[n],t[n]=o)}else t[r]=o}function J(e,t,n){var r,o,i=0,a=J.prefilters.length,l=ye.Deferred().always(function(){delete s.elem}),s=function(){if(o)return!1;for(var t=vt||W(),n=Math.max(0,u.startTime+u.duration-t),r=n/u.duration||0,i=1-r,a=0,s=u.tweens.length;a<s;a++)u.tweens[a].run(i);return l.notifyWith(e,[u,i,n]),i<1&&s?n:(l.resolveWith(e,[u]),!1)},u=l.promise({elem:e,props:ye.extend({},t),opts:ye.extend(!0,{specialEasing:{},easing:ye.easing._default},n),originalProperties:t,originalOptions:n,startTime:vt||W(),duration:n.duration,tweens:[],createTween:function(t,n){var r=ye.Tween(e,u.opts,t,n,u.opts.specialEasing[t]||u.opts.easing);return u.tweens.push(r),r},stop:function(t){var n=0,r=t?u.tweens.length:0;if(o)return this;for(o=!0;n<r;n++)u.tweens[n].run(1);return t?(l.notifyWith(e,[u,1,0]),l.resolveWith(e,[u,t])):l.rejectWith(e,[u,t]),this}}),c=u.props;for(G(c,u.opts.specialEasing);i<a;i++)if(r=J.prefilters[i].call(u,e,c,u.opts))return ye.isFunction(r.stop)&&(ye._queueHooks(u.elem,u.opts.queue).stop=ye.proxy(r.stop,r)),r;return ye.map(c,X,u),ye.isFunction(u.opts.start)&&u.opts.start.call(e,u),ye.fx.timer(ye.extend(s,{elem:e,anim:u,queue:u.opts.queue})),u.progress(u.opts.progress).done(u.opts.done,u.opts.complete).fail(u.opts.fail).always(u.opts.always)}function V(e){var t=e.match(Le)||[];return t.join(" ")}function Q(e){return e.getAttribute&&e.getAttribute("class")||""}function Y(e,t,n,r){var o;if(ye.isArray(t))ye.each(t,function(t,o){n||Dt.test(e)?r(e,o):Y(e+"["+("object"==typeof o&&null!=o?t:"")+"]",o,n,r)});else if(n||"object"!==ye.type(t))r(e,t);else for(o in t)Y(e+"["+o+"]",t[o],n,r)}function K(e){return function(t,n){"string"!=typeof t&&(n=t,t="*");var r,o=0,i=t.toLowerCase().match(Le)||[];if(ye.isFunction(n))for(;r=i[o++];)"+"===r[0]?(r=r.slice(1)||"*",(e[r]=e[r]||[]).unshift(n)):(e[r]=e[r]||[]).push(n)}}function Z(e,t,n,r){function o(l){var s;return i[l]=!0,ye.each(e[l]||[],function(e,l){var u=l(t,n,r);return"string"!=typeof u||a||i[u]?a?!(s=u):void 0:(t.dataTypes.unshift(u),o(u),!1)}),s}var i={},a=e===Mt;return o(t.dataTypes[0])||!i["*"]&&o("*")}function ee(e,t){var n,r,o=ye.ajaxSettings.flatOptions||{};for(n in t)void 0!==t[n]&&((o[n]?e:r||(r={}))[n]=t[n]);return r&&ye.extend(!0,e,r),e}function te(e,t,n){for(var r,o,i,a,l=e.contents,s=e.dataTypes;"*"===s[0];)s.shift(),void 0===r&&(r=e.mimeType||t.getResponseHeader("Content-Type"));if(r)for(o in l)if(l[o]&&l[o].test(r)){s.unshift(o);break}if(s[0]in n)i=s[0];else{for(o in n){if(!s[0]||e.converters[o+" "+s[0]]){i=o;break}a||(a=o)}i=i||a}if(i)return i!==s[0]&&s.unshift(i),n[i]}function ne(e,t,n,r){var o,i,a,l,s,u={},c=e.dataTypes.slice();if(c[1])for(a in e.converters)u[a.toLowerCase()]=e.converters[a];for(i=c.shift();i;)if(e.responseFields[i]&&(n[e.responseFields[i]]=t),!s&&r&&e.dataFilter&&(t=e.dataFilter(t,e.dataType)),s=i,i=c.shift())if("*"===i)i=s;else if("*"!==s&&s!==i){if(a=u[s+" "+i]||u["* "+i],!a)for(o in u)if(l=o.split(" "),l[1]===i&&(a=u[s+" "+l[0]]||u["* "+l[0]])){a===!0?a=u[o]:u[o]!==!0&&(i=l[0],c.unshift(l[1]));break}if(a!==!0)if(a&&e.throws)t=a(t);else try{t=a(t)}catch(e){return{state:"parsererror",error:a?e:"No conversion from "+s+" to "+i}}}return{state:"success",data:t}}function re(e){return ye.isWindow(e)?e:9===e.nodeType&&e.defaultView}var oe=[],ie=n.document,ae=Object.getPrototypeOf,le=oe.slice,se=oe.concat,ue=oe.push,ce=oe.indexOf,de={},fe=de.toString,pe=de.hasOwnProperty,he=pe.toString,ge=he.call(Object),me={},ve="3.1.1",ye=function(e,t){return new ye.fn.init(e,t)},xe=/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,be=/^-ms-/,Ne=/-([a-z])/g,qe=function(e,t){return t.toUpperCase()};ye.fn=ye.prototype={jquery:ve,constructor:ye,length:0,toArray:function(){return le.call(this)},get:function(e){return null==e?le.call(this):e<0?this[e+this.length]:this[e]},pushStack:function(e){var t=ye.merge(this.constructor(),e);return t.prevObject=this,t},each:function(e){return ye.each(this,e)},map:function(e){return this.pushStack(ye.map(this,function(t,n){return e.call(t,n,t)}))},slice:function(){return this.pushStack(le.apply(this,arguments))},first:function(){return this.eq(0)},last:function(){return this.eq(-1)},eq:function(e){var t=this.length,n=+e+(e<0?t:0);return this.pushStack(n>=0&&n<t?[this[n]]:[])},end:function(){return this.prevObject||this.constructor()},push:ue,sort:oe.sort,splice:oe.splice},ye.extend=ye.fn.extend=function(){var e,t,n,r,o,i,a=arguments[0]||{},l=1,s=arguments.length,u=!1;for("boolean"==typeof a&&(u=a,a=arguments[l]||{},l++),"object"==typeof a||ye.isFunction(a)||(a={}),l===s&&(a=this,l--);l<s;l++)if(null!=(e=arguments[l]))for(t in e)n=a[t],r=e[t],a!==r&&(u&&r&&(ye.isPlainObject(r)||(o=ye.isArray(r)))?(o?(o=!1,i=n&&ye.isArray(n)?n:[]):i=n&&ye.isPlainObject(n)?n:{},a[t]=ye.extend(u,i,r)):void 0!==r&&(a[t]=r));return a},ye.extend({expando:"jQuery"+(ve+Math.random()).replace(/\D/g,""),isReady:!0,error:function(e){throw new Error(e)},noop:function(){},isFunction:function(e){return"function"===ye.type(e)},isArray:Array.isArray,isWindow:function(e){return null!=e&&e===e.window},isNumeric:function(e){var t=ye.type(e);return("number"===t||"string"===t)&&!isNaN(e-parseFloat(e))},isPlainObject:function(e){var t,n;return!(!e||"[object Object]"!==fe.call(e))&&(!(t=ae(e))||(n=pe.call(t,"constructor")&&t.constructor,"function"==typeof n&&he.call(n)===ge))},isEmptyObject:function(e){var t;for(t in e)return!1;return!0},type:function(e){return null==e?e+"":"object"==typeof e||"function"==typeof e?de[fe.call(e)]||"object":typeof e},globalEval:function(e){a(e)},camelCase:function(e){return e.replace(be,"ms-").replace(Ne,qe)},nodeName:function(e,t){return e.nodeName&&e.nodeName.toLowerCase()===t.toLowerCase()},each:function(e,t){var n,r=0;if(l(e))for(n=e.length;r<n&&t.call(e[r],r,e[r])!==!1;r++);else for(r in e)if(t.call(e[r],r,e[r])===!1)break;return e},trim:function(e){return null==e?"":(e+"").replace(xe,"")},makeArray:function(e,t){var n=t||[];return null!=e&&(l(Object(e))?ye.merge(n,"string"==typeof e?[e]:e):ue.call(n,e)),n},inArray:function(e,t,n){return null==t?-1:ce.call(t,e,n)},merge:function(e,t){for(var n=+t.length,r=0,o=e.length;r<n;r++)e[o++]=t[r];return e.length=o,e},grep:function(e,t,n){for(var r,o=[],i=0,a=e.length,l=!n;i<a;i++)r=!t(e[i],i),r!==l&&o.push(e[i]);return o},map:function(e,t,n){var r,o,i=0,a=[];if(l(e))for(r=e.length;i<r;i++)o=t(e[i],i,n),null!=o&&a.push(o);else for(i in e)o=t(e[i],i,n),null!=o&&a.push(o);return se.apply([],a)},guid:1,proxy:function(e,t){var n,r,o;if("string"==typeof t&&(n=e[t],t=e,e=n),ye.isFunction(e))return r=le.call(arguments,2),o=function(){return e.apply(t||this,r.concat(le.call(arguments)))},o.guid=e.guid=e.guid||ye.guid++,o},now:Date.now,support:me}),"function"==typeof Symbol&&(ye.fn[Symbol.iterator]=oe[Symbol.iterator]),ye.each("Boolean Number String Function Array Date RegExp Object Error Symbol".split(" "),function(e,t){de["[object "+t+"]"]=t.toLowerCase()});var we=/*!
- * Sizzle CSS Selector Engine v2.3.3
- * https://sizzlejs.com/
- *
- * Copyright jQuery Foundation and other contributors
- * Released under the MIT license
- * http://jquery.org/license
- *
- * Date: 2016-08-08
- */
-function(e){function t(e,t,n,r){var o,i,a,l,s,u,c,f=t&&t.ownerDocument,h=t?t.nodeType:9;if(n=n||[],"string"!=typeof e||!e||1!==h&&9!==h&&11!==h)return n;if(!r&&((t?t.ownerDocument||t:R)!==F&&B(t),t=t||F,O)){if(11!==h&&(s=ve.exec(e)))if(o=s[1]){if(9===h){if(!(a=t.getElementById(o)))return n;if(a.id===o)return n.push(a),n}else if(f&&(a=f.getElementById(o))&&H(t,a)&&a.id===o)return n.push(a),n}else{if(s[2])return K.apply(n,t.getElementsByTagName(e)),n;if((o=s[3])&&q.getElementsByClassName&&t.getElementsByClassName)return K.apply(n,t.getElementsByClassName(o)),n}if(q.qsa&&!z[e+" "]&&(!P||!P.test(e))){if(1!==h)f=t,c=e;else if("object"!==t.nodeName.toLowerCase()){for((l=t.getAttribute("id"))?l=l.replace(Ne,qe):t.setAttribute("id",l=I),u=j(e),i=u.length;i--;)u[i]="#"+l+" "+p(u[i]);c=u.join(","),f=ye.test(e)&&d(t.parentNode)||t}if(c)try{return K.apply(n,f.querySelectorAll(c)),n}catch(e){}finally{l===I&&t.removeAttribute("id")}}}return k(e.replace(le,"$1"),t,n,r)}function n(){function e(n,r){return t.push(n+" ")>w.cacheLength&&delete e[t.shift()],e[n+" "]=r}var t=[];return e}function r(e){return e[I]=!0,e}function o(e){var t=F.createElement("fieldset");try{return!!e(t)}catch(e){return!1}finally{t.parentNode&&t.parentNode.removeChild(t),t=null}}function i(e,t){for(var n=e.split("|"),r=n.length;r--;)w.attrHandle[n[r]]=t}function a(e,t){var n=t&&e,r=n&&1===e.nodeType&&1===t.nodeType&&e.sourceIndex-t.sourceIndex;if(r)return r;if(n)for(;n=n.nextSibling;)if(n===t)return-1;return e?1:-1}function l(e){return function(t){var n=t.nodeName.toLowerCase();return"input"===n&&t.type===e}}function s(e){return function(t){var n=t.nodeName.toLowerCase();return("input"===n||"button"===n)&&t.type===e}}function u(e){return function(t){return"form"in t?t.parentNode&&t.disabled===!1?"label"in t?"label"in t.parentNode?t.parentNode.disabled===e:t.disabled===e:t.isDisabled===e||t.isDisabled!==!e&&Te(t)===e:t.disabled===e:"label"in t&&t.disabled===e}}function c(e){return r(function(t){return t=+t,r(function(n,r){for(var o,i=e([],n.length,t),a=i.length;a--;)n[o=i[a]]&&(n[o]=!(r[o]=n[o]))})})}function d(e){return e&&"undefined"!=typeof e.getElementsByTagName&&e}function f(){}function p(e){for(var t=0,n=e.length,r="";t<n;t++)r+=e[t].value;return r}function h(e,t,n){var r=t.dir,o=t.next,i=o||r,a=n&&"parentNode"===i,l=W++;return t.first?function(t,n,o){for(;t=t[r];)if(1===t.nodeType||a)return e(t,n,o);return!1}:function(t,n,s){var u,c,d,f=[M,l];if(s){for(;t=t[r];)if((1===t.nodeType||a)&&e(t,n,s))return!0}else for(;t=t[r];)if(1===t.nodeType||a)if(d=t[I]||(t[I]={}),c=d[t.uniqueID]||(d[t.uniqueID]={}),o&&o===t.nodeName.toLowerCase())t=t[r]||t;else{if((u=c[i])&&u[0]===M&&u[1]===l)return f[2]=u[2];if(c[i]=f,f[2]=e(t,n,s))return!0}return!1}}function g(e){return e.length>1?function(t,n,r){for(var o=e.length;o--;)if(!e[o](t,n,r))return!1;return!0}:e[0]}function m(e,n,r){for(var o=0,i=n.length;o<i;o++)t(e,n[o],r);return r}function v(e,t,n,r,o){for(var i,a=[],l=0,s=e.length,u=null!=t;l<s;l++)(i=e[l])&&(n&&!n(i,r,o)||(a.push(i),u&&t.push(l)));return a}function y(e,t,n,o,i,a){return o&&!o[I]&&(o=y(o)),i&&!i[I]&&(i=y(i,a)),r(function(r,a,l,s){var u,c,d,f=[],p=[],h=a.length,g=r||m(t||"*",l.nodeType?[l]:l,[]),y=!e||!r&&t?g:v(g,f,e,l,s),x=n?i||(r?e:h||o)?[]:a:y;if(n&&n(y,x,l,s),o)for(u=v(x,p),o(u,[],l,s),c=u.length;c--;)(d=u[c])&&(x[p[c]]=!(y[p[c]]=d));if(r){if(i||e){if(i){for(u=[],c=x.length;c--;)(d=x[c])&&u.push(y[c]=d);i(null,x=[],u,s)}for(c=x.length;c--;)(d=x[c])&&(u=i?ee(r,d):f[c])>-1&&(r[u]=!(a[u]=d))}}else x=v(x===a?x.splice(h,x.length):x),i?i(null,a,x,s):K.apply(a,x)})}function x(e){for(var t,n,r,o=e.length,i=w.relative[e[0].type],a=i||w.relative[" "],l=i?1:0,s=h(function(e){return e===t},a,!0),u=h(function(e){return ee(t,e)>-1},a,!0),c=[function(e,n,r){var o=!i&&(r||n!==E)||((t=n).nodeType?s(e,n,r):u(e,n,r));return t=null,o}];l<o;l++)if(n=w.relative[e[l].type])c=[h(g(c),n)];else{if(n=w.filter[e[l].type].apply(null,e[l].matches),n[I]){for(r=++l;r<o&&!w.relative[e[r].type];r++);return y(l>1&&g(c),l>1&&p(e.slice(0,l-1).concat({value:" "===e[l-2].type?"*":""})).replace(le,"$1"),n,l<r&&x(e.slice(l,r)),r<o&&x(e=e.slice(r)),r<o&&p(e))}c.push(n)}return g(c)}function b(e,n){var o=n.length>0,i=e.length>0,a=function(r,a,l,s,u){var c,d,f,p=0,h="0",g=r&&[],m=[],y=E,x=r||i&&w.find.TAG("*",u),b=M+=null==y?1:Math.random()||.1,N=x.length;for(u&&(E=a===F||a||u);h!==N&&null!=(c=x[h]);h++){if(i&&c){for(d=0,a||c.ownerDocument===F||(B(c),l=!O);f=e[d++];)if(f(c,a||F,l)){s.push(c);break}u&&(M=b)}o&&((c=!f&&c)&&p--,r&&g.push(c))}if(p+=h,o&&h!==p){for(d=0;f=n[d++];)f(g,m,a,l);if(r){if(p>0)for(;h--;)g[h]||m[h]||(m[h]=Q.call(s));m=v(m)}K.apply(s,m),u&&!r&&m.length>0&&p+n.length>1&&t.uniqueSort(s)}return u&&(M=b,E=y),g};return o?r(a):a}var N,q,w,T,C,j,S,k,E,D,A,B,F,L,O,P,$,_,H,I="sizzle"+1*new Date,R=e.document,M=0,W=0,U=n(),X=n(),z=n(),G=function(e,t){return e===t&&(A=!0),0},J={}.hasOwnProperty,V=[],Q=V.pop,Y=V.push,K=V.push,Z=V.slice,ee=function(e,t){for(var n=0,r=e.length;n<r;n++)if(e[n]===t)return n;return-1},te="checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|ismap|loop|multiple|open|readonly|required|scoped",ne="[\\x20\\t\\r\\n\\f]",re="(?:\\\\.|[\\w-]|[^\0-\\xa0])+",oe="\\["+ne+"*("+re+")(?:"+ne+"*([*^$|!~]?=)"+ne+"*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|("+re+"))|)"+ne+"*\\]",ie=":("+re+")(?:\\((('((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\")|((?:\\\\.|[^\\\\()[\\]]|"+oe+")*)|.*)\\)|)",ae=new RegExp(ne+"+","g"),le=new RegExp("^"+ne+"+|((?:^|[^\\\\])(?:\\\\.)*)"+ne+"+$","g"),se=new RegExp("^"+ne+"*,"+ne+"*"),ue=new RegExp("^"+ne+"*([>+~]|"+ne+")"+ne+"*"),ce=new RegExp("="+ne+"*([^\\]'\"]*?)"+ne+"*\\]","g"),de=new RegExp(ie),fe=new RegExp("^"+re+"$"),pe={ID:new RegExp("^#("+re+")"),CLASS:new RegExp("^\\.("+re+")"),TAG:new RegExp("^("+re+"|[*])"),ATTR:new RegExp("^"+oe),PSEUDO:new RegExp("^"+ie),CHILD:new RegExp("^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\("+ne+"*(even|odd|(([+-]|)(\\d*)n|)"+ne+"*(?:([+-]|)"+ne+"*(\\d+)|))"+ne+"*\\)|)","i"),bool:new RegExp("^(?:"+te+")$","i"),needsContext:new RegExp("^"+ne+"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\("+ne+"*((?:-\\d)?\\d*)"+ne+"*\\)|)(?=[^-]|$)","i")},he=/^(?:input|select|textarea|button)$/i,ge=/^h\d$/i,me=/^[^{]+\{\s*\[native \w/,ve=/^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,ye=/[+~]/,xe=new RegExp("\\\\([\\da-f]{1,6}"+ne+"?|("+ne+")|.)","ig"),be=function(e,t,n){var r="0x"+t-65536;return r!==r||n?t:r<0?String.fromCharCode(r+65536):String.fromCharCode(r>>10|55296,1023&r|56320)},Ne=/([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g,qe=function(e,t){return t?"\0"===e?"�":e.slice(0,-1)+"\\"+e.charCodeAt(e.length-1).toString(16)+" ":"\\"+e},we=function(){B()},Te=h(function(e){return e.disabled===!0&&("form"in e||"label"in e)},{dir:"parentNode",next:"legend"});try{K.apply(V=Z.call(R.childNodes),R.childNodes),V[R.childNodes.length].nodeType}catch(e){K={apply:V.length?function(e,t){Y.apply(e,Z.call(t))}:function(e,t){for(var n=e.length,r=0;e[n++]=t[r++];);e.length=n-1}}}q=t.support={},C=t.isXML=function(e){var t=e&&(e.ownerDocument||e).documentElement;return!!t&&"HTML"!==t.nodeName},B=t.setDocument=function(e){var t,n,r=e?e.ownerDocument||e:R;return r!==F&&9===r.nodeType&&r.documentElement?(F=r,L=F.documentElement,O=!C(F),R!==F&&(n=F.defaultView)&&n.top!==n&&(n.addEventListener?n.addEventListener("unload",we,!1):n.attachEvent&&n.attachEvent("onunload",we)),q.attributes=o(function(e){return e.className="i",!e.getAttribute("className")}),q.getElementsByTagName=o(function(e){return e.appendChild(F.createComment("")),!e.getElementsByTagName("*").length}),q.getElementsByClassName=me.test(F.getElementsByClassName),q.getById=o(function(e){return L.appendChild(e).id=I,!F.getElementsByName||!F.getElementsByName(I).length}),q.getById?(w.filter.ID=function(e){var t=e.replace(xe,be);return function(e){return e.getAttribute("id")===t}},w.find.ID=function(e,t){if("undefined"!=typeof t.getElementById&&O){var n=t.getElementById(e);return n?[n]:[]}}):(w.filter.ID=function(e){var t=e.replace(xe,be);return function(e){var n="undefined"!=typeof e.getAttributeNode&&e.getAttributeNode("id");return n&&n.value===t}},w.find.ID=function(e,t){if("undefined"!=typeof t.getElementById&&O){var n,r,o,i=t.getElementById(e);if(i){if(n=i.getAttributeNode("id"),n&&n.value===e)return[i];for(o=t.getElementsByName(e),r=0;i=o[r++];)if(n=i.getAttributeNode("id"),n&&n.value===e)return[i]}return[]}}),w.find.TAG=q.getElementsByTagName?function(e,t){return"undefined"!=typeof t.getElementsByTagName?t.getElementsByTagName(e):q.qsa?t.querySelectorAll(e):void 0}:function(e,t){var n,r=[],o=0,i=t.getElementsByTagName(e);if("*"===e){for(;n=i[o++];)1===n.nodeType&&r.push(n);return r}return i},w.find.CLASS=q.getElementsByClassName&&function(e,t){if("undefined"!=typeof t.getElementsByClassName&&O)return t.getElementsByClassName(e)},$=[],P=[],(q.qsa=me.test(F.querySelectorAll))&&(o(function(e){L.appendChild(e).innerHTML="<a id='"+I+"'></a><select id='"+I+"-\r\\' msallowcapture=''><option selected=''></option></select>",e.querySelectorAll("[msallowcapture^='']").length&&P.push("[*^$]="+ne+"*(?:''|\"\")"),e.querySelectorAll("[selected]").length||P.push("\\["+ne+"*(?:value|"+te+")"),e.querySelectorAll("[id~="+I+"-]").length||P.push("~="),e.querySelectorAll(":checked").length||P.push(":checked"),e.querySelectorAll("a#"+I+"+*").length||P.push(".#.+[+~]")}),o(function(e){e.innerHTML="<a href='' disabled='disabled'></a><select disabled='disabled'><option/></select>";var t=F.createElement("input");t.setAttribute("type","hidden"),e.appendChild(t).setAttribute("name","D"),e.querySelectorAll("[name=d]").length&&P.push("name"+ne+"*[*^$|!~]?="),2!==e.querySelectorAll(":enabled").length&&P.push(":enabled",":disabled"),L.appendChild(e).disabled=!0,2!==e.querySelectorAll(":disabled").length&&P.push(":enabled",":disabled"),e.querySelectorAll("*,:x"),P.push(",.*:")})),(q.matchesSelector=me.test(_=L.matches||L.webkitMatchesSelector||L.mozMatchesSelector||L.oMatchesSelector||L.msMatchesSelector))&&o(function(e){q.disconnectedMatch=_.call(e,"*"),_.call(e,"[s!='']:x"),$.push("!=",ie)}),P=P.length&&new RegExp(P.join("|")),$=$.length&&new RegExp($.join("|")),t=me.test(L.compareDocumentPosition),H=t||me.test(L.contains)?function(e,t){var n=9===e.nodeType?e.documentElement:e,r=t&&t.parentNode;return e===r||!(!r||1!==r.nodeType||!(n.contains?n.contains(r):e.compareDocumentPosition&&16&e.compareDocumentPosition(r)))}:function(e,t){if(t)for(;t=t.parentNode;)if(t===e)return!0;return!1},G=t?function(e,t){if(e===t)return A=!0,0;var n=!e.compareDocumentPosition-!t.compareDocumentPosition;return n?n:(n=(e.ownerDocument||e)===(t.ownerDocument||t)?e.compareDocumentPosition(t):1,1&n||!q.sortDetached&&t.compareDocumentPosition(e)===n?e===F||e.ownerDocument===R&&H(R,e)?-1:t===F||t.ownerDocument===R&&H(R,t)?1:D?ee(D,e)-ee(D,t):0:4&n?-1:1)}:function(e,t){if(e===t)return A=!0,0;var n,r=0,o=e.parentNode,i=t.parentNode,l=[e],s=[t];if(!o||!i)return e===F?-1:t===F?1:o?-1:i?1:D?ee(D,e)-ee(D,t):0;if(o===i)return a(e,t);for(n=e;n=n.parentNode;)l.unshift(n);for(n=t;n=n.parentNode;)s.unshift(n);for(;l[r]===s[r];)r++;return r?a(l[r],s[r]):l[r]===R?-1:s[r]===R?1:0},F):F},t.matches=function(e,n){return t(e,null,null,n)},t.matchesSelector=function(e,n){if((e.ownerDocument||e)!==F&&B(e),n=n.replace(ce,"='$1']"),q.matchesSelector&&O&&!z[n+" "]&&(!$||!$.test(n))&&(!P||!P.test(n)))try{var r=_.call(e,n);if(r||q.disconnectedMatch||e.document&&11!==e.document.nodeType)return r}catch(e){}return t(n,F,null,[e]).length>0},t.contains=function(e,t){return(e.ownerDocument||e)!==F&&B(e),H(e,t)},t.attr=function(e,t){(e.ownerDocument||e)!==F&&B(e);var n=w.attrHandle[t.toLowerCase()],r=n&&J.call(w.attrHandle,t.toLowerCase())?n(e,t,!O):void 0;return void 0!==r?r:q.attributes||!O?e.getAttribute(t):(r=e.getAttributeNode(t))&&r.specified?r.value:null},t.escape=function(e){return(e+"").replace(Ne,qe)},t.error=function(e){throw new Error("Syntax error, unrecognized expression: "+e)},t.uniqueSort=function(e){var t,n=[],r=0,o=0;if(A=!q.detectDuplicates,D=!q.sortStable&&e.slice(0),e.sort(G),A){for(;t=e[o++];)t===e[o]&&(r=n.push(o));for(;r--;)e.splice(n[r],1)}return D=null,e},T=t.getText=function(e){var t,n="",r=0,o=e.nodeType;if(o){if(1===o||9===o||11===o){if("string"==typeof e.textContent)return e.textContent;for(e=e.firstChild;e;e=e.nextSibling)n+=T(e)}else if(3===o||4===o)return e.nodeValue}else for(;t=e[r++];)n+=T(t);return n},w=t.selectors={cacheLength:50,createPseudo:r,match:pe,attrHandle:{},find:{},relative:{">":{dir:"parentNode",first:!0}," ":{dir:"parentNode"},"+":{dir:"previousSibling",first:!0},"~":{dir:"previousSibling"}},preFilter:{ATTR:function(e){return e[1]=e[1].replace(xe,be),e[3]=(e[3]||e[4]||e[5]||"").replace(xe,be),"~="===e[2]&&(e[3]=" "+e[3]+" "),e.slice(0,4)},CHILD:function(e){return e[1]=e[1].toLowerCase(),"nth"===e[1].slice(0,3)?(e[3]||t.error(e[0]),e[4]=+(e[4]?e[5]+(e[6]||1):2*("even"===e[3]||"odd"===e[3])),e[5]=+(e[7]+e[8]||"odd"===e[3])):e[3]&&t.error(e[0]),e},PSEUDO:function(e){var t,n=!e[6]&&e[2];return pe.CHILD.test(e[0])?null:(e[3]?e[2]=e[4]||e[5]||"":n&&de.test(n)&&(t=j(n,!0))&&(t=n.indexOf(")",n.length-t)-n.length)&&(e[0]=e[0].slice(0,t),e[2]=n.slice(0,t)),e.slice(0,3))}},filter:{TAG:function(e){var t=e.replace(xe,be).toLowerCase();return"*"===e?function(){return!0}:function(e){return e.nodeName&&e.nodeName.toLowerCase()===t}},CLASS:function(e){var t=U[e+" "];return t||(t=new RegExp("(^|"+ne+")"+e+"("+ne+"|$)"))&&U(e,function(e){return t.test("string"==typeof e.className&&e.className||"undefined"!=typeof e.getAttribute&&e.getAttribute("class")||"")})},ATTR:function(e,n,r){return function(o){var i=t.attr(o,e);return null==i?"!="===n:!n||(i+="","="===n?i===r:"!="===n?i!==r:"^="===n?r&&0===i.indexOf(r):"*="===n?r&&i.indexOf(r)>-1:"$="===n?r&&i.slice(-r.length)===r:"~="===n?(" "+i.replace(ae," ")+" ").indexOf(r)>-1:"|="===n&&(i===r||i.slice(0,r.length+1)===r+"-"))}},CHILD:function(e,t,n,r,o){var i="nth"!==e.slice(0,3),a="last"!==e.slice(-4),l="of-type"===t;return 1===r&&0===o?function(e){return!!e.parentNode}:function(t,n,s){var u,c,d,f,p,h,g=i!==a?"nextSibling":"previousSibling",m=t.parentNode,v=l&&t.nodeName.toLowerCase(),y=!s&&!l,x=!1;if(m){if(i){for(;g;){for(f=t;f=f[g];)if(l?f.nodeName.toLowerCase()===v:1===f.nodeType)return!1;h=g="only"===e&&!h&&"nextSibling"}return!0}if(h=[a?m.firstChild:m.lastChild],a&&y){for(f=m,d=f[I]||(f[I]={}),c=d[f.uniqueID]||(d[f.uniqueID]={}),u=c[e]||[],p=u[0]===M&&u[1],x=p&&u[2],f=p&&m.childNodes[p];f=++p&&f&&f[g]||(x=p=0)||h.pop();)if(1===f.nodeType&&++x&&f===t){c[e]=[M,p,x];break}}else if(y&&(f=t,d=f[I]||(f[I]={}),c=d[f.uniqueID]||(d[f.uniqueID]={}),u=c[e]||[],p=u[0]===M&&u[1],x=p),x===!1)for(;(f=++p&&f&&f[g]||(x=p=0)||h.pop())&&((l?f.nodeName.toLowerCase()!==v:1!==f.nodeType)||!++x||(y&&(d=f[I]||(f[I]={}),c=d[f.uniqueID]||(d[f.uniqueID]={}),c[e]=[M,x]),f!==t)););return x-=o,x===r||x%r===0&&x/r>=0}}},PSEUDO:function(e,n){var o,i=w.pseudos[e]||w.setFilters[e.toLowerCase()]||t.error("unsupported pseudo: "+e);return i[I]?i(n):i.length>1?(o=[e,e,"",n],w.setFilters.hasOwnProperty(e.toLowerCase())?r(function(e,t){for(var r,o=i(e,n),a=o.length;a--;)r=ee(e,o[a]),e[r]=!(t[r]=o[a])}):function(e){return i(e,0,o)}):i}},pseudos:{not:r(function(e){var t=[],n=[],o=S(e.replace(le,"$1"));return o[I]?r(function(e,t,n,r){for(var i,a=o(e,null,r,[]),l=e.length;l--;)(i=a[l])&&(e[l]=!(t[l]=i))}):function(e,r,i){return t[0]=e,o(t,null,i,n),t[0]=null,!n.pop()}}),has:r(function(e){return function(n){return t(e,n).length>0}}),contains:r(function(e){return e=e.replace(xe,be),function(t){return(t.textContent||t.innerText||T(t)).indexOf(e)>-1}}),lang:r(function(e){return fe.test(e||"")||t.error("unsupported lang: "+e),e=e.replace(xe,be).toLowerCase(),function(t){var n;do if(n=O?t.lang:t.getAttribute("xml:lang")||t.getAttribute("lang"))return n=n.toLowerCase(),n===e||0===n.indexOf(e+"-");while((t=t.parentNode)&&1===t.nodeType);return!1}}),target:function(t){var n=e.location&&e.location.hash;return n&&n.slice(1)===t.id},root:function(e){return e===L},focus:function(e){return e===F.activeElement&&(!F.hasFocus||F.hasFocus())&&!!(e.type||e.href||~e.tabIndex)},enabled:u(!1),disabled:u(!0),checked:function(e){var t=e.nodeName.toLowerCase();return"input"===t&&!!e.checked||"option"===t&&!!e.selected},selected:function(e){return e.parentNode&&e.parentNode.selectedIndex,e.selected===!0},empty:function(e){for(e=e.firstChild;e;e=e.nextSibling)if(e.nodeType<6)return!1;return!0},parent:function(e){return!w.pseudos.empty(e)},header:function(e){return ge.test(e.nodeName)},input:function(e){return he.test(e.nodeName)},button:function(e){var t=e.nodeName.toLowerCase();return"input"===t&&"button"===e.type||"button"===t},text:function(e){var t;return"input"===e.nodeName.toLowerCase()&&"text"===e.type&&(null==(t=e.getAttribute("type"))||"text"===t.toLowerCase())},first:c(function(){return[0]}),last:c(function(e,t){return[t-1]}),eq:c(function(e,t,n){return[n<0?n+t:n]}),even:c(function(e,t){for(var n=0;n<t;n+=2)e.push(n);return e}),odd:c(function(e,t){for(var n=1;n<t;n+=2)e.push(n);return e}),lt:c(function(e,t,n){for(var r=n<0?n+t:n;--r>=0;)e.push(r);return e}),gt:c(function(e,t,n){for(var r=n<0?n+t:n;++r<t;)e.push(r);return e})}},w.pseudos.nth=w.pseudos.eq;for(N in{radio:!0,checkbox:!0,file:!0,password:!0,image:!0})w.pseudos[N]=l(N);for(N in{submit:!0,reset:!0})w.pseudos[N]=s(N);return f.prototype=w.filters=w.pseudos,w.setFilters=new f,j=t.tokenize=function(e,n){var r,o,i,a,l,s,u,c=X[e+" "];if(c)return n?0:c.slice(0);for(l=e,s=[],u=w.preFilter;l;){r&&!(o=se.exec(l))||(o&&(l=l.slice(o[0].length)||l),s.push(i=[])),r=!1,(o=ue.exec(l))&&(r=o.shift(),i.push({value:r,type:o[0].replace(le," ")}),l=l.slice(r.length));for(a in w.filter)!(o=pe[a].exec(l))||u[a]&&!(o=u[a](o))||(r=o.shift(),i.push({value:r,type:a,matches:o}),l=l.slice(r.length));if(!r)break}return n?l.length:l?t.error(e):X(e,s).slice(0)},S=t.compile=function(e,t){var n,r=[],o=[],i=z[e+" "];if(!i){for(t||(t=j(e)),n=t.length;n--;)i=x(t[n]),i[I]?r.push(i):o.push(i);i=z(e,b(o,r)),i.selector=e}return i},k=t.select=function(e,t,n,r){var o,i,a,l,s,u="function"==typeof e&&e,c=!r&&j(e=u.selector||e);if(n=n||[],1===c.length){if(i=c[0]=c[0].slice(0),i.length>2&&"ID"===(a=i[0]).type&&9===t.nodeType&&O&&w.relative[i[1].type]){if(t=(w.find.ID(a.matches[0].replace(xe,be),t)||[])[0],!t)return n;u&&(t=t.parentNode),e=e.slice(i.shift().value.length)}for(o=pe.needsContext.test(e)?0:i.length;o--&&(a=i[o],!w.relative[l=a.type]);)if((s=w.find[l])&&(r=s(a.matches[0].replace(xe,be),ye.test(i[0].type)&&d(t.parentNode)||t))){if(i.splice(o,1),e=r.length&&p(i),!e)return K.apply(n,r),n;break}}return(u||S(e,c))(r,t,!O,n,!t||ye.test(e)&&d(t.parentNode)||t),n},q.sortStable=I.split("").sort(G).join("")===I,q.detectDuplicates=!!A,B(),q.sortDetached=o(function(e){return 1&e.compareDocumentPosition(F.createElement("fieldset"))}),o(function(e){return e.innerHTML="<a href='#'></a>","#"===e.firstChild.getAttribute("href")})||i("type|href|height|width",function(e,t,n){if(!n)return e.getAttribute(t,"type"===t.toLowerCase()?1:2)}),q.attributes&&o(function(e){return e.innerHTML="<input/>",e.firstChild.setAttribute("value",""),""===e.firstChild.getAttribute("value")})||i("value",function(e,t,n){if(!n&&"input"===e.nodeName.toLowerCase())return e.defaultValue}),o(function(e){return null==e.getAttribute("disabled")})||i(te,function(e,t,n){var r;if(!n)return e[t]===!0?t.toLowerCase():(r=e.getAttributeNode(t))&&r.specified?r.value:null}),t}(n);ye.find=we,ye.expr=we.selectors,ye.expr[":"]=ye.expr.pseudos,ye.uniqueSort=ye.unique=we.uniqueSort,ye.text=we.getText,ye.isXMLDoc=we.isXML,ye.contains=we.contains,ye.escapeSelector=we.escape;var Te=function(e,t,n){for(var r=[],o=void 0!==n;(e=e[t])&&9!==e.nodeType;)if(1===e.nodeType){if(o&&ye(e).is(n))break;r.push(e)}return r},Ce=function(e,t){for(var n=[];e;e=e.nextSibling)1===e.nodeType&&e!==t&&n.push(e);return n},je=ye.expr.match.needsContext,Se=/^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i,ke=/^.[^:#\[\.,]*$/;ye.filter=function(e,t,n){var r=t[0];return n&&(e=":not("+e+")"),1===t.length&&1===r.nodeType?ye.find.matchesSelector(r,e)?[r]:[]:ye.find.matches(e,ye.grep(t,function(e){return 1===e.nodeType}))},ye.fn.extend({find:function(e){var t,n,r=this.length,o=this;if("string"!=typeof e)return this.pushStack(ye(e).filter(function(){for(t=0;t<r;t++)if(ye.contains(o[t],this))return!0}));for(n=this.pushStack([]),t=0;t<r;t++)ye.find(e,o[t],n);return r>1?ye.uniqueSort(n):n},filter:function(e){return this.pushStack(s(this,e||[],!1))},not:function(e){return this.pushStack(s(this,e||[],!0))},is:function(e){return!!s(this,"string"==typeof e&&je.test(e)?ye(e):e||[],!1).length}});var Ee,De=/^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/,Ae=ye.fn.init=function(e,t,n){var r,o;if(!e)return this;if(n=n||Ee,"string"==typeof e){if(r="<"===e[0]&&">"===e[e.length-1]&&e.length>=3?[null,e,null]:De.exec(e),!r||!r[1]&&t)return!t||t.jquery?(t||n).find(e):this.constructor(t).find(e);if(r[1]){if(t=t instanceof ye?t[0]:t,ye.merge(this,ye.parseHTML(r[1],t&&t.nodeType?t.ownerDocument||t:ie,!0)),Se.test(r[1])&&ye.isPlainObject(t))for(r in t)ye.isFunction(this[r])?this[r](t[r]):this.attr(r,t[r]);return this}return o=ie.getElementById(r[2]),o&&(this[0]=o,this.length=1),this}return e.nodeType?(this[0]=e,this.length=1,this):ye.isFunction(e)?void 0!==n.ready?n.ready(e):e(ye):ye.makeArray(e,this)};Ae.prototype=ye.fn,Ee=ye(ie);var Be=/^(?:parents|prev(?:Until|All))/,Fe={children:!0,contents:!0,next:!0,prev:!0};ye.fn.extend({has:function(e){var t=ye(e,this),n=t.length;return this.filter(function(){for(var e=0;e<n;e++)if(ye.contains(this,t[e]))return!0})},closest:function(e,t){var n,r=0,o=this.length,i=[],a="string"!=typeof e&&ye(e);if(!je.test(e))for(;r<o;r++)for(n=this[r];n&&n!==t;n=n.parentNode)if(n.nodeType<11&&(a?a.index(n)>-1:1===n.nodeType&&ye.find.matchesSelector(n,e))){i.push(n);break}return this.pushStack(i.length>1?ye.uniqueSort(i):i)},index:function(e){return e?"string"==typeof e?ce.call(ye(e),this[0]):ce.call(this,e.jquery?e[0]:e):this[0]&&this[0].parentNode?this.first().prevAll().length:-1},add:function(e,t){return this.pushStack(ye.uniqueSort(ye.merge(this.get(),ye(e,t))))},addBack:function(e){return this.add(null==e?this.prevObject:this.prevObject.filter(e))}}),ye.each({parent:function(e){var t=e.parentNode;return t&&11!==t.nodeType?t:null},parents:function(e){return Te(e,"parentNode")},parentsUntil:function(e,t,n){return Te(e,"parentNode",n)},next:function(e){return u(e,"nextSibling")},prev:function(e){return u(e,"previousSibling")},nextAll:function(e){return Te(e,"nextSibling")},prevAll:function(e){return Te(e,"previousSibling")},nextUntil:function(e,t,n){return Te(e,"nextSibling",n)},prevUntil:function(e,t,n){return Te(e,"previousSibling",n)},siblings:function(e){return Ce((e.parentNode||{}).firstChild,e)},children:function(e){return Ce(e.firstChild)},contents:function(e){return e.contentDocument||ye.merge([],e.childNodes)}},function(e,t){ye.fn[e]=function(n,r){var o=ye.map(this,t,n);return"Until"!==e.slice(-5)&&(r=n),r&&"string"==typeof r&&(o=ye.filter(r,o)),this.length>1&&(Fe[e]||ye.uniqueSort(o),Be.test(e)&&o.reverse()),this.pushStack(o)}});var Le=/[^\x20\t\r\n\f]+/g;ye.Callbacks=function(e){e="string"==typeof e?c(e):ye.extend({},e);var t,n,r,o,i=[],a=[],l=-1,s=function(){for(o=e.once,r=t=!0;a.length;l=-1)for(n=a.shift();++l<i.length;)i[l].apply(n[0],n[1])===!1&&e.stopOnFalse&&(l=i.length,n=!1);e.memory||(n=!1),t=!1,o&&(i=n?[]:"")},u={add:function(){return i&&(n&&!t&&(l=i.length-1,a.push(n)),function t(n){ye.each(n,function(n,r){ye.isFunction(r)?e.unique&&u.has(r)||i.push(r):r&&r.length&&"string"!==ye.type(r)&&t(r)})}(arguments),n&&!t&&s()),this},remove:function(){return ye.each(arguments,function(e,t){for(var n;(n=ye.inArray(t,i,n))>-1;)i.splice(n,1),n<=l&&l--}),this},has:function(e){return e?ye.inArray(e,i)>-1:i.length>0},empty:function(){return i&&(i=[]),this},disable:function(){return o=a=[],i=n="",this},disabled:function(){return!i},lock:function(){return o=a=[],n||t||(i=n=""),this},locked:function(){return!!o},fireWith:function(e,n){return o||(n=n||[],n=[e,n.slice?n.slice():n],a.push(n),t||s()),this},fire:function(){return u.fireWith(this,arguments),this},fired:function(){return!!r}};return u},ye.extend({Deferred:function(e){var t=[["notify","progress",ye.Callbacks("memory"),ye.Callbacks("memory"),2],["resolve","done",ye.Callbacks("once memory"),ye.Callbacks("once memory"),0,"resolved"],["reject","fail",ye.Callbacks("once memory"),ye.Callbacks("once memory"),1,"rejected"]],r="pending",o={state:function(){return r},always:function(){return i.done(arguments).fail(arguments),this},catch:function(e){return o.then(null,e)},pipe:function(){var e=arguments;return ye.Deferred(function(n){ye.each(t,function(t,r){var o=ye.isFunction(e[r[4]])&&e[r[4]];i[r[1]](function(){var e=o&&o.apply(this,arguments);e&&ye.isFunction(e.promise)?e.promise().progress(n.notify).done(n.resolve).fail(n.reject):n[r[0]+"With"](this,o?[e]:arguments)})}),e=null}).promise()},then:function(e,r,o){function i(e,t,r,o){return function(){var l=this,s=arguments,u=function(){var n,u;if(!(e<a)){if(n=r.apply(l,s),n===t.promise())throw new TypeError("Thenable self-resolution");u=n&&("object"==typeof n||"function"==typeof n)&&n.then,ye.isFunction(u)?o?u.call(n,i(a,t,d,o),i(a,t,f,o)):(a++,u.call(n,i(a,t,d,o),i(a,t,f,o),i(a,t,d,t.notifyWith))):(r!==d&&(l=void 0,s=[n]),(o||t.resolveWith)(l,s))}},c=o?u:function(){try{u()}catch(n){ye.Deferred.exceptionHook&&ye.Deferred.exceptionHook(n,c.stackTrace),e+1>=a&&(r!==f&&(l=void 0,s=[n]),t.rejectWith(l,s))}};e?c():(ye.Deferred.getStackHook&&(c.stackTrace=ye.Deferred.getStackHook()),n.setTimeout(c))}}var a=0;return ye.Deferred(function(n){t[0][3].add(i(0,n,ye.isFunction(o)?o:d,n.notifyWith)),t[1][3].add(i(0,n,ye.isFunction(e)?e:d)),t[2][3].add(i(0,n,ye.isFunction(r)?r:f))}).promise()},promise:function(e){return null!=e?ye.extend(e,o):o}},i={};return ye.each(t,function(e,n){var a=n[2],l=n[5];o[n[1]]=a.add,l&&a.add(function(){r=l},t[3-e][2].disable,t[0][2].lock),a.add(n[3].fire),i[n[0]]=function(){return i[n[0]+"With"](this===i?void 0:this,arguments),this},i[n[0]+"With"]=a.fireWith}),o.promise(i),e&&e.call(i,i),i},when:function(e){var t=arguments.length,n=t,r=Array(n),o=le.call(arguments),i=ye.Deferred(),a=function(e){return function(n){r[e]=this,o[e]=arguments.length>1?le.call(arguments):n,--t||i.resolveWith(r,o)}};if(t<=1&&(p(e,i.done(a(n)).resolve,i.reject),"pending"===i.state()||ye.isFunction(o[n]&&o[n].then)))return i.then();for(;n--;)p(o[n],a(n),i.reject);return i.promise()}});var Oe=/^(Eval|Internal|Range|Reference|Syntax|Type|URI)Error$/;ye.Deferred.exceptionHook=function(e,t){n.console&&n.console.warn&&e&&Oe.test(e.name)&&n.console.warn("jQuery.Deferred exception: "+e.message,e.stack,t)},ye.readyException=function(e){n.setTimeout(function(){throw e})};var Pe=ye.Deferred();ye.fn.ready=function(e){return Pe.then(e).catch(function(e){ye.readyException(e)}),this},ye.extend({isReady:!1,readyWait:1,holdReady:function(e){e?ye.readyWait++:ye.ready(!0)},ready:function(e){(e===!0?--ye.readyWait:ye.isReady)||(ye.isReady=!0,e!==!0&&--ye.readyWait>0||Pe.resolveWith(ie,[ye]))}}),ye.ready.then=Pe.then,"complete"===ie.readyState||"loading"!==ie.readyState&&!ie.documentElement.doScroll?n.setTimeout(ye.ready):(ie.addEventListener("DOMContentLoaded",h),n.addEventListener("load",h));var $e=function(e,t,n,r,o,i,a){var l=0,s=e.length,u=null==n;if("object"===ye.type(n)){o=!0;for(l in n)$e(e,t,l,n[l],!0,i,a)}else if(void 0!==r&&(o=!0,ye.isFunction(r)||(a=!0),u&&(a?(t.call(e,r),t=null):(u=t,t=function(e,t,n){return u.call(ye(e),n)})),t))for(;l<s;l++)t(e[l],n,a?r:r.call(e[l],l,t(e[l],n)));return o?e:u?t.call(e):s?t(e[0],n):i},_e=function(e){return 1===e.nodeType||9===e.nodeType||!+e.nodeType};g.uid=1,g.prototype={cache:function(e){var t=e[this.expando];return t||(t={},_e(e)&&(e.nodeType?e[this.expando]=t:Object.defineProperty(e,this.expando,{value:t,configurable:!0}))),t},set:function(e,t,n){var r,o=this.cache(e);if("string"==typeof t)o[ye.camelCase(t)]=n;else for(r in t)o[ye.camelCase(r)]=t[r];return o},get:function(e,t){return void 0===t?this.cache(e):e[this.expando]&&e[this.expando][ye.camelCase(t)]},access:function(e,t,n){return void 0===t||t&&"string"==typeof t&&void 0===n?this.get(e,t):(this.set(e,t,n),void 0!==n?n:t)},remove:function(e,t){var n,r=e[this.expando];if(void 0!==r){if(void 0!==t){ye.isArray(t)?t=t.map(ye.camelCase):(t=ye.camelCase(t),t=t in r?[t]:t.match(Le)||[]),n=t.length;for(;n--;)delete r[t[n]]}(void 0===t||ye.isEmptyObject(r))&&(e.nodeType?e[this.expando]=void 0:delete e[this.expando])}},hasData:function(e){var t=e[this.expando];return void 0!==t&&!ye.isEmptyObject(t)}};var He=new g,Ie=new g,Re=/^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,Me=/[A-Z]/g;ye.extend({hasData:function(e){return Ie.hasData(e)||He.hasData(e)},data:function(e,t,n){return Ie.access(e,t,n)},removeData:function(e,t){Ie.remove(e,t)},_data:function(e,t,n){return He.access(e,t,n)},_removeData:function(e,t){He.remove(e,t)}}),ye.fn.extend({data:function(e,t){var n,r,o,i=this[0],a=i&&i.attributes;if(void 0===e){if(this.length&&(o=Ie.get(i),1===i.nodeType&&!He.get(i,"hasDataAttrs"))){for(n=a.length;n--;)a[n]&&(r=a[n].name,0===r.indexOf("data-")&&(r=ye.camelCase(r.slice(5)),v(i,r,o[r])));He.set(i,"hasDataAttrs",!0)}return o}return"object"==typeof e?this.each(function(){Ie.set(this,e)}):$e(this,function(t){var n;if(i&&void 0===t){if(n=Ie.get(i,e),void 0!==n)return n;if(n=v(i,e),void 0!==n)return n}else this.each(function(){Ie.set(this,e,t)})},null,t,arguments.length>1,null,!0)},removeData:function(e){return this.each(function(){Ie.remove(this,e)})}}),ye.extend({queue:function(e,t,n){var r;if(e)return t=(t||"fx")+"queue",r=He.get(e,t),n&&(!r||ye.isArray(n)?r=He.access(e,t,ye.makeArray(n)):r.push(n)),r||[]},dequeue:function(e,t){t=t||"fx";var n=ye.queue(e,t),r=n.length,o=n.shift(),i=ye._queueHooks(e,t),a=function(){ye.dequeue(e,t)};"inprogress"===o&&(o=n.shift(),r--),o&&("fx"===t&&n.unshift("inprogress"),delete i.stop,o.call(e,a,i)),!r&&i&&i.empty.fire()},_queueHooks:function(e,t){var n=t+"queueHooks";return He.get(e,n)||He.access(e,n,{empty:ye.Callbacks("once memory").add(function(){He.remove(e,[t+"queue",n])})})}}),ye.fn.extend({queue:function(e,t){var n=2;return"string"!=typeof e&&(t=e,e="fx",n--),arguments.length<n?ye.queue(this[0],e):void 0===t?this:this.each(function(){var n=ye.queue(this,e,t);ye._queueHooks(this,e),"fx"===e&&"inprogress"!==n[0]&&ye.dequeue(this,e)})},dequeue:function(e){return this.each(function(){ye.dequeue(this,e)})},clearQueue:function(e){return this.queue(e||"fx",[])},promise:function(e,t){var n,r=1,o=ye.Deferred(),i=this,a=this.length,l=function(){--r||o.resolveWith(i,[i])};for("string"!=typeof e&&(t=e,e=void 0),e=e||"fx";a--;)n=He.get(i[a],e+"queueHooks"),n&&n.empty&&(r++,n.empty.add(l));return l(),o.promise(t)}});var We=/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,Ue=new RegExp("^(?:([+-])=|)("+We+")([a-z%]*)$","i"),Xe=["Top","Right","Bottom","Left"],ze=function(e,t){return e=t||e,"none"===e.style.display||""===e.style.display&&ye.contains(e.ownerDocument,e)&&"none"===ye.css(e,"display")},Ge=function(e,t,n,r){var o,i,a={};for(i in t)a[i]=e.style[i],e.style[i]=t[i];o=n.apply(e,r||[]);for(i in t)e.style[i]=a[i];return o},Je={};ye.fn.extend({show:function(){return b(this,!0)},hide:function(){return b(this)},toggle:function(e){return"boolean"==typeof e?e?this.show():this.hide():this.each(function(){ze(this)?ye(this).show():ye(this).hide()})}});var Ve=/^(?:checkbox|radio)$/i,Qe=/<([a-z][^\/\0>\x20\t\r\n\f]+)/i,Ye=/^$|\/(?:java|ecma)script/i,Ke={option:[1,"<select multiple='multiple'>","</select>"],thead:[1,"<table>","</table>"],col:[2,"<table><colgroup>","</colgroup></table>"],tr:[2,"<table><tbody>","</tbody></table>"],td:[3,"<table><tbody><tr>","</tr></tbody></table>"],_default:[0,"",""]};Ke.optgroup=Ke.option,Ke.tbody=Ke.tfoot=Ke.colgroup=Ke.caption=Ke.thead,Ke.th=Ke.td;
-var Ze=/<|&#?\w+;/;!function(){var e=ie.createDocumentFragment(),t=e.appendChild(ie.createElement("div")),n=ie.createElement("input");n.setAttribute("type","radio"),n.setAttribute("checked","checked"),n.setAttribute("name","t"),t.appendChild(n),me.checkClone=t.cloneNode(!0).cloneNode(!0).lastChild.checked,t.innerHTML="<textarea>x</textarea>",me.noCloneChecked=!!t.cloneNode(!0).lastChild.defaultValue}();var et=ie.documentElement,tt=/^key/,nt=/^(?:mouse|pointer|contextmenu|drag|drop)|click/,rt=/^([^.]*)(?:\.(.+)|)/;ye.event={global:{},add:function(e,t,n,r,o){var i,a,l,s,u,c,d,f,p,h,g,m=He.get(e);if(m)for(n.handler&&(i=n,n=i.handler,o=i.selector),o&&ye.find.matchesSelector(et,o),n.guid||(n.guid=ye.guid++),(s=m.events)||(s=m.events={}),(a=m.handle)||(a=m.handle=function(t){return"undefined"!=typeof ye&&ye.event.triggered!==t.type?ye.event.dispatch.apply(e,arguments):void 0}),t=(t||"").match(Le)||[""],u=t.length;u--;)l=rt.exec(t[u])||[],p=g=l[1],h=(l[2]||"").split(".").sort(),p&&(d=ye.event.special[p]||{},p=(o?d.delegateType:d.bindType)||p,d=ye.event.special[p]||{},c=ye.extend({type:p,origType:g,data:r,handler:n,guid:n.guid,selector:o,needsContext:o&&ye.expr.match.needsContext.test(o),namespace:h.join(".")},i),(f=s[p])||(f=s[p]=[],f.delegateCount=0,d.setup&&d.setup.call(e,r,h,a)!==!1||e.addEventListener&&e.addEventListener(p,a)),d.add&&(d.add.call(e,c),c.handler.guid||(c.handler.guid=n.guid)),o?f.splice(f.delegateCount++,0,c):f.push(c),ye.event.global[p]=!0)},remove:function(e,t,n,r,o){var i,a,l,s,u,c,d,f,p,h,g,m=He.hasData(e)&&He.get(e);if(m&&(s=m.events)){for(t=(t||"").match(Le)||[""],u=t.length;u--;)if(l=rt.exec(t[u])||[],p=g=l[1],h=(l[2]||"").split(".").sort(),p){for(d=ye.event.special[p]||{},p=(r?d.delegateType:d.bindType)||p,f=s[p]||[],l=l[2]&&new RegExp("(^|\\.)"+h.join("\\.(?:.*\\.|)")+"(\\.|$)"),a=i=f.length;i--;)c=f[i],!o&&g!==c.origType||n&&n.guid!==c.guid||l&&!l.test(c.namespace)||r&&r!==c.selector&&("**"!==r||!c.selector)||(f.splice(i,1),c.selector&&f.delegateCount--,d.remove&&d.remove.call(e,c));a&&!f.length&&(d.teardown&&d.teardown.call(e,h,m.handle)!==!1||ye.removeEvent(e,p,m.handle),delete s[p])}else for(p in s)ye.event.remove(e,p+t[u],n,r,!0);ye.isEmptyObject(s)&&He.remove(e,"handle events")}},dispatch:function(e){var t,n,r,o,i,a,l=ye.event.fix(e),s=new Array(arguments.length),u=(He.get(this,"events")||{})[l.type]||[],c=ye.event.special[l.type]||{};for(s[0]=l,t=1;t<arguments.length;t++)s[t]=arguments[t];if(l.delegateTarget=this,!c.preDispatch||c.preDispatch.call(this,l)!==!1){for(a=ye.event.handlers.call(this,l,u),t=0;(o=a[t++])&&!l.isPropagationStopped();)for(l.currentTarget=o.elem,n=0;(i=o.handlers[n++])&&!l.isImmediatePropagationStopped();)l.rnamespace&&!l.rnamespace.test(i.namespace)||(l.handleObj=i,l.data=i.data,r=((ye.event.special[i.origType]||{}).handle||i.handler).apply(o.elem,s),void 0!==r&&(l.result=r)===!1&&(l.preventDefault(),l.stopPropagation()));return c.postDispatch&&c.postDispatch.call(this,l),l.result}},handlers:function(e,t){var n,r,o,i,a,l=[],s=t.delegateCount,u=e.target;if(s&&u.nodeType&&!("click"===e.type&&e.button>=1))for(;u!==this;u=u.parentNode||this)if(1===u.nodeType&&("click"!==e.type||u.disabled!==!0)){for(i=[],a={},n=0;n<s;n++)r=t[n],o=r.selector+" ",void 0===a[o]&&(a[o]=r.needsContext?ye(o,this).index(u)>-1:ye.find(o,this,null,[u]).length),a[o]&&i.push(r);i.length&&l.push({elem:u,handlers:i})}return u=this,s<t.length&&l.push({elem:u,handlers:t.slice(s)}),l},addProp:function(e,t){Object.defineProperty(ye.Event.prototype,e,{enumerable:!0,configurable:!0,get:ye.isFunction(t)?function(){if(this.originalEvent)return t(this.originalEvent)}:function(){if(this.originalEvent)return this.originalEvent[e]},set:function(t){Object.defineProperty(this,e,{enumerable:!0,configurable:!0,writable:!0,value:t})}})},fix:function(e){return e[ye.expando]?e:new ye.Event(e)},special:{load:{noBubble:!0},focus:{trigger:function(){if(this!==j()&&this.focus)return this.focus(),!1},delegateType:"focusin"},blur:{trigger:function(){if(this===j()&&this.blur)return this.blur(),!1},delegateType:"focusout"},click:{trigger:function(){if("checkbox"===this.type&&this.click&&ye.nodeName(this,"input"))return this.click(),!1},_default:function(e){return ye.nodeName(e.target,"a")}},beforeunload:{postDispatch:function(e){void 0!==e.result&&e.originalEvent&&(e.originalEvent.returnValue=e.result)}}}},ye.removeEvent=function(e,t,n){e.removeEventListener&&e.removeEventListener(t,n)},ye.Event=function(e,t){return this instanceof ye.Event?(e&&e.type?(this.originalEvent=e,this.type=e.type,this.isDefaultPrevented=e.defaultPrevented||void 0===e.defaultPrevented&&e.returnValue===!1?T:C,this.target=e.target&&3===e.target.nodeType?e.target.parentNode:e.target,this.currentTarget=e.currentTarget,this.relatedTarget=e.relatedTarget):this.type=e,t&&ye.extend(this,t),this.timeStamp=e&&e.timeStamp||ye.now(),void(this[ye.expando]=!0)):new ye.Event(e,t)},ye.Event.prototype={constructor:ye.Event,isDefaultPrevented:C,isPropagationStopped:C,isImmediatePropagationStopped:C,isSimulated:!1,preventDefault:function(){var e=this.originalEvent;this.isDefaultPrevented=T,e&&!this.isSimulated&&e.preventDefault()},stopPropagation:function(){var e=this.originalEvent;this.isPropagationStopped=T,e&&!this.isSimulated&&e.stopPropagation()},stopImmediatePropagation:function(){var e=this.originalEvent;this.isImmediatePropagationStopped=T,e&&!this.isSimulated&&e.stopImmediatePropagation(),this.stopPropagation()}},ye.each({altKey:!0,bubbles:!0,cancelable:!0,changedTouches:!0,ctrlKey:!0,detail:!0,eventPhase:!0,metaKey:!0,pageX:!0,pageY:!0,shiftKey:!0,view:!0,char:!0,charCode:!0,key:!0,keyCode:!0,button:!0,buttons:!0,clientX:!0,clientY:!0,offsetX:!0,offsetY:!0,pointerId:!0,pointerType:!0,screenX:!0,screenY:!0,targetTouches:!0,toElement:!0,touches:!0,which:function(e){var t=e.button;return null==e.which&&tt.test(e.type)?null!=e.charCode?e.charCode:e.keyCode:!e.which&&void 0!==t&&nt.test(e.type)?1&t?1:2&t?3:4&t?2:0:e.which}},ye.event.addProp),ye.each({mouseenter:"mouseover",mouseleave:"mouseout",pointerenter:"pointerover",pointerleave:"pointerout"},function(e,t){ye.event.special[e]={delegateType:t,bindType:t,handle:function(e){var n,r=this,o=e.relatedTarget,i=e.handleObj;return o&&(o===r||ye.contains(r,o))||(e.type=i.origType,n=i.handler.apply(this,arguments),e.type=t),n}}}),ye.fn.extend({on:function(e,t,n,r){return S(this,e,t,n,r)},one:function(e,t,n,r){return S(this,e,t,n,r,1)},off:function(e,t,n){var r,o;if(e&&e.preventDefault&&e.handleObj)return r=e.handleObj,ye(e.delegateTarget).off(r.namespace?r.origType+"."+r.namespace:r.origType,r.selector,r.handler),this;if("object"==typeof e){for(o in e)this.off(o,t,e[o]);return this}return t!==!1&&"function"!=typeof t||(n=t,t=void 0),n===!1&&(n=C),this.each(function(){ye.event.remove(this,e,n,t)})}});var ot=/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([a-z][^\/\0>\x20\t\r\n\f]*)[^>]*)\/>/gi,it=/<script|<style|<link/i,at=/checked\s*(?:[^=]|=\s*.checked.)/i,lt=/^true\/(.*)/,st=/^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g;ye.extend({htmlPrefilter:function(e){return e.replace(ot,"<$1></$2>")},clone:function(e,t,n){var r,o,i,a,l=e.cloneNode(!0),s=ye.contains(e.ownerDocument,e);if(!(me.noCloneChecked||1!==e.nodeType&&11!==e.nodeType||ye.isXMLDoc(e)))for(a=N(l),i=N(e),r=0,o=i.length;r<o;r++)B(i[r],a[r]);if(t)if(n)for(i=i||N(e),a=a||N(l),r=0,o=i.length;r<o;r++)A(i[r],a[r]);else A(e,l);return a=N(l,"script"),a.length>0&&q(a,!s&&N(e,"script")),l},cleanData:function(e){for(var t,n,r,o=ye.event.special,i=0;void 0!==(n=e[i]);i++)if(_e(n)){if(t=n[He.expando]){if(t.events)for(r in t.events)o[r]?ye.event.remove(n,r):ye.removeEvent(n,r,t.handle);n[He.expando]=void 0}n[Ie.expando]&&(n[Ie.expando]=void 0)}}}),ye.fn.extend({detach:function(e){return L(this,e,!0)},remove:function(e){return L(this,e)},text:function(e){return $e(this,function(e){return void 0===e?ye.text(this):this.empty().each(function(){1!==this.nodeType&&11!==this.nodeType&&9!==this.nodeType||(this.textContent=e)})},null,e,arguments.length)},append:function(){return F(this,arguments,function(e){if(1===this.nodeType||11===this.nodeType||9===this.nodeType){var t=k(this,e);t.appendChild(e)}})},prepend:function(){return F(this,arguments,function(e){if(1===this.nodeType||11===this.nodeType||9===this.nodeType){var t=k(this,e);t.insertBefore(e,t.firstChild)}})},before:function(){return F(this,arguments,function(e){this.parentNode&&this.parentNode.insertBefore(e,this)})},after:function(){return F(this,arguments,function(e){this.parentNode&&this.parentNode.insertBefore(e,this.nextSibling)})},empty:function(){for(var e,t=0;null!=(e=this[t]);t++)1===e.nodeType&&(ye.cleanData(N(e,!1)),e.textContent="");return this},clone:function(e,t){return e=null!=e&&e,t=null==t?e:t,this.map(function(){return ye.clone(this,e,t)})},html:function(e){return $e(this,function(e){var t=this[0]||{},n=0,r=this.length;if(void 0===e&&1===t.nodeType)return t.innerHTML;if("string"==typeof e&&!it.test(e)&&!Ke[(Qe.exec(e)||["",""])[1].toLowerCase()]){e=ye.htmlPrefilter(e);try{for(;n<r;n++)t=this[n]||{},1===t.nodeType&&(ye.cleanData(N(t,!1)),t.innerHTML=e);t=0}catch(e){}}t&&this.empty().append(e)},null,e,arguments.length)},replaceWith:function(){var e=[];return F(this,arguments,function(t){var n=this.parentNode;ye.inArray(this,e)<0&&(ye.cleanData(N(this)),n&&n.replaceChild(t,this))},e)}}),ye.each({appendTo:"append",prependTo:"prepend",insertBefore:"before",insertAfter:"after",replaceAll:"replaceWith"},function(e,t){ye.fn[e]=function(e){for(var n,r=[],o=ye(e),i=o.length-1,a=0;a<=i;a++)n=a===i?this:this.clone(!0),ye(o[a])[t](n),ue.apply(r,n.get());return this.pushStack(r)}});var ut=/^margin/,ct=new RegExp("^("+We+")(?!px)[a-z%]+$","i"),dt=function(e){var t=e.ownerDocument.defaultView;return t&&t.opener||(t=n),t.getComputedStyle(e)};!function(){function e(){if(l){l.style.cssText="box-sizing:border-box;position:relative;display:block;margin:auto;border:1px;padding:1px;top:1%;width:50%",l.innerHTML="",et.appendChild(a);var e=n.getComputedStyle(l);t="1%"!==e.top,i="2px"===e.marginLeft,r="4px"===e.width,l.style.marginRight="50%",o="4px"===e.marginRight,et.removeChild(a),l=null}}var t,r,o,i,a=ie.createElement("div"),l=ie.createElement("div");l.style&&(l.style.backgroundClip="content-box",l.cloneNode(!0).style.backgroundClip="",me.clearCloneStyle="content-box"===l.style.backgroundClip,a.style.cssText="border:0;width:8px;height:0;top:0;left:-9999px;padding:0;margin-top:1px;position:absolute",a.appendChild(l),ye.extend(me,{pixelPosition:function(){return e(),t},boxSizingReliable:function(){return e(),r},pixelMarginRight:function(){return e(),o},reliableMarginLeft:function(){return e(),i}}))}();var ft=/^(none|table(?!-c[ea]).+)/,pt={position:"absolute",visibility:"hidden",display:"block"},ht={letterSpacing:"0",fontWeight:"400"},gt=["Webkit","Moz","ms"],mt=ie.createElement("div").style;ye.extend({cssHooks:{opacity:{get:function(e,t){if(t){var n=O(e,"opacity");return""===n?"1":n}}}},cssNumber:{animationIterationCount:!0,columnCount:!0,fillOpacity:!0,flexGrow:!0,flexShrink:!0,fontWeight:!0,lineHeight:!0,opacity:!0,order:!0,orphans:!0,widows:!0,zIndex:!0,zoom:!0},cssProps:{float:"cssFloat"},style:function(e,t,n,r){if(e&&3!==e.nodeType&&8!==e.nodeType&&e.style){var o,i,a,l=ye.camelCase(t),s=e.style;return t=ye.cssProps[l]||(ye.cssProps[l]=$(l)||l),a=ye.cssHooks[t]||ye.cssHooks[l],void 0===n?a&&"get"in a&&void 0!==(o=a.get(e,!1,r))?o:s[t]:(i=typeof n,"string"===i&&(o=Ue.exec(n))&&o[1]&&(n=y(e,t,o),i="number"),null!=n&&n===n&&("number"===i&&(n+=o&&o[3]||(ye.cssNumber[l]?"":"px")),me.clearCloneStyle||""!==n||0!==t.indexOf("background")||(s[t]="inherit"),a&&"set"in a&&void 0===(n=a.set(e,n,r))||(s[t]=n)),void 0)}},css:function(e,t,n,r){var o,i,a,l=ye.camelCase(t);return t=ye.cssProps[l]||(ye.cssProps[l]=$(l)||l),a=ye.cssHooks[t]||ye.cssHooks[l],a&&"get"in a&&(o=a.get(e,!0,n)),void 0===o&&(o=O(e,t,r)),"normal"===o&&t in ht&&(o=ht[t]),""===n||n?(i=parseFloat(o),n===!0||isFinite(i)?i||0:o):o}}),ye.each(["height","width"],function(e,t){ye.cssHooks[t]={get:function(e,n,r){if(n)return!ft.test(ye.css(e,"display"))||e.getClientRects().length&&e.getBoundingClientRect().width?I(e,t,r):Ge(e,pt,function(){return I(e,t,r)})},set:function(e,n,r){var o,i=r&&dt(e),a=r&&H(e,t,r,"border-box"===ye.css(e,"boxSizing",!1,i),i);return a&&(o=Ue.exec(n))&&"px"!==(o[3]||"px")&&(e.style[t]=n,n=ye.css(e,t)),_(e,n,a)}}}),ye.cssHooks.marginLeft=P(me.reliableMarginLeft,function(e,t){if(t)return(parseFloat(O(e,"marginLeft"))||e.getBoundingClientRect().left-Ge(e,{marginLeft:0},function(){return e.getBoundingClientRect().left}))+"px"}),ye.each({margin:"",padding:"",border:"Width"},function(e,t){ye.cssHooks[e+t]={expand:function(n){for(var r=0,o={},i="string"==typeof n?n.split(" "):[n];r<4;r++)o[e+Xe[r]+t]=i[r]||i[r-2]||i[0];return o}},ut.test(e)||(ye.cssHooks[e+t].set=_)}),ye.fn.extend({css:function(e,t){return $e(this,function(e,t,n){var r,o,i={},a=0;if(ye.isArray(t)){for(r=dt(e),o=t.length;a<o;a++)i[t[a]]=ye.css(e,t[a],!1,r);return i}return void 0!==n?ye.style(e,t,n):ye.css(e,t)},e,t,arguments.length>1)}}),ye.Tween=R,R.prototype={constructor:R,init:function(e,t,n,r,o,i){this.elem=e,this.prop=n,this.easing=o||ye.easing._default,this.options=t,this.start=this.now=this.cur(),this.end=r,this.unit=i||(ye.cssNumber[n]?"":"px")},cur:function(){var e=R.propHooks[this.prop];return e&&e.get?e.get(this):R.propHooks._default.get(this)},run:function(e){var t,n=R.propHooks[this.prop];return this.options.duration?this.pos=t=ye.easing[this.easing](e,this.options.duration*e,0,1,this.options.duration):this.pos=t=e,this.now=(this.end-this.start)*t+this.start,this.options.step&&this.options.step.call(this.elem,this.now,this),n&&n.set?n.set(this):R.propHooks._default.set(this),this}},R.prototype.init.prototype=R.prototype,R.propHooks={_default:{get:function(e){var t;return 1!==e.elem.nodeType||null!=e.elem[e.prop]&&null==e.elem.style[e.prop]?e.elem[e.prop]:(t=ye.css(e.elem,e.prop,""),t&&"auto"!==t?t:0)},set:function(e){ye.fx.step[e.prop]?ye.fx.step[e.prop](e):1!==e.elem.nodeType||null==e.elem.style[ye.cssProps[e.prop]]&&!ye.cssHooks[e.prop]?e.elem[e.prop]=e.now:ye.style(e.elem,e.prop,e.now+e.unit)}}},R.propHooks.scrollTop=R.propHooks.scrollLeft={set:function(e){e.elem.nodeType&&e.elem.parentNode&&(e.elem[e.prop]=e.now)}},ye.easing={linear:function(e){return e},swing:function(e){return.5-Math.cos(e*Math.PI)/2},_default:"swing"},ye.fx=R.prototype.init,ye.fx.step={};var vt,yt,xt=/^(?:toggle|show|hide)$/,bt=/queueHooks$/;ye.Animation=ye.extend(J,{tweeners:{"*":[function(e,t){var n=this.createTween(e,t);return y(n.elem,e,Ue.exec(t),n),n}]},tweener:function(e,t){ye.isFunction(e)?(t=e,e=["*"]):e=e.match(Le);for(var n,r=0,o=e.length;r<o;r++)n=e[r],J.tweeners[n]=J.tweeners[n]||[],J.tweeners[n].unshift(t)},prefilters:[z],prefilter:function(e,t){t?J.prefilters.unshift(e):J.prefilters.push(e)}}),ye.speed=function(e,t,n){var r=e&&"object"==typeof e?ye.extend({},e):{complete:n||!n&&t||ye.isFunction(e)&&e,duration:e,easing:n&&t||t&&!ye.isFunction(t)&&t};return ye.fx.off||ie.hidden?r.duration=0:"number"!=typeof r.duration&&(r.duration in ye.fx.speeds?r.duration=ye.fx.speeds[r.duration]:r.duration=ye.fx.speeds._default),null!=r.queue&&r.queue!==!0||(r.queue="fx"),r.old=r.complete,r.complete=function(){ye.isFunction(r.old)&&r.old.call(this),r.queue&&ye.dequeue(this,r.queue)},r},ye.fn.extend({fadeTo:function(e,t,n,r){return this.filter(ze).css("opacity",0).show().end().animate({opacity:t},e,n,r)},animate:function(e,t,n,r){var o=ye.isEmptyObject(e),i=ye.speed(t,n,r),a=function(){var t=J(this,ye.extend({},e),i);(o||He.get(this,"finish"))&&t.stop(!0)};return a.finish=a,o||i.queue===!1?this.each(a):this.queue(i.queue,a)},stop:function(e,t,n){var r=function(e){var t=e.stop;delete e.stop,t(n)};return"string"!=typeof e&&(n=t,t=e,e=void 0),t&&e!==!1&&this.queue(e||"fx",[]),this.each(function(){var t=!0,o=null!=e&&e+"queueHooks",i=ye.timers,a=He.get(this);if(o)a[o]&&a[o].stop&&r(a[o]);else for(o in a)a[o]&&a[o].stop&&bt.test(o)&&r(a[o]);for(o=i.length;o--;)i[o].elem!==this||null!=e&&i[o].queue!==e||(i[o].anim.stop(n),t=!1,i.splice(o,1));!t&&n||ye.dequeue(this,e)})},finish:function(e){return e!==!1&&(e=e||"fx"),this.each(function(){var t,n=He.get(this),r=n[e+"queue"],o=n[e+"queueHooks"],i=ye.timers,a=r?r.length:0;for(n.finish=!0,ye.queue(this,e,[]),o&&o.stop&&o.stop.call(this,!0),t=i.length;t--;)i[t].elem===this&&i[t].queue===e&&(i[t].anim.stop(!0),i.splice(t,1));for(t=0;t<a;t++)r[t]&&r[t].finish&&r[t].finish.call(this);delete n.finish})}}),ye.each(["toggle","show","hide"],function(e,t){var n=ye.fn[t];ye.fn[t]=function(e,r,o){return null==e||"boolean"==typeof e?n.apply(this,arguments):this.animate(U(t,!0),e,r,o)}}),ye.each({slideDown:U("show"),slideUp:U("hide"),slideToggle:U("toggle"),fadeIn:{opacity:"show"},fadeOut:{opacity:"hide"},fadeToggle:{opacity:"toggle"}},function(e,t){ye.fn[e]=function(e,n,r){return this.animate(t,e,n,r)}}),ye.timers=[],ye.fx.tick=function(){var e,t=0,n=ye.timers;for(vt=ye.now();t<n.length;t++)e=n[t],e()||n[t]!==e||n.splice(t--,1);n.length||ye.fx.stop(),vt=void 0},ye.fx.timer=function(e){ye.timers.push(e),e()?ye.fx.start():ye.timers.pop()},ye.fx.interval=13,ye.fx.start=function(){yt||(yt=n.requestAnimationFrame?n.requestAnimationFrame(M):n.setInterval(ye.fx.tick,ye.fx.interval))},ye.fx.stop=function(){n.cancelAnimationFrame?n.cancelAnimationFrame(yt):n.clearInterval(yt),yt=null},ye.fx.speeds={slow:600,fast:200,_default:400},ye.fn.delay=function(e,t){return e=ye.fx?ye.fx.speeds[e]||e:e,t=t||"fx",this.queue(t,function(t,r){var o=n.setTimeout(t,e);r.stop=function(){n.clearTimeout(o)}})},function(){var e=ie.createElement("input"),t=ie.createElement("select"),n=t.appendChild(ie.createElement("option"));e.type="checkbox",me.checkOn=""!==e.value,me.optSelected=n.selected,e=ie.createElement("input"),e.value="t",e.type="radio",me.radioValue="t"===e.value}();var Nt,qt=ye.expr.attrHandle;ye.fn.extend({attr:function(e,t){return $e(this,ye.attr,e,t,arguments.length>1)},removeAttr:function(e){return this.each(function(){ye.removeAttr(this,e)})}}),ye.extend({attr:function(e,t,n){var r,o,i=e.nodeType;if(3!==i&&8!==i&&2!==i)return"undefined"==typeof e.getAttribute?ye.prop(e,t,n):(1===i&&ye.isXMLDoc(e)||(o=ye.attrHooks[t.toLowerCase()]||(ye.expr.match.bool.test(t)?Nt:void 0)),void 0!==n?null===n?void ye.removeAttr(e,t):o&&"set"in o&&void 0!==(r=o.set(e,n,t))?r:(e.setAttribute(t,n+""),n):o&&"get"in o&&null!==(r=o.get(e,t))?r:(r=ye.find.attr(e,t),null==r?void 0:r))},attrHooks:{type:{set:function(e,t){if(!me.radioValue&&"radio"===t&&ye.nodeName(e,"input")){var n=e.value;return e.setAttribute("type",t),n&&(e.value=n),t}}}},removeAttr:function(e,t){var n,r=0,o=t&&t.match(Le);if(o&&1===e.nodeType)for(;n=o[r++];)e.removeAttribute(n)}}),Nt={set:function(e,t,n){return t===!1?ye.removeAttr(e,n):e.setAttribute(n,n),n}},ye.each(ye.expr.match.bool.source.match(/\w+/g),function(e,t){var n=qt[t]||ye.find.attr;qt[t]=function(e,t,r){var o,i,a=t.toLowerCase();return r||(i=qt[a],qt[a]=o,o=null!=n(e,t,r)?a:null,qt[a]=i),o}});var wt=/^(?:input|select|textarea|button)$/i,Tt=/^(?:a|area)$/i;ye.fn.extend({prop:function(e,t){return $e(this,ye.prop,e,t,arguments.length>1)},removeProp:function(e){return this.each(function(){delete this[ye.propFix[e]||e]})}}),ye.extend({prop:function(e,t,n){var r,o,i=e.nodeType;if(3!==i&&8!==i&&2!==i)return 1===i&&ye.isXMLDoc(e)||(t=ye.propFix[t]||t,o=ye.propHooks[t]),void 0!==n?o&&"set"in o&&void 0!==(r=o.set(e,n,t))?r:e[t]=n:o&&"get"in o&&null!==(r=o.get(e,t))?r:e[t]},propHooks:{tabIndex:{get:function(e){var t=ye.find.attr(e,"tabindex");return t?parseInt(t,10):wt.test(e.nodeName)||Tt.test(e.nodeName)&&e.href?0:-1}}},propFix:{for:"htmlFor",class:"className"}}),me.optSelected||(ye.propHooks.selected={get:function(e){var t=e.parentNode;return t&&t.parentNode&&t.parentNode.selectedIndex,null},set:function(e){var t=e.parentNode;t&&(t.selectedIndex,t.parentNode&&t.parentNode.selectedIndex)}}),ye.each(["tabIndex","readOnly","maxLength","cellSpacing","cellPadding","rowSpan","colSpan","useMap","frameBorder","contentEditable"],function(){ye.propFix[this.toLowerCase()]=this}),ye.fn.extend({addClass:function(e){var t,n,r,o,i,a,l,s=0;if(ye.isFunction(e))return this.each(function(t){ye(this).addClass(e.call(this,t,Q(this)))});if("string"==typeof e&&e)for(t=e.match(Le)||[];n=this[s++];)if(o=Q(n),r=1===n.nodeType&&" "+V(o)+" "){for(a=0;i=t[a++];)r.indexOf(" "+i+" ")<0&&(r+=i+" ");l=V(r),o!==l&&n.setAttribute("class",l)}return this},removeClass:function(e){var t,n,r,o,i,a,l,s=0;if(ye.isFunction(e))return this.each(function(t){ye(this).removeClass(e.call(this,t,Q(this)))});if(!arguments.length)return this.attr("class","");if("string"==typeof e&&e)for(t=e.match(Le)||[];n=this[s++];)if(o=Q(n),r=1===n.nodeType&&" "+V(o)+" "){for(a=0;i=t[a++];)for(;r.indexOf(" "+i+" ")>-1;)r=r.replace(" "+i+" "," ");l=V(r),o!==l&&n.setAttribute("class",l)}return this},toggleClass:function(e,t){var n=typeof e;return"boolean"==typeof t&&"string"===n?t?this.addClass(e):this.removeClass(e):ye.isFunction(e)?this.each(function(n){ye(this).toggleClass(e.call(this,n,Q(this),t),t)}):this.each(function(){var t,r,o,i;if("string"===n)for(r=0,o=ye(this),i=e.match(Le)||[];t=i[r++];)o.hasClass(t)?o.removeClass(t):o.addClass(t);else void 0!==e&&"boolean"!==n||(t=Q(this),t&&He.set(this,"__className__",t),this.setAttribute&&this.setAttribute("class",t||e===!1?"":He.get(this,"__className__")||""))})},hasClass:function(e){var t,n,r=0;for(t=" "+e+" ";n=this[r++];)if(1===n.nodeType&&(" "+V(Q(n))+" ").indexOf(t)>-1)return!0;return!1}});var Ct=/\r/g;ye.fn.extend({val:function(e){var t,n,r,o=this[0];{if(arguments.length)return r=ye.isFunction(e),this.each(function(n){var o;1===this.nodeType&&(o=r?e.call(this,n,ye(this).val()):e,null==o?o="":"number"==typeof o?o+="":ye.isArray(o)&&(o=ye.map(o,function(e){return null==e?"":e+""})),t=ye.valHooks[this.type]||ye.valHooks[this.nodeName.toLowerCase()],t&&"set"in t&&void 0!==t.set(this,o,"value")||(this.value=o))});if(o)return t=ye.valHooks[o.type]||ye.valHooks[o.nodeName.toLowerCase()],t&&"get"in t&&void 0!==(n=t.get(o,"value"))?n:(n=o.value,"string"==typeof n?n.replace(Ct,""):null==n?"":n)}}}),ye.extend({valHooks:{option:{get:function(e){var t=ye.find.attr(e,"value");return null!=t?t:V(ye.text(e))}},select:{get:function(e){var t,n,r,o=e.options,i=e.selectedIndex,a="select-one"===e.type,l=a?null:[],s=a?i+1:o.length;for(r=i<0?s:a?i:0;r<s;r++)if(n=o[r],(n.selected||r===i)&&!n.disabled&&(!n.parentNode.disabled||!ye.nodeName(n.parentNode,"optgroup"))){if(t=ye(n).val(),a)return t;l.push(t)}return l},set:function(e,t){for(var n,r,o=e.options,i=ye.makeArray(t),a=o.length;a--;)r=o[a],(r.selected=ye.inArray(ye.valHooks.option.get(r),i)>-1)&&(n=!0);return n||(e.selectedIndex=-1),i}}}}),ye.each(["radio","checkbox"],function(){ye.valHooks[this]={set:function(e,t){if(ye.isArray(t))return e.checked=ye.inArray(ye(e).val(),t)>-1}},me.checkOn||(ye.valHooks[this].get=function(e){return null===e.getAttribute("value")?"on":e.value})});var jt=/^(?:focusinfocus|focusoutblur)$/;ye.extend(ye.event,{trigger:function(e,t,r,o){var i,a,l,s,u,c,d,f=[r||ie],p=pe.call(e,"type")?e.type:e,h=pe.call(e,"namespace")?e.namespace.split("."):[];if(a=l=r=r||ie,3!==r.nodeType&&8!==r.nodeType&&!jt.test(p+ye.event.triggered)&&(p.indexOf(".")>-1&&(h=p.split("."),p=h.shift(),h.sort()),u=p.indexOf(":")<0&&"on"+p,e=e[ye.expando]?e:new ye.Event(p,"object"==typeof e&&e),e.isTrigger=o?2:3,e.namespace=h.join("."),e.rnamespace=e.namespace?new RegExp("(^|\\.)"+h.join("\\.(?:.*\\.|)")+"(\\.|$)"):null,e.result=void 0,e.target||(e.target=r),t=null==t?[e]:ye.makeArray(t,[e]),d=ye.event.special[p]||{},o||!d.trigger||d.trigger.apply(r,t)!==!1)){if(!o&&!d.noBubble&&!ye.isWindow(r)){for(s=d.delegateType||p,jt.test(s+p)||(a=a.parentNode);a;a=a.parentNode)f.push(a),l=a;l===(r.ownerDocument||ie)&&f.push(l.defaultView||l.parentWindow||n)}for(i=0;(a=f[i++])&&!e.isPropagationStopped();)e.type=i>1?s:d.bindType||p,c=(He.get(a,"events")||{})[e.type]&&He.get(a,"handle"),c&&c.apply(a,t),c=u&&a[u],c&&c.apply&&_e(a)&&(e.result=c.apply(a,t),e.result===!1&&e.preventDefault());return e.type=p,o||e.isDefaultPrevented()||d._default&&d._default.apply(f.pop(),t)!==!1||!_e(r)||u&&ye.isFunction(r[p])&&!ye.isWindow(r)&&(l=r[u],l&&(r[u]=null),ye.event.triggered=p,r[p](),ye.event.triggered=void 0,l&&(r[u]=l)),e.result}},simulate:function(e,t,n){var r=ye.extend(new ye.Event,n,{type:e,isSimulated:!0});ye.event.trigger(r,null,t)}}),ye.fn.extend({trigger:function(e,t){return this.each(function(){ye.event.trigger(e,t,this)})},triggerHandler:function(e,t){var n=this[0];if(n)return ye.event.trigger(e,t,n,!0)}}),ye.each("blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu".split(" "),function(e,t){ye.fn[t]=function(e,n){return arguments.length>0?this.on(t,null,e,n):this.trigger(t)}}),ye.fn.extend({hover:function(e,t){return this.mouseenter(e).mouseleave(t||e)}}),me.focusin="onfocusin"in n,me.focusin||ye.each({focus:"focusin",blur:"focusout"},function(e,t){var n=function(e){ye.event.simulate(t,e.target,ye.event.fix(e))};ye.event.special[t]={setup:function(){var r=this.ownerDocument||this,o=He.access(r,t);o||r.addEventListener(e,n,!0),He.access(r,t,(o||0)+1)},teardown:function(){var r=this.ownerDocument||this,o=He.access(r,t)-1;o?He.access(r,t,o):(r.removeEventListener(e,n,!0),He.remove(r,t))}}});var St=n.location,kt=ye.now(),Et=/\?/;ye.parseXML=function(e){var t;if(!e||"string"!=typeof e)return null;try{t=(new n.DOMParser).parseFromString(e,"text/xml")}catch(e){t=void 0}return t&&!t.getElementsByTagName("parsererror").length||ye.error("Invalid XML: "+e),t};var Dt=/\[\]$/,At=/\r?\n/g,Bt=/^(?:submit|button|image|reset|file)$/i,Ft=/^(?:input|select|textarea|keygen)/i;ye.param=function(e,t){var n,r=[],o=function(e,t){var n=ye.isFunction(t)?t():t;r[r.length]=encodeURIComponent(e)+"="+encodeURIComponent(null==n?"":n)};if(ye.isArray(e)||e.jquery&&!ye.isPlainObject(e))ye.each(e,function(){o(this.name,this.value)});else for(n in e)Y(n,e[n],t,o);return r.join("&")},ye.fn.extend({serialize:function(){return ye.param(this.serializeArray())},serializeArray:function(){return this.map(function(){var e=ye.prop(this,"elements");return e?ye.makeArray(e):this}).filter(function(){var e=this.type;return this.name&&!ye(this).is(":disabled")&&Ft.test(this.nodeName)&&!Bt.test(e)&&(this.checked||!Ve.test(e))}).map(function(e,t){var n=ye(this).val();return null==n?null:ye.isArray(n)?ye.map(n,function(e){return{name:t.name,value:e.replace(At,"\r\n")}}):{name:t.name,value:n.replace(At,"\r\n")}}).get()}});var Lt=/%20/g,Ot=/#.*$/,Pt=/([?&])_=[^&]*/,$t=/^(.*?):[ \t]*([^\r\n]*)$/gm,_t=/^(?:about|app|app-storage|.+-extension|file|res|widget):$/,Ht=/^(?:GET|HEAD)$/,It=/^\/\//,Rt={},Mt={},Wt="*/".concat("*"),Ut=ie.createElement("a");Ut.href=St.href,ye.extend({active:0,lastModified:{},etag:{},ajaxSettings:{url:St.href,type:"GET",isLocal:_t.test(St.protocol),global:!0,processData:!0,async:!0,contentType:"application/x-www-form-urlencoded; charset=UTF-8",accepts:{"*":Wt,text:"text/plain",html:"text/html",xml:"application/xml, text/xml",json:"application/json, text/javascript"},contents:{xml:/\bxml\b/,html:/\bhtml/,json:/\bjson\b/},responseFields:{xml:"responseXML",text:"responseText",json:"responseJSON"},converters:{"* text":String,"text html":!0,"text json":JSON.parse,"text xml":ye.parseXML},flatOptions:{url:!0,context:!0}},ajaxSetup:function(e,t){return t?ee(ee(e,ye.ajaxSettings),t):ee(ye.ajaxSettings,e)},ajaxPrefilter:K(Rt),ajaxTransport:K(Mt),ajax:function(e,t){function r(e,t,r,l){var u,f,p,b,N,q=t;c||(c=!0,s&&n.clearTimeout(s),o=void 0,a=l||"",w.readyState=e>0?4:0,u=e>=200&&e<300||304===e,r&&(b=te(h,w,r)),b=ne(h,b,w,u),u?(h.ifModified&&(N=w.getResponseHeader("Last-Modified"),N&&(ye.lastModified[i]=N),N=w.getResponseHeader("etag"),N&&(ye.etag[i]=N)),204===e||"HEAD"===h.type?q="nocontent":304===e?q="notmodified":(q=b.state,f=b.data,p=b.error,u=!p)):(p=q,!e&&q||(q="error",e<0&&(e=0))),w.status=e,w.statusText=(t||q)+"",u?v.resolveWith(g,[f,q,w]):v.rejectWith(g,[w,q,p]),w.statusCode(x),x=void 0,d&&m.trigger(u?"ajaxSuccess":"ajaxError",[w,h,u?f:p]),y.fireWith(g,[w,q]),d&&(m.trigger("ajaxComplete",[w,h]),--ye.active||ye.event.trigger("ajaxStop")))}"object"==typeof e&&(t=e,e=void 0),t=t||{};var o,i,a,l,s,u,c,d,f,p,h=ye.ajaxSetup({},t),g=h.context||h,m=h.context&&(g.nodeType||g.jquery)?ye(g):ye.event,v=ye.Deferred(),y=ye.Callbacks("once memory"),x=h.statusCode||{},b={},N={},q="canceled",w={readyState:0,getResponseHeader:function(e){var t;if(c){if(!l)for(l={};t=$t.exec(a);)l[t[1].toLowerCase()]=t[2];t=l[e.toLowerCase()]}return null==t?null:t},getAllResponseHeaders:function(){return c?a:null},setRequestHeader:function(e,t){return null==c&&(e=N[e.toLowerCase()]=N[e.toLowerCase()]||e,b[e]=t),this},overrideMimeType:function(e){return null==c&&(h.mimeType=e),this},statusCode:function(e){var t;if(e)if(c)w.always(e[w.status]);else for(t in e)x[t]=[x[t],e[t]];return this},abort:function(e){var t=e||q;return o&&o.abort(t),r(0,t),this}};if(v.promise(w),h.url=((e||h.url||St.href)+"").replace(It,St.protocol+"//"),h.type=t.method||t.type||h.method||h.type,h.dataTypes=(h.dataType||"*").toLowerCase().match(Le)||[""],null==h.crossDomain){u=ie.createElement("a");try{u.href=h.url,u.href=u.href,h.crossDomain=Ut.protocol+"//"+Ut.host!=u.protocol+"//"+u.host}catch(e){h.crossDomain=!0}}if(h.data&&h.processData&&"string"!=typeof h.data&&(h.data=ye.param(h.data,h.traditional)),Z(Rt,h,t,w),c)return w;d=ye.event&&h.global,d&&0===ye.active++&&ye.event.trigger("ajaxStart"),h.type=h.type.toUpperCase(),h.hasContent=!Ht.test(h.type),i=h.url.replace(Ot,""),h.hasContent?h.data&&h.processData&&0===(h.contentType||"").indexOf("application/x-www-form-urlencoded")&&(h.data=h.data.replace(Lt,"+")):(p=h.url.slice(i.length),h.data&&(i+=(Et.test(i)?"&":"?")+h.data,delete h.data),h.cache===!1&&(i=i.replace(Pt,"$1"),p=(Et.test(i)?"&":"?")+"_="+kt++ +p),h.url=i+p),h.ifModified&&(ye.lastModified[i]&&w.setRequestHeader("If-Modified-Since",ye.lastModified[i]),ye.etag[i]&&w.setRequestHeader("If-None-Match",ye.etag[i])),(h.data&&h.hasContent&&h.contentType!==!1||t.contentType)&&w.setRequestHeader("Content-Type",h.contentType),w.setRequestHeader("Accept",h.dataTypes[0]&&h.accepts[h.dataTypes[0]]?h.accepts[h.dataTypes[0]]+("*"!==h.dataTypes[0]?", "+Wt+"; q=0.01":""):h.accepts["*"]);for(f in h.headers)w.setRequestHeader(f,h.headers[f]);if(h.beforeSend&&(h.beforeSend.call(g,w,h)===!1||c))return w.abort();if(q="abort",y.add(h.complete),w.done(h.success),w.fail(h.error),o=Z(Mt,h,t,w)){if(w.readyState=1,d&&m.trigger("ajaxSend",[w,h]),c)return w;h.async&&h.timeout>0&&(s=n.setTimeout(function(){w.abort("timeout")},h.timeout));try{c=!1,o.send(b,r)}catch(e){if(c)throw e;r(-1,e)}}else r(-1,"No Transport");return w},getJSON:function(e,t,n){return ye.get(e,t,n,"json")},getScript:function(e,t){return ye.get(e,void 0,t,"script")}}),ye.each(["get","post"],function(e,t){ye[t]=function(e,n,r,o){return ye.isFunction(n)&&(o=o||r,r=n,n=void 0),ye.ajax(ye.extend({url:e,type:t,dataType:o,data:n,success:r},ye.isPlainObject(e)&&e))}}),ye._evalUrl=function(e){return ye.ajax({url:e,type:"GET",dataType:"script",cache:!0,async:!1,global:!1,throws:!0})},ye.fn.extend({wrapAll:function(e){var t;return this[0]&&(ye.isFunction(e)&&(e=e.call(this[0])),t=ye(e,this[0].ownerDocument).eq(0).clone(!0),this[0].parentNode&&t.insertBefore(this[0]),t.map(function(){for(var e=this;e.firstElementChild;)e=e.firstElementChild;return e}).append(this)),this},wrapInner:function(e){return ye.isFunction(e)?this.each(function(t){ye(this).wrapInner(e.call(this,t))}):this.each(function(){var t=ye(this),n=t.contents();n.length?n.wrapAll(e):t.append(e)})},wrap:function(e){var t=ye.isFunction(e);return this.each(function(n){ye(this).wrapAll(t?e.call(this,n):e)})},unwrap:function(e){return this.parent(e).not("body").each(function(){
-ye(this).replaceWith(this.childNodes)}),this}}),ye.expr.pseudos.hidden=function(e){return!ye.expr.pseudos.visible(e)},ye.expr.pseudos.visible=function(e){return!!(e.offsetWidth||e.offsetHeight||e.getClientRects().length)},ye.ajaxSettings.xhr=function(){try{return new n.XMLHttpRequest}catch(e){}};var Xt={0:200,1223:204},zt=ye.ajaxSettings.xhr();me.cors=!!zt&&"withCredentials"in zt,me.ajax=zt=!!zt,ye.ajaxTransport(function(e){var t,r;if(me.cors||zt&&!e.crossDomain)return{send:function(o,i){var a,l=e.xhr();if(l.open(e.type,e.url,e.async,e.username,e.password),e.xhrFields)for(a in e.xhrFields)l[a]=e.xhrFields[a];e.mimeType&&l.overrideMimeType&&l.overrideMimeType(e.mimeType),e.crossDomain||o["X-Requested-With"]||(o["X-Requested-With"]="XMLHttpRequest");for(a in o)l.setRequestHeader(a,o[a]);t=function(e){return function(){t&&(t=r=l.onload=l.onerror=l.onabort=l.onreadystatechange=null,"abort"===e?l.abort():"error"===e?"number"!=typeof l.status?i(0,"error"):i(l.status,l.statusText):i(Xt[l.status]||l.status,l.statusText,"text"!==(l.responseType||"text")||"string"!=typeof l.responseText?{binary:l.response}:{text:l.responseText},l.getAllResponseHeaders()))}},l.onload=t(),r=l.onerror=t("error"),void 0!==l.onabort?l.onabort=r:l.onreadystatechange=function(){4===l.readyState&&n.setTimeout(function(){t&&r()})},t=t("abort");try{l.send(e.hasContent&&e.data||null)}catch(e){if(t)throw e}},abort:function(){t&&t()}}}),ye.ajaxPrefilter(function(e){e.crossDomain&&(e.contents.script=!1)}),ye.ajaxSetup({accepts:{script:"text/javascript, application/javascript, application/ecmascript, application/x-ecmascript"},contents:{script:/\b(?:java|ecma)script\b/},converters:{"text script":function(e){return ye.globalEval(e),e}}}),ye.ajaxPrefilter("script",function(e){void 0===e.cache&&(e.cache=!1),e.crossDomain&&(e.type="GET")}),ye.ajaxTransport("script",function(e){if(e.crossDomain){var t,n;return{send:function(r,o){t=ye("<script>").prop({charset:e.scriptCharset,src:e.url}).on("load error",n=function(e){t.remove(),n=null,e&&o("error"===e.type?404:200,e.type)}),ie.head.appendChild(t[0])},abort:function(){n&&n()}}}});var Gt=[],Jt=/(=)\?(?=&|$)|\?\?/;ye.ajaxSetup({jsonp:"callback",jsonpCallback:function(){var e=Gt.pop()||ye.expando+"_"+kt++;return this[e]=!0,e}}),ye.ajaxPrefilter("json jsonp",function(e,t,r){var o,i,a,l=e.jsonp!==!1&&(Jt.test(e.url)?"url":"string"==typeof e.data&&0===(e.contentType||"").indexOf("application/x-www-form-urlencoded")&&Jt.test(e.data)&&"data");if(l||"jsonp"===e.dataTypes[0])return o=e.jsonpCallback=ye.isFunction(e.jsonpCallback)?e.jsonpCallback():e.jsonpCallback,l?e[l]=e[l].replace(Jt,"$1"+o):e.jsonp!==!1&&(e.url+=(Et.test(e.url)?"&":"?")+e.jsonp+"="+o),e.converters["script json"]=function(){return a||ye.error(o+" was not called"),a[0]},e.dataTypes[0]="json",i=n[o],n[o]=function(){a=arguments},r.always(function(){void 0===i?ye(n).removeProp(o):n[o]=i,e[o]&&(e.jsonpCallback=t.jsonpCallback,Gt.push(o)),a&&ye.isFunction(i)&&i(a[0]),a=i=void 0}),"script"}),me.createHTMLDocument=function(){var e=ie.implementation.createHTMLDocument("").body;return e.innerHTML="<form></form><form></form>",2===e.childNodes.length}(),ye.parseHTML=function(e,t,n){if("string"!=typeof e)return[];"boolean"==typeof t&&(n=t,t=!1);var r,o,i;return t||(me.createHTMLDocument?(t=ie.implementation.createHTMLDocument(""),r=t.createElement("base"),r.href=ie.location.href,t.head.appendChild(r)):t=ie),o=Se.exec(e),i=!n&&[],o?[t.createElement(o[1])]:(o=w([e],t,i),i&&i.length&&ye(i).remove(),ye.merge([],o.childNodes))},ye.fn.load=function(e,t,n){var r,o,i,a=this,l=e.indexOf(" ");return l>-1&&(r=V(e.slice(l)),e=e.slice(0,l)),ye.isFunction(t)?(n=t,t=void 0):t&&"object"==typeof t&&(o="POST"),a.length>0&&ye.ajax({url:e,type:o||"GET",dataType:"html",data:t}).done(function(e){i=arguments,a.html(r?ye("<div>").append(ye.parseHTML(e)).find(r):e)}).always(n&&function(e,t){a.each(function(){n.apply(this,i||[e.responseText,t,e])})}),this},ye.each(["ajaxStart","ajaxStop","ajaxComplete","ajaxError","ajaxSuccess","ajaxSend"],function(e,t){ye.fn[t]=function(e){return this.on(t,e)}}),ye.expr.pseudos.animated=function(e){return ye.grep(ye.timers,function(t){return e===t.elem}).length},ye.offset={setOffset:function(e,t,n){var r,o,i,a,l,s,u,c=ye.css(e,"position"),d=ye(e),f={};"static"===c&&(e.style.position="relative"),l=d.offset(),i=ye.css(e,"top"),s=ye.css(e,"left"),u=("absolute"===c||"fixed"===c)&&(i+s).indexOf("auto")>-1,u?(r=d.position(),a=r.top,o=r.left):(a=parseFloat(i)||0,o=parseFloat(s)||0),ye.isFunction(t)&&(t=t.call(e,n,ye.extend({},l))),null!=t.top&&(f.top=t.top-l.top+a),null!=t.left&&(f.left=t.left-l.left+o),"using"in t?t.using.call(e,f):d.css(f)}},ye.fn.extend({offset:function(e){if(arguments.length)return void 0===e?this:this.each(function(t){ye.offset.setOffset(this,e,t)});var t,n,r,o,i=this[0];if(i)return i.getClientRects().length?(r=i.getBoundingClientRect(),r.width||r.height?(o=i.ownerDocument,n=re(o),t=o.documentElement,{top:r.top+n.pageYOffset-t.clientTop,left:r.left+n.pageXOffset-t.clientLeft}):r):{top:0,left:0}},position:function(){if(this[0]){var e,t,n=this[0],r={top:0,left:0};return"fixed"===ye.css(n,"position")?t=n.getBoundingClientRect():(e=this.offsetParent(),t=this.offset(),ye.nodeName(e[0],"html")||(r=e.offset()),r={top:r.top+ye.css(e[0],"borderTopWidth",!0),left:r.left+ye.css(e[0],"borderLeftWidth",!0)}),{top:t.top-r.top-ye.css(n,"marginTop",!0),left:t.left-r.left-ye.css(n,"marginLeft",!0)}}},offsetParent:function(){return this.map(function(){for(var e=this.offsetParent;e&&"static"===ye.css(e,"position");)e=e.offsetParent;return e||et})}}),ye.each({scrollLeft:"pageXOffset",scrollTop:"pageYOffset"},function(e,t){var n="pageYOffset"===t;ye.fn[e]=function(r){return $e(this,function(e,r,o){var i=re(e);return void 0===o?i?i[t]:e[r]:void(i?i.scrollTo(n?i.pageXOffset:o,n?o:i.pageYOffset):e[r]=o)},e,r,arguments.length)}}),ye.each(["top","left"],function(e,t){ye.cssHooks[t]=P(me.pixelPosition,function(e,n){if(n)return n=O(e,t),ct.test(n)?ye(e).position()[t]+"px":n})}),ye.each({Height:"height",Width:"width"},function(e,t){ye.each({padding:"inner"+e,content:t,"":"outer"+e},function(n,r){ye.fn[r]=function(o,i){var a=arguments.length&&(n||"boolean"!=typeof o),l=n||(o===!0||i===!0?"margin":"border");return $e(this,function(t,n,o){var i;return ye.isWindow(t)?0===r.indexOf("outer")?t["inner"+e]:t.document.documentElement["client"+e]:9===t.nodeType?(i=t.documentElement,Math.max(t.body["scroll"+e],i["scroll"+e],t.body["offset"+e],i["offset"+e],i["client"+e])):void 0===o?ye.css(t,n,l):ye.style(t,n,o,l)},t,a?o:void 0,a)}})}),ye.fn.extend({bind:function(e,t,n){return this.on(e,null,t,n)},unbind:function(e,t){return this.off(e,null,t)},delegate:function(e,t,n,r){return this.on(t,e,n,r)},undelegate:function(e,t,n){return 1===arguments.length?this.off(e,"**"):this.off(t,e||"**",n)}}),ye.parseJSON=JSON.parse,r=[],o=function(){return ye}.apply(t,r),!(void 0!==o&&(e.exports=o));var Vt=n.jQuery,Qt=n.$;return ye.noConflict=function(e){return n.$===ye&&(n.$=Qt),e&&n.jQuery===ye&&(n.jQuery=Vt),ye},i||(n.jQuery=n.$=ye),ye})},,,,,,,,,function(e,t,n){function r(e,t,n){function r(e){n.equal(e.name,"node2"),n.ok(e.is_open),l()}var o=$("#tree1");o.tree({data:a});var i=o.tree("getNodeByName","node2"),l=n.async();t?o.tree("openNode",i,e,r):o.tree("openNode",i,r)}var o=n(8)(jQuery,window),i=n(2),a=i.example_data,l=i.example_data2,s=i.formatNodes,u=i.formatTitles,c=i.isNodeOpen,d=i.isNodeClosed,f=i.getTreeVariables(),p=f.Position,h=QUnit.test;QUnit.module("jqtree",{beforeEach:function(){$("body").append('<div id="tree1"></div>')},afterEach:function(){var e=$("#tree1");e.tree("destroy"),e.remove(),$.mockjax.clear()}}),h("create jqtree from data",function(e){$("#tree1").tree({data:a}),e.equal($("#tree1").children().length,1,"number of children on level 0"),e.ok($("#tree1").children().is("ul.jqtree-tree"),"first element is ul.jqtree-tree"),e.equal($("#tree1 ul.jqtree-tree > li").length,2,"number of children on level 1"),e.ok($("#tree1 ul.jqtree-tree li:eq(0)").is("li.jqtree-folder.jqtree-closed"),"first child is li.jqtree-folder.jqtree-closed"),e.ok($("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element > a.jqtree-toggler").is("a.jqtree-toggler.jqtree-closed"),"button in first folder"),e.equal($("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element span.jqtree-title").text(),"node1")}),h("toggle",function(e){var t,n,r=e.async(),o=$("#tree1");o.tree({data:a}),o.on("tree.open",function(r){e.ok(!d(t),"node1 is open"),o.tree("toggle",n)}),o.on("tree.close",function(n){e.ok(d(t),"node1 is closed"),r()});var i=o.tree("getTree");n=i.children[0],t=o.find("ul.jqtree-tree li:eq(0)"),e.ok(d(t),"node1 is closed"),o.tree("toggle",n)}),h("click event",function(e){var t=0,n=$("#tree1");n.tree({data:a,selectable:!0});var r=n.find("ul.jqtree-tree li:first"),o=r.find("span:first");n.on("tree.click",function(t){e.equal(t.node.name,"node1")});var i=e.async();n.on("tree.select",function(r){t+=1,1==t?(e.equal(r.node.name,"node1"),e.equal(n.tree("getSelectedNode").name,"node1"),o.click()):(e.equal(r.node,null),e.equal(r.previous_node.name,"node1"),e.equal(n.tree("getSelectedNode"),!1),i())}),o.click()}),h("saveState",function(e){function t(e){o=e}function n(){return o}function r(){i.tree({data:a,saveState:!0,onSetStateFromStorage:t,onGetStateFromStorage:n,selectable:!0})}var o,i=$("#tree1");r();var l=i.tree("getTree");l.iterate(function(t){return e.ok(!t.is_open,"jqtree-closed"),!0}),i.tree("toggle",l.children[0]),e.ok(l.children[0].is_open,"node1 is_open"),i.tree("selectNode",l.children[1]),e.equal(i.tree("getSelectedNode").name,"node2","getSelectedNode (1)"),i.tree("destroy"),r(),l=i.tree("getTree"),e.ok(l.children[0].is_open,"node1 is_open"),e.ok(!l.children[1].is_open,"node2 is closed"),e.equal(i.tree("getSelectedNode").name,"node2","getSelectedNode (2)")}),h("getSelectedNode",function(e){var t=$("#tree1");t.tree({data:a,selectable:!0}),e.equal(t.tree("getSelectedNode"),!1,"getSelectedNode");var n=t.tree("getTree"),r=n.children[0];t.tree("selectNode",r),e.equal(t.tree("getSelectedNode").name,"node1","getSelectedNode")}),h("toJson",function(e){var t=$("#tree1");t.tree({data:a}),e.equal(t.tree("toJson"),'[{"name":"node1","id":123,"int_property":1,"str_property":"1","children":[{"name":"child1","id":125,"int_property":2},{"name":"child2","id":126}]},{"name":"node2","id":124,"int_property":3,"str_property":"3","children":[{"name":"child3","id":127}]}]');var n=t.tree("getTree");e.equal(n.children.length,2),e.ok(void 0!=n.children[0].parent,"parent"),e.ok($(n.children[0].element).is("li"),"element")}),h("loadData",function(e){var t=$("#tree1");t.tree({data:a,autoOpen:!0}),e.equal(t.find("> ul > li:first .jqtree-element:first > span").text(),"node1"),t.tree("loadData",l),e.equal(t.find("> ul > li:first .jqtree-element:first > span").text(),"main"),t.tree("loadData",a);var n=t.tree("getNodeByName","child3"),r=[{label:"c4",id:200},{label:"c5",id:201,children:[{label:"c6",id:202}]}];t.tree("loadData",r,n),e.equal(t.find("li:eq(0)").find(".jqtree-element:eq(0) span.jqtree-title").text(),"node1");var o=t.find("span:contains(child3)"),i=o.closest("li");e.equal(i.children("ul").children("li:eq(0)").find(".jqtree-element span.jqtree-title").text(),"c4"),e.ok(o.prev().is("a.jqtree-toggler"),"node 'child3' must have toggler button");var s=t.tree("getNodeByName","c5");t.tree("selectNode",s),e.equal(t.tree("getSelectedNode").name,"c5");var u=[{label:"c7"},{label:"c8"}];t.tree("loadData",u,n),e.equal(t.tree("getSelectedNode"),!1),t.tree("selectNode",t.tree("getNodeByName","c7")),e.equal(t.tree("getSelectedNode").name,"c7"),t.tree("loadData",["c9"],n),e.equal(t.tree("getSelectedNode"),!1),t.tree("selectNode",t.tree("getNodeByName","c9"));var c=t.tree("getNodeByName","child2");t.tree("loadData",["c10"],c),e.equal(t.tree("getSelectedNode").name,"c9")}),h("openNode and closeNode",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","node2");e.equal(n.name,"node2"),e.equal(n.is_open,void 0),t.tree("openNode",n,!1),e.equal(n.is_open,!0),e.equal(c($(n.element)),!0),t.tree("closeNode",n,!1),e.equal(n.is_open,!1),e.equal(d($(n.element)),!0);var r=t.tree("getNodeByName","node1"),o=t.tree("getNodeByName","child1");t.tree("appendNode","child1a",o),e.equal(r.is_open,void 0),t.tree("openNode",o,!1),e.equal(r.is_open,!0),e.equal(o.is_open,!0)}),h("openNode with callback with slide true",function(e){r(!0,!0,e)}),h("openNode with callback with slide false",function(e){r(!1,!0,e)}),h("openNode with callback with slide null",function(e){r(null,!0,e)}),h("openNode with callback without slide param",function(e){r(null,!1,e)}),h("selectNode",function(e){var t=$("#tree1");t.tree({data:a,selectable:!0});var n=t.tree("getTree").children[0],r=t.tree("getTree").children[1],o=r.children[0];e.equal(o.name,"child3"),e.equal(n.is_open,void 0),e.equal(r.is_open,void 0),e.equal(o.is_open,void 0),t.tree("selectNode",o,!0),e.equal(t.tree("getSelectedNode").name,"child3"),e.equal(n.is_open,void 0),e.equal(r.is_open,!0),e.equal(o.is_open,void 0),t.tree("selectNode",n),e.equal(t.tree("getSelectedNode").name,"node1"),e.equal(t.tree("isNodeSelected",n),!0),t.tree("selectNode",null),e.equal(t.tree("getSelectedNode"),!1),e.equal(t.tree("isNodeSelected",n),!1)}),h("selectNode when another node is selected",function(e){var t=$("#tree1");t.tree({data:a,selectable:!0});var n=t.tree("getTree").children[0],r=t.tree("getTree").children[1];t.tree("selectNode",r),e.equal(t.tree("getSelectedNode").name,"node2");var o=!1;t.on("tree.select",function(t){e.equal(t.deselected_node,r),o=!0}),t.tree("selectNode",n),e.equal(t.tree("getSelectedNode").name,"node1"),e.equal(t.tree("isNodeSelected",n),!0),e.ok(o)}),h("click toggler",function(e){var t=e.async(),n=$("#tree1");n.tree({data:a,selectable:!0});var r=n.find("li:eq(0)").find("> .jqtree-element > span.jqtree-title");e.equal(r.text(),"node1");var o=r.prev();e.ok(o.is("a.jqtree-toggler.jqtree-closed")),n.on("tree.open",function(t){e.equal(t.node.name,"node1"),o.click()}),n.on("tree.close",function(n){e.equal(n.node.name,"node1"),t()}),o.click()}),h("getNodeById",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","node2");e.equal(t.tree("getNodeById",124).name,"node2"),e.equal(t.tree("getNodeById",333),null),e.equal(t.tree("getNodeById","124").name,"node2"),t.tree("appendNode",{label:"abc",id:"234"}),e.equal(t.tree("getNodeById",234).name,"abc"),e.equal(t.tree("getNodeById","234").name,"abc");var r=[{label:"sub1",id:200,children:[{label:"sub2",id:201}]}];t.tree("loadData",r,n);t.tree("getTree");e.equal(t.tree("getNodeById",200).name,"sub1"),e.equal(t.tree("getNodeById",201).name,"sub2")}),h("autoOpen",function(e){function t(){var e=[];return n.find("li").each(function(){var t=$(this);if(t.is(".jqtree-folder")&&!t.is(".jqtree-closed")){var n=t.children(".jqtree-element").find("span").text();e.push(n)}}),e.join(";")}var n=$("#tree1"),r=[{label:"l1n1",children:["l2n1",{label:"l2n2",children:[{label:"l3n1",children:["l4n1"]}]}]},"l1n2"];n.tree({data:r,autoOpen:!1}),e.equal(t(),""),n.tree("destroy"),n.tree({data:r,autoOpen:!0}),e.equal(t(),"l1n1;l2n2;l3n1"),n.tree("destroy"),n.tree({data:r,autoOpen:1}),e.equal(t(),"l1n1;l2n2")}),h("onCreateLi",function(e){var t=$("#tree1");t.tree({data:a,onCreateLi:function(e,t){var n=t.children(".jqtree-element").find("span");n.html("_"+e.name+"_")}}),e.equal(t.find("span:eq(0)").text(),"_node1_")}),h("save state",function(e){var t=null;$.cookie=function(e,n,r){return"object"!=typeof r?t:void(t=n)},"undefined"!=typeof localStorage&&localStorage.setItem("my_tree",null);var n=$("#tree1");n.tree({data:a,selectable:!0,saveState:"my_tree"});var r=n.tree("getTree");e.equal(n.tree("getSelectedNode"),!1),n.tree("selectNode",r.children[0]),e.equal(n.tree("getSelectedNode").name,"node1"),n.tree("destroy"),n.tree({data:a,selectable:!0,saveState:"my_tree"}),e.equal(n.tree("getSelectedNode").name,"node1"),$.cookie=null}),h("generate hit areas",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeById",123),r=t.tree("testGenerateHitAreas",n),o=$.map(r,function(e){return e.node.name+" "+p.getName(e.position)});e.equal(o.join(";"),"node1 none;node2 inside;node2 after")}),h("removeNode",function(e){var t=$("#tree1");t.tree({data:a,selectable:!0});var n=t.tree("getNodeByName","child1");t.tree("selectNode",n),e.equal(t.tree("getSelectedNode").name,"child1"),t.tree("removeNode",n),e.equal(u(t),"node1 child2 node2 child3"),e.equal(t.tree("getSelectedNode"),!1),t.tree("loadData",a);var r=t.tree("getNodeByName","child3");t.tree("removeNode",r),e.equal(u(t),"node1 child1 child2 node2"),e.equal(t.tree("getSelectedNode"),!1),t.tree("loadData",a),n=t.tree("getNodeByName","child1");var o=t.tree("getNodeByName","node1");t.tree("selectNode",n),t.tree("removeNode",o),e.equal(t.tree("getSelectedNode"),!1),t.tree("loadData",l);var i=t.tree("getNodeByName","c1");t.tree("removeNode",i),e.equal(u(t),"main c2")}),h("appendNode",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","node1");t.tree("appendNode","child3",n),e.equal(u($(n.element)),"node1 child1 child2 child3");var r=t.tree("getNodeByName","child1");e.equal($(r.element).find("> .jqtree-element > .jqtree-toggler").length,0),t.tree("appendNode","child4",r),e.equal(u($(r.element)),"child1 child4"),e.equal($(r.element).find("> .jqtree-element > .jqtree-toggler").length,1)}),h("prependNode",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","node1");t.tree("prependNode","child0",n),e.equal(u($(n.element)),"node1 child0 child1 child2")}),h("init event for local data",function(e){var t=e.async(),n=$("#tree1");n.on("tree.init",function(){e.equal(n.tree("getNodeByName","node2").name,"node2"),t()}),n.tree({data:a})}),h("init event for ajax",function(e){var t=e.async(),n=$("#tree1");o({url:"/tree/",responseText:a,logging:!1}),n.on("tree.init",function(){e.equal(n.tree("getNodeByName","node2").name,"node2"),t()}),n.tree({dataUrl:"/tree/"})}),h("updateNode",function(e){var t=$("#tree1");t.tree({data:a}),e.equal(u(t),"node1 child1 child2 node2 child3");var n=t.tree("getNodeByName","node2");t.tree("updateNode",n,"CHANGED"),e.equal(u(t),"node1 child1 child2 CHANGED child3"),e.equal(n.name,"CHANGED"),t.tree("updateNode",n,{name:"xyz",tag1:"abc"}),e.equal(u(t),"node1 child1 child2 xyz child3"),e.equal(n.name,"xyz"),e.equal(n.tag1,"abc"),e.equal(n.id,124),t.tree("updateNode",n,{id:555}),e.equal(n.id,555),e.equal(n.name,"xyz");var r=t.tree("getNodeById",555);e.equal(r.name,"xyz");var o=t.tree("getNodeById",124);e.equal(o,void 0);var i=t.tree("getNodeByName","child1");t.tree("updateNode",i,"child1a"),e.equal(u(t),"node1 child1a child2 xyz child3"),t.tree("selectNode",i),t.tree("updateNode",i,"child1b"),e.ok($(i.element).hasClass("jqtree-selected")),t.tree("updateNode",i,{id:i.id,name:"child1",children:[{id:5,name:"child1-1"}]}),e.equal(u(t),"node1 child1 child1-1 child2 xyz child3"),t.tree("updateNode",i,{id:i.id,name:"child1",children:[]}),e.equal(u(t),"node1 child1 child2 xyz child3")}),h("moveNode",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","child1"),r=t.tree("getNodeByName","child2"),o=t.tree("getNodeByName","node1"),i=t.tree("getNodeByName","node2");t.tree("moveNode",n,i,"after"),e.equal(u(t),"node1 child2 node2 child3 child1"),t.tree("moveNode",o,r,"inside")}),h("load on demand",function(e){function t(t){e.equal(t.name,"node1"),e.equal(u(r),"node1 child1","4"),n()}var n=e.async(),r=$("#tree1");r.tree({data:[{id:1,label:"node1",load_on_demand:!0}],dataUrl:"/tree/"}),o({url:"*",response:function(t){e.equal(t.url,"/tree/","2"),e.deepEqual(t.data,{node:1},"3"),this.responseText=[{id:2,label:"child1"}]},logging:!1});var i=r.tree("getNodeByName","node1");e.equal(u(r),"node1","1"),r.tree("openNode",i,t)}),h("addNodeAfter",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","node1");t.tree("addNodeAfter","node3",n),e.equal(u(t),"node1 child1 child2 node3 node2 child3")}),h("addNodeBefore",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","node1");t.tree("addNodeBefore","node3",n);e.equal(u(t),"node3 node1 child1 child2 node2 child3")}),h("addParentNode",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","child3");t.tree("addParentNode","node3",n),e.equal(u(t),"node1 child1 child2 node2 node3 child3")}),h("mouse events",function(e){function t(e){var t=n.tree("getNodeByName",e),r=$(t.element);return $(r.find(".jqtree-title"))}var n=$("#tree1");n.tree({data:a,dragAndDrop:!0,autoOpen:!0}),n.tree("setMouseDelay",0);var r=t("node1"),o=t("child3");r.trigger($.Event("mousedown",{which:1}));var i=o.offset();n.trigger($.Event("mousemove",{pageX:i.left,pageY:i.top})),n.trigger("mouseup"),e.equal(u(n),"node2 child3 node1 child1 child2")}),h("multiple select",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","child1"),r=t.tree("getNodeByName","child2");t.tree("addToSelection",n),t.tree("addToSelection",r);var o=t.tree("getSelectedNodes");e.equal(s(o),"child1 child2")}),h("keyboard",function(e){function t(e){n.trigger($.Event("keydown",{which:e}))}var n=$("#tree1");n.tree({data:a});var r=n.tree("getNodeByName","node1");n.tree("selectNode",r),e.equal(r.is_open,void 0),t(40),e.equal(n.tree("getSelectedNode").name,"node2"),t(38),e.equal(n.tree("getSelectedNode").name,"node1"),t(39),e.equal(r.is_open,!0),e.equal(n.tree("getSelectedNode").name,"node1"),n.tree("selectNode",n.tree("getNodeByName","child3")),t(38),e.equal(n.tree("getSelectedNode").name,"node2"),t(38),e.equal(n.tree("getSelectedNode").name,"child2"),n.tree("selectNode",r),t(37),e.equal(r.is_open,!1),e.equal(n.tree("getSelectedNode").name,"node1")}),h("getNodesByProperty",function(e){var t=$("#tree1");t.tree({data:a});var n=t.tree("getNodeByName","node2");e.equal(t.tree("getNodesByProperty","int_property",1)[0].name,"node1"),e.equal(t.tree("getNodesByProperty","int_property",123).length,0),e.equal(t.tree("getNodesByProperty","str_property","1")[0].name,"node1"),t.tree("appendNode",{label:"abc",id:"234",str_property:"111",int_property:111}),e.equal(t.tree("getNodesByProperty","int_property",111)[0].name,"abc"),e.equal(t.tree("getNodesByProperty","str_property","111")[0].name,"abc");var r=[{label:"sub1",id:200,int_property:222,children:[{label:"sub2",id:201,int_property:444}]}];t.tree("loadData",r,n);t.tree("getTree");e.equal(t.tree("getNodesByProperty","int_property",222)[0].name,"sub1"),e.equal(t.tree("getNodesByProperty","int_property",444)[0].name,"sub2")}),h("dataUrl extra options",function(e){var t=e.async(),n=$("#tree1");o({url:"*",response:function(n){e.equal(n.url,"/tree2/"),e.deepEqual(n.headers,{abc:"def"}),t()},logging:!1}),n.tree({dataUrl:{url:"/tree2/",headers:{abc:"def"}}})}),h("dataUrl is function",function(e){var t=e.async(),n=$("#tree1");o({url:"*",response:function(n){e.equal(n.url,"/tree3/"),e.deepEqual(n.headers,{abc:"def"}),t()},logging:!1}),n.tree({dataUrl:function(e){return{url:"/tree3/",headers:{abc:"def"}}}})}),h("getNodeByHtmlElement",function(e){var t=$("#tree1");t.tree({data:a});var n=$(".jqtree-title"),r=t.tree("getNodeByHtmlElement",n);e.equal(r.name,"node1"),r=t.tree("getNodeByHtmlElement",n[0]),e.equal(r.name,"node1")}),h("onLoadFailed",function(e){function t(t){e.equal(t.responseText,"test error"),n()}o({url:"/tree/",status:500,responseText:"test error",logging:!1});var n=e.async(),r=$("#tree1");r.tree({dataUrl:"/tree/",onLoadFailed:t})})},function(e,t,n){var r=n(2),o=r.example_data,i=r.formatNodes,a=r.getTreeVariables(),l=a.Node,s=a.Position,u=QUnit.test;QUnit.module("Tree"),u("constructor",function(e){var t=new l("n1");e.equal(t.name,"n1"),e.equal(t.children.length,0),e.equal(t.parent,null),t=new l({label:"n2",id:123,parent:"abc",children:["c"],url:"/"}),e.equal(t.name,"n2"),e.equal(t.id,123),e.equal(t.url,"/"),e.equal(t.label,void 0),e.equal(t.children.length,0),e.equal(t.parent,null)}),u("create tree from data",function(e){function t(t){e.equal(i(t.children),"node1 node2","nodes on level 1"),e.equal(i(t.children[0].children),"child1 child2","children of node1"),e.equal(i(t.children[1].children),"child3","children of node2"),e.equal(t.children[0].id,123,"id")}var n=new l(null,!0);n.loadFromData(o),t(n);var r=[{label:"node1",id:123,children:["child1","child2"]},{label:"node2",id:124,children:["child3"]}],n=new l(null,!0);n.loadFromData(r),t(n)}),u("addChild",function(e){var t=new l("tree1",!0);t.addChild(new l("abc")),t.addChild(new l("def")),e.equal(i(t.children),"abc def","children");var n=t.children[0];e.equal(n.parent.name,"tree1","parent of node")}),u("addChildAtPosition",function(e){var t=new l(null,!0);t.addChildAtPosition(new l("abc"),0),t.addChildAtPosition(new l("ghi"),2),t.addChildAtPosition(new l("def"),1),t.addChildAtPosition(new l("123"),0),e.equal(i(t.children),"123 abc def ghi","children")}),u("removeChild",function(e){var t=new l(null,!0),n=new l({label:"abc",id:1}),r=new l({label:"def",id:2}),o=new l({label:"ghi",id:3});t.addChild(n),t.addChild(r),t.addChild(o);var a=new l({label:"jkl",id:4});r.addChild(a),e.equal(i(t.children),"abc def ghi","children"),e.equal(t.id_mapping[2].name,"def"),e.equal(t.id_mapping[4].name,"jkl"),t.removeChild(r),e.equal(i(t.children),"abc ghi","children"),e.equal(t.id_mapping[2],null),e.equal(t.id_mapping[4],null),t.removeChild(o),e.equal(i(t.children),"abc","children"),t.removeChild(n),e.equal(i(t.children),"","children")}),u("getChildIndex",function(e){var t=new l(null,!0),n=new l("abc"),r=new l("def"),o=new l("ghi");t.addChild(n),t.addChild(r),t.addChild(o),e.equal(t.getChildIndex(r),1),e.equal(t.getChildIndex(new l("xyz")),-1)}),u("hasChildren",function(e){var t=new l(null,!0);e.equal(t.hasChildren(),!1,"tree without children"),t.addChild(new l("abc")),e.equal(t.hasChildren(),!0,"tree has children")}),u("iterate",function(e){var t=new l(null,!0);t.loadFromData(o);var n=[];t.iterate(function(e,t){return n.push(e),!0}),e.equal(i(n),"node1 child1 child2 node2 child3","all nodes"),n=[],t.iterate(function(e,t){return n.push(e),!1}),e.equal(i(n),"node1 node2","nodes on first level");var r=t.getNodeById(124).children[0];r.addChild(new l("child4")),n=[],t.iterate(function(e,t){return n.push(e.name+" "+t),!0}),e.equal(n.join(","),"node1 0,child1 1,child2 1,node2 0,child3 1,child4 2")}),u("moveNode",function(e){var t=new l(null,!0);t.loadFromData(o);var n=t.children[0],r=t.children[1],a=n.children[0],u=n.children[1];e.equal(r.name,"node2","node2 name"),e.equal(u.name,"child2","child2 name"),t.moveNode(u,r,s.AFTER),e.equal(i(t.children),"node1 node2 child2","tree nodes at first level"),e.equal(i(n.children),"child1","node1 children"),t.moveNode(a,r,s.INSIDE),e.equal(i(r.children),"child1 child3","node2 children"),e.equal(i(n.children),"","node1 has no children"),t.moveNode(u,a,s.BEFORE),e.equal(i(r.children),"child2 child1 child3","node2 children"),e.equal(i(t.children),"node1 node2","tree nodes at first level")}),u("initFromData",function(e){var t={label:"main",children:["c1",{label:"c2",id:201}]},n=new l(null,!0);n.initFromData(t),e.equal(n.name,"main"),e.equal(i(n.children),"c1 c2","children"),e.equal(n.children[1].id,201)}),u("getData",function(e){var t=new l(null,!0);e.deepEqual(t.getData(),[]),t.loadFromData([{label:"n1",children:[{label:"c1"}]}]),e.deepEqual(t.getData(),[{name:"n1",children:[{name:"c1"}]}]);var n=t.getNodeByName("n1");e.deepEqual(n.getData(!0),[{name:"n1",children:[{name:"c1"}]}])}),u("addAfter",function(e){var t=new l(null,!0);t.loadFromData(o),e.equal(i(t.children),"node1 node2");var n=t.getNodeByName("node2");n.addAfter("node_b"),e.equal(i(t.children),"node1 node2 node_b");var r=t.getNodeByName("node_b");e.equal(r.name,"node_b");var a=t.getNodeByName("node1");a.addAfter("node_a"),e.equal(i(t.children),"node1 node_a node2 node_b"),r.addAfter({label:"node_c",id:789});var s=t.getNodeByName("node_c");e.equal(s.id,789),e.equal(i(t.children),"node1 node_a node2 node_b node_c"),e.equal(t.addAfter("node_x"),null)}),u("addBefore",function(e){var t=new l(null,!0);t.loadFromData(o);var n=t.getNodeByName("node1");n.addBefore("node0"),e.equal(i(t.children),"node0 node1 node2"),e.equal(t.addBefore("x"),null)}),u("addParent",function(e){var t=new l(null,!0);t.loadFromData(o);var n=t.getNodeByName("node1");n.addParent("root");var r=t.getNodeByName("root");e.equal(i(r.children),"node1 node2"),e.equal(t.addParent("x"),null)}),u("remove",function(e){var t=new l(null,!0);t.loadFromData(o);var n=t.getNodeByName("child1"),r=t.getNodeByName("node1");e.equal(i(r.children),"child1 child2"),e.equal(n.parent,r),n.remove(),e.equal(i(r.children),"child2"),e.equal(n.parent,null)}),u("append",function(e){var t=new l(null,!0);t.loadFromData(o);var n=t.getNodeByName("node1");n.append("child3"),e.equal(i(n.children),"child1 child2 child3"),n.append({name:"child4",children:[{name:"child5"}]}),e.equal(i(n.children),"child1 child2 child3 child4");var r=n.getNodeByName("child4");e.equal(i(r.children),"child5")}),u("prepend",function(e){var t=new l(null,!0);t.loadFromData(o);var n=t.getNodeByName("node1");n.prepend("child0"),e.equal(i(n.children),"child0 child1 child2"),n.prepend({name:"child3",children:[{name:"child4"}]}),e.equal(i(n.children),"child3 child0 child1 child2");var r=n.getNodeByName("child3");e.equal(i(r.children),"child4")}),u("getNodeById",function(e){var t=new l(null,!0);t.loadFromData(o);var n=t.getNodeById(124);e.equal(n.name,"node2"),n.remove(),e.equal(t.getNodeById(124),null);var r=t.getNodeByName("child2");r.append({id:456,label:"new node"}),n=t.getNodeById(456),e.equal(n.name,"new node")}),u("getLevel",function(e){var t=new l(null,!0);t.loadFromData(o),e.equal(t.getNodeByName("node1").getLevel(),1),e.equal(t.getNodeByName("child1").getLevel(),2)}),u("loadFromData and id mapping",function(e){var t=new l(null,!0);e.equal(t.getNodeById(999),null),t.loadFromData(o),e.equal(t.getNodeById(124).name,"node2");var n=t.getNodeById(126);n.addChild(new l({label:"child4",id:128})),n.addChild(new l({label:"child5",id:129})),n.loadFromData(["abc","def"]),e.equal(t.getNodeById(128),null),e.equal(n.children.length,2),e.equal(n.children[0].name,"abc")}),u("removeChildren",function(e){var t=new l(null,!0);t.loadFromData(o);var n=t.getNodeById(126);e.equal(n.name,"child2"),n.addChild(new l({label:"child4",id:128})),n.addChild(new l({label:"child5",id:129})),e.equal(t.getNodeById(128).name,"child4"),n.removeChildren(),e.equal(t.getNodeById(128),null),e.equal(n.children.length,0)}),u("node with id 0",function(e){var t=new l(null,!0);t.loadFromData([{id:0,label:"mynode"}]);var n=t.getNodeById(0);e.equal(n.name,"mynode"),n.remove(),e.equal(t.getNodeById(0),void 0)}),u("getPreviousSibling",function(e){var t=new l(null,!0);t.loadFromData(o),e.equal(t.getNodeByName("child2").getPreviousSibling().name,"child1"),e.equal(t.getPreviousSibling(),null),e.equal(t.getNodeByName("child1").getPreviousSibling(),null)}),u("getNextSibling",function(e){var t=new l(null,!0);t.loadFromData(o),e.equal(t.getNodeByName("node1").getNextSibling().name,"node2"),e.equal(t.getNodeByName("node2").getNextSibling(),null),e.equal(t.getNextSibling(),null)}),u("getNodesByProperty",function(e){var t=new l(null,!0);t.loadFromData(o),nodes=t.getNodesByProperty("name","child1"),e.equal(nodes.length,1),e.equal(nodes[0].name,"child1")}),u("getNodeByCallback",function(e){var t=new l(null,!0);t.loadFromData(o),node=t.getNodeByCallback(function(e){return"child1"==e.name}),e.equal(node.name,"child1")})},function(e,t,n){var r=n(2),o=r.getTreeVariables(),i=o.Position,a=o.util,l=QUnit.test;QUnit.module("util"),l("indexOf",function(e){var t=a._indexOf,n=a.indexOf;e.equal(n([3,2,1],1),2),e.equal(t([3,2,1],1),2),e.equal(n([4,5,6],1),-1),e.equal(t([4,5,6],1),-1)}),l("Position.getName",function(e){e.equal(i.getName(i.BEFORE),"before"),e.equal(i.getName(i.AFTER),"after"),e.equal(i.getName(i.INSIDE),"inside"),e.equal(i.getName(i.NONE),"none")}),l("Position.nameToIndex",function(e){e.equal(i.nameToIndex("before"),i.BEFORE),
-e.equal(i.nameToIndex("after"),i.AFTER),e.equal(i.nameToIndex(""),0)})},,function(e,t,n){e.exports=n(7)}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.Position = {
+    getName: function (position) {
+        return exports.Position.strings[position - 1];
+    },
+    nameToIndex: function (name) {
+        for (var i = 1; i <= exports.Position.strings.length; i++) {
+            if (exports.Position.strings[i - 1] === name) {
+                return i;
+            }
+        }
+        return 0;
+    },
+    BEFORE: 1,
+    AFTER: 2,
+    INSIDE: 3,
+    NONE: 4,
+    strings: ["before", "after", "inside", "none"]
+};
+var Node = (function () {
+    function Node(o, is_root, node_class) {
+        if (is_root === void 0) { is_root = false; }
+        if (node_class === void 0) { node_class = Node; }
+        this.name = "";
+        this.setData(o);
+        this.children = [];
+        this.parent = null;
+        if (is_root) {
+            this.id_mapping = {};
+            this.tree = this;
+            this.node_class = node_class;
+        }
+    }
+    /*
+    Set the data of this node.
+
+    setData(string): set the name of the node
+    setdata(object): set attributes of the node
+
+    Examples:
+        setdata('node1')
+
+        setData({ name: 'node1', id: 1});
+
+        setData({ name: 'node2', id: 2, color: 'green'});
+
+    * This is an internal function; it is not in the docs
+    * Does not remove existing node values
+    */
+    Node.prototype.setData = function (o) {
+        var _this = this;
+        var setName = function (name) {
+            if (name != null) {
+                _this.name = name;
+            }
+        };
+        if (!o) {
+            return;
+        }
+        else if (typeof o !== "object") {
+            setName(o);
+        }
+        else {
+            for (var key in o) {
+                if (o.hasOwnProperty(key)) {
+                    var value = o[key];
+                    if (key === "label") {
+                        // You can use the 'label' key instead of 'name'; this is a legacy feature
+                        setName(value);
+                    }
+                    else if (key !== "children") {
+                        // You can't update the children using this function
+                        this[key] = value;
+                    }
+                }
+            }
+        }
+    };
+    /*
+    Create tree from data.
+
+    Structure of data is:
+    [
+        {
+            label: 'node1',
+            children: [
+                { label: 'child1' },
+                { label: 'child2' }
+            ]
+        },
+        {
+            label: 'node2'
+        }
+    ]
+    */
+    Node.prototype.loadFromData = function (data) {
+        this.removeChildren();
+        for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
+            var o = data_1[_i];
+            var node = new this.tree.node_class(o);
+            this.addChild(node);
+            if (typeof o === "object" && o["children"]) {
+                node.loadFromData(o["children"]);
+            }
+        }
+    };
+    /*
+    Add child.
+
+    tree.addChild(
+        new Node('child1')
+    );
+    */
+    Node.prototype.addChild = function (node) {
+        this.children.push(node);
+        node._setParent(this);
+    };
+    /*
+    Add child at position. Index starts at 0.
+
+    tree.addChildAtPosition(
+        new Node('abc'),
+        1
+    );
+    */
+    Node.prototype.addChildAtPosition = function (node, index) {
+        this.children.splice(index, 0, node);
+        node._setParent(this);
+    };
+    /*
+    Remove child. This also removes the children of the node.
+
+    tree.removeChild(tree.children[0]);
+    */
+    Node.prototype.removeChild = function (node) {
+        // remove children from the index
+        node.removeChildren();
+        this._removeChild(node);
+    };
+    /*
+    Get child index.
+
+    var index = getChildIndex(node);
+    */
+    Node.prototype.getChildIndex = function (node) {
+        return $.inArray(node, this.children);
+    };
+    /*
+    Does the tree have children?
+
+    if (tree.hasChildren()) {
+        //
+    }
+    */
+    Node.prototype.hasChildren = function () {
+        return this.children.length !== 0;
+    };
+    Node.prototype.isFolder = function () {
+        return this.hasChildren() || this.load_on_demand;
+    };
+    /*
+    Iterate over all the nodes in the tree.
+
+    Calls callback with (node, level).
+
+    The callback must return true to continue the iteration on current node.
+
+    tree.iterate(
+        function(node, level) {
+           console.log(node.name);
+
+           // stop iteration after level 2
+           return (level <= 2);
+        }
+    );
+
+    */
+    Node.prototype.iterate = function (callback) {
+        var _iterate = function (node, level) {
+            if (node.children) {
+                for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+                    var child = _a[_i];
+                    var result = callback(child, level);
+                    if (result && child.hasChildren()) {
+                        _iterate(child, level + 1);
+                    }
+                }
+            }
+        };
+        _iterate(this, 0);
+    };
+    /*
+    Move node relative to another node.
+
+    Argument position: Position.BEFORE, Position.AFTER or Position.Inside
+
+    // move node1 after node2
+    tree.moveNode(node1, node2, Position.AFTER);
+    */
+    Node.prototype.moveNode = function (moved_node, target_node, position) {
+        if (moved_node.isParentOf(target_node)) {
+            // Node is parent of target node. This is an illegal move
+            return;
+        }
+        moved_node.parent._removeChild(moved_node);
+        if (position === exports.Position.AFTER) {
+            target_node.parent.addChildAtPosition(moved_node, target_node.parent.getChildIndex(target_node) + 1);
+        }
+        else if (position === exports.Position.BEFORE) {
+            target_node.parent.addChildAtPosition(moved_node, target_node.parent.getChildIndex(target_node));
+        }
+        else if (position === exports.Position.INSIDE) {
+            // move inside as first child
+            target_node.addChildAtPosition(moved_node, 0);
+        }
+    };
+    /*
+    Get the tree as data.
+    */
+    Node.prototype.getData = function (include_parent) {
+        if (include_parent === void 0) { include_parent = false; }
+        function getDataFromNodes(nodes) {
+            return nodes.map(function (node) {
+                var tmp_node = {};
+                for (var k in node) {
+                    if (["parent", "children", "element", "tree"].indexOf(k) === -1 &&
+                        Object.prototype.hasOwnProperty.call(node, k)) {
+                        var v = node[k];
+                        tmp_node[k] = v;
+                    }
+                }
+                if (node.hasChildren()) {
+                    tmp_node["children"] = getDataFromNodes(node.children);
+                }
+                return tmp_node;
+            });
+        }
+        if (include_parent) {
+            return getDataFromNodes([this]);
+        }
+        else {
+            return getDataFromNodes(this.children);
+        }
+    };
+    Node.prototype.getNodeByName = function (name) {
+        return this.getNodeByCallback(function (node) { return node.name === name; });
+    };
+    Node.prototype.getNodeByCallback = function (callback) {
+        var result = null;
+        this.iterate(function (node) {
+            if (callback(node)) {
+                result = node;
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+        return result;
+    };
+    Node.prototype.addAfter = function (node_info) {
+        if (!this.parent) {
+            return null;
+        }
+        else {
+            var node = new this.tree.node_class(node_info);
+            var child_index = this.parent.getChildIndex(this);
+            this.parent.addChildAtPosition(node, child_index + 1);
+            if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
+                node.loadFromData(node_info["children"]);
+            }
+            return node;
+        }
+    };
+    Node.prototype.addBefore = function (node_info) {
+        if (!this.parent) {
+            return null;
+        }
+        else {
+            var node = new this.tree.node_class(node_info);
+            var child_index = this.parent.getChildIndex(this);
+            this.parent.addChildAtPosition(node, child_index);
+            if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
+                node.loadFromData(node_info["children"]);
+            }
+            return node;
+        }
+    };
+    Node.prototype.addParent = function (node_info) {
+        if (!this.parent) {
+            return null;
+        }
+        else {
+            var new_parent = new this.tree.node_class(node_info);
+            new_parent._setParent(this.tree);
+            var original_parent = this.parent;
+            for (var _i = 0, _a = original_parent.children; _i < _a.length; _i++) {
+                var child = _a[_i];
+                new_parent.addChild(child);
+            }
+            original_parent.children = [];
+            original_parent.addChild(new_parent);
+            return new_parent;
+        }
+    };
+    Node.prototype.remove = function () {
+        if (this.parent) {
+            this.parent.removeChild(this);
+            this.parent = null;
+        }
+    };
+    Node.prototype.append = function (node_info) {
+        var node = new this.tree.node_class(node_info);
+        this.addChild(node);
+        if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
+            node.loadFromData(node_info["children"]);
+        }
+        return node;
+    };
+    Node.prototype.prepend = function (node_info) {
+        var node = new this.tree.node_class(node_info);
+        this.addChildAtPosition(node, 0);
+        if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
+            node.loadFromData(node_info["children"]);
+        }
+        return node;
+    };
+    Node.prototype.isParentOf = function (node) {
+        var parent = node.parent;
+        while (parent) {
+            if (parent === this) {
+                return true;
+            }
+            parent = parent.parent;
+        }
+        return false;
+    };
+    Node.prototype.getLevel = function () {
+        var level = 0;
+        var node = this;
+        while (node.parent) {
+            level += 1;
+            node = node.parent;
+        }
+        return level;
+    };
+    Node.prototype.getNodeById = function (node_id) {
+        return this.id_mapping[node_id];
+    };
+    Node.prototype.addNodeToIndex = function (node) {
+        if (node.id != null) {
+            this.id_mapping[node.id] = node;
+        }
+    };
+    Node.prototype.removeNodeFromIndex = function (node) {
+        if (node.id != null) {
+            delete this.id_mapping[node.id];
+        }
+    };
+    Node.prototype.removeChildren = function () {
+        var _this = this;
+        this.iterate(function (child) {
+            _this.tree.removeNodeFromIndex(child);
+            return true;
+        });
+        this.children = [];
+    };
+    Node.prototype.getPreviousSibling = function () {
+        if (!this.parent) {
+            return null;
+        }
+        else {
+            var previous_index = this.parent.getChildIndex(this) - 1;
+            if (previous_index >= 0) {
+                return this.parent.children[previous_index];
+            }
+            else {
+                return null;
+            }
+        }
+    };
+    Node.prototype.getNextSibling = function () {
+        if (!this.parent) {
+            return null;
+        }
+        else {
+            var next_index = this.parent.getChildIndex(this) + 1;
+            if (next_index < this.parent.children.length) {
+                return this.parent.children[next_index];
+            }
+            else {
+                return null;
+            }
+        }
+    };
+    Node.prototype.getNodesByProperty = function (key, value) {
+        return this.filter(function (node) { return node[key] === value; });
+    };
+    Node.prototype.filter = function (f) {
+        var result = [];
+        this.iterate(function (node) {
+            if (f(node)) {
+                result.push(node);
+            }
+            return true;
+        });
+        return result;
+    };
+    Node.prototype.getNextNode = function (include_children) {
+        if (include_children === void 0) { include_children = true; }
+        if (include_children && this.hasChildren() && this.is_open) {
+            // First child
+            return this.children[0];
+        }
+        else {
+            if (!this.parent) {
+                return null;
+            }
+            else {
+                var next_sibling = this.getNextSibling();
+                if (next_sibling) {
+                    // Next sibling
+                    return next_sibling;
+                }
+                else {
+                    // Next node of parent
+                    return this.parent.getNextNode(false);
+                }
+            }
+        }
+    };
+    Node.prototype.getPreviousNode = function () {
+        if (!this.parent) {
+            return null;
+        }
+        else {
+            var previous_sibling = this.getPreviousSibling();
+            if (previous_sibling) {
+                if (!previous_sibling.hasChildren() || !previous_sibling.is_open) {
+                    // Previous sibling
+                    return previous_sibling;
+                }
+                else {
+                    // Last child of previous sibling
+                    return previous_sibling.getLastChild();
+                }
+            }
+            else {
+                return this.getParent();
+            }
+        }
+    };
+    Node.prototype.getParent = function () {
+        // Return parent except if it is the root node
+        if (!this.parent) {
+            return null;
+        }
+        else if (!this.parent.parent) {
+            // Root node -> null
+            return null;
+        }
+        else {
+            return this.parent;
+        }
+    };
+    Node.prototype.getLastChild = function () {
+        if (!this.hasChildren()) {
+            return null;
+        }
+        else {
+            var last_child = this.children[this.children.length - 1];
+            if (!last_child.hasChildren() || !last_child.is_open) {
+                return last_child;
+            }
+            else {
+                return last_child.getLastChild();
+            }
+        }
+    };
+    // Init Node from data without making it the root of the tree
+    Node.prototype.initFromData = function (data) {
+        var _this = this;
+        var addNode = function (node_data) {
+            _this.setData(node_data);
+            if (node_data["children"]) {
+                addChildren(node_data["children"]);
+            }
+        };
+        var addChildren = function (children_data) {
+            for (var _i = 0, children_data_1 = children_data; _i < children_data_1.length; _i++) {
+                var child = children_data_1[_i];
+                var node = new _this.tree.node_class("");
+                node.initFromData(child);
+                _this.addChild(node);
+            }
+        };
+        addNode(data);
+    };
+    Node.prototype._setParent = function (parent) {
+        this.parent = parent;
+        this.tree = parent.tree;
+        this.tree.addNodeToIndex(this);
+    };
+    Node.prototype._removeChild = function (node) {
+        this.children.splice(this.getChildIndex(node), 1);
+        this.tree.removeNodeFromIndex(node);
+    };
+    return Node;
+}());
+exports.Node = Node;
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+function isInt(n) {
+    return typeof n === "number" && n % 1 === 0;
+}
+exports.isInt = isInt;
+function isFunction(v) {
+    return typeof v === "function";
+}
+exports.isFunction = isFunction;
+// Escape a string for HTML interpolation; copied from underscore js
+function html_escape(text) {
+    return ("" + text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#x27;")
+        .replace(/\//g, "&#x2F;");
+}
+exports.html_escape = html_escape;
+function getBoolString(value) {
+    if (value) {
+        return "true";
+    }
+    else {
+        return "false";
+    }
+}
+exports.getBoolString = getBoolString;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var SimpleWidget = (function () {
+    function SimpleWidget(el, options) {
+        this.$el = $(el);
+        var defaults = this.constructor.defaults;
+        this.options = $.extend({}, defaults, options);
+    }
+    SimpleWidget.register = function (widget_class, widget_name) {
+        var getDataKey = function () { return "simple_widget_" + widget_name; };
+        function getWidgetData(el, data_key) {
+            var widget = $.data(el, data_key);
+            if (widget && (widget instanceof SimpleWidget)) {
+                return widget;
+            }
+            else {
+                return null;
+            }
+        }
+        function createWidget($el, options) {
+            var data_key = getDataKey();
+            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+                var el = _a[_i];
+                var existing_widget = getWidgetData(el, data_key);
+                if (!existing_widget) {
+                    var widget = new widget_class(el, options);
+                    if (!$.data(el, data_key)) {
+                        $.data(el, data_key, widget);
+                    }
+                    // Call init after setting data, so we can call methods
+                    widget._init();
+                }
+            }
+            return $el;
+        }
+        function destroyWidget($el) {
+            var data_key = getDataKey();
+            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+                var el = _a[_i];
+                var widget = getWidgetData(el, data_key);
+                if (widget) {
+                    widget.destroy();
+                }
+                $.removeData(el, data_key);
+            }
+        }
+        function callFunction($el, function_name, args) {
+            var result = null;
+            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+                var el = _a[_i];
+                var widget = $.data(el, getDataKey());
+                if (widget && (widget instanceof SimpleWidget)) {
+                    var widget_function = widget[function_name];
+                    if (widget_function && (typeof widget_function === "function")) {
+                        result = widget_function.apply(widget, args);
+                    }
+                }
+            }
+            return result;
+        }
+        // tslint:disable-next-line: only-arrow-functions
+        $.fn[widget_name] = function (argument1) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            var $el = this;
+            if (argument1 === undefined || typeof argument1 === "object") {
+                var options = argument1;
+                return createWidget($el, options);
+            }
+            else if (typeof argument1 === "string" && argument1[0] !== "_") {
+                var function_name = argument1;
+                if (function_name === "destroy") {
+                    return destroyWidget($el);
+                }
+                else if (function_name === "get_widget_class") {
+                    return widget_class;
+                }
+                else {
+                    return callFunction($el, function_name, args);
+                }
+            }
+        };
+    };
+    SimpleWidget.prototype.destroy = function () {
+        this._deinit();
+    };
+    SimpleWidget.prototype._init = function () {
+        //
+    };
+    SimpleWidget.prototype._deinit = function () {
+        //
+    };
+    return SimpleWidget;
+}());
+SimpleWidget.defaults = {};
+exports.__esModule = true;
+exports["default"] = SimpleWidget;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var version_1 = __webpack_require__(12);
+var drag_and_drop_handler_1 = __webpack_require__(4);
+var elements_renderer_1 = __webpack_require__(5);
+var key_handler_1 = __webpack_require__(6);
+var mouse_widget_1 = __webpack_require__(7);
+var save_state_handler_1 = __webpack_require__(9);
+var scroll_handler_1 = __webpack_require__(10);
+var select_node_handler_1 = __webpack_require__(11);
+var simple_widget_1 = __webpack_require__(2);
+var node_1 = __webpack_require__(0);
+var util_1 = __webpack_require__(1);
+var node_element_1 = __webpack_require__(8);
+var JqTreeWidget = (function (_super) {
+    __extends(JqTreeWidget, _super);
+    function JqTreeWidget() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    JqTreeWidget.prototype.toggle = function (node, slide_param) {
+        if (slide_param === void 0) { slide_param = null; }
+        var slide;
+        if (slide_param == null) {
+            slide = this.options.slide;
+        }
+        else {
+            slide = slide_param;
+        }
+        if (node.is_open) {
+            this.closeNode(node, slide);
+        }
+        else {
+            this.openNode(node, slide);
+        }
+        return this.element;
+    };
+    JqTreeWidget.prototype.getTree = function () {
+        return this.tree;
+    };
+    JqTreeWidget.prototype.selectNode = function (node) {
+        this._selectNode(node, false);
+        return this.element;
+    };
+    JqTreeWidget.prototype.getSelectedNode = function () {
+        if (this.select_node_handler) {
+            return this.select_node_handler.getSelectedNode();
+        }
+        else {
+            return false;
+        }
+    };
+    JqTreeWidget.prototype.toJson = function () {
+        return JSON.stringify(this.tree.getData());
+    };
+    JqTreeWidget.prototype.loadData = function (data, parent_node) {
+        this._loadData(data, parent_node);
+        return this.element;
+    };
+    /*
+    signatures:
+    - loadDataFromUrl(url, parent_node=null, on_finished=null)
+        loadDataFromUrl('/my_data');
+        loadDataFromUrl('/my_data', node1);
+        loadDataFromUrl('/my_data', node1, function() { console.log('finished'); });
+        loadDataFromUrl('/my_data', null, function() { console.log('finished'); });
+
+    - loadDataFromUrl(parent_node=null, on_finished=null)
+        loadDataFromUrl();
+        loadDataFromUrl(node1);
+        loadDataFromUrl(null, function() { console.log('finished'); });
+        loadDataFromUrl(node1, function() { console.log('finished'); });
+    */
+    JqTreeWidget.prototype.loadDataFromUrl = function (param1, param2, param3) {
+        if ($.type(param1) === "string") {
+            // first parameter is url
+            this._loadDataFromUrl(param1, param2, param3);
+        }
+        else {
+            // first parameter is not url
+            this._loadDataFromUrl(null, param1, param2);
+        }
+        return this.element;
+    };
+    JqTreeWidget.prototype.reload = function (on_finished) {
+        this._loadDataFromUrl(null, null, on_finished);
+        return this.element;
+    };
+    JqTreeWidget.prototype.getNodeById = function (node_id) {
+        return this.tree.getNodeById(node_id);
+    };
+    JqTreeWidget.prototype.getNodeByName = function (name) {
+        return this.tree.getNodeByName(name);
+    };
+    JqTreeWidget.prototype.getNodesByProperty = function (key, value) {
+        return this.tree.getNodesByProperty(key, value);
+    };
+    JqTreeWidget.prototype.getNodeByHtmlElement = function (element) {
+        return this._getNode($(element));
+    };
+    JqTreeWidget.prototype.getNodeByCallback = function (callback) {
+        return this.tree.getNodeByCallback(callback);
+    };
+    JqTreeWidget.prototype.openNode = function (node, param1, param2) {
+        var _this = this;
+        var parseParams = function () {
+            var on_finished;
+            var slide;
+            if (util_1.isFunction(param1)) {
+                on_finished = param1;
+                slide = null;
+            }
+            else {
+                slide = param1;
+                on_finished = param2;
+            }
+            if (slide == null) {
+                slide = _this.options.slide;
+            }
+            return [slide, on_finished];
+        };
+        var _a = parseParams(), slide = _a[0], on_finished = _a[1];
+        if (node) {
+            this._openNode(node, slide, on_finished);
+        }
+        return this.element;
+    };
+    JqTreeWidget.prototype.closeNode = function (node, slide_param) {
+        if (slide_param === void 0) { slide_param = null; }
+        var slide;
+        if (slide_param == null) {
+            slide = this.options.slide;
+        }
+        else {
+            slide = slide_param;
+        }
+        if (node.isFolder()) {
+            new node_element_1.FolderElement(node, this).close(slide);
+            this._saveState();
+        }
+        return this.element;
+    };
+    JqTreeWidget.prototype.isDragging = function () {
+        if (this.dnd_handler) {
+            return this.dnd_handler.is_dragging;
+        }
+        else {
+            return false;
+        }
+    };
+    JqTreeWidget.prototype.refreshHitAreas = function () {
+        this.dnd_handler.refresh();
+        return this.element;
+    };
+    JqTreeWidget.prototype.addNodeAfter = function (new_node_info, existing_node) {
+        var new_node = existing_node.addAfter(new_node_info);
+        this._refreshElements(existing_node.parent);
+        return new_node;
+    };
+    JqTreeWidget.prototype.addNodeBefore = function (new_node_info, existing_node) {
+        var new_node = existing_node.addBefore(new_node_info);
+        this._refreshElements(existing_node.parent);
+        return new_node;
+    };
+    JqTreeWidget.prototype.addParentNode = function (new_node_info, existing_node) {
+        var new_node = existing_node.addParent(new_node_info);
+        this._refreshElements(new_node.parent);
+        return new_node;
+    };
+    JqTreeWidget.prototype.removeNode = function (node) {
+        var parent = node.parent;
+        if (parent) {
+            this.select_node_handler.removeFromSelection(node, true); // including children
+            node.remove();
+            this._refreshElements(parent);
+        }
+        return this.element;
+    };
+    JqTreeWidget.prototype.appendNode = function (new_node_info, parent_node_param) {
+        var parent_node = parent_node_param || this.tree;
+        var node = parent_node.append(new_node_info);
+        this._refreshElements(parent_node);
+        return node;
+    };
+    JqTreeWidget.prototype.prependNode = function (new_node_info, parent_node_param) {
+        var parent_node;
+        if (!parent_node_param) {
+            parent_node = this.tree;
+        }
+        else {
+            parent_node = parent_node_param;
+        }
+        var node = parent_node.prepend(new_node_info);
+        this._refreshElements(parent_node);
+        return node;
+    };
+    JqTreeWidget.prototype.updateNode = function (node, data) {
+        var id_is_changed = data.id && data.id !== node.id;
+        if (id_is_changed) {
+            this.tree.removeNodeFromIndex(node);
+        }
+        node.setData(data);
+        if (id_is_changed) {
+            this.tree.addNodeToIndex(node);
+        }
+        if (typeof data === "object" && data.children) {
+            node.removeChildren();
+            if (data.children.length) {
+                node.loadFromData(data.children);
+            }
+        }
+        this.renderer.renderFromNode(node);
+        this._selectCurrentNode();
+        return this.element;
+    };
+    JqTreeWidget.prototype.moveNode = function (node, target_node, position) {
+        var position_index = node_1.Position.nameToIndex(position);
+        this.tree.moveNode(node, target_node, position_index);
+        this._refreshElements();
+        return this.element;
+    };
+    JqTreeWidget.prototype.getStateFromStorage = function () {
+        return this.save_state_handler.getStateFromStorage();
+    };
+    JqTreeWidget.prototype.addToSelection = function (node) {
+        if (node) {
+            this.select_node_handler.addToSelection(node);
+            this._getNodeElementForNode(node).select();
+            this._saveState();
+        }
+        return this.element;
+    };
+    JqTreeWidget.prototype.getSelectedNodes = function () {
+        return this.select_node_handler.getSelectedNodes();
+    };
+    JqTreeWidget.prototype.isNodeSelected = function (node) {
+        return this.select_node_handler.isNodeSelected(node);
+    };
+    JqTreeWidget.prototype.removeFromSelection = function (node) {
+        this.select_node_handler.removeFromSelection(node);
+        this._getNodeElementForNode(node).deselect();
+        this._saveState();
+        return this.element;
+    };
+    JqTreeWidget.prototype.scrollToNode = function (node) {
+        var $element = $(node.element);
+        var top = $element.offset().top - this.$el.offset().top;
+        this.scroll_handler.scrollTo(top);
+        return this.element;
+    };
+    JqTreeWidget.prototype.getState = function () {
+        return this.save_state_handler.getState();
+    };
+    JqTreeWidget.prototype.setState = function (state) {
+        this.save_state_handler.setInitialState(state);
+        this._refreshElements();
+        return this.element;
+    };
+    JqTreeWidget.prototype.setOption = function (option, value) {
+        this.options[option] = value;
+        return this.element;
+    };
+    JqTreeWidget.prototype.moveDown = function () {
+        if (this.key_handler) {
+            this.key_handler.moveDown();
+        }
+        return this.element;
+    };
+    JqTreeWidget.prototype.moveUp = function () {
+        if (this.key_handler) {
+            this.key_handler.moveUp();
+        }
+        return this.element;
+    };
+    JqTreeWidget.prototype.getVersion = function () {
+        return version_1["default"];
+    };
+    JqTreeWidget.prototype.testGenerateHitAreas = function (moving_node) {
+        this.dnd_handler.current_item = this._getNodeElementForNode(moving_node);
+        this.dnd_handler.generateHitAreas();
+        return this.dnd_handler.hit_areas;
+    };
+    JqTreeWidget.prototype._triggerEvent = function (event_name, values) {
+        var event = $.Event(event_name);
+        $.extend(event, values);
+        this.element.trigger(event);
+        return event;
+    };
+    JqTreeWidget.prototype._openNode = function (node, slide, on_finished) {
+        var _this = this;
+        if (slide === void 0) { slide = true; }
+        var doOpenNode = function (_node, _slide, _on_finished) {
+            var folder_element = new node_element_1.FolderElement(_node, _this);
+            folder_element.open(_on_finished, _slide);
+        };
+        if (node.isFolder()) {
+            if (node.load_on_demand) {
+                this._loadFolderOnDemand(node, slide, on_finished);
+            }
+            else {
+                var parent_1 = node.parent;
+                while (parent_1) {
+                    // nb: do not open root element
+                    if (parent_1.parent) {
+                        doOpenNode(parent_1, false, null);
+                    }
+                    parent_1 = parent_1.parent;
+                }
+                doOpenNode(node, slide, on_finished);
+                this._saveState();
+            }
+        }
+    };
+    /*
+    Redraw the tree or part of the tree.
+     from_node: redraw this subtree
+    */
+    JqTreeWidget.prototype._refreshElements = function (from_node) {
+        this.renderer.render(from_node);
+        this._triggerEvent("tree.refresh");
+    };
+    JqTreeWidget.prototype._getNodeElementForNode = function (node) {
+        if (node.isFolder()) {
+            return new node_element_1.FolderElement(node, this);
+        }
+        else {
+            return new node_element_1.NodeElement(node, this);
+        }
+    };
+    JqTreeWidget.prototype._getNodeElement = function ($element) {
+        var node = this._getNode($element);
+        if (node) {
+            return this._getNodeElementForNode(node);
+        }
+        else {
+            return null;
+        }
+    };
+    JqTreeWidget.prototype._init = function () {
+        _super.prototype._init.call(this);
+        this.element = this.$el;
+        this.mouse_delay = 300;
+        this.is_initialized = false;
+        this.options.rtl = this._getRtlOption();
+        if (!this.options.closedIcon) {
+            this.options.closedIcon = this._getDefaultClosedIcon();
+        }
+        this.renderer = new elements_renderer_1["default"](this);
+        if (save_state_handler_1["default"] != null) {
+            this.save_state_handler = new save_state_handler_1["default"](this);
+        }
+        else {
+            this.options.saveState = false;
+        }
+        if (select_node_handler_1["default"] != null) {
+            this.select_node_handler = new select_node_handler_1["default"](this);
+        }
+        if (drag_and_drop_handler_1.DragAndDropHandler != null) {
+            this.dnd_handler = new drag_and_drop_handler_1.DragAndDropHandler(this);
+        }
+        else {
+            this.options.dragAndDrop = false;
+        }
+        if (scroll_handler_1["default"] != null) {
+            this.scroll_handler = new scroll_handler_1["default"](this);
+        }
+        if (key_handler_1["default"] != null && select_node_handler_1["default"] != null) {
+            this.key_handler = new key_handler_1["default"](this);
+        }
+        this._initData();
+        this.element.click($.proxy(this._click, this));
+        this.element.dblclick($.proxy(this._dblclick, this));
+        if (this.options.useContextMenu) {
+            this.element.on("contextmenu", $.proxy(this._contextmenu, this));
+        }
+    };
+    JqTreeWidget.prototype._deinit = function () {
+        this.element.empty();
+        this.element.off();
+        if (this.key_handler) {
+            this.key_handler.deinit();
+        }
+        this.tree = null;
+        _super.prototype._deinit.call(this);
+    };
+    JqTreeWidget.prototype._mouseCapture = function (position_info) {
+        if (this.options.dragAndDrop) {
+            return this.dnd_handler.mouseCapture(position_info);
+        }
+        else {
+            return false;
+        }
+    };
+    JqTreeWidget.prototype._mouseStart = function (position_info) {
+        if (this.options.dragAndDrop) {
+            return this.dnd_handler.mouseStart(position_info);
+        }
+        else {
+            return false;
+        }
+    };
+    JqTreeWidget.prototype._mouseDrag = function (position_info) {
+        if (this.options.dragAndDrop) {
+            var result = this.dnd_handler.mouseDrag(position_info);
+            if (this.scroll_handler) {
+                this.scroll_handler.checkScrolling();
+            }
+            return result;
+        }
+        else {
+            return false;
+        }
+    };
+    JqTreeWidget.prototype._mouseStop = function (position_info) {
+        if (this.options.dragAndDrop) {
+            return this.dnd_handler.mouseStop(position_info);
+        }
+        else {
+            return false;
+        }
+    };
+    JqTreeWidget.prototype._initData = function () {
+        if (this.options.data) {
+            this._loadData(this.options.data);
+        }
+        else {
+            var data_url = this._getDataUrlInfo();
+            if (data_url) {
+                this._loadDataFromUrl();
+            }
+            else {
+                this._loadData([]);
+            }
+        }
+    };
+    JqTreeWidget.prototype._getDataUrlInfo = function (node) {
+        var _this = this;
+        var data_url = this.options.dataUrl || this.element.data("url");
+        var getUrlFromString = function () {
+            var url_info = { url: data_url };
+            if (node && node.id) {
+                // Load on demand of a subtree; add node parameter
+                var data = { node: node.id };
+                // tslint:disable-next-line: no-string-literal
+                url_info["data"] = data;
+            }
+            else {
+                // Add selected_node parameter
+                var selected_node_id = _this._getNodeIdToBeSelected();
+                if (selected_node_id) {
+                    var data = { selected_node: selected_node_id };
+                    // tslint:disable-next-line: no-string-literal
+                    url_info["data"] = data;
+                }
+            }
+            return url_info;
+        };
+        if ($.isFunction(data_url)) {
+            return data_url(node);
+        }
+        else if ($.type(data_url) === "string") {
+            return getUrlFromString();
+        }
+        else {
+            return data_url;
+        }
+    };
+    JqTreeWidget.prototype._getNodeIdToBeSelected = function () {
+        if (this.options.saveState) {
+            return this.save_state_handler.getNodeIdToBeSelected();
+        }
+        else {
+            return null;
+        }
+    };
+    JqTreeWidget.prototype._initTree = function (data) {
+        var _this = this;
+        var doInit = function () {
+            if (!_this.is_initialized) {
+                _this.is_initialized = true;
+                _this._triggerEvent("tree.init");
+            }
+        };
+        this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
+        if (this.select_node_handler) {
+            this.select_node_handler.clear();
+        }
+        this.tree.loadFromData(data);
+        var must_load_on_demand = this._setInitialState();
+        this._refreshElements();
+        if (!must_load_on_demand) {
+            doInit();
+        }
+        else {
+            // Load data on demand and then init the tree
+            this._setInitialStateOnDemand(doInit);
+        }
+    };
+    // Set initial state, either by restoring the state or auto-opening nodes
+    // result: must load nodes on demand?
+    JqTreeWidget.prototype._setInitialState = function () {
+        var _this = this;
+        var restoreState = function () {
+            // result: is state restored, must load on demand?
+            if (!(_this.options.saveState && _this.save_state_handler)) {
+                return [false, false];
+            }
+            else {
+                var state = _this.save_state_handler.getStateFromStorage();
+                if (!state) {
+                    return [false, false];
+                }
+                else {
+                    var must_load_on_demand_1 = _this.save_state_handler.setInitialState(state);
+                    // return true: the state is restored
+                    return [true, must_load_on_demand_1];
+                }
+            }
+        };
+        var autoOpenNodes = function () {
+            // result: must load on demand?
+            if (_this.options.autoOpen === false) {
+                return false;
+            }
+            var max_level = _this._getAutoOpenMaxLevel();
+            var must_load_on_demand = false;
+            _this.tree.iterate(function (node, level) {
+                if (node.load_on_demand) {
+                    must_load_on_demand = true;
+                    return false;
+                }
+                else if (!node.hasChildren()) {
+                    return false;
+                }
+                else {
+                    node.is_open = true;
+                    return (level !== max_level);
+                }
+            });
+            return must_load_on_demand;
+        };
+        // tslint:disable-next-line: prefer-const
+        var _a = restoreState(), is_restored = _a[0], must_load_on_demand = _a[1];
+        if (!is_restored) {
+            must_load_on_demand = autoOpenNodes();
+        }
+        return must_load_on_demand;
+    };
+    // Set the initial state for nodes that are loaded on demand
+    // Call cb_finished when done
+    JqTreeWidget.prototype._setInitialStateOnDemand = function (cb_finished) {
+        var _this = this;
+        var restoreState = function () {
+            if (!(_this.options.saveState && _this.save_state_handler)) {
+                return false;
+            }
+            else {
+                var state = _this.save_state_handler.getStateFromStorage();
+                if (!state) {
+                    return false;
+                }
+                else {
+                    _this.save_state_handler.setInitialStateOnDemand(state, cb_finished);
+                    return true;
+                }
+            }
+        };
+        var autoOpenNodes = function () {
+            var max_level = _this._getAutoOpenMaxLevel();
+            var loading_count = 0;
+            var loadAndOpenNode = function (node) {
+                loading_count += 1;
+                _this._openNode(node, false, function () {
+                    loading_count -= 1;
+                    openNodes();
+                });
+            };
+            var openNodes = function () {
+                _this.tree.iterate(function (node, level) {
+                    if (node.load_on_demand) {
+                        if (!node.is_loading) {
+                            loadAndOpenNode(node);
+                        }
+                        return false;
+                    }
+                    else {
+                        _this._openNode(node, false);
+                        return (level !== max_level);
+                    }
+                });
+                if (loading_count === 0) {
+                    cb_finished();
+                }
+            };
+            openNodes();
+        };
+        if (!restoreState()) {
+            autoOpenNodes();
+        }
+    };
+    JqTreeWidget.prototype._getAutoOpenMaxLevel = function () {
+        if (this.options.autoOpen === true) {
+            return -1;
+        }
+        else {
+            return parseInt(this.options.autoOpen, 10);
+        }
+    };
+    JqTreeWidget.prototype._click = function (e) {
+        var click_target = this._getClickTarget(e.target);
+        if (click_target) {
+            if (click_target.type === "button") {
+                this.toggle(click_target.node, this.options.slide);
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            else if (click_target.type === "label") {
+                var node = click_target.node;
+                var event_1 = this._triggerEvent("tree.click", {
+                    node: node,
+                    click_event: e
+                });
+                if (!event_1.isDefaultPrevented()) {
+                    this._selectNode(node, true);
+                }
+            }
+        }
+    };
+    JqTreeWidget.prototype._dblclick = function (e) {
+        var click_target = this._getClickTarget(e.target);
+        if (click_target && click_target.type === "label") {
+            this._triggerEvent("tree.dblclick", {
+                node: click_target.node,
+                click_event: e
+            });
+        }
+    };
+    JqTreeWidget.prototype._getClickTarget = function (element) {
+        var $target = $(element);
+        var $button = $target.closest(".jqtree-toggler");
+        if ($button.length) {
+            var node = this._getNode($button);
+            if (node) {
+                return {
+                    type: "button",
+                    node: node
+                };
+            }
+        }
+        else {
+            var $el = $target.closest(".jqtree-element");
+            if ($el.length) {
+                var node = this._getNode($el);
+                if (node) {
+                    return {
+                        type: "label",
+                        node: node
+                    };
+                }
+            }
+        }
+    };
+    JqTreeWidget.prototype._getNode = function ($element) {
+        var $li = $element.closest("li.jqtree_common");
+        if ($li.length === 0) {
+            return null;
+        }
+        else {
+            return $li.data("node");
+        }
+    };
+    JqTreeWidget.prototype._contextmenu = function (e) {
+        var $div = $(e.target).closest("ul.jqtree-tree .jqtree-element");
+        if ($div.length) {
+            var node = this._getNode($div);
+            if (node) {
+                e.preventDefault();
+                e.stopPropagation();
+                this._triggerEvent("tree.contextmenu", {
+                    node: node,
+                    click_event: e
+                });
+                return false;
+            }
+        }
+    };
+    JqTreeWidget.prototype._saveState = function () {
+        if (this.options.saveState) {
+            this.save_state_handler.saveState();
+        }
+    };
+    JqTreeWidget.prototype._selectCurrentNode = function () {
+        var node = this.getSelectedNode();
+        if (node) {
+            var node_element = this._getNodeElementForNode(node);
+            if (node_element) {
+                node_element.select();
+            }
+        }
+    };
+    JqTreeWidget.prototype._deselectCurrentNode = function () {
+        var node = this.getSelectedNode();
+        if (node) {
+            this.removeFromSelection(node);
+        }
+    };
+    JqTreeWidget.prototype._getDefaultClosedIcon = function () {
+        if (this.options.rtl) {
+            // triangle to the left
+            return "&#x25c0;";
+        }
+        else {
+            // triangle to the right
+            return "&#x25ba;";
+        }
+    };
+    JqTreeWidget.prototype._getRtlOption = function () {
+        if (this.options.rtl != null) {
+            return this.options.rtl;
+        }
+        else {
+            var data_rtl = this.element.data("rtl");
+            if (data_rtl != null && data_rtl !== false) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    };
+    JqTreeWidget.prototype._notifyLoading = function (is_loading, node, $el) {
+        if (this.options.onLoading) {
+            this.options.onLoading(is_loading, node, $el);
+        }
+    };
+    JqTreeWidget.prototype._selectNode = function (node, must_toggle) {
+        var _this = this;
+        if (must_toggle === void 0) { must_toggle = false; }
+        if (!this.select_node_handler) {
+            return;
+        }
+        var canSelect = function () {
+            if (_this.options.onCanSelectNode) {
+                return _this.options.selectable && _this.options.onCanSelectNode(node);
+            }
+            else {
+                return _this.options.selectable;
+            }
+        };
+        var openParents = function () {
+            var parent = node.parent;
+            if (parent && parent.parent && !parent.is_open) {
+                _this.openNode(parent, false);
+            }
+        };
+        var saveState = function () {
+            if (_this.options.saveState) {
+                _this.save_state_handler.saveState();
+            }
+        };
+        if (!node) {
+            // Called with empty node -> deselect current node
+            this._deselectCurrentNode();
+            saveState();
+            return;
+        }
+        if (!canSelect()) {
+            return;
+        }
+        if (this.select_node_handler.isNodeSelected(node)) {
+            if (must_toggle) {
+                this._deselectCurrentNode();
+                this._triggerEvent("tree.select", {
+                    node: null,
+                    previous_node: node
+                });
+            }
+        }
+        else {
+            var deselected_node = this.getSelectedNode();
+            this._deselectCurrentNode();
+            this.addToSelection(node);
+            this._triggerEvent("tree.select", {
+                node: node,
+                deselected_node: deselected_node
+            });
+            openParents();
+        }
+        saveState();
+    };
+    JqTreeWidget.prototype._loadData = function (data, parent_node) {
+        var _this = this;
+        var deselectNodes = function () {
+            if (_this.select_node_handler) {
+                var selected_nodes_under_parent = _this.select_node_handler.getSelectedNodesUnder(parent_node);
+                for (var _i = 0, selected_nodes_under_parent_1 = selected_nodes_under_parent; _i < selected_nodes_under_parent_1.length; _i++) {
+                    var n = selected_nodes_under_parent_1[_i];
+                    _this.select_node_handler.removeFromSelection(n);
+                }
+            }
+        };
+        var loadSubtree = function () {
+            parent_node.loadFromData(data);
+            parent_node.load_on_demand = false;
+            parent_node.is_loading = false;
+            _this._refreshElements(parent_node);
+        };
+        if (!data) {
+            return;
+        }
+        this._triggerEvent("tree.load_data", { tree_data: data });
+        if (!parent_node) {
+            this._initTree(data);
+        }
+        else {
+            deselectNodes();
+            loadSubtree();
+        }
+        if (this.isDragging()) {
+            this.dnd_handler.refresh();
+        }
+    };
+    JqTreeWidget.prototype._loadDataFromUrl = function (url_info_param, parent_node, on_finished) {
+        var _this = this;
+        var $el = null;
+        var url_info = url_info_param;
+        var addLoadingClass = function () {
+            if (parent_node) {
+                $el = $(parent_node.element);
+            }
+            else {
+                $el = _this.element;
+            }
+            $el.addClass("jqtree-loading");
+            _this._notifyLoading(true, parent_node, $el);
+        };
+        var removeLoadingClass = function () {
+            if ($el) {
+                $el.removeClass("jqtree-loading");
+                _this._notifyLoading(false, parent_node, $el);
+            }
+        };
+        var parseUrlInfo = function () {
+            if ($.type(url_info) === "string") {
+                return { url: url_info };
+            }
+            if (!url_info.method) {
+                url_info.method = "get";
+            }
+            return url_info;
+        };
+        var handeLoadData = function (data) {
+            removeLoadingClass();
+            _this._loadData(data, parent_node);
+            if (on_finished && $.isFunction(on_finished)) {
+                on_finished();
+            }
+        };
+        var handleSuccess = function (response) {
+            var data;
+            if ($.isArray(response) || typeof response === "object") {
+                data = response;
+            }
+            else if (data != null) {
+                data = $.parseJSON(response);
+            }
+            else {
+                data = [];
+            }
+            if (_this.options.dataFilter) {
+                data = _this.options.dataFilter(data);
+            }
+            handeLoadData(data);
+        };
+        var handleError = function (response) {
+            removeLoadingClass();
+            if (_this.options.onLoadFailed) {
+                _this.options.onLoadFailed(response);
+            }
+        };
+        var loadDataFromUrlInfo = function () {
+            var _url_info = parseUrlInfo();
+            $.ajax($.extend({}, _url_info, {
+                method: url_info.method != null ? url_info.method.toUpperCase() : "GET",
+                cache: false,
+                dataType: "json",
+                success: handleSuccess,
+                error: handleError
+            }));
+        };
+        if (!url_info_param) {
+            // Generate url for node
+            url_info = this._getDataUrlInfo(parent_node);
+        }
+        addLoadingClass();
+        if (!url_info) {
+            removeLoadingClass();
+            return;
+        }
+        else if ($.isArray(url_info)) {
+            handeLoadData(url_info);
+            return;
+        }
+        else {
+            loadDataFromUrlInfo();
+            return;
+        }
+    };
+    JqTreeWidget.prototype._loadFolderOnDemand = function (node, slide, on_finished) {
+        var _this = this;
+        if (slide === void 0) { slide = true; }
+        node.is_loading = true;
+        this._loadDataFromUrl(null, node, function () {
+            _this._openNode(node, slide, on_finished);
+        });
+    };
+    return JqTreeWidget;
+}(mouse_widget_1["default"]));
+JqTreeWidget.defaults = {
+    autoOpen: false,
+    saveState: false,
+    dragAndDrop: false,
+    selectable: true,
+    useContextMenu: true,
+    onCanSelectNode: null,
+    onSetStateFromStorage: null,
+    onGetStateFromStorage: null,
+    onCreateLi: null,
+    onIsMoveHandle: null,
+    // Can this node be moved? function(node)
+    onCanMove: null,
+    // Can this node be moved to this position? function(moved_node, target_node, position)
+    onCanMoveTo: null,
+    onLoadFailed: null,
+    autoEscape: true,
+    dataUrl: null,
+    // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
+    // http://www.fileformat.info/info/unicode/char/25ba/index.htm
+    closedIcon: null,
+    // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+    // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+    openedIcon: "&#x25bc;",
+    slide: true,
+    nodeClass: node_1.Node,
+    dataFilter: null,
+    keyboardSupport: true,
+    openFolderDelay: 500,
+    rtl: false,
+    onDragMove: null,
+    onDragStop: null,
+    buttonLeft: true,
+    onLoading: null
+};
+simple_widget_1["default"].register(JqTreeWidget, "tree");
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var node_1 = __webpack_require__(0);
+var util_1 = __webpack_require__(1);
+var DragAndDropHandler = (function () {
+    function DragAndDropHandler(tree_widget) {
+        this.tree_widget = tree_widget;
+        this.hovered_area = null;
+        this.$ghost = null;
+        this.hit_areas = [];
+        this.is_dragging = false;
+        this.current_item = null;
+    }
+    DragAndDropHandler.prototype.mouseCapture = function (position_info) {
+        var $element = $(position_info.target);
+        if (!this.mustCaptureElement($element)) {
+            return null;
+        }
+        if (this.tree_widget.options.onIsMoveHandle && !this.tree_widget.options.onIsMoveHandle($element)) {
+            return null;
+        }
+        var node_element = this.tree_widget._getNodeElement($element);
+        if (node_element && this.tree_widget.options.onCanMove) {
+            if (!this.tree_widget.options.onCanMove(node_element.node)) {
+                node_element = null;
+            }
+        }
+        this.current_item = node_element;
+        return (this.current_item != null);
+    };
+    DragAndDropHandler.prototype.generateHitAreas = function () {
+        var hit_areas_generator = new HitAreasGenerator(this.tree_widget.tree, this.current_item.node, this.getTreeDimensions().bottom);
+        this.hit_areas = hit_areas_generator.generate();
+    };
+    DragAndDropHandler.prototype.mouseStart = function (position_info) {
+        this.refresh();
+        var offset = $(position_info.target).offset();
+        var node = this.current_item.node;
+        var node_name;
+        if (this.tree_widget.options.autoEscape) {
+            node_name = util_1.html_escape(node.name);
+        }
+        else {
+            node_name = node.name;
+        }
+        this.drag_element = new DragElement(node_name, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
+        this.is_dragging = true;
+        this.current_item.$element.addClass("jqtree-moving");
+        return true;
+    };
+    DragAndDropHandler.prototype.mouseDrag = function (position_info) {
+        this.drag_element.move(position_info.page_x, position_info.page_y);
+        var area = this.findHoveredArea(position_info.page_x, position_info.page_y);
+        var can_move_to = this.canMoveToArea(area);
+        if (can_move_to && area) {
+            if (!area.node.isFolder()) {
+                this.stopOpenFolderTimer();
+            }
+            if (this.hovered_area !== area) {
+                this.hovered_area = area;
+                // If this is a closed folder, start timer to open it
+                if (this.mustOpenFolderTimer(area)) {
+                    this.startOpenFolderTimer(area.node);
+                }
+                else {
+                    this.stopOpenFolderTimer();
+                }
+                this.updateDropHint();
+            }
+        }
+        else {
+            this.removeHover();
+            this.removeDropHint();
+            this.stopOpenFolderTimer();
+        }
+        if (!area) {
+            if (this.tree_widget.options.onDragMove) {
+                this.tree_widget.options.onDragMove(this.current_item.node, position_info.original_event);
+            }
+        }
+        return true;
+    };
+    DragAndDropHandler.prototype.mouseStop = function (position_info) {
+        this.moveItem(position_info);
+        this.clear();
+        this.removeHover();
+        this.removeDropHint();
+        this.removeHitAreas();
+        var current_item = this.current_item;
+        if (this.current_item) {
+            this.current_item.$element.removeClass("jqtree-moving");
+            this.current_item = null;
+        }
+        this.is_dragging = false;
+        if (!this.hovered_area && current_item) {
+            if (this.tree_widget.options.onDragStop) {
+                this.tree_widget.options.onDragStop(current_item.node, position_info.original_event);
+            }
+        }
+        return false;
+    };
+    DragAndDropHandler.prototype.refresh = function () {
+        this.removeHitAreas();
+        if (this.current_item) {
+            this.generateHitAreas();
+            this.current_item = this.tree_widget._getNodeElementForNode(this.current_item.node);
+            if (this.is_dragging) {
+                this.current_item.$element.addClass("jqtree-moving");
+            }
+        }
+    };
+    DragAndDropHandler.prototype.mustCaptureElement = function ($element) {
+        return !$element.is("input,select,textarea");
+    };
+    DragAndDropHandler.prototype.canMoveToArea = function (area) {
+        if (!area) {
+            return false;
+        }
+        else if (this.tree_widget.options.onCanMoveTo) {
+            var position_name = node_1.Position.getName(area.position);
+            return this.tree_widget.options.onCanMoveTo(this.current_item.node, area.node, position_name);
+        }
+        else {
+            return true;
+        }
+    };
+    DragAndDropHandler.prototype.removeHitAreas = function () {
+        this.hit_areas = [];
+    };
+    DragAndDropHandler.prototype.clear = function () {
+        this.drag_element.remove();
+        this.drag_element = null;
+    };
+    DragAndDropHandler.prototype.removeDropHint = function () {
+        if (this.previous_ghost) {
+            this.previous_ghost.remove();
+        }
+    };
+    DragAndDropHandler.prototype.removeHover = function () {
+        this.hovered_area = null;
+    };
+    DragAndDropHandler.prototype.findHoveredArea = function (x, y) {
+        var dimensions = this.getTreeDimensions();
+        if (x < dimensions.left ||
+            y < dimensions.top ||
+            x > dimensions.right ||
+            y > dimensions.bottom) {
+            return null;
+        }
+        var low = 0;
+        var high = this.hit_areas.length;
+        while (low < high) {
+            // tslint:disable-next-line: no-bitwise
+            var mid = (low + high) >> 1;
+            var area = this.hit_areas[mid];
+            if (y < area.top) {
+                high = mid;
+            }
+            else if (y > area.bottom) {
+                low = mid + 1;
+            }
+            else {
+                return area;
+            }
+        }
+        return null;
+    };
+    DragAndDropHandler.prototype.mustOpenFolderTimer = function (area) {
+        var node = area.node;
+        return (node.isFolder() &&
+            !node.is_open &&
+            area.position === node_1.Position.INSIDE);
+    };
+    DragAndDropHandler.prototype.updateDropHint = function () {
+        if (!this.hovered_area) {
+            return;
+        }
+        // remove previous drop hint
+        this.removeDropHint();
+        // add new drop hint
+        var node_element = this.tree_widget._getNodeElementForNode(this.hovered_area.node);
+        this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
+    };
+    DragAndDropHandler.prototype.startOpenFolderTimer = function (folder) {
+        var _this = this;
+        var openFolder = function () {
+            _this.tree_widget._openNode(folder, _this.tree_widget.options.slide, function () {
+                _this.refresh();
+                _this.updateDropHint();
+            });
+        };
+        this.stopOpenFolderTimer();
+        this.open_folder_timer = setTimeout(openFolder, this.tree_widget.options.openFolderDelay);
+    };
+    DragAndDropHandler.prototype.stopOpenFolderTimer = function () {
+        if (this.open_folder_timer) {
+            clearTimeout(this.open_folder_timer);
+            this.open_folder_timer = null;
+        }
+    };
+    DragAndDropHandler.prototype.moveItem = function (position_info) {
+        var _this = this;
+        if (this.hovered_area &&
+            this.hovered_area.position !== node_1.Position.NONE &&
+            this.canMoveToArea(this.hovered_area)) {
+            var moved_node_1 = this.current_item.node;
+            var target_node_1 = this.hovered_area.node;
+            var position_1 = this.hovered_area.position;
+            var previous_parent = moved_node_1.parent;
+            if (position_1 === node_1.Position.INSIDE) {
+                this.hovered_area.node.is_open = true;
+            }
+            var doMove = function () {
+                _this.tree_widget.tree.moveNode(moved_node_1, target_node_1, position_1);
+                _this.tree_widget.element.empty();
+                _this.tree_widget._refreshElements();
+            };
+            var event_1 = this.tree_widget._triggerEvent("tree.move", {
+                move_info: {
+                    moved_node: moved_node_1,
+                    target_node: target_node_1,
+                    position: node_1.Position.getName(position_1),
+                    previous_parent: previous_parent,
+                    do_move: doMove,
+                    original_event: position_info.original_event
+                }
+            });
+            if (!event_1.isDefaultPrevented()) {
+                doMove();
+            }
+        }
+    };
+    DragAndDropHandler.prototype.getTreeDimensions = function () {
+        // Return the dimensions of the tree. Add a margin to the bottom to allow
+        // for some to drag-and-drop the last element.
+        var offset = this.tree_widget.element.offset();
+        return {
+            left: offset.left,
+            top: offset.top,
+            right: offset.left + this.tree_widget.element.width(),
+            bottom: offset.top + this.tree_widget.element.height() + 16
+        };
+    };
+    return DragAndDropHandler;
+}());
+exports.DragAndDropHandler = DragAndDropHandler;
+var VisibleNodeIterator = (function () {
+    function VisibleNodeIterator(tree) {
+        this.tree = tree;
+    }
+    VisibleNodeIterator.prototype.iterate = function () {
+        var _this = this;
+        var is_first_node = true;
+        var _iterateNode = function (node, next_node) {
+            var must_iterate_inside = ((node.is_open || !node.element) && node.hasChildren());
+            var $element = null;
+            if (node.element) {
+                $element = $(node.element);
+                if (!$element.is(":visible")) {
+                    return;
+                }
+                if (is_first_node) {
+                    _this.handleFirstNode(node, $element);
+                    is_first_node = false;
+                }
+                if (!node.hasChildren()) {
+                    _this.handleNode(node, next_node, $element);
+                }
+                else if (node.is_open) {
+                    if (!_this.handleOpenFolder(node, $element)) {
+                        must_iterate_inside = false;
+                    }
+                }
+                else {
+                    _this.handleClosedFolder(node, next_node, $element);
+                }
+            }
+            if (must_iterate_inside) {
+                var children_length_1 = node.children.length;
+                node.children.forEach(function (child, i) {
+                    if (i === (children_length_1 - 1)) {
+                        _iterateNode(node.children[i], null);
+                    }
+                    else {
+                        _iterateNode(node.children[i], node.children[i + 1]);
+                    }
+                });
+                if (node.is_open) {
+                    _this.handleAfterOpenFolder(node, next_node, $element);
+                }
+            }
+        };
+        _iterateNode(this.tree, null);
+    };
+    VisibleNodeIterator.prototype.handleNode = function (node, next_node, $element) {
+        // override
+    };
+    VisibleNodeIterator.prototype.handleOpenFolder = function (node, $element) {
+        /*
+        override
+        return
+          - true: continue iterating
+          - false: stop iterating
+         */
+    };
+    VisibleNodeIterator.prototype.handleClosedFolder = function (node, next_node, $element) {
+        // override
+    };
+    VisibleNodeIterator.prototype.handleAfterOpenFolder = function (node, next_node, $element) {
+        // override
+    };
+    VisibleNodeIterator.prototype.handleFirstNode = function (node, $element) {
+        // override
+    };
+    return VisibleNodeIterator;
+}());
+var HitAreasGenerator = (function (_super) {
+    __extends(HitAreasGenerator, _super);
+    function HitAreasGenerator(tree, current_node, tree_bottom) {
+        var _this = _super.call(this, tree) || this;
+        _this.current_node = current_node;
+        _this.tree_bottom = tree_bottom;
+        return _this;
+    }
+    HitAreasGenerator.prototype.generate = function () {
+        this.positions = [];
+        this.last_top = 0;
+        this.iterate();
+        return this.generateHitAreas(this.positions);
+    };
+    HitAreasGenerator.prototype.generateHitAreas = function (positions) {
+        var previous_top = -1;
+        var group = [];
+        var hit_areas = [];
+        for (var _i = 0, positions_1 = positions; _i < positions_1.length; _i++) {
+            var position = positions_1[_i];
+            if (position.top !== previous_top && group.length) {
+                if (group.length) {
+                    this.generateHitAreasForGroup(hit_areas, group, previous_top, position.top);
+                }
+                previous_top = position.top;
+                group = [];
+            }
+            group.push(position);
+        }
+        this.generateHitAreasForGroup(hit_areas, group, previous_top, this.tree_bottom);
+        return hit_areas;
+    };
+    HitAreasGenerator.prototype.handleOpenFolder = function (node, $element) {
+        if (node === this.current_node) {
+            // Cannot move inside current item
+            // Stop iterating
+            return false;
+        }
+        // Cannot move before current item
+        if (node.children[0] !== this.current_node) {
+            this.addPosition(node, node_1.Position.INSIDE, this.getTop($element));
+        }
+        // Continue iterating
+        return true;
+    };
+    HitAreasGenerator.prototype.handleClosedFolder = function (node, next_node, $element) {
+        var top = this.getTop($element);
+        if (node === this.current_node) {
+            // Cannot move after current item
+            this.addPosition(node, node_1.Position.NONE, top);
+        }
+        else {
+            this.addPosition(node, node_1.Position.INSIDE, top);
+            // Cannot move before current item
+            if (next_node !== this.current_node) {
+                this.addPosition(node, node_1.Position.AFTER, top);
+            }
+        }
+    };
+    HitAreasGenerator.prototype.handleFirstNode = function (node, $element) {
+        if (node !== this.current_node) {
+            this.addPosition(node, node_1.Position.BEFORE, this.getTop($(node.element)));
+        }
+    };
+    HitAreasGenerator.prototype.handleAfterOpenFolder = function (node, next_node, $element) {
+        if (node === this.current_node ||
+            next_node === this.current_node) {
+            // Cannot move before or after current item
+            this.addPosition(node, node_1.Position.NONE, this.last_top);
+        }
+        else {
+            this.addPosition(node, node_1.Position.AFTER, this.last_top);
+        }
+    };
+    HitAreasGenerator.prototype.handleNode = function (node, next_node, $element) {
+        var top = this.getTop($element);
+        if (node === this.current_node) {
+            // Cannot move inside current item
+            this.addPosition(node, node_1.Position.NONE, top);
+        }
+        else {
+            this.addPosition(node, node_1.Position.INSIDE, top);
+        }
+        if (next_node === this.current_node ||
+            node === this.current_node) {
+            // Cannot move before or after current item
+            this.addPosition(node, node_1.Position.NONE, top);
+        }
+        else {
+            this.addPosition(node, node_1.Position.AFTER, top);
+        }
+    };
+    HitAreasGenerator.prototype.getTop = function ($element) {
+        return $element.offset().top;
+    };
+    HitAreasGenerator.prototype.addPosition = function (node, position, top) {
+        var area = {
+            top: top,
+            bottom: 0,
+            node: node,
+            position: position
+        };
+        this.positions.push(area);
+        this.last_top = top;
+    };
+    HitAreasGenerator.prototype.generateHitAreasForGroup = function (hit_areas, positions_in_group, top, bottom) {
+        // limit positions in group
+        var position_count = Math.min(positions_in_group.length, 4);
+        var area_height = Math.round((bottom - top) / position_count);
+        var area_top = top;
+        var i = 0;
+        while (i < position_count) {
+            var position = positions_in_group[i];
+            hit_areas.push({
+                top: area_top,
+                bottom: area_top + area_height,
+                node: position.node,
+                position: position.position
+            });
+            area_top += area_height;
+            i += 1;
+        }
+    };
+    return HitAreasGenerator;
+}(VisibleNodeIterator));
+exports.HitAreasGenerator = HitAreasGenerator;
+var DragElement = (function () {
+    function DragElement(node_name, offset_x, offset_y, $tree) {
+        this.offset_x = offset_x;
+        this.offset_y = offset_y;
+        this.$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node_name }</span>");
+        this.$element.css("position", "absolute");
+        $tree.append(this.$element);
+    }
+    DragElement.prototype.move = function (page_x, page_y) {
+        this.$element.offset({
+            left: page_x - this.offset_x,
+            top: page_y - this.offset_y
+        });
+    };
+    DragElement.prototype.remove = function () {
+        this.$element.remove();
+    };
+    return DragElement;
+}());
+exports.DragElement = DragElement;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var util_1 = __webpack_require__(1);
+var ElementsRenderer = (function () {
+    function ElementsRenderer(tree_widget) {
+        this.tree_widget = tree_widget;
+        this.opened_icon_element = this.createButtonElement(tree_widget.options.openedIcon);
+        this.closed_icon_element = this.createButtonElement(tree_widget.options.closedIcon);
+    }
+    ElementsRenderer.prototype.render = function (from_node) {
+        if (from_node && from_node.parent) {
+            this.renderFromNode(from_node);
+        }
+        else {
+            this.renderFromRoot();
+        }
+    };
+    ElementsRenderer.prototype.renderFromRoot = function () {
+        var $element = this.tree_widget.element;
+        $element.empty();
+        this.createDomElements($element[0], this.tree_widget.tree.children, true, true, 1);
+    };
+    ElementsRenderer.prototype.renderFromNode = function (node) {
+        // remember current li
+        var $previous_li = $(node.element);
+        // create element
+        var li = this.createLi(node, node.getLevel());
+        this.attachNodeData(node, li);
+        // add element to dom
+        $previous_li.after(li);
+        // remove previous li
+        $previous_li.remove();
+        // create children
+        if (node.children) {
+            this.createDomElements(li, node.children, false, false, node.getLevel() + 1);
+        }
+    };
+    ElementsRenderer.prototype.createDomElements = function (element, children, is_root_node, is_open, level) {
+        var ul = this.createUl(is_root_node);
+        element.appendChild(ul);
+        for (var _i = 0, children_1 = children; _i < children_1.length; _i++) {
+            var child = children_1[_i];
+            var li = this.createLi(child, level);
+            ul.appendChild(li);
+            this.attachNodeData(child, li);
+            if (child.hasChildren()) {
+                this.createDomElements(li, child.children, false, child.is_open, level + 1);
+            }
+        }
+    };
+    ElementsRenderer.prototype.attachNodeData = function (node, li) {
+        node.element = li;
+        $(li).data("node", node);
+    };
+    ElementsRenderer.prototype.createUl = function (is_root_node) {
+        var class_string;
+        var role;
+        if (!is_root_node) {
+            class_string = "";
+            role = "group";
+        }
+        else {
+            class_string = "jqtree-tree";
+            role = "tree";
+            if (this.tree_widget.options.rtl) {
+                class_string += " jqtree-rtl";
+            }
+        }
+        var ul = document.createElement("ul");
+        ul.className = "jqtree_common " + class_string;
+        ul.setAttribute("role", role);
+        return ul;
+    };
+    ElementsRenderer.prototype.createLi = function (node, level) {
+        var is_selected = (this.tree_widget.select_node_handler &&
+            this.tree_widget.select_node_handler.isNodeSelected(node));
+        var li;
+        if (node.isFolder()) {
+            li = this.createFolderLi(node, level, is_selected);
+        }
+        else {
+            li = this.createNodeLi(node, level, is_selected);
+        }
+        if (this.tree_widget.options.onCreateLi) {
+            this.tree_widget.options.onCreateLi(node, $(li));
+        }
+        return li;
+    };
+    ElementsRenderer.prototype.createFolderLi = function (node, level, is_selected) {
+        var button_classes = this.getButtonClasses(node);
+        var folder_classes = this.getFolderClasses(node, is_selected);
+        var icon_element;
+        if (node.is_open) {
+            icon_element = this.opened_icon_element;
+        }
+        else {
+            icon_element = this.closed_icon_element;
+        }
+        // li
+        var li = document.createElement("li");
+        li.className = "jqtree_common " + folder_classes;
+        li.setAttribute("role", "presentation");
+        // div
+        var div = document.createElement("div");
+        div.className = "jqtree-element jqtree_common";
+        div.setAttribute("role", "presentation");
+        li.appendChild(div);
+        // button link
+        var button_link = document.createElement("a");
+        button_link.className = button_classes;
+        button_link.appendChild(icon_element.cloneNode(false));
+        button_link.setAttribute("role", "presentation");
+        button_link.setAttribute("aria-hidden", "true");
+        if (this.tree_widget.options.buttonLeft) {
+            div.appendChild(button_link);
+        }
+        // title span
+        div.appendChild(this.createTitleSpan(node.name, level, is_selected, node.is_open, true));
+        if (!this.tree_widget.options.buttonLeft) {
+            div.appendChild(button_link);
+        }
+        return li;
+    };
+    ElementsRenderer.prototype.createNodeLi = function (node, level, is_selected) {
+        var li_classes = ["jqtree_common"];
+        if (is_selected) {
+            li_classes.push("jqtree-selected");
+        }
+        var class_string = li_classes.join(" ");
+        // li
+        var li = document.createElement("li");
+        li.className = class_string;
+        li.setAttribute("role", "presentation");
+        // div
+        var div = document.createElement("div");
+        div.className = "jqtree-element jqtree_common";
+        div.setAttribute("role", "presentation");
+        li.appendChild(div);
+        // title span
+        div.appendChild(this.createTitleSpan(node.name, level, is_selected, node.is_open, false));
+        return li;
+    };
+    ElementsRenderer.prototype.createTitleSpan = function (node_name, level, is_selected, is_open, is_folder) {
+        var title_span = document.createElement("span");
+        var classes = "jqtree-title jqtree_common";
+        if (is_folder) {
+            classes += " jqtree-title-folder";
+        }
+        title_span.className = classes;
+        title_span.setAttribute("role", "treeitem");
+        title_span.setAttribute("aria-level", "" + level);
+        title_span.setAttribute("aria-selected", util_1.getBoolString(is_selected));
+        title_span.setAttribute("aria-expanded", util_1.getBoolString(is_open));
+        if (is_selected) {
+            title_span.setAttribute("tabindex", "0");
+        }
+        title_span.innerHTML = this.escapeIfNecessary(node_name);
+        return title_span;
+    };
+    ElementsRenderer.prototype.getButtonClasses = function (node) {
+        var classes = ["jqtree-toggler", "jqtree_common"];
+        if (!node.is_open) {
+            classes.push("jqtree-closed");
+        }
+        if (this.tree_widget.options.buttonLeft) {
+            classes.push("jqtree-toggler-left");
+        }
+        else {
+            classes.push("jqtree-toggler-right");
+        }
+        return classes.join(" ");
+    };
+    ElementsRenderer.prototype.getFolderClasses = function (node, is_selected) {
+        var classes = ["jqtree-folder"];
+        if (!node.is_open) {
+            classes.push("jqtree-closed");
+        }
+        if (is_selected) {
+            classes.push("jqtree-selected");
+        }
+        if (node.is_loading) {
+            classes.push("jqtree-loading");
+        }
+        return classes.join(" ");
+    };
+    ElementsRenderer.prototype.escapeIfNecessary = function (value) {
+        if (this.tree_widget.options.autoEscape) {
+            return util_1.html_escape(value);
+        }
+        else {
+            return value;
+        }
+    };
+    ElementsRenderer.prototype.createButtonElement = function (value) {
+        if (typeof value === "string") {
+            // convert value to html
+            var div = document.createElement("div");
+            div.innerHTML = value;
+            return document.createTextNode(div.innerHTML);
+        }
+        else {
+            return $(value)[0];
+        }
+    };
+    return ElementsRenderer;
+}());
+exports.__esModule = true;
+exports["default"] = ElementsRenderer;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var KeyHandler = (function () {
+    function KeyHandler(tree_widget) {
+        this.tree_widget = tree_widget;
+        if (tree_widget.options.keyboardSupport) {
+            $(document).on("keydown.jqtree", $.proxy(this.handleKeyDown, this));
+        }
+    }
+    KeyHandler.prototype.deinit = function () {
+        $(document).off("keydown.jqtree");
+    };
+    KeyHandler.prototype.moveDown = function () {
+        var node = this.tree_widget.getSelectedNode();
+        if (node) {
+            return this.selectNode(node.getNextNode());
+        }
+        else {
+            return false;
+        }
+    };
+    KeyHandler.prototype.moveUp = function () {
+        var node = this.tree_widget.getSelectedNode();
+        if (node) {
+            return this.selectNode(node.getPreviousNode());
+        }
+        else {
+            return false;
+        }
+    };
+    KeyHandler.prototype.moveRight = function () {
+        var node = this.tree_widget.getSelectedNode();
+        if (!node) {
+            return true;
+        }
+        else if (!node.isFolder()) {
+            return true;
+        }
+        else {
+            // folder node
+            if (node.is_open) {
+                // Right moves to the first child of an open node
+                return this.selectNode(node.getNextNode());
+            }
+            else {
+                // Right expands a closed node
+                this.tree_widget.openNode(node);
+                return false;
+            }
+        }
+    };
+    KeyHandler.prototype.moveLeft = function () {
+        var node = this.tree_widget.getSelectedNode();
+        if (!node) {
+            return true;
+        }
+        else if (node.isFolder() && node.is_open) {
+            // Left on an open node closes the node
+            this.tree_widget.closeNode(node);
+            return false;
+        }
+        else {
+            /// Left on a closed or end node moves focus to the node's parent
+            return this.selectNode(node.getParent());
+        }
+    };
+    KeyHandler.prototype.handleKeyDown = function (e) {
+        if (!this.tree_widget.options.keyboardSupport) {
+            return true;
+        }
+        if ($(document.activeElement).is("textarea,input,select")) {
+            return true;
+        }
+        if (!this.tree_widget.getSelectedNode()) {
+            return true;
+        }
+        var key = e.which;
+        switch (key) {
+            case KeyHandler.DOWN:
+                return this.moveDown();
+            case KeyHandler.UP:
+                return this.moveUp();
+            case KeyHandler.RIGHT:
+                return this.moveRight();
+            case KeyHandler.LEFT:
+                return this.moveLeft();
+            default:
+                return true;
+        }
+    };
+    KeyHandler.prototype.selectNode = function (node) {
+        if (!node) {
+            return true;
+        }
+        else {
+            this.tree_widget.selectNode(node);
+            if (this.tree_widget.scroll_handler &&
+                (!this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find(".jqtree-element")))) {
+                this.tree_widget.scrollToNode(node);
+            }
+            return false;
+        }
+    };
+    return KeyHandler;
+}());
+KeyHandler.LEFT = 37;
+KeyHandler.UP = 38;
+KeyHandler.RIGHT = 39;
+KeyHandler.DOWN = 40;
+exports.__esModule = true;
+exports["default"] = KeyHandler;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+/*
+This widget does the same a the mouse widget in jqueryui.
+*/
+var simple_widget_1 = __webpack_require__(2);
+var MouseWidget = (function (_super) {
+    __extends(MouseWidget, _super);
+    function MouseWidget() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MouseWidget.prototype.setMouseDelay = function (mouse_delay) {
+        this.mouse_delay = mouse_delay;
+    };
+    MouseWidget.prototype._init = function () {
+        this.$el.on("mousedown.mousewidget", $.proxy(this._mouseDown, this));
+        this.$el.on("touchstart.mousewidget", $.proxy(this._touchStart, this));
+        this.is_mouse_started = false;
+        this.mouse_delay = 0;
+        this._mouse_delay_timer = null;
+        this._is_mouse_delay_met = true;
+        this.mouse_down_info = null;
+    };
+    MouseWidget.prototype._deinit = function () {
+        this.$el.off("mousedown.mousewidget");
+        this.$el.off("touchstart.mousewidget");
+        var $document = $(document);
+        $document.off("mousemove.mousewidget");
+        $document.off("mouseup.mousewidget");
+    };
+    MouseWidget.prototype._mouseDown = function (e) {
+        // Is left mouse button?
+        if (e.which !== 1) {
+            return;
+        }
+        var result = this._handleMouseDown(e, this._getPositionInfo(e));
+        if (result) {
+            e.preventDefault();
+        }
+        return result;
+    };
+    MouseWidget.prototype._mouseCapture = function (position_info) {
+        return true;
+    };
+    MouseWidget.prototype._mouseStart = function (position_info) {
+        return false;
+    };
+    MouseWidget.prototype._mouseDrag = function (position_info) {
+        //
+    };
+    MouseWidget.prototype._mouseStop = function (position_info) {
+        //
+    };
+    MouseWidget.prototype._handleMouseDown = function (e, position_info) {
+        // We may have missed mouseup (out of window)
+        if (this.is_mouse_started) {
+            this._handleMouseUp(position_info);
+        }
+        this.mouse_down_info = position_info;
+        if (!this._mouseCapture(position_info)) {
+            return;
+        }
+        this._handleStartMouse();
+        return true;
+    };
+    MouseWidget.prototype._handleStartMouse = function () {
+        var $document = $(document);
+        $document.on("mousemove.mousewidget", $.proxy(this._mouseMove, this));
+        $document.on("touchmove.mousewidget", $.proxy(this._touchMove, this));
+        $document.on("mouseup.mousewidget", $.proxy(this._mouseUp, this));
+        $document.on("touchend.mousewidget", $.proxy(this._touchEnd, this));
+        if (this.mouse_delay) {
+            this._startMouseDelayTimer();
+        }
+    };
+    MouseWidget.prototype._startMouseDelayTimer = function () {
+        var _this = this;
+        if (this._mouse_delay_timer) {
+            clearTimeout(this._mouse_delay_timer);
+        }
+        this._mouse_delay_timer = setTimeout(function () {
+            _this._is_mouse_delay_met = true;
+        }, this.mouse_delay);
+        this._is_mouse_delay_met = false;
+    };
+    MouseWidget.prototype._mouseMove = function (e) {
+        return this._handleMouseMove(e, this._getPositionInfo(e));
+    };
+    MouseWidget.prototype._handleMouseMove = function (e, position_info) {
+        if (this.is_mouse_started) {
+            this._mouseDrag(position_info);
+            return e.preventDefault();
+        }
+        if (this.mouse_delay && !this._is_mouse_delay_met) {
+            return true;
+        }
+        this.is_mouse_started = this._mouseStart(this.mouse_down_info) !== false;
+        if (this.is_mouse_started) {
+            this._mouseDrag(position_info);
+        }
+        else {
+            this._handleMouseUp(position_info);
+        }
+        return !this.is_mouse_started;
+    };
+    MouseWidget.prototype._getPositionInfo = function (e) {
+        return {
+            page_x: e.pageX,
+            page_y: e.pageY,
+            target: e.target,
+            original_event: e
+        };
+    };
+    MouseWidget.prototype._mouseUp = function (e) {
+        return this._handleMouseUp(this._getPositionInfo(e));
+    };
+    MouseWidget.prototype._handleMouseUp = function (position_info) {
+        var $document = $(document);
+        $document.off("mousemove.mousewidget");
+        $document.off("touchmove.mousewidget");
+        $document.off("mouseup.mousewidget");
+        $document.off("touchend.mousewidget");
+        if (this.is_mouse_started) {
+            this.is_mouse_started = false;
+            this._mouseStop(position_info);
+        }
+    };
+    MouseWidget.prototype._touchStart = function (e) {
+        var touch_event = e.originalEvent;
+        if (touch_event.touches.length > 1) {
+            return;
+        }
+        var touch = touch_event.changedTouches[0];
+        return this._handleMouseDown(e, this._getPositionInfo(touch));
+    };
+    MouseWidget.prototype._touchMove = function (e) {
+        var touch_event = e.originalEvent;
+        if (touch_event.touches.length > 1) {
+            return;
+        }
+        var touch = touch_event.changedTouches[0];
+        return this._handleMouseMove(e, this._getPositionInfo(touch));
+    };
+    MouseWidget.prototype._touchEnd = function (e) {
+        var touch_event = e.originalEvent;
+        if (touch_event.touches.length > 1) {
+            return;
+        }
+        var touch = touch_event.changedTouches[0];
+        return this._handleMouseUp(this._getPositionInfo(touch));
+    };
+    return MouseWidget;
+}(simple_widget_1["default"]));
+exports.__esModule = true;
+exports["default"] = MouseWidget;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var node_1 = __webpack_require__(0);
+var NodeElement = (function () {
+    function NodeElement(node, tree_widget) {
+        this.init(node, tree_widget);
+    }
+    NodeElement.prototype.init = function (node, tree_widget) {
+        this.node = node;
+        this.tree_widget = tree_widget;
+        if (!node.element) {
+            node.element = this.tree_widget.element.get(0);
+        }
+        this.$element = $(node.element);
+    };
+    NodeElement.prototype.addDropHint = function (position) {
+        if (position === node_1.Position.INSIDE) {
+            return new BorderDropHint(this.$element);
+        }
+        else {
+            return new GhostDropHint(this.node, this.$element, position);
+        }
+    };
+    NodeElement.prototype.select = function () {
+        var $li = this.getLi();
+        $li.addClass("jqtree-selected");
+        $li.attr("aria-selected", "true");
+        var $span = this.getSpan();
+        $span.attr("tabindex", 0);
+    };
+    NodeElement.prototype.deselect = function () {
+        var $li = this.getLi();
+        $li.removeClass("jqtree-selected");
+        $li.attr("aria-selected", "false");
+        var $span = this.getSpan();
+        $span.attr("tabindex", -1);
+    };
+    NodeElement.prototype.getUl = function () {
+        return this.$element.children("ul:first");
+    };
+    NodeElement.prototype.getSpan = function () {
+        return this.$element.children(".jqtree-element").find("span.jqtree-title");
+    };
+    NodeElement.prototype.getLi = function () {
+        return this.$element;
+    };
+    return NodeElement;
+}());
+exports.NodeElement = NodeElement;
+var FolderElement = (function (_super) {
+    __extends(FolderElement, _super);
+    function FolderElement() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    FolderElement.prototype.open = function (on_finished, slide) {
+        var _this = this;
+        if (slide === void 0) { slide = true; }
+        if (!this.node.is_open) {
+            this.node.is_open = true;
+            var $button = this.getButton();
+            $button.removeClass("jqtree-closed");
+            $button.html("");
+            var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+            $button.get(0).appendChild(icon);
+            var doOpen = function () {
+                var $li = _this.getLi();
+                $li.removeClass("jqtree-closed");
+                var $span = _this.getSpan();
+                $span.attr("aria-expanded", "true");
+                if (on_finished) {
+                    on_finished(_this.node);
+                }
+                _this.tree_widget._triggerEvent("tree.open", { node: _this.node });
+            };
+            if (slide) {
+                this.getUl().slideDown("fast", doOpen);
+            }
+            else {
+                this.getUl().show();
+                doOpen();
+            }
+        }
+    };
+    FolderElement.prototype.close = function (slide) {
+        var _this = this;
+        if (slide === void 0) { slide = true; }
+        if (this.node.is_open) {
+            this.node.is_open = false;
+            var $button = this.getButton();
+            $button.addClass("jqtree-closed");
+            $button.html("");
+            var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+            $button.get(0).appendChild(icon);
+            var doClose = function () {
+                var $li = _this.getLi();
+                $li.addClass("jqtree-closed");
+                var $span = _this.getSpan();
+                $span.attr("aria-expanded", "false");
+                _this.tree_widget._triggerEvent("tree.close", { node: _this.node });
+            };
+            if (slide) {
+                this.getUl().slideUp("fast", doClose);
+            }
+            else {
+                this.getUl().hide();
+                doClose();
+            }
+        }
+    };
+    FolderElement.prototype.addDropHint = function (position) {
+        if (!this.node.is_open && position === node_1.Position.INSIDE) {
+            return new BorderDropHint(this.$element);
+        }
+        else {
+            return new GhostDropHint(this.node, this.$element, position);
+        }
+    };
+    FolderElement.prototype.getButton = function () {
+        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
+    };
+    return FolderElement;
+}(NodeElement));
+exports.FolderElement = FolderElement;
+var BorderDropHint = (function () {
+    function BorderDropHint($element) {
+        var $div = $element.children(".jqtree-element");
+        var width = $element.width() - 4;
+        this.$hint = $('<span class="jqtree-border"></span>');
+        $div.append(this.$hint);
+        this.$hint.css({
+            width: width,
+            height: $div.outerHeight() - 4
+        });
+    }
+    BorderDropHint.prototype.remove = function () {
+        this.$hint.remove();
+    };
+    return BorderDropHint;
+}());
+exports.BorderDropHint = BorderDropHint;
+var GhostDropHint = (function () {
+    function GhostDropHint(node, $element, position) {
+        this.$element = $element;
+        this.node = node;
+        this.$ghost = $("<li class=\"jqtree_common jqtree-ghost\"><span class=\"jqtree_common jqtree-circle\"></span>\n            <span class=\"jqtree_common jqtree-line\"></span></li>");
+        if (position === node_1.Position.AFTER) {
+            this.moveAfter();
+        }
+        else if (position === node_1.Position.BEFORE) {
+            this.moveBefore();
+        }
+        else if (position === node_1.Position.INSIDE) {
+            if (node.isFolder() && node.is_open) {
+                this.moveInsideOpenFolder();
+            }
+            else {
+                this.moveInside();
+            }
+        }
+    }
+    GhostDropHint.prototype.remove = function () {
+        this.$ghost.remove();
+    };
+    GhostDropHint.prototype.moveAfter = function () {
+        this.$element.after(this.$ghost);
+    };
+    GhostDropHint.prototype.moveBefore = function () {
+        this.$element.before(this.$ghost);
+    };
+    GhostDropHint.prototype.moveInsideOpenFolder = function () {
+        $(this.node.children[0].element).before(this.$ghost);
+    };
+    GhostDropHint.prototype.moveInside = function () {
+        this.$element.after(this.$ghost);
+        this.$ghost.addClass("jqtree-inside");
+    };
+    return GhostDropHint;
+}());
+exports.GhostDropHint = GhostDropHint;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var util_1 = __webpack_require__(1);
+var SaveStateHandler = (function () {
+    function SaveStateHandler(tree_widget) {
+        this.tree_widget = tree_widget;
+    }
+    SaveStateHandler.prototype.saveState = function () {
+        var state = JSON.stringify(this.getState());
+        if (this.tree_widget.options.onSetStateFromStorage) {
+            this.tree_widget.options.onSetStateFromStorage(state);
+        }
+        else if (this.supportsLocalStorage()) {
+            localStorage.setItem(this.getKeyName(), state);
+        }
+    };
+    SaveStateHandler.prototype.getStateFromStorage = function () {
+        var json_data = this._loadFromStorage();
+        if (json_data) {
+            return this._parseState(json_data);
+        }
+        else {
+            return null;
+        }
+    };
+    SaveStateHandler.prototype.getState = function () {
+        var _this = this;
+        var getOpenNodeIds = function () {
+            var open_nodes = [];
+            _this.tree_widget.tree.iterate(function (node) {
+                if (node.is_open &&
+                    node.id &&
+                    node.hasChildren()) {
+                    open_nodes.push(node.id);
+                }
+                return true;
+            });
+            return open_nodes;
+        };
+        var getSelectedNodeIds = function () { return _this.tree_widget.getSelectedNodes().map(function (n) { return n.id; }); };
+        return {
+            open_nodes: getOpenNodeIds(),
+            selected_node: getSelectedNodeIds()
+        };
+    };
+    /*
+    Set initial state
+    Don't handle nodes that are loaded on demand
+
+    result: must load on demand
+    */
+    SaveStateHandler.prototype.setInitialState = function (state) {
+        if (!state) {
+            return false;
+        }
+        else {
+            var must_load_on_demand = this._openInitialNodes(state.open_nodes);
+            this._selectInitialNodes(state.selected_node);
+            return must_load_on_demand;
+        }
+    };
+    SaveStateHandler.prototype.setInitialStateOnDemand = function (state, cb_finished) {
+        if (state) {
+            this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cb_finished);
+        }
+        else {
+            cb_finished();
+        }
+    };
+    SaveStateHandler.prototype.getNodeIdToBeSelected = function () {
+        var state = this.getStateFromStorage();
+        if (state && state.selected_node) {
+            return state.selected_node[0];
+        }
+        else {
+            return null;
+        }
+    };
+    SaveStateHandler.prototype._parseState = function (json_data) {
+        var state = $.parseJSON(json_data);
+        // Check if selected_node is an int (instead of an array)
+        if (state && state.selected_node && util_1.isInt(state.selected_node)) {
+            // Convert to array
+            state.selected_node = [state.selected_node];
+        }
+        return state;
+    };
+    SaveStateHandler.prototype._loadFromStorage = function () {
+        if (this.tree_widget.options.onGetStateFromStorage) {
+            return this.tree_widget.options.onGetStateFromStorage();
+        }
+        else if (this.supportsLocalStorage()) {
+            return localStorage.getItem(this.getKeyName());
+        }
+    };
+    SaveStateHandler.prototype._openInitialNodes = function (node_ids) {
+        var must_load_on_demand = false;
+        for (var _i = 0, node_ids_1 = node_ids; _i < node_ids_1.length; _i++) {
+            var node_id = node_ids_1[_i];
+            var node = this.tree_widget.getNodeById(node_id);
+            if (node) {
+                if (!node.load_on_demand) {
+                    node.is_open = true;
+                }
+                else {
+                    must_load_on_demand = true;
+                }
+            }
+        }
+        return must_load_on_demand;
+    };
+    SaveStateHandler.prototype._selectInitialNodes = function (node_ids) {
+        var select_count = 0;
+        for (var _i = 0, node_ids_2 = node_ids; _i < node_ids_2.length; _i++) {
+            var node_id = node_ids_2[_i];
+            var node = this.tree_widget.getNodeById(node_id);
+            if (node) {
+                select_count += 1;
+                this.tree_widget.select_node_handler.addToSelection(node);
+            }
+        }
+        return select_count !== 0;
+    };
+    SaveStateHandler.prototype._setInitialStateOnDemand = function (node_ids_param, selected_nodes, cb_finished) {
+        var _this = this;
+        var loading_count = 0;
+        var node_ids = node_ids_param;
+        var openNodes = function () {
+            var new_nodes_ids = [];
+            for (var _i = 0, node_ids_3 = node_ids; _i < node_ids_3.length; _i++) {
+                var node_id = node_ids_3[_i];
+                var node = _this.tree_widget.getNodeById(node_id);
+                if (!node) {
+                    new_nodes_ids.push(node_id);
+                }
+                else {
+                    if (!node.is_loading) {
+                        if (node.load_on_demand) {
+                            loadAndOpenNode(node);
+                        }
+                        else {
+                            _this.tree_widget._openNode(node, false);
+                        }
+                    }
+                }
+            }
+            node_ids = new_nodes_ids;
+            if (_this._selectInitialNodes(selected_nodes)) {
+                _this.tree_widget._refreshElements();
+            }
+            if (loading_count === 0) {
+                cb_finished();
+            }
+        };
+        var loadAndOpenNode = function (node) {
+            loading_count += 1;
+            _this.tree_widget._openNode(node, false, function () {
+                loading_count -= 1;
+                openNodes();
+            });
+        };
+        openNodes();
+    };
+    SaveStateHandler.prototype.getKeyName = function () {
+        if (typeof this.tree_widget.options.saveState === "string") {
+            return this.tree_widget.options.saveState;
+        }
+        else {
+            return "tree";
+        }
+    };
+    SaveStateHandler.prototype.supportsLocalStorage = function () {
+        var testSupport = function () {
+            // Is local storage supported?
+            if (localStorage == null) {
+                return false;
+            }
+            else {
+                // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
+                try {
+                    var key = "_storage_test";
+                    sessionStorage.setItem(key, "value");
+                    sessionStorage.removeItem(key);
+                }
+                catch (error) {
+                    return false;
+                }
+                return true;
+            }
+        };
+        if (this._supportsLocalStorage == null) {
+            this._supportsLocalStorage = testSupport();
+        }
+        return this._supportsLocalStorage;
+    };
+    return SaveStateHandler;
+}());
+exports.__esModule = true;
+exports["default"] = SaveStateHandler;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var ScrollHandler = (function () {
+    function ScrollHandler(tree_widget) {
+        this.tree_widget = tree_widget;
+        this.previous_top = -1;
+        this.is_initialized = false;
+    }
+    ScrollHandler.prototype.checkScrolling = function () {
+        this._ensureInit();
+        var hovered_area = this.tree_widget.dnd_handler.hovered_area;
+        if (hovered_area && hovered_area.top !== this.previous_top) {
+            this.previous_top = hovered_area.top;
+            if (this.$scroll_parent) {
+                this._handleScrollingWithScrollParent(hovered_area);
+            }
+            else {
+                this._handleScrollingWithDocument(hovered_area);
+            }
+        }
+    };
+    ScrollHandler.prototype.scrollTo = function (top) {
+        this._ensureInit();
+        if (this.$scroll_parent) {
+            this.$scroll_parent[0].scrollTop = top;
+        }
+        else {
+            var tree_top = this.tree_widget.$el.offset().top;
+            $(document).scrollTop(top + tree_top);
+        }
+    };
+    ScrollHandler.prototype.isScrolledIntoView = function (element) {
+        this._ensureInit();
+        var $element = $(element);
+        var element_bottom;
+        var view_bottom;
+        var element_top;
+        var view_top;
+        if (this.$scroll_parent) {
+            view_top = 0;
+            view_bottom = this.$scroll_parent.height();
+            element_top = $element.offset().top - this.scroll_parent_top;
+            element_bottom = element_top + $element.height();
+        }
+        else {
+            view_top = $(window).scrollTop();
+            view_bottom = view_top + $(window).height();
+            element_top = $element.offset().top;
+            element_bottom = element_top + $element.height();
+        }
+        return ((element_bottom <= view_bottom) && (element_top >= view_top));
+    };
+    ScrollHandler.prototype._initScrollParent = function () {
+        var _this = this;
+        var getParentWithOverflow = function () {
+            var css_values = ["overflow", "overflow-y"];
+            var hasOverFlow = function ($el) {
+                for (var _i = 0, css_values_1 = css_values; _i < css_values_1.length; _i++) {
+                    var css_value = css_values_1[_i];
+                    if ($el.css(css_value) in ["auto", "scroll"]) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            if (hasOverFlow(_this.tree_widget.$el)) {
+                return _this.tree_widget.$el;
+            }
+            for (var _i = 0, _a = _this.tree_widget.$el.parents().get(); _i < _a.length; _i++) {
+                var el = _a[_i];
+                var $el = $(el);
+                if (hasOverFlow($el)) {
+                    return $el;
+                }
+            }
+            return null;
+        };
+        var setDocumentAsScrollParent = function () {
+            _this.scroll_parent_top = 0;
+            _this.$scroll_parent = null;
+        };
+        if (this.tree_widget.$el.css("position") === "fixed") {
+            setDocumentAsScrollParent();
+        }
+        var $scroll_parent = getParentWithOverflow();
+        if ($scroll_parent && $scroll_parent.length && $scroll_parent[0].tagName !== "HTML") {
+            this.$scroll_parent = $scroll_parent;
+            this.scroll_parent_top = this.$scroll_parent.offset().top;
+        }
+        else {
+            setDocumentAsScrollParent();
+        }
+        this.is_initialized = true;
+    };
+    ScrollHandler.prototype._ensureInit = function () {
+        if (!this.is_initialized) {
+            this._initScrollParent();
+        }
+    };
+    ScrollHandler.prototype._handleScrollingWithScrollParent = function (area) {
+        var distance_bottom = this.scroll_parent_top + this.$scroll_parent[0].offsetHeight - area.bottom;
+        if (distance_bottom < 20) {
+            this.$scroll_parent[0].scrollTop += 20;
+            this.tree_widget.refreshHitAreas();
+            this.previous_top = -1;
+        }
+        else if ((area.top - this.scroll_parent_top) < 20) {
+            this.$scroll_parent[0].scrollTop -= 20;
+            this.tree_widget.refreshHitAreas();
+            this.previous_top = -1;
+        }
+    };
+    ScrollHandler.prototype._handleScrollingWithDocument = function (area) {
+        var distance_top = area.top - $(document).scrollTop();
+        if (distance_top < 20) {
+            $(document).scrollTop($(document).scrollTop() - 20);
+        }
+        else if ($(window).height() - (area.bottom - $(document).scrollTop()) < 20) {
+            $(document).scrollTop($(document).scrollTop() + 20);
+        }
+    };
+    return ScrollHandler;
+}());
+exports.__esModule = true;
+exports["default"] = ScrollHandler;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var SelectNodeHandler = (function () {
+    function SelectNodeHandler(tree_widget) {
+        this.tree_widget = tree_widget;
+        this.clear();
+    }
+    SelectNodeHandler.prototype.getSelectedNode = function () {
+        var selected_nodes = this.getSelectedNodes();
+        if (selected_nodes.length) {
+            return selected_nodes[0];
+        }
+        else {
+            return false;
+        }
+    };
+    SelectNodeHandler.prototype.getSelectedNodes = function () {
+        if (this.selected_single_node) {
+            return [this.selected_single_node];
+        }
+        else {
+            var selected_nodes = [];
+            for (var id in this.selected_nodes) {
+                if (this.selected_nodes.hasOwnProperty(id)) {
+                    var node = this.tree_widget.getNodeById(id);
+                    if (node) {
+                        selected_nodes.push(node);
+                    }
+                }
+            }
+            return selected_nodes;
+        }
+    };
+    SelectNodeHandler.prototype.getSelectedNodesUnder = function (parent) {
+        if (this.selected_single_node) {
+            if (parent.isParentOf(this.selected_single_node)) {
+                return [this.selected_single_node];
+            }
+            else {
+                return [];
+            }
+        }
+        else {
+            var selected_nodes = [];
+            for (var id in this.selected_nodes) {
+                if (this.selected_nodes.hasOwnProperty(id)) {
+                    var node = this.tree_widget.getNodeById(id);
+                    if (node && parent.isParentOf(node)) {
+                        selected_nodes.push(node);
+                    }
+                }
+            }
+            return selected_nodes;
+        }
+    };
+    SelectNodeHandler.prototype.isNodeSelected = function (node) {
+        if (!node) {
+            return false;
+        }
+        else if (node.id != null) {
+            if (this.selected_nodes[node.id]) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else if (this.selected_single_node) {
+            return this.selected_single_node.element === node.element;
+        }
+        else {
+            return false;
+        }
+    };
+    SelectNodeHandler.prototype.clear = function () {
+        this.selected_nodes = {};
+        this.selected_single_node = null;
+    };
+    SelectNodeHandler.prototype.removeFromSelection = function (node, include_children) {
+        var _this = this;
+        if (include_children === void 0) { include_children = false; }
+        if (node.id == null) {
+            if (this.selected_single_node && node.element === this.selected_single_node.element) {
+                this.selected_single_node = null;
+            }
+        }
+        else {
+            delete this.selected_nodes[node.id];
+            if (include_children) {
+                node.iterate(function (n) {
+                    delete _this.selected_nodes[node.id];
+                    return true;
+                });
+            }
+        }
+    };
+    SelectNodeHandler.prototype.addToSelection = function (node) {
+        if (node.id != null) {
+            this.selected_nodes[node.id] = true;
+        }
+        else {
+            this.selected_single_node = node;
+        }
+    };
+    return SelectNodeHandler;
+}());
+exports.__esModule = true;
+exports["default"] = SelectNodeHandler;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var version = "1.3.7";
+exports.__esModule = true;
+exports["default"] = version;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.example_data = [
+    {
+        label: "node1",
+        id: 123,
+        int_property: 1,
+        str_property: "1",
+        children: [
+            { label: "child1", id: 125, int_property: 2 },
+            { label: "child2", id: 126 }
+        ]
+    },
+    {
+        label: "node2",
+        id: 124,
+        int_property: 3,
+        str_property: "3",
+        children: [
+            { label: "child3", id: 127 }
+        ]
+    }
+];
+/*
+example data 2:
+
+-main
+---c1
+---c2
+*/
+exports.example_data2 = [
+    {
+        label: "main",
+        children: [
+            { label: "c1" },
+            { label: "c2" }
+        ]
+    }
+];
+function formatNodes(nodes) {
+    var strings = $.map(nodes, function (node) { return node.name; });
+    return strings.join(" ");
+}
+exports.formatNodes = formatNodes;
+;
+function isNodeClosed($node) {
+    return (($node.is("li.jqtree-folder.jqtree-closed")) &&
+        ($node.find("a:eq(0)").is("a.jqtree-toggler.jqtree-closed")) &&
+        ($node.find("ul:eq(0)").is("ul")));
+}
+exports.isNodeClosed = isNodeClosed;
+function isNodeOpen($node) {
+    return (($node.is("li.jqtree-folder")) &&
+        ($node.find("a:eq(0)").is("a.jqtree-toggler")) &&
+        ($node.find("ul:eq(0)").is("ul")) &&
+        (!$node.is("li.jqtree-folder.jqtree-closed")) &&
+        (!$node.find("span:eq(0)").is("a.jqtree-toggler.jqtree-closed")));
+}
+exports.isNodeOpen = isNodeOpen;
+function formatTitles($node) {
+    var titles = $node.find(".jqtree-title").map(function (i, el) { return $(el).text(); });
+    return titles.toArray().join(" ");
+}
+exports.formatTitles = formatTitles;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+__webpack_require__(18);
+__webpack_require__(17);
+__webpack_require__(16);
+QUnit.config.testTimeout = 5000;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+;
+;
+;
+;
+;
+;
+;
+;
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+__webpack_require__(3);
+var utils_for_test_1 = __webpack_require__(13);
+var node_1 = __webpack_require__(0);
+__webpack_require__(15);
+var module = QUnit.module, test = QUnit.test;
+module("jqtree", {
+    beforeEach: function () {
+        $("body").append('<div id="tree1"></div>');
+    },
+    afterEach: function () {
+        var $tree = $("#tree1");
+        $tree.tree("destroy");
+        $tree.remove();
+        $.mockjax.clear();
+    }
+});
+test("create jqtree from data", function (assert) {
+    $("#tree1").tree({
+        data: utils_for_test_1.example_data
+    });
+    assert.equal($("#tree1").children().length, 1, "number of children on level 0");
+    assert.ok($("#tree1").children().is("ul.jqtree-tree"), "first element is ul.jqtree-tree");
+    assert.equal($("#tree1 ul.jqtree-tree > li").length, 2, "number of children on level 1");
+    assert.ok($("#tree1 ul.jqtree-tree li:eq(0)").is("li.jqtree-folder.jqtree-closed"), "first child is li.jqtree-folder.jqtree-closed");
+    assert.ok($("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element > a.jqtree-toggler").is("a.jqtree-toggler.jqtree-closed"), "button in first folder");
+    assert.equal($("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element span.jqtree-title").text(), "node1");
+});
+test("toggle", function (assert) {
+    // setup
+    var done = assert.async();
+    // create tree
+    var $tree = $("#tree1");
+    var $node1;
+    var node1;
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    $tree.on("tree.open", function (e) {
+        assert.ok(!utils_for_test_1.isNodeClosed($node1), "node1 is open");
+        // 2. close node1
+        $tree.tree("toggle", node1);
+    });
+    $tree.on("tree.close", function (e) {
+        assert.ok(utils_for_test_1.isNodeClosed($node1), "node1 is closed");
+        done();
+    });
+    var tree = $tree.tree("getTree");
+    node1 = tree.children[0];
+    $node1 = $tree.find("ul.jqtree-tree li:eq(0)");
+    // node1 is initially closed
+    assert.ok(utils_for_test_1.isNodeClosed($node1), "node1 is closed");
+    // 1. open node1
+    $tree.tree("toggle", node1);
+});
+test("click event", function (assert) {
+    var select_count = 0;
+    // create tree
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        selectable: true
+    });
+    var $node1 = $tree.find("ul.jqtree-tree li:first");
+    var $text_span = $node1.find("span:first");
+    $tree.on("tree.click", function (e) {
+        assert.equal(e.node.name, "node1");
+    });
+    var done = assert.async();
+    $tree.on("tree.select", function (e) {
+        select_count += 1;
+        if (select_count === 1) {
+            assert.equal(e.node.name, "node1");
+            assert.equal($tree.tree("getSelectedNode").name, "node1");
+            // deselect
+            $text_span.click();
+        }
+        else {
+            assert.equal(e.node, null);
+            assert.equal(e.previous_node.name, "node1");
+            assert.equal($tree.tree("getSelectedNode"), false);
+            done();
+        }
+    });
+    // click on node1
+    $text_span.click();
+});
+test("saveState", function (assert) {
+    var $tree = $("#tree1");
+    var saved_state;
+    function setState(state) {
+        saved_state = state;
+    }
+    function getState() {
+        return saved_state;
+    }
+    function createTree() {
+        $tree.tree({
+            data: utils_for_test_1.example_data,
+            saveState: true,
+            onSetStateFromStorage: setState,
+            onGetStateFromStorage: getState,
+            selectable: true
+        });
+    }
+    // create tree
+    createTree();
+    // nodes are initially closed
+    var tree = $tree.tree("getTree");
+    tree.iterate(function (node) {
+        assert.ok(!node.is_open, "jqtree-closed");
+        return true;
+    });
+    // open node1
+    $tree.tree("toggle", tree.children[0]);
+    // node1 is open
+    assert.ok(tree.children[0].is_open, "node1 is_open");
+    // select node2
+    $tree.tree("selectNode", tree.children[1]);
+    // node2 is selected
+    assert.equal($tree.tree("getSelectedNode").name, "node2", "getSelectedNode (1)");
+    // create tree again
+    $tree.tree("destroy");
+    createTree();
+    var tree2 = $tree.tree("getTree");
+    assert.ok(tree2.children[0].is_open, "node1 is_open");
+    assert.ok(!tree2.children[1].is_open, "node2 is closed");
+    // node2 is selected
+    assert.equal($tree.tree("getSelectedNode").name, "node2", "getSelectedNode (2)");
+});
+test("getSelectedNode", function (assert) {
+    var $tree = $("#tree1");
+    // create tree
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        selectable: true
+    });
+    // there is no node selected
+    assert.equal($tree.tree("getSelectedNode"), false, "getSelectedNode");
+    // select node1
+    var tree = $tree.tree("getTree");
+    var node1 = tree.children[0];
+    $tree.tree("selectNode", node1);
+    // node1 is selected
+    assert.equal($tree.tree("getSelectedNode").name, "node1", "getSelectedNode");
+});
+test("toJson", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    // 1. call toJson
+    assert.equal($tree.tree("toJson"), '[{"name":"node1","id":123,"int_property":1,"str_property":"1",' +
+        '"children":[{"name":"child1","id":125,"int_property":2},{"name":' +
+        '"child2","id":126}]},{"name":"node2","id":124,"int_property":3,' +
+        '"str_property":"3","children":[{"name":"child3","id":127}]}]');
+    // Check that properties 'children', 'parent' and 'element' still exist.
+    var tree = $tree.tree("getTree");
+    assert.equal(tree.children.length, 2);
+    assert.ok(tree.children[0].parent !== undefined, "parent");
+    assert.ok($(tree.children[0].element).is("li"), "element");
+});
+test("loadData", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        autoOpen: true
+    });
+    // first node is 'node1'
+    assert.equal($tree.find("> ul > li:first .jqtree-element:first > span").text(), "node1");
+    // - load new data
+    $tree.tree("loadData", utils_for_test_1.example_data2);
+    // first node is 'main'
+    assert.equal($tree.find("> ul > li:first .jqtree-element:first > span").text(), "main");
+    // - load new data under node 'child3'
+    $tree.tree("loadData", utils_for_test_1.example_data);
+    var child3 = $tree.tree("getNodeByName", "child3");
+    var data = [
+        { label: "c4", id: 200 },
+        {
+            label: "c5", id: 201,
+            children: [
+                { label: "c6", id: 202 }
+            ]
+        }
+    ];
+    $tree.tree("loadData", data, child3);
+    // first node in html is still 'node1'
+    assert.equal($tree.find("li:eq(0)").find(".jqtree-element:eq(0) span.jqtree-title").text(), "node1");
+    // Node 'child3' now has a children 'c4' and 'c5'
+    var $child3 = $tree.find("span:contains(child3)");
+    var $li = $child3.closest("li");
+    assert.equal($li.children("ul").children("li:eq(0)").find(".jqtree-element span.jqtree-title").text(), "c4");
+    // Node 'child3' must have toggler button
+    assert.ok($child3.prev().is("a.jqtree-toggler"), "node 'child3' must have toggler button");
+    // - select node 'c5' and load new data under 'child3'
+    var c5 = $tree.tree("getNodeByName", "c5");
+    $tree.tree("selectNode", c5);
+    assert.equal($tree.tree("getSelectedNode").name, "c5");
+    var data2 = [
+        { label: "c7" },
+        { label: "c8" }
+    ];
+    $tree.tree("loadData", data2, child3);
+    // c5 must be deselected
+    assert.equal($tree.tree("getSelectedNode"), false);
+    // - select c7; load new data under child3; note that c7 has no id
+    $tree.tree("selectNode", $tree.tree("getNodeByName", "c7"));
+    assert.equal($tree.tree("getSelectedNode").name, "c7");
+    $tree.tree("loadData", ["c9"], child3);
+    assert.equal($tree.tree("getSelectedNode"), false);
+    // - select c9 (which has no id); load new nodes under child2
+    $tree.tree("selectNode", $tree.tree("getNodeByName", "c9"));
+    var child2 = $tree.tree("getNodeByName", "child2");
+    $tree.tree("loadData", ["c10"], child2);
+    assert.equal($tree.tree("getSelectedNode").name, "c9");
+});
+test("openNode and closeNode", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    var node2 = $tree.tree("getNodeByName", "node2");
+    assert.equal(node2.name, "node2");
+    assert.equal(node2.is_open, undefined);
+    // 1. open node2
+    $tree.tree("openNode", node2, false);
+    assert.equal(node2.is_open, true);
+    assert.equal(utils_for_test_1.isNodeOpen($(node2.element)), true);
+    // 2. close node2
+    $tree.tree("closeNode", node2, false);
+    assert.equal(node2.is_open, false);
+    assert.equal(utils_for_test_1.isNodeClosed($(node2.element)), true);
+    // 3. open child1
+    var node1 = $tree.tree("getNodeByName", "node1");
+    var child1 = $tree.tree("getNodeByName", "child1");
+    // add a child to child1 so it is a folder
+    $tree.tree("appendNode", "child1a", child1);
+    // node1 is initialy closed
+    assert.equal(node1.is_open, undefined);
+    // open child1
+    $tree.tree("openNode", child1, false);
+    // node1 and child1 are now open1
+    assert.equal(node1.is_open, true);
+    assert.equal(child1.is_open, true);
+});
+function test_open_node_with_callback(slide, include_slide_param, assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    var node2 = $tree.tree("getNodeByName", "node2");
+    // open node2
+    var done = assert.async();
+    function handleOpenNode(node) {
+        assert.equal(node.name, "node2");
+        assert.ok(node.is_open);
+        done();
+    }
+    if (include_slide_param) {
+        $tree.tree("openNode", node2, slide, handleOpenNode);
+    }
+    else {
+        $tree.tree("openNode", node2, handleOpenNode);
+    }
+}
+test("openNode with callback with slide true", function (assert) {
+    test_open_node_with_callback(true, true, assert);
+});
+test("openNode with callback with slide false", function (assert) {
+    test_open_node_with_callback(false, true, assert);
+});
+test("openNode with callback with slide null", function (assert) {
+    test_open_node_with_callback(null, true, assert);
+});
+test("openNode with callback without slide param", function (assert) {
+    test_open_node_with_callback(null, false, assert);
+});
+test("selectNode", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        selectable: true
+    });
+    var node1 = $tree.tree("getTree").children[0];
+    var node2 = $tree.tree("getTree").children[1];
+    var child3 = node2.children[0];
+    assert.equal(child3.name, "child3");
+    assert.equal(node1.is_open, undefined);
+    assert.equal(node2.is_open, undefined);
+    assert.equal(child3.is_open, undefined);
+    // -- select node 'child3', which is a child of 'node2'; must_open_parents = true
+    $tree.tree("selectNode", child3, true);
+    assert.equal($tree.tree("getSelectedNode").name, "child3");
+    assert.equal(node1.is_open, undefined);
+    assert.equal(node2.is_open, true);
+    assert.equal(child3.is_open, undefined);
+    // -- select node 'node1'
+    $tree.tree("selectNode", node1);
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    // -- is 'node1' selected?
+    assert.equal($tree.tree("isNodeSelected", node1), true);
+    // -- deselect
+    $tree.tree("selectNode", null);
+    assert.equal($tree.tree("getSelectedNode"), false);
+    // -- is 'node1' selected?
+    assert.equal($tree.tree("isNodeSelected", node1), false);
+});
+test("selectNode when another node is selected", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        selectable: true
+    });
+    var node1 = $tree.tree("getTree").children[0];
+    var node2 = $tree.tree("getTree").children[1];
+    // -- select node 'node2'
+    $tree.tree("selectNode", node2);
+    assert.equal($tree.tree("getSelectedNode").name, "node2");
+    // -- setting event
+    // -- is node 'node2' named 'deselected_node' in object's attributes?
+    var is_select_event_fired = false;
+    $tree.on("tree.select", function (e) {
+        assert.equal(e.deselected_node, node2);
+        is_select_event_fired = true;
+    });
+    // -- select node 'node1'; node 'node2' is selected before it
+    $tree.tree("selectNode", node1);
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal($tree.tree("isNodeSelected", node1), true);
+    // event was fired
+    assert.ok(is_select_event_fired);
+});
+test("click toggler", function (assert) {
+    // setup
+    var done = assert.async();
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        selectable: true
+    });
+    var $title = $tree.find("li:eq(0)").find("> .jqtree-element > span.jqtree-title");
+    assert.equal($title.text(), "node1");
+    var $toggler = $title.prev();
+    assert.ok($toggler.is("a.jqtree-toggler.jqtree-closed"));
+    $tree.on("tree.open", function (e) {
+        // 2. handle 'open' event
+        assert.equal(e.node.name, "node1");
+        // 3. click toggler again
+        $toggler.click();
+    });
+    $tree.on("tree.close", function (e) {
+        assert.equal(e.node.name, "node1");
+        done();
+    });
+    // 1. click toggler of 'node1'
+    $toggler.click();
+});
+test("getNodeById", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    var node2 = $tree.tree("getNodeByName", "node2");
+    // 1. get 'node2' by id
+    assert.equal($tree.tree("getNodeById", 124).name, "node2");
+    // 2. get id that does not exist
+    assert.equal($tree.tree("getNodeById", 333), null);
+    // 3. get id by string
+    assert.equal($tree.tree("getNodeById", "124").name, "node2");
+    // 4. add node with string id; search by int
+    $tree.tree("appendNode", {
+        label: "abc",
+        id: "234"
+    });
+    assert.equal($tree.tree("getNodeById", 234).name, "abc");
+    assert.equal($tree.tree("getNodeById", "234").name, "abc");
+    // 5. load subtree in node2
+    var subtree_data = [
+        {
+            label: "sub1",
+            id: 200,
+            children: [
+                { label: "sub2", id: 201 }
+            ]
+        }
+    ];
+    $tree.tree("loadData", subtree_data, node2);
+    var t = $tree.tree("getTree");
+    assert.equal($tree.tree("getNodeById", 200).name, "sub1");
+    assert.equal($tree.tree("getNodeById", 201).name, "sub2");
+});
+test("autoOpen", function (assert) {
+    var $tree = $("#tree1");
+    function formatOpenFolders() {
+        var open_nodes = [];
+        $tree.find("li").each(
+        // tslint:disable-next-line: only-arrow-functions
+        function () {
+            var $li = $(this);
+            if ($li.is(".jqtree-folder") && !$li.is(".jqtree-closed")) {
+                var label = $li.children(".jqtree-element").find("span").text();
+                open_nodes.push(label);
+            }
+        });
+        return open_nodes.join(";");
+    }
+    /*
+    -l1n1 (level 0)
+    ----l2n1 (1)
+    ----l2n2 (1)
+    -------l3n1 (2)
+    ----------l4n1 (3)
+    -l1n2
+    */
+    var data = [
+        {
+            label: "l1n1",
+            children: [
+                "l2n1",
+                {
+                    label: "l2n2",
+                    children: [
+                        {
+                            label: "l3n1",
+                            children: [
+                                "l4n1"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "l1n2"
+    ];
+    // 1. autoOpen is false
+    $tree.tree({
+        data: data,
+        autoOpen: false
+    });
+    assert.equal(formatOpenFolders(), "");
+    $tree.tree("destroy");
+    // 2. autoOpen is true
+    $tree.tree({
+        data: data,
+        autoOpen: true
+    });
+    assert.equal(formatOpenFolders(), "l1n1;l2n2;l3n1");
+    $tree.tree("destroy");
+    // 3. autoOpen level 1
+    $tree.tree({
+        data: data,
+        autoOpen: 1
+    });
+    assert.equal(formatOpenFolders(), "l1n1;l2n2");
+});
+test("onCreateLi", function (assert) {
+    // 1. init tree with onCreateLi
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        onCreateLi: function (node, $li) {
+            var $span = $li.children(".jqtree-element").find("span");
+            $span.html("_" + node.name + "_");
+        }
+    });
+    assert.equal($tree.find("span:eq(0)").text(), "_node1_");
+});
+test("save state", function (assert) {
+    // Remove state from localstorage
+    if (typeof localStorage !== "undefined") {
+        localStorage.setItem("my_tree", null);
+    }
+    // 1. init tree
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        selectable: true,
+        saveState: "my_tree"
+    });
+    var tree = $tree.tree("getTree");
+    assert.equal($tree.tree("getSelectedNode"), false);
+    // 2. select node -> state is saved
+    $tree.tree("selectNode", tree.children[0]);
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    // 3. init tree again
+    $tree.tree("destroy");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        selectable: true,
+        saveState: "my_tree"
+    });
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
+});
+test("generate hit areas", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    // 1. get hit areas
+    var node = $tree.tree("getNodeById", 123);
+    var hit_areas = $tree.tree("testGenerateHitAreas", node);
+    var strings = $.map(hit_areas, function (hit_area) {
+        return hit_area.node.name + " " + node_1.Position.getName(hit_area.position);
+    });
+    assert.equal(strings.join(";"), "node1 none;node2 inside;node2 after");
+});
+test("removeNode", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        selectable: true
+    });
+    // 1. Remove selected node; node is 'child1'
+    var child1 = $tree.tree("getNodeByName", "child1");
+    $tree.tree("selectNode", child1);
+    assert.equal($tree.tree("getSelectedNode").name, "child1");
+    $tree.tree("removeNode", child1);
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child2 node2 child3");
+    // getSelectedNode must now return false
+    assert.equal($tree.tree("getSelectedNode"), false);
+    // 2. No node is selected; remove child3
+    $tree.tree("loadData", utils_for_test_1.example_data);
+    var child3 = $tree.tree("getNodeByName", "child3");
+    $tree.tree("removeNode", child3);
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 node2");
+    assert.equal($tree.tree("getSelectedNode"), false);
+    // 3. Remove parent of selected node
+    $tree.tree("loadData", utils_for_test_1.example_data);
+    var child1a = $tree.tree("getNodeByName", "child1");
+    var node1 = $tree.tree("getNodeByName", "node1");
+    $tree.tree("selectNode", child1a);
+    $tree.tree("removeNode", node1);
+    // node is unselected
+    assert.equal($tree.tree("getSelectedNode"), false);
+    // 4. Remove unselected node without an id
+    $tree.tree("loadData", utils_for_test_1.example_data2);
+    var c1 = $tree.tree("getNodeByName", "c1");
+    $tree.tree("removeNode", c1);
+    assert.equal(utils_for_test_1.formatTitles($tree), "main c2");
+});
+test("appendNode", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    var node1 = $tree.tree("getNodeByName", "node1");
+    // 1. Add child3 to node1
+    $tree.tree("appendNode", "child3", node1);
+    assert.equal(utils_for_test_1.formatTitles($(node1.element)), "node1 child1 child2 child3");
+    // 2. Add child4 to child1
+    var child1 = $tree.tree("getNodeByName", "child1");
+    // Node 'child1' does not have a toggler button
+    assert.equal($(child1.element).find("> .jqtree-element > .jqtree-toggler").length, 0);
+    $tree.tree("appendNode", "child4", child1);
+    assert.equal(utils_for_test_1.formatTitles($(child1.element)), "child1 child4");
+    // Node 'child1' must get a toggler button
+    assert.equal($(child1.element).find("> .jqtree-element > .jqtree-toggler").length, 1);
+});
+test("prependNode", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    var node1 = $tree.tree("getNodeByName", "node1");
+    // 1. Prepend child0 to node1
+    $tree.tree("prependNode", "child0", node1);
+    assert.equal(utils_for_test_1.formatTitles($(node1.element)), "node1 child0 child1 child2");
+});
+test("init event for local data", function (assert) {
+    // setup
+    var done = assert.async();
+    var $tree = $("#tree1");
+    $tree.on("tree.init", function () {
+        // Check that we can call functions in 'tree.init' event
+        assert.equal($tree.tree("getNodeByName", "node2").name, "node2");
+        done();
+    });
+    // init tree
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+});
+test("init event for ajax", function (assert) {
+    // setup
+    var done = assert.async();
+    var $tree = $("#tree1");
+    $.mockjax({
+        url: "/tree/",
+        responseText: utils_for_test_1.example_data,
+        logging: false
+    });
+    $tree.on("tree.init", function () {
+        assert.equal($tree.tree("getNodeByName", "node2").name, "node2");
+        done();
+    });
+    // init tree
+    $tree.tree({
+        dataUrl: "/tree/"
+    });
+});
+test("updateNode", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({ data: utils_for_test_1.example_data });
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 node2 child3");
+    // -- update label
+    var node2 = $tree.tree("getNodeByName", "node2");
+    $tree.tree("updateNode", node2, "CHANGED");
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 CHANGED child3");
+    assert.equal(node2.name, "CHANGED");
+    // -- update data
+    $tree.tree("updateNode", node2, {
+        name: "xyz",
+        tag1: "abc"
+    });
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 xyz child3");
+    assert.equal(node2.name, "xyz");
+    assert.equal(node2.tag1, "abc");
+    // - update id
+    assert.equal(node2.id, 124);
+    $tree.tree("updateNode", node2, { id: 555 });
+    assert.equal(node2.id, 555);
+    assert.equal(node2.name, "xyz");
+    // get node by id
+    var node_555 = $tree.tree("getNodeById", 555);
+    assert.equal(node_555.name, "xyz");
+    var node_124 = $tree.tree("getNodeById", 124);
+    assert.equal(node_124, undefined);
+    // update child1
+    var child1 = $tree.tree("getNodeByName", "child1");
+    $tree.tree("updateNode", child1, "child1a");
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1a child2 xyz child3");
+    // select child1
+    $tree.tree("selectNode", child1);
+    $tree.tree("updateNode", child1, "child1b");
+    assert.ok($(child1.element).hasClass("jqtree-selected"));
+    // add children to child1
+    $tree.tree("updateNode", child1, {
+        id: child1.id,
+        name: "child1",
+        children: [
+            { id: 5, name: "child1-1" }
+        ]
+    });
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child1-1 child2 xyz child3");
+    // remove children
+    $tree.tree("updateNode", child1, {
+        id: child1.id,
+        name: "child1",
+        children: []
+    });
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 xyz child3");
+});
+test("moveNode", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({ data: utils_for_test_1.example_data });
+    var child1 = $tree.tree("getNodeByName", "child1");
+    var child2 = $tree.tree("getNodeByName", "child2");
+    var node1 = $tree.tree("getNodeByName", "node1");
+    var node2 = $tree.tree("getNodeByName", "node2");
+    // -- Move child1 after node2
+    $tree.tree("moveNode", child1, node2, "after");
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child2 node2 child3 child1");
+    // -- Check that illegal moves are skipped
+    $tree.tree("moveNode", node1, child2, "inside");
+});
+test("load on demand", function (assert) {
+    // setup
+    var done = assert.async();
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: [
+            {
+                id: 1,
+                label: "node1",
+                load_on_demand: true
+            }
+        ],
+        dataUrl: "/tree/"
+    });
+    // tslint:disable-next-line: only-arrow-functions
+    function handleResponse(options) {
+        assert.equal(options.url, "/tree/", "2");
+        assert.deepEqual(options.data, { node: 1 }, "3");
+        this.responseText = [
+            {
+                id: 2,
+                label: "child1"
+            }
+        ];
+    }
+    $.mockjax({
+        url: "*",
+        response: handleResponse,
+        logging: false
+    });
+    // -- open node
+    function handleOpenNode(node) {
+        assert.equal(node.name, "node1");
+        assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1", "4");
+        done();
+    }
+    var node1 = $tree.tree("getNodeByName", "node1");
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1", "1");
+    $tree.tree("openNode", node1, handleOpenNode);
+});
+test("addNodeAfter", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({ data: utils_for_test_1.example_data });
+    var node1 = $tree.tree("getNodeByName", "node1");
+    // -- add node after node1
+    $tree.tree("addNodeAfter", "node3", node1);
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 node3 node2 child3");
+});
+test("addNodeBefore", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({ data: utils_for_test_1.example_data });
+    var node1 = $tree.tree("getNodeByName", "node1");
+    // -- add node before node1
+    var new_node = $tree.tree("addNodeBefore", "node3", node1);
+    assert.equal(utils_for_test_1.formatTitles($tree), "node3 node1 child1 child2 node2 child3");
+});
+test("addParentNode", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({ data: utils_for_test_1.example_data });
+    var child3 = $tree.tree("getNodeByName", "child3");
+    // -- add parent to child3
+    $tree.tree("addParentNode", "node3", child3);
+    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 node2 node3 child3");
+});
+test("mouse events", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data,
+        dragAndDrop: true,
+        autoOpen: true
+    });
+    $tree.tree("setMouseDelay", 0);
+    function getTitleElement(node_name) {
+        var node = $tree.tree("getNodeByName", node_name);
+        var $el = $(node.element);
+        return $($el.find(".jqtree-title"));
+    }
+    var $node1 = getTitleElement("node1");
+    var $child3 = getTitleElement("child3");
+    // Move node1 inside child3
+    // trigger mousedown event on node1
+    $node1.trigger($.Event("mousedown", { which: 1 }));
+    // trigger mouse move to child3
+    var child3_offset = $child3.offset();
+    $tree.trigger($.Event("mousemove", { pageX: child3_offset.left, pageY: child3_offset.top }));
+    $tree.trigger("mouseup");
+    assert.equal(utils_for_test_1.formatTitles($tree), "node2 child3 node1 child1 child2");
+});
+test("multiple select", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({ data: utils_for_test_1.example_data });
+    var child1 = $tree.tree("getNodeByName", "child1");
+    var child2 = $tree.tree("getNodeByName", "child2");
+    // -- add nodes to selection
+    // todo: more nodes as parameters?
+    // todo: rename to 'selection.add' or 'selection' 'add'?
+    $tree.tree("addToSelection", child1);
+    $tree.tree("addToSelection", child2);
+    // -- get selected nodes
+    var selected_nodes = $tree.tree("getSelectedNodes");
+    assert.equal(utils_for_test_1.formatNodes(selected_nodes), "child1 child2");
+});
+test("keyboard", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    function keyDown(key) {
+        $tree.trigger($.Event("keydown", { which: key }));
+    }
+    $tree.tree({ data: utils_for_test_1.example_data });
+    var node1 = $tree.tree("getNodeByName", "node1");
+    // select node1
+    $tree.tree("selectNode", node1);
+    assert.equal(node1.is_open, undefined);
+    // - move down; -> node2
+    keyDown(40);
+    assert.equal($tree.tree("getSelectedNode").name, "node2");
+    // - move up; -> back to node1
+    keyDown(38);
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    // - move right; open node1
+    keyDown(39);
+    assert.equal(node1.is_open, true);
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    // - select child3 and move up -> node2
+    $tree.tree("selectNode", $tree.tree("getNodeByName", "child3"));
+    keyDown(38);
+    assert.equal($tree.tree("getSelectedNode").name, "node2");
+    // - move up -> child2
+    keyDown(38);
+    assert.equal($tree.tree("getSelectedNode").name, "child2");
+    // - select node1 and move left ->  close
+    $tree.tree("selectNode", node1);
+    keyDown(37);
+    assert.equal(node1.is_open, false);
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
+});
+test("getNodesByProperty", function (assert) {
+    // setup
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    var node2 = $tree.tree("getNodeByName", "node2");
+    // 1. get 'node1' by property
+    assert.equal($tree.tree("getNodesByProperty", "int_property", 1)[0].name, "node1");
+    // 2. get property that does not exist in any node
+    assert.equal($tree.tree("getNodesByProperty", "int_property", 123).length, 0);
+    // 3. get string property
+    assert.equal($tree.tree("getNodesByProperty", "str_property", "1")[0].name, "node1");
+    // 4. add node with string id; search by int
+    $tree.tree("appendNode", {
+        label: "abc",
+        id: "234",
+        str_property: "111",
+        int_property: 111
+    });
+    assert.equal($tree.tree("getNodesByProperty", "int_property", 111)[0].name, "abc");
+    assert.equal($tree.tree("getNodesByProperty", "str_property", "111")[0].name, "abc");
+    // 5. load subtree in node2
+    var subtree_data = [
+        {
+            label: "sub1",
+            id: 200,
+            int_property: 222,
+            children: [
+                { label: "sub2", id: 201, int_property: 444 }
+            ]
+        }
+    ];
+    $tree.tree("loadData", subtree_data, node2);
+    var t = $tree.tree("getTree");
+    assert.equal($tree.tree("getNodesByProperty", "int_property", 222)[0].name, "sub1");
+    assert.equal($tree.tree("getNodesByProperty", "int_property", 444)[0].name, "sub2");
+});
+test("dataUrl extra options", function (assert) {
+    var done = assert.async();
+    var $tree = $("#tree1");
+    $.mockjax({
+        url: "*",
+        response: function (options) {
+            // 2. handle ajax request
+            // expect 'headers' option
+            assert.equal(options.url, "/tree2/");
+            assert.deepEqual(options.headers, { abc: "def" });
+            done();
+        },
+        logging: false
+    });
+    // 1. init tree
+    // dataUrl contains 'headers' option
+    $tree.tree({
+        dataUrl: {
+            url: "/tree2/",
+            headers: { abc: "def" }
+        }
+    });
+});
+test("dataUrl is function", function (assert) {
+    var done = assert.async();
+    var $tree = $("#tree1");
+    $.mockjax({
+        url: "*",
+        response: function (options) {
+            // 2. handle ajax request
+            // expect 'headers' option
+            assert.equal(options.url, "/tree3/");
+            assert.deepEqual(options.headers, { abc: "def" });
+            done();
+        },
+        logging: false
+    });
+    // 1. init tree
+    // dataUrl is a function
+    $tree.tree({
+        dataUrl: function (node) {
+            return {
+                url: "/tree3/",
+                headers: { abc: "def" }
+            };
+        }
+    });
+});
+test("getNodeByHtmlElement", function (assert) {
+    var $tree = $("#tree1");
+    $tree.tree({
+        data: utils_for_test_1.example_data
+    });
+    var $el = $(".jqtree-title");
+    // Get node for jquery element
+    var node = $tree.tree("getNodeByHtmlElement", $el);
+    assert.equal(node.name, "node1");
+    // Same for html element
+    var node2 = $tree.tree("getNodeByHtmlElement", $el[0]);
+    assert.equal(node2.name, "node1");
+});
+test("onLoadFailed", function (assert) {
+    $.mockjax({
+        url: "/tree/",
+        status: 500,
+        responseText: "test error",
+        logging: false
+    });
+    var done = assert.async();
+    function handleLoadFailed(e) {
+        assert.equal(e.responseText, "test error");
+        done();
+    }
+    var $tree = $("#tree1");
+    $tree.tree({
+        dataUrl: "/tree/",
+        onLoadFailed: handleLoadFailed
+    });
+});
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var module = QUnit.module, test = QUnit.test;
+var utils_for_test_1 = __webpack_require__(13);
+var node_1 = __webpack_require__(0);
+module("Tree");
+test("constructor", function (assert) {
+    // 1. Create node from string
+    var node = new node_1.Node("n1");
+    assert.equal(node.name, "n1");
+    assert.equal(node.children.length, 0);
+    assert.equal(node.parent, null);
+    // 2. Create node from object
+    var node2 = new node_1.Node({
+        label: "n2",
+        id: 123,
+        parent: "abc",
+        children: ["c"],
+        url: "/"
+    });
+    assert.equal(node2.name, "n2");
+    assert.equal(node2.id, 123);
+    // tslint:disable-next-line: no-string-literal
+    assert.equal(node2["url"], "/");
+    // tslint:disable-next-line: no-string-literal
+    assert.equal(node2["label"], undefined);
+    assert.equal(node2.children.length, 0);
+    assert.equal(node2.parent, null);
+});
+test("create tree from data", function (assert) {
+    function checkData(tree) {
+        assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2", "nodes on level 1");
+        assert.equal(utils_for_test_1.formatNodes(tree.children[0].children), "child1 child2", "children of node1");
+        assert.equal(utils_for_test_1.formatNodes(tree.children[1].children), "child3", "children of node2");
+        assert.equal(tree.children[0].id, 123, "id");
+    }
+    // - create tree from example data
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    checkData(tree);
+    // - create tree from new data format
+    var data = [
+        {
+            label: "node1",
+            id: 123,
+            children: ["child1", "child2"] // nodes are only defined by a string
+        },
+        {
+            label: "node2",
+            id: 124,
+            children: ["child3"]
+        }
+    ];
+    var tree2 = new node_1.Node(null, true);
+    tree2.loadFromData(data);
+    checkData(tree2);
+});
+test("addChild", function (assert) {
+    var tree = new node_1.Node("tree1", true);
+    tree.addChild(new node_1.Node("abc"));
+    tree.addChild(new node_1.Node("def"));
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc def", "children");
+    var node = tree.children[0];
+    assert.equal(node.parent.name, "tree1", "parent of node");
+});
+test("addChildAtPosition", function (assert) {
+    var tree = new node_1.Node(null, true);
+    tree.addChildAtPosition(new node_1.Node("abc"), 0); // first
+    tree.addChildAtPosition(new node_1.Node("ghi"), 2); // index 2 does not exist
+    tree.addChildAtPosition(new node_1.Node("def"), 1);
+    tree.addChildAtPosition(new node_1.Node("123"), 0);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "123 abc def ghi", "children");
+});
+test("removeChild", function (assert) {
+    var tree = new node_1.Node(null, true);
+    var abc = new node_1.Node({ label: "abc", id: 1 });
+    var def = new node_1.Node({ label: "def", id: 2 });
+    var ghi = new node_1.Node({ label: "ghi", id: 3 });
+    tree.addChild(abc);
+    tree.addChild(def);
+    tree.addChild(ghi);
+    var jkl = new node_1.Node({ label: "jkl", id: 4 });
+    def.addChild(jkl);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc def ghi", "children");
+    assert.equal(tree.id_mapping[2].name, "def");
+    assert.equal(tree.id_mapping[4].name, "jkl");
+    // remove 'def'
+    tree.removeChild(def);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc ghi", "children");
+    assert.equal(tree.id_mapping[2], null);
+    assert.equal(tree.id_mapping[4], null);
+    // remove 'ghi'
+    tree.removeChild(ghi);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc", "children");
+    // remove 'abc'
+    tree.removeChild(abc);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "", "children");
+});
+test("getChildIndex", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    var abc = new node_1.Node("abc");
+    var def = new node_1.Node("def");
+    var ghi = new node_1.Node("ghi");
+    tree.addChild(abc);
+    tree.addChild(def);
+    tree.addChild(ghi);
+    // 1. Get child index of 'def'
+    assert.equal(tree.getChildIndex(def), 1);
+    // 2. Get child index of non-existing node
+    assert.equal(tree.getChildIndex(new node_1.Node("xyz")), -1);
+});
+test("hasChildren", function (assert) {
+    var tree = new node_1.Node(null, true);
+    assert.equal(tree.hasChildren(), false, "tree without children");
+    tree.addChild(new node_1.Node("abc"));
+    assert.equal(tree.hasChildren(), true, "tree has children");
+});
+test("iterate", function (assert) {
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // iterate over all the nodes
+    var nodes = [];
+    tree.iterate(function (node, level) {
+        nodes.push(node);
+        return true;
+    });
+    assert.equal(utils_for_test_1.formatNodes(nodes), "node1 child1 child2 node2 child3", "all nodes");
+    // iterate over nodes on first level
+    var nodes2 = [];
+    tree.iterate(function (node, level) {
+        nodes2.push(node);
+        return false;
+    });
+    assert.equal(utils_for_test_1.formatNodes(nodes2), "node1 node2", "nodes on first level");
+    // add child 4
+    var node3 = tree.getNodeById(124).children[0];
+    node3.addChild(new node_1.Node("child4"));
+    // test level parameter
+    var nodes3 = [];
+    tree.iterate(function (node, level) {
+        nodes3.push(node.name + " " + level);
+        return true;
+    });
+    assert.equal(nodes3.join(","), "node1 0,child1 1,child2 1,node2 0,child3 1,child4 2");
+});
+test("moveNode", function (assert) {
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    /*
+      node1
+      ---child1
+      ---child2
+      node2
+      ---child3
+    */
+    var node1 = tree.children[0];
+    var node2 = tree.children[1];
+    var child1 = node1.children[0];
+    var child2 = node1.children[1];
+    assert.equal(node2.name, "node2", "node2 name");
+    assert.equal(child2.name, "child2", "child2 name");
+    // move child2 after node2
+    tree.moveNode(child2, node2, node_1.Position.AFTER);
+    /*
+      node1
+      ---child1
+      node2
+      ---child3
+      child2
+    */
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 child2", "tree nodes at first level");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1", "node1 children");
+    // move child1 inside node2
+    // this means it's the first child
+    tree.moveNode(child1, node2, node_1.Position.INSIDE);
+    /*
+      node1
+      node2
+      ---child1
+      ---child3
+      child2
+    */
+    assert.equal(utils_for_test_1.formatNodes(node2.children), "child1 child3", "node2 children");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "", "node1 has no children");
+    // move child2 before child1
+    tree.moveNode(child2, child1, node_1.Position.BEFORE);
+    /*
+      node1
+      node2
+      ---child2
+      ---child1
+      ---child3
+    */
+    assert.equal(utils_for_test_1.formatNodes(node2.children), "child2 child1 child3", "node2 children");
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2", "tree nodes at first level");
+});
+test("initFromData", function (assert) {
+    var data = {
+        label: "main",
+        children: [
+            "c1",
+            {
+                label: "c2",
+                id: 201
+            }
+        ]
+    };
+    var node = new node_1.Node(null, true);
+    node.initFromData(data);
+    assert.equal(node.name, "main");
+    assert.equal(utils_for_test_1.formatNodes(node.children), "c1 c2", "children");
+    assert.equal(node.children[1].id, 201);
+});
+test("getData", function (assert) {
+    // 1. empty node
+    var node = new node_1.Node(null, true);
+    assert.deepEqual(node.getData(), []);
+    // 2.node with data
+    node.loadFromData([
+        {
+            label: "n1",
+            children: [
+                {
+                    label: "c1"
+                }
+            ]
+        }
+    ]);
+    assert.deepEqual(node.getData(), [
+        {
+            name: "n1",
+            children: [
+                {
+                    name: "c1"
+                }
+            ]
+        }
+    ]);
+    // 3. get data including parent
+    var n1 = node.getNodeByName("n1");
+    assert.deepEqual(n1.getData(true), [
+        {
+            name: "n1",
+            children: [
+                { name: "c1" }
+            ]
+        }
+    ]);
+});
+test("addAfter", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    /*
+    -node1
+    ---c1
+    ---c2
+    -node2
+    ---c3
+    */
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2");
+    // - Add 'node_b' after node2
+    var node2 = tree.getNodeByName("node2");
+    node2.addAfter("node_b");
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 node_b");
+    var node_b = tree.getNodeByName("node_b");
+    assert.equal(node_b.name, "node_b");
+    // - Add 'node_a' after node1
+    var node1 = tree.getNodeByName("node1");
+    node1.addAfter("node_a");
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b");
+    // - Add 'node_c' after node_b; new node is an object
+    node_b.addAfter({
+        label: "node_c",
+        id: 789
+    });
+    var node_c = tree.getNodeByName("node_c");
+    assert.equal(node_c.id, 789);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b node_c");
+    // - Add after root node; this is not possible
+    assert.equal(tree.addAfter("node_x"), null);
+});
+test("addBefore", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // - Add 'node_0' before node1
+    var node1 = tree.getNodeByName("node1");
+    node1.addBefore("node0");
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node0 node1 node2");
+    // - Add before root node; this is not possile
+    assert.equal(tree.addBefore("x"), null);
+});
+test("addParent", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // - Add node 'root' as parent of node1
+    // Note that node also becomes a child of 'root'
+    var node1 = tree.getNodeByName("node1");
+    node1.addParent("root");
+    var root = tree.getNodeByName("root");
+    assert.equal(utils_for_test_1.formatNodes(root.children), "node1 node2");
+    // - Add parent to root node; not possible
+    assert.equal(tree.addParent("x"), null);
+});
+test("remove", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var child1 = tree.getNodeByName("child1");
+    var node1 = tree.getNodeByName("node1");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2");
+    assert.equal(child1.parent, node1);
+    // 1. Remove child1
+    child1.remove();
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child2");
+    assert.equal(child1.parent, null);
+});
+test("append", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var node1 = tree.getNodeByName("node1");
+    // 1. Append child3 to node1
+    node1.append("child3");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2 child3");
+    // 2. Append subtree
+    node1.append({
+        name: "child4",
+        children: [
+            { name: "child5" }
+        ]
+    });
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2 child3 child4");
+    var child4 = node1.getNodeByName("child4");
+    assert.equal(utils_for_test_1.formatNodes(child4.children), "child5");
+});
+test("prepend", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var node1 = tree.getNodeByName("node1");
+    // 1. Prepend child0 to node1
+    node1.prepend("child0");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child0 child1 child2");
+    // 2. Prepend subtree
+    node1.prepend({
+        name: "child3",
+        children: [
+            { name: "child4" }
+        ]
+    });
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child3 child0 child1 child2");
+    var child3 = node1.getNodeByName("child3");
+    assert.equal(utils_for_test_1.formatNodes(child3.children), "child4");
+});
+test("getNodeById", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // 1. Get node with id 124
+    var node = tree.getNodeById(124);
+    assert.equal(node.name, "node2");
+    // 2. Delete node with id 124 and search again
+    node.remove();
+    assert.equal(tree.getNodeById(124), null);
+    // 3. Add node with id 456 and search for it
+    var child3 = tree.getNodeByName("child2");
+    child3.append({
+        id: 456,
+        label: "new node"
+    });
+    var node2 = tree.getNodeById(456);
+    assert.equal(node2.name, "new node");
+});
+test("getLevel", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // 1. get level for node1 and child1
+    assert.equal(tree.getNodeByName("node1").getLevel(), 1);
+    assert.equal(tree.getNodeByName("child1").getLevel(), 2);
+});
+test("loadFromData and id mapping", function (assert) {
+    // - get node from empty tree
+    var tree = new node_1.Node(null, true);
+    assert.equal(tree.getNodeById(999), null);
+    // - load example data in tree
+    tree.loadFromData(utils_for_test_1.example_data);
+    assert.equal(tree.getNodeById(124).name, "node2");
+    var child2 = tree.getNodeById(126);
+    child2.addChild(new node_1.Node({ label: "child4", id: 128 }));
+    child2.addChild(new node_1.Node({ label: "child5", id: 129 }));
+    // - load data in node child2
+    child2.loadFromData(["abc", "def"]);
+    assert.equal(tree.getNodeById(128), null);
+    assert.equal(child2.children.length, 2);
+    assert.equal(child2.children[0].name, "abc");
+});
+test("removeChildren", function (assert) {
+    // - load example data
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // add child4 and child5
+    var child2 = tree.getNodeById(126);
+    assert.equal(child2.name, "child2");
+    child2.addChild(new node_1.Node({ label: "child4", id: 128 }));
+    child2.addChild(new node_1.Node({ label: "child5", id: 129 }));
+    assert.equal(tree.getNodeById(128).name, "child4");
+    // - remove children from child2
+    child2.removeChildren();
+    assert.equal(tree.getNodeById(128), null);
+    assert.equal(child2.children.length, 0);
+});
+test("node with id 0", function (assert) {
+    // - load node with id 0
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData([
+        {
+            id: 0,
+            label: "mynode"
+        }
+    ]);
+    // - get node by id
+    var node = tree.getNodeById(0);
+    assert.equal(node.name, "mynode");
+    // -- remove the node
+    node.remove();
+    assert.equal(tree.getNodeById(0), undefined);
+});
+test("getPreviousSibling", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // - getPreviousSibling
+    assert.equal(tree.getNodeByName("child2").getPreviousSibling().name, "child1");
+    assert.equal(tree.getPreviousSibling(), null);
+    assert.equal(tree.getNodeByName("child1").getPreviousSibling(), null);
+});
+test("getNextSibling", function (assert) {
+    // setup
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // - getNextSibling
+    assert.equal(tree.getNodeByName("node1").getNextSibling().name, "node2");
+    assert.equal(tree.getNodeByName("node2").getNextSibling(), null);
+    assert.equal(tree.getNextSibling(), null);
+});
+test("getNodesByProperty", function (assert) {
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var nodes = tree.getNodesByProperty("name", "child1");
+    assert.equal(nodes.length, 1);
+    assert.equal(nodes[0].name, "child1");
+});
+test("getNodeByCallback", function (assert) {
+    var tree = new node_1.Node(null, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var node = tree.getNodeByCallback(function (n) { return n.name === "child1"; });
+    assert.equal(node.name, "child1");
+});
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var module = QUnit.module, test = QUnit.test;
+var node_1 = __webpack_require__(0);
+module("util");
+test("Position.getName", function (assert) {
+    assert.equal(node_1.Position.getName(node_1.Position.BEFORE), "before");
+    assert.equal(node_1.Position.getName(node_1.Position.AFTER), "after");
+    assert.equal(node_1.Position.getName(node_1.Position.INSIDE), "inside");
+    assert.equal(node_1.Position.getName(node_1.Position.NONE), "none");
+});
+test("Position.nameToIndex", function (assert) {
+    assert.equal(node_1.Position.nameToIndex("before"), node_1.Position.BEFORE);
+    assert.equal(node_1.Position.nameToIndex("after"), node_1.Position.AFTER);
+    assert.equal(node_1.Position.nameToIndex(""), 0);
+});
+
+
+/***/ }),
+/* 19 */,
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(14);
+
+
+/***/ })
+/******/ ]);
