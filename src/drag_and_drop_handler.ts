@@ -591,7 +591,7 @@ export class DragElement {
         this.offset_x = offset_x;
         this.offset_y = offset_y;
 
-        this.$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node_name }</span>");
+        this.$element = $(`<span class=\"jqtree-title jqtree-dragging\">${ node_name }</span>`);
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }
