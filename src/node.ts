@@ -1,28 +1,39 @@
 // tslint:disable: no-string-literal
 export type NodeId = number|string;
 
-export const Position = {
-    getName: (position: number): string => {
-        return Position.strings[position - 1];
-    },
+export enum Position {
+    Before = 1,
+    After,
+    Inside,
+    None
+};
 
-    nameToIndex: (name: string): number => {
-        for (let i = 1; i <= Position.strings.length; i++) {
-            if (Position.strings[i - 1] === name) {
-                return i;
+interface IPositions {
+    [key: string]: Position;
+}
+
+export const position_names: IPositions = {
+    before: Position.Before,
+    after: Position.After,
+    inside: Position.Inside,
+    none: Position.None
+};
+
+export function getPositionName(position: Position): string {
+    for (const name in position_names) {
+        if (position_names.hasOwnProperty(name)) {
+            if (position_names[name] === position) {
+                return name;
             }
         }
+    }
 
-        return 0;
-    },
+    return "";
+}
 
-    BEFORE: 1,
-    AFTER: 2,
-    INSIDE: 3,
-    NONE: 4,
-
-    strings: ["before", "after", "inside", "none"]
-};
+export function getPosition(name: string): Position {
+    return position_names[name];
+}
 
 export class Node {
     public id: NodeId;
@@ -237,17 +248,17 @@ export class Node {
         }
 
         moved_node.parent._removeChild(moved_node);
-        if (position === Position.AFTER) {
+        if (position === Position.After) {
             target_node.parent.addChildAtPosition(
                 moved_node,
                 target_node.parent.getChildIndex(target_node) + 1
             );
-        } else if (position === Position.BEFORE) {
+        } else if (position === Position.Before) {
             target_node.parent.addChildAtPosition(
                 moved_node,
                 target_node.parent.getChildIndex(target_node)
             );
-        } else if (position === Position.INSIDE) {
+        } else if (position === Position.Inside) {
             // move inside as first child
             target_node.addChildAtPosition(moved_node, 0);
         }

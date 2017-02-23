@@ -1,7 +1,7 @@
 import "../src/tree.jquery";
 
 import { example_data, example_data2, formatNodes, formatTitles, isNodeOpen, isNodeClosed } from "./utils_for_test";
-import { Position, Node } from "../src/node";
+import { Position, Node, getPositionName } from "../src/node";
 import "../src/itree_widget";
 
 const { module, test } = QUnit;
@@ -733,7 +733,8 @@ test("generate hit areas", (assert: Assert) =>  {
     const hit_areas = $tree.tree("testGenerateHitAreas", node);
 
     const strings = $.map(hit_areas, hit_area => {
-        return hit_area.node.name + " " + Position.getName(hit_area.position);
+        const position_name = getPositionName(hit_area.position);
+        return `${hit_area.node.name} ${position_name}`;
     });
     assert.equal(strings.join(";"), "node1 none;node2 inside;node2 after");
 });

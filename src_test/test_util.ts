@@ -1,18 +1,16 @@
 const { module, test } = QUnit;
 
-import { Position } from "../src/node";
+import { Position, getPositionName, getPosition } from "../src/node";
 
 module("util");
 
-test("Position.getName", (assert: Assert) => {
-    assert.equal(Position.getName(Position.BEFORE), "before");
-    assert.equal(Position.getName(Position.AFTER), "after");
-    assert.equal(Position.getName(Position.INSIDE), "inside");
-    assert.equal(Position.getName(Position.NONE), "none");
+test("getPositionName", (assert: Assert) => {
+    assert.equal(getPositionName(Position.Before), "before");
+    assert.equal(getPositionName(Position.After), "after");
+    assert.equal(getPositionName(Position.Inside), "inside");
+    assert.equal(getPositionName(Position.None), "none");
 });
 
-test("Position.nameToIndex", (assert: Assert) => {
-    assert.equal(Position.nameToIndex("before"), Position.BEFORE);
-    assert.equal(Position.nameToIndex("after"), Position.AFTER);
-    assert.equal(Position.nameToIndex(""), 0);
+test("getPosition", (assert: Assert) => {
+    assert.equal(getPosition("inside"), Position.Inside);
 });

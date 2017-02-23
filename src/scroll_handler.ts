@@ -40,10 +40,8 @@ export default class ScrollHandler {
         }
     }
 
-    public isScrolledIntoView(element: Element): boolean {
+    public isScrolledIntoView($element: JQuery): boolean {
         this._ensureInit();
-
-        const $element = $(element);
 
         let element_bottom;
         let view_bottom;

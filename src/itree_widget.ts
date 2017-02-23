@@ -1,4 +1,4 @@
-import { Node } from "./node";
+import { Node, NodeId, Position } from "./node";
 
 export type IconElement = Text|HTMLElement;
 
@@ -6,7 +6,7 @@ export interface IHitArea {
     top: number;
     bottom: number;
     node: Node;
-    position: number;
+    position: Position;
 };
 
 export interface IDragAndDropHandler {
@@ -19,12 +19,12 @@ export interface IElementsRenderer {
 };
 
 export interface IScrollHandler {
-    isScrolledIntoView: Function;
+    isScrolledIntoView: ($element: JQuery) => boolean;
 };
 
 export interface ISelectNodeHandler {
-    addToSelection: Function;
-    isNodeSelected: Function;
+    addToSelection: (node: Node) => void;
+    isNodeSelected: (node?: Node) => boolean;
 };
 
 export interface ITreeWidget {
@@ -38,27 +38,28 @@ export interface ITreeWidget {
     scroll_handler: IScrollHandler;
     select_node_handler: ISelectNodeHandler;
 
-    // todo: signatures
-    _triggerEvent: Function;
-    _openNode: Function;
-    _refreshElements: Function;
-    _getNodeElement: Function;
-    _getNodeElementForNode: Function;
-    refreshHitAreas: Function;
-    getSelectedNode: Function;
-    openNode: Function;
-    closeNode: Function;
-    selectNode: Function;
-    scrollToNode: Function;
-    getNodeById: Function;
-    getSelectedNodes: Function;
+    _triggerEvent: (event_name: string, values?: any) => JQueryEventObject;
+    _openNode: (node: Node, slide: boolean, on_finished?: Function) => void;
+    _refreshElements: (from_node?: Node) => void;
+    _getNodeElement: ($element: JQuery) => INodeElement|null;
+    _getNodeElementForNode: (node: Node) => INodeElement;
+    refreshHitAreas: () => JQuery;
+    getSelectedNode: () => Node|false;
+    openNode: (node: Node, param1?: any, param2?: any) => JQuery;
+    closeNode: (node: Node, slide_param?: any) => JQuery;
+    selectNode: (node: Node) => JQuery;
+    scrollToNode: (node: Node) => JQuery;
+    getNodeById: (node_id: NodeId) => Node|null;
+    getSelectedNodes: () => Node[];
 };
 
 export interface INodeElement {
     node: Node;
     $element: JQuery;
+
+    addDropHint: (position: Position) => IDropHint;
 };
 
 export interface IDropHint {
-    remove: Function;
+    remove: () => void;
 };

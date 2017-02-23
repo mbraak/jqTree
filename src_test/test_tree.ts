@@ -275,7 +275,7 @@ test("moveNode", (assert: Assert) => {
     assert.equal(child2.name, "child2", "child2 name");
 
     // move child2 after node2
-    tree.moveNode(child2, node2, Position.AFTER);
+    tree.moveNode(child2, node2, Position.After);
 
     /*
       node1
@@ -297,7 +297,7 @@ test("moveNode", (assert: Assert) => {
 
     // move child1 inside node2
     // this means it's the first child
-    tree.moveNode(child1, node2, Position.INSIDE);
+    tree.moveNode(child1, node2, Position.Inside);
 
     /*
       node1
@@ -318,7 +318,7 @@ test("moveNode", (assert: Assert) => {
     );
 
     // move child2 before child1
-    tree.moveNode(child2, child1, Position.BEFORE);
+    tree.moveNode(child2, child1, Position.Before);
 
     /*
       node1

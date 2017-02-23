@@ -10,10 +10,11 @@ import ScrollHandler from "./scroll_handler";
 import SelectNodeHandler from "./select_node_handler";
 import SimpleWidget from "./simple.widget";
 import * as node_module from "./node";
-import { Node, Position, NodeId } from "./node";
+import { Node, Position, NodeId, getPosition } from "./node";
 import * as util_module from "./util";
 import { isFunction } from "./util";
 import { BorderDropHint, FolderElement, GhostDropHint, NodeElement } from "./node_element";
+import { INodeElement } from "./itree_widget";
 
 class JqTreeWidget extends MouseWidget {
     protected static defaults = {
@@ -164,7 +165,7 @@ class JqTreeWidget extends MouseWidget {
         return this.tree.getNodeByCallback(callback);
     }
 
-    public openNode(node: Node, param1: any, param2?: any): JQuery {
+    public openNode(node: Node, param1?: any, param2?: any): JQuery {
         const parseParams = () => {
             let on_finished;
             let slide;
@@ -193,7 +194,7 @@ class JqTreeWidget extends MouseWidget {
         return this.element;
     }
 
-    public closeNode(node: Node, slide_param: any = null): JQuery {
+    public closeNode(node: Node, slide_param?: any): JQuery {
         let slide;
 
         if (slide_param == null) {
@@ -308,7 +309,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     public moveNode(node: Node, target_node: Node, position: string): JQuery {
-        const position_index = Position.nameToIndex(position);
+        const position_index = getPosition(position);
 
         this.tree.moveNode(node, target_node, position_index);
         this._refreshElements();
@@ -395,7 +396,7 @@ class JqTreeWidget extends MouseWidget {
         return this.dnd_handler.hit_areas;
     }
 
-    public _triggerEvent(event_name: string, values?: any) {
+    public _triggerEvent(event_name: string, values?: any): JQueryEventObject {
         const event = $.Event(event_name);
         $.extend(event, values);
 
@@ -439,7 +440,7 @@ class JqTreeWidget extends MouseWidget {
         this._triggerEvent("tree.refresh");
     }
 
-    public _getNodeElementForNode(node: Node) {
+    public _getNodeElementForNode(node: Node): NodeElement {
         if (node.isFolder()) {
             return new FolderElement(node, this);
         } else {
@@ -447,7 +448,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    public _getNodeElement($element: JQuery) {
+    public _getNodeElement($element: JQuery): NodeElement|null {
         const node = this._getNode($element);
         if (node) {
             return this._getNodeElementForNode(node);

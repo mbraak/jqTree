@@ -22,7 +22,7 @@ export class NodeElement implements INodeElement {
     }
 
     public addDropHint(position: number): IDropHint {
-        if (position === Position.INSIDE) {
+        if (position === Position.Inside) {
             return new BorderDropHint(this.$element);
         } else {
             return new GhostDropHint(this.node, this.$element, position);
@@ -127,7 +127,7 @@ export class FolderElement extends NodeElement {
     }
 
     public addDropHint(position: number) {
-        if (! this.node.is_open && position === Position.INSIDE) {
+        if (! this.node.is_open && position === Position.Inside) {
             return new BorderDropHint(this.$element);
         } else {
             return new GhostDropHint(this.node, this.$element, position);
@@ -174,11 +174,11 @@ export class GhostDropHint implements IDropHint {
             <span class="jqtree_common jqtree-line"></span></li>`
         );
 
-        if (position === Position.AFTER) {
+        if (position === Position.After) {
             this.moveAfter();
-        } else if (position === Position.BEFORE) {
+        } else if (position === Position.Before) {
             this.moveBefore();
-        } else if (position === Position.INSIDE) {
+        } else if (position === Position.Inside) {
             if (node.isFolder() && node.is_open) {
                 this.moveInsideOpenFolder();
             } else {

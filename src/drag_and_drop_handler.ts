@@ -1,4 +1,4 @@
-import { Position, Node } from "./node";
+import { Position, Node, getPositionName } from "./node";
 import { html_escape } from "./util";
 import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itree_widget";
 import { IPositionInfo } from "./imouse_widget";
@@ -169,7 +169,7 @@ export class DragAndDropHandler {
         if (! area) {
             return false;
         } else if (this.tree_widget.options.onCanMoveTo) {
-            const position_name = Position.getName(area.position);
+            const position_name = getPositionName(area.position);
 
             return this.tree_widget.options.onCanMoveTo(this.current_item.node, area.node, position_name);
         } else {
@@ -233,7 +233,7 @@ export class DragAndDropHandler {
         return (
             node.isFolder() &&
             ! node.is_open &&
-            area.position === Position.INSIDE
+            area.position === Position.Inside
         );
     }
 
@@ -277,7 +277,7 @@ export class DragAndDropHandler {
     private moveItem(position_info: IPositionInfo) {
         if (
             this.hovered_area &&
-            this.hovered_area.position !== Position.NONE &&
+            this.hovered_area.position !== Position.None &&
             this.canMoveToArea(this.hovered_area)
         ) {
             const moved_node = this.current_item.node;
@@ -285,7 +285,7 @@ export class DragAndDropHandler {
             const position = this.hovered_area.position;
             const previous_parent = moved_node.parent;
 
-            if (position === Position.INSIDE) {
+            if (position === Position.Inside) {
                 this.hovered_area.node.is_open = true;
             }
 
@@ -301,7 +301,7 @@ export class DragAndDropHandler {
                     move_info: {
                         moved_node,
                         target_node,
-                        position: Position.getName(position),
+                        position: getPositionName(position),
                         previous_parent,
                         do_move: doMove,
                         original_event: position_info.original_event
@@ -478,7 +478,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
 
         // Cannot move before current item
         if (node.children[0] !== this.current_node) {
-            this.addPosition(node, Position.INSIDE, this.getTop($element));
+            this.addPosition(node, Position.Inside, this.getTop($element));
         }
 
         // Continue iterating
@@ -490,20 +490,20 @@ export class HitAreasGenerator extends VisibleNodeIterator {
 
         if (node === this.current_node) {
             // Cannot move after current item
-            this.addPosition(node, Position.NONE, top);
+            this.addPosition(node, Position.None, top);
         } else {
-            this.addPosition(node, Position.INSIDE, top);
+            this.addPosition(node, Position.Inside, top);
 
             // Cannot move before current item
             if (next_node !== this.current_node) {
-                this.addPosition(node, Position.AFTER, top);
+                this.addPosition(node, Position.After, top);
             }
         }
     }
 
     protected handleFirstNode(node: Node, $element: JQuery) {
         if (node !== this.current_node) {
-            this.addPosition(node, Position.BEFORE, this.getTop($(node.element)));
+            this.addPosition(node, Position.Before, this.getTop($(node.element)));
         }
     }
 
@@ -513,9 +513,9 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             next_node === this.current_node
         ) {
             // Cannot move before or after current item
-            this.addPosition(node, Position.NONE, this.last_top);
+            this.addPosition(node, Position.None, this.last_top);
         } else {
-            this.addPosition(node, Position.AFTER, this.last_top);
+            this.addPosition(node, Position.After, this.last_top);
         }
     }
 
@@ -524,9 +524,9 @@ export class HitAreasGenerator extends VisibleNodeIterator {
 
         if (node === this.current_node) {
             // Cannot move inside current item
-            this.addPosition(node, Position.NONE, top);
+            this.addPosition(node, Position.None, top);
         } else {
-            this.addPosition(node, Position.INSIDE, top);
+            this.addPosition(node, Position.Inside, top);
         }
 
         if (
@@ -534,9 +534,9 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             node === this.current_node
         ) {
             // Cannot move before or after current item
-            this.addPosition(node, Position.NONE, top);
+            this.addPosition(node, Position.None, top);
         } else {
-            this.addPosition(node, Position.AFTER, top);
+            this.addPosition(node, Position.After, top);
         }
     }
 
