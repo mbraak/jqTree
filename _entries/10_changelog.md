@@ -7,6 +7,7 @@ name: changelog
 
 * Issue #471: use webpack instead of browserify
 * Issue #472: use 'jquery.on' instead of deprecated 'bind'
+* Issue #478: use Use typescript instead of coffeescript
 
 ##### 1.3.7 (january 11 2017)
 
