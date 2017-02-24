@@ -90,24 +90,36 @@
 
 "use strict";
 
-exports.Position = {
-    getName: function (position) {
-        return exports.Position.strings[position - 1];
-    },
-    nameToIndex: function (name) {
-        for (var i = 1; i <= exports.Position.strings.length; i++) {
-            if (exports.Position.strings[i - 1] === name) {
-                return i;
+exports.__esModule = true;
+var Position;
+(function (Position) {
+    Position[Position["Before"] = 1] = "Before";
+    Position[Position["After"] = 2] = "After";
+    Position[Position["Inside"] = 3] = "Inside";
+    Position[Position["None"] = 4] = "None";
+})(Position = exports.Position || (exports.Position = {}));
+;
+exports.position_names = {
+    before: Position.Before,
+    after: Position.After,
+    inside: Position.Inside,
+    none: Position.None
+};
+function getPositionName(position) {
+    for (var name_1 in exports.position_names) {
+        if (exports.position_names.hasOwnProperty(name_1)) {
+            if (exports.position_names[name_1] === position) {
+                return name_1;
             }
         }
-        return 0;
-    },
-    BEFORE: 1,
-    AFTER: 2,
-    INSIDE: 3,
-    NONE: 4,
-    strings: ["before", "after", "inside", "none"]
-};
+    }
+    return "";
+}
+exports.getPositionName = getPositionName;
+function getPosition(name) {
+    return exports.position_names[name];
+}
+exports.getPosition = getPosition;
 var Node = (function () {
     function Node(o, is_root, node_class) {
         if (is_root === void 0) { is_root = false; }
@@ -294,13 +306,13 @@ var Node = (function () {
             return;
         }
         moved_node.parent._removeChild(moved_node);
-        if (position === exports.Position.AFTER) {
+        if (position === Position.After) {
             target_node.parent.addChildAtPosition(moved_node, target_node.parent.getChildIndex(target_node) + 1);
         }
-        else if (position === exports.Position.BEFORE) {
+        else if (position === Position.Before) {
             target_node.parent.addChildAtPosition(moved_node, target_node.parent.getChildIndex(target_node));
         }
-        else if (position === exports.Position.INSIDE) {
+        else if (position === Position.Inside) {
             // move inside as first child
             target_node.addChildAtPosition(moved_node, 0);
         }
@@ -607,6 +619,7 @@ exports.Node = Node;
 
 "use strict";
 
+exports.__esModule = true;
 function isInt(n) {
     return typeof n === "number" && n % 1 === 0;
 }
@@ -643,6 +656,7 @@ exports.getBoolString = getBoolString;
 
 "use strict";
 
+exports.__esModule = true;
 var SimpleWidget = (function () {
     function SimpleWidget(el, options) {
         this.$el = $(el);
@@ -738,7 +752,6 @@ var SimpleWidget = (function () {
     return SimpleWidget;
 }());
 SimpleWidget.defaults = {};
-exports.__esModule = true;
 exports["default"] = SimpleWidget;
 
 
@@ -758,6 +771,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+exports.__esModule = true;
 var version_1 = __webpack_require__(12);
 var drag_and_drop_handler_1 = __webpack_require__(4);
 var elements_renderer_1 = __webpack_require__(5);
@@ -883,7 +897,6 @@ var JqTreeWidget = (function (_super) {
         return this.element;
     };
     JqTreeWidget.prototype.closeNode = function (node, slide_param) {
-        if (slide_param === void 0) { slide_param = null; }
         var slide;
         if (slide_param == null) {
             slide = this.options.slide;
@@ -971,7 +984,7 @@ var JqTreeWidget = (function (_super) {
         return this.element;
     };
     JqTreeWidget.prototype.moveNode = function (node, target_node, position) {
-        var position_index = node_1.Position.nameToIndex(position);
+        var position_index = node_1.getPosition(position);
         this.tree.moveNode(node, target_node, position_index);
         this._refreshElements();
         return this.element;
@@ -1727,6 +1740,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+exports.__esModule = true;
 var node_1 = __webpack_require__(0);
 var util_1 = __webpack_require__(1);
 var DragAndDropHandler = (function () {
@@ -1844,7 +1858,7 @@ var DragAndDropHandler = (function () {
             return false;
         }
         else if (this.tree_widget.options.onCanMoveTo) {
-            var position_name = node_1.Position.getName(area.position);
+            var position_name = node_1.getPositionName(area.position);
             return this.tree_widget.options.onCanMoveTo(this.current_item.node, area.node, position_name);
         }
         else {
@@ -1896,7 +1910,7 @@ var DragAndDropHandler = (function () {
         var node = area.node;
         return (node.isFolder() &&
             !node.is_open &&
-            area.position === node_1.Position.INSIDE);
+            area.position === node_1.Position.Inside);
     };
     DragAndDropHandler.prototype.updateDropHint = function () {
         if (!this.hovered_area) {
@@ -1928,13 +1942,13 @@ var DragAndDropHandler = (function () {
     DragAndDropHandler.prototype.moveItem = function (position_info) {
         var _this = this;
         if (this.hovered_area &&
-            this.hovered_area.position !== node_1.Position.NONE &&
+            this.hovered_area.position !== node_1.Position.None &&
             this.canMoveToArea(this.hovered_area)) {
             var moved_node_1 = this.current_item.node;
             var target_node_1 = this.hovered_area.node;
             var position_1 = this.hovered_area.position;
             var previous_parent = moved_node_1.parent;
-            if (position_1 === node_1.Position.INSIDE) {
+            if (position_1 === node_1.Position.Inside) {
                 this.hovered_area.node.is_open = true;
             }
             var doMove = function () {
@@ -1946,7 +1960,7 @@ var DragAndDropHandler = (function () {
                 move_info: {
                     moved_node: moved_node_1,
                     target_node: target_node_1,
-                    position: node_1.Position.getName(position_1),
+                    position: node_1.getPositionName(position_1),
                     previous_parent: previous_parent,
                     do_move: doMove,
                     original_event: position_info.original_event
@@ -2081,7 +2095,7 @@ var HitAreasGenerator = (function (_super) {
         }
         // Cannot move before current item
         if (node.children[0] !== this.current_node) {
-            this.addPosition(node, node_1.Position.INSIDE, this.getTop($element));
+            this.addPosition(node, node_1.Position.Inside, this.getTop($element));
         }
         // Continue iterating
         return true;
@@ -2090,47 +2104,47 @@ var HitAreasGenerator = (function (_super) {
         var top = this.getTop($element);
         if (node === this.current_node) {
             // Cannot move after current item
-            this.addPosition(node, node_1.Position.NONE, top);
+            this.addPosition(node, node_1.Position.None, top);
         }
         else {
-            this.addPosition(node, node_1.Position.INSIDE, top);
+            this.addPosition(node, node_1.Position.Inside, top);
             // Cannot move before current item
             if (next_node !== this.current_node) {
-                this.addPosition(node, node_1.Position.AFTER, top);
+                this.addPosition(node, node_1.Position.After, top);
             }
         }
     };
     HitAreasGenerator.prototype.handleFirstNode = function (node, $element) {
         if (node !== this.current_node) {
-            this.addPosition(node, node_1.Position.BEFORE, this.getTop($(node.element)));
+            this.addPosition(node, node_1.Position.Before, this.getTop($(node.element)));
         }
     };
     HitAreasGenerator.prototype.handleAfterOpenFolder = function (node, next_node, $element) {
         if (node === this.current_node ||
             next_node === this.current_node) {
             // Cannot move before or after current item
-            this.addPosition(node, node_1.Position.NONE, this.last_top);
+            this.addPosition(node, node_1.Position.None, this.last_top);
         }
         else {
-            this.addPosition(node, node_1.Position.AFTER, this.last_top);
+            this.addPosition(node, node_1.Position.After, this.last_top);
         }
     };
     HitAreasGenerator.prototype.handleNode = function (node, next_node, $element) {
         var top = this.getTop($element);
         if (node === this.current_node) {
             // Cannot move inside current item
-            this.addPosition(node, node_1.Position.NONE, top);
+            this.addPosition(node, node_1.Position.None, top);
         }
         else {
-            this.addPosition(node, node_1.Position.INSIDE, top);
+            this.addPosition(node, node_1.Position.Inside, top);
         }
         if (next_node === this.current_node ||
             node === this.current_node) {
             // Cannot move before or after current item
-            this.addPosition(node, node_1.Position.NONE, top);
+            this.addPosition(node, node_1.Position.None, top);
         }
         else {
-            this.addPosition(node, node_1.Position.AFTER, top);
+            this.addPosition(node, node_1.Position.After, top);
         }
     };
     HitAreasGenerator.prototype.getTop = function ($element) {
@@ -2171,7 +2185,7 @@ var DragElement = (function () {
     function DragElement(node_name, offset_x, offset_y, $tree) {
         this.offset_x = offset_x;
         this.offset_y = offset_y;
-        this.$element = $("<span class=\"jqtree-title jqtree-dragging\">#{ node_name }</span>");
+        this.$element = $("<span class=\"jqtree-title jqtree-dragging\">" + node_name + "</span>");
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }
@@ -2195,6 +2209,7 @@ exports.DragElement = DragElement;
 
 "use strict";
 
+exports.__esModule = true;
 var util_1 = __webpack_require__(1);
 var ElementsRenderer = (function () {
     function ElementsRenderer(tree_widget) {
@@ -2399,7 +2414,6 @@ var ElementsRenderer = (function () {
     };
     return ElementsRenderer;
 }());
-exports.__esModule = true;
 exports["default"] = ElementsRenderer;
 
 
@@ -2409,6 +2423,7 @@ exports["default"] = ElementsRenderer;
 
 "use strict";
 
+exports.__esModule = true;
 var KeyHandler = (function () {
     function KeyHandler(tree_widget) {
         this.tree_widget = tree_widget;
@@ -2516,7 +2531,6 @@ KeyHandler.LEFT = 37;
 KeyHandler.UP = 38;
 KeyHandler.RIGHT = 39;
 KeyHandler.DOWN = 40;
-exports.__esModule = true;
 exports["default"] = KeyHandler;
 
 
@@ -2536,6 +2550,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+exports.__esModule = true;
 /*
 This widget does the same a the mouse widget in jqueryui.
 */
@@ -2687,7 +2702,6 @@ var MouseWidget = (function (_super) {
     };
     return MouseWidget;
 }(simple_widget_1["default"]));
-exports.__esModule = true;
 exports["default"] = MouseWidget;
 
 
@@ -2707,6 +2721,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+exports.__esModule = true;
 var node_1 = __webpack_require__(0);
 var NodeElement = (function () {
     function NodeElement(node, tree_widget) {
@@ -2721,7 +2736,7 @@ var NodeElement = (function () {
         this.$element = $(node.element);
     };
     NodeElement.prototype.addDropHint = function (position) {
-        if (position === node_1.Position.INSIDE) {
+        if (position === node_1.Position.Inside) {
             return new BorderDropHint(this.$element);
         }
         else {
@@ -2815,7 +2830,7 @@ var FolderElement = (function (_super) {
         }
     };
     FolderElement.prototype.addDropHint = function (position) {
-        if (!this.node.is_open && position === node_1.Position.INSIDE) {
+        if (!this.node.is_open && position === node_1.Position.Inside) {
             return new BorderDropHint(this.$element);
         }
         else {
@@ -2850,13 +2865,13 @@ var GhostDropHint = (function () {
         this.$element = $element;
         this.node = node;
         this.$ghost = $("<li class=\"jqtree_common jqtree-ghost\"><span class=\"jqtree_common jqtree-circle\"></span>\n            <span class=\"jqtree_common jqtree-line\"></span></li>");
-        if (position === node_1.Position.AFTER) {
+        if (position === node_1.Position.After) {
             this.moveAfter();
         }
-        else if (position === node_1.Position.BEFORE) {
+        else if (position === node_1.Position.Before) {
             this.moveBefore();
         }
-        else if (position === node_1.Position.INSIDE) {
+        else if (position === node_1.Position.Inside) {
             if (node.isFolder() && node.is_open) {
                 this.moveInsideOpenFolder();
             }
@@ -2892,6 +2907,7 @@ exports.GhostDropHint = GhostDropHint;
 
 "use strict";
 
+exports.__esModule = true;
 var util_1 = __webpack_require__(1);
 var SaveStateHandler = (function () {
     function SaveStateHandler(tree_widget) {
@@ -3087,7 +3103,6 @@ var SaveStateHandler = (function () {
     };
     return SaveStateHandler;
 }());
-exports.__esModule = true;
 exports["default"] = SaveStateHandler;
 
 
@@ -3097,6 +3112,7 @@ exports["default"] = SaveStateHandler;
 
 "use strict";
 
+exports.__esModule = true;
 var ScrollHandler = (function () {
     function ScrollHandler(tree_widget) {
         this.tree_widget = tree_widget;
@@ -3126,9 +3142,8 @@ var ScrollHandler = (function () {
             $(document).scrollTop(top + tree_top);
         }
     };
-    ScrollHandler.prototype.isScrolledIntoView = function (element) {
+    ScrollHandler.prototype.isScrolledIntoView = function ($element) {
         this._ensureInit();
-        var $element = $(element);
         var element_bottom;
         var view_bottom;
         var element_top;
@@ -3218,7 +3233,6 @@ var ScrollHandler = (function () {
     };
     return ScrollHandler;
 }());
-exports.__esModule = true;
 exports["default"] = ScrollHandler;
 
 
@@ -3228,6 +3242,7 @@ exports["default"] = ScrollHandler;
 
 "use strict";
 
+exports.__esModule = true;
 var SelectNodeHandler = (function () {
     function SelectNodeHandler(tree_widget) {
         this.tree_widget = tree_widget;
@@ -3332,7 +3347,6 @@ var SelectNodeHandler = (function () {
     };
     return SelectNodeHandler;
 }());
-exports.__esModule = true;
 exports["default"] = SelectNodeHandler;
 
 
@@ -3342,8 +3356,8 @@ exports["default"] = SelectNodeHandler;
 
 "use strict";
 
-var version = "1.3.7";
 exports.__esModule = true;
+var version = "1.3.7";
 exports["default"] = version;
 
 
