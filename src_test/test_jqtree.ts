@@ -691,7 +691,7 @@ test("onCreateLi", (assert: Assert) =>  {
 test("save state", (assert: Assert) =>  {
     // Remove state from localstorage
     if (typeof localStorage !== "undefined") {
-        localStorage.setItem("my_tree", null);
+        localStorage.setItem("my_tree", "");
     }
 
     // 1. init tree
@@ -1114,13 +1114,13 @@ test("mouse events", (assert: Assert) =>  {
     const $node1 = getTitleElement("node1");
     const $child3 = getTitleElement("child3");
 
-    // Move node1 inside child3
-    // trigger mousedown event on node1
+    // -- Move node1 inside child3
+    // 1: trigger mousedown event on node1
     $node1.trigger(
         $.Event("mousedown", { which: 1 })
     );
 
-    // trigger mouse move to child3
+    // 2: trigger mouse move to child3
     const child3_offset = $child3.offset();
     $tree.trigger(
         $.Event("mousemove", { pageX: child3_offset.left, pageY: child3_offset.top })

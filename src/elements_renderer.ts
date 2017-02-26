@@ -98,7 +98,7 @@ export default class ElementsRenderer {
     }
 
     private createLi(node: Node, level: number) {
-        const is_selected = (
+        const is_selected = Boolean(
             this.tree_widget.select_node_handler &&
             this.tree_widget.select_node_handler.isNodeSelected(node)
         );

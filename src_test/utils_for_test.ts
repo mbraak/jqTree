@@ -50,7 +50,7 @@ export const example_data2 = [
 ];
 
 export function formatNodes(nodes: Node[]) {
-    const strings = $.map(nodes, node => node.name);
+    const strings = nodes.map(node => node.name);
 
     return strings.join(" ");
 };
@@ -78,4 +78,24 @@ export function formatTitles($node: JQuery) {
         (i, el) => $(el).text()
     );
     return titles.toArray().join(" ");
+}
+
+export function doGetNodeByName(tree: Node, name: string): Node {
+    const result = tree.getNodeByName(name);
+
+    if (!result) {
+        throw Error(`Node with name '${name}' not found`);
+    }
+
+    return result;
+}
+
+export function doGetNodeById(tree: Node, id: string|number): Node {
+    const result = tree.getNodeById(id);
+
+    if (!result) {
+        throw Error(`Node with id '${id}' not found`);
+    }
+
+    return result;
 }

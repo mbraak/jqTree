@@ -39,7 +39,7 @@ export class Node {
     public id: NodeId;
     public name: string;
     public children: Node[];
-    public parent: Node;
+    public parent: Node|null;
     public id_mapping: any;
     public tree: Node;
     public node_class: any;  // todo: type class?
@@ -242,25 +242,31 @@ export class Node {
     tree.moveNode(node1, node2, Position.AFTER);
     */
     public moveNode(moved_node: Node, target_node: Node, position: number) {
-        if (moved_node.isParentOf(target_node)) {
-            // Node is parent of target node. This is an illegal move
+        if (!moved_node.parent || moved_node.isParentOf(target_node)) {
+            // - Node is parent of target node
+            // - Or, parent is empty
             return;
-        }
+        } else {
+            moved_node.parent._removeChild(moved_node);
 
-        moved_node.parent._removeChild(moved_node);
-        if (position === Position.After) {
-            target_node.parent.addChildAtPosition(
-                moved_node,
-                target_node.parent.getChildIndex(target_node) + 1
-            );
-        } else if (position === Position.Before) {
-            target_node.parent.addChildAtPosition(
-                moved_node,
-                target_node.parent.getChildIndex(target_node)
-            );
-        } else if (position === Position.Inside) {
-            // move inside as first child
-            target_node.addChildAtPosition(moved_node, 0);
+            if (position === Position.After) {
+                if (target_node.parent) {
+                    target_node.parent.addChildAtPosition(
+                        moved_node,
+                        target_node.parent.getChildIndex(target_node) + 1
+                    );
+                }
+            } else if (position === Position.Before) {
+                if (target_node.parent) {
+                    target_node.parent.addChildAtPosition(
+                        moved_node,
+                        target_node.parent.getChildIndex(target_node)
+                    );
+                }
+            } else if (position === Position.Inside) {
+                // move inside as first child
+                target_node.addChildAtPosition(moved_node, 0);
+            }
         }
     }
 

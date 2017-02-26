@@ -33,14 +33,14 @@ export interface ITreeWidget {
     options: any;
     tree: Node;
 
-    dnd_handler: IDragAndDropHandler;
+    dnd_handler: IDragAndDropHandler|null;
     renderer: IElementsRenderer;
-    scroll_handler: IScrollHandler;
-    select_node_handler: ISelectNodeHandler;
+    scroll_handler: IScrollHandler|null;
+    select_node_handler: ISelectNodeHandler|null;
 
     _triggerEvent: (event_name: string, values?: any) => JQueryEventObject;
-    _openNode: (node: Node, slide: boolean, on_finished?: Function) => void;
-    _refreshElements: (from_node?: Node) => void;
+    _openNode: (node: Node, slide: boolean, on_finished: Function|null) => void;
+    _refreshElements: (from_node: Node|null) => void;
     _getNodeElement: ($element: JQuery) => INodeElement|null;
     _getNodeElementForNode: (node: Node) => INodeElement;
     refreshHitAreas: () => JQuery;
@@ -58,6 +58,8 @@ export interface INodeElement {
     $element: JQuery;
 
     addDropHint: (position: Position) => IDropHint;
+    select: () => void;
+    deselect: () => void;
 };
 
 export interface IDropHint {

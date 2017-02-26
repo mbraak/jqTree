@@ -109,7 +109,7 @@ export default class KeyHandler {
         }
     }
 
-    public selectNode(node: Node) {
+    public selectNode(node: Node|null) {
         if (! node) {
             return true;
         } else {

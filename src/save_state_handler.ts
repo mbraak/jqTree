@@ -33,7 +33,7 @@ export default class SaveStateHandler {
         }
     }
 
-    public getState() {
+    public getState(): any {
         const getOpenNodeIds = () => {
             const open_nodes: NodeId[] = [];
 
@@ -148,7 +148,9 @@ export default class SaveStateHandler {
             if (node) {
                 select_count += 1;
 
-                this.tree_widget.select_node_handler.addToSelection(node);
+                if (this.tree_widget.select_node_handler) {
+                    this.tree_widget.select_node_handler.addToSelection(node);
+                }
             }
         }
 
@@ -172,7 +174,7 @@ export default class SaveStateHandler {
                         if (node.load_on_demand) {
                             loadAndOpenNode(node);
                         } else {
-                            this.tree_widget._openNode(node, false);
+                            this.tree_widget._openNode(node, false, null);
                         }
                     }
                 }
@@ -181,7 +183,7 @@ export default class SaveStateHandler {
             node_ids = new_nodes_ids;
 
             if (this._selectInitialNodes(selected_nodes)) {
-                this.tree_widget._refreshElements();
+                this.tree_widget._refreshElements(null);
             }
 
             if (loading_count === 0) {

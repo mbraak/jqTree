@@ -7,6 +7,7 @@
     "compilerOptions": {
         "typeRoots" : ["./typings/globals"],
         "noImplicitAny": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "strictNullChecks": true
     }
 }

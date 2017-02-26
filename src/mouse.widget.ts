@@ -54,7 +54,7 @@ export default class MouseWidget extends SimpleWidget {
         return result;
     }
 
-    protected _mouseCapture(position_info: IPositionInfo): boolean {
+    protected _mouseCapture(position_info: IPositionInfo): boolean|null {
         return true;
     }
 
@@ -131,7 +131,9 @@ export default class MouseWidget extends SimpleWidget {
             return true;
         }
 
-        this.is_mouse_started = this._mouseStart(this.mouse_down_info) !== false;
+        if (this.mouse_down_info) {
+            this.is_mouse_started = this._mouseStart(this.mouse_down_info) !== false;
+        }
 
         if (this.is_mouse_started) {
             this._mouseDrag(position_info);

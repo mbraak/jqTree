@@ -14,7 +14,7 @@ import { Node, Position, NodeId, getPosition } from "./node";
 import * as util_module from "./util";
 import { isFunction } from "./util";
 import { BorderDropHint, FolderElement, GhostDropHint, NodeElement } from "./node_element";
-import { INodeElement } from "./itree_widget";
+import { INodeElement, IHitArea } from "./itree_widget";
 
 class JqTreeWidget extends MouseWidget {
     protected static defaults = {
@@ -221,35 +221,48 @@ class JqTreeWidget extends MouseWidget {
     }
 
     public refreshHitAreas(): JQuery {
-        this.dnd_handler.refresh();
+        if (this.dnd_handler) {
+            this.dnd_handler.refresh();
+        }
         return this.element;
     }
 
-    public addNodeAfter(new_node_info: any, existing_node: Node): Node {
+    public addNodeAfter(new_node_info: any, existing_node: Node): Node|null {
         const new_node = existing_node.addAfter(new_node_info);
-        this._refreshElements(existing_node.parent);
+
+        if (new_node) {
+            this._refreshElements(existing_node.parent);
+        }
+
         return new_node;
     }
 
-    public addNodeBefore(new_node_info: any, existing_node: Node): Node {
+    public addNodeBefore(new_node_info: any, existing_node: Node): Node|null {
         const new_node = existing_node.addBefore(new_node_info);
-        this._refreshElements(existing_node.parent);
+
+        if (new_node) {
+            this._refreshElements(existing_node.parent);
+        }
+
         return new_node;
     }
 
-    public addParentNode(new_node_info: any, existing_node: Node): Node {
+    public addParentNode(new_node_info: any, existing_node: Node): Node|null {
         const new_node = existing_node.addParent(new_node_info);
-        this._refreshElements(new_node.parent);
+
+        if (new_node) {
+            this._refreshElements(new_node.parent);
+        }
+
         return new_node;
     }
 
     public removeNode(node: Node): JQuery {
-        const parent = node.parent;
-        if (parent) {
+        if (node.parent && this.select_node_handler) {
             this.select_node_handler.removeFromSelection(node, true);  // including children
 
             node.remove();
-            this._refreshElements(parent);
+            this._refreshElements(node.parent);
         }
 
         return this.element;
@@ -312,16 +325,18 @@ class JqTreeWidget extends MouseWidget {
         const position_index = getPosition(position);
 
         this.tree.moveNode(node, target_node, position_index);
-        this._refreshElements();
+        this._refreshElements(null);
         return this.element;
     }
 
     public getStateFromStorage() {
-        return this.save_state_handler.getStateFromStorage();
+        if (this.save_state_handler) {
+            return this.save_state_handler.getStateFromStorage();
+        }
     }
 
     public addToSelection(node: Node): JQuery {
-        if (node) {
+        if (node && this.select_node_handler) {
             this.select_node_handler.addToSelection(node);
 
             this._getNodeElementForNode(node).select();
@@ -332,36 +347,55 @@ class JqTreeWidget extends MouseWidget {
     }
 
     public getSelectedNodes(): Node[] {
-        return this.select_node_handler.getSelectedNodes();
+        if (!this.select_node_handler) {
+            return [];
+        } else {
+            return this.select_node_handler.getSelectedNodes();
+        }
     }
 
     public isNodeSelected(node: Node): boolean {
-        return this.select_node_handler.isNodeSelected(node);
+        if (!this.select_node_handler) {
+            return false;
+        } else {
+            return this.select_node_handler.isNodeSelected(node);
+        }
     }
 
     public removeFromSelection(node: Node): JQuery {
-        this.select_node_handler.removeFromSelection(node);
+        if (this.select_node_handler) {
+            this.select_node_handler.removeFromSelection(node);
 
-        this._getNodeElementForNode(node).deselect();
-        this._saveState();
+            this._getNodeElementForNode(node).deselect();
+            this._saveState();
+        }
+
         return this.element;
     }
 
     public scrollToNode(node: Node): JQuery {
-        const $element = $(node.element);
-        const top = $element.offset().top - this.$el.offset().top;
+        if (this.scroll_handler) {
+            const $element = $(node.element);
+            const top = $element.offset().top - this.$el.offset().top;
 
-        this.scroll_handler.scrollTo(top);
+            this.scroll_handler.scrollTo(top);
+        }
+
         return this.element;
     }
 
-    public getState() {
-        return this.save_state_handler.getState();
+    public getState(): any {
+        if (this.save_state_handler) {
+            return this.save_state_handler.getState();
+        }
     }
 
     public setState(state: any): JQuery {
-        this.save_state_handler.setInitialState(state);
-        this._refreshElements();
+        if (this.save_state_handler) {
+            this.save_state_handler.setInitialState(state);
+            this._refreshElements(null);
+        }
+
         return this.element;
     }
 
@@ -390,10 +424,14 @@ class JqTreeWidget extends MouseWidget {
         return __version__;
     }
 
-    public testGenerateHitAreas(moving_node: Node): any[] {
-        this.dnd_handler.current_item = this._getNodeElementForNode(moving_node);
-        this.dnd_handler.generateHitAreas();
-        return this.dnd_handler.hit_areas;
+    public testGenerateHitAreas(moving_node: Node): IHitArea[] {
+        if (!this.dnd_handler) {
+            return [];
+        } else {
+            this.dnd_handler.current_item = this._getNodeElementForNode(moving_node);
+            this.dnd_handler.generateHitAreas();
+            return this.dnd_handler.hit_areas;
+        }
     }
 
     public _triggerEvent(event_name: string, values?: any): JQueryEventObject {
@@ -404,8 +442,8 @@ class JqTreeWidget extends MouseWidget {
         return event;
     }
 
-    public _openNode(node: Node, slide: boolean = true, on_finished?: Function) {
-        const doOpenNode = (_node: Node, _slide: any, _on_finished?: Function) => {
+    public _openNode(node: Node, slide: boolean = true, on_finished: Function|null) {
+        const doOpenNode = (_node: Node, _slide: any, _on_finished: Function|null) => {
             const folder_element = new FolderElement(_node, this);
             folder_element.open(_on_finished, _slide);
         };
@@ -434,13 +472,13 @@ class JqTreeWidget extends MouseWidget {
     Redraw the tree or part of the tree.
      from_node: redraw this subtree
     */
-    public _refreshElements(from_node?: Node) {
+    public _refreshElements(from_node: Node|null) {
         this.renderer.render(from_node);
 
         this._triggerEvent("tree.refresh");
     }
 
-    public _getNodeElementForNode(node: Node): NodeElement {
+    public _getNodeElementForNode(node: Node): INodeElement {
         if (node.isFolder()) {
             return new FolderElement(node, this);
         } else {
@@ -448,7 +486,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    public _getNodeElement($element: JQuery): NodeElement|null {
+    public _getNodeElement($element: JQuery): INodeElement|null {
         const node = this._getNode($element);
         if (node) {
             return this._getNodeElementForNode(node);
@@ -514,13 +552,13 @@ class JqTreeWidget extends MouseWidget {
             this.key_handler.deinit();
         }
 
-        this.tree = null;
+        this.tree = new Node({}, true);
 
         super._deinit();
     }
 
-    protected _mouseCapture(position_info: IPositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+    protected _mouseCapture(position_info: IPositionInfo): boolean|null {
+        if (this.options.dragAndDrop && this.dnd_handler) {
             return this.dnd_handler.mouseCapture(position_info);
         } else {
             return false;
@@ -528,7 +566,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     protected _mouseStart(position_info: IPositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this.options.dragAndDrop && this.dnd_handler) {
             return this.dnd_handler.mouseStart(position_info);
         } else {
             return false;
@@ -536,7 +574,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     protected _mouseDrag(position_info: IPositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this.options.dragAndDrop && this.dnd_handler) {
             const result = this.dnd_handler.mouseDrag(position_info);
 
             if (this.scroll_handler) {
@@ -549,7 +587,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     protected _mouseStop(position_info: IPositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this.options.dragAndDrop && this.dnd_handler) {
             return this.dnd_handler.mouseStop(position_info);
         } else {
             return false;
@@ -558,19 +596,19 @@ class JqTreeWidget extends MouseWidget {
 
     private _initData() {
         if (this.options.data) {
-            this._loadData(this.options.data);
+            this._loadData(this.options.data, null);
         } else {
-            const data_url = this._getDataUrlInfo();
+            const data_url = this._getDataUrlInfo(null);
 
             if (data_url) {
-                this._loadDataFromUrl();
+                this._loadDataFromUrl(null, null, null);
             } else {
-                this._loadData([]);
+                this._loadData([], null);
             }
         }
     }
 
-    private _getDataUrlInfo(node?: Node) {
+    private _getDataUrlInfo(node: Node|null) {
         const data_url = this.options.dataUrl || this.element.data("url");
 
         const getUrlFromString = () => {
@@ -604,7 +642,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     private _getNodeIdToBeSelected(): NodeId|null {
-        if (this.options.saveState) {
+        if (this.options.saveState && this.save_state_handler) {
             return this.save_state_handler.getNodeIdToBeSelected();
         } else {
             return null;
@@ -629,7 +667,7 @@ class JqTreeWidget extends MouseWidget {
 
         const must_load_on_demand = this._setInitialState();
 
-        this._refreshElements();
+        this._refreshElements(null);
 
         if (! must_load_on_demand) {
             doInit();
@@ -741,7 +779,7 @@ class JqTreeWidget extends MouseWidget {
 
                             return false;
                         } else {
-                            this._openNode(node, false);
+                            this._openNode(node, false, null);
 
                             return (level !== max_level);
                         }
@@ -867,7 +905,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     private _saveState() {
-        if (this.options.saveState) {
+        if (this.options.saveState && this.save_state_handler) {
             this.save_state_handler.saveState();
         }
     }
@@ -913,7 +951,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _notifyLoading(is_loading: boolean, node: Node, $el: JQuery) {
+    private _notifyLoading(is_loading: boolean, node: Node|null, $el: JQuery) {
         if (this.options.onLoading) {
             this.options.onLoading(is_loading, node, $el);
         }
@@ -941,7 +979,7 @@ class JqTreeWidget extends MouseWidget {
         };
 
         const saveState = () => {
-            if (this.options.saveState) {
+            if (this.options.saveState && this.save_state_handler) {
                 this.save_state_handler.saveState();
             }
         };
@@ -986,44 +1024,44 @@ class JqTreeWidget extends MouseWidget {
         saveState();
     }
 
-    private _loadData(data: any, parent_node?: Node) {
-        const deselectNodes = () => {
-            if (this.select_node_handler) {
-                const selected_nodes_under_parent = this.select_node_handler.getSelectedNodesUnder(parent_node);
-                for (const n of selected_nodes_under_parent) {
-                    this.select_node_handler.removeFromSelection(n);
-                }
-            }
-        };
-
-        const loadSubtree = () => {
-            parent_node.loadFromData(data);
-
-            parent_node.load_on_demand = false;
-            parent_node.is_loading = false;
-
-            this._refreshElements(parent_node);
-        };
-
+    private _loadData(data: any[]|null, parent_node: Node|null) {
         if (! data) {
             return;
-        }
-
-        this._triggerEvent("tree.load_data", { tree_data: data });
-
-        if (! parent_node) {
-            this._initTree(data);
         } else {
-            deselectNodes();
-            loadSubtree();
-        }
+            this._triggerEvent("tree.load_data", { tree_data: data });
 
-        if (this.isDragging()) {
-            this.dnd_handler.refresh();
+            if (parent_node) {
+                this._deselectNodes(parent_node);
+                this._loadSubtree(data, parent_node);
+            } else {
+                this._initTree(data);
+            }
+
+            if (this.isDragging() && this.dnd_handler) {
+                this.dnd_handler.refresh();
+            }
         }
     }
 
-    private _loadDataFromUrl(url_info_param?: any, parent_node?: Node, on_finished?: Function) {
+    private _deselectNodes(parent_node: Node) {
+        if (this.select_node_handler) {
+            const selected_nodes_under_parent = this.select_node_handler.getSelectedNodesUnder(parent_node);
+            for (const n of selected_nodes_under_parent) {
+                this.select_node_handler.removeFromSelection(n);
+            }
+        }
+    };
+
+    private _loadSubtree(data: any[], parent_node: Node) {
+        parent_node.loadFromData(data);
+
+        parent_node.load_on_demand = false;
+        parent_node.is_loading = false;
+
+        this._refreshElements(parent_node);
+    }
+
+    private _loadDataFromUrl(url_info_param: any, parent_node: Node|null, on_finished: Function|null) {
         let $el: JQuery|null = null;
         let url_info = url_info_param;
 
@@ -1130,7 +1168,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _loadFolderOnDemand(node: Node, slide: boolean = true, on_finished?: Function) {
+    private _loadFolderOnDemand(node: Node, slide: boolean = true, on_finished: Function|null) {
         node.is_loading = true;
 
         this._loadDataFromUrl(
