@@ -36,11 +36,13 @@ module.exports = function(debug) {
             extensions: [".ts", ".js"]
         },
         module: {
-            loaders: [
+            rules: [
                 {
                     test: /\.ts$/,
-                    loader: "ts-loader",
-                    exclude: /node_modules/
+                    exclude: /node_modules/,
+                    use: {
+                        loader: "ts-loader"
+                    }
                 }
             ]
         },
