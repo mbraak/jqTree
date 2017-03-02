@@ -14,7 +14,7 @@ export default class SimpleWidget {
             }
         }
 
-        function createWidget($el: JQuery, options: Object) {
+        function createWidget($el: JQuery, options: object) {
             const data_key = getDataKey();
 
             for (const el of $el.get()) {

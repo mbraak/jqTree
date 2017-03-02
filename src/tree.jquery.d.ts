@@ -1,4 +1,4 @@
 // tslint:disable-next-line: interface-name
 interface JQuery {
-    tree: Function;
+    tree: (function_name: string, ...params: any[]) => any;
 }

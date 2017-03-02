@@ -1,5 +1,5 @@
 import { Position, Node } from "./node";
-import { ITreeWidget, IDropHint, INodeElement } from "./itree_widget";
+import { ITreeWidget, IDropHint, INodeElement, OnFinishOpenNode } from "./itree_widget";
 
 export class NodeElement implements INodeElement {
     public node: Node;
@@ -63,7 +63,7 @@ export class NodeElement implements INodeElement {
 }
 
 export class FolderElement extends NodeElement {
-    public open(on_finished: Function | null, slide = true) {
+    public open(on_finished: OnFinishOpenNode|null, slide = true) {
         if (! this.node.is_open) {
             this.node.is_open = true;
 

@@ -19,6 +19,8 @@ export const position_names: IPositions = {
     none: Position.None
 };
 
+type IterateCallback = (node: Node, level: number) => boolean;
+
 export function getPositionName(position: Position): string {
     for (const name in position_names) {
         if (position_names.hasOwnProperty(name)) {
@@ -50,7 +52,7 @@ export class Node {
 
     [key: string]: any;
 
-    constructor(o: Object, is_root: boolean = false, node_class = Node) {
+    constructor(o: object|string, is_root: boolean = false, node_class = Node) {
         this.name = "";
 
         this.setData(o);
@@ -217,7 +219,7 @@ export class Node {
     );
 
     */
-    public iterate(callback: Function) {
+    public iterate(callback: IterateCallback) {
         const _iterate = (node: Node, level: number) => {
             if (node.children) {
                 for (const child of node.children) {
@@ -273,8 +275,8 @@ export class Node {
     /*
     Get the tree as data.
     */
-    public getData(include_parent = false): Object[] {
-        function getDataFromNodes(nodes: Node[]): Object[] {
+    public getData(include_parent = false): any[] {
+        function getDataFromNodes(nodes: Node[]): any[] {
             return nodes.map(
                 node => {
                     const tmp_node: any = {};
@@ -311,7 +313,7 @@ export class Node {
         );
     }
 
-    public getNodeByCallback(callback: Function): Node|null {
+    public getNodeByCallback(callback: (node: Node) => boolean): Node|null {
         let result = null;
 
         this.iterate(
@@ -494,7 +496,7 @@ export class Node {
         );
     }
 
-    public filter(f: Function): Node[] {
+    public filter(f: (node: Node) => boolean): Node[] {
         const result: Node[] = [];
 
         this.iterate(
@@ -584,7 +586,7 @@ export class Node {
             }
         };
 
-        const addChildren = (children_data: Object[]) => {
+        const addChildren = (children_data: any[]) => {
             for (const child of children_data) {
                 const node = new this.tree.node_class("");
                 node.initFromData(child);

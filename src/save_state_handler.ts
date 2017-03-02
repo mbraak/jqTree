@@ -81,7 +81,7 @@ export default class SaveStateHandler {
         }
     }
 
-    public setInitialStateOnDemand(state: any, cb_finished: Function) {
+    public setInitialStateOnDemand(state: any, cb_finished: () => void) {
         if (state) {
             this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cb_finished);
         } else {
@@ -157,7 +157,7 @@ export default class SaveStateHandler {
         return select_count !== 0;
     }
 
-    private _setInitialStateOnDemand(node_ids_param: NodeId[], selected_nodes: NodeId[], cb_finished: Function) {
+    private _setInitialStateOnDemand(node_ids_param: NodeId[], selected_nodes: NodeId[], cb_finished: () => void) {
         let loading_count = 0;
         let node_ids = node_ids_param;
 

@@ -14,7 +14,20 @@ import { Node, Position, NodeId, getPosition } from "./node";
 import * as util_module from "./util";
 import { isFunction } from "./util";
 import { BorderDropHint, FolderElement, GhostDropHint, NodeElement } from "./node_element";
-import { INodeElement, IHitArea } from "./itree_widget";
+import { INodeElement, IHitArea, OnFinishOpenNode } from "./itree_widget";
+
+type CanSelectNode = (node: Node) => boolean;
+type SetFromStorage = (data: string) => void;
+type GetFromStorage = () => any;
+type CreateLi = (node: Node, el: JQuery) => void;
+type IsMoveHandler = (el: JQuery) => boolean;
+type CanMoveNode = CanSelectNode;
+type CanMoveNodeTo = (node: Node, target_node: Node, position_name: string) => void;
+type HandleLoadFailed = (response: any) => void;
+type HandleDataFilter = (data: any) => any;
+type HandleDrag = (node: Node, event: JQueryEventObject|Touch) => void;
+type HandleLoadData = (is_loading: boolean, node: Node, $el: JQuery) => void;
+type HandleFinishedLoading = () => void;
 
 class JqTreeWidget extends MouseWidget {
     protected static defaults = {
@@ -23,18 +36,18 @@ class JqTreeWidget extends MouseWidget {
         dragAndDrop: false,
         selectable: true,
         useContextMenu: true,
-        onCanSelectNode: null as Function|null,
-        onSetStateFromStorage: null as Function|null,
-        onGetStateFromStorage: null as Function|null,
-        onCreateLi: null as Function|null,
-        onIsMoveHandle: null as Function|null,
+        onCanSelectNode: null as CanSelectNode|null,
+        onSetStateFromStorage: null as SetFromStorage|null,
+        onGetStateFromStorage: null as GetFromStorage|null,
+        onCreateLi: null as CreateLi|null,
+        onIsMoveHandle: null as IsMoveHandler|null,
 
-        // Can this node be moved? function(node)
-        onCanMove: null as Function|null,
+        // Can this node be moved?
+        onCanMove: null as CanMoveNode|null,
 
         // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanMoveTo: null as Function|null,
-        onLoadFailed: null as Function|null,
+        onCanMoveTo: null as CanMoveNodeTo|null,
+        onLoadFailed: null as HandleLoadFailed|null,
         autoEscape: true,
         dataUrl: null as any,
 
@@ -47,14 +60,14 @@ class JqTreeWidget extends MouseWidget {
         openedIcon: "&#x25bc;" as string|Element|null,
         slide: true,  // must display slide animation?
         nodeClass: Node,
-        dataFilter: null as Function|null,
+        dataFilter: null as HandleDataFilter|null,
         keyboardSupport: true,
         openFolderDelay: 500,  // The delay for opening a folder during drag and drop; the value is in milliseconds
         rtl: false,  // right-to-left support; true / false (default)
-        onDragMove: null as Function|null,
-        onDragStop: null as Function|null,
+        onDragMove: null as HandleDrag|null,
+        onDragStop: null as HandleDrag|null,
         buttonLeft: true,
-        onLoading: null as Function|null
+        onLoading: null as HandleLoadData|null
     };
 
     public element: JQuery;
@@ -68,7 +81,7 @@ class JqTreeWidget extends MouseWidget {
     private save_state_handler: SaveStateHandler|null;
     private key_handler: KeyHandler|null;
 
-    public toggle(node: Node, slide_param: Function|null = null): JQuery {
+    public toggle(node: Node, slide_param?: boolean): JQuery {
         let slide;
 
         if (slide_param == null) {
@@ -140,7 +153,7 @@ class JqTreeWidget extends MouseWidget {
         return this.element;
     }
 
-    public reload(on_finished: Function|null): JQuery {
+    public reload(on_finished: HandleFinishedLoading|null): JQuery {
         this._loadDataFromUrl(null, null, on_finished);
         return this.element;
     }
@@ -161,21 +174,21 @@ class JqTreeWidget extends MouseWidget {
         return this._getNode($(element));
     }
 
-    public getNodeByCallback(callback: Function): Node|null {
+    public getNodeByCallback(callback: (node: Node) => boolean): Node|null {
         return this.tree.getNodeByCallback(callback);
     }
 
     public openNode(node: Node, param1?: any, param2?: any): JQuery {
         const parseParams = () => {
-            let on_finished;
+            let on_finished: OnFinishOpenNode|null;
             let slide;
 
             if (isFunction(param1)) {
-                on_finished = param1 as Function;
+                on_finished = param1 as OnFinishOpenNode|null;
                 slide = null;
             } else {
                 slide = param1;
-                on_finished = param2 as Function;
+                on_finished = param2 as OnFinishOpenNode|null;
             }
 
             if (slide == null) {
@@ -442,8 +455,8 @@ class JqTreeWidget extends MouseWidget {
         return event;
     }
 
-    public _openNode(node: Node, slide: boolean = true, on_finished: Function|null) {
-        const doOpenNode = (_node: Node, _slide: any, _on_finished: Function|null) => {
+    public _openNode(node: Node, slide: boolean = true, on_finished: OnFinishOpenNode|null) {
+        const doOpenNode = (_node: Node, _slide: any, _on_finished: OnFinishOpenNode|null) => {
             const folder_element = new FolderElement(_node, this);
             folder_element.open(_on_finished, _slide);
         };
@@ -736,7 +749,7 @@ class JqTreeWidget extends MouseWidget {
 
     // Set the initial state for nodes that are loaded on demand
     // Call cb_finished when done
-    private _setInitialStateOnDemand(cb_finished: Function) {
+    private _setInitialStateOnDemand(cb_finished: () => void) {
         const restoreState = () => {
             if (! (this.options.saveState && this.save_state_handler)) {
                 return false;
@@ -1061,7 +1074,7 @@ class JqTreeWidget extends MouseWidget {
         this._refreshElements(parent_node);
     }
 
-    private _loadDataFromUrl(url_info_param: any, parent_node: Node|null, on_finished: Function|null) {
+    private _loadDataFromUrl(url_info_param: any, parent_node: Node|null, on_finished: HandleFinishedLoading|null) {
         let $el: JQuery|null = null;
         let url_info = url_info_param;
 
@@ -1168,7 +1181,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _loadFolderOnDemand(node: Node, slide: boolean = true, on_finished: Function|null) {
+    private _loadFolderOnDemand(node: Node, slide: boolean = true, on_finished: OnFinishOpenNode|null) {
         node.is_loading = true;
 
         this._loadDataFromUrl(
