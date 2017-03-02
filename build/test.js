@@ -797,7 +797,6 @@ var JqTreeWidget = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     JqTreeWidget.prototype.toggle = function (node, slide_param) {
-        if (slide_param === void 0) { slide_param = null; }
         var slide;
         if (slide_param == null) {
             slide = this.options.slide;
@@ -1738,7 +1737,7 @@ JqTreeWidget.defaults = {
     onGetStateFromStorage: null,
     onCreateLi: null,
     onIsMoveHandle: null,
-    // Can this node be moved? function(node)
+    // Can this node be moved?
     onCanMove: null,
     // Can this node be moved to this position? function(moved_node, target_node, position)
     onCanMoveTo: null,
