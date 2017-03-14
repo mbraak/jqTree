@@ -7,7 +7,8 @@
     "tree"
   ],
   "license": "Apache-2.0",
-  "main": "lib/tree.jquery.js",
+  "main": "./lib/tree.jquery.js",
+  "types": "./src/tree.jquery.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/mbraak/jqtree"
