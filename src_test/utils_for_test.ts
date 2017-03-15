@@ -75,7 +75,7 @@ export function isNodeOpen($node: JQuery) {
 
 export function formatTitles($node: JQuery) {
     const titles = $node.find(".jqtree-title").map(
-        (i, el) => $(el).text()
+        (_, el) => $(el).text()
     );
     return titles.toArray().join(" ");
 }

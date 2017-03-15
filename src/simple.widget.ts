@@ -68,7 +68,7 @@ export default class SimpleWidget {
         }
 
         // tslint:disable-next-line: only-arrow-functions
-        $.fn[widget_name] = function(argument1: any, ...args: any[]) {
+        $.fn[widget_name] = function(this: JQuery, argument1: any, ...args: any[]) {
             const $el = this;
 
             if (argument1 === undefined || typeof argument1 === "object") {

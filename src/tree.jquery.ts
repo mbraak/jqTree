@@ -1,6 +1,5 @@
 import __version__ from "./version";
-import * as drag_and_drop_handler from "./drag_and_drop_handler";
-import { DragAndDropHandler, DragElement, HitAreasGenerator } from "./drag_and_drop_handler";
+import { DragAndDropHandler } from "./drag_and_drop_handler";
 import ElementsRenderer from "./elements_renderer";
 import KeyHandler from "./key_handler";
 import MouseWidget from "./mouse.widget";
@@ -9,11 +8,9 @@ import SaveStateHandler from "./save_state_handler";
 import ScrollHandler from "./scroll_handler";
 import SelectNodeHandler from "./select_node_handler";
 import SimpleWidget from "./simple.widget";
-import * as node_module from "./node";
-import { Node, Position, NodeId, getPosition } from "./node";
-import * as util_module from "./util";
+import { Node, NodeId, getPosition } from "./node";
 import { isFunction } from "./util";
-import { BorderDropHint, FolderElement, GhostDropHint, NodeElement } from "./node_element";
+import { FolderElement, NodeElement } from "./node_element";
 import { INodeElement, IHitArea, OnFinishOpenNode } from "./itree_widget";
 
 type CanSelectNode = (node: Node) => boolean;
@@ -886,6 +883,8 @@ class JqTreeWidget extends MouseWidget {
                 }
             }
         }
+
+        return null;
     }
 
     private _getNode($element: JQuery) {
@@ -915,6 +914,8 @@ class JqTreeWidget extends MouseWidget {
                 return false;
             }
         }
+
+        return null;
     }
 
     private _saveState() {

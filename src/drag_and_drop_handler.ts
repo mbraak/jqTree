@@ -344,7 +344,7 @@ export class DragAndDropHandler {
     }
 }
 
-class VisibleNodeIterator {
+abstract class VisibleNodeIterator {
     private tree: Node;
 
     constructor(tree: Node) {
@@ -369,7 +369,7 @@ class VisibleNodeIterator {
                 }
 
                 if (is_first_node) {
-                    this.handleFirstNode(node, $element);
+                    this.handleFirstNode(node);
                     is_first_node = false;
                 }
 
@@ -386,7 +386,7 @@ class VisibleNodeIterator {
 
             if (must_iterate_inside) {
                 const children_length = node.children.length;
-                node.children.forEach((child, i) => {
+                node.children.forEach((_, i) => {
                     if (i === (children_length - 1)) {
                         _iterateNode(node.children[i], null);
                     } else {
@@ -395,7 +395,7 @@ class VisibleNodeIterator {
                 });
 
                 if (node.is_open && $element) {
-                    this.handleAfterOpenFolder(node, next_node, $element);
+                    this.handleAfterOpenFolder(node, next_node);
                 }
             }
         };
@@ -403,30 +403,21 @@ class VisibleNodeIterator {
         _iterateNode(this.tree, null);
     }
 
-    protected handleNode(node: Node, next_node: Node|null, $element: JQuery) {
-        // override
-    }
+    protected abstract handleNode(node: Node, next_node: Node|null, $element: JQuery): void;
 
-    protected handleOpenFolder(node: Node, $element: JQuery) {
-        /*
-        override
-        return
-          - true: continue iterating
-          - false: stop iterating
-         */
-    }
+    /*
+    override
+    return
+        - true: continue iterating
+        - false: stop iterating
+    */
+    protected abstract handleOpenFolder(node: Node, $element: JQuery): boolean;
 
-    protected handleClosedFolder(node: Node, next_node: Node|null, $element: JQuery) {
-        // override
-    }
+    protected abstract handleClosedFolder(node: Node, next_node: Node|null, $element: JQuery): void;
 
-    protected handleAfterOpenFolder(node: Node, next_node: Node|null, $element: JQuery) {
-        // override
-    }
+    protected abstract handleAfterOpenFolder(node: Node, next_node: Node|null): void;
 
-    protected handleFirstNode(node: Node, $element: JQuery) {
-        // override
-    }
+    protected abstract handleFirstNode(node: Node): void;
 }
 
 export class HitAreasGenerator extends VisibleNodeIterator {
@@ -516,13 +507,13 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    protected handleFirstNode(node: Node, $element: JQuery) {
+    protected handleFirstNode(node: Node) {
         if (node !== this.current_node) {
             this.addPosition(node, Position.Before, this.getTop($(node.element)));
         }
     }
 
-    protected handleAfterOpenFolder(node: Node, next_node: Node, $element: JQuery) {
+    protected handleAfterOpenFolder(node: Node, next_node: Node) {
         if (
             node === this.current_node ||
             next_node === this.current_node

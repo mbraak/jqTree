@@ -94,7 +94,7 @@ export default class SelectNodeHandler {
 
             if (include_children) {
                 node.iterate(
-                    (n: Node) => {
+                    () => {
                         delete this.selected_nodes[node.id];
                         return true;
                     }

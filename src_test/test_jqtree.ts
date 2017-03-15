@@ -1,7 +1,7 @@
 import "../src/tree.jquery";
 
 import { example_data, example_data2, formatNodes, formatTitles, isNodeOpen, isNodeClosed } from "./utils_for_test";
-import { Position, Node, getPositionName } from "../src/node";
+import { Node, getPositionName } from "../src/node";
 import "../src/itree_widget";
 
 const { module, test } = QUnit;
@@ -66,7 +66,7 @@ test("toggle", (assert: Assert) =>  {
 
     $tree.on(
         "tree.open",
-        e => {
+        () => {
             assert.ok(! isNodeClosed($node1), "node1 is open");
 
             // 2. close node1
@@ -76,7 +76,7 @@ test("toggle", (assert: Assert) =>  {
 
     $tree.on(
         "tree.close",
-        e => {
+        () => {
             assert.ok(isNodeClosed($node1), "node1 is closed");
 
             done();
@@ -586,6 +586,7 @@ test("getNodeById", (assert: Assert) =>  {
     ];
     $tree.tree("loadData",  subtree_data, node2);
     const t = $tree.tree("getTree");
+    assert.notEqual(t, null);
 
     assert.equal(
         $tree.tree("getNodeById", 200).name,
@@ -604,7 +605,7 @@ test("autoOpen", (assert: Assert) =>  {
         const open_nodes: string[] = [];
         $tree.find("li").each(
             // tslint:disable-next-line: only-arrow-functions
-            function() {
+            function(this: Element) {
                 const $li = $(this);
                 if ($li.is(".jqtree-folder") && ! $li.is(".jqtree-closed")) {
                     const label = $li.children(".jqtree-element").find("span").text();
@@ -1024,7 +1025,7 @@ test("load on demand", (assert: Assert) =>  {
     });
 
     // tslint:disable-next-line: only-arrow-functions
-    function handleResponse(options: any) {
+    function handleResponse(this: any, options: any) {
         assert.equal(options.url, "/tree/", "2");
         assert.deepEqual(options.data, { node : 1 }, "3");
 
@@ -1077,7 +1078,7 @@ test("addNodeBefore", (assert: Assert) =>  {
     const node1 = $tree.tree("getNodeByName", "node1");
 
     // -- add node before node1
-    const new_node = $tree.tree("addNodeBefore", "node3", node1);
+    $tree.tree("addNodeBefore", "node3", node1);
 
     assert.equal(formatTitles($tree), "node3 node1 child1 child2 node2 child3");
 });
@@ -1258,6 +1259,7 @@ test("getNodesByProperty", (assert: Assert) =>  {
     ];
     $tree.tree("loadData", subtree_data, node2);
     const t = $tree.tree("getTree");
+    assert.notEqual(t, null);
 
     assert.equal(
         $tree.tree("getNodesByProperty", "int_property", 222)[0].name,
@@ -1318,7 +1320,7 @@ test("dataUrl is function", (assert: Assert) =>  {
     // 1. init tree
     // dataUrl is a function
     $tree.tree({
-        dataUrl: (node: Node) => {
+        dataUrl: () => {
             return {
                 url: "/tree3/",
                 headers: {abc: "def"}

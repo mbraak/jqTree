@@ -1,4 +1,3 @@
-import { NodeElement } from "./node_element";
 import { html_escape, getBoolString } from "./util";
 import { Node } from "./node";
 import { ITreeWidget, IconElement } from "./itree_widget";
@@ -27,7 +26,7 @@ export default class ElementsRenderer {
         const $element = this.tree_widget.element;
         $element.empty();
 
-        this.createDomElements($element[0], this.tree_widget.tree.children, true, true, 1);
+        this.createDomElements($element[0], this.tree_widget.tree.children, true, 1);
     }
 
     public renderFromNode(node: Node) {
@@ -46,12 +45,12 @@ export default class ElementsRenderer {
 
         // create children
         if (node.children) {
-            this.createDomElements(li, node.children, false, false, node.getLevel() + 1);
+            this.createDomElements(li, node.children, false, node.getLevel() + 1);
         }
     }
 
     private createDomElements(
-        element: Element, children: Node[], is_root_node: boolean, is_open: boolean, level: number
+        element: Element, children: Node[], is_root_node: boolean, level: number
     ) {
         const ul = this.createUl(is_root_node);
         element.appendChild(ul);
@@ -63,7 +62,7 @@ export default class ElementsRenderer {
             this.attachNodeData(child, li);
 
             if (child.hasChildren()) {
-                this.createDomElements(li, child.children, false, child.is_open, level + 1);
+                this.createDomElements(li, child.children, false, level + 1);
             }
         }
     }

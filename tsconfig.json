@@ -6,8 +6,13 @@
     ],
     "compilerOptions": {
         "typeRoots" : ["./typings/globals"],
-        "noImplicitAny": true,
         "moduleResolution": "node",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
         "strictNullChecks": true
     }
 }

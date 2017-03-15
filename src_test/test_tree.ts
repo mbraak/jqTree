@@ -212,7 +212,7 @@ test("iterate", (assert: Assert) => {
     // iterate over all the nodes
     const nodes: Node[] = [];
     tree.iterate(
-        (node: Node, level: number) => {
+        (node: Node) => {
             nodes.push(node);
             return true;
         }
@@ -227,7 +227,7 @@ test("iterate", (assert: Assert) => {
     // iterate over nodes on first level
     const nodes2: Node[] = [];
     tree.iterate(
-        (node: Node, level: number) => {
+        (node: Node) => {
             nodes2.push(node);
             return false;
         }

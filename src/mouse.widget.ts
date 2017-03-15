@@ -4,7 +4,7 @@ This widget does the same a the mouse widget in jqueryui.
 import SimpleWidget from "./simple.widget";
 import { IPositionInfo } from "./imouse_widget";
 
-export default class MouseWidget extends SimpleWidget {
+abstract class MouseWidget extends SimpleWidget {
     public $el: JQuery;
     protected is_mouse_started: boolean;
     protected mouse_delay: number;
@@ -42,10 +42,7 @@ export default class MouseWidget extends SimpleWidget {
             return;
         }
 
-        const result = this._handleMouseDown(
-            e,
-            this._getPositionInfo(e)
-        );
+        const result = this._handleMouseDown(this._getPositionInfo(e));
 
         if (result) {
             e.preventDefault();
@@ -54,23 +51,15 @@ export default class MouseWidget extends SimpleWidget {
         return result;
     }
 
-    protected _mouseCapture(position_info: IPositionInfo): boolean|null {
-        return true;
-    }
+    protected abstract _mouseCapture(position_info: IPositionInfo): boolean|null;
 
-    protected _mouseStart(position_info: IPositionInfo): boolean {
-        return false;
-    }
+    protected abstract _mouseStart(position_info: IPositionInfo): boolean;
 
-    protected _mouseDrag(position_info: IPositionInfo) {
-        //
-    }
+    protected abstract _mouseDrag(position_info: IPositionInfo): void;
 
-    protected _mouseStop(position_info: IPositionInfo) {
-        //
-    }
+    protected abstract _mouseStop(position_info: IPositionInfo): void;
 
-    private _handleMouseDown(e: JQueryEventObject, position_info: IPositionInfo) {
+    private _handleMouseDown(position_info: IPositionInfo) {
         // We may have missed mouseup (out of window)
         if (this.is_mouse_started) {
             this._handleMouseUp(position_info);
@@ -181,10 +170,7 @@ export default class MouseWidget extends SimpleWidget {
 
         const touch = touch_event.changedTouches[0];
 
-        return this._handleMouseDown(
-            e,
-            this._getPositionInfo(touch)
-        );
+        return this._handleMouseDown(this._getPositionInfo(touch));
     }
 
     private _touchMove(e: JQueryEventObject) {
@@ -216,3 +202,5 @@ export default class MouseWidget extends SimpleWidget {
         );
     }
 }
+
+export default MouseWidget;
