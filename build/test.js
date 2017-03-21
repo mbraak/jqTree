@@ -1467,6 +1467,7 @@ var JqTreeWidget = (function (_super) {
                 }
             }
         }
+        return null;
     };
     JqTreeWidget.prototype._getNode = function ($element) {
         var $li = $element.closest("li.jqtree_common");
@@ -1491,6 +1492,7 @@ var JqTreeWidget = (function (_super) {
                 return false;
             }
         }
+        return null;
     };
     JqTreeWidget.prototype._saveState = function () {
         if (this.options.saveState && this.save_state_handler) {
@@ -2059,7 +2061,7 @@ var VisibleNodeIterator = (function () {
                     return;
                 }
                 if (is_first_node) {
-                    _this.handleFirstNode(node, $element);
+                    _this.handleFirstNode(node);
                     is_first_node = false;
                 }
                 if (!node.hasChildren()) {
@@ -2076,7 +2078,7 @@ var VisibleNodeIterator = (function () {
             }
             if (must_iterate_inside) {
                 var children_length_1 = node.children.length;
-                node.children.forEach(function (child, i) {
+                node.children.forEach(function (_, i) {
                     if (i === (children_length_1 - 1)) {
                         _iterateNode(node.children[i], null);
                     }
@@ -2085,31 +2087,11 @@ var VisibleNodeIterator = (function () {
                     }
                 });
                 if (node.is_open && $element) {
-                    _this.handleAfterOpenFolder(node, next_node, $element);
+                    _this.handleAfterOpenFolder(node, next_node);
                 }
             }
         };
         _iterateNode(this.tree, null);
-    };
-    VisibleNodeIterator.prototype.handleNode = function (node, next_node, $element) {
-        // override
-    };
-    VisibleNodeIterator.prototype.handleOpenFolder = function (node, $element) {
-        /*
-        override
-        return
-          - true: continue iterating
-          - false: stop iterating
-         */
-    };
-    VisibleNodeIterator.prototype.handleClosedFolder = function (node, next_node, $element) {
-        // override
-    };
-    VisibleNodeIterator.prototype.handleAfterOpenFolder = function (node, next_node, $element) {
-        // override
-    };
-    VisibleNodeIterator.prototype.handleFirstNode = function (node, $element) {
-        // override
     };
     return VisibleNodeIterator;
 }());
@@ -2172,12 +2154,12 @@ var HitAreasGenerator = (function (_super) {
             }
         }
     };
-    HitAreasGenerator.prototype.handleFirstNode = function (node, $element) {
+    HitAreasGenerator.prototype.handleFirstNode = function (node) {
         if (node !== this.current_node) {
             this.addPosition(node, node_1.Position.Before, this.getTop($(node.element)));
         }
     };
-    HitAreasGenerator.prototype.handleAfterOpenFolder = function (node, next_node, $element) {
+    HitAreasGenerator.prototype.handleAfterOpenFolder = function (node, next_node) {
         if (node === this.current_node ||
             next_node === this.current_node) {
             // Cannot move before or after current item
@@ -2286,7 +2268,7 @@ var ElementsRenderer = (function () {
     ElementsRenderer.prototype.renderFromRoot = function () {
         var $element = this.tree_widget.element;
         $element.empty();
-        this.createDomElements($element[0], this.tree_widget.tree.children, true, true, 1);
+        this.createDomElements($element[0], this.tree_widget.tree.children, true, 1);
     };
     ElementsRenderer.prototype.renderFromNode = function (node) {
         // remember current li
@@ -2300,10 +2282,10 @@ var ElementsRenderer = (function () {
         $previous_li.remove();
         // create children
         if (node.children) {
-            this.createDomElements(li, node.children, false, false, node.getLevel() + 1);
+            this.createDomElements(li, node.children, false, node.getLevel() + 1);
         }
     };
-    ElementsRenderer.prototype.createDomElements = function (element, children, is_root_node, is_open, level) {
+    ElementsRenderer.prototype.createDomElements = function (element, children, is_root_node, level) {
         var ul = this.createUl(is_root_node);
         element.appendChild(ul);
         for (var _i = 0, children_1 = children; _i < children_1.length; _i++) {
@@ -2312,7 +2294,7 @@ var ElementsRenderer = (function () {
             ul.appendChild(li);
             this.attachNodeData(child, li);
             if (child.hasChildren()) {
-                this.createDomElements(li, child.children, false, child.is_open, level + 1);
+                this.createDomElements(li, child.children, false, level + 1);
             }
         }
     };
@@ -2642,25 +2624,13 @@ var MouseWidget = (function (_super) {
         if (e.which !== 1) {
             return;
         }
-        var result = this._handleMouseDown(e, this._getPositionInfo(e));
+        var result = this._handleMouseDown(this._getPositionInfo(e));
         if (result) {
             e.preventDefault();
         }
         return result;
     };
-    MouseWidget.prototype._mouseCapture = function (position_info) {
-        return true;
-    };
-    MouseWidget.prototype._mouseStart = function (position_info) {
-        return false;
-    };
-    MouseWidget.prototype._mouseDrag = function (position_info) {
-        //
-    };
-    MouseWidget.prototype._mouseStop = function (position_info) {
-        //
-    };
-    MouseWidget.prototype._handleMouseDown = function (e, position_info) {
+    MouseWidget.prototype._handleMouseDown = function (position_info) {
         // We may have missed mouseup (out of window)
         if (this.is_mouse_started) {
             this._handleMouseUp(position_info);
@@ -2742,7 +2712,7 @@ var MouseWidget = (function (_super) {
             return;
         }
         var touch = touch_event.changedTouches[0];
-        return this._handleMouseDown(e, this._getPositionInfo(touch));
+        return this._handleMouseDown(this._getPositionInfo(touch));
     };
     MouseWidget.prototype._touchMove = function (e) {
         var touch_event = e.originalEvent;
@@ -3399,7 +3369,7 @@ var SelectNodeHandler = (function () {
         else {
             delete this.selected_nodes[node.id];
             if (include_children) {
-                node.iterate(function (n) {
+                node.iterate(function () {
                     delete _this.selected_nodes[node.id];
                     return true;
                 });
@@ -3495,7 +3465,7 @@ function isNodeOpen($node) {
 }
 exports.isNodeOpen = isNodeOpen;
 function formatTitles($node) {
-    var titles = $node.find(".jqtree-title").map(function (i, el) { return $(el).text(); });
+    var titles = $node.find(".jqtree-title").map(function (_, el) { return $(el).text(); });
     return titles.toArray().join(" ");
 }
 exports.formatTitles = formatTitles;
@@ -3591,12 +3561,12 @@ test("toggle", function (assert) {
     $tree.tree({
         data: utils_for_test_1.example_data
     });
-    $tree.on("tree.open", function (e) {
+    $tree.on("tree.open", function () {
         assert.ok(!utils_for_test_1.isNodeClosed($node1), "node1 is open");
         // 2. close node1
         $tree.tree("toggle", node1);
     });
-    $tree.on("tree.close", function (e) {
+    $tree.on("tree.close", function () {
         assert.ok(utils_for_test_1.isNodeClosed($node1), "node1 is closed");
         done();
     });
@@ -3949,6 +3919,7 @@ test("getNodeById", function (assert) {
     ];
     $tree.tree("loadData", subtree_data, node2);
     var t = $tree.tree("getTree");
+    assert.notEqual(t, null);
     assert.equal($tree.tree("getNodeById", 200).name, "sub1");
     assert.equal($tree.tree("getNodeById", 201).name, "sub2");
 });
@@ -4288,7 +4259,7 @@ test("addNodeBefore", function (assert) {
     $tree.tree({ data: utils_for_test_1.example_data });
     var node1 = $tree.tree("getNodeByName", "node1");
     // -- add node before node1
-    var new_node = $tree.tree("addNodeBefore", "node3", node1);
+    $tree.tree("addNodeBefore", "node3", node1);
     assert.equal(utils_for_test_1.formatTitles($tree), "node3 node1 child1 child2 node2 child3");
 });
 test("addParentNode", function (assert) {
@@ -4409,6 +4380,7 @@ test("getNodesByProperty", function (assert) {
     ];
     $tree.tree("loadData", subtree_data, node2);
     var t = $tree.tree("getTree");
+    assert.notEqual(t, null);
     assert.equal($tree.tree("getNodesByProperty", "int_property", 222)[0].name, "sub1");
     assert.equal($tree.tree("getNodesByProperty", "int_property", 444)[0].name, "sub2");
 });
@@ -4452,7 +4424,7 @@ test("dataUrl is function", function (assert) {
     // 1. init tree
     // dataUrl is a function
     $tree.tree({
-        dataUrl: function (node) {
+        dataUrl: function () {
             return {
                 url: "/tree3/",
                 headers: { abc: "def" }
@@ -4626,14 +4598,14 @@ test("iterate", function (assert) {
     tree.loadFromData(utils_for_test_1.example_data);
     // iterate over all the nodes
     var nodes = [];
-    tree.iterate(function (node, level) {
+    tree.iterate(function (node) {
         nodes.push(node);
         return true;
     });
     assert.equal(utils_for_test_1.formatNodes(nodes), "node1 child1 child2 node2 child3", "all nodes");
     // iterate over nodes on first level
     var nodes2 = [];
-    tree.iterate(function (node, level) {
+    tree.iterate(function (node) {
         nodes2.push(node);
         return false;
     });
