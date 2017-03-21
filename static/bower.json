@@ -4,7 +4,7 @@
     "blanket": "1.1.7",
     "bootstrap": "3.3.7",
     "fontawesome": "4.7.0",
-    "jquery": "3.2.0",
+    "jquery": "3.2.1",
     "jquery-2": "jquery#2.2.4",
     "jquery-1": "jquery#1.12.4",
     "jquery-mockjax": "2.2.1",
