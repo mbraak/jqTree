@@ -15,19 +15,19 @@
   },
   "scripts": {
     "test": "karma start --browsers Chrome --single-run && tslint src/*.ts src_test/*.ts",
+    "lint": "tslint src/*.ts",
     "watch": "webpack",
     "production": "webpack --config webpack.config.production && gulp && cp build/tree.jquery.js .",
     "karma": "karma start --browsers Chrome",
     "jekyll-build": "jekyll build",
-    "jekyll-serve": "jekyll serve",
-    "lint": "tslint src/*.ts"
+    "jekyll-serve": "jekyll serve"
   },
   "dependencies": {
     "jquery": ">=1.9"
   },
   "devDependencies": {
     "connect": "^3.6.0",
-    "coveralls": "^2.12.0",
+    "coveralls": "^2.13.0",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
@@ -35,7 +35,7 @@
     "ie-version": "^0.1.0",
     "jquery-mockjax": "^2.2.1",
     "jsonfile": "^2.4.0",
-    "karma": "^1.5.0",
+    "karma": "^1.6.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-cli": "^1.0.1",
     "karma-firefox-launcher": "^1.0.1",
@@ -44,11 +44,11 @@
     "karma-webpack": "^2.0.3",
     "lodash.template": "^4.4.0",
     "phantomjs-prebuilt": "^2.1.14",
-    "qunitjs": "^2.2.1",
+    "qunitjs": "^2.3.0",
     "serve-static": "^1.12.1",
-    "ts-loader": "^2.0.2",
-    "tslint": "^4.5.1",
-    "typescript": "^2.2.1",
-    "webpack": "^2.2.1"
+    "ts-loader": "^2.0.3",
+    "tslint": "^5.0.0",
+    "typescript": "^2.2.2",
+    "webpack": "^2.3.3"
   }
 }
