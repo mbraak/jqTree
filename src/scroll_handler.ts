@@ -69,11 +69,12 @@ export default class ScrollHandler {
 
     private _initScrollParent() {
         const getParentWithOverflow = () => {
-            const css_values = ["overflow", "overflow-y"];
+            const css_attributes = ["overflow", "overflow-y"];
 
             const hasOverFlow = ($el: JQuery) => {
-                for (const css_value of css_values) {
-                    if ($el.css(css_value) in ["auto", "scroll"]) {
+                for (const attr of css_attributes) {
+                    const overflow_value = $el.css(attr);
+                    if (overflow_value === "auto" || overflow_value === "scroll") {
                         return true;
                     }
                 }
