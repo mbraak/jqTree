@@ -71,7 +71,7 @@ export default class KeyHandler {
             this.tree_widget.closeNode(node);
             return false;
         } else {
-            /// Left on a closed or end node moves focus to the node's parent
+            // Left on a closed or end node moves focus to the node's parent
             return this.selectNode(node.getParent());
         }
     }

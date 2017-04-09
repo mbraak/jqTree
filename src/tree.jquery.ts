@@ -1064,7 +1064,7 @@ class JqTreeWidget extends MouseWidget {
                 this.select_node_handler.removeFromSelection(n);
             }
         }
-    };
+    }
 
     private _loadSubtree(data: any[], parent_node: Node) {
         parent_node.loadFromData(data);

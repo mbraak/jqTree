@@ -6,7 +6,7 @@ export enum Position {
     After,
     Inside,
     None
-};
+}
 
 interface IPositions {
     [key: string]: Position;

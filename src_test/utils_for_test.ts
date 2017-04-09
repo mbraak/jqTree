@@ -53,7 +53,7 @@ export function formatNodes(nodes: Node[]) {
     const strings = nodes.map(node => node.name);
 
     return strings.join(" ");
-};
+}
 
 export function isNodeClosed($node: JQuery) {
     return (

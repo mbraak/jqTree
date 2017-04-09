@@ -9,25 +9,25 @@ export interface IHitArea {
     bottom: number;
     node: Node;
     position: Position;
-};
+}
 
 export interface IDragAndDropHandler {
     hovered_area: IHitArea|null;
-};
+}
 
 export interface IElementsRenderer {
     opened_icon_element: IconElement;
     closed_icon_element: IconElement;
-};
+}
 
 export interface IScrollHandler {
     isScrolledIntoView: ($element: JQuery) => boolean;
-};
+}
 
 export interface ISelectNodeHandler {
     addToSelection: (node: Node) => void;
     isNodeSelected: (node?: Node) => boolean;
-};
+}
 
 export interface ITreeWidget {
     $el: JQuery;
@@ -53,7 +53,7 @@ export interface ITreeWidget {
     scrollToNode: (node: Node) => JQuery;
     getNodeById: (node_id: NodeId) => Node|null;
     getSelectedNodes: () => Node[];
-};
+}
 
 export interface INodeElement {
     node: Node;
@@ -62,8 +62,8 @@ export interface INodeElement {
     addDropHint: (position: Position) => IDropHint;
     select: () => void;
     deselect: () => void;
-};
+}
 
 export interface IDropHint {
     remove: () => void;
-};
+}
