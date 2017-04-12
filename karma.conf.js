@@ -9,12 +9,13 @@ module.exports = function(config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['browserify', 'qunit'],
+        frameworks: ['qunit'],
 
         // list of files / patterns to load in the browser
         files: [
-            'src_test/karma-test.js',
-            'static/bower_components/json3/lib/json3.js'
+            { pattern: 'static/bower_components/jquery/dist/jquery.min.js', watched: false },
+            { pattern: 'static/bower_components/jquery-mockjax/dist/jquery.mockjax.js', watched: false },
+            { pattern: 'src_test/test.ts', watched: false }
         ],
 
         // list of files to exclude
@@ -22,12 +23,29 @@ module.exports = function(config) {
         ],
 
         preprocessors: {
-            'src_test/karma-test.js': ['browserify']
+            'src_test/test.ts': ['webpack']
         },
 
-        browserify: {
-            transform: ['coffeeify'],
-            extensions: ['.js', '.coffee']
+        webpack: {
+            resolve: {
+                extensions: [".ts", ".js"]
+            },
+            module: {
+                loaders: [
+                    {
+                        test: /\.ts$/,
+                        loader: "ts-loader",
+                        exclude: /node_modules/
+                    }
+                ]
+            },
+            externals: {
+                "jquery": "jQuery"
+            }
+        },
+
+        mime: {
+            'text/x-typescript': ['ts','tsx']
         },
 
         // test results reporter to use

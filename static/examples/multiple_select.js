@@ -4,7 +4,7 @@ $(function() {
         data: ExampleData.example_data,
         autoOpen: true
     });
-    $tree.bind(
+    $tree.on(
         'tree.click',
         function(e) {
             // Disable single selection

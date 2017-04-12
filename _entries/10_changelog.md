@@ -3,6 +3,13 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.3.8 (april 12 2017)
+
+* Issue #471: use webpack instead of browserify
+* Issue #472: use 'jquery.on' instead of deprecated 'bind'
+* Issue #478: use typescript instead of coffeescript
+* Issue #480: support jquery 3.2.x
+
 ##### 1.3.7 (january 11 2017)
 
 * Issue 462: add on_finished parameter to openNode function

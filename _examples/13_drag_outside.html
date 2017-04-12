@@ -1,0 +1,25 @@
+---
+title: Drag outside tree
+layout: page
+js: examples/drag-outside.js
+css: example.css
+---
+
+<p id="nav">
+    <a href="../12_button_on_right/">&laquo; Example 11</a>
+</p>
+
+<h1>Example 13 - drag node outside tree</h1>
+
+<div id="tree1" data-url="/example_data/"></div>
+
+<div id="targetDiv">drag here</div>
+
+<h3>javascript</h3>
+
+{% highlight js %}
+$('#tree1').tree({
+    onDragMove: handleMove,
+    onDragStop: handleStop
+});
+{% endhighlight %}
