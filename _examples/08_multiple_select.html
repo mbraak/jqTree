@@ -7,7 +7,7 @@ css: example.css
 
 <p id="nav">
     <a href="../07_autoscroll/">&laquo; Example 7</a>
-    <a href="../09_custom_html/" class="next">Example 9 &raquo;</a>    
+    <a href="../09_custom_html/" class="next">Example 9 &raquo;</a>
 </p>
 
 <h1>Example 8 - multiple select</h1>
@@ -48,7 +48,7 @@ $(function() {
         data: ExampleData.example_data,
         autoOpen: true
     });
-    $tree.bind(
+    $tree.on(
         'tree.click',
         function(e) {
             // Disable single selection

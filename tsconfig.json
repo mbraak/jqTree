@@ -1,0 +1,18 @@
+{
+    "compileOnSave": false,
+    "exclude": [
+        "_site",
+        "node_modules"
+    ],
+    "compilerOptions": {
+        "typeRoots" : ["./typings/globals"],
+        "moduleResolution": "node",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strictNullChecks": true
+    }
+}
