@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development
+
+* Issue #481: fixed error that occured when opening an invalid node (thanks to Luciano Deriu)
+
 ##### 1.3.8 (april 12 2017)
 
 * Issue #471: use webpack instead of browserify
