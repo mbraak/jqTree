@@ -1,12 +1,12 @@
 /*!
- * QUnit 2.3.0
+ * QUnit 2.3.2
  * https://qunitjs.com/
  *
  * Copyright jQuery Foundation and other contributors
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2017-03-29T15:13Z
+ * Date: 2017-04-18T02:19Z
  */
 (function (global$1) {
   'use strict';
@@ -634,7 +634,8 @@
   		name: "",
   		tests: [],
   		childModules: [],
-  		testsRun: 0
+  		testsRun: 0,
+  		unskippedTestsRun: 0
   	},
 
   	callbacks: {},
@@ -1097,12 +1098,6 @@
   		var elapsedTime = now() - start;
 
   		if (!defined.setTimeout || config.updateRate <= 0 || elapsedTime < config.updateRate) {
-  			if (config.current) {
-
-  				// Reset async tracking for each phase of the Test lifecycle
-  				config.current.usedAsync = false;
-  			}
-
   			if (priorityCount > 0) {
   				priorityCount--;
   			}
@@ -1230,7 +1225,7 @@
   		this.skipped = !!options.skip;
   		this.todo = !!options.todo;
 
-  		this.testInstance = options.testInstance;
+  		this.valid = options.valid;
 
   		this._startTime = 0;
   		this._endTime = 0;
@@ -1239,11 +1234,6 @@
   	}
 
   	createClass(TestReport, [{
-  		key: "isValid",
-  		value: function isValid() {
-  			return this.testInstance.valid();
-  		}
-  	}, {
   		key: "start",
   		value: function start(recordTime) {
   			if (recordTime) {
@@ -1309,6 +1299,19 @@
   		value: function getAssertions() {
   			return this.assertions.slice();
   		}
+
+  		// Remove actual and expected values from assertions. This is to prevent
+  		// leaking memory throughout a test suite.
+
+  	}, {
+  		key: "slimAssertions",
+  		value: function slimAssertions() {
+  			this.assertions = this.assertions.map(function (assertion) {
+  				delete assertion.actual;
+  				delete assertion.expected;
+  				return assertion;
+  			});
+  		}
   	}]);
   	return TestReport;
   }();
@@ -1324,7 +1327,6 @@
   	extend(this, settings);
   	this.assertions = [];
   	this.semaphore = 0;
-  	this.usedAsync = false;
   	this.module = config.currentModule;
   	this.stack = sourceFromStacktrace(3);
   	this.steps = [];
@@ -1332,7 +1334,7 @@
   	this.testReport = new TestReport(settings.testName, this.module.suiteReport, {
   		todo: settings.todo,
   		skip: settings.skip,
-  		testInstance: this
+  		valid: this.valid()
   	});
 
   	// Register unique strings
@@ -1346,7 +1348,8 @@
 
   	this.module.tests.push({
   		name: this.testName,
-  		testId: this.testId
+  		testId: this.testId,
+  		skip: !!settings.skip
   	});
 
   	if (settings.skip) {
@@ -1450,14 +1453,14 @@
   		    test = this;
   		return function runHook() {
   			if (hookName === "before") {
-  				if (hookOwner.testsRun !== 0) {
+  				if (hookOwner.unskippedTestsRun !== 0) {
   					return;
   				}
 
   				test.preserveEnvironment = true;
   			}
 
-  			if (hookName === "after" && hookOwner.testsRun !== numberOfTests(hookOwner) - 1 && config.queue.length > 2) {
+  			if (hookName === "after" && hookOwner.unskippedTestsRun !== numberOfUnskippedTests(hookOwner) - 1 && config.queue.length > 2) {
   				return;
   			}
 
@@ -1531,7 +1534,7 @@
   			}
   		}
 
-  		notifyTestsRan(module);
+  		notifyTestsRan(module, skipped);
 
   		// Store result when possible
   		if (storage) {
@@ -1542,7 +1545,11 @@
   			}
   		}
 
+  		// After emitting the js-reporters event we cleanup the assertion data to
+  		// avoid leaking it. It is not used by the legacy testDone callbacks.
   		emit("testEnd", this.testReport.end(true));
+  		this.testReport.slimAssertions();
+
   		runLoggingCallbacks("testDone", {
   			name: testName,
   			module: moduleName,
@@ -1562,6 +1569,20 @@
   		});
 
   		if (module.testsRun === numberOfTests(module)) {
+  			logSuiteEnd(module);
+
+  			// Check if the parent modules, iteratively, are done. If that the case,
+  			// we emit the `suiteEnd` event and trigger `moduleDone` callback.
+  			var parent = module.parentModule;
+  			while (parent && parent.testsRun === numberOfTests(parent)) {
+  				logSuiteEnd(parent);
+  				parent = parent.parentModule;
+  			}
+  		}
+
+  		config.current = undefined;
+
+  		function logSuiteEnd(module) {
   			emit("suiteEnd", module.suiteReport.end(true));
   			runLoggingCallbacks("moduleDone", {
   				name: module.name,
@@ -1572,8 +1593,6 @@
   				runtime: now() - module.stats.started
   			});
   		}
-
-  		config.current = undefined;
   	},
 
   	preserveTestEnvironment: function preserveTestEnvironment() {
@@ -1623,6 +1642,9 @@
 
 
   	pushResult: function pushResult(resultInfo) {
+  		if (this !== config.current) {
+  			throw new Error("Assertion occured after test had finished.");
+  		}
 
   		// Destructure of resultInfo = { result, actual, expected, message, negative }
   		var source,
@@ -1972,24 +1994,40 @@
   	}
   }
 
-  function numberOfTests(module) {
-  	var count = module.tests.length;
+  function collectTests(module) {
+  	var tests = [].concat(module.tests);
   	var modules = [].concat(toConsumableArray(module.childModules));
 
   	// Do a breadth-first traversal of the child modules
   	while (modules.length) {
   		var nextModule = modules.shift();
-  		count += nextModule.tests.length;
+  		tests.push.apply(tests, nextModule.tests);
   		modules.push.apply(modules, toConsumableArray(nextModule.childModules));
   	}
 
-  	return count;
+  	return tests;
   }
 
-  function notifyTestsRan(module) {
+  function numberOfTests(module) {
+  	return collectTests(module).length;
+  }
+
+  function numberOfUnskippedTests(module) {
+  	return collectTests(module).filter(function (test) {
+  		return !test.skip;
+  	}).length;
+  }
+
+  function notifyTestsRan(module, skipped) {
   	module.testsRun++;
+  	if (!skipped) {
+  		module.unskippedTestsRun++;
+  	}
   	while (module = module.parentModule) {
   		module.testsRun++;
+  		if (!skipped) {
+  			module.unskippedTestsRun++;
+  		}
   	}
   }
 
@@ -2071,10 +2109,13 @@
   				acceptCallCount = 1;
   			}
 
-  			test$$1.usedAsync = true;
   			var resume = internalStop(test$$1);
 
   			return function done() {
+  				if (config.current !== test$$1) {
+  					throw Error("assert.async callback called after test finished.");
+  				}
+
   				if (popped) {
   					test$$1.pushFailure("Too many calls to the `assert.async` callback", sourceFromStacktrace(2));
   					return;
@@ -2122,12 +2163,6 @@
   			// not exactly the test where assertion were intended to be called.
   			if (!currentTest) {
   				throw new Error("assertion outside test context, in " + sourceFromStacktrace(2));
-  			}
-
-  			if (currentTest.usedAsync === true && currentTest.semaphore === 0) {
-  				currentTest.pushFailure("Assertion after the final `assert.async` was resolved", sourceFromStacktrace(2));
-
-  				// Allow this assertion to continue running anyway...
   			}
 
   			if (!(assert instanceof Assert)) {
@@ -2472,7 +2507,7 @@
   			var counts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { passed: 0, failed: 0, skipped: 0, todo: 0, total: 0 };
 
   			counts = this.tests.reduce(function (counts, test) {
-  				if (test.isValid()) {
+  				if (test.valid) {
   					counts[test.getStatus()]++;
   					counts.total++;
   				}
@@ -2548,7 +2583,7 @@
   QUnit.isLocal = !(defined.document && window.location.protocol !== "file:");
 
   // Expose the current QUnit version
-  QUnit.version = "2.3.0";
+  QUnit.version = "2.3.2";
 
   function createModule(name, testEnvironment) {
   	var parentModule = moduleStack.length ? moduleStack.slice(-1)[0] : null;
@@ -2561,6 +2596,7 @@
   		tests: [],
   		moduleId: generateHash(moduleName),
   		testsRun: 0,
+  		unskippedTestsRun: 0,
   		childModules: [],
   		suiteReport: new SuiteReport(name, parentSuite)
   	};
@@ -3624,13 +3660,19 @@
 
   				message += "<tr class='test-actual'><th>Result: </th><td><pre>" + escapeText(actual) + "</pre></td></tr>";
 
-  				// Don't show diff if actual or expected are booleans
-  				if (!/^(true|false)$/.test(actual) && !/^(true|false)$/.test(expected)) {
+  				if (typeof details.actual === "number" && typeof details.expected === "number") {
+  					if (!isNaN(details.actual) && !isNaN(details.expected)) {
+  						showDiff = true;
+  						diff = details.actual - details.expected;
+  						diff = (diff > 0 ? "+" : "") + diff;
+  					}
+  				} else if (typeof details.actual !== "boolean" && typeof details.expected !== "boolean") {
   					diff = QUnit.diff(expected, actual);
+
+  					// don't show diff if there is zero overlap
   					showDiff = stripHtml(diff).length !== stripHtml(expected).length + stripHtml(actual).length;
   				}
 
-  				// Don't show diff if expected and actual are totally different
   				if (showDiff) {
   					message += "<tr class='test-diff'><th>Diff: </th><td><pre>" + diff + "</pre></td></tr>";
   				}
