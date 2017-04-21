@@ -37,6 +37,8 @@ export class NodeElement implements INodeElement {
 
         const $span = this.getSpan();
         $span.attr("tabindex", 0);
+
+        $span.focus();
     }
 
     public deselect() {
@@ -47,6 +49,8 @@ export class NodeElement implements INodeElement {
 
         const $span = this.getSpan();
         $span.attr("tabindex", -1);
+
+        $span.blur();
     }
 
     protected getUl() {
