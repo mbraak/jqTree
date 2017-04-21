@@ -24,9 +24,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -2777,6 +2777,7 @@ var NodeElement = (function () {
         $li.attr("aria-selected", "true");
         var $span = this.getSpan();
         $span.attr("tabindex", 0);
+        $span.focus();
     };
     NodeElement.prototype.deselect = function () {
         var $li = this.getLi();
@@ -2784,6 +2785,7 @@ var NodeElement = (function () {
         $li.attr("aria-selected", "false");
         var $span = this.getSpan();
         $span.attr("tabindex", -1);
+        $span.blur();
     };
     NodeElement.prototype.getUl = function () {
         return this.$element.children("ul:first");
@@ -2810,8 +2812,11 @@ var FolderElement = (function (_super) {
             var $button = this.getButton();
             $button.removeClass("jqtree-closed");
             $button.html("");
-            var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
-            $button.get(0).appendChild(icon);
+            var button_el = $button.get(0);
+            if (button_el) {
+                var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+                button_el.appendChild(icon);
+            }
             var doOpen = function () {
                 var $li = _this.getLi();
                 $li.removeClass("jqtree-closed");
@@ -2839,8 +2844,11 @@ var FolderElement = (function (_super) {
             var $button = this.getButton();
             $button.addClass("jqtree-closed");
             $button.html("");
-            var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
-            $button.get(0).appendChild(icon);
+            var button_el = $button.get(0);
+            if (button_el) {
+                var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+                button_el.appendChild(icon);
+            }
             var doClose = function () {
                 var $li = _this.getLi();
                 $li.addClass("jqtree-closed");
