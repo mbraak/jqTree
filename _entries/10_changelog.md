@@ -6,6 +6,9 @@ name: changelog
 ##### development
 
 * Issue #481: fixed error that occured when opening an invalid node (thanks to Luciano Deriu)
+* Issue #482: changed keyboard logic (thanks to bnsblue)
+    * Set focus to the selected node.
+    * The keyboard is active if a tree node has the focus.
 
 ##### 1.3.8 (april 12 2017)
 
