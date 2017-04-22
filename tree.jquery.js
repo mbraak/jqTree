@@ -1143,6 +1143,10 @@ var JqTreeWidget = (function (_super) {
             return null;
         }
     };
+    JqTreeWidget.prototype._containsElement = function (element) {
+        var node = this._getNode($(element));
+        return node != null && node.tree === this.tree;
+    };
     JqTreeWidget.prototype._init = function () {
         _super.prototype._init.call(this);
         this.element = this.$el;
@@ -2527,27 +2531,23 @@ var KeyHandler = (function () {
         }
     };
     KeyHandler.prototype.handleKeyDown = function (e) {
-        if (!this.tree_widget.options.keyboardSupport) {
+        if (!this.canHandleKeyboard()) {
             return true;
         }
-        if ($(document.activeElement).is("textarea,input,select")) {
-            return true;
-        }
-        if (!this.tree_widget.getSelectedNode()) {
-            return true;
-        }
-        var key = e.which;
-        switch (key) {
-            case KeyHandler.DOWN:
-                return this.moveDown();
-            case KeyHandler.UP:
-                return this.moveUp();
-            case KeyHandler.RIGHT:
-                return this.moveRight();
-            case KeyHandler.LEFT:
-                return this.moveLeft();
-            default:
-                return true;
+        else {
+            var key = e.which;
+            switch (key) {
+                case KeyHandler.DOWN:
+                    return this.moveDown();
+                case KeyHandler.UP:
+                    return this.moveUp();
+                case KeyHandler.RIGHT:
+                    return this.moveRight();
+                case KeyHandler.LEFT:
+                    return this.moveLeft();
+                default:
+                    return true;
+            }
         }
     };
     KeyHandler.prototype.selectNode = function (node) {
@@ -2562,6 +2562,17 @@ var KeyHandler = (function () {
             }
             return false;
         }
+    };
+    KeyHandler.prototype.canHandleKeyboard = function () {
+        return (this.tree_widget.options.keyboardSupport &&
+            this.isFocusOnTree() &&
+            this.tree_widget.getSelectedNode() != null);
+    };
+    KeyHandler.prototype.isFocusOnTree = function () {
+        var active_element = document.activeElement;
+        return (active_element &&
+            active_element.tagName === "SPAN" &&
+            this.tree_widget._containsElement(active_element));
     };
     return KeyHandler;
 }());

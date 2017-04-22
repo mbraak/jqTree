@@ -1,3 +1,21 @@
+/*!
+ * JqTree 1.3.8
+ * 
+ * Copyright 2017 Marco Braak
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -1124,6 +1142,10 @@ var JqTreeWidget = (function (_super) {
         else {
             return null;
         }
+    };
+    JqTreeWidget.prototype._containsElement = function (element) {
+        var node = this._getNode($(element));
+        return node != null && node.tree === this.tree;
     };
     JqTreeWidget.prototype._init = function () {
         _super.prototype._init.call(this);
@@ -2509,27 +2531,23 @@ var KeyHandler = (function () {
         }
     };
     KeyHandler.prototype.handleKeyDown = function (e) {
-        if (!this.tree_widget.options.keyboardSupport) {
+        if (!this.canHandleKeyboard()) {
             return true;
         }
-        if ($(document.activeElement).is("textarea,input,select")) {
-            return true;
-        }
-        if (!this.tree_widget.getSelectedNode()) {
-            return true;
-        }
-        var key = e.which;
-        switch (key) {
-            case KeyHandler.DOWN:
-                return this.moveDown();
-            case KeyHandler.UP:
-                return this.moveUp();
-            case KeyHandler.RIGHT:
-                return this.moveRight();
-            case KeyHandler.LEFT:
-                return this.moveLeft();
-            default:
-                return true;
+        else {
+            var key = e.which;
+            switch (key) {
+                case KeyHandler.DOWN:
+                    return this.moveDown();
+                case KeyHandler.UP:
+                    return this.moveUp();
+                case KeyHandler.RIGHT:
+                    return this.moveRight();
+                case KeyHandler.LEFT:
+                    return this.moveLeft();
+                default:
+                    return true;
+            }
         }
     };
     KeyHandler.prototype.selectNode = function (node) {
@@ -2544,6 +2562,17 @@ var KeyHandler = (function () {
             }
             return false;
         }
+    };
+    KeyHandler.prototype.canHandleKeyboard = function () {
+        return (this.tree_widget.options.keyboardSupport &&
+            this.isFocusOnTree() &&
+            this.tree_widget.getSelectedNode() != null);
+    };
+    KeyHandler.prototype.isFocusOnTree = function () {
+        var active_element = document.activeElement;
+        return (active_element &&
+            active_element.tagName === "SPAN" &&
+            this.tree_widget._containsElement(active_element));
     };
     return KeyHandler;
 }());
@@ -4970,4 +4999,3 @@ module.exports = __webpack_require__(14);
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=test.js.map
