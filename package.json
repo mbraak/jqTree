@@ -20,7 +20,8 @@
     "production": "webpack --config webpack.config.production && gulp && cp build/tree.jquery.js .",
     "karma": "karma start --browsers Chrome",
     "jekyll-build": "jekyll build",
-    "jekyll-serve": "jekyll serve"
+    "jekyll-serve": "jekyll serve",
+    "devserver": "webpack-dev-server"
   },
   "dependencies": {
     "jquery": ">=1.9"
@@ -48,6 +49,7 @@
     "ts-loader": "^2.0.3",
     "tslint": "^5.1.0",
     "typescript": "^2.2.2",
-    "webpack": "^2.4.1"
+    "webpack": "^2.4.1",
+    "webpack-dev-server": "^2.4.2"
   }
 }
