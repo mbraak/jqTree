@@ -77,35 +77,27 @@ export default class KeyHandler {
     }
 
     public handleKeyDown(e: JQueryEventObject) {
-        if (! this.tree_widget.options.keyboardSupport) {
+        if (! this.canHandleKeyboard()) {
             return true;
-        }
+        } else {
+            const key = e.which;
 
-        if ($(document.activeElement).is("textarea,input,select")) {
-            return true;
-        }
+            switch (key) {
+                case KeyHandler.DOWN:
+                    return this.moveDown();
 
-        if (! this.tree_widget.getSelectedNode()) {
-            return true;
-        }
+                case KeyHandler.UP:
+                    return this.moveUp();
 
-        const key = e.which;
+                case KeyHandler.RIGHT:
+                    return this.moveRight();
 
-        switch (key) {
-            case KeyHandler.DOWN:
-                return this.moveDown();
+                case KeyHandler.LEFT:
+                    return this.moveLeft();
 
-            case KeyHandler.UP:
-                return this.moveUp();
-
-            case KeyHandler.RIGHT:
-                return this.moveRight();
-
-            case KeyHandler.LEFT:
-                return this.moveLeft();
-
-            default:
-                return true;
+                default:
+                    return true;
+            }
         }
     }
 
@@ -124,5 +116,23 @@ export default class KeyHandler {
 
             return false;
         }
+    }
+
+    private canHandleKeyboard(): boolean {
+        return (
+            this.tree_widget.options.keyboardSupport &&
+            this.isFocusOnTree() &&
+            this.tree_widget.getSelectedNode() != null
+        );
+    }
+
+    private isFocusOnTree(): boolean {
+        const active_element = document.activeElement;
+
+        return (
+            active_element &&
+            active_element.tagName === "SPAN" &&
+            this.tree_widget._containsElement(active_element)
+        );
     }
 }

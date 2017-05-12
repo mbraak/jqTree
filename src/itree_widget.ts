@@ -45,6 +45,7 @@ export interface ITreeWidget {
     _refreshElements: (from_node: Node|null) => void;
     _getNodeElement: ($element: JQuery) => INodeElement|null;
     _getNodeElementForNode: (node: Node) => INodeElement;
+    _containsElement: (element: Element) => boolean;
     refreshHitAreas: () => JQuery;
     getSelectedNode: () => Node|false;
     openNode: (node: Node, param1?: any, param2?: any) => JQuery;

@@ -37,6 +37,8 @@ export class NodeElement implements INodeElement {
 
         const $span = this.getSpan();
         $span.attr("tabindex", 0);
+
+        $span.focus();
     }
 
     public deselect() {
@@ -47,6 +49,8 @@ export class NodeElement implements INodeElement {
 
         const $span = this.getSpan();
         $span.attr("tabindex", -1);
+
+        $span.blur();
     }
 
     protected getUl() {
@@ -71,8 +75,13 @@ export class FolderElement extends NodeElement {
             $button.removeClass("jqtree-closed");
             $button.html("");
 
-            const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
-            $button.get(0).appendChild(icon);
+            const button_el = $button.get(0);
+
+            if (button_el) {
+                const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+
+                button_el.appendChild(icon);
+            }
 
             const doOpen = () => {
                 const $li = this.getLi();
@@ -104,8 +113,13 @@ export class FolderElement extends NodeElement {
             $button.addClass("jqtree-closed");
             $button.html("");
 
-            const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
-            $button.get(0).appendChild(icon);
+            const button_el = $button.get(0);
+
+            if (button_el) {
+                const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+
+                button_el.appendChild(icon);
+            }
 
             const doClose = () => {
                 const $li = this.getLi();
