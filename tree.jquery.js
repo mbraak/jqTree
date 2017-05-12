@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.3.8
+ * JqTree 1.4.0
  * 
  * Copyright 2017 Marco Braak
  * 
@@ -3414,7 +3414,7 @@ exports["default"] = SelectNodeHandler;
 "use strict";
 
 exports.__esModule = true;
-var version = "1.3.7";
+var version = "1.4.0";
 exports["default"] = version;
 
 
