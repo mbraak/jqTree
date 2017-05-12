@@ -505,6 +505,12 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
+    public _containsElement(element: Element): boolean {
+        const node = this._getNode($(element));
+
+        return node != null && node.tree === this.tree;
+    }
+
     protected _init() {
         super._init();
 

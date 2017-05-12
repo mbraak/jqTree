@@ -1,3 +1,21 @@
+/*!
+ * JqTree 1.4.0
+ * 
+ * Copyright 2017 Marco Braak
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -6,9 +24,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -1124,6 +1142,10 @@ var JqTreeWidget = (function (_super) {
         else {
             return null;
         }
+    };
+    JqTreeWidget.prototype._containsElement = function (element) {
+        var node = this._getNode($(element));
+        return node != null && node.tree === this.tree;
     };
     JqTreeWidget.prototype._init = function () {
         _super.prototype._init.call(this);
@@ -2509,27 +2531,23 @@ var KeyHandler = (function () {
         }
     };
     KeyHandler.prototype.handleKeyDown = function (e) {
-        if (!this.tree_widget.options.keyboardSupport) {
+        if (!this.canHandleKeyboard()) {
             return true;
         }
-        if ($(document.activeElement).is("textarea,input,select")) {
-            return true;
-        }
-        if (!this.tree_widget.getSelectedNode()) {
-            return true;
-        }
-        var key = e.which;
-        switch (key) {
-            case KeyHandler.DOWN:
-                return this.moveDown();
-            case KeyHandler.UP:
-                return this.moveUp();
-            case KeyHandler.RIGHT:
-                return this.moveRight();
-            case KeyHandler.LEFT:
-                return this.moveLeft();
-            default:
-                return true;
+        else {
+            var key = e.which;
+            switch (key) {
+                case KeyHandler.DOWN:
+                    return this.moveDown();
+                case KeyHandler.UP:
+                    return this.moveUp();
+                case KeyHandler.RIGHT:
+                    return this.moveRight();
+                case KeyHandler.LEFT:
+                    return this.moveLeft();
+                default:
+                    return true;
+            }
         }
     };
     KeyHandler.prototype.selectNode = function (node) {
@@ -2544,6 +2562,17 @@ var KeyHandler = (function () {
             }
             return false;
         }
+    };
+    KeyHandler.prototype.canHandleKeyboard = function () {
+        return (this.tree_widget.options.keyboardSupport &&
+            this.isFocusOnTree() &&
+            this.tree_widget.getSelectedNode() != null);
+    };
+    KeyHandler.prototype.isFocusOnTree = function () {
+        var active_element = document.activeElement;
+        return (active_element &&
+            active_element.tagName === "SPAN" &&
+            this.tree_widget._containsElement(active_element));
     };
     return KeyHandler;
 }());
@@ -2759,6 +2788,7 @@ var NodeElement = (function () {
         $li.attr("aria-selected", "true");
         var $span = this.getSpan();
         $span.attr("tabindex", 0);
+        $span.focus();
     };
     NodeElement.prototype.deselect = function () {
         var $li = this.getLi();
@@ -2766,6 +2796,7 @@ var NodeElement = (function () {
         $li.attr("aria-selected", "false");
         var $span = this.getSpan();
         $span.attr("tabindex", -1);
+        $span.blur();
     };
     NodeElement.prototype.getUl = function () {
         return this.$element.children("ul:first");
@@ -2792,8 +2823,11 @@ var FolderElement = (function (_super) {
             var $button = this.getButton();
             $button.removeClass("jqtree-closed");
             $button.html("");
-            var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
-            $button.get(0).appendChild(icon);
+            var button_el = $button.get(0);
+            if (button_el) {
+                var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+                button_el.appendChild(icon);
+            }
             var doOpen = function () {
                 var $li = _this.getLi();
                 $li.removeClass("jqtree-closed");
@@ -2821,8 +2855,11 @@ var FolderElement = (function (_super) {
             var $button = this.getButton();
             $button.addClass("jqtree-closed");
             $button.html("");
-            var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
-            $button.get(0).appendChild(icon);
+            var button_el = $button.get(0);
+            if (button_el) {
+                var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+                button_el.appendChild(icon);
+            }
             var doClose = function () {
                 var $li = _this.getLi();
                 $li.addClass("jqtree-closed");
@@ -3377,7 +3414,7 @@ exports["default"] = SelectNodeHandler;
 "use strict";
 
 exports.__esModule = true;
-var version = "1.3.7";
+var version = "1.4.0";
 exports["default"] = version;
 
 
@@ -4304,15 +4341,13 @@ test("keyboard", function (assert) {
     keyDown(39);
     assert.equal(node1.is_open, true);
     assert.equal($tree.tree("getSelectedNode").name, "node1");
-    // - select child3 and move up -> node2
-    $tree.tree("selectNode", $tree.tree("getNodeByName", "child3"));
+    // - down -> child1
+    keyDown(40);
+    assert.equal($tree.tree("getSelectedNode").name, "child1");
+    // - up -> node1
     keyDown(38);
-    assert.equal($tree.tree("getSelectedNode").name, "node2");
-    // - move up -> child2
-    keyDown(38);
-    assert.equal($tree.tree("getSelectedNode").name, "child2");
-    // - select node1 and move left ->  close
-    $tree.tree("selectNode", node1);
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    // - left ->  close
     keyDown(37);
     assert.equal(node1.is_open, false);
     assert.equal($tree.tree("getSelectedNode").name, "node1");
@@ -4962,4 +4997,3 @@ module.exports = __webpack_require__(14);
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=test.js.map

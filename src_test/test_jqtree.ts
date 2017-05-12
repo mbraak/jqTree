@@ -1187,17 +1187,15 @@ test("keyboard", (assert: Assert) =>  {
     assert.equal(node1.is_open, true);
     assert.equal($tree.tree("getSelectedNode").name, "node1");
 
-    // - select child3 and move up -> node2
-    $tree.tree("selectNode", $tree.tree("getNodeByName", "child3"));
-    keyDown(38);
-    assert.equal($tree.tree("getSelectedNode").name, "node2");
+    // - down -> child1
+    keyDown(40);
+    assert.equal($tree.tree("getSelectedNode").name, "child1");
 
-    // - move up -> child2
+    // - up -> node1
     keyDown(38);
-    assert.equal($tree.tree("getSelectedNode").name, "child2");
+    assert.equal($tree.tree("getSelectedNode").name, "node1");
 
-    // - select node1 and move left ->  close
-    $tree.tree("selectNode", node1);
+    // - left ->  close
     keyDown(37);
     assert.equal(node1.is_open, false);
     assert.equal($tree.tree("getSelectedNode").name, "node1");
