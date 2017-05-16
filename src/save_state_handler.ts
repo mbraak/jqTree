@@ -73,9 +73,15 @@ export default class SaveStateHandler {
         if (! state) {
             return false;
         } else {
-            const must_load_on_demand = this._openInitialNodes(state.open_nodes);
+            let must_load_on_demand = false;
 
-            this._selectInitialNodes(state.selected_node);
+            if (state.open_nodes) {
+                must_load_on_demand = this._openInitialNodes(state.open_nodes);
+            }
+
+            if (state.selected_node) {
+                this._selectInitialNodes(state.selected_node);
+            }
 
             return must_load_on_demand;
         }
