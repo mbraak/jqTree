@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue #487: setState must clear the selection (thanks to terryoy)
+
 ##### 1.4.0 (may 12 2017)
 
 * Issue #481: fixed error that occured when opening an invalid node (thanks to Luciano Deriu)
