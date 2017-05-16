@@ -3009,8 +3009,14 @@ var SaveStateHandler = (function () {
             return false;
         }
         else {
-            var must_load_on_demand = this._openInitialNodes(state.open_nodes);
-            this._selectInitialNodes(state.selected_node);
+            var must_load_on_demand = false;
+            if (state.open_nodes) {
+                must_load_on_demand = this._openInitialNodes(state.open_nodes);
+            }
+            if (state.selected_node) {
+                this._resetSelection();
+                this._selectInitialNodes(state.selected_node);
+            }
             return must_load_on_demand;
         }
     };
@@ -3077,6 +3083,15 @@ var SaveStateHandler = (function () {
             }
         }
         return select_count !== 0;
+    };
+    SaveStateHandler.prototype._resetSelection = function () {
+        var select_node_handler = this.tree_widget.select_node_handler;
+        if (select_node_handler) {
+            var selected_nodes = select_node_handler.getSelectedNodes();
+            selected_nodes.forEach(function (node) {
+                select_node_handler.removeFromSelection(node);
+            });
+        }
     };
     SaveStateHandler.prototype._setInitialStateOnDemand = function (node_ids_param, selected_nodes, cb_finished) {
         var _this = this;
