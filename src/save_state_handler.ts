@@ -80,6 +80,7 @@ export default class SaveStateHandler {
             }
 
             if (state.selected_node) {
+                this._resetSelection();
                 this._selectInitialNodes(state.selected_node);
             }
 
@@ -161,6 +162,20 @@ export default class SaveStateHandler {
         }
 
         return select_count !== 0;
+    }
+
+    private _resetSelection() {
+        const select_node_handler = this.tree_widget.select_node_handler;
+
+        if (select_node_handler) {
+            const selected_nodes = select_node_handler.getSelectedNodes();
+
+            selected_nodes.forEach(
+                node => {
+                    select_node_handler.removeFromSelection(node);
+                }
+            );
+        }
     }
 
     private _setInitialStateOnDemand(node_ids_param: NodeId[], selected_nodes: NodeId[], cb_finished: () => void) {
