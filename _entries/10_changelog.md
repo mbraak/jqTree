@@ -13,6 +13,7 @@ name: changelog
 * Issue #482: changed keyboard logic (thanks to bnsblue)
     * Set focus to the selected node.
     * The keyboard is active if a tree node has the focus.
+* Issue #488: add is_selected parameter to onCreateLi
 
 ##### 1.3.8 (april 12 2017)
 

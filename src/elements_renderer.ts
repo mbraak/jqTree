@@ -110,7 +110,7 @@ export default class ElementsRenderer {
         }
 
         if (this.tree_widget.options.onCreateLi) {
-            this.tree_widget.options.onCreateLi(node, $(li));
+            this.tree_widget.options.onCreateLi(node, $(li), is_selected);
         }
 
         return li;
