@@ -79,13 +79,7 @@ class JqTreeWidget extends MouseWidget {
     private key_handler: KeyHandler|null;
 
     public toggle(node: Node, slide_param?: boolean): JQuery {
-        let slide;
-
-        if (slide_param == null) {
-            slide = this.options.slide;
-        } else {
-            slide = slide_param;
-        }
+        const slide = slide_param == null ? this.options.slide : slide_param;
 
         if (node.is_open) {
             this.closeNode(node, slide);
@@ -205,13 +199,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     public closeNode(node: Node, slide_param?: any): JQuery {
-        let slide;
-
-        if (slide_param == null) {
-            slide = this.options.slide;
-        } else {
-            slide = slide_param;
-        }
+        const slide = slide_param == null ? this.options.slide : slide_param;
 
         if (node.isFolder()) {
             new FolderElement(node, this).close(slide);
@@ -289,13 +277,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     public prependNode(new_node_info: any, parent_node_param: Node): Node {
-        let parent_node;
-
-        if (! parent_node_param) {
-            parent_node = this.tree;
-        } else {
-            parent_node = parent_node_param;
-        }
+        const parent_node = !parent_node_param ? this.tree : parent_node_param;
 
         const node = parent_node.prepend(new_node_info);
 
@@ -1086,11 +1068,7 @@ class JqTreeWidget extends MouseWidget {
         let url_info = url_info_param;
 
         const addLoadingClass = () => {
-            if (parent_node) {
-                $el = $(parent_node.element);
-            } else {
-                $el = this.element;
-            }
+            $el = parent_node ? $(parent_node.element) : this.element;
 
             $el.addClass("jqtree-loading");
             this._notifyLoading(true, parent_node, $el);
@@ -1125,20 +1103,20 @@ class JqTreeWidget extends MouseWidget {
             }
         };
 
+        const getDataFromResponse = (response: any) => (
+            $.isArray(response) || typeof response === "object"
+                ? response
+                : data != null ?  $.parseJSON(response) : []
+        );
+
+        const filterData = (data: any) => (
+            this.options.dataFilter ? this.options.dataFilter(data) : data
+        );
+
         const handleSuccess = (response: any) => {
-            let data;
-
-            if ($.isArray(response) || typeof response === "object") {
-                data = response;
-            } else if (data != null) {
-                data = $.parseJSON(response);
-            } else {
-                data = [];
-            }
-
-            if (this.options.dataFilter) {
-                data = this.options.dataFilter(data);
-            }
+            const data = filterData(
+                getDataFromReponse(response)
+            );
 
             handeLoadData(data);
         };
