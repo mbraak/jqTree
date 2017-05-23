@@ -1106,7 +1106,7 @@ class JqTreeWidget extends MouseWidget {
         const getDataFromResponse = (response: any) => (
             $.isArray(response) || typeof response === "object"
                 ? response
-                : data != null ?  $.parseJSON(response) : []
+                : response != null ? $.parseJSON(response) : []
         );
 
         const filterData = (data: any) => (
@@ -1115,7 +1115,7 @@ class JqTreeWidget extends MouseWidget {
 
         const handleSuccess = (response: any) => {
             const data = filterData(
-                getDataFromReponse(response)
+                getDataFromResponse(response)
             );
 
             handeLoadData(data);

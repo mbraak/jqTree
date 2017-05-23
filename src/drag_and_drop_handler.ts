@@ -71,7 +71,7 @@ export class DragAndDropHandler {
 
             const node = this.current_item.node;
 
-            const node_name = this.tree_widget.options.autoEscape ? node_name = html_escape(node.name) : node.name;
+            const node_name: string = this.tree_widget.options.autoEscape ? html_escape(node.name) : node.name;
 
             this.drag_element = new DragElement(
                 node_name,
