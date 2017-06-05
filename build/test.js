@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.4.0
+ * JqTree 1.4.1
  * 
  * Copyright 2017 Marco Braak
  * 
@@ -796,13 +796,7 @@ var JqTreeWidget = (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     JqTreeWidget.prototype.toggle = function (node, slide_param) {
-        var slide;
-        if (slide_param == null) {
-            slide = this.options.slide;
-        }
-        else {
-            slide = slide_param;
-        }
+        var slide = slide_param == null ? this.options.slide : slide_param;
         if (node.is_open) {
             this.closeNode(node, slide);
         }
@@ -902,13 +896,7 @@ var JqTreeWidget = (function (_super) {
         return this.element;
     };
     JqTreeWidget.prototype.closeNode = function (node, slide_param) {
-        var slide;
-        if (slide_param == null) {
-            slide = this.options.slide;
-        }
-        else {
-            slide = slide_param;
-        }
+        var slide = slide_param == null ? this.options.slide : slide_param;
         if (node.isFolder()) {
             new node_element_1.FolderElement(node, this).close(slide);
             this._saveState();
@@ -965,13 +953,7 @@ var JqTreeWidget = (function (_super) {
         return node;
     };
     JqTreeWidget.prototype.prependNode = function (new_node_info, parent_node_param) {
-        var parent_node;
-        if (!parent_node_param) {
-            parent_node = this.tree;
-        }
-        else {
-            parent_node = parent_node_param;
-        }
+        var parent_node = !parent_node_param ? this.tree : parent_node_param;
         var node = parent_node.prepend(new_node_info);
         this._refreshElements(parent_node);
         return node;
@@ -1639,12 +1621,7 @@ var JqTreeWidget = (function (_super) {
         var $el = null;
         var url_info = url_info_param;
         var addLoadingClass = function () {
-            if (parent_node) {
-                $el = $(parent_node.element);
-            }
-            else {
-                $el = _this.element;
-            }
+            $el = parent_node ? $(parent_node.element) : _this.element;
             $el.addClass("jqtree-loading");
             _this._notifyLoading(true, parent_node, $el);
         };
@@ -1670,20 +1647,12 @@ var JqTreeWidget = (function (_super) {
                 on_finished();
             }
         };
+        var getDataFromResponse = function (response) { return ($.isArray(response) || typeof response === "object"
+            ? response
+            : response != null ? $.parseJSON(response) : []); };
+        var filterData = function (data) { return (_this.options.dataFilter ? _this.options.dataFilter(data) : data); };
         var handleSuccess = function (response) {
-            var data;
-            if ($.isArray(response) || typeof response === "object") {
-                data = response;
-            }
-            else if (data != null) {
-                data = $.parseJSON(response);
-            }
-            else {
-                data = [];
-            }
-            if (_this.options.dataFilter) {
-                data = _this.options.dataFilter(data);
-            }
+            var data = filterData(getDataFromResponse(response));
             handeLoadData(data);
         };
         var handleError = function (response) {
@@ -1830,13 +1799,7 @@ var DragAndDropHandler = (function () {
             this.refresh();
             var offset = $(position_info.target).offset();
             var node = this.current_item.node;
-            var node_name = void 0;
-            if (this.tree_widget.options.autoEscape) {
-                node_name = util_1.html_escape(node.name);
-            }
-            else {
-                node_name = node.name;
-            }
+            var node_name = this.tree_widget.options.autoEscape ? util_1.html_escape(node.name) : node.name;
             this.drag_element = new DragElement(node_name, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
             this.is_dragging = true;
             this.current_item.$element.addClass("jqtree-moving");
@@ -2326,28 +2289,18 @@ var ElementsRenderer = (function () {
     ElementsRenderer.prototype.createLi = function (node, level) {
         var is_selected = Boolean(this.tree_widget.select_node_handler &&
             this.tree_widget.select_node_handler.isNodeSelected(node));
-        var li;
-        if (node.isFolder()) {
-            li = this.createFolderLi(node, level, is_selected);
-        }
-        else {
-            li = this.createNodeLi(node, level, is_selected);
-        }
+        var li = node.isFolder()
+            ? this.createFolderLi(node, level, is_selected)
+            : this.createNodeLi(node, level, is_selected);
         if (this.tree_widget.options.onCreateLi) {
-            this.tree_widget.options.onCreateLi(node, $(li));
+            this.tree_widget.options.onCreateLi(node, $(li), is_selected);
         }
         return li;
     };
     ElementsRenderer.prototype.createFolderLi = function (node, level, is_selected) {
         var button_classes = this.getButtonClasses(node);
         var folder_classes = this.getFolderClasses(node, is_selected);
-        var icon_element;
-        if (node.is_open) {
-            icon_element = this.opened_icon_element;
-        }
-        else {
-            icon_element = this.closed_icon_element;
-        }
+        var icon_element = node.is_open ? this.opened_icon_element : this.closed_icon_element;
         // li
         var li = document.createElement("li");
         li.className = "jqtree_common " + folder_classes;
@@ -3009,8 +2962,14 @@ var SaveStateHandler = (function () {
             return false;
         }
         else {
-            var must_load_on_demand = this._openInitialNodes(state.open_nodes);
-            this._selectInitialNodes(state.selected_node);
+            var must_load_on_demand = false;
+            if (state.open_nodes) {
+                must_load_on_demand = this._openInitialNodes(state.open_nodes);
+            }
+            if (state.selected_node) {
+                this._resetSelection();
+                this._selectInitialNodes(state.selected_node);
+            }
             return must_load_on_demand;
         }
     };
@@ -3077,6 +3036,15 @@ var SaveStateHandler = (function () {
             }
         }
         return select_count !== 0;
+    };
+    SaveStateHandler.prototype._resetSelection = function () {
+        var select_node_handler = this.tree_widget.select_node_handler;
+        if (select_node_handler) {
+            var selected_nodes = select_node_handler.getSelectedNodes();
+            selected_nodes.forEach(function (node) {
+                select_node_handler.removeFromSelection(node);
+            });
+        }
     };
     SaveStateHandler.prototype._setInitialStateOnDemand = function (node_ids_param, selected_nodes, cb_finished) {
         var _this = this;
@@ -3414,7 +3382,7 @@ exports["default"] = SelectNodeHandler;
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.0";
+var version = "1.4.1";
 exports["default"] = version;
 
 

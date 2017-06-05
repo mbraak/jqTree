@@ -73,9 +73,16 @@ export default class SaveStateHandler {
         if (! state) {
             return false;
         } else {
-            const must_load_on_demand = this._openInitialNodes(state.open_nodes);
+            let must_load_on_demand = false;
 
-            this._selectInitialNodes(state.selected_node);
+            if (state.open_nodes) {
+                must_load_on_demand = this._openInitialNodes(state.open_nodes);
+            }
+
+            if (state.selected_node) {
+                this._resetSelection();
+                this._selectInitialNodes(state.selected_node);
+            }
 
             return must_load_on_demand;
         }
@@ -155,6 +162,20 @@ export default class SaveStateHandler {
         }
 
         return select_count !== 0;
+    }
+
+    private _resetSelection() {
+        const select_node_handler = this.tree_widget.select_node_handler;
+
+        if (select_node_handler) {
+            const selected_nodes = select_node_handler.getSelectedNodes();
+
+            selected_nodes.forEach(
+                node => {
+                    select_node_handler.removeFromSelection(node);
+                }
+            );
+        }
     }
 
     private _setInitialStateOnDemand(node_ids_param: NodeId[], selected_nodes: NodeId[], cb_finished: () => void) {

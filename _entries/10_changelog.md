@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.4.1 (june 5 2017)
+
+* Issue #487: setState must clear the selection (thanks to terryoy)
+* Issue #488: add is_selected parameter to onCreateLi
+
 ##### 1.4.0 (may 12 2017)
 
 * Issue #481: fixed error that occured when opening an invalid node (thanks to Luciano Deriu)

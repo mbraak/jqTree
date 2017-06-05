@@ -101,16 +101,13 @@ export default class ElementsRenderer {
             this.tree_widget.select_node_handler &&
             this.tree_widget.select_node_handler.isNodeSelected(node)
         );
-        let li;
 
-        if (node.isFolder()) {
-            li = this.createFolderLi(node, level, is_selected);
-        } else {
-            li = this.createNodeLi(node, level, is_selected);
-        }
+        const li = node.isFolder()
+          ? this.createFolderLi(node, level, is_selected)
+          : this.createNodeLi(node, level, is_selected);
 
         if (this.tree_widget.options.onCreateLi) {
-            this.tree_widget.options.onCreateLi(node, $(li));
+            this.tree_widget.options.onCreateLi(node, $(li), is_selected);
         }
 
         return li;
@@ -119,13 +116,8 @@ export default class ElementsRenderer {
     private createFolderLi(node: Node, level: number, is_selected: boolean) {
         const button_classes = this.getButtonClasses(node);
         const folder_classes = this.getFolderClasses(node, is_selected);
-        let icon_element;
 
-        if (node.is_open) {
-            icon_element = this.opened_icon_element;
-        } else {
-            icon_element = this.closed_icon_element;
-        }
+        const icon_element = node.is_open ? this.opened_icon_element : this.closed_icon_element;
 
         // li
         const li = document.createElement("li");

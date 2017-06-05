@@ -27,6 +27,8 @@ export interface IScrollHandler {
 export interface ISelectNodeHandler {
     addToSelection: (node: Node) => void;
     isNodeSelected: (node?: Node) => boolean;
+    getSelectedNodes: () => Node[];
+    removeFromSelection: (node: Node) => void;
 }
 
 export interface ITreeWidget {
