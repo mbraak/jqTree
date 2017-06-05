@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.4.1 (june 5 2017)
 
 * Issue #487: setState must clear the selection (thanks to terryoy)
 * Issue #488: add is_selected parameter to onCreateLi
