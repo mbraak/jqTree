@@ -44,10 +44,10 @@
     "karma-webpack": "^2.0.3",
     "lodash.template": "^4.4.0",
     "phantomjs-prebuilt": "^2.1.14",
-    "qunitjs": "^2.3.2",
+    "qunitjs": "^2.3.3",
     "serve-static": "^1.12.2",
     "ts-loader": "^2.0.3",
-    "tslint": "^5.3.2",
+    "tslint": "^5.4.2",
     "typescript": "^2.3.3",
     "webpack": "^2.6.0",
     "webpack-dev-server": "^2.4.5"
