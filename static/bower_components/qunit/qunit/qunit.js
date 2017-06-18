@@ -1,12 +1,12 @@
 /*!
- * QUnit 2.3.2
+ * QUnit 2.3.3
  * https://qunitjs.com/
  *
  * Copyright jQuery Foundation and other contributors
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2017-04-18T02:19Z
+ * Date: 2017-06-02T14:07Z
  */
 (function (global$1) {
   'use strict';
@@ -14,6 +14,7 @@
   global$1 = 'default' in global$1 ? global$1['default'] : global$1;
 
   var window = global$1.window;
+  var self$1 = global$1.self;
   var console = global$1.console;
   var setTimeout = global$1.setTimeout;
   var clearTimeout = global$1.clearTimeout;
@@ -2427,6 +2428,11 @@
   		});
   		QUnit.config.autostart = false;
   	}
+
+  	// For Web/Service Workers
+  	if (self$1 && self$1.WorkerGlobalScope && self$1 instanceof self$1.WorkerGlobalScope) {
+  		self$1.QUnit = QUnit;
+  	}
   }
 
   var SuiteReport = function () {
@@ -2583,7 +2589,7 @@
   QUnit.isLocal = !(defined.document && window.location.protocol !== "file:");
 
   // Expose the current QUnit version
-  QUnit.version = "2.3.2";
+  QUnit.version = "2.3.3";
 
   function createModule(name, testEnvironment) {
   	var parentModule = moduleStack.length ? moduleStack.slice(-1)[0] : null;
