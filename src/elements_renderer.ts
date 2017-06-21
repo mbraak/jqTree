@@ -136,7 +136,7 @@ export default class ElementsRenderer {
         button_link.className = button_classes;
 
         button_link.appendChild(
-            icon_element.cloneNode(false)
+            icon_element.cloneNode(true)
         );
 
         button_link.setAttribute("role", "presentation");
