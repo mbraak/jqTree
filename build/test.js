@@ -2313,7 +2313,7 @@ var ElementsRenderer = (function () {
         // button link
         var button_link = document.createElement("a");
         button_link.className = button_classes;
-        button_link.appendChild(icon_element.cloneNode(false));
+        button_link.appendChild(icon_element.cloneNode(true));
         button_link.setAttribute("role", "presentation");
         button_link.setAttribute("aria-hidden", "true");
         if (this.tree_widget.options.buttonLeft) {
