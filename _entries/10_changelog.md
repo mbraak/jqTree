@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue #489: make it possible to use nested element for icon (thanks to terryoy)
+
 ##### 1.4.1 (june 5 2017)
 
 * Issue #487: setState must clear the selection (thanks to terryoy)
