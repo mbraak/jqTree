@@ -502,7 +502,7 @@ class JqTreeWidget extends MouseWidget {
 
         this.options.rtl = this._getRtlOption();
 
-        if (!this.options.closedIcon) {
+        if (this.options.closedIcon === null) {
             this.options.closedIcon = this._getDefaultClosedIcon();
         }
 
