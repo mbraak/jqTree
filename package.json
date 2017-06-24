@@ -33,7 +33,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
     "gulp-typescript": "^3.1.6",
-    "jquery-mockjax": "^2.2.1",
+    "jquery-mockjax": "^2.2.2",
     "jsonfile": "^3.0.0",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.1.1",
@@ -47,9 +47,9 @@
     "qunitjs": "^2.3.3",
     "serve-static": "^1.12.3",
     "ts-loader": "^2.0.3",
-    "tslint": "^5.4.2",
+    "tslint": "^5.4.3",
     "typescript": "^2.3.3",
-    "webpack": "^2.6.0",
-    "webpack-dev-server": "^2.4.5"
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.5.0"
   }
 }
