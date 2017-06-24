@@ -126,7 +126,6 @@ ul.jqtree-tree {
         background: -webkit-gradient(linear, left top, left bottom, from(#BEE0F5), to(#89AFCA));
         background: -moz-linear-gradient(top, #BEE0F5, #89AFCA);
         background: -ms-linear-gradient(top, #BEE0F5, #89AFCA);
-        background: -o-linear-gradient(top, #BEE0F5, #89AFCA);
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
@@ -188,10 +187,3 @@ span.jqtree-dragging {
     padding: 2px 8px;
 }
 
-/* IE 6, 7, 8 */
-@media \0screen\,screen\9  {
-    ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
-        background: url(jqtree-circle.png) no-repeat;
-        border: 0 none;
-    }
-}
