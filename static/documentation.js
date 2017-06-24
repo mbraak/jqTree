@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
     var $menu = $('#menu');
     var $body = $('body');
     var $h1 = $('#jqtree h1');
@@ -20,7 +20,7 @@ $(function() {
     var scrollspy = $body.data('bs.scrollspy');
 
     // If no menu item is active, then activate first item
-    if (! scrollspy.activeTarget) {
+    if (!scrollspy.activeTarget) {
         scrollspy.activate('#general');
     }
 

@@ -4,7 +4,7 @@ import { Node, NodeId } from "./node";
 
 export default class SaveStateHandler {
     private tree_widget: ITreeWidget;
-    private _supportsLocalStorage: boolean|null;
+    private _supportsLocalStorage: boolean | null;
 
     constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
@@ -70,7 +70,7 @@ export default class SaveStateHandler {
     result: must load on demand
     */
     public setInitialState(state: any): boolean {
-        if (! state) {
+        if (!state) {
             return false;
         } else {
             let must_load_on_demand = false;
@@ -135,7 +135,7 @@ export default class SaveStateHandler {
             const node = this.tree_widget.getNodeById(node_id);
 
             if (node) {
-                if (! node.load_on_demand) {
+                if (!node.load_on_demand) {
                     node.is_open = true;
                 } else {
                     must_load_on_demand = true;
@@ -188,10 +188,10 @@ export default class SaveStateHandler {
             for (const node_id of node_ids) {
                 const node = this.tree_widget.getNodeById(node_id);
 
-                if (! node) {
+                if (!node) {
                     new_nodes_ids.push(node_id);
                 } else {
-                    if (! node.is_loading) {
+                    if (!node.is_loading) {
                         if (node.load_on_demand) {
                             loadAndOpenNode(node);
                         } else {

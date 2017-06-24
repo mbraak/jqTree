@@ -4,7 +4,7 @@ export default class ScrollHandler {
     private tree_widget: ITreeWidget;
     private previous_top: number;
     private is_initialized: boolean;
-    private $scroll_parent: JQuery|null;
+    private $scroll_parent: JQuery | null;
     private scroll_parent_top: number;
 
     constructor(tree_widget: ITreeWidget) {
@@ -118,7 +118,7 @@ export default class ScrollHandler {
     }
 
     private _ensureInit() {
-        if (! this.is_initialized) {
+        if (!this.is_initialized) {
             this._initScrollParent();
         }
     }

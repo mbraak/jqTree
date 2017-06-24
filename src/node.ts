@@ -1,5 +1,5 @@
 // tslint:disable: no-string-literal
-export type NodeId = number|string;
+export type NodeId = number | string;
 
 export enum Position {
     Before = 1,
@@ -41,7 +41,7 @@ export class Node {
     public id: NodeId;
     public name: string;
     public children: Node[];
-    public parent: Node|null;
+    public parent: Node | null;
     public id_mapping: any;
     public tree: Node;
     public node_class: any;  // todo: type class?
@@ -52,7 +52,7 @@ export class Node {
 
     [key: string]: any;
 
-    constructor(o: object|string, is_root: boolean = false, node_class = Node) {
+    constructor(o: object | string, is_root: boolean = false, node_class = Node) {
         this.name = "";
 
         this.setData(o);
@@ -307,13 +307,13 @@ export class Node {
         }
     }
 
-    public getNodeByName(name: string): Node|null {
+    public getNodeByName(name: string): Node | null {
         return this.getNodeByCallback(
             (node: Node) => node.name === name
         );
     }
 
-    public getNodeByCallback(callback: (node: Node) => boolean): Node|null {
+    public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
         let result = null;
 
         this.iterate(
@@ -330,8 +330,8 @@ export class Node {
         return result;
     }
 
-    public addAfter(node_info: any): Node|null {
-        if (! this.parent) {
+    public addAfter(node_info: any): Node | null {
+        if (!this.parent) {
             return null;
         } else {
             const node = new this.tree.node_class(node_info);
@@ -347,8 +347,8 @@ export class Node {
         }
     }
 
-    public addBefore(node_info: any): Node|null {
-        if (! this.parent) {
+    public addBefore(node_info: any): Node | null {
+        if (!this.parent) {
             return null;
         } else {
             const node = new this.tree.node_class(node_info);
@@ -364,8 +364,8 @@ export class Node {
         }
     }
 
-    public addParent(node_info: any): Node|null {
-        if (! this.parent) {
+    public addParent(node_info: any): Node | null {
+        if (!this.parent) {
             return null;
         } else {
             const new_parent = new this.tree.node_class(node_info);
@@ -437,7 +437,7 @@ export class Node {
         return level;
     }
 
-    public getNodeById(node_id: NodeId): Node|null {
+    public getNodeById(node_id: NodeId): Node | null {
         return this.id_mapping[node_id];
     }
 
@@ -464,8 +464,8 @@ export class Node {
         this.children = [];
     }
 
-    public getPreviousSibling(): Node|null {
-        if (! this.parent) {
+    public getPreviousSibling(): Node | null {
+        if (!this.parent) {
             return null;
         } else {
             const previous_index = this.parent.getChildIndex(this) - 1;
@@ -477,8 +477,8 @@ export class Node {
         }
     }
 
-    public getNextSibling(): Node|null {
-        if (! this.parent) {
+    public getNextSibling(): Node | null {
+        if (!this.parent) {
             return null;
         } else {
             const next_index = this.parent.getChildIndex(this) + 1;
@@ -512,12 +512,12 @@ export class Node {
         return result;
     }
 
-    public getNextNode(include_children = true): Node|null {
+    public getNextNode(include_children = true): Node | null {
         if (include_children && this.hasChildren() && this.is_open) {
             // First child
             return this.children[0];
         } else {
-            if (! this.parent) {
+            if (!this.parent) {
                 return null;
             } else {
                 const next_sibling = this.getNextSibling();
@@ -532,13 +532,13 @@ export class Node {
         }
     }
 
-    public getPreviousNode(): Node|null {
-        if (! this.parent) {
+    public getPreviousNode(): Node | null {
+        if (!this.parent) {
             return null;
         } else {
             const previous_sibling = this.getPreviousSibling();
             if (previous_sibling) {
-                if (! previous_sibling.hasChildren() || ! previous_sibling.is_open) {
+                if (!previous_sibling.hasChildren() || !previous_sibling.is_open) {
                     // Previous sibling
                     return previous_sibling;
                 } else {
@@ -551,11 +551,11 @@ export class Node {
         }
     }
 
-    public getParent(): Node|null {
+    public getParent(): Node | null {
         // Return parent except if it is the root node
-        if (! this.parent) {
+        if (!this.parent) {
             return null;
-        } else if (! this.parent.parent) {
+        } else if (!this.parent.parent) {
             // Root node -> null
             return null;
         } else {
@@ -563,12 +563,12 @@ export class Node {
         }
     }
 
-    public getLastChild(): Node|null {
-        if (! this.hasChildren()) {
+    public getLastChild(): Node | null {
+        if (!this.hasChildren()) {
             return null;
         } else {
             const last_child = this.children[this.children.length - 1];
-            if (! last_child.hasChildren() || ! last_child.is_open) {
+            if (!last_child.hasChildren() || !last_child.is_open) {
                 return last_child;
             } else {
                 return last_child.getLastChild();

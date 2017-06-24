@@ -14,7 +14,7 @@ export default class ElementsRenderer {
         this.closed_icon_element = this.createButtonElement(tree_widget.options.closedIcon);
     }
 
-    public render(from_node: Node|null) {
+    public render(from_node: Node | null) {
         if (from_node && from_node.parent) {
             this.renderFromNode(from_node);
         } else {
@@ -89,7 +89,7 @@ export default class ElementsRenderer {
         }
 
         const ul = document.createElement("ul");
-        ul.className = `jqtree_common ${ class_string }`;
+        ul.className = `jqtree_common ${class_string}`;
 
         ul.setAttribute("role", role);
 
@@ -103,8 +103,8 @@ export default class ElementsRenderer {
         );
 
         const li = node.isFolder()
-          ? this.createFolderLi(node, level, is_selected)
-          : this.createNodeLi(node, level, is_selected);
+            ? this.createFolderLi(node, level, is_selected)
+            : this.createNodeLi(node, level, is_selected);
 
         if (this.tree_widget.options.onCreateLi) {
             this.tree_widget.options.onCreateLi(node, $(li), is_selected);
@@ -121,7 +121,7 @@ export default class ElementsRenderer {
 
         // li
         const li = document.createElement("li");
-        li.className = `jqtree_common ${ folder_classes }`;
+        li.className = `jqtree_common ${folder_classes}`;
         li.setAttribute("role", "presentation");
 
         // div
@@ -151,7 +151,7 @@ export default class ElementsRenderer {
             this.createTitleSpan(node.name, level, is_selected, node.is_open, true)
         );
 
-        if (! this.tree_widget.options.buttonLeft) {
+        if (!this.tree_widget.options.buttonLeft) {
             div.appendChild(button_link);
         }
 
@@ -218,7 +218,7 @@ export default class ElementsRenderer {
     private getButtonClasses(node: Node) {
         const classes = ["jqtree-toggler", "jqtree_common"];
 
-        if (! node.is_open) {
+        if (!node.is_open) {
             classes.push("jqtree-closed");
         }
 
@@ -234,7 +234,7 @@ export default class ElementsRenderer {
     private getFolderClasses(node: Node, is_selected: boolean): string {
         const classes = ["jqtree-folder"];
 
-        if (! node.is_open) {
+        if (!node.is_open) {
             classes.push("jqtree-closed");
         }
 
@@ -257,7 +257,7 @@ export default class ElementsRenderer {
         }
     }
 
-    private createButtonElement(value: string|Element) {
+    private createButtonElement(value: string | Element) {
         if (typeof value === "string") {
             // convert value to html
             const div = document.createElement("div");

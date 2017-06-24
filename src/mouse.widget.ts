@@ -8,8 +8,8 @@ abstract class MouseWidget extends SimpleWidget {
     public $el: JQuery;
     protected is_mouse_started: boolean;
     protected mouse_delay: number;
-    protected mouse_down_info: IPositionInfo|null;
-    private _mouse_delay_timer: number|null;
+    protected mouse_down_info: IPositionInfo | null;
+    private _mouse_delay_timer: number | null;
     private _is_mouse_delay_met: boolean;
 
     public setMouseDelay(mouse_delay: number) {
@@ -51,7 +51,7 @@ abstract class MouseWidget extends SimpleWidget {
         return result;
     }
 
-    protected abstract _mouseCapture(position_info: IPositionInfo): boolean|null;
+    protected abstract _mouseCapture(position_info: IPositionInfo): boolean | null;
 
     protected abstract _mouseStart(position_info: IPositionInfo): boolean;
 
@@ -67,7 +67,7 @@ abstract class MouseWidget extends SimpleWidget {
 
         this.mouse_down_info = position_info;
 
-        if (! this._mouseCapture(position_info)) {
+        if (!this._mouseCapture(position_info)) {
             return;
         }
 
@@ -116,7 +116,7 @@ abstract class MouseWidget extends SimpleWidget {
             return e.preventDefault();
         }
 
-        if (this.mouse_delay && ! this._is_mouse_delay_met) {
+        if (this.mouse_delay && !this._is_mouse_delay_met) {
             return true;
         }
 
@@ -130,10 +130,10 @@ abstract class MouseWidget extends SimpleWidget {
             this._handleMouseUp(position_info);
         }
 
-        return ! this.is_mouse_started;
+        return !this.is_mouse_started;
     }
 
-    private _getPositionInfo(e: JQueryEventObject|Touch): IPositionInfo {
+    private _getPositionInfo(e: JQueryEventObject | Touch): IPositionInfo {
         return {
             page_x: e.pageX,
             page_y: e.pageY,

@@ -20,7 +20,7 @@ module("jqtree", {
     }
 });
 
-test("create jqtree from data", (assert: Assert) =>  {
+test("create jqtree from data", (assert: Assert) => {
     $("#tree1").tree({
         data: example_data
     });
@@ -51,7 +51,7 @@ test("create jqtree from data", (assert: Assert) =>  {
     );
 });
 
-test("toggle", (assert: Assert) =>  {
+test("toggle", (assert: Assert) => {
     // setup
     const done = assert.async();
 
@@ -67,7 +67,7 @@ test("toggle", (assert: Assert) =>  {
     $tree.on(
         "tree.open",
         () => {
-            assert.ok(! isNodeClosed($node1), "node1 is open");
+            assert.ok(!isNodeClosed($node1), "node1 is open");
 
             // 2. close node1
             $tree.tree("toggle", node1);
@@ -94,7 +94,7 @@ test("toggle", (assert: Assert) =>  {
     $tree.tree("toggle", node1);
 });
 
-test("click event", (assert: Assert) =>  {
+test("click event", (assert: Assert) => {
     let select_count = 0;
 
     // create tree
@@ -137,7 +137,7 @@ test("click event", (assert: Assert) =>  {
     $text_span.click();
 });
 
-test("saveState", (assert: Assert) =>  {
+test("saveState", (assert: Assert) => {
     const $tree = $("#tree1");
 
     let saved_state: any;
@@ -166,7 +166,7 @@ test("saveState", (assert: Assert) =>  {
     // nodes are initially closed
     const tree = $tree.tree("getTree");
     tree.iterate((node: Node) => {
-        assert.ok(! node.is_open, "jqtree-closed");
+        assert.ok(!node.is_open, "jqtree-closed");
         return true;
     });
 
@@ -192,7 +192,7 @@ test("saveState", (assert: Assert) =>  {
 
     const tree2 = $tree.tree("getTree");
     assert.ok(tree2.children[0].is_open, "node1 is_open");
-    assert.ok(! tree2.children[1].is_open, "node2 is closed");
+    assert.ok(!tree2.children[1].is_open, "node2 is closed");
 
     // node2 is selected
     assert.equal(
@@ -202,7 +202,7 @@ test("saveState", (assert: Assert) =>  {
     );
 });
 
-test("getSelectedNode", (assert: Assert) =>  {
+test("getSelectedNode", (assert: Assert) => {
     const $tree = $("#tree1");
 
     // create tree
@@ -231,7 +231,7 @@ test("getSelectedNode", (assert: Assert) =>  {
     );
 });
 
-test("toJson", (assert: Assert) =>  {
+test("toJson", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -254,7 +254,7 @@ test("toJson", (assert: Assert) =>  {
     assert.ok($(tree.children[0].element).is("li"), "element");
 });
 
-test("loadData", (assert: Assert) =>  {
+test("loadData", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -333,7 +333,7 @@ test("loadData", (assert: Assert) =>  {
 
     assert.equal($tree.tree("getSelectedNode").name, "c7");
 
-    $tree.tree("loadData", [ "c9" ], child3);
+    $tree.tree("loadData", ["c9"], child3);
 
     assert.equal($tree.tree("getSelectedNode"), false);
 
@@ -341,12 +341,12 @@ test("loadData", (assert: Assert) =>  {
     $tree.tree("selectNode", $tree.tree("getNodeByName", "c9"));
 
     const child2 = $tree.tree("getNodeByName", "child2");
-    $tree.tree("loadData", [ "c10" ], child2);
+    $tree.tree("loadData", ["c10"], child2);
 
     assert.equal($tree.tree("getSelectedNode").name, "c9");
 });
 
-test("openNode and closeNode", (assert: Assert) =>  {
+test("openNode and closeNode", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -398,10 +398,10 @@ function test_open_node_with_callback(slide: any, include_slide_param: boolean, 
     const done = assert.async();
 
     function handleOpenNode(node: Node) {
-      assert.equal(node.name, "node2");
-      assert.ok(node.is_open);
+        assert.equal(node.name, "node2");
+        assert.ok(node.is_open);
 
-      done();
+        done();
     }
 
     if (include_slide_param) {
@@ -411,23 +411,23 @@ function test_open_node_with_callback(slide: any, include_slide_param: boolean, 
     }
 }
 
-test("openNode with callback with slide true", (assert: Assert) =>  {
+test("openNode with callback with slide true", (assert: Assert) => {
     test_open_node_with_callback(true, true, assert);
 });
 
-test("openNode with callback with slide false", (assert: Assert) =>  {
+test("openNode with callback with slide false", (assert: Assert) => {
     test_open_node_with_callback(false, true, assert);
 });
 
-test("openNode with callback with slide null", (assert: Assert) =>  {
+test("openNode with callback with slide null", (assert: Assert) => {
     test_open_node_with_callback(null, true, assert);
 });
 
-test("openNode with callback without slide param", (assert: Assert) =>  {
+test("openNode with callback without slide param", (assert: Assert) => {
     test_open_node_with_callback(null, false, assert);
 });
 
-test("selectNode", (assert: Assert) =>  {
+test("selectNode", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -467,7 +467,7 @@ test("selectNode", (assert: Assert) =>  {
     assert.equal($tree.tree("isNodeSelected", node1), false);
 });
 
-test("selectNode when another node is selected", (assert: Assert) =>  {
+test("selectNode when another node is selected", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -501,7 +501,7 @@ test("selectNode when another node is selected", (assert: Assert) =>  {
     assert.ok(is_select_event_fired);
 });
 
-test("click toggler", (assert: Assert) =>  {
+test("click toggler", (assert: Assert) => {
     // setup
     const done = assert.async();
 
@@ -533,7 +533,7 @@ test("click toggler", (assert: Assert) =>  {
     $toggler.click();
 });
 
-test("getNodeById", (assert: Assert) =>  {
+test("getNodeById", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -580,11 +580,11 @@ test("getNodeById", (assert: Assert) =>  {
             label: "sub1",
             id: 200,
             children: [
-                {label: "sub2", id: 201}
+                { label: "sub2", id: 201 }
             ]
         }
     ];
-    $tree.tree("loadData",  subtree_data, node2);
+    $tree.tree("loadData", subtree_data, node2);
     const t = $tree.tree("getTree");
     assert.notEqual(t, null);
 
@@ -598,16 +598,16 @@ test("getNodeById", (assert: Assert) =>  {
     );
 });
 
-test("autoOpen", (assert: Assert) =>  {
+test("autoOpen", (assert: Assert) => {
     const $tree = $("#tree1");
 
     function formatOpenFolders() {
         const open_nodes: string[] = [];
         $tree.find("li").each(
             // tslint:disable-next-line: only-arrow-functions
-            function(this: Element) {
+            function (this: Element) {
                 const $li = $(this);
-                if ($li.is(".jqtree-folder") && ! $li.is(".jqtree-closed")) {
+                if ($li.is(".jqtree-folder") && !$li.is(".jqtree-closed")) {
                     const label = $li.children(".jqtree-element").find("span").text();
                     open_nodes.push(label);
                 }
@@ -672,7 +672,7 @@ test("autoOpen", (assert: Assert) =>  {
     assert.equal(formatOpenFolders(), "l1n1;l2n2");
 });
 
-test("onCreateLi", (assert: Assert) =>  {
+test("onCreateLi", (assert: Assert) => {
     // 1. init tree with onCreateLi
     const $tree = $("#tree1");
     $tree.tree({
@@ -689,7 +689,7 @@ test("onCreateLi", (assert: Assert) =>  {
     );
 });
 
-test("save state", (assert: Assert) =>  {
+test("save state", (assert: Assert) => {
     // Remove state from localstorage
     if (typeof localStorage !== "undefined") {
         localStorage.setItem("my_tree", "");
@@ -722,7 +722,7 @@ test("save state", (assert: Assert) =>  {
     assert.equal($tree.tree("getSelectedNode").name, "node1");
 });
 
-test("generate hit areas", (assert: Assert) =>  {
+test("generate hit areas", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -740,7 +740,7 @@ test("generate hit areas", (assert: Assert) =>  {
     assert.equal(strings.join(";"), "node1 none;node2 inside;node2 after");
 });
 
-test("removeNode", (assert: Assert) =>  {
+test("removeNode", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -803,7 +803,7 @@ test("removeNode", (assert: Assert) =>  {
     );
 });
 
-test("appendNode", (assert: Assert) =>  {
+test("appendNode", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -840,7 +840,7 @@ test("appendNode", (assert: Assert) =>  {
     );
 });
 
-test("prependNode", (assert: Assert) =>  {
+test("prependNode", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -858,7 +858,7 @@ test("prependNode", (assert: Assert) =>  {
     );
 });
 
-test("init event for local data", (assert: Assert) =>  {
+test("init event for local data", (assert: Assert) => {
     // setup
     const done = assert.async();
 
@@ -877,7 +877,7 @@ test("init event for local data", (assert: Assert) =>  {
     });
 });
 
-test("init event for ajax", (assert: Assert) =>  {
+test("init event for ajax", (assert: Assert) => {
     // setup
     const done = assert.async();
 
@@ -901,7 +901,7 @@ test("init event for ajax", (assert: Assert) =>  {
     });
 });
 
-test("updateNode", (assert: Assert) =>  {
+test("updateNode", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
 
@@ -933,7 +933,7 @@ test("updateNode", (assert: Assert) =>  {
     // - update id
     assert.equal(node2.id, 124);
 
-    $tree.tree("updateNode", node2, {id: 555});
+    $tree.tree("updateNode", node2, { id: 555 });
 
     assert.equal(node2.id, 555);
     assert.equal(node2.name, "xyz");
@@ -987,7 +987,7 @@ test("updateNode", (assert: Assert) =>  {
     assert.equal(formatTitles($tree), "node1 child1 child2 xyz child3");
 });
 
-test("moveNode", (assert: Assert) =>  {
+test("moveNode", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
 
@@ -1007,7 +1007,7 @@ test("moveNode", (assert: Assert) =>  {
     $tree.tree("moveNode", node1, child2, "inside");
 });
 
-test("load on demand", (assert: Assert) =>  {
+test("load on demand", (assert: Assert) => {
     // setup
     const done = assert.async();
 
@@ -1027,7 +1027,7 @@ test("load on demand", (assert: Assert) =>  {
     // tslint:disable-next-line: only-arrow-functions
     function handleResponse(this: any, options: any) {
         assert.equal(options.url, "/tree/", "2");
-        assert.deepEqual(options.data, { node : 1 }, "3");
+        assert.deepEqual(options.data, { node: 1 }, "3");
 
         this.responseText = [
             {
@@ -1057,7 +1057,7 @@ test("load on demand", (assert: Assert) =>  {
     $tree.tree("openNode", node1, handleOpenNode);
 });
 
-test("addNodeAfter", (assert: Assert) =>  {
+test("addNodeAfter", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
 
@@ -1070,7 +1070,7 @@ test("addNodeAfter", (assert: Assert) =>  {
     assert.equal(formatTitles($tree), "node1 child1 child2 node3 node2 child3");
 });
 
-test("addNodeBefore", (assert: Assert) =>  {
+test("addNodeBefore", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
 
@@ -1083,7 +1083,7 @@ test("addNodeBefore", (assert: Assert) =>  {
     assert.equal(formatTitles($tree), "node3 node1 child1 child2 node2 child3");
 });
 
-test("addParentNode", (assert: Assert) =>  {
+test("addParentNode", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
 
@@ -1096,7 +1096,7 @@ test("addParentNode", (assert: Assert) =>  {
     assert.equal(formatTitles($tree), "node1 child1 child2 node2 node3 child3");
 });
 
-test("mouse events", (assert: Assert) =>  {
+test("mouse events", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -1134,7 +1134,7 @@ test("mouse events", (assert: Assert) =>  {
     );
 });
 
-test("multiple select", (assert: Assert) =>  {
+test("multiple select", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
     $tree.tree({ data: example_data });
@@ -1156,7 +1156,7 @@ test("multiple select", (assert: Assert) =>  {
     );
 });
 
-test("keyboard", (assert: Assert) =>  {
+test("keyboard", (assert: Assert) => {
     // setup
     const $tree = $("#tree1");
 
@@ -1201,8 +1201,8 @@ test("keyboard", (assert: Assert) =>  {
     assert.equal($tree.tree("getSelectedNode").name, "node1");
 });
 
-test("getNodesByProperty", (assert: Assert) =>  {
-  // setup
+test("getNodesByProperty", (assert: Assert) => {
+    // setup
     const $tree = $("#tree1");
     $tree.tree({
         data: example_data
@@ -1251,7 +1251,7 @@ test("getNodesByProperty", (assert: Assert) =>  {
             id: 200,
             int_property: 222,
             children: [
-                {label: "sub2", id: 201, int_property: 444}
+                { label: "sub2", id: 201, int_property: 444 }
             ]
         }
     ];
@@ -1269,7 +1269,7 @@ test("getNodesByProperty", (assert: Assert) =>  {
     );
 });
 
-test("dataUrl extra options", (assert: Assert) =>  {
+test("dataUrl extra options", (assert: Assert) => {
     const done = assert.async();
 
     const $tree = $("#tree1");
@@ -1280,7 +1280,7 @@ test("dataUrl extra options", (assert: Assert) =>  {
             // 2. handle ajax request
             // expect 'headers' option
             assert.equal(options.url, "/tree2/");
-            assert.deepEqual(options.headers, {abc: "def"});
+            assert.deepEqual(options.headers, { abc: "def" });
 
             done();
         },
@@ -1292,12 +1292,12 @@ test("dataUrl extra options", (assert: Assert) =>  {
     $tree.tree({
         dataUrl: {
             url: "/tree2/",
-            headers: {abc: "def"}
+            headers: { abc: "def" }
         }
     });
 });
 
-test("dataUrl is function", (assert: Assert) =>  {
+test("dataUrl is function", (assert: Assert) => {
     const done = assert.async();
 
     const $tree = $("#tree1");
@@ -1308,7 +1308,7 @@ test("dataUrl is function", (assert: Assert) =>  {
             // 2. handle ajax request
             // expect 'headers' option
             assert.equal(options.url, "/tree3/");
-            assert.deepEqual(options.headers, {abc: "def"});
+            assert.deepEqual(options.headers, { abc: "def" });
 
             done();
         },
@@ -1321,13 +1321,13 @@ test("dataUrl is function", (assert: Assert) =>  {
         dataUrl: () => {
             return {
                 url: "/tree3/",
-                headers: {abc: "def"}
+                headers: { abc: "def" }
             };
         }
     });
 });
 
-test("getNodeByHtmlElement", (assert: Assert) =>  {
+test("getNodeByHtmlElement", (assert: Assert) => {
     const $tree = $("#tree1");
     $tree.tree({
         data: example_data
@@ -1344,7 +1344,7 @@ test("getNodeByHtmlElement", (assert: Assert) =>  {
     assert.equal(node2.name, "node1");
 });
 
-test("onLoadFailed", (assert: Assert) =>  {
+test("onLoadFailed", (assert: Assert) => {
     $.mockjax({
         url: "/tree/",
         status: 500,

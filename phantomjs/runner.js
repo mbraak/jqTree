@@ -13,7 +13,7 @@
 
 /*global phantom:false, require:false, console:false, window:false, QUnit:false */
 
-(function() {
+(function () {
     'use strict';
 
     var url, page, timeout,
@@ -32,15 +32,15 @@
     }
 
     // Route `console.log()` calls from within the Page context to the main Phantom context (i.e. current `this`)
-    page.onConsoleMessage = function(msg) {
+    page.onConsoleMessage = function (msg) {
         console.log(msg);
     };
 
-    page.onInitialized = function() {
+    page.onInitialized = function () {
         page.evaluate(addLogging);
     };
 
-    page.onCallback = function(message) {
+    page.onCallback = function (message) {
         var result,
             failed;
 
@@ -70,14 +70,14 @@
         }
     };
 
-    page.open(url, function(status) {
+    page.open(url, function (status) {
         if (status !== 'success') {
             console.error('Unable to access network: ' + status);
             phantom.exit(1);
         } else {
             // Cannot do this verification with the 'DOMContentLoaded' handler because it
             // will be too late to attach it if a page does not have any script tags.
-            var qunitMissing = page.evaluate(function() { return (typeof QUnit === 'undefined' || !QUnit); });
+            var qunitMissing = page.evaluate(function () { return (typeof QUnit === 'undefined' || !QUnit); });
             if (qunitMissing) {
                 console.error('The `QUnit` object is not present on this page.');
                 phantom.exit(1);
@@ -85,7 +85,7 @@
 
             // Set a timeout on the test running, otherwise tests with async problems will hang forever
             if (typeof timeout === 'number') {
-                setTimeout(function() {
+                setTimeout(function () {
                     console.error('The specified timeout of ' + timeout + ' seconds has expired. Aborting...');
                     phantom.exit(1);
                 }, timeout * 1000);
@@ -96,10 +96,10 @@
     });
 
     function addLogging() {
-        window.document.addEventListener('DOMContentLoaded', function() {
+        window.document.addEventListener('DOMContentLoaded', function () {
             var currentTestAssertions = [];
 
-            QUnit.log(function(details) {
+            QUnit.log(function (details) {
                 var response;
 
                 // Ignore passing assertions
@@ -124,7 +124,7 @@
                 currentTestAssertions.push('Failed assertion: ' + response);
             });
 
-            QUnit.testDone(function(result) {
+            QUnit.testDone(function (result) {
                 var i,
                     len,
                     name = result.module + ': ' + result.name;
@@ -140,8 +140,8 @@
                 currentTestAssertions.length = 0;
             });
 
-            QUnit.done(function(result) {
-                console.log('Took ' + result.runtime +  'ms to run ' + result.total + ' tests. ' + result.passed + ' passed, ' + result.failed + ' failed.');
+            QUnit.done(function (result) {
+                console.log('Took ' + result.runtime + 'ms to run ' + result.total + ' tests. ' + result.passed + ' passed, ' + result.failed + ' failed.');
 
                 if (typeof window.callPhantom === 'function') {
                     window.callPhantom({
@@ -153,11 +153,11 @@
 
             blanket.options(
                 'reporter',
-                function(coverage) {
+                function (coverage) {
                     var result = '';
 
                     function addLine() {
-                        for (var i=0; i<arguments.length; i++) {
+                        for (var i = 0; i < arguments.length; i++) {
                             result += arguments[i];
                         }
 
@@ -169,7 +169,7 @@
 
                         addLine('SF:', filename.replace('http://localhost:8000/', ''));
 
-                        data.source.forEach(function(line, num) {
+                        data.source.forEach(function (line, num) {
                             num++;
 
                             if (data[num] !== undefined) {

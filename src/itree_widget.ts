@@ -1,6 +1,6 @@
 import { Node, NodeId, Position } from "./node";
 
-export type IconElement = Text|HTMLElement;
+export type IconElement = Text | HTMLElement;
 
 export type OnFinishOpenNode = (node: Node) => void;
 
@@ -12,7 +12,7 @@ export interface IHitArea {
 }
 
 export interface IDragAndDropHandler {
-    hovered_area: IHitArea|null;
+    hovered_area: IHitArea | null;
 }
 
 export interface IElementsRenderer {
@@ -37,24 +37,24 @@ export interface ITreeWidget {
     options: any;
     tree: Node;
 
-    dnd_handler: IDragAndDropHandler|null;
+    dnd_handler: IDragAndDropHandler | null;
     renderer: IElementsRenderer;
-    scroll_handler: IScrollHandler|null;
-    select_node_handler: ISelectNodeHandler|null;
+    scroll_handler: IScrollHandler | null;
+    select_node_handler: ISelectNodeHandler | null;
 
     _triggerEvent: (event_name: string, values?: any) => JQueryEventObject;
-    _openNode: (node: Node, slide: boolean, on_finished: OnFinishOpenNode|null) => void;
-    _refreshElements: (from_node: Node|null) => void;
-    _getNodeElement: ($element: JQuery) => INodeElement|null;
+    _openNode: (node: Node, slide: boolean, on_finished: OnFinishOpenNode | null) => void;
+    _refreshElements: (from_node: Node | null) => void;
+    _getNodeElement: ($element: JQuery) => INodeElement | null;
     _getNodeElementForNode: (node: Node) => INodeElement;
     _containsElement: (element: Element) => boolean;
     refreshHitAreas: () => JQuery;
-    getSelectedNode: () => Node|false;
+    getSelectedNode: () => Node | false;
     openNode: (node: Node, param1?: any, param2?: any) => JQuery;
     closeNode: (node: Node, slide_param?: any) => JQuery;
     selectNode: (node: Node) => JQuery;
     scrollToNode: (node: Node) => JQuery;
-    getNodeById: (node_id: NodeId) => Node|null;
+    getNodeById: (node_id: NodeId) => Node | null;
     getSelectedNodes: () => Node[];
 }
 

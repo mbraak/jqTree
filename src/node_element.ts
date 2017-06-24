@@ -14,7 +14,7 @@ export class NodeElement implements INodeElement {
         this.node = node;
         this.tree_widget = tree_widget;
 
-        if (! node.element) {
+        if (!node.element) {
             node.element = this.tree_widget.element.get(0);
         }
 
@@ -67,8 +67,8 @@ export class NodeElement implements INodeElement {
 }
 
 export class FolderElement extends NodeElement {
-    public open(on_finished: OnFinishOpenNode|null, slide = true) {
-        if (! this.node.is_open) {
+    public open(on_finished: OnFinishOpenNode | null, slide = true) {
+        if (!this.node.is_open) {
             this.node.is_open = true;
 
             const $button = this.getButton();
@@ -94,7 +94,7 @@ export class FolderElement extends NodeElement {
                     on_finished(this.node);
                 }
 
-                this.tree_widget._triggerEvent("tree.open", {node: this.node});
+                this.tree_widget._triggerEvent("tree.open", { node: this.node });
             };
 
             if (slide) {
@@ -128,7 +128,7 @@ export class FolderElement extends NodeElement {
                 const $span = this.getSpan();
                 $span.attr("aria-expanded", "false");
 
-                this.tree_widget._triggerEvent("tree.close", {node: this.node});
+                this.tree_widget._triggerEvent("tree.close", { node: this.node });
             };
 
             if (slide) {
@@ -141,7 +141,7 @@ export class FolderElement extends NodeElement {
     }
 
     public addDropHint(position: number) {
-        if (! this.node.is_open && position === Position.Inside) {
+        if (!this.node.is_open && position === Position.Inside) {
             return new BorderDropHint(this.$element);
         } else {
             return new GhostDropHint(this.node, this.$element, position);

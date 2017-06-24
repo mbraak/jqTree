@@ -123,15 +123,15 @@ test("addChildAtPosition", (assert: Assert) => {
 test("removeChild", (assert: Assert) => {
     const tree = new Node({}, true);
 
-    const abc = new Node({label: "abc", id: 1});
-    const def = new Node({label: "def", id: 2});
-    const ghi = new Node({label: "ghi", id: 3});
+    const abc = new Node({ label: "abc", id: 1 });
+    const def = new Node({ label: "def", id: 2 });
+    const ghi = new Node({ label: "ghi", id: 3 });
 
     tree.addChild(abc);
     tree.addChild(def);
     tree.addChild(ghi);
 
-    const jkl = new Node({label: "jkl", id: 4});
+    const jkl = new Node({ label: "jkl", id: 4 });
     def.addChild(jkl);
 
     assert.equal(
@@ -409,7 +409,7 @@ test("getData", (assert: Assert) => {
             {
                 name: "n1",
                 children: [
-                    { name: "c1"}
+                    { name: "c1" }
                 ]
             }
         ]
@@ -612,10 +612,10 @@ test("loadFromData and id mapping", (assert: Assert) => {
 
     const child2 = doGetNodeById(tree, 126);
     child2.addChild(
-        new Node({label: "child4", id: 128})
+        new Node({ label: "child4", id: 128 })
     );
     child2.addChild(
-        new Node({label: "child5", id: 129})
+        new Node({ label: "child5", id: 129 })
     );
 
     // - load data in node child2
@@ -636,10 +636,10 @@ test("removeChildren", (assert: Assert) => {
     assert.equal(child2.name, "child2");
 
     child2.addChild(
-        new Node({label: "child4", id: 128})
+        new Node({ label: "child4", id: 128 })
     );
     child2.addChild(
-        new Node({label: "child5", id: 129})
+        new Node({ label: "child5", id: 129 })
     );
     assert.equal(doGetNodeById(tree, 128).name, "child4");
 

@@ -20,10 +20,10 @@ export default class SimpleWidget {
             for (const el of $el.get()) {
                 const existing_widget = getWidgetData(el, data_key);
 
-                if (! existing_widget) {
+                if (!existing_widget) {
                     const widget = new widget_class(el, options);
 
-                    if (! $.data(el, data_key)) {
+                    if (!$.data(el, data_key)) {
                         $.data(el, data_key, widget);
                     }
 
@@ -68,7 +68,7 @@ export default class SimpleWidget {
         }
 
         // tslint:disable-next-line: only-arrow-functions
-        $.fn[widget_name] = function(this: JQuery, argument1: any, ...args: any[]) {
+        $.fn[widget_name] = function (this: JQuery, argument1: any, ...args: any[]) {
             const $el = this;
 
             if (argument1 === undefined || typeof argument1 === "object") {

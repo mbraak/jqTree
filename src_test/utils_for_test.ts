@@ -68,8 +68,8 @@ export function isNodeOpen($node: JQuery) {
         ($node.is("li.jqtree-folder")) &&
         ($node.find("a:eq(0)").is("a.jqtree-toggler")) &&
         ($node.find("ul:eq(0)").is("ul")) &&
-        (! $node.is("li.jqtree-folder.jqtree-closed")) &&
-        (! $node.find("span:eq(0)").is("a.jqtree-toggler.jqtree-closed"))
+        (!$node.is("li.jqtree-folder.jqtree-closed")) &&
+        (!$node.find("span:eq(0)").is("a.jqtree-toggler.jqtree-closed"))
     );
 }
 
@@ -90,7 +90,7 @@ export function doGetNodeByName(tree: Node, name: string): Node {
     return result;
 }
 
-export function doGetNodeById(tree: Node, id: string|number): Node {
+export function doGetNodeById(tree: Node, id: string | number): Node {
     const result = tree.getNodeById(id);
 
     if (!result) {
