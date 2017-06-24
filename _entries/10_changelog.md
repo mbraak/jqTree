@@ -6,6 +6,7 @@ name: changelog
 ##### development version
 
 * Issue #489: make it possible to use nested element for icon (thanks to terryoy)
+* Issue #492: handle empty string for icon options
 
 ##### 1.4.1 (june 5 2017)
 
