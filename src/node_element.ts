@@ -36,7 +36,7 @@ export class NodeElement implements INodeElement {
         $li.attr("aria-selected", "true");
 
         const $span = this.getSpan();
-        $span.attr("tabindex", 0);
+        $span.attr("tabindex", this.tree_widget.options.tabIndex);
 
         $span.focus();
     }

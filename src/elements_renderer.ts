@@ -207,7 +207,7 @@ export default class ElementsRenderer {
         title_span.setAttribute("aria-expanded", getBoolString(is_open));
 
         if (is_selected) {
-            title_span.setAttribute("tabindex", "0");
+            title_span.setAttribute("tabindex", this.tree_widget.options.tabIndex);
         }
 
         title_span.innerHTML = this.escapeIfNecessary(node_name);

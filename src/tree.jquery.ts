@@ -64,7 +64,8 @@ class JqTreeWidget extends MouseWidget {
         onDragMove: null as HandleDrag | null,
         onDragStop: null as HandleDrag | null,
         buttonLeft: true,
-        onLoading: null as HandleLoadData | null
+        onLoading: null as HandleLoadData | null,
+        tabIndex: 0
     };
 
     public element: JQuery;
