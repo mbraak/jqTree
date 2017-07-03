@@ -48,7 +48,7 @@ export class NodeElement implements INodeElement {
         $li.attr("aria-selected", "false");
 
         const $span = this.getSpan();
-        $span.attr("tabindex", -1);
+        $span.removeAttr("tabindex");
 
         $span.blur();
     }
