@@ -51,9 +51,6 @@
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -81,7 +78,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -755,9 +752,9 @@ var SimpleWidget = (function () {
     SimpleWidget.prototype._deinit = function () {
         //
     };
+    SimpleWidget.defaults = {};
     return SimpleWidget;
 }());
-SimpleWidget.defaults = {};
 exports["default"] = SimpleWidget;
 
 
@@ -778,18 +775,18 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var version_1 = __webpack_require__(12);
-var drag_and_drop_handler_1 = __webpack_require__(4);
-var elements_renderer_1 = __webpack_require__(5);
-var key_handler_1 = __webpack_require__(6);
-var mouse_widget_1 = __webpack_require__(7);
+var version_1 = __webpack_require__(4);
+var drag_and_drop_handler_1 = __webpack_require__(5);
+var elements_renderer_1 = __webpack_require__(6);
+var key_handler_1 = __webpack_require__(7);
+var mouse_widget_1 = __webpack_require__(8);
 var save_state_handler_1 = __webpack_require__(9);
 var scroll_handler_1 = __webpack_require__(10);
 var select_node_handler_1 = __webpack_require__(11);
 var simple_widget_1 = __webpack_require__(2);
 var node_1 = __webpack_require__(0);
 var util_1 = __webpack_require__(1);
-var node_element_1 = __webpack_require__(8);
+var node_element_1 = __webpack_require__(12);
 var JqTreeWidget = (function (_super) {
     __extends(JqTreeWidget, _super);
     function JqTreeWidget() {
@@ -1135,7 +1132,7 @@ var JqTreeWidget = (function (_super) {
         this.mouse_delay = 300;
         this.is_initialized = false;
         this.options.rtl = this._getRtlOption();
-        if (!this.options.closedIcon) {
+        if (this.options.closedIcon === null) {
             this.options.closedIcon = this._getDefaultClosedIcon();
         }
         this.renderer = new elements_renderer_1["default"](this);
@@ -1697,48 +1694,60 @@ var JqTreeWidget = (function (_super) {
             _this._openNode(node, slide, on_finished);
         });
     };
+    JqTreeWidget.defaults = {
+        autoOpen: false,
+        saveState: false,
+        dragAndDrop: false,
+        selectable: true,
+        useContextMenu: true,
+        onCanSelectNode: null,
+        onSetStateFromStorage: null,
+        onGetStateFromStorage: null,
+        onCreateLi: null,
+        onIsMoveHandle: null,
+        // Can this node be moved?
+        onCanMove: null,
+        // Can this node be moved to this position? function(moved_node, target_node, position)
+        onCanMoveTo: null,
+        onLoadFailed: null,
+        autoEscape: true,
+        dataUrl: null,
+        // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
+        // http://www.fileformat.info/info/unicode/char/25ba/index.htm
+        closedIcon: null,
+        // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+        // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+        openedIcon: "&#x25bc;",
+        slide: true,
+        nodeClass: node_1.Node,
+        dataFilter: null,
+        keyboardSupport: true,
+        openFolderDelay: 500,
+        rtl: false,
+        onDragMove: null,
+        onDragStop: null,
+        buttonLeft: true,
+        onLoading: null,
+        tabIndex: 0
+    };
     return JqTreeWidget;
 }(mouse_widget_1["default"]));
-JqTreeWidget.defaults = {
-    autoOpen: false,
-    saveState: false,
-    dragAndDrop: false,
-    selectable: true,
-    useContextMenu: true,
-    onCanSelectNode: null,
-    onSetStateFromStorage: null,
-    onGetStateFromStorage: null,
-    onCreateLi: null,
-    onIsMoveHandle: null,
-    // Can this node be moved?
-    onCanMove: null,
-    // Can this node be moved to this position? function(moved_node, target_node, position)
-    onCanMoveTo: null,
-    onLoadFailed: null,
-    autoEscape: true,
-    dataUrl: null,
-    // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
-    // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-    closedIcon: null,
-    // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-    // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-    openedIcon: "&#x25bc;",
-    slide: true,
-    nodeClass: node_1.Node,
-    dataFilter: null,
-    keyboardSupport: true,
-    openFolderDelay: 500,
-    rtl: false,
-    onDragMove: null,
-    onDragStop: null,
-    buttonLeft: true,
-    onLoading: null
-};
 simple_widget_1["default"].register(JqTreeWidget, "tree");
 
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var version = "1.4.1";
+exports["default"] = version;
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2209,7 +2218,7 @@ exports.DragElement = DragElement;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2357,7 +2366,7 @@ var ElementsRenderer = (function () {
         title_span.setAttribute("aria-selected", util_1.getBoolString(is_selected));
         title_span.setAttribute("aria-expanded", util_1.getBoolString(is_open));
         if (is_selected) {
-            title_span.setAttribute("tabindex", "0");
+            title_span.setAttribute("tabindex", this.tree_widget.options.tabIndex);
         }
         title_span.innerHTML = this.escapeIfNecessary(node_name);
         return title_span;
@@ -2413,7 +2422,7 @@ exports["default"] = ElementsRenderer;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2527,17 +2536,17 @@ var KeyHandler = (function () {
             active_element.tagName === "SPAN" &&
             this.tree_widget._containsElement(active_element));
     };
+    KeyHandler.LEFT = 37;
+    KeyHandler.UP = 38;
+    KeyHandler.RIGHT = 39;
+    KeyHandler.DOWN = 40;
     return KeyHandler;
 }());
-KeyHandler.LEFT = 37;
-KeyHandler.UP = 38;
-KeyHandler.RIGHT = 39;
-KeyHandler.DOWN = 40;
 exports["default"] = KeyHandler;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2695,210 +2704,6 @@ var MouseWidget = (function (_super) {
     return MouseWidget;
 }(simple_widget_1["default"]));
 exports["default"] = MouseWidget;
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-exports.__esModule = true;
-var node_1 = __webpack_require__(0);
-var NodeElement = (function () {
-    function NodeElement(node, tree_widget) {
-        this.init(node, tree_widget);
-    }
-    NodeElement.prototype.init = function (node, tree_widget) {
-        this.node = node;
-        this.tree_widget = tree_widget;
-        if (!node.element) {
-            node.element = this.tree_widget.element.get(0);
-        }
-        this.$element = $(node.element);
-    };
-    NodeElement.prototype.addDropHint = function (position) {
-        if (position === node_1.Position.Inside) {
-            return new BorderDropHint(this.$element);
-        }
-        else {
-            return new GhostDropHint(this.node, this.$element, position);
-        }
-    };
-    NodeElement.prototype.select = function () {
-        var $li = this.getLi();
-        $li.addClass("jqtree-selected");
-        $li.attr("aria-selected", "true");
-        var $span = this.getSpan();
-        $span.attr("tabindex", 0);
-        $span.focus();
-    };
-    NodeElement.prototype.deselect = function () {
-        var $li = this.getLi();
-        $li.removeClass("jqtree-selected");
-        $li.attr("aria-selected", "false");
-        var $span = this.getSpan();
-        $span.attr("tabindex", -1);
-        $span.blur();
-    };
-    NodeElement.prototype.getUl = function () {
-        return this.$element.children("ul:first");
-    };
-    NodeElement.prototype.getSpan = function () {
-        return this.$element.children(".jqtree-element").find("span.jqtree-title");
-    };
-    NodeElement.prototype.getLi = function () {
-        return this.$element;
-    };
-    return NodeElement;
-}());
-exports.NodeElement = NodeElement;
-var FolderElement = (function (_super) {
-    __extends(FolderElement, _super);
-    function FolderElement() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    FolderElement.prototype.open = function (on_finished, slide) {
-        var _this = this;
-        if (slide === void 0) { slide = true; }
-        if (!this.node.is_open) {
-            this.node.is_open = true;
-            var $button = this.getButton();
-            $button.removeClass("jqtree-closed");
-            $button.html("");
-            var button_el = $button.get(0);
-            if (button_el) {
-                var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
-                button_el.appendChild(icon);
-            }
-            var doOpen = function () {
-                var $li = _this.getLi();
-                $li.removeClass("jqtree-closed");
-                var $span = _this.getSpan();
-                $span.attr("aria-expanded", "true");
-                if (on_finished) {
-                    on_finished(_this.node);
-                }
-                _this.tree_widget._triggerEvent("tree.open", { node: _this.node });
-            };
-            if (slide) {
-                this.getUl().slideDown("fast", doOpen);
-            }
-            else {
-                this.getUl().show();
-                doOpen();
-            }
-        }
-    };
-    FolderElement.prototype.close = function (slide) {
-        var _this = this;
-        if (slide === void 0) { slide = true; }
-        if (this.node.is_open) {
-            this.node.is_open = false;
-            var $button = this.getButton();
-            $button.addClass("jqtree-closed");
-            $button.html("");
-            var button_el = $button.get(0);
-            if (button_el) {
-                var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
-                button_el.appendChild(icon);
-            }
-            var doClose = function () {
-                var $li = _this.getLi();
-                $li.addClass("jqtree-closed");
-                var $span = _this.getSpan();
-                $span.attr("aria-expanded", "false");
-                _this.tree_widget._triggerEvent("tree.close", { node: _this.node });
-            };
-            if (slide) {
-                this.getUl().slideUp("fast", doClose);
-            }
-            else {
-                this.getUl().hide();
-                doClose();
-            }
-        }
-    };
-    FolderElement.prototype.addDropHint = function (position) {
-        if (!this.node.is_open && position === node_1.Position.Inside) {
-            return new BorderDropHint(this.$element);
-        }
-        else {
-            return new GhostDropHint(this.node, this.$element, position);
-        }
-    };
-    FolderElement.prototype.getButton = function () {
-        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
-    };
-    return FolderElement;
-}(NodeElement));
-exports.FolderElement = FolderElement;
-var BorderDropHint = (function () {
-    function BorderDropHint($element) {
-        var $div = $element.children(".jqtree-element");
-        var width = $element.width() - 4;
-        this.$hint = $('<span class="jqtree-border"></span>');
-        $div.append(this.$hint);
-        this.$hint.css({
-            width: width,
-            height: $div.outerHeight() - 4
-        });
-    }
-    BorderDropHint.prototype.remove = function () {
-        this.$hint.remove();
-    };
-    return BorderDropHint;
-}());
-exports.BorderDropHint = BorderDropHint;
-var GhostDropHint = (function () {
-    function GhostDropHint(node, $element, position) {
-        this.$element = $element;
-        this.node = node;
-        this.$ghost = $("<li class=\"jqtree_common jqtree-ghost\"><span class=\"jqtree_common jqtree-circle\"></span>\n            <span class=\"jqtree_common jqtree-line\"></span></li>");
-        if (position === node_1.Position.After) {
-            this.moveAfter();
-        }
-        else if (position === node_1.Position.Before) {
-            this.moveBefore();
-        }
-        else if (position === node_1.Position.Inside) {
-            if (node.isFolder() && node.is_open) {
-                this.moveInsideOpenFolder();
-            }
-            else {
-                this.moveInside();
-            }
-        }
-    }
-    GhostDropHint.prototype.remove = function () {
-        this.$ghost.remove();
-    };
-    GhostDropHint.prototype.moveAfter = function () {
-        this.$element.after(this.$ghost);
-    };
-    GhostDropHint.prototype.moveBefore = function () {
-        this.$element.before(this.$ghost);
-    };
-    GhostDropHint.prototype.moveInsideOpenFolder = function () {
-        $(this.node.children[0].element).before(this.$ghost);
-    };
-    GhostDropHint.prototype.moveInside = function () {
-        this.$element.after(this.$ghost);
-        this.$ghost.addClass("jqtree-inside");
-    };
-    return GhostDropHint;
-}());
-exports.GhostDropHint = GhostDropHint;
 
 
 /***/ }),
@@ -3381,9 +3186,202 @@ exports["default"] = SelectNodeHandler;
 
 "use strict";
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 exports.__esModule = true;
-var version = "1.4.1";
-exports["default"] = version;
+var node_1 = __webpack_require__(0);
+var NodeElement = (function () {
+    function NodeElement(node, tree_widget) {
+        this.init(node, tree_widget);
+    }
+    NodeElement.prototype.init = function (node, tree_widget) {
+        this.node = node;
+        this.tree_widget = tree_widget;
+        if (!node.element) {
+            node.element = this.tree_widget.element.get(0);
+        }
+        this.$element = $(node.element);
+    };
+    NodeElement.prototype.addDropHint = function (position) {
+        if (position === node_1.Position.Inside) {
+            return new BorderDropHint(this.$element);
+        }
+        else {
+            return new GhostDropHint(this.node, this.$element, position);
+        }
+    };
+    NodeElement.prototype.select = function () {
+        var $li = this.getLi();
+        $li.addClass("jqtree-selected");
+        $li.attr("aria-selected", "true");
+        var $span = this.getSpan();
+        $span.attr("tabindex", this.tree_widget.options.tabIndex);
+        $span.focus();
+    };
+    NodeElement.prototype.deselect = function () {
+        var $li = this.getLi();
+        $li.removeClass("jqtree-selected");
+        $li.attr("aria-selected", "false");
+        var $span = this.getSpan();
+        $span.removeAttr("tabindex");
+        $span.blur();
+    };
+    NodeElement.prototype.getUl = function () {
+        return this.$element.children("ul:first");
+    };
+    NodeElement.prototype.getSpan = function () {
+        return this.$element.children(".jqtree-element").find("span.jqtree-title");
+    };
+    NodeElement.prototype.getLi = function () {
+        return this.$element;
+    };
+    return NodeElement;
+}());
+exports.NodeElement = NodeElement;
+var FolderElement = (function (_super) {
+    __extends(FolderElement, _super);
+    function FolderElement() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    FolderElement.prototype.open = function (on_finished, slide) {
+        var _this = this;
+        if (slide === void 0) { slide = true; }
+        if (!this.node.is_open) {
+            this.node.is_open = true;
+            var $button = this.getButton();
+            $button.removeClass("jqtree-closed");
+            $button.html("");
+            var button_el = $button.get(0);
+            if (button_el) {
+                var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+                button_el.appendChild(icon);
+            }
+            var doOpen = function () {
+                var $li = _this.getLi();
+                $li.removeClass("jqtree-closed");
+                var $span = _this.getSpan();
+                $span.attr("aria-expanded", "true");
+                if (on_finished) {
+                    on_finished(_this.node);
+                }
+                _this.tree_widget._triggerEvent("tree.open", { node: _this.node });
+            };
+            if (slide) {
+                this.getUl().slideDown("fast", doOpen);
+            }
+            else {
+                this.getUl().show();
+                doOpen();
+            }
+        }
+    };
+    FolderElement.prototype.close = function (slide) {
+        var _this = this;
+        if (slide === void 0) { slide = true; }
+        if (this.node.is_open) {
+            this.node.is_open = false;
+            var $button = this.getButton();
+            $button.addClass("jqtree-closed");
+            $button.html("");
+            var button_el = $button.get(0);
+            if (button_el) {
+                var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+                button_el.appendChild(icon);
+            }
+            var doClose = function () {
+                var $li = _this.getLi();
+                $li.addClass("jqtree-closed");
+                var $span = _this.getSpan();
+                $span.attr("aria-expanded", "false");
+                _this.tree_widget._triggerEvent("tree.close", { node: _this.node });
+            };
+            if (slide) {
+                this.getUl().slideUp("fast", doClose);
+            }
+            else {
+                this.getUl().hide();
+                doClose();
+            }
+        }
+    };
+    FolderElement.prototype.addDropHint = function (position) {
+        if (!this.node.is_open && position === node_1.Position.Inside) {
+            return new BorderDropHint(this.$element);
+        }
+        else {
+            return new GhostDropHint(this.node, this.$element, position);
+        }
+    };
+    FolderElement.prototype.getButton = function () {
+        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
+    };
+    return FolderElement;
+}(NodeElement));
+exports.FolderElement = FolderElement;
+var BorderDropHint = (function () {
+    function BorderDropHint($element) {
+        var $div = $element.children(".jqtree-element");
+        var width = $element.width() - 4;
+        this.$hint = $('<span class="jqtree-border"></span>');
+        $div.append(this.$hint);
+        this.$hint.css({
+            width: width,
+            height: $div.outerHeight() - 4
+        });
+    }
+    BorderDropHint.prototype.remove = function () {
+        this.$hint.remove();
+    };
+    return BorderDropHint;
+}());
+exports.BorderDropHint = BorderDropHint;
+var GhostDropHint = (function () {
+    function GhostDropHint(node, $element, position) {
+        this.$element = $element;
+        this.node = node;
+        this.$ghost = $("<li class=\"jqtree_common jqtree-ghost\"><span class=\"jqtree_common jqtree-circle\"></span>\n            <span class=\"jqtree_common jqtree-line\"></span></li>");
+        if (position === node_1.Position.After) {
+            this.moveAfter();
+        }
+        else if (position === node_1.Position.Before) {
+            this.moveBefore();
+        }
+        else if (position === node_1.Position.Inside) {
+            if (node.isFolder() && node.is_open) {
+                this.moveInsideOpenFolder();
+            }
+            else {
+                this.moveInside();
+            }
+        }
+    }
+    GhostDropHint.prototype.remove = function () {
+        this.$ghost.remove();
+    };
+    GhostDropHint.prototype.moveAfter = function () {
+        this.$element.after(this.$ghost);
+    };
+    GhostDropHint.prototype.moveBefore = function () {
+        this.$element.before(this.$ghost);
+    };
+    GhostDropHint.prototype.moveInsideOpenFolder = function () {
+        $(this.node.children[0].element).before(this.$ghost);
+    };
+    GhostDropHint.prototype.moveInside = function () {
+        this.$element.after(this.$ghost);
+        this.$ghost.addClass("jqtree-inside");
+    };
+    return GhostDropHint;
+}());
+exports.GhostDropHint = GhostDropHint;
 
 
 /***/ }),
@@ -3473,25 +3471,11 @@ exports.doGetNodeById = doGetNodeById;
 
 
 /***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-__webpack_require__(18);
-__webpack_require__(17);
-__webpack_require__(16);
-QUnit.config.testTimeout = 5000;
-
-
-/***/ }),
+/* 14 */,
 /* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-exports.__esModule = true;
+module.exports = __webpack_require__(16);
 
 
 /***/ }),
@@ -3501,10 +3485,538 @@ exports.__esModule = true;
 "use strict";
 
 exports.__esModule = true;
+__webpack_require__(17);
+__webpack_require__(18);
+__webpack_require__(19);
+QUnit.config.testTimeout = 5000;
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var module = QUnit.module, test = QUnit.test;
+var node_1 = __webpack_require__(0);
+module("util");
+test("getPositionName", function (assert) {
+    assert.equal(node_1.getPositionName(node_1.Position.Before), "before");
+    assert.equal(node_1.getPositionName(node_1.Position.After), "after");
+    assert.equal(node_1.getPositionName(node_1.Position.Inside), "inside");
+    assert.equal(node_1.getPositionName(node_1.Position.None), "none");
+});
+test("getPosition", function (assert) {
+    assert.equal(node_1.getPosition("inside"), node_1.Position.Inside);
+});
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var module = QUnit.module, test = QUnit.test;
+var utils_for_test_1 = __webpack_require__(13);
+var node_1 = __webpack_require__(0);
+module("Tree");
+test("constructor", function (assert) {
+    // 1. Create node from string
+    var node = new node_1.Node("n1");
+    assert.equal(node.name, "n1");
+    assert.equal(node.children.length, 0);
+    assert.equal(node.parent, null);
+    // 2. Create node from object
+    var node2 = new node_1.Node({
+        label: "n2",
+        id: 123,
+        parent: "abc",
+        children: ["c"],
+        url: "/"
+    });
+    assert.equal(node2.name, "n2");
+    assert.equal(node2.id, 123);
+    // tslint:disable-next-line: no-string-literal
+    assert.equal(node2["url"], "/");
+    // tslint:disable-next-line: no-string-literal
+    assert.equal(node2["label"], undefined);
+    assert.equal(node2.children.length, 0);
+    assert.equal(node2.parent, null);
+});
+test("create tree from data", function (assert) {
+    function checkData(tree) {
+        assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2", "nodes on level 1");
+        assert.equal(utils_for_test_1.formatNodes(tree.children[0].children), "child1 child2", "children of node1");
+        assert.equal(utils_for_test_1.formatNodes(tree.children[1].children), "child3", "children of node2");
+        assert.equal(tree.children[0].id, 123, "id");
+    }
+    // - create tree from example data
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    checkData(tree);
+    // - create tree from new data format
+    var data = [
+        {
+            label: "node1",
+            id: 123,
+            children: ["child1", "child2"] // nodes are only defined by a string
+        },
+        {
+            label: "node2",
+            id: 124,
+            children: ["child3"]
+        }
+    ];
+    var tree2 = new node_1.Node({}, true);
+    tree2.loadFromData(data);
+    checkData(tree2);
+});
+test("addChild", function (assert) {
+    var tree = new node_1.Node("tree1", true);
+    tree.addChild(new node_1.Node("abc"));
+    tree.addChild(new node_1.Node("def"));
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc def", "children");
+    var node = tree.children[0];
+    if (!node.parent) {
+        assert.ok(false, "Node has no parent");
+    }
+    else {
+        assert.equal(node.parent.name, "tree1", "parent of node");
+    }
+});
+test("addChildAtPosition", function (assert) {
+    var tree = new node_1.Node({}, true);
+    tree.addChildAtPosition(new node_1.Node("abc"), 0); // first
+    tree.addChildAtPosition(new node_1.Node("ghi"), 2); // index 2 does not exist
+    tree.addChildAtPosition(new node_1.Node("def"), 1);
+    tree.addChildAtPosition(new node_1.Node("123"), 0);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "123 abc def ghi", "children");
+});
+test("removeChild", function (assert) {
+    var tree = new node_1.Node({}, true);
+    var abc = new node_1.Node({ label: "abc", id: 1 });
+    var def = new node_1.Node({ label: "def", id: 2 });
+    var ghi = new node_1.Node({ label: "ghi", id: 3 });
+    tree.addChild(abc);
+    tree.addChild(def);
+    tree.addChild(ghi);
+    var jkl = new node_1.Node({ label: "jkl", id: 4 });
+    def.addChild(jkl);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc def ghi", "children");
+    assert.equal(tree.id_mapping[2].name, "def");
+    assert.equal(tree.id_mapping[4].name, "jkl");
+    // remove 'def'
+    tree.removeChild(def);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc ghi", "children");
+    assert.equal(tree.id_mapping[2], null);
+    assert.equal(tree.id_mapping[4], null);
+    // remove 'ghi'
+    tree.removeChild(ghi);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc", "children");
+    // remove 'abc'
+    tree.removeChild(abc);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "", "children");
+});
+test("getChildIndex", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    var abc = new node_1.Node("abc");
+    var def = new node_1.Node("def");
+    var ghi = new node_1.Node("ghi");
+    tree.addChild(abc);
+    tree.addChild(def);
+    tree.addChild(ghi);
+    // 1. Get child index of 'def'
+    assert.equal(tree.getChildIndex(def), 1);
+    // 2. Get child index of non-existing node
+    assert.equal(tree.getChildIndex(new node_1.Node("xyz")), -1);
+});
+test("hasChildren", function (assert) {
+    var tree = new node_1.Node({}, true);
+    assert.equal(tree.hasChildren(), false, "tree without children");
+    tree.addChild(new node_1.Node("abc"));
+    assert.equal(tree.hasChildren(), true, "tree has children");
+});
+test("iterate", function (assert) {
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // iterate over all the nodes
+    var nodes = [];
+    tree.iterate(function (node) {
+        nodes.push(node);
+        return true;
+    });
+    assert.equal(utils_for_test_1.formatNodes(nodes), "node1 child1 child2 node2 child3", "all nodes");
+    // iterate over nodes on first level
+    var nodes2 = [];
+    tree.iterate(function (node) {
+        nodes2.push(node);
+        return false;
+    });
+    assert.equal(utils_for_test_1.formatNodes(nodes2), "node1 node2", "nodes on first level");
+    // add child 4
+    var node124 = utils_for_test_1.doGetNodeById(tree, 124);
+    var node3 = node124.children[0];
+    node3.addChild(new node_1.Node("child4"));
+    // test level parameter
+    var nodes3 = [];
+    tree.iterate(function (node, level) {
+        nodes3.push(node.name + " " + level);
+        return true;
+    });
+    assert.equal(nodes3.join(","), "node1 0,child1 1,child2 1,node2 0,child3 1,child4 2");
+});
+test("moveNode", function (assert) {
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    /*
+      node1
+      ---child1
+      ---child2
+      node2
+      ---child3
+    */
+    var node1 = tree.children[0];
+    var node2 = tree.children[1];
+    var child1 = node1.children[0];
+    var child2 = node1.children[1];
+    assert.equal(node2.name, "node2", "node2 name");
+    assert.equal(child2.name, "child2", "child2 name");
+    // move child2 after node2
+    tree.moveNode(child2, node2, node_1.Position.After);
+    /*
+      node1
+      ---child1
+      node2
+      ---child3
+      child2
+    */
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 child2", "tree nodes at first level");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1", "node1 children");
+    // move child1 inside node2
+    // this means it's the first child
+    tree.moveNode(child1, node2, node_1.Position.Inside);
+    /*
+      node1
+      node2
+      ---child1
+      ---child3
+      child2
+    */
+    assert.equal(utils_for_test_1.formatNodes(node2.children), "child1 child3", "node2 children");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "", "node1 has no children");
+    // move child2 before child1
+    tree.moveNode(child2, child1, node_1.Position.Before);
+    /*
+      node1
+      node2
+      ---child2
+      ---child1
+      ---child3
+    */
+    assert.equal(utils_for_test_1.formatNodes(node2.children), "child2 child1 child3", "node2 children");
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2", "tree nodes at first level");
+});
+test("initFromData", function (assert) {
+    var data = {
+        label: "main",
+        children: [
+            "c1",
+            {
+                label: "c2",
+                id: 201
+            }
+        ]
+    };
+    var node = new node_1.Node({}, true);
+    node.initFromData(data);
+    assert.equal(node.name, "main");
+    assert.equal(utils_for_test_1.formatNodes(node.children), "c1 c2", "children");
+    assert.equal(node.children[1].id, 201);
+});
+test("getData", function (assert) {
+    // 1. empty node
+    var node = new node_1.Node({}, true);
+    assert.deepEqual(node.getData(), []);
+    // 2.node with data
+    node.loadFromData([
+        {
+            label: "n1",
+            children: [
+                {
+                    label: "c1"
+                }
+            ]
+        }
+    ]);
+    assert.deepEqual(node.getData(), [
+        {
+            name: "n1",
+            children: [
+                {
+                    name: "c1"
+                }
+            ]
+        }
+    ]);
+    // 3. get data including parent
+    var n1 = utils_for_test_1.doGetNodeByName(node, "n1");
+    assert.deepEqual(n1.getData(true), [
+        {
+            name: "n1",
+            children: [
+                { name: "c1" }
+            ]
+        }
+    ]);
+});
+test("addAfter", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    /*
+    -node1
+    ---c1
+    ---c2
+    -node2
+    ---c3
+    */
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2");
+    // - Add 'node_b' after node2
+    var node2 = utils_for_test_1.doGetNodeByName(tree, "node2");
+    node2.addAfter("node_b");
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 node_b");
+    var node_b = utils_for_test_1.doGetNodeByName(tree, "node_b");
+    assert.equal(node_b.name, "node_b");
+    // - Add 'node_a' after node1
+    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    node1.addAfter("node_a");
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b");
+    // - Add 'node_c' after node_b; new node is an object
+    if (node_b) {
+        node_b.addAfter({
+            label: "node_c",
+            id: 789
+        });
+    }
+    var node_c = utils_for_test_1.doGetNodeByName(tree, "node_c");
+    assert.equal(node_c.id, 789);
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b node_c");
+    // - Add after root node; this is not possible
+    assert.equal(tree.addAfter("node_x"), null);
+});
+test("addBefore", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // - Add 'node_0' before node1
+    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    node1.addBefore("node0");
+    assert.equal(utils_for_test_1.formatNodes(tree.children), "node0 node1 node2");
+    // - Add before root node; this is not possile
+    assert.equal(tree.addBefore("x"), null);
+});
+test("addParent", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // - Add node 'root' as parent of node1
+    // Note that node also becomes a child of 'root'
+    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    node1.addParent("root");
+    var root = utils_for_test_1.doGetNodeByName(tree, "root");
+    assert.equal(utils_for_test_1.formatNodes(root.children), "node1 node2");
+    // - Add parent to root node; not possible
+    assert.equal(tree.addParent("x"), null);
+});
+test("remove", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var child1 = utils_for_test_1.doGetNodeByName(tree, "child1");
+    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2");
+    assert.equal(child1.parent, node1);
+    // 1. Remove child1
+    child1.remove();
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child2");
+    assert.equal(child1.parent, null);
+});
+test("append", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    // 1. Append child3 to node1
+    node1.append("child3");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2 child3");
+    // 2. Append subtree
+    node1.append({
+        name: "child4",
+        children: [
+            { name: "child5" }
+        ]
+    });
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2 child3 child4");
+    var child4 = utils_for_test_1.doGetNodeByName(node1, "child4");
+    assert.equal(utils_for_test_1.formatNodes(child4.children), "child5");
+});
+test("prepend", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    // 1. Prepend child0 to node1
+    node1.prepend("child0");
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child0 child1 child2");
+    // 2. Prepend subtree
+    node1.prepend({
+        name: "child3",
+        children: [
+            { name: "child4" }
+        ]
+    });
+    assert.equal(utils_for_test_1.formatNodes(node1.children), "child3 child0 child1 child2");
+    var child3 = utils_for_test_1.doGetNodeByName(node1, "child3");
+    assert.equal(utils_for_test_1.formatNodes(child3.children), "child4");
+});
+test("getNodeById", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // 1. Get node with id 124
+    var node = utils_for_test_1.doGetNodeById(tree, 124);
+    assert.equal(node.name, "node2");
+    // 2. Delete node with id 124 and search again
+    node.remove();
+    assert.equal(tree.getNodeById(124), null);
+    // 3. Add node with id 456 and search for it
+    var child3 = utils_for_test_1.doGetNodeByName(tree, "child2");
+    child3.append({
+        id: 456,
+        label: "new node"
+    });
+    var node2 = utils_for_test_1.doGetNodeById(tree, 456);
+    assert.equal(node2.name, "new node");
+});
+test("getLevel", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // 1. get level for node1 and child1
+    assert.equal(utils_for_test_1.doGetNodeByName(tree, "node1").getLevel(), 1);
+    assert.equal(utils_for_test_1.doGetNodeByName(tree, "child1").getLevel(), 2);
+});
+test("loadFromData and id mapping", function (assert) {
+    // - get node from empty tree
+    var tree = new node_1.Node({}, true);
+    assert.equal(tree.getNodeById(999), null);
+    // - load example data in tree
+    tree.loadFromData(utils_for_test_1.example_data);
+    assert.equal(utils_for_test_1.doGetNodeById(tree, 124).name, "node2");
+    var child2 = utils_for_test_1.doGetNodeById(tree, 126);
+    child2.addChild(new node_1.Node({ label: "child4", id: 128 }));
+    child2.addChild(new node_1.Node({ label: "child5", id: 129 }));
+    // - load data in node child2
+    child2.loadFromData(["abc", "def"]);
+    assert.equal(tree.getNodeById(128), null);
+    assert.equal(child2.children.length, 2);
+    assert.equal(child2.children[0].name, "abc");
+});
+test("removeChildren", function (assert) {
+    // - load example data
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // add child4 and child5
+    var child2 = utils_for_test_1.doGetNodeById(tree, 126);
+    assert.equal(child2.name, "child2");
+    child2.addChild(new node_1.Node({ label: "child4", id: 128 }));
+    child2.addChild(new node_1.Node({ label: "child5", id: 129 }));
+    assert.equal(utils_for_test_1.doGetNodeById(tree, 128).name, "child4");
+    // - remove children from child2
+    child2.removeChildren();
+    assert.equal(tree.getNodeById(128), null);
+    assert.equal(child2.children.length, 0);
+});
+test("node with id 0", function (assert) {
+    // - load node with id 0
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData([
+        {
+            id: 0,
+            label: "mynode"
+        }
+    ]);
+    var node = utils_for_test_1.doGetNodeById(tree, 0);
+    assert.equal(node.name, "mynode");
+    // -- remove the node
+    node.remove();
+    assert.equal(tree.getNodeById(0), undefined);
+});
+test("getPreviousSibling", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // - getPreviousSibling
+    var previous_sibling = utils_for_test_1.doGetNodeByName(tree, "child2").getPreviousSibling();
+    if (!previous_sibling) {
+        assert.ok(false, "Previous sibling not found");
+    }
+    else {
+        assert.equal(previous_sibling.name, "child1");
+    }
+    assert.equal(tree.getPreviousSibling(), null);
+    assert.equal(utils_for_test_1.doGetNodeByName(tree, "child1").getPreviousSibling(), null);
+});
+test("getNextSibling", function (assert) {
+    // setup
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    // - getNextSibling
+    var next_sibling = utils_for_test_1.doGetNodeByName(tree, "node1").getNextSibling();
+    if (!next_sibling) {
+        assert.ok(false, "Next sibling not found");
+    }
+    else {
+        assert.equal(next_sibling.name, "node2");
+    }
+    assert.equal(utils_for_test_1.doGetNodeByName(tree, "node2").getNextSibling(), null);
+    assert.equal(tree.getNextSibling(), null);
+});
+test("getNodesByProperty", function (assert) {
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var nodes = tree.getNodesByProperty("name", "child1");
+    assert.equal(nodes.length, 1);
+    assert.equal(nodes[0].name, "child1");
+});
+test("getNodeByCallback", function (assert) {
+    var tree = new node_1.Node({}, true);
+    tree.loadFromData(utils_for_test_1.example_data);
+    var node = tree.getNodeByCallback(function (n) { return n.name === "child1"; });
+    if (!node) {
+        assert.ok(false, "Node not found");
+    }
+    else {
+        assert.equal(node.name, "child1");
+    }
+});
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
 __webpack_require__(3);
 var utils_for_test_1 = __webpack_require__(13);
 var node_1 = __webpack_require__(0);
-__webpack_require__(15);
+__webpack_require__(20);
 var module = QUnit.module, test = QUnit.test;
 module("jqtree", {
     beforeEach: function () {
@@ -4441,526 +4953,12 @@ test("onLoadFailed", function (assert) {
 
 
 /***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var module = QUnit.module, test = QUnit.test;
-var utils_for_test_1 = __webpack_require__(13);
-var node_1 = __webpack_require__(0);
-module("Tree");
-test("constructor", function (assert) {
-    // 1. Create node from string
-    var node = new node_1.Node("n1");
-    assert.equal(node.name, "n1");
-    assert.equal(node.children.length, 0);
-    assert.equal(node.parent, null);
-    // 2. Create node from object
-    var node2 = new node_1.Node({
-        label: "n2",
-        id: 123,
-        parent: "abc",
-        children: ["c"],
-        url: "/"
-    });
-    assert.equal(node2.name, "n2");
-    assert.equal(node2.id, 123);
-    // tslint:disable-next-line: no-string-literal
-    assert.equal(node2["url"], "/");
-    // tslint:disable-next-line: no-string-literal
-    assert.equal(node2["label"], undefined);
-    assert.equal(node2.children.length, 0);
-    assert.equal(node2.parent, null);
-});
-test("create tree from data", function (assert) {
-    function checkData(tree) {
-        assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2", "nodes on level 1");
-        assert.equal(utils_for_test_1.formatNodes(tree.children[0].children), "child1 child2", "children of node1");
-        assert.equal(utils_for_test_1.formatNodes(tree.children[1].children), "child3", "children of node2");
-        assert.equal(tree.children[0].id, 123, "id");
-    }
-    // - create tree from example data
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    checkData(tree);
-    // - create tree from new data format
-    var data = [
-        {
-            label: "node1",
-            id: 123,
-            children: ["child1", "child2"] // nodes are only defined by a string
-        },
-        {
-            label: "node2",
-            id: 124,
-            children: ["child3"]
-        }
-    ];
-    var tree2 = new node_1.Node({}, true);
-    tree2.loadFromData(data);
-    checkData(tree2);
-});
-test("addChild", function (assert) {
-    var tree = new node_1.Node("tree1", true);
-    tree.addChild(new node_1.Node("abc"));
-    tree.addChild(new node_1.Node("def"));
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc def", "children");
-    var node = tree.children[0];
-    if (!node.parent) {
-        assert.ok(false, "Node has no parent");
-    }
-    else {
-        assert.equal(node.parent.name, "tree1", "parent of node");
-    }
-});
-test("addChildAtPosition", function (assert) {
-    var tree = new node_1.Node({}, true);
-    tree.addChildAtPosition(new node_1.Node("abc"), 0); // first
-    tree.addChildAtPosition(new node_1.Node("ghi"), 2); // index 2 does not exist
-    tree.addChildAtPosition(new node_1.Node("def"), 1);
-    tree.addChildAtPosition(new node_1.Node("123"), 0);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "123 abc def ghi", "children");
-});
-test("removeChild", function (assert) {
-    var tree = new node_1.Node({}, true);
-    var abc = new node_1.Node({ label: "abc", id: 1 });
-    var def = new node_1.Node({ label: "def", id: 2 });
-    var ghi = new node_1.Node({ label: "ghi", id: 3 });
-    tree.addChild(abc);
-    tree.addChild(def);
-    tree.addChild(ghi);
-    var jkl = new node_1.Node({ label: "jkl", id: 4 });
-    def.addChild(jkl);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc def ghi", "children");
-    assert.equal(tree.id_mapping[2].name, "def");
-    assert.equal(tree.id_mapping[4].name, "jkl");
-    // remove 'def'
-    tree.removeChild(def);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc ghi", "children");
-    assert.equal(tree.id_mapping[2], null);
-    assert.equal(tree.id_mapping[4], null);
-    // remove 'ghi'
-    tree.removeChild(ghi);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc", "children");
-    // remove 'abc'
-    tree.removeChild(abc);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "", "children");
-});
-test("getChildIndex", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    var abc = new node_1.Node("abc");
-    var def = new node_1.Node("def");
-    var ghi = new node_1.Node("ghi");
-    tree.addChild(abc);
-    tree.addChild(def);
-    tree.addChild(ghi);
-    // 1. Get child index of 'def'
-    assert.equal(tree.getChildIndex(def), 1);
-    // 2. Get child index of non-existing node
-    assert.equal(tree.getChildIndex(new node_1.Node("xyz")), -1);
-});
-test("hasChildren", function (assert) {
-    var tree = new node_1.Node({}, true);
-    assert.equal(tree.hasChildren(), false, "tree without children");
-    tree.addChild(new node_1.Node("abc"));
-    assert.equal(tree.hasChildren(), true, "tree has children");
-});
-test("iterate", function (assert) {
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    // iterate over all the nodes
-    var nodes = [];
-    tree.iterate(function (node) {
-        nodes.push(node);
-        return true;
-    });
-    assert.equal(utils_for_test_1.formatNodes(nodes), "node1 child1 child2 node2 child3", "all nodes");
-    // iterate over nodes on first level
-    var nodes2 = [];
-    tree.iterate(function (node) {
-        nodes2.push(node);
-        return false;
-    });
-    assert.equal(utils_for_test_1.formatNodes(nodes2), "node1 node2", "nodes on first level");
-    // add child 4
-    var node124 = utils_for_test_1.doGetNodeById(tree, 124);
-    var node3 = node124.children[0];
-    node3.addChild(new node_1.Node("child4"));
-    // test level parameter
-    var nodes3 = [];
-    tree.iterate(function (node, level) {
-        nodes3.push(node.name + " " + level);
-        return true;
-    });
-    assert.equal(nodes3.join(","), "node1 0,child1 1,child2 1,node2 0,child3 1,child4 2");
-});
-test("moveNode", function (assert) {
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    /*
-      node1
-      ---child1
-      ---child2
-      node2
-      ---child3
-    */
-    var node1 = tree.children[0];
-    var node2 = tree.children[1];
-    var child1 = node1.children[0];
-    var child2 = node1.children[1];
-    assert.equal(node2.name, "node2", "node2 name");
-    assert.equal(child2.name, "child2", "child2 name");
-    // move child2 after node2
-    tree.moveNode(child2, node2, node_1.Position.After);
-    /*
-      node1
-      ---child1
-      node2
-      ---child3
-      child2
-    */
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 child2", "tree nodes at first level");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1", "node1 children");
-    // move child1 inside node2
-    // this means it's the first child
-    tree.moveNode(child1, node2, node_1.Position.Inside);
-    /*
-      node1
-      node2
-      ---child1
-      ---child3
-      child2
-    */
-    assert.equal(utils_for_test_1.formatNodes(node2.children), "child1 child3", "node2 children");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "", "node1 has no children");
-    // move child2 before child1
-    tree.moveNode(child2, child1, node_1.Position.Before);
-    /*
-      node1
-      node2
-      ---child2
-      ---child1
-      ---child3
-    */
-    assert.equal(utils_for_test_1.formatNodes(node2.children), "child2 child1 child3", "node2 children");
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2", "tree nodes at first level");
-});
-test("initFromData", function (assert) {
-    var data = {
-        label: "main",
-        children: [
-            "c1",
-            {
-                label: "c2",
-                id: 201
-            }
-        ]
-    };
-    var node = new node_1.Node({}, true);
-    node.initFromData(data);
-    assert.equal(node.name, "main");
-    assert.equal(utils_for_test_1.formatNodes(node.children), "c1 c2", "children");
-    assert.equal(node.children[1].id, 201);
-});
-test("getData", function (assert) {
-    // 1. empty node
-    var node = new node_1.Node({}, true);
-    assert.deepEqual(node.getData(), []);
-    // 2.node with data
-    node.loadFromData([
-        {
-            label: "n1",
-            children: [
-                {
-                    label: "c1"
-                }
-            ]
-        }
-    ]);
-    assert.deepEqual(node.getData(), [
-        {
-            name: "n1",
-            children: [
-                {
-                    name: "c1"
-                }
-            ]
-        }
-    ]);
-    // 3. get data including parent
-    var n1 = utils_for_test_1.doGetNodeByName(node, "n1");
-    assert.deepEqual(n1.getData(true), [
-        {
-            name: "n1",
-            children: [
-                { name: "c1" }
-            ]
-        }
-    ]);
-});
-test("addAfter", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    /*
-    -node1
-    ---c1
-    ---c2
-    -node2
-    ---c3
-    */
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2");
-    // - Add 'node_b' after node2
-    var node2 = utils_for_test_1.doGetNodeByName(tree, "node2");
-    node2.addAfter("node_b");
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 node_b");
-    var node_b = utils_for_test_1.doGetNodeByName(tree, "node_b");
-    assert.equal(node_b.name, "node_b");
-    // - Add 'node_a' after node1
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
-    node1.addAfter("node_a");
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b");
-    // - Add 'node_c' after node_b; new node is an object
-    if (node_b) {
-        node_b.addAfter({
-            label: "node_c",
-            id: 789
-        });
-    }
-    var node_c = utils_for_test_1.doGetNodeByName(tree, "node_c");
-    assert.equal(node_c.id, 789);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b node_c");
-    // - Add after root node; this is not possible
-    assert.equal(tree.addAfter("node_x"), null);
-});
-test("addBefore", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    // - Add 'node_0' before node1
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
-    node1.addBefore("node0");
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node0 node1 node2");
-    // - Add before root node; this is not possile
-    assert.equal(tree.addBefore("x"), null);
-});
-test("addParent", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    // - Add node 'root' as parent of node1
-    // Note that node also becomes a child of 'root'
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
-    node1.addParent("root");
-    var root = utils_for_test_1.doGetNodeByName(tree, "root");
-    assert.equal(utils_for_test_1.formatNodes(root.children), "node1 node2");
-    // - Add parent to root node; not possible
-    assert.equal(tree.addParent("x"), null);
-});
-test("remove", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    var child1 = utils_for_test_1.doGetNodeByName(tree, "child1");
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2");
-    assert.equal(child1.parent, node1);
-    // 1. Remove child1
-    child1.remove();
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child2");
-    assert.equal(child1.parent, null);
-});
-test("append", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
-    // 1. Append child3 to node1
-    node1.append("child3");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2 child3");
-    // 2. Append subtree
-    node1.append({
-        name: "child4",
-        children: [
-            { name: "child5" }
-        ]
-    });
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2 child3 child4");
-    var child4 = utils_for_test_1.doGetNodeByName(node1, "child4");
-    assert.equal(utils_for_test_1.formatNodes(child4.children), "child5");
-});
-test("prepend", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
-    // 1. Prepend child0 to node1
-    node1.prepend("child0");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child0 child1 child2");
-    // 2. Prepend subtree
-    node1.prepend({
-        name: "child3",
-        children: [
-            { name: "child4" }
-        ]
-    });
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child3 child0 child1 child2");
-    var child3 = utils_for_test_1.doGetNodeByName(node1, "child3");
-    assert.equal(utils_for_test_1.formatNodes(child3.children), "child4");
-});
-test("getNodeById", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    // 1. Get node with id 124
-    var node = utils_for_test_1.doGetNodeById(tree, 124);
-    assert.equal(node.name, "node2");
-    // 2. Delete node with id 124 and search again
-    node.remove();
-    assert.equal(tree.getNodeById(124), null);
-    // 3. Add node with id 456 and search for it
-    var child3 = utils_for_test_1.doGetNodeByName(tree, "child2");
-    child3.append({
-        id: 456,
-        label: "new node"
-    });
-    var node2 = utils_for_test_1.doGetNodeById(tree, 456);
-    assert.equal(node2.name, "new node");
-});
-test("getLevel", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    // 1. get level for node1 and child1
-    assert.equal(utils_for_test_1.doGetNodeByName(tree, "node1").getLevel(), 1);
-    assert.equal(utils_for_test_1.doGetNodeByName(tree, "child1").getLevel(), 2);
-});
-test("loadFromData and id mapping", function (assert) {
-    // - get node from empty tree
-    var tree = new node_1.Node({}, true);
-    assert.equal(tree.getNodeById(999), null);
-    // - load example data in tree
-    tree.loadFromData(utils_for_test_1.example_data);
-    assert.equal(utils_for_test_1.doGetNodeById(tree, 124).name, "node2");
-    var child2 = utils_for_test_1.doGetNodeById(tree, 126);
-    child2.addChild(new node_1.Node({ label: "child4", id: 128 }));
-    child2.addChild(new node_1.Node({ label: "child5", id: 129 }));
-    // - load data in node child2
-    child2.loadFromData(["abc", "def"]);
-    assert.equal(tree.getNodeById(128), null);
-    assert.equal(child2.children.length, 2);
-    assert.equal(child2.children[0].name, "abc");
-});
-test("removeChildren", function (assert) {
-    // - load example data
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    // add child4 and child5
-    var child2 = utils_for_test_1.doGetNodeById(tree, 126);
-    assert.equal(child2.name, "child2");
-    child2.addChild(new node_1.Node({ label: "child4", id: 128 }));
-    child2.addChild(new node_1.Node({ label: "child5", id: 129 }));
-    assert.equal(utils_for_test_1.doGetNodeById(tree, 128).name, "child4");
-    // - remove children from child2
-    child2.removeChildren();
-    assert.equal(tree.getNodeById(128), null);
-    assert.equal(child2.children.length, 0);
-});
-test("node with id 0", function (assert) {
-    // - load node with id 0
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData([
-        {
-            id: 0,
-            label: "mynode"
-        }
-    ]);
-    var node = utils_for_test_1.doGetNodeById(tree, 0);
-    assert.equal(node.name, "mynode");
-    // -- remove the node
-    node.remove();
-    assert.equal(tree.getNodeById(0), undefined);
-});
-test("getPreviousSibling", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    // - getPreviousSibling
-    var previous_sibling = utils_for_test_1.doGetNodeByName(tree, "child2").getPreviousSibling();
-    if (!previous_sibling) {
-        assert.ok(false, "Previous sibling not found");
-    }
-    else {
-        assert.equal(previous_sibling.name, "child1");
-    }
-    assert.equal(tree.getPreviousSibling(), null);
-    assert.equal(utils_for_test_1.doGetNodeByName(tree, "child1").getPreviousSibling(), null);
-});
-test("getNextSibling", function (assert) {
-    // setup
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    // - getNextSibling
-    var next_sibling = utils_for_test_1.doGetNodeByName(tree, "node1").getNextSibling();
-    if (!next_sibling) {
-        assert.ok(false, "Next sibling not found");
-    }
-    else {
-        assert.equal(next_sibling.name, "node2");
-    }
-    assert.equal(utils_for_test_1.doGetNodeByName(tree, "node2").getNextSibling(), null);
-    assert.equal(tree.getNextSibling(), null);
-});
-test("getNodesByProperty", function (assert) {
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    var nodes = tree.getNodesByProperty("name", "child1");
-    assert.equal(nodes.length, 1);
-    assert.equal(nodes[0].name, "child1");
-});
-test("getNodeByCallback", function (assert) {
-    var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.example_data);
-    var node = tree.getNodeByCallback(function (n) { return n.name === "child1"; });
-    if (!node) {
-        assert.ok(false, "Node not found");
-    }
-    else {
-        assert.equal(node.name, "child1");
-    }
-});
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var module = QUnit.module, test = QUnit.test;
-var node_1 = __webpack_require__(0);
-module("util");
-test("getPositionName", function (assert) {
-    assert.equal(node_1.getPositionName(node_1.Position.Before), "before");
-    assert.equal(node_1.getPositionName(node_1.Position.After), "after");
-    assert.equal(node_1.getPositionName(node_1.Position.Inside), "inside");
-    assert.equal(node_1.getPositionName(node_1.Position.None), "none");
-});
-test("getPosition", function (assert) {
-    assert.equal(node_1.getPosition("inside"), node_1.Position.Inside);
-});
-
-
-/***/ }),
-/* 19 */,
 /* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(14);
+"use strict";
+
+exports.__esModule = true;
 
 
 /***/ })
