@@ -7,6 +7,7 @@ name: changelog
 
 * Issue #489: make it possible to use nested element for icon (thanks to terryoy)
 * Issue #492: handle empty string for icon options
+* Issue #493: add tabIndex option (thanks to Aimeos)
 
 ##### 1.4.1 (june 5 2017)
 
