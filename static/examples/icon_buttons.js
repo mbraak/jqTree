@@ -1,5 +1,5 @@
 $.mockjax({
-    url: '*',
+    url: "*",
     response: function(options) {
         this.responseText = ExampleData.example_data;
     },
@@ -7,7 +7,7 @@ $.mockjax({
 });
 
 $(function() {
-    $('#tree1').tree({
+    $("#tree1").tree({
         closedIcon: $('<i class="fa fa-arrow-circle-right"></i>'),
         openedIcon: $('<i class="fa fa-arrow-circle-down"></i>')
     });

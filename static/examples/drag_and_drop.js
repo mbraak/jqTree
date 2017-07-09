@@ -1,5 +1,5 @@
 $.mockjax({
-    url: '*',
+    url: "*",
     response: function(options) {
         this.responseText = ExampleData.example_data;
     },
@@ -7,7 +7,7 @@ $.mockjax({
 });
 
 $(function() {
-    var $tree = $('#tree1');
+    var $tree = $("#tree1");
     $tree.tree({
         dragAndDrop: true,
         autoOpen: 0
