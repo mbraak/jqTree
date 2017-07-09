@@ -7,7 +7,7 @@ export default class SimpleWidget {
         function getWidgetData(el: Element, data_key: string) {
             const widget = $.data(el, data_key);
 
-            if (widget && (widget instanceof SimpleWidget)) {
+            if (widget && widget instanceof SimpleWidget) {
                 return widget;
             } else {
                 return null;
@@ -49,16 +49,23 @@ export default class SimpleWidget {
             }
         }
 
-        function callFunction($el: JQuery, function_name: string, args: any[]): any {
+        function callFunction(
+            $el: JQuery,
+            function_name: string,
+            args: any[]
+        ): any {
             let result = null;
 
             for (const el of $el.get()) {
                 const widget = $.data(el, getDataKey());
 
-                if (widget && (widget instanceof SimpleWidget)) {
+                if (widget && widget instanceof SimpleWidget) {
                     const widget_function = widget[function_name];
 
-                    if (widget_function && (typeof widget_function === "function")) {
+                    if (
+                        widget_function &&
+                        typeof widget_function === "function"
+                    ) {
                         result = widget_function.apply(widget, args);
                     }
                 }
@@ -68,7 +75,11 @@ export default class SimpleWidget {
         }
 
         // tslint:disable-next-line: only-arrow-functions
-        $.fn[widget_name] = function (this: JQuery, argument1: any, ...args: any[]) {
+        $.fn[widget_name] = function(
+            this: JQuery,
+            argument1: any,
+            ...args: any[]
+        ) {
             const $el = this;
 
             if (argument1 === undefined || typeof argument1 === "object") {

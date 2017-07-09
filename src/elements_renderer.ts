@@ -10,8 +10,12 @@ export default class ElementsRenderer {
     constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
 
-        this.opened_icon_element = this.createButtonElement(tree_widget.options.openedIcon);
-        this.closed_icon_element = this.createButtonElement(tree_widget.options.closedIcon);
+        this.opened_icon_element = this.createButtonElement(
+            tree_widget.options.openedIcon
+        );
+        this.closed_icon_element = this.createButtonElement(
+            tree_widget.options.closedIcon
+        );
     }
 
     public render(from_node: Node | null) {
@@ -26,7 +30,12 @@ export default class ElementsRenderer {
         const $element = this.tree_widget.element;
         $element.empty();
 
-        this.createDomElements($element[0], this.tree_widget.tree.children, true, 1);
+        this.createDomElements(
+            $element[0],
+            this.tree_widget.tree.children,
+            true,
+            1
+        );
     }
 
     public renderFromNode(node: Node) {
@@ -45,12 +54,20 @@ export default class ElementsRenderer {
 
         // create children
         if (node.children) {
-            this.createDomElements(li, node.children, false, node.getLevel() + 1);
+            this.createDomElements(
+                li,
+                node.children,
+                false,
+                node.getLevel() + 1
+            );
         }
     }
 
     private createDomElements(
-        element: Element, children: Node[], is_root_node: boolean, level: number
+        element: Element,
+        children: Node[],
+        is_root_node: boolean,
+        level: number
     ) {
         const ul = this.createUl(is_root_node);
         element.appendChild(ul);
@@ -99,7 +116,7 @@ export default class ElementsRenderer {
     private createLi(node: Node, level: number) {
         const is_selected = Boolean(
             this.tree_widget.select_node_handler &&
-            this.tree_widget.select_node_handler.isNodeSelected(node)
+                this.tree_widget.select_node_handler.isNodeSelected(node)
         );
 
         const li = node.isFolder()
@@ -117,7 +134,9 @@ export default class ElementsRenderer {
         const button_classes = this.getButtonClasses(node);
         const folder_classes = this.getFolderClasses(node, is_selected);
 
-        const icon_element = node.is_open ? this.opened_icon_element : this.closed_icon_element;
+        const icon_element = node.is_open
+            ? this.opened_icon_element
+            : this.closed_icon_element;
 
         // li
         const li = document.createElement("li");
@@ -135,9 +154,7 @@ export default class ElementsRenderer {
         const button_link = document.createElement("a");
         button_link.className = button_classes;
 
-        button_link.appendChild(
-            icon_element.cloneNode(true)
-        );
+        button_link.appendChild(icon_element.cloneNode(true));
 
         button_link.setAttribute("role", "presentation");
         button_link.setAttribute("aria-hidden", "true");
@@ -148,7 +165,13 @@ export default class ElementsRenderer {
 
         // title span
         div.appendChild(
-            this.createTitleSpan(node.name, level, is_selected, node.is_open, true)
+            this.createTitleSpan(
+                node.name,
+                level,
+                is_selected,
+                node.is_open,
+                true
+            )
         );
 
         if (!this.tree_widget.options.buttonLeft) {
@@ -181,14 +204,24 @@ export default class ElementsRenderer {
 
         // title span
         div.appendChild(
-            this.createTitleSpan(node.name, level, is_selected, node.is_open, false)
+            this.createTitleSpan(
+                node.name,
+                level,
+                is_selected,
+                node.is_open,
+                false
+            )
         );
 
         return li;
     }
 
     private createTitleSpan(
-        node_name: string, level: number, is_selected: boolean, is_open: boolean, is_folder: boolean
+        node_name: string,
+        level: number,
+        is_selected: boolean,
+        is_open: boolean,
+        is_folder: boolean
     ) {
         const title_span = document.createElement("span");
 
@@ -207,7 +240,10 @@ export default class ElementsRenderer {
         title_span.setAttribute("aria-expanded", getBoolString(is_open));
 
         if (is_selected) {
-            title_span.setAttribute("tabindex", this.tree_widget.options.tabIndex);
+            title_span.setAttribute(
+                "tabindex",
+                this.tree_widget.options.tabIndex
+            );
         }
 
         title_span.innerHTML = this.escapeIfNecessary(node_name);

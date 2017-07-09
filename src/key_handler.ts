@@ -109,7 +109,9 @@ export default class KeyHandler {
 
             if (
                 this.tree_widget.scroll_handler &&
-                (!this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find(".jqtree-element")))
+                !this.tree_widget.scroll_handler.isScrolledIntoView(
+                    $(node.element).find(".jqtree-element")
+                )
             ) {
                 this.tree_widget.scrollToNode(node);
             }

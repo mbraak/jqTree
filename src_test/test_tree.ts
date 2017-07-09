@@ -1,6 +1,11 @@
 const { module, test } = QUnit;
 
-import { example_data, formatNodes, doGetNodeByName, doGetNodeById } from "./utils_for_test";
+import {
+    example_data,
+    formatNodes,
+    doGetNodeByName,
+    doGetNodeById
+} from "./utils_for_test";
 import { Node, Position } from "../src/node";
 
 module("Tree");
@@ -16,7 +21,7 @@ test("constructor", (assert: Assert) => {
     const node2 = new Node({
         label: "n2",
         id: 123,
-        parent: "abc",  // parent must be ignored
+        parent: "abc", // parent must be ignored
         children: ["c"], // children must be ignored
         url: "/"
     });
@@ -48,11 +53,7 @@ test("create tree from data", (assert: Assert) => {
             "child3",
             "children of node2"
         );
-        assert.equal(
-            tree.children[0].id,
-            123,
-            "id"
-        );
+        assert.equal(tree.children[0].id, 123, "id");
     }
 
     // - create tree from example data
@@ -65,7 +66,7 @@ test("create tree from data", (assert: Assert) => {
         {
             label: "node1",
             id: 123,
-            children: ["child1", "child2"]  // nodes are only defined by a string
+            children: ["child1", "child2"] // nodes are only defined by a string
         },
         {
             label: "node2",
@@ -80,44 +81,28 @@ test("create tree from data", (assert: Assert) => {
 
 test("addChild", (assert: Assert) => {
     const tree = new Node("tree1", true);
-    tree.addChild(
-        new Node("abc")
-    );
-    tree.addChild(
-        new Node("def")
-    );
+    tree.addChild(new Node("abc"));
+    tree.addChild(new Node("def"));
 
-    assert.equal(
-        formatNodes(tree.children),
-        "abc def",
-        "children"
-    );
+    assert.equal(formatNodes(tree.children), "abc def", "children");
 
     const node = tree.children[0];
 
     if (!node.parent) {
         assert.ok(false, "Node has no parent");
     } else {
-        assert.equal(
-            node.parent.name,
-            "tree1",
-            "parent of node"
-        );
+        assert.equal(node.parent.name, "tree1", "parent of node");
     }
 });
 
 test("addChildAtPosition", (assert: Assert) => {
     const tree = new Node({}, true);
-    tree.addChildAtPosition(new Node("abc"), 0);  // first
-    tree.addChildAtPosition(new Node("ghi"), 2);  // index 2 does not exist
+    tree.addChildAtPosition(new Node("abc"), 0); // first
+    tree.addChildAtPosition(new Node("ghi"), 2); // index 2 does not exist
     tree.addChildAtPosition(new Node("def"), 1);
     tree.addChildAtPosition(new Node("123"), 0);
 
-    assert.equal(
-        formatNodes(tree.children),
-        "123 abc def ghi",
-        "children"
-    );
+    assert.equal(formatNodes(tree.children), "123 abc def ghi", "children");
 });
 
 test("removeChild", (assert: Assert) => {
@@ -134,41 +119,25 @@ test("removeChild", (assert: Assert) => {
     const jkl = new Node({ label: "jkl", id: 4 });
     def.addChild(jkl);
 
-    assert.equal(
-        formatNodes(tree.children),
-        "abc def ghi",
-        "children"
-    );
+    assert.equal(formatNodes(tree.children), "abc def ghi", "children");
 
     assert.equal(tree.id_mapping[2].name, "def");
     assert.equal(tree.id_mapping[4].name, "jkl");
 
     // remove 'def'
     tree.removeChild(def);
-    assert.equal(
-        formatNodes(tree.children),
-        "abc ghi",
-        "children"
-    );
+    assert.equal(formatNodes(tree.children), "abc ghi", "children");
 
     assert.equal(tree.id_mapping[2], null);
     assert.equal(tree.id_mapping[4], null);
 
     // remove 'ghi'
     tree.removeChild(ghi);
-    assert.equal(
-        formatNodes(tree.children),
-        "abc",
-        "children"
-    );
+    assert.equal(formatNodes(tree.children), "abc", "children");
 
     // remove 'abc'
     tree.removeChild(abc);
-    assert.equal(
-        formatNodes(tree.children),
-        "",
-        "children"
-    );
+    assert.equal(formatNodes(tree.children), "", "children");
 });
 
 test("getChildIndex", (assert: Assert) => {
@@ -191,18 +160,10 @@ test("getChildIndex", (assert: Assert) => {
 
 test("hasChildren", (assert: Assert) => {
     const tree = new Node({}, true);
-    assert.equal(
-        tree.hasChildren(),
-        false,
-        "tree without children"
-    );
+    assert.equal(tree.hasChildren(), false, "tree without children");
 
     tree.addChild(new Node("abc"));
-    assert.equal(
-        tree.hasChildren(),
-        true,
-        "tree has children"
-    );
+    assert.equal(tree.hasChildren(), true, "tree has children");
 });
 
 test("iterate", (assert: Assert) => {
@@ -211,12 +172,10 @@ test("iterate", (assert: Assert) => {
 
     // iterate over all the nodes
     const nodes: Node[] = [];
-    tree.iterate(
-        (node: Node) => {
-            nodes.push(node);
-            return true;
-        }
-    );
+    tree.iterate((node: Node) => {
+        nodes.push(node);
+        return true;
+    });
 
     assert.equal(
         formatNodes(nodes),
@@ -226,34 +185,24 @@ test("iterate", (assert: Assert) => {
 
     // iterate over nodes on first level
     const nodes2: Node[] = [];
-    tree.iterate(
-        (node: Node) => {
-            nodes2.push(node);
-            return false;
-        }
-    );
+    tree.iterate((node: Node) => {
+        nodes2.push(node);
+        return false;
+    });
 
-    assert.equal(
-        formatNodes(nodes2),
-        "node1 node2",
-        "nodes on first level"
-    );
+    assert.equal(formatNodes(nodes2), "node1 node2", "nodes on first level");
 
     // add child 4
     const node124 = doGetNodeById(tree, 124);
     const node3 = node124.children[0];
-    node3.addChild(
-        new Node("child4")
-    );
+    node3.addChild(new Node("child4"));
 
     // test level parameter
     const nodes3: string[] = [];
-    tree.iterate(
-        (node: Node, level: number) => {
-            nodes3.push(`${node.name} ${level}`);
-            return true;
-        }
-    );
+    tree.iterate((node: Node, level: number) => {
+        nodes3.push(`${node.name} ${level}`);
+        return true;
+    });
 
     assert.equal(
         nodes3.join(","),
@@ -295,11 +244,7 @@ test("moveNode", (assert: Assert) => {
         "node1 node2 child2",
         "tree nodes at first level"
     );
-    assert.equal(
-        formatNodes(node1.children),
-        "child1",
-        "node1 children"
-    );
+    assert.equal(formatNodes(node1.children), "child1", "node1 children");
 
     // move child1 inside node2
     // this means it's the first child
@@ -317,11 +262,7 @@ test("moveNode", (assert: Assert) => {
         "child1 child3",
         "node2 children"
     );
-    assert.equal(
-        formatNodes(node1.children),
-        "",
-        "node1 has no children"
-    );
+    assert.equal(formatNodes(node1.children), "", "node1 has no children");
 
     // move child2 before child1
     tree.moveNode(child2, child1, Position.Before);
@@ -360,11 +301,7 @@ test("initFromData", (assert: Assert) => {
     node.initFromData(data);
 
     assert.equal(node.name, "main");
-    assert.equal(
-        formatNodes(node.children),
-        "c1 c2",
-        "children"
-    );
+    assert.equal(formatNodes(node.children), "c1 c2", "children");
     assert.equal(node.children[1].id, 201);
 });
 
@@ -374,46 +311,36 @@ test("getData", (assert: Assert) => {
     assert.deepEqual(node.getData(), []);
 
     // 2.node with data
-    node.loadFromData(
-        [
-            {
-                label: "n1",
-                children: [
-                    {
-                        label: "c1"
-                    }
-                ]
-            }
-        ]
-    );
-    assert.deepEqual(
-        node.getData(),
-        [
-            {
-                name: "n1",
-                children: [
-                    {
-                        name: "c1"
-                    }
-                ]
-            }
-        ]
-    );
+    node.loadFromData([
+        {
+            label: "n1",
+            children: [
+                {
+                    label: "c1"
+                }
+            ]
+        }
+    ]);
+    assert.deepEqual(node.getData(), [
+        {
+            name: "n1",
+            children: [
+                {
+                    name: "c1"
+                }
+            ]
+        }
+    ]);
 
     // 3. get data including parent
     const n1 = doGetNodeByName(node, "n1");
 
-    assert.deepEqual(
-        n1.getData(true),
-        [
-            {
-                name: "n1",
-                children: [
-                    { name: "c1" }
-                ]
-            }
-        ]
-    );
+    assert.deepEqual(n1.getData(true), [
+        {
+            name: "n1",
+            children: [{ name: "c1" }]
+        }
+    ]);
 });
 
 test("addAfter", (assert: Assert) => {
@@ -457,7 +384,10 @@ test("addAfter", (assert: Assert) => {
     const node_c = doGetNodeByName(tree, "node_c");
     assert.equal(node_c.id, 789);
 
-    assert.equal(formatNodes(tree.children), "node1 node_a node2 node_b node_c");
+    assert.equal(
+        formatNodes(tree.children),
+        "node1 node_a node2 node_b node_c"
+    );
 
     // - Add after root node; this is not possible
     assert.equal(tree.addAfter("node_x"), null);
@@ -525,14 +455,10 @@ test("append", (assert: Assert) => {
     assert.equal(formatNodes(node1.children), "child1 child2 child3");
 
     // 2. Append subtree
-    node1.append(
-        {
-            name: "child4",
-            children: [
-                { name: "child5" }
-            ]
-        }
-    );
+    node1.append({
+        name: "child4",
+        children: [{ name: "child5" }]
+    });
 
     assert.equal(formatNodes(node1.children), "child1 child2 child3 child4");
 
@@ -555,9 +481,7 @@ test("prepend", (assert: Assert) => {
     // 2. Prepend subtree
     node1.prepend({
         name: "child3",
-        children: [
-            { name: "child4" }
-        ]
+        children: [{ name: "child4" }]
     });
 
     assert.equal(formatNodes(node1.children), "child3 child0 child1 child2");
@@ -611,12 +535,8 @@ test("loadFromData and id mapping", (assert: Assert) => {
     assert.equal(doGetNodeById(tree, 124).name, "node2");
 
     const child2 = doGetNodeById(tree, 126);
-    child2.addChild(
-        new Node({ label: "child4", id: 128 })
-    );
-    child2.addChild(
-        new Node({ label: "child5", id: 129 })
-    );
+    child2.addChild(new Node({ label: "child4", id: 128 }));
+    child2.addChild(new Node({ label: "child5", id: 129 }));
 
     // - load data in node child2
     child2.loadFromData(["abc", "def"]);
@@ -635,12 +555,8 @@ test("removeChildren", (assert: Assert) => {
     const child2 = doGetNodeById(tree, 126);
     assert.equal(child2.name, "child2");
 
-    child2.addChild(
-        new Node({ label: "child4", id: 128 })
-    );
-    child2.addChild(
-        new Node({ label: "child5", id: 129 })
-    );
+    child2.addChild(new Node({ label: "child4", id: 128 }));
+    child2.addChild(new Node({ label: "child5", id: 129 }));
     assert.equal(doGetNodeById(tree, 128).name, "child4");
 
     // - remove children from child2
@@ -674,7 +590,10 @@ test("getPreviousSibling", (assert: Assert) => {
     tree.loadFromData(example_data);
 
     // - getPreviousSibling
-    const previous_sibling = doGetNodeByName(tree, "child2").getPreviousSibling();
+    const previous_sibling = doGetNodeByName(
+        tree,
+        "child2"
+    ).getPreviousSibling();
 
     if (!previous_sibling) {
         assert.ok(false, "Previous sibling not found");
@@ -683,10 +602,7 @@ test("getPreviousSibling", (assert: Assert) => {
     }
 
     assert.equal(tree.getPreviousSibling(), null);
-    assert.equal(
-        doGetNodeByName(tree, "child1").getPreviousSibling(),
-        null
-    );
+    assert.equal(doGetNodeByName(tree, "child1").getPreviousSibling(), null);
 });
 
 test("getNextSibling", (assert: Assert) => {
@@ -703,10 +619,7 @@ test("getNextSibling", (assert: Assert) => {
         assert.equal(next_sibling.name, "node2");
     }
 
-    assert.equal(
-        doGetNodeByName(tree, "node2").getNextSibling(),
-        null
-    );
+    assert.equal(doGetNodeByName(tree, "node2").getNextSibling(), null);
     assert.equal(tree.getNextSibling(), null);
 });
 
@@ -724,9 +637,7 @@ test("getNodeByCallback", (assert: Assert) => {
     const tree = new Node({}, true);
     tree.loadFromData(example_data);
 
-    const node = tree.getNodeByCallback(
-        (n: Node) => n.name === "child1"
-    );
+    const node = tree.getNodeByCallback((n: Node) => n.name === "child1");
 
     if (!node) {
         assert.ok(false, "Node not found");

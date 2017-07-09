@@ -12,7 +12,7 @@ import { Node } from "../src/node";
 export const example_data = [
     {
         label: "node1",
-        id: 123,  // extra data
+        id: 123, // extra data
         int_property: 1,
         str_property: "1",
         children: [
@@ -25,9 +25,7 @@ export const example_data = [
         id: 124,
         int_property: 3,
         str_property: "3",
-        children: [
-            { label: "child3", id: 127 }
-        ]
+        children: [{ label: "child3", id: 127 }]
     }
 ];
 
@@ -42,10 +40,7 @@ example data 2:
 export const example_data2 = [
     {
         label: "main",
-        children: [
-            { label: "c1" },
-            { label: "c2" }
-        ]
+        children: [{ label: "c1" }, { label: "c2" }]
     }
 ];
 
@@ -57,26 +52,24 @@ export function formatNodes(nodes: Node[]) {
 
 export function isNodeClosed($node: JQuery) {
     return (
-        ($node.is("li.jqtree-folder.jqtree-closed")) &&
-        ($node.find("a:eq(0)").is("a.jqtree-toggler.jqtree-closed")) &&
-        ($node.find("ul:eq(0)").is("ul"))
+        $node.is("li.jqtree-folder.jqtree-closed") &&
+        $node.find("a:eq(0)").is("a.jqtree-toggler.jqtree-closed") &&
+        $node.find("ul:eq(0)").is("ul")
     );
 }
 
 export function isNodeOpen($node: JQuery) {
     return (
-        ($node.is("li.jqtree-folder")) &&
-        ($node.find("a:eq(0)").is("a.jqtree-toggler")) &&
-        ($node.find("ul:eq(0)").is("ul")) &&
-        (!$node.is("li.jqtree-folder.jqtree-closed")) &&
-        (!$node.find("span:eq(0)").is("a.jqtree-toggler.jqtree-closed"))
+        $node.is("li.jqtree-folder") &&
+        $node.find("a:eq(0)").is("a.jqtree-toggler") &&
+        $node.find("ul:eq(0)").is("ul") &&
+        !$node.is("li.jqtree-folder.jqtree-closed") &&
+        !$node.find("span:eq(0)").is("a.jqtree-toggler.jqtree-closed")
     );
 }
 
 export function formatTitles($node: JQuery) {
-    const titles = $node.find(".jqtree-title").map(
-        (_, el) => $(el).text()
-    );
+    const titles = $node.find(".jqtree-title").map((_, el) => $(el).text());
     return titles.toArray().join(" ");
 }
 

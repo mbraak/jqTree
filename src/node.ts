@@ -44,7 +44,7 @@ export class Node {
     public parent: Node | null;
     public id_mapping: any;
     public tree: Node;
-    public node_class: any;  // todo: type class?
+    public node_class: any; // todo: type class?
     public load_on_demand: boolean;
     public is_open: boolean;
     public element: Element;
@@ -52,7 +52,11 @@ export class Node {
 
     [key: string]: any;
 
-    constructor(o: object | string, is_root: boolean = false, node_class = Node) {
+    constructor(
+        o: object | string,
+        is_root: boolean = false,
+        node_class = Node
+    ) {
         this.name = "";
 
         this.setData(o);
@@ -277,27 +281,26 @@ export class Node {
     */
     public getData(include_parent = false): any[] {
         function getDataFromNodes(nodes: Node[]): any[] {
-            return nodes.map(
-                node => {
-                    const tmp_node: any = {};
+            return nodes.map(node => {
+                const tmp_node: any = {};
 
-                    for (const k in node) {
-                        if (
-                            ["parent", "children", "element", "tree"].indexOf(k) === -1 &&
-                            Object.prototype.hasOwnProperty.call(node, k)
-                        ) {
-                            const v = node[k];
-                            tmp_node[k] = v;
-                        }
+                for (const k in node) {
+                    if (
+                        ["parent", "children", "element", "tree"].indexOf(k) ===
+                            -1 &&
+                        Object.prototype.hasOwnProperty.call(node, k)
+                    ) {
+                        const v = node[k];
+                        tmp_node[k] = v;
                     }
-
-                    if (node.hasChildren()) {
-                        tmp_node["children"] = getDataFromNodes(node.children);
-                    }
-
-                    return tmp_node;
                 }
-            );
+
+                if (node.hasChildren()) {
+                    tmp_node["children"] = getDataFromNodes(node.children);
+                }
+
+                return tmp_node;
+            });
         }
 
         if (include_parent) {
@@ -308,24 +311,20 @@ export class Node {
     }
 
     public getNodeByName(name: string): Node | null {
-        return this.getNodeByCallback(
-            (node: Node) => node.name === name
-        );
+        return this.getNodeByCallback((node: Node) => node.name === name);
     }
 
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
         let result = null;
 
-        this.iterate(
-            (node: Node) => {
-                if (callback(node)) {
-                    result = node;
-                    return false;
-                } else {
-                    return true;
-                }
+        this.iterate((node: Node) => {
+            if (callback(node)) {
+                result = node;
+                return false;
+            } else {
+                return true;
             }
-        );
+        });
 
         return result;
     }
@@ -339,7 +338,11 @@ export class Node {
             const child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index + 1);
 
-            if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
+            if (
+                typeof node_info === "object" &&
+                node_info["children"] &&
+                node_info["children"].length
+            ) {
                 node.loadFromData(node_info["children"]);
             }
 
@@ -356,7 +359,11 @@ export class Node {
             const child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index);
 
-            if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
+            if (
+                typeof node_info === "object" &&
+                node_info["children"] &&
+                node_info["children"].length
+            ) {
                 node.loadFromData(node_info["children"]);
             }
 
@@ -393,7 +400,11 @@ export class Node {
         const node = new this.tree.node_class(node_info);
         this.addChild(node);
 
-        if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
+        if (
+            typeof node_info === "object" &&
+            node_info["children"] &&
+            node_info["children"].length
+        ) {
             node.loadFromData(node_info["children"]);
         }
 
@@ -404,7 +415,11 @@ export class Node {
         const node = new this.tree.node_class(node_info);
         this.addChildAtPosition(node, 0);
 
-        if (typeof node_info === "object" && node_info["children"] && node_info["children"].length) {
+        if (
+            typeof node_info === "object" &&
+            node_info["children"] &&
+            node_info["children"].length
+        ) {
             node.loadFromData(node_info["children"]);
         }
 
@@ -454,12 +469,10 @@ export class Node {
     }
 
     public removeChildren() {
-        this.iterate(
-            (child: Node) => {
-                this.tree.removeNodeFromIndex(child);
-                return true;
-            }
-        );
+        this.iterate((child: Node) => {
+            this.tree.removeNodeFromIndex(child);
+            return true;
+        });
 
         this.children = [];
     }
@@ -491,23 +504,19 @@ export class Node {
     }
 
     public getNodesByProperty(key: string, value: any): Node[] {
-        return this.filter(
-            (node: Node) => node[key] === value
-        );
+        return this.filter((node: Node) => node[key] === value);
     }
 
     public filter(f: (node: Node) => boolean): Node[] {
         const result: Node[] = [];
 
-        this.iterate(
-            (node: Node) => {
-                if (f(node)) {
-                    result.push(node);
-                }
-
-                return true;
+        this.iterate((node: Node) => {
+            if (f(node)) {
+                result.push(node);
             }
-        );
+
+            return true;
+        });
 
         return result;
     }
@@ -538,7 +547,10 @@ export class Node {
         } else {
             const previous_sibling = this.getPreviousSibling();
             if (previous_sibling) {
-                if (!previous_sibling.hasChildren() || !previous_sibling.is_open) {
+                if (
+                    !previous_sibling.hasChildren() ||
+                    !previous_sibling.is_open
+                ) {
                     // Previous sibling
                     return previous_sibling;
                 } else {
@@ -604,10 +616,7 @@ export class Node {
     }
 
     private _removeChild(node: Node) {
-        this.children.splice(
-            this.getChildIndex(node),
-            1
-        );
+        this.children.splice(this.getChildIndex(node), 1);
         this.tree.removeNodeFromIndex(node);
     }
 }

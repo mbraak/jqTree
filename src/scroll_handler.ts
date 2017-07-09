@@ -64,7 +64,7 @@ export default class ScrollHandler {
             element_bottom = element_top + $element.height();
         }
 
-        return ((element_bottom <= view_bottom) && (element_top >= view_top));
+        return element_bottom <= view_bottom && element_top >= view_top;
     }
 
     private _initScrollParent() {
@@ -74,7 +74,10 @@ export default class ScrollHandler {
             const hasOverFlow = ($el: JQuery) => {
                 for (const attr of css_attributes) {
                     const overflow_value = $el.css(attr);
-                    if (overflow_value === "auto" || overflow_value === "scroll") {
+                    if (
+                        overflow_value === "auto" ||
+                        overflow_value === "scroll"
+                    ) {
                         return true;
                     }
                 }
@@ -107,7 +110,11 @@ export default class ScrollHandler {
 
         const $scroll_parent = getParentWithOverflow();
 
-        if ($scroll_parent && $scroll_parent.length && $scroll_parent[0].tagName !== "HTML") {
+        if (
+            $scroll_parent &&
+            $scroll_parent.length &&
+            $scroll_parent[0].tagName !== "HTML"
+        ) {
             this.$scroll_parent = $scroll_parent;
             this.scroll_parent_top = this.$scroll_parent.offset().top;
         } else {
@@ -127,13 +134,16 @@ export default class ScrollHandler {
         if (!this.$scroll_parent) {
             return;
         } else {
-            const distance_bottom = this.scroll_parent_top + this.$scroll_parent[0].offsetHeight - area.bottom;
+            const distance_bottom =
+                this.scroll_parent_top +
+                this.$scroll_parent[0].offsetHeight -
+                area.bottom;
 
             if (distance_bottom < 20) {
                 this.$scroll_parent[0].scrollTop += 20;
                 this.tree_widget.refreshHitAreas();
                 this.previous_top = -1;
-            } else if ((area.top - this.scroll_parent_top) < 20) {
+            } else if (area.top - this.scroll_parent_top < 20) {
                 this.$scroll_parent[0].scrollTop -= 20;
                 this.tree_widget.refreshHitAreas();
                 this.previous_top = -1;
@@ -146,7 +156,10 @@ export default class ScrollHandler {
 
         if (distance_top < 20) {
             $(document).scrollTop($(document).scrollTop() - 20);
-        } else if ($(window).height() - (area.bottom - $(document).scrollTop()) < 20) {
+        } else if (
+            $(window).height() - (area.bottom - $(document).scrollTop()) <
+            20
+        ) {
             $(document).scrollTop($(document).scrollTop() + 20);
         }
     }

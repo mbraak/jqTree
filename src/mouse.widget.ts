@@ -51,7 +51,9 @@ abstract class MouseWidget extends SimpleWidget {
         return result;
     }
 
-    protected abstract _mouseCapture(position_info: IPositionInfo): boolean | null;
+    protected abstract _mouseCapture(
+        position_info: IPositionInfo
+    ): boolean | null;
 
     protected abstract _mouseStart(position_info: IPositionInfo): boolean;
 
@@ -93,24 +95,21 @@ abstract class MouseWidget extends SimpleWidget {
             clearTimeout(this._mouse_delay_timer);
         }
 
-        this._mouse_delay_timer = setTimeout(
-            () => {
-                this._is_mouse_delay_met = true;
-            },
-            this.mouse_delay
-        );
+        this._mouse_delay_timer = setTimeout(() => {
+            this._is_mouse_delay_met = true;
+        }, this.mouse_delay);
 
         this._is_mouse_delay_met = false;
     }
 
     private _mouseMove(e: JQueryEventObject) {
-        return this._handleMouseMove(
-            e,
-            this._getPositionInfo(e)
-        );
+        return this._handleMouseMove(e, this._getPositionInfo(e));
     }
 
-    private _handleMouseMove(e: JQueryEventObject, position_info: IPositionInfo) {
+    private _handleMouseMove(
+        e: JQueryEventObject,
+        position_info: IPositionInfo
+    ) {
         if (this.is_mouse_started) {
             this._mouseDrag(position_info);
             return e.preventDefault();
@@ -121,7 +120,8 @@ abstract class MouseWidget extends SimpleWidget {
         }
 
         if (this.mouse_down_info) {
-            this.is_mouse_started = this._mouseStart(this.mouse_down_info) !== false;
+            this.is_mouse_started =
+                this._mouseStart(this.mouse_down_info) !== false;
         }
 
         if (this.is_mouse_started) {
@@ -143,9 +143,7 @@ abstract class MouseWidget extends SimpleWidget {
     }
 
     private _mouseUp(e: JQueryEventObject) {
-        return this._handleMouseUp(
-            this._getPositionInfo(e)
-        );
+        return this._handleMouseUp(this._getPositionInfo(e));
     }
 
     private _handleMouseUp(position_info: IPositionInfo) {
@@ -182,10 +180,7 @@ abstract class MouseWidget extends SimpleWidget {
 
         const touch = touch_event.changedTouches[0];
 
-        return this._handleMouseMove(
-            e,
-            this._getPositionInfo(touch)
-        );
+        return this._handleMouseMove(e, this._getPositionInfo(touch));
     }
 
     private _touchEnd(e: JQueryEventObject) {
@@ -197,9 +192,7 @@ abstract class MouseWidget extends SimpleWidget {
 
         const touch = touch_event.changedTouches[0];
 
-        return this._handleMouseUp(
-            this._getPositionInfo(touch)
-        );
+        return this._handleMouseUp(this._getPositionInfo(touch));
     }
 }
 

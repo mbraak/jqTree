@@ -1,5 +1,10 @@
 import { Position, Node } from "./node";
-import { ITreeWidget, IDropHint, INodeElement, OnFinishOpenNode } from "./itree_widget";
+import {
+    ITreeWidget,
+    IDropHint,
+    INodeElement,
+    OnFinishOpenNode
+} from "./itree_widget";
 
 export class NodeElement implements INodeElement {
     public node: Node;
@@ -58,7 +63,9 @@ export class NodeElement implements INodeElement {
     }
 
     protected getSpan() {
-        return this.$element.children(".jqtree-element").find("span.jqtree-title");
+        return this.$element
+            .children(".jqtree-element")
+            .find("span.jqtree-title");
     }
 
     protected getLi() {
@@ -78,7 +85,9 @@ export class FolderElement extends NodeElement {
             const button_el = $button.get(0);
 
             if (button_el) {
-                const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+                const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(
+                    false
+                );
 
                 button_el.appendChild(icon);
             }
@@ -94,7 +103,9 @@ export class FolderElement extends NodeElement {
                     on_finished(this.node);
                 }
 
-                this.tree_widget._triggerEvent("tree.open", { node: this.node });
+                this.tree_widget._triggerEvent("tree.open", {
+                    node: this.node
+                });
             };
 
             if (slide) {
@@ -116,7 +127,9 @@ export class FolderElement extends NodeElement {
             const button_el = $button.get(0);
 
             if (button_el) {
-                const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+                const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(
+                    false
+                );
 
                 button_el.appendChild(icon);
             }
@@ -128,7 +141,9 @@ export class FolderElement extends NodeElement {
                 const $span = this.getSpan();
                 $span.attr("aria-expanded", "false");
 
-                this.tree_widget._triggerEvent("tree.close", { node: this.node });
+                this.tree_widget._triggerEvent("tree.close", {
+                    node: this.node
+                });
             };
 
             if (slide) {
@@ -149,7 +164,9 @@ export class FolderElement extends NodeElement {
     }
 
     private getButton(): JQuery {
-        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
+        return this.$element
+            .children(".jqtree-element")
+            .find("a.jqtree-toggler");
     }
 }
 

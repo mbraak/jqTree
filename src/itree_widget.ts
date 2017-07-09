@@ -43,7 +43,11 @@ export interface ITreeWidget {
     select_node_handler: ISelectNodeHandler | null;
 
     _triggerEvent: (event_name: string, values?: any) => JQueryEventObject;
-    _openNode: (node: Node, slide: boolean, on_finished: OnFinishOpenNode | null) => void;
+    _openNode: (
+        node: Node,
+        slide: boolean,
+        on_finished: OnFinishOpenNode | null
+    ) => void;
     _refreshElements: (from_node: Node | null) => void;
     _getNodeElement: ($element: JQuery) => INodeElement | null;
     _getNodeElementForNode: (node: Node) => INodeElement;
