@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.4.2 (july 15 2017)
 
 * Issue #489: make it possible to use nested element for icon (thanks to terryoy)
 * Issue #492: handle empty string for icon options
