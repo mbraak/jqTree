@@ -44,9 +44,9 @@ export default class KeyHandler {
     public moveRight() {
         const node = this.tree_widget.getSelectedNode();
 
-        if (! node) {
+        if (!node) {
             return true;
-        } else if (! node.isFolder()) {
+        } else if (!node.isFolder()) {
             return true;
         } else {
             // folder node
@@ -64,7 +64,7 @@ export default class KeyHandler {
     public moveLeft() {
         const node = this.tree_widget.getSelectedNode();
 
-        if (! node) {
+        if (!node) {
             return true;
         } else if (node.isFolder() && node.is_open) {
             // Left on an open node closes the node
@@ -77,7 +77,7 @@ export default class KeyHandler {
     }
 
     public handleKeyDown(e: JQueryEventObject) {
-        if (! this.canHandleKeyboard()) {
+        if (!this.canHandleKeyboard()) {
             return true;
         } else {
             const key = e.which;
@@ -101,15 +101,17 @@ export default class KeyHandler {
         }
     }
 
-    public selectNode(node: Node|null) {
-        if (! node) {
+    public selectNode(node: Node | null) {
+        if (!node) {
             return true;
         } else {
             this.tree_widget.selectNode(node);
 
             if (
                 this.tree_widget.scroll_handler &&
-                (! this.tree_widget.scroll_handler.isScrolledIntoView($(node.element).find(".jqtree-element")))
+                !this.tree_widget.scroll_handler.isScrolledIntoView(
+                    $(node.element).find(".jqtree-element")
+                )
             ) {
                 this.tree_widget.scrollToNode(node);
             }

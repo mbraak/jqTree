@@ -6,14 +6,14 @@ import { IPositionInfo } from "./imouse_widget";
 export class DragAndDropHandler {
     public hit_areas: IHitArea[];
     public is_dragging: boolean;
-    public current_item: INodeElement|null;
-    public hovered_area: IHitArea|null;
+    public current_item: INodeElement | null;
+    public hovered_area: IHitArea | null;
 
     private tree_widget: ITreeWidget;
-    private $ghost: JQuery|null;
-    private drag_element: DragElement|null;
-    private previous_ghost: IDropHint|null;
-    private open_folder_timer: number|null;
+    private $ghost: JQuery | null;
+    private drag_element: DragElement | null;
+    private previous_ghost: IDropHint | null;
+    private open_folder_timer: number | null;
 
     constructor(tree_widget: ITreeWidget) {
         this.tree_widget = tree_widget;
@@ -25,27 +25,30 @@ export class DragAndDropHandler {
         this.current_item = null;
     }
 
-    public mouseCapture(position_info: IPositionInfo): boolean|null {
+    public mouseCapture(position_info: IPositionInfo): boolean | null {
         const $element = $(position_info.target);
 
-        if (! this.mustCaptureElement($element)) {
+        if (!this.mustCaptureElement($element)) {
             return null;
         }
 
-        if (this.tree_widget.options.onIsMoveHandle && ! this.tree_widget.options.onIsMoveHandle($element)) {
+        if (
+            this.tree_widget.options.onIsMoveHandle &&
+            !this.tree_widget.options.onIsMoveHandle($element)
+        ) {
             return null;
         }
 
         let node_element = this.tree_widget._getNodeElement($element);
 
         if (node_element && this.tree_widget.options.onCanMove) {
-            if (! this.tree_widget.options.onCanMove(node_element.node)) {
+            if (!this.tree_widget.options.onCanMove(node_element.node)) {
                 node_element = null;
             }
         }
 
         this.current_item = node_element;
-        return (this.current_item != null);
+        return this.current_item != null;
     }
 
     public generateHitAreas() {
@@ -71,7 +74,9 @@ export class DragAndDropHandler {
 
             const node = this.current_item.node;
 
-            const node_name: string = this.tree_widget.options.autoEscape ? html_escape(node.name) : node.name;
+            const node_name: string = this.tree_widget.options.autoEscape
+                ? html_escape(node.name)
+                : node.name;
 
             this.drag_element = new DragElement(
                 node_name,
@@ -92,7 +97,10 @@ export class DragAndDropHandler {
         } else {
             this.drag_element.move(position_info.page_x, position_info.page_y);
 
-            const area = this.findHoveredArea(position_info.page_x, position_info.page_y);
+            const area = this.findHoveredArea(
+                position_info.page_x,
+                position_info.page_y
+            );
             const can_move_to = this.canMoveToArea(area);
 
             if (can_move_to && area) {
@@ -118,9 +126,12 @@ export class DragAndDropHandler {
                 this.stopOpenFolderTimer();
             }
 
-            if (! area) {
+            if (!area) {
                 if (this.tree_widget.options.onDragMove) {
-                    this.tree_widget.options.onDragMove(this.current_item.node, position_info.original_event);
+                    this.tree_widget.options.onDragMove(
+                        this.current_item.node,
+                        position_info.original_event
+                    );
                 }
             }
 
@@ -144,9 +155,12 @@ export class DragAndDropHandler {
 
         this.is_dragging = false;
 
-        if (! this.hovered_area && current_item) {
+        if (!this.hovered_area && current_item) {
             if (this.tree_widget.options.onDragStop) {
-                this.tree_widget.options.onDragStop(current_item.node, position_info.original_event);
+                this.tree_widget.options.onDragStop(
+                    current_item.node,
+                    position_info.original_event
+                );
             }
         }
 
@@ -159,7 +173,9 @@ export class DragAndDropHandler {
         if (this.current_item) {
             this.generateHitAreas();
 
-            this.current_item = this.tree_widget._getNodeElementForNode(this.current_item.node);
+            this.current_item = this.tree_widget._getNodeElementForNode(
+                this.current_item.node
+            );
 
             if (this.is_dragging) {
                 this.current_item.$element.addClass("jqtree-moving");
@@ -168,16 +184,20 @@ export class DragAndDropHandler {
     }
 
     private mustCaptureElement($element: JQuery) {
-        return ! $element.is("input,select,textarea");
+        return !$element.is("input,select,textarea");
     }
 
-    private canMoveToArea(area: IHitArea|null): boolean {
+    private canMoveToArea(area: IHitArea | null): boolean {
         if (!area || !this.current_item) {
             return false;
         } else if (this.tree_widget.options.onCanMoveTo) {
             const position_name = getPositionName(area.position);
 
-            return this.tree_widget.options.onCanMoveTo(this.current_item.node, area.node, position_name);
+            return this.tree_widget.options.onCanMoveTo(
+                this.current_item.node,
+                area.node,
+                position_name
+            );
         } else {
             return true;
         }
@@ -204,7 +224,7 @@ export class DragAndDropHandler {
         this.hovered_area = null;
     }
 
-    private findHoveredArea(x: number, y: number): IHitArea|null {
+    private findHoveredArea(x: number, y: number): IHitArea | null {
         const dimensions = this.getTreeDimensions();
 
         if (
@@ -240,13 +260,13 @@ export class DragAndDropHandler {
 
         return (
             node.isFolder() &&
-            ! node.is_open &&
+            !node.is_open &&
             area.position === Position.Inside
         );
     }
 
     private updateDropHint() {
-        if (! this.hovered_area) {
+        if (!this.hovered_area) {
             return;
         }
 
@@ -254,8 +274,12 @@ export class DragAndDropHandler {
         this.removeDropHint();
 
         // add new drop hint
-        const node_element = this.tree_widget._getNodeElementForNode(this.hovered_area.node);
-        this.previous_ghost = node_element.addDropHint(this.hovered_area.position);
+        const node_element = this.tree_widget._getNodeElementForNode(
+            this.hovered_area.node
+        );
+        this.previous_ghost = node_element.addDropHint(
+            this.hovered_area.position
+        );
     }
 
     private startOpenFolderTimer(folder: Node) {
@@ -272,7 +296,10 @@ export class DragAndDropHandler {
 
         this.stopOpenFolderTimer();
 
-        this.open_folder_timer = setTimeout(openFolder, this.tree_widget.options.openFolderDelay);
+        this.open_folder_timer = setTimeout(
+            openFolder,
+            this.tree_widget.options.openFolderDelay
+        );
     }
 
     private stopOpenFolderTimer() {
@@ -299,26 +326,27 @@ export class DragAndDropHandler {
             }
 
             const doMove = () => {
-                this.tree_widget.tree.moveNode(moved_node, target_node, position);
+                this.tree_widget.tree.moveNode(
+                    moved_node,
+                    target_node,
+                    position
+                );
                 this.tree_widget.element.empty();
                 this.tree_widget._refreshElements(null);
             };
 
-            const event = this.tree_widget._triggerEvent(
-                "tree.move",
-                {
-                    move_info: {
-                        moved_node,
-                        target_node,
-                        position: getPositionName(position),
-                        previous_parent,
-                        do_move: doMove,
-                        original_event: position_info.original_event
-                    }
+            const event = this.tree_widget._triggerEvent("tree.move", {
+                move_info: {
+                    moved_node,
+                    target_node,
+                    position: getPositionName(position),
+                    previous_parent,
+                    do_move: doMove,
+                    original_event: position_info.original_event
                 }
-            );
+            });
 
-            if (! event.isDefaultPrevented()) {
+            if (!event.isDefaultPrevented()) {
                 doMove();
             }
         }
@@ -348,17 +376,16 @@ abstract class VisibleNodeIterator {
     protected iterate() {
         let is_first_node = true;
 
-        const _iterateNode = (node: Node, next_node: Node|null) => {
-            let must_iterate_inside = (
-                (node.is_open || ! node.element) && node.hasChildren()
-            );
+        const _iterateNode = (node: Node, next_node: Node | null) => {
+            let must_iterate_inside =
+                (node.is_open || !node.element) && node.hasChildren();
 
-            let $element: JQuery|null = null;
+            let $element: JQuery | null = null;
 
             if (node.element) {
                 $element = $(node.element);
 
-                if (! $element.is(":visible")) {
+                if (!$element.is(":visible")) {
                     return;
                 }
 
@@ -367,10 +394,10 @@ abstract class VisibleNodeIterator {
                     is_first_node = false;
                 }
 
-                if (! node.hasChildren()) {
+                if (!node.hasChildren()) {
                     this.handleNode(node, next_node, $element);
                 } else if (node.is_open) {
-                    if (! this.handleOpenFolder(node, $element)) {
+                    if (!this.handleOpenFolder(node, $element)) {
                         must_iterate_inside = false;
                     }
                 } else {
@@ -381,7 +408,7 @@ abstract class VisibleNodeIterator {
             if (must_iterate_inside) {
                 const children_length = node.children.length;
                 node.children.forEach((_, i) => {
-                    if (i === (children_length - 1)) {
+                    if (i === children_length - 1) {
                         _iterateNode(node.children[i], null);
                     } else {
                         _iterateNode(node.children[i], node.children[i + 1]);
@@ -397,7 +424,11 @@ abstract class VisibleNodeIterator {
         _iterateNode(this.tree, null);
     }
 
-    protected abstract handleNode(node: Node, next_node: Node|null, $element: JQuery): void;
+    protected abstract handleNode(
+        node: Node,
+        next_node: Node | null,
+        $element: JQuery
+    ): void;
 
     /*
     override
@@ -407,9 +438,16 @@ abstract class VisibleNodeIterator {
     */
     protected abstract handleOpenFolder(node: Node, $element: JQuery): boolean;
 
-    protected abstract handleClosedFolder(node: Node, next_node: Node|null, $element: JQuery): void;
+    protected abstract handleClosedFolder(
+        node: Node,
+        next_node: Node | null,
+        $element: JQuery
+    ): void;
 
-    protected abstract handleAfterOpenFolder(node: Node, next_node: Node|null): void;
+    protected abstract handleAfterOpenFolder(
+        node: Node,
+        next_node: Node | null
+    ): void;
 
     protected abstract handleFirstNode(node: Node): void;
 }
@@ -485,7 +523,11 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return true;
     }
 
-    protected handleClosedFolder(node: Node, next_node: Node, $element: JQuery) {
+    protected handleClosedFolder(
+        node: Node,
+        next_node: Node,
+        $element: JQuery
+    ) {
         const top = this.getTop($element);
 
         if (node === this.current_node) {
@@ -503,15 +545,16 @@ export class HitAreasGenerator extends VisibleNodeIterator {
 
     protected handleFirstNode(node: Node) {
         if (node !== this.current_node) {
-            this.addPosition(node, Position.Before, this.getTop($(node.element)));
+            this.addPosition(
+                node,
+                Position.Before,
+                this.getTop($(node.element))
+            );
         }
     }
 
     protected handleAfterOpenFolder(node: Node, next_node: Node) {
-        if (
-            node === this.current_node ||
-            next_node === this.current_node
-        ) {
+        if (node === this.current_node || next_node === this.current_node) {
             // Cannot move before or after current item
             this.addPosition(node, Position.None, this.last_top);
         } else {
@@ -529,10 +572,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             this.addPosition(node, Position.Inside, top);
         }
 
-        if (
-            next_node === this.current_node ||
-            node === this.current_node
-        ) {
+        if (next_node === this.current_node || node === this.current_node) {
             // Cannot move before or after current item
             this.addPosition(node, Position.None, top);
         } else {
@@ -557,7 +597,10 @@ export class HitAreasGenerator extends VisibleNodeIterator {
     }
 
     private generateHitAreasForGroup(
-        hit_areas: IHitArea[], positions_in_group: IHitArea[], top: number, bottom: number
+        hit_areas: IHitArea[],
+        positions_in_group: IHitArea[],
+        top: number,
+        bottom: number
     ) {
         // limit positions in group
         const position_count = Math.min(positions_in_group.length, 4);
@@ -587,11 +630,18 @@ export class DragElement {
     private offset_y: number;
     private $element: JQuery;
 
-    constructor(node_name: string, offset_x: number, offset_y: number, $tree: JQuery) {
+    constructor(
+        node_name: string,
+        offset_x: number,
+        offset_y: number,
+        $tree: JQuery
+    ) {
         this.offset_x = offset_x;
         this.offset_y = offset_y;
 
-        this.$element = $(`<span class=\"jqtree-title jqtree-dragging\">${ node_name }</span>`);
+        this.$element = $(
+            `<span class=\"jqtree-title jqtree-dragging\">${node_name}</span>`
+        );
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }

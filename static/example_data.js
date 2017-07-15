@@ -2,49 +2,49 @@ var ExampleData = {};
 
 ExampleData.example_data = [
     {
-        name: 'Saurischia',
+        name: "Saurischia",
         id: 1,
         children: [
-            {name: 'Herrerasaurians', id: 2},
+            { name: "Herrerasaurians", id: 2 },
             {
-                name: 'Theropods',
+                name: "Theropods",
                 id: 3,
                 children: [
-                    {name: 'Coelophysoids', id: 4},
-                    {name: 'Ceratosaurians', id: 5},
-                    {name: 'Spinosauroids', id: 6},
-                    {name: 'Carnosaurians', id: 7},
+                    { name: "Coelophysoids", id: 4 },
+                    { name: "Ceratosaurians", id: 5 },
+                    { name: "Spinosauroids", id: 6 },
+                    { name: "Carnosaurians", id: 7 },
                     {
-                        name: 'Coelurosaurians',
+                        name: "Coelurosaurians",
                         id: 8,
                         children: [
-                            {name: 'Tyrannosauroids', id: 9},
-                            {name: 'Ornithomimosaurians', id: 10},
-                            {name: 'Therizinosauroids', id: 11},
-                            {name: 'Oviraptorosaurians', id: 12},
-                            {name: 'Dromaeosaurids', id: 13},
-                            {name: 'Troodontids', id: 14},
-                            {name: 'Avialans', id: 15}
+                            { name: "Tyrannosauroids", id: 9 },
+                            { name: "Ornithomimosaurians", id: 10 },
+                            { name: "Therizinosauroids", id: 11 },
+                            { name: "Oviraptorosaurians", id: 12 },
+                            { name: "Dromaeosaurids", id: 13 },
+                            { name: "Troodontids", id: 14 },
+                            { name: "Avialans", id: 15 }
                         ]
                     }
                 ]
             },
             {
-                name: 'Sauropodomorphs',
+                name: "Sauropodomorphs",
                 id: 16,
                 children: [
-                    {name: 'Prosauropods', id: 17},
+                    { name: "Prosauropods", id: 17 },
                     {
-                        name: 'Sauropods',
+                        name: "Sauropods",
                         id: 18,
                         children: [
-                            {name: 'Diplodocoids', id: 19},
+                            { name: "Diplodocoids", id: 19 },
                             {
-                                name: 'Macronarians',
+                                name: "Macronarians",
                                 id: 20,
                                 children: [
-                                    {name: 'Brachiosaurids', id: 21},
-                                    {name: 'Titanosaurians', id: 22}
+                                    { name: "Brachiosaurids", id: 21 },
+                                    { name: "Titanosaurians", id: 22 }
                                 ]
                             }
                         ]
@@ -54,33 +54,31 @@ ExampleData.example_data = [
         ]
     },
     {
-        name: 'Ornithischians',
+        name: "Ornithischians",
         id: 23,
         children: [
-            {name: 'Heterodontosaurids', id: 24},
+            { name: "Heterodontosaurids", id: 24 },
             {
-                name: 'Thyreophorans',
+                name: "Thyreophorans",
                 id: 25,
                 children: [
-                    {name: 'Ankylosaurians', id: 26},
-                    {name: 'Stegosaurians', id: 27}
+                    { name: "Ankylosaurians", id: 26 },
+                    { name: "Stegosaurians", id: 27 }
                 ]
             },
             {
-                name: 'Ornithopods',
+                name: "Ornithopods",
                 id: 28,
-                children: [
-                    {name: 'Hadrosaurids', id: 29}
-                ]
+                children: [{ name: "Hadrosaurids", id: 29 }]
             },
-            {name: 'Pachycephalosaurians', id: 30},
-            {name: 'Ceratopsians', id: 31}
+            { name: "Pachycephalosaurians", id: 30 },
+            { name: "Ceratopsians", id: 31 }
         ]
     }
 ];
 
 ExampleData.getFirstLevelData = function(nodes) {
-    if (! nodes) {
+    if (!nodes) {
         nodes = ExampleData.example_data;
     }
 
@@ -100,7 +98,7 @@ ExampleData.getFirstLevelData = function(nodes) {
     });
 
     return data;
-}
+};
 
 ExampleData.getChildrenOfNode = function(node_id) {
     var result = null;
@@ -109,8 +107,7 @@ ExampleData.getChildrenOfNode = function(node_id) {
         $.each(nodes, function() {
             if (result) {
                 return;
-            }
-            else {
+            } else {
                 if (this.id == node_id) {
                     result = this;
                 }
@@ -125,4 +122,4 @@ ExampleData.getChildrenOfNode = function(node_id) {
     iterate(ExampleData.example_data);
 
     return ExampleData.getFirstLevelData(result.children);
-}
+};

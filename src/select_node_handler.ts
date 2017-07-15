@@ -64,7 +64,7 @@ export default class SelectNodeHandler {
     }
 
     public isNodeSelected(node?: Node): boolean {
-        if (! node) {
+        if (!node) {
             return false;
         } else if (node.id != null) {
             if (this.selected_nodes[node.id]) {
@@ -86,19 +86,20 @@ export default class SelectNodeHandler {
 
     public removeFromSelection(node: Node, include_children: boolean = false) {
         if (node.id == null) {
-            if (this.selected_single_node && node.element === this.selected_single_node.element) {
+            if (
+                this.selected_single_node &&
+                node.element === this.selected_single_node.element
+            ) {
                 this.selected_single_node = null;
             }
         } else {
             delete this.selected_nodes[node.id];
 
             if (include_children) {
-                node.iterate(
-                    () => {
-                        delete this.selected_nodes[node.id];
-                        return true;
-                    }
-                );
+                node.iterate(() => {
+                    delete this.selected_nodes[node.id];
+                    return true;
+                });
             }
         }
     }

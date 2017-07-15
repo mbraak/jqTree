@@ -1,5 +1,5 @@
 $.mockjax({
-    url: '*',
+    url: "*",
     response: function(options) {
         this.responseText = ExampleData.example_data;
     },
@@ -12,9 +12,12 @@ $(function() {
     function isOverTarget(e) {
         return (
             e.clientX > targetCollisionDiv.position().left &&
-            e.clientX < (targetCollisionDiv.position().left + targetCollisionDiv.width()) &&
+            e.clientX <
+                targetCollisionDiv.position().left +
+                    targetCollisionDiv.width() &&
             e.clientY > targetCollisionDiv.position().top &&
-            e.clientY < (targetCollisionDiv.position().top + targetCollisionDiv.height())
+            e.clientY <
+                targetCollisionDiv.position().top + targetCollisionDiv.height()
         );
     }
 
@@ -28,7 +31,7 @@ $(function() {
         console.log("stopped over target: ", isOverTarget(e));
     }
 
-    $('#tree1').tree({
+    $("#tree1").tree({
         dragAndDrop: true,
         onDragMove: handleMove,
         onDragStop: handleStop

@@ -3,6 +3,13 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.4.2 (july 15 2017)
+
+* Issue #489: make it possible to use nested element for icon (thanks to terryoy)
+* Issue #492: handle empty string for icon options
+* Issue #493: add tabIndex option (thanks to Aimeos)
+* Issue #494: remove tabindex if a node is deselected (thanks to Aimeos)
+
 ##### 1.4.1 (june 5 2017)
 
 * Issue #487: setState must clear the selection (thanks to terryoy)

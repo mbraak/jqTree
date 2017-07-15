@@ -1,5 +1,10 @@
 import { Position, Node } from "./node";
-import { ITreeWidget, IDropHint, INodeElement, OnFinishOpenNode } from "./itree_widget";
+import {
+    ITreeWidget,
+    IDropHint,
+    INodeElement,
+    OnFinishOpenNode
+} from "./itree_widget";
 
 export class NodeElement implements INodeElement {
     public node: Node;
@@ -14,7 +19,7 @@ export class NodeElement implements INodeElement {
         this.node = node;
         this.tree_widget = tree_widget;
 
-        if (! node.element) {
+        if (!node.element) {
             node.element = this.tree_widget.element.get(0);
         }
 
@@ -36,7 +41,7 @@ export class NodeElement implements INodeElement {
         $li.attr("aria-selected", "true");
 
         const $span = this.getSpan();
-        $span.attr("tabindex", 0);
+        $span.attr("tabindex", this.tree_widget.options.tabIndex);
 
         $span.focus();
     }
@@ -48,7 +53,7 @@ export class NodeElement implements INodeElement {
         $li.attr("aria-selected", "false");
 
         const $span = this.getSpan();
-        $span.attr("tabindex", -1);
+        $span.removeAttr("tabindex");
 
         $span.blur();
     }
@@ -58,7 +63,9 @@ export class NodeElement implements INodeElement {
     }
 
     protected getSpan() {
-        return this.$element.children(".jqtree-element").find("span.jqtree-title");
+        return this.$element
+            .children(".jqtree-element")
+            .find("span.jqtree-title");
     }
 
     protected getLi() {
@@ -67,8 +74,8 @@ export class NodeElement implements INodeElement {
 }
 
 export class FolderElement extends NodeElement {
-    public open(on_finished: OnFinishOpenNode|null, slide = true) {
-        if (! this.node.is_open) {
+    public open(on_finished: OnFinishOpenNode | null, slide = true) {
+        if (!this.node.is_open) {
             this.node.is_open = true;
 
             const $button = this.getButton();
@@ -78,7 +85,9 @@ export class FolderElement extends NodeElement {
             const button_el = $button.get(0);
 
             if (button_el) {
-                const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+                const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(
+                    false
+                );
 
                 button_el.appendChild(icon);
             }
@@ -94,7 +103,9 @@ export class FolderElement extends NodeElement {
                     on_finished(this.node);
                 }
 
-                this.tree_widget._triggerEvent("tree.open", {node: this.node});
+                this.tree_widget._triggerEvent("tree.open", {
+                    node: this.node
+                });
             };
 
             if (slide) {
@@ -116,7 +127,9 @@ export class FolderElement extends NodeElement {
             const button_el = $button.get(0);
 
             if (button_el) {
-                const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+                const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(
+                    false
+                );
 
                 button_el.appendChild(icon);
             }
@@ -128,7 +141,9 @@ export class FolderElement extends NodeElement {
                 const $span = this.getSpan();
                 $span.attr("aria-expanded", "false");
 
-                this.tree_widget._triggerEvent("tree.close", {node: this.node});
+                this.tree_widget._triggerEvent("tree.close", {
+                    node: this.node
+                });
             };
 
             if (slide) {
@@ -141,7 +156,7 @@ export class FolderElement extends NodeElement {
     }
 
     public addDropHint(position: number) {
-        if (! this.node.is_open && position === Position.Inside) {
+        if (!this.node.is_open && position === Position.Inside) {
             return new BorderDropHint(this.$element);
         } else {
             return new GhostDropHint(this.node, this.$element, position);
@@ -149,7 +164,9 @@ export class FolderElement extends NodeElement {
     }
 
     private getButton(): JQuery {
-        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
+        return this.$element
+            .children(".jqtree-element")
+            .find("a.jqtree-toggler");
     }
 }
 
