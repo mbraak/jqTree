@@ -74,7 +74,11 @@ export class NodeElement implements INodeElement {
 }
 
 export class FolderElement extends NodeElement {
-    public open(on_finished: OnFinishOpenNode | null, slide = true) {
+    public open(
+        on_finished: OnFinishOpenNode | null,
+        slide = true,
+        animationSpeed = "fast"
+    ) {
         if (!this.node.is_open) {
             this.node.is_open = true;
 
@@ -109,7 +113,7 @@ export class FolderElement extends NodeElement {
             };
 
             if (slide) {
-                this.getUl().slideDown("fast", doOpen);
+                this.getUl().slideDown(animationSpeed, doOpen);
             } else {
                 this.getUl().show();
                 doOpen();
@@ -117,7 +121,7 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    public close(slide: boolean = true) {
+    public close(slide: boolean = true, animationSpeed = "fast") {
         if (this.node.is_open) {
             this.node.is_open = false;
             const $button = this.getButton();
@@ -147,7 +151,7 @@ export class FolderElement extends NodeElement {
             };
 
             if (slide) {
-                this.getUl().slideUp("fast", doClose);
+                this.getUl().slideUp(animationSpeed, doClose);
             } else {
                 this.getUl().hide();
                 doClose();
