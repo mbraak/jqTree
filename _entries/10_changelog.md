@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.4.3 (october 22 2017)
 
 * Issue #503: add animationSpeed option
 
