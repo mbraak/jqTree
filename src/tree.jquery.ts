@@ -32,6 +32,7 @@ type HandleFinishedLoading = () => void;
 
 class JqTreeWidget extends MouseWidget {
     protected static defaults = {
+        animationSpeed: "fast",
         autoOpen: false, // true / false / int (open n levels starting at 0)
         saveState: false, // true / false / string (cookie name)
         dragAndDrop: false,
@@ -205,7 +206,10 @@ class JqTreeWidget extends MouseWidget {
         const slide = slide_param == null ? this.options.slide : slide_param;
 
         if (node.isFolder()) {
-            new FolderElement(node, this).close(slide);
+            new FolderElement(node, this).close(
+                slide,
+                this.options.animationSpeed
+            );
 
             this._saveState();
         }
@@ -450,7 +454,11 @@ class JqTreeWidget extends MouseWidget {
             _on_finished: OnFinishOpenNode | null
         ) => {
             const folder_element = new FolderElement(_node, this);
-            folder_element.open(_on_finished, _slide);
+            folder_element.open(
+                _on_finished,
+                _slide,
+                this.options.animationSpeed
+            );
         };
 
         if (node.isFolder()) {

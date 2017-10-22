@@ -1,6 +1,6 @@
 {
     "name": "jqtree",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "description": "Tree widget for jQuery",
     "keywords": ["jquery-plugin", "tree"],
     "license": "Apache-2.0",
@@ -11,10 +11,12 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "test": "karma start --browsers PhantomJS --single-run && tslint src/*.ts src_test/*.ts",
+        "test":
+            "karma start --browsers PhantomJS --single-run && tslint src/*.ts src_test/*.ts",
         "lint": "tslint src/*.ts src_test/*.ts",
         "watch": "webpack",
-        "production": "webpack --config webpack.config.production && gulp && cp build/tree.jquery.js .",
+        "production":
+            "webpack --config webpack.config.production && gulp && cp build/tree.jquery.js .",
         "karma": "karma start --browsers PhantomJS",
         "jekyll-build": "jekyll build",
         "jekyll-serve": "jekyll serve",
@@ -25,30 +27,30 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
-        "connect": "^3.6.2",
-        "coveralls": "^2.13.1",
+        "connect": "^3.6.5",
+        "coveralls": "^3.0.0",
         "gulp": "^3.9.1",
         "gulp-rename": "^1.2.2",
         "gulp-sass": "^3.1.0",
-        "gulp-typescript": "^3.2.0",
+        "gulp-typescript": "^3.2.2",
         "jquery-mockjax": "^2.2.2",
-        "jsonfile": "^3.0.1",
-        "karma": "^1.7.0",
+        "jsonfile": "^4.0.0",
+        "karma": "^1.7.1",
         "karma-chrome-launcher": "^2.1.1",
         "karma-cli": "^1.0.1",
         "karma-firefox-launcher": "^1.0.1",
         "karma-phantomjs-launcher": "^1.0.4",
         "karma-qunit": "^1.2.1",
-        "karma-webpack": "^2.0.4",
+        "karma-webpack": "^2.0.5",
         "lodash.template": "^4.4.0",
-        "phantomjs-prebuilt": "^2.1.14",
-        "prettier": "^1.5.2",
-        "qunitjs": "^2.4.0",
-        "serve-static": "^1.12.3",
-        "ts-loader": "^2.0.3",
-        "tslint": "^5.5.0",
-        "typescript": "^2.4.1",
-        "webpack": "^3.2.0",
-        "webpack-dev-server": "^2.5.1"
+        "phantomjs-prebuilt": "^2.1.15",
+        "prettier": "^1.7.2",
+        "qunitjs": "^2.4.1",
+        "serve-static": "^1.13.0",
+        "ts-loader": "^3.0.5",
+        "tslint": "^5.8.0",
+        "typescript": "^2.5.3",
+        "webpack": "^3.8.1",
+        "webpack-dev-server": "^2.9.3"
     }
 }

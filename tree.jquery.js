@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.4.2
+ * JqTree 1.4.3
  * 
  * Copyright 2017 Marco Braak
  * 
@@ -116,7 +116,7 @@ function getPosition(name) {
     return exports.position_names[name];
 }
 exports.getPosition = getPosition;
-var Node = (function () {
+var Node = /** @class */ (function () {
     function Node(o, is_root, node_class) {
         if (is_root === void 0) { is_root = false; }
         if (node_class === void 0) { node_class = Node; }
@@ -670,7 +670,7 @@ exports.getBoolString = getBoolString;
 "use strict";
 
 exports.__esModule = true;
-var SimpleWidget = (function () {
+var SimpleWidget = /** @class */ (function () {
     function SimpleWidget(el, options) {
         this.$el = $(el);
         var defaults = this.constructor.defaults;
@@ -798,7 +798,7 @@ var simple_widget_1 = __webpack_require__(2);
 var node_1 = __webpack_require__(0);
 var util_1 = __webpack_require__(1);
 var node_element_1 = __webpack_require__(12);
-var JqTreeWidget = (function (_super) {
+var JqTreeWidget = /** @class */ (function (_super) {
     __extends(JqTreeWidget, _super);
     function JqTreeWidget() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -906,7 +906,7 @@ var JqTreeWidget = (function (_super) {
     JqTreeWidget.prototype.closeNode = function (node, slide_param) {
         var slide = slide_param == null ? this.options.slide : slide_param;
         if (node.isFolder()) {
-            new node_element_1.FolderElement(node, this).close(slide);
+            new node_element_1.FolderElement(node, this).close(slide, this.options.animationSpeed);
             this._saveState();
         }
         return this.element;
@@ -1088,7 +1088,7 @@ var JqTreeWidget = (function (_super) {
         if (slide === void 0) { slide = true; }
         var doOpenNode = function (_node, _slide, _on_finished) {
             var folder_element = new node_element_1.FolderElement(_node, _this);
-            folder_element.open(_on_finished, _slide);
+            folder_element.open(_on_finished, _slide, _this.options.animationSpeed);
         };
         if (node.isFolder()) {
             if (node.load_on_demand) {
@@ -1713,6 +1713,7 @@ var JqTreeWidget = (function (_super) {
         });
     };
     JqTreeWidget.defaults = {
+        animationSpeed: "fast",
         autoOpen: false,
         saveState: false,
         dragAndDrop: false,
@@ -1760,7 +1761,7 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.2";
+var version = "1.4.3";
 exports["default"] = version;
 
 
@@ -1783,7 +1784,7 @@ var __extends = (this && this.__extends) || (function () {
 exports.__esModule = true;
 var node_1 = __webpack_require__(0);
 var util_1 = __webpack_require__(1);
-var DragAndDropHandler = (function () {
+var DragAndDropHandler = /** @class */ (function () {
     function DragAndDropHandler(tree_widget) {
         this.tree_widget = tree_widget;
         this.hovered_area = null;
@@ -2040,7 +2041,7 @@ var DragAndDropHandler = (function () {
     return DragAndDropHandler;
 }());
 exports.DragAndDropHandler = DragAndDropHandler;
-var VisibleNodeIterator = (function () {
+var VisibleNodeIterator = /** @class */ (function () {
     function VisibleNodeIterator(tree) {
         this.tree = tree;
     }
@@ -2090,7 +2091,7 @@ var VisibleNodeIterator = (function () {
     };
     return VisibleNodeIterator;
 }());
-var HitAreasGenerator = (function (_super) {
+var HitAreasGenerator = /** @class */ (function (_super) {
     __extends(HitAreasGenerator, _super);
     function HitAreasGenerator(tree, current_node, tree_bottom) {
         var _this = _super.call(this, tree) || this;
@@ -2214,7 +2215,7 @@ var HitAreasGenerator = (function (_super) {
     return HitAreasGenerator;
 }(VisibleNodeIterator));
 exports.HitAreasGenerator = HitAreasGenerator;
-var DragElement = (function () {
+var DragElement = /** @class */ (function () {
     function DragElement(node_name, offset_x, offset_y, $tree) {
         this.offset_x = offset_x;
         this.offset_y = offset_y;
@@ -2244,7 +2245,7 @@ exports.DragElement = DragElement;
 
 exports.__esModule = true;
 var util_1 = __webpack_require__(1);
-var ElementsRenderer = (function () {
+var ElementsRenderer = /** @class */ (function () {
     function ElementsRenderer(tree_widget) {
         this.tree_widget = tree_widget;
         this.opened_icon_element = this.createButtonElement(tree_widget.options.openedIcon);
@@ -2449,7 +2450,7 @@ exports["default"] = ElementsRenderer;
 "use strict";
 
 exports.__esModule = true;
-var KeyHandler = (function () {
+var KeyHandler = /** @class */ (function () {
     function KeyHandler(tree_widget) {
         this.tree_widget = tree_widget;
         if (tree_widget.options.keyboardSupport) {
@@ -2587,7 +2588,7 @@ exports.__esModule = true;
 This widget does the same a the mouse widget in jqueryui.
 */
 var simple_widget_1 = __webpack_require__(2);
-var MouseWidget = (function (_super) {
+var MouseWidget = /** @class */ (function (_super) {
     __extends(MouseWidget, _super);
     function MouseWidget() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2736,7 +2737,7 @@ exports["default"] = MouseWidget;
 
 exports.__esModule = true;
 var util_1 = __webpack_require__(1);
-var SaveStateHandler = (function () {
+var SaveStateHandler = /** @class */ (function () {
     function SaveStateHandler(tree_widget) {
         this.tree_widget = tree_widget;
     }
@@ -2957,7 +2958,7 @@ exports["default"] = SaveStateHandler;
 "use strict";
 
 exports.__esModule = true;
-var ScrollHandler = (function () {
+var ScrollHandler = /** @class */ (function () {
     function ScrollHandler(tree_widget) {
         this.tree_widget = tree_widget;
         this.previous_top = -1;
@@ -3101,7 +3102,7 @@ exports["default"] = ScrollHandler;
 "use strict";
 
 exports.__esModule = true;
-var SelectNodeHandler = (function () {
+var SelectNodeHandler = /** @class */ (function () {
     function SelectNodeHandler(tree_widget) {
         this.tree_widget = tree_widget;
         this.clear();
@@ -3227,7 +3228,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var node_1 = __webpack_require__(0);
-var NodeElement = (function () {
+var NodeElement = /** @class */ (function () {
     function NodeElement(node, tree_widget) {
         this.init(node, tree_widget);
     }
@@ -3277,14 +3278,15 @@ var NodeElement = (function () {
     return NodeElement;
 }());
 exports.NodeElement = NodeElement;
-var FolderElement = (function (_super) {
+var FolderElement = /** @class */ (function (_super) {
     __extends(FolderElement, _super);
     function FolderElement() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    FolderElement.prototype.open = function (on_finished, slide) {
+    FolderElement.prototype.open = function (on_finished, slide, animationSpeed) {
         var _this = this;
         if (slide === void 0) { slide = true; }
+        if (animationSpeed === void 0) { animationSpeed = "fast"; }
         if (!this.node.is_open) {
             this.node.is_open = true;
             var $button = this.getButton();
@@ -3308,7 +3310,7 @@ var FolderElement = (function (_super) {
                 });
             };
             if (slide) {
-                this.getUl().slideDown("fast", doOpen);
+                this.getUl().slideDown(animationSpeed, doOpen);
             }
             else {
                 this.getUl().show();
@@ -3316,9 +3318,10 @@ var FolderElement = (function (_super) {
             }
         }
     };
-    FolderElement.prototype.close = function (slide) {
+    FolderElement.prototype.close = function (slide, animationSpeed) {
         var _this = this;
         if (slide === void 0) { slide = true; }
+        if (animationSpeed === void 0) { animationSpeed = "fast"; }
         if (this.node.is_open) {
             this.node.is_open = false;
             var $button = this.getButton();
@@ -3339,7 +3342,7 @@ var FolderElement = (function (_super) {
                 });
             };
             if (slide) {
-                this.getUl().slideUp("fast", doClose);
+                this.getUl().slideUp(animationSpeed, doClose);
             }
             else {
                 this.getUl().hide();
@@ -3363,7 +3366,7 @@ var FolderElement = (function (_super) {
     return FolderElement;
 }(NodeElement));
 exports.FolderElement = FolderElement;
-var BorderDropHint = (function () {
+var BorderDropHint = /** @class */ (function () {
     function BorderDropHint($element) {
         var $div = $element.children(".jqtree-element");
         var width = $element.width() - 4;
@@ -3380,7 +3383,7 @@ var BorderDropHint = (function () {
     return BorderDropHint;
 }());
 exports.BorderDropHint = BorderDropHint;
-var GhostDropHint = (function () {
+var GhostDropHint = /** @class */ (function () {
     function GhostDropHint(node, $element, position) {
         this.$element = $element;
         this.node = node;

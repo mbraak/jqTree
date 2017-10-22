@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.4.3 (october 22 2017)
+
+* Issue #503: add animationSpeed option
+
 ##### 1.4.2 (july 15 2017)
 
 * Issue #489: make it possible to use nested element for icon (thanks to terryoy)
