@@ -10,7 +10,6 @@ export class DragAndDropHandler {
     public hovered_area: IHitArea | null;
 
     private tree_widget: ITreeWidget;
-    private $ghost: JQuery | null;
     private drag_element: DragElement | null;
     private previous_ghost: IDropHint | null;
     private open_folder_timer: number | null;
@@ -19,7 +18,6 @@ export class DragAndDropHandler {
         this.tree_widget = tree_widget;
 
         this.hovered_area = null;
-        this.$ghost = null;
         this.hit_areas = [];
         this.is_dragging = false;
         this.current_item = null;
