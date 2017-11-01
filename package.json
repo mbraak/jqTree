@@ -32,7 +32,7 @@
         "gulp": "^3.9.1",
         "gulp-rename": "^1.2.2",
         "gulp-sass": "^3.1.0",
-        "gulp-typescript": "^3.2.2",
+        "gulp-typescript": "^3.2.3",
         "jquery-mockjax": "^2.2.2",
         "jsonfile": "^4.0.0",
         "karma": "^1.7.1",
@@ -47,9 +47,9 @@
         "prettier": "^1.7.2",
         "qunitjs": "^2.4.1",
         "serve-static": "^1.13.0",
-        "ts-loader": "^3.0.5",
+        "ts-loader": "^3.1.1",
         "tslint": "^5.8.0",
-        "typescript": "^2.5.3",
+        "typescript": "^2.6.1",
         "webpack": "^3.8.1",
         "webpack-dev-server": "^2.9.3"
     }
