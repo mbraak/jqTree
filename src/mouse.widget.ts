@@ -17,8 +17,14 @@ abstract class MouseWidget extends SimpleWidget {
     }
 
     protected _init() {
-        this.$el.on("mousedown.mousewidget", $.proxy(this._mouseDown, this));
-        this.$el.on("touchstart.mousewidget", $.proxy(this._touchStart, this));
+        this.$el.on(
+            "mousedown.mousewidget",
+            jQuery.proxy(this._mouseDown, this)
+        );
+        this.$el.on(
+            "touchstart.mousewidget",
+            jQuery.proxy(this._touchStart, this)
+        );
 
         this.is_mouse_started = false;
         this.mouse_delay = 0;
@@ -31,7 +37,7 @@ abstract class MouseWidget extends SimpleWidget {
         this.$el.off("mousedown.mousewidget");
         this.$el.off("touchstart.mousewidget");
 
-        const $document = $(document);
+        const $document = jQuery(document);
         $document.off("mousemove.mousewidget");
         $document.off("mouseup.mousewidget");
     }
@@ -79,11 +85,20 @@ abstract class MouseWidget extends SimpleWidget {
     }
 
     private _handleStartMouse() {
-        const $document = $(document);
-        $document.on("mousemove.mousewidget", $.proxy(this._mouseMove, this));
-        $document.on("touchmove.mousewidget", $.proxy(this._touchMove, this));
-        $document.on("mouseup.mousewidget", $.proxy(this._mouseUp, this));
-        $document.on("touchend.mousewidget", $.proxy(this._touchEnd, this));
+        const $document = jQuery(document);
+        $document.on(
+            "mousemove.mousewidget",
+            jQuery.proxy(this._mouseMove, this)
+        );
+        $document.on(
+            "touchmove.mousewidget",
+            jQuery.proxy(this._touchMove, this)
+        );
+        $document.on("mouseup.mousewidget", jQuery.proxy(this._mouseUp, this));
+        $document.on(
+            "touchend.mousewidget",
+            jQuery.proxy(this._touchEnd, this)
+        );
 
         if (this.mouse_delay) {
             this._startMouseDelayTimer();
@@ -147,7 +162,7 @@ abstract class MouseWidget extends SimpleWidget {
     }
 
     private _handleMouseUp(position_info: IPositionInfo) {
-        const $document = $(document);
+        const $document = jQuery(document);
         $document.off("mousemove.mousewidget");
         $document.off("touchmove.mousewidget");
         $document.off("mouseup.mousewidget");

@@ -23,7 +23,7 @@ export class NodeElement implements INodeElement {
             node.element = this.tree_widget.element.get(0);
         }
 
-        this.$element = $(node.element);
+        this.$element = jQuery(node.element);
     }
 
     public addDropHint(position: number): IDropHint {
@@ -181,7 +181,7 @@ export class BorderDropHint implements IDropHint {
         const $div = $element.children(".jqtree-element");
         const width = $element.width() - 4;
 
-        this.$hint = $('<span class="jqtree-border"></span>');
+        this.$hint = jQuery('<span class="jqtree-border"></span>');
         $div.append(this.$hint);
 
         this.$hint.css({
@@ -204,7 +204,7 @@ export class GhostDropHint implements IDropHint {
         this.$element = $element;
 
         this.node = node;
-        this.$ghost = $(
+        this.$ghost = jQuery(
             `<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span>
             <span class="jqtree_common jqtree-line"></span></li>`
         );
@@ -235,7 +235,7 @@ export class GhostDropHint implements IDropHint {
     }
 
     public moveInsideOpenFolder() {
-        $(this.node.children[0].element).before(this.$ghost);
+        jQuery(this.node.children[0].element).before(this.$ghost);
     }
 
     public moveInside() {

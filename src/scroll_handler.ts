@@ -38,7 +38,7 @@ export default class ScrollHandler {
             this.$scroll_parent[0].scrollTop = top;
         } else {
             const tree_top = this.tree_widget.$el.offset().top;
-            $(document).scrollTop(top + tree_top);
+            jQuery(document).scrollTop(top + tree_top);
         }
     }
 
@@ -57,8 +57,8 @@ export default class ScrollHandler {
             element_top = $element.offset().top - this.scroll_parent_top;
             element_bottom = element_top + $element.height();
         } else {
-            view_top = $(window).scrollTop();
-            view_bottom = view_top + $(window).height();
+            view_top = jQuery(window).scrollTop();
+            view_bottom = view_top + jQuery(window).height();
 
             element_top = $element.offset().top;
             element_bottom = element_top + $element.height();
@@ -90,7 +90,7 @@ export default class ScrollHandler {
             }
 
             for (const el of this.tree_widget.$el.parents().get()) {
-                const $el = $(el);
+                const $el = jQuery(el);
                 if (hasOverFlow($el)) {
                     return $el;
                 }
@@ -152,15 +152,16 @@ export default class ScrollHandler {
     }
 
     private _handleScrollingWithDocument(area: IHitArea) {
-        const distance_top = area.top - $(document).scrollTop();
+        const distance_top = area.top - jQuery(document).scrollTop();
 
         if (distance_top < 20) {
-            $(document).scrollTop($(document).scrollTop() - 20);
+            jQuery(document).scrollTop(jQuery(document).scrollTop() - 20);
         } else if (
-            $(window).height() - (area.bottom - $(document).scrollTop()) <
+            jQuery(window).height() -
+                (area.bottom - jQuery(document).scrollTop()) <
             20
         ) {
-            $(document).scrollTop($(document).scrollTop() + 20);
+            jQuery(document).scrollTop(jQuery(document).scrollTop() + 20);
         }
     }
 }

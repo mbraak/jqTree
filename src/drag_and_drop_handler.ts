@@ -24,7 +24,7 @@ export class DragAndDropHandler {
     }
 
     public mouseCapture(position_info: IPositionInfo): boolean | null {
-        const $element = $(position_info.target);
+        const $element = jQuery(position_info.target);
 
         if (!this.mustCaptureElement($element)) {
             return null;
@@ -68,7 +68,7 @@ export class DragAndDropHandler {
         } else {
             this.refresh();
 
-            const offset = $(position_info.target).offset();
+            const offset = jQuery(position_info.target).offset();
 
             const node = this.current_item.node;
 
@@ -381,7 +381,7 @@ abstract class VisibleNodeIterator {
             let $element: JQuery | null = null;
 
             if (node.element) {
-                $element = $(node.element);
+                $element = jQuery(node.element);
 
                 if (!$element.is(":visible")) {
                     return;
@@ -546,7 +546,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             this.addPosition(
                 node,
                 Position.Before,
-                this.getTop($(node.element))
+                this.getTop(jQuery(node.element))
             );
         }
     }
@@ -637,7 +637,7 @@ export class DragElement {
         this.offset_x = offset_x;
         this.offset_y = offset_y;
 
-        this.$element = $(
+        this.$element = jQuery(
             `<span class=\"jqtree-title jqtree-dragging\">${node_name}</span>`
         );
         this.$element.css("position", "absolute");
