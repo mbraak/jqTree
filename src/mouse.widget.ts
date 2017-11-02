@@ -42,7 +42,7 @@ abstract class MouseWidget extends SimpleWidget {
         $document.off("mouseup.mousewidget");
     }
 
-    protected _mouseDown(e: JQueryEventObject) {
+    protected _mouseDown(e: JQuery.Event) {
         // Is left mouse button?
         if (e.which !== 1) {
             return;
@@ -117,14 +117,11 @@ abstract class MouseWidget extends SimpleWidget {
         this._is_mouse_delay_met = false;
     }
 
-    private _mouseMove(e: JQueryEventObject) {
+    private _mouseMove(e: JQuery.Event) {
         return this._handleMouseMove(e, this._getPositionInfo(e));
     }
 
-    private _handleMouseMove(
-        e: JQueryEventObject,
-        position_info: IPositionInfo
-    ) {
+    private _handleMouseMove(e: JQuery.Event, position_info: IPositionInfo) {
         if (this.is_mouse_started) {
             this._mouseDrag(position_info);
             return e.preventDefault();
@@ -148,7 +145,7 @@ abstract class MouseWidget extends SimpleWidget {
         return !this.is_mouse_started;
     }
 
-    private _getPositionInfo(e: JQueryEventObject | Touch): IPositionInfo {
+    private _getPositionInfo(e: JQuery.Event | Touch): IPositionInfo {
         return {
             page_x: e.pageX,
             page_y: e.pageY,
@@ -157,7 +154,7 @@ abstract class MouseWidget extends SimpleWidget {
         };
     }
 
-    private _mouseUp(e: JQueryEventObject) {
+    private _mouseUp(e: JQuery.Event) {
         return this._handleMouseUp(this._getPositionInfo(e));
     }
 
@@ -174,7 +171,7 @@ abstract class MouseWidget extends SimpleWidget {
         }
     }
 
-    private _touchStart(e: JQueryEventObject) {
+    private _touchStart(e: JQuery.Event) {
         const touch_event = e.originalEvent as TouchEvent;
 
         if (touch_event.touches.length > 1) {
@@ -186,7 +183,7 @@ abstract class MouseWidget extends SimpleWidget {
         return this._handleMouseDown(this._getPositionInfo(touch));
     }
 
-    private _touchMove(e: JQueryEventObject) {
+    private _touchMove(e: JQuery.Event) {
         const touch_event = e.originalEvent as TouchEvent;
 
         if (touch_event.touches.length > 1) {
@@ -198,7 +195,7 @@ abstract class MouseWidget extends SimpleWidget {
         return this._handleMouseMove(e, this._getPositionInfo(touch));
     }
 
-    private _touchEnd(e: JQueryEventObject) {
+    private _touchEnd(e: JQuery.Event) {
         const touch_event = e.originalEvent as TouchEvent;
 
         if (touch_event.touches.length > 1) {

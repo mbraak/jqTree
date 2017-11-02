@@ -38,7 +38,9 @@ test("create jqtree from data", (assert: Assert) => {
         "number of children on level 0"
     );
     assert.ok(
-        $("#tree1").children().is("ul.jqtree-tree"),
+        $("#tree1")
+            .children()
+            .is("ul.jqtree-tree"),
         "first element is ul.jqtree-tree"
     );
     assert.equal(
@@ -1086,8 +1088,8 @@ test("mouse events", (assert: Assert) => {
     const child3_offset = $child3.offset();
     $tree.trigger(
         $.Event("mousemove", {
-            pageX: child3_offset.left,
-            pageY: child3_offset.top
+            pageX: child3_offset ? child3_offset.left : 0,
+            pageY: child3_offset ? child3_offset.top : 0
         })
     );
     $tree.trigger("mouseup");

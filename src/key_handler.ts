@@ -79,7 +79,7 @@ export default class KeyHandler {
         }
     }
 
-    public handleKeyDown(e: JQueryEventObject) {
+    public handleKeyDown(e: JQuery.Event) {
         if (!this.canHandleKeyboard()) {
             return true;
         } else {

@@ -1,4 +1,5 @@
 import __version__ from "./version";
+import * as jQuery from "jquery";
 import { DragAndDropHandler } from "./drag_and_drop_handler";
 import ElementsRenderer from "./elements_renderer";
 import KeyHandler from "./key_handler";
@@ -374,8 +375,13 @@ class JqTreeWidget extends MouseWidget {
 
     public scrollToNode(node: Node): JQuery {
         if (this.scroll_handler) {
-            const $element = jQuery(node.element);
-            const top = $element.offset().top - this.$el.offset().top;
+            const node_offset = jQuery(node.element).offset();
+            const node_top = node_offset ? node_offset.top : 0;
+
+            const tree_offset = this.$el.offset();
+            const tree_top = tree_offset ? tree_offset.top : 0;
+
+            const top = node_top - tree_top;
 
             this.scroll_handler.scrollTo(top);
         }
@@ -435,7 +441,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    public _triggerEvent(event_name: string, values?: any): JQueryEventObject {
+    public _triggerEvent(event_name: string, values?: any): JQuery.Event {
         const event = jQuery.Event(event_name);
         jQuery.extend(event, values);
 
@@ -830,7 +836,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _click(e: JQueryEventObject) {
+    private _click(e: JQuery.Event) {
         const click_target = this._getClickTarget(e.target);
 
         if (click_target) {
@@ -853,7 +859,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _dblclick(e: JQueryEventObject) {
+    private _dblclick(e: JQuery.Event) {
         const click_target = this._getClickTarget(e.target);
 
         if (click_target && click_target.type === "label") {
@@ -864,7 +870,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _getClickTarget(element: Element) {
+    private _getClickTarget(element: EventTarget) {
         const $target = jQuery(element);
 
         const $button = $target.closest(".jqtree-toggler");
@@ -903,7 +909,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _contextmenu(e: JQueryEventObject) {
+    private _contextmenu(e: JQuery.Event) {
         const $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
         if ($div.length) {
             const node = this._getNode($div);

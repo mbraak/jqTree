@@ -1,8 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/c2a54db3e9247d3881668c3ca80e5b5284961db6/jquery-mockjax/index.d.ts",
-    "raw": "registry:dt/jquery-mockjax#2.0.1+20160915014424",
-    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/c2a54db3e9247d3881668c3ca80e5b5284961db6/jquery-mockjax/index.d.ts"
-  }
-}

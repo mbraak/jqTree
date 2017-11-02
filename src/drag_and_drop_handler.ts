@@ -1,3 +1,4 @@
+import * as jQuery from "jquery";
 import { Position, Node, getPositionName } from "./node";
 import { html_escape } from "./util";
 import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itree_widget";
@@ -69,6 +70,8 @@ export class DragAndDropHandler {
             this.refresh();
 
             const offset = jQuery(position_info.target).offset();
+            const left = offset ? offset.left : 0;
+            const top = offset ? offset.top : 0;
 
             const node = this.current_item.node;
 
@@ -78,8 +81,8 @@ export class DragAndDropHandler {
 
             this.drag_element = new DragElement(
                 node_name,
-                position_info.page_x - offset.left,
-                position_info.page_y - offset.top,
+                position_info.page_x - left,
+                position_info.page_y - top,
                 this.tree_widget.element
             );
 
@@ -355,12 +358,20 @@ export class DragAndDropHandler {
         // for some to drag-and-drop the last element.
         const offset = this.tree_widget.element.offset();
 
-        return {
-            left: offset.left,
-            top: offset.top,
-            right: offset.left + this.tree_widget.element.width(),
-            bottom: offset.top + this.tree_widget.element.height() + 16
-        };
+        if (!offset) {
+            return { left: 0, top: 0, right: 0, bottom: 0 };
+        } else {
+            const el = this.tree_widget.element;
+            const width = el.width() || 0;
+            const height = el.height() || 0;
+
+            return {
+                left: offset.left,
+                top: offset.top,
+                right: offset.left + width,
+                bottom: offset.top + height + 16
+            };
+        }
     }
 }
 
@@ -579,7 +590,9 @@ export class HitAreasGenerator extends VisibleNodeIterator {
     }
 
     private getTop($element: JQuery): number {
-        return $element.offset().top;
+        const offset = $element.offset();
+
+        return offset ? offset.top : 0;
     }
 
     private addPosition(node: Node, position: number, top: number) {

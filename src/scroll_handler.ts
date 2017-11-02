@@ -37,7 +37,9 @@ export default class ScrollHandler {
         if (this.$scroll_parent) {
             this.$scroll_parent[0].scrollTop = top;
         } else {
-            const tree_top = this.tree_widget.$el.offset().top;
+            const offset = this.tree_widget.$el.offset();
+            const tree_top = offset ? offset.top : 0;
+
             jQuery(document).scrollTop(top + tree_top);
         }
     }
@@ -45,23 +47,32 @@ export default class ScrollHandler {
     public isScrolledIntoView($element: JQuery): boolean {
         this._ensureInit();
 
-        let element_bottom;
-        let view_bottom;
-        let element_top;
-        let view_top;
+        let element_bottom: number;
+        let view_bottom: number;
+        let element_top: number;
+        let view_top: number;
+
+        const el_height = $element.height() || 0;
 
         if (this.$scroll_parent) {
             view_top = 0;
-            view_bottom = this.$scroll_parent.height();
+            view_bottom = this.$scroll_parent.height() || 0;
 
-            element_top = $element.offset().top - this.scroll_parent_top;
-            element_bottom = element_top + $element.height();
+            const offset = $element.offset();
+            const original_top = offset ? offset.top : 0;
+
+            element_top = original_top - this.scroll_parent_top;
+            element_bottom = element_top + el_height;
         } else {
-            view_top = jQuery(window).scrollTop();
-            view_bottom = view_top + jQuery(window).height();
+            view_top = jQuery(window).scrollTop() || 0;
 
-            element_top = $element.offset().top;
-            element_bottom = element_top + $element.height();
+            const window_height = jQuery(window).height() || 0;
+            view_bottom = view_top + window_height;
+
+            const offset = $element.offset();
+
+            element_top = offset ? offset.top : 0;
+            element_bottom = element_top + el_height;
         }
 
         return element_bottom <= view_bottom && element_top >= view_top;
@@ -116,7 +127,9 @@ export default class ScrollHandler {
             $scroll_parent[0].tagName !== "HTML"
         ) {
             this.$scroll_parent = $scroll_parent;
-            this.scroll_parent_top = this.$scroll_parent.offset().top;
+
+            const offset = this.$scroll_parent.offset();
+            this.scroll_parent_top = offset ? offset.top : 0;
         } else {
             setDocumentAsScrollParent();
         }
@@ -152,16 +165,17 @@ export default class ScrollHandler {
     }
 
     private _handleScrollingWithDocument(area: IHitArea) {
-        const distance_top = area.top - jQuery(document).scrollTop();
+        const scroll_top = jQuery(document).scrollTop() || 0;
+        const distance_top = area.top - scroll_top;
 
         if (distance_top < 20) {
-            jQuery(document).scrollTop(jQuery(document).scrollTop() - 20);
-        } else if (
-            jQuery(window).height() -
-                (area.bottom - jQuery(document).scrollTop()) <
-            20
-        ) {
-            jQuery(document).scrollTop(jQuery(document).scrollTop() + 20);
+            jQuery(document).scrollTop(scroll_top - 20);
+        } else {
+            const window_height = jQuery(window).height() || 0;
+
+            if (window_height - (area.bottom - scroll_top) < 20) {
+                jQuery(document).scrollTop(scroll_top + 20);
+            }
         }
     }
 }

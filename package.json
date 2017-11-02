@@ -27,6 +27,9 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
+        "@types/jquery": "^3.2.16",
+        "@types/jquery-mockjax": "^2.0.31",
+        "@types/qunit": "^2.0.31",
         "connect": "^3.6.5",
         "coveralls": "^3.0.0",
         "gulp": "^3.9.1",

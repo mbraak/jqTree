@@ -75,7 +75,7 @@ export default class SimpleWidget {
         }
 
         // tslint:disable-next-line: only-arrow-functions
-        jQuery.fn[widget_name] = function(
+        (jQuery.fn as any)[widget_name] = function(
             this: JQuery,
             argument1: any,
             ...args: any[]

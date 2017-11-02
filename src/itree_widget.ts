@@ -42,7 +42,7 @@ export interface ITreeWidget {
     scroll_handler: IScrollHandler | null;
     select_node_handler: ISelectNodeHandler | null;
 
-    _triggerEvent: (event_name: string, values?: any) => JQueryEventObject;
+    _triggerEvent: (event_name: string, values?: any) => JQuery.Event;
     _openNode: (
         node: Node,
         slide: boolean,
