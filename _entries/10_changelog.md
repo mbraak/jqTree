@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue #506: use jQuery alias to fix conflict with Prototype.js
+
 ##### 1.4.3 (october 22 2017)
 
 * Issue #503: add animationSpeed option
