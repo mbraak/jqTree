@@ -9,6 +9,7 @@ export class DragAndDropHandler {
     public is_dragging: boolean;
     public current_item: INodeElement | null;
     public hovered_area: IHitArea | null;
+    public position_info: IPositionInfo | null;
 
     private tree_widget: ITreeWidget;
     private drag_element: DragElement | null;
@@ -22,6 +23,7 @@ export class DragAndDropHandler {
         this.hit_areas = [];
         this.is_dragging = false;
         this.current_item = null;
+        this.position_info = null;
     }
 
     public mouseCapture(position_info: IPositionInfo): boolean | null {
@@ -87,6 +89,7 @@ export class DragAndDropHandler {
             );
 
             this.is_dragging = true;
+            this.position_info = position_info;
             this.current_item.$element.addClass("jqtree-moving");
             return true;
         }
@@ -97,6 +100,7 @@ export class DragAndDropHandler {
             return false;
         } else {
             this.drag_element.move(position_info.page_x, position_info.page_y);
+            this.position_info = position_info;
 
             const area = this.findHoveredArea(
                 position_info.page_x,
@@ -155,6 +159,7 @@ export class DragAndDropHandler {
         }
 
         this.is_dragging = false;
+        this.position_info = null;
 
         if (!this.hovered_area && current_item) {
             if (this.tree_widget.options.onDragStop) {
@@ -355,7 +360,7 @@ export class DragAndDropHandler {
 
     private getTreeDimensions() {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
-        // for some to drag-and-drop the last element.
+        // to drag-and-drop after the last element.
         const offset = this.tree_widget.element.offset();
 
         if (!offset) {
@@ -364,11 +369,12 @@ export class DragAndDropHandler {
             const el = this.tree_widget.element;
             const width = el.width() || 0;
             const height = el.height() || 0;
+            const left = offset.left + this.tree_widget._getScrollLeft();
 
             return {
-                left: offset.left,
+                left,
                 top: offset.top,
-                right: offset.left + width,
+                right: left + width,
                 bottom: offset.top + height + 16
             };
         }
@@ -636,7 +642,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
     }
 }
 
-export class DragElement {
+class DragElement {
     private offset_x: number;
     private offset_y: number;
     private $element: JQuery;

@@ -27,8 +27,11 @@ export class NodeElement implements INodeElement {
     }
 
     public addDropHint(position: number): IDropHint {
-        if (position === Position.Inside) {
-            return new BorderDropHint(this.$element);
+        if (this.mustShowBorderDropHint(position)) {
+            return new BorderDropHint(
+                this.$element,
+                this.tree_widget._getScrollLeft()
+            );
         } else {
             return new GhostDropHint(this.node, this.$element, position);
         }
@@ -70,6 +73,10 @@ export class NodeElement implements INodeElement {
 
     protected getLi() {
         return this.$element;
+    }
+
+    protected mustShowBorderDropHint(position: number): boolean {
+        return position === Position.Inside;
     }
 }
 
@@ -159,12 +166,8 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    public addDropHint(position: number) {
-        if (!this.node.is_open && position === Position.Inside) {
-            return new BorderDropHint(this.$element);
-        } else {
-            return new GhostDropHint(this.node, this.$element, position);
-        }
+    protected mustShowBorderDropHint(position: number): boolean {
+        return !this.node.is_open && position === Position.Inside;
     }
 
     private getButton(): JQuery {
@@ -177,11 +180,11 @@ export class FolderElement extends NodeElement {
 export class BorderDropHint implements IDropHint {
     private $hint: JQuery;
 
-    constructor($element: JQuery) {
+    constructor($element: JQuery, scroll_left: number) {
         const $div = $element.children(".jqtree-element");
 
         const el_width = $element.width() || 0;
-        const width = Math.max(el_width - 4, 0);
+        const width = Math.max(el_width + scroll_left - 4, 0);
 
         const el_height = $div.outerHeight() || 0;
         const height = Math.max(el_height - 4, 0);
@@ -197,7 +200,7 @@ export class BorderDropHint implements IDropHint {
     }
 }
 
-export class GhostDropHint implements IDropHint {
+class GhostDropHint implements IDropHint {
     private $element: JQuery;
     private node: Node;
     private $ghost: JQuery;

@@ -383,7 +383,7 @@ class JqTreeWidget extends MouseWidget {
 
             const top = node_top - tree_top;
 
-            this.scroll_handler.scrollTo(top);
+            this.scroll_handler.scrollToY(top);
         }
 
         return this.element;
@@ -518,6 +518,12 @@ class JqTreeWidget extends MouseWidget {
         const node = this._getNode(jQuery(element));
 
         return node != null && node.tree === this.tree;
+    }
+
+    public _getScrollLeft(): number {
+        return (
+            (this.scroll_handler && this.scroll_handler.getScrollLeft()) || 0
+        );
     }
 
     protected _init() {

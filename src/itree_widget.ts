@@ -1,4 +1,5 @@
 import { Node, NodeId, Position } from "./node";
+import { IPositionInfo } from "./imouse_widget";
 
 export type IconElement = Text | HTMLElement;
 
@@ -13,6 +14,7 @@ export interface IHitArea {
 
 export interface IDragAndDropHandler {
     hovered_area: IHitArea | null;
+    position_info: IPositionInfo | null;
 }
 
 export interface IElementsRenderer {
@@ -52,6 +54,7 @@ export interface ITreeWidget {
     _getNodeElement: ($element: JQuery) => INodeElement | null;
     _getNodeElementForNode: (node: Node) => INodeElement;
     _containsElement: (element: Element) => boolean;
+    _getScrollLeft: () => number;
     refreshHitAreas: () => JQuery;
     getSelectedNode: () => Node | false;
     openNode: (node: Node, param1?: any, param2?: any) => JQuery;
