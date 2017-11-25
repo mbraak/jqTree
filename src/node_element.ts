@@ -181,10 +181,10 @@ export class BorderDropHint implements IDropHint {
         const $div = $element.children(".jqtree-element");
 
         const el_width = $element.width() || 0;
-        const width = Math.min(el_width - 4, 0);
+        const width = Math.max(el_width - 4, 0);
 
         const el_height = $div.outerHeight() || 0;
-        const height = Math.min(el_height - 4, 0);
+        const height = Math.max(el_height - 4, 0);
 
         this.$hint = jQuery('<span class="jqtree-border"></span>');
         $div.append(this.$hint);
