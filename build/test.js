@@ -78,7 +78,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -665,6 +665,12 @@ exports.getBoolString = getBoolString;
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+module.exports = jQuery;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -770,7 +776,7 @@ exports["default"] = SimpleWidget;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -786,18 +792,19 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var version_1 = __webpack_require__(4);
-var drag_and_drop_handler_1 = __webpack_require__(5);
-var elements_renderer_1 = __webpack_require__(6);
-var key_handler_1 = __webpack_require__(7);
-var mouse_widget_1 = __webpack_require__(8);
-var save_state_handler_1 = __webpack_require__(9);
-var scroll_handler_1 = __webpack_require__(10);
-var select_node_handler_1 = __webpack_require__(11);
-var simple_widget_1 = __webpack_require__(2);
+var version_1 = __webpack_require__(5);
+var jQuery = __webpack_require__(2);
+var drag_and_drop_handler_1 = __webpack_require__(6);
+var elements_renderer_1 = __webpack_require__(7);
+var key_handler_1 = __webpack_require__(8);
+var mouse_widget_1 = __webpack_require__(9);
+var save_state_handler_1 = __webpack_require__(10);
+var scroll_handler_1 = __webpack_require__(11);
+var select_node_handler_1 = __webpack_require__(12);
+var simple_widget_1 = __webpack_require__(3);
 var node_1 = __webpack_require__(0);
 var util_1 = __webpack_require__(1);
-var node_element_1 = __webpack_require__(12);
+var node_element_1 = __webpack_require__(13);
 var JqTreeWidget = /** @class */ (function (_super) {
     __extends(JqTreeWidget, _super);
     function JqTreeWidget() {
@@ -1030,9 +1037,12 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.prototype.scrollToNode = function (node) {
         if (this.scroll_handler) {
-            var $element = jQuery(node.element);
-            var top_1 = $element.offset().top - this.$el.offset().top;
-            this.scroll_handler.scrollTo(top_1);
+            var node_offset = jQuery(node.element).offset();
+            var node_top = node_offset ? node_offset.top : 0;
+            var tree_offset = this.$el.offset();
+            var tree_top = tree_offset ? tree_offset.top : 0;
+            var top_1 = node_top - tree_top;
+            this.scroll_handler.scrollToY(top_1);
         }
         return this.element;
     };
@@ -1136,6 +1146,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype._containsElement = function (element) {
         var node = this._getNode(jQuery(element));
         return node != null && node.tree === this.tree;
+    };
+    JqTreeWidget.prototype._getScrollLeft = function () {
+        return ((this.scroll_handler && this.scroll_handler.getScrollLeft()) || 0);
     };
     JqTreeWidget.prototype._init = function () {
         _super.prototype._init.call(this);
@@ -1755,7 +1768,7 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1766,7 +1779,7 @@ exports["default"] = version;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1782,6 +1795,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+var jQuery = __webpack_require__(2);
 var node_1 = __webpack_require__(0);
 var util_1 = __webpack_require__(1);
 var DragAndDropHandler = /** @class */ (function () {
@@ -1791,6 +1805,7 @@ var DragAndDropHandler = /** @class */ (function () {
         this.hit_areas = [];
         this.is_dragging = false;
         this.current_item = null;
+        this.position_info = null;
     }
     DragAndDropHandler.prototype.mouseCapture = function (position_info) {
         var $element = jQuery(position_info.target);
@@ -1826,12 +1841,15 @@ var DragAndDropHandler = /** @class */ (function () {
         else {
             this.refresh();
             var offset = jQuery(position_info.target).offset();
+            var left = offset ? offset.left : 0;
+            var top_1 = offset ? offset.top : 0;
             var node = this.current_item.node;
             var node_name = this.tree_widget.options.autoEscape
                 ? util_1.html_escape(node.name)
                 : node.name;
-            this.drag_element = new DragElement(node_name, position_info.page_x - offset.left, position_info.page_y - offset.top, this.tree_widget.element);
+            this.drag_element = new DragElement(node_name, position_info.page_x - left, position_info.page_y - top_1, this.tree_widget.element);
             this.is_dragging = true;
+            this.position_info = position_info;
             this.current_item.$element.addClass("jqtree-moving");
             return true;
         }
@@ -1842,6 +1860,7 @@ var DragAndDropHandler = /** @class */ (function () {
         }
         else {
             this.drag_element.move(position_info.page_x, position_info.page_y);
+            this.position_info = position_info;
             var area = this.findHoveredArea(position_info.page_x, position_info.page_y);
             var can_move_to = this.canMoveToArea(area);
             if (can_move_to && area) {
@@ -1885,6 +1904,7 @@ var DragAndDropHandler = /** @class */ (function () {
             this.current_item = null;
         }
         this.is_dragging = false;
+        this.position_info = null;
         if (!this.hovered_area && current_item) {
             if (this.tree_widget.options.onDragStop) {
                 this.tree_widget.options.onDragStop(current_item.node, position_info.original_event);
@@ -2028,14 +2048,23 @@ var DragAndDropHandler = /** @class */ (function () {
     };
     DragAndDropHandler.prototype.getTreeDimensions = function () {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
-        // for some to drag-and-drop the last element.
+        // to drag-and-drop after the last element.
         var offset = this.tree_widget.element.offset();
-        return {
-            left: offset.left,
-            top: offset.top,
-            right: offset.left + this.tree_widget.element.width(),
-            bottom: offset.top + this.tree_widget.element.height() + 16
-        };
+        if (!offset) {
+            return { left: 0, top: 0, right: 0, bottom: 0 };
+        }
+        else {
+            var el = this.tree_widget.element;
+            var width = el.width() || 0;
+            var height = el.height() || 0;
+            var left = offset.left + this.tree_widget._getScrollLeft();
+            return {
+                left: left,
+                top: offset.top,
+                right: left + width,
+                bottom: offset.top + height + 16
+            };
+        }
     };
     return DragAndDropHandler;
 }());
@@ -2181,7 +2210,8 @@ var HitAreasGenerator = /** @class */ (function (_super) {
         }
     };
     HitAreasGenerator.prototype.getTop = function ($element) {
-        return $element.offset().top;
+        var offset = $element.offset();
+        return offset ? offset.top : 0;
     };
     HitAreasGenerator.prototype.addPosition = function (node, position, top) {
         var area = {
@@ -2233,11 +2263,10 @@ var DragElement = /** @class */ (function () {
     };
     return DragElement;
 }());
-exports.DragElement = DragElement;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2443,7 +2472,7 @@ exports["default"] = ElementsRenderer;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2567,7 +2596,7 @@ exports["default"] = KeyHandler;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2586,7 +2615,7 @@ exports.__esModule = true;
 /*
 This widget does the same a the mouse widget in jqueryui.
 */
-var simple_widget_1 = __webpack_require__(2);
+var simple_widget_1 = __webpack_require__(3);
 var MouseWidget = /** @class */ (function (_super) {
     __extends(MouseWidget, _super);
     function MouseWidget() {
@@ -2729,7 +2758,7 @@ exports["default"] = MouseWidget;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2951,7 +2980,7 @@ exports["default"] = SaveStateHandler;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2964,51 +2993,55 @@ var ScrollHandler = /** @class */ (function () {
         this.is_initialized = false;
     }
     ScrollHandler.prototype.checkScrolling = function () {
-        this._ensureInit();
-        if (this.tree_widget.dnd_handler) {
-            var hovered_area = this.tree_widget.dnd_handler.hovered_area;
-            if (hovered_area && hovered_area.top !== this.previous_top) {
-                this.previous_top = hovered_area.top;
-                if (this.$scroll_parent) {
-                    this._handleScrollingWithScrollParent(hovered_area);
-                }
-                else {
-                    this._handleScrollingWithDocument(hovered_area);
-                }
-            }
-        }
+        this.ensureInit();
+        this.checkVerticalScrolling();
+        this.checkHorizontalScrolling();
     };
-    ScrollHandler.prototype.scrollTo = function (top) {
-        this._ensureInit();
+    ScrollHandler.prototype.scrollToY = function (top) {
+        this.ensureInit();
         if (this.$scroll_parent) {
             this.$scroll_parent[0].scrollTop = top;
         }
         else {
-            var tree_top = this.tree_widget.$el.offset().top;
+            var offset = this.tree_widget.$el.offset();
+            var tree_top = offset ? offset.top : 0;
             jQuery(document).scrollTop(top + tree_top);
         }
     };
     ScrollHandler.prototype.isScrolledIntoView = function ($element) {
-        this._ensureInit();
+        this.ensureInit();
         var element_bottom;
         var view_bottom;
         var element_top;
         var view_top;
+        var el_height = $element.height() || 0;
         if (this.$scroll_parent) {
             view_top = 0;
-            view_bottom = this.$scroll_parent.height();
-            element_top = $element.offset().top - this.scroll_parent_top;
-            element_bottom = element_top + $element.height();
+            view_bottom = this.$scroll_parent.height() || 0;
+            var offset = $element.offset();
+            var original_top = offset ? offset.top : 0;
+            element_top = original_top - this.scroll_parent_top;
+            element_bottom = element_top + el_height;
         }
         else {
-            view_top = jQuery(window).scrollTop();
-            view_bottom = view_top + jQuery(window).height();
-            element_top = $element.offset().top;
-            element_bottom = element_top + $element.height();
+            view_top = jQuery(window).scrollTop() || 0;
+            var window_height = jQuery(window).height() || 0;
+            view_bottom = view_top + window_height;
+            var offset = $element.offset();
+            element_top = offset ? offset.top : 0;
+            element_bottom = element_top + el_height;
         }
         return element_bottom <= view_bottom && element_top >= view_top;
     };
-    ScrollHandler.prototype._initScrollParent = function () {
+    ScrollHandler.prototype.getScrollLeft = function () {
+        if (!this.$scroll_parent) {
+            return 0;
+        }
+        else {
+            return this.$scroll_parent.scrollLeft() || 0;
+        }
+    };
+    ScrollHandler.prototype.initScrollParent = function () {
         var _this = this;
         var getParentWithOverflow = function () {
             var css_attributes = ["overflow", "overflow-y"];
@@ -3047,47 +3080,108 @@ var ScrollHandler = /** @class */ (function () {
             $scroll_parent.length &&
             $scroll_parent[0].tagName !== "HTML") {
             this.$scroll_parent = $scroll_parent;
-            this.scroll_parent_top = this.$scroll_parent.offset().top;
+            var offset = this.$scroll_parent.offset();
+            this.scroll_parent_top = offset ? offset.top : 0;
         }
         else {
             setDocumentAsScrollParent();
         }
         this.is_initialized = true;
     };
-    ScrollHandler.prototype._ensureInit = function () {
+    ScrollHandler.prototype.ensureInit = function () {
         if (!this.is_initialized) {
-            this._initScrollParent();
+            this.initScrollParent();
         }
     };
-    ScrollHandler.prototype._handleScrollingWithScrollParent = function (area) {
-        if (!this.$scroll_parent) {
+    ScrollHandler.prototype.handleVerticalScrollingWithScrollParent = function (area) {
+        var scroll_parent = this.$scroll_parent && this.$scroll_parent[0];
+        if (!scroll_parent) {
             return;
         }
+        var distance_bottom = this.scroll_parent_top + scroll_parent.offsetHeight - area.bottom;
+        if (distance_bottom < 20) {
+            scroll_parent.scrollTop += 20;
+            this.tree_widget.refreshHitAreas();
+            this.previous_top = -1;
+        }
+        else if (area.top - this.scroll_parent_top < 20) {
+            scroll_parent.scrollTop -= 20;
+            this.tree_widget.refreshHitAreas();
+            this.previous_top = -1;
+        }
+    };
+    ScrollHandler.prototype.handleVerticalScrollingWithDocument = function (area) {
+        var scroll_top = jQuery(document).scrollTop() || 0;
+        var distance_top = area.top - scroll_top;
+        if (distance_top < 20) {
+            jQuery(document).scrollTop(scroll_top - 20);
+        }
         else {
-            var distance_bottom = this.scroll_parent_top +
-                this.$scroll_parent[0].offsetHeight -
-                area.bottom;
-            if (distance_bottom < 20) {
-                this.$scroll_parent[0].scrollTop += 20;
-                this.tree_widget.refreshHitAreas();
-                this.previous_top = -1;
-            }
-            else if (area.top - this.scroll_parent_top < 20) {
-                this.$scroll_parent[0].scrollTop -= 20;
-                this.tree_widget.refreshHitAreas();
-                this.previous_top = -1;
+            var window_height = jQuery(window).height() || 0;
+            if (window_height - (area.bottom - scroll_top) < 20) {
+                jQuery(document).scrollTop(scroll_top + 20);
             }
         }
     };
-    ScrollHandler.prototype._handleScrollingWithDocument = function (area) {
-        var distance_top = area.top - jQuery(document).scrollTop();
-        if (distance_top < 20) {
-            jQuery(document).scrollTop(jQuery(document).scrollTop() - 20);
+    ScrollHandler.prototype.checkVerticalScrolling = function () {
+        var hovered_area = this.tree_widget.dnd_handler &&
+            this.tree_widget.dnd_handler.hovered_area;
+        if (hovered_area && hovered_area.top !== this.previous_top) {
+            this.previous_top = hovered_area.top;
+            if (this.$scroll_parent) {
+                this.handleVerticalScrollingWithScrollParent(hovered_area);
+            }
+            else {
+                this.handleVerticalScrollingWithDocument(hovered_area);
+            }
         }
-        else if (jQuery(window).height() -
-            (area.bottom - jQuery(document).scrollTop()) <
-            20) {
-            jQuery(document).scrollTop(jQuery(document).scrollTop() + 20);
+    };
+    ScrollHandler.prototype.checkHorizontalScrolling = function () {
+        var position_info = this.tree_widget.dnd_handler &&
+            this.tree_widget.dnd_handler.position_info;
+        if (!position_info) {
+            return;
+        }
+        if (this.$scroll_parent) {
+            this.handleHorizontalScrollingWithParent(position_info);
+        }
+        else {
+            this.handleHorizontalScrollingWithDocument(position_info);
+        }
+    };
+    ScrollHandler.prototype.handleHorizontalScrollingWithParent = function (position_info) {
+        var $scroll_parent = this.$scroll_parent;
+        var scroll_parent_offset = $scroll_parent && $scroll_parent.offset();
+        if (!($scroll_parent && scroll_parent_offset)) {
+            return;
+        }
+        var scroll_parent = $scroll_parent[0];
+        var can_scroll_right = scroll_parent.scrollLeft + scroll_parent.clientWidth <
+            scroll_parent.scrollWidth;
+        var can_scroll_left = scroll_parent.scrollLeft > 0;
+        var right_edge = scroll_parent_offset.left + scroll_parent.clientWidth;
+        var left_edge = scroll_parent_offset.left;
+        var is_near_right_edge = position_info.page_x > right_edge - 20;
+        var is_near_left_edge = position_info.page_x < left_edge + 20;
+        if (is_near_right_edge && can_scroll_right) {
+            scroll_parent.scrollLeft = Math.min(scroll_parent.scrollLeft + 20, scroll_parent.scrollWidth);
+        }
+        else if (is_near_left_edge && can_scroll_left) {
+            scroll_parent.scrollLeft = Math.max(scroll_parent.scrollLeft - 20, 0);
+        }
+    };
+    ScrollHandler.prototype.handleHorizontalScrollingWithDocument = function (position_info) {
+        var $document = jQuery(document);
+        var scroll_left = $document.scrollLeft() || 0;
+        var window_width = jQuery(window).width() || 0;
+        var can_scroll_left = scroll_left > 0;
+        var is_near_right_edge = position_info.page_x > window_width - 20;
+        var is_near_left_edge = position_info.page_x - scroll_left < 20;
+        if (is_near_right_edge) {
+            $document.scrollLeft(scroll_left + 20);
+        }
+        else if (is_near_left_edge && can_scroll_left) {
+            $document.scrollLeft(Math.max(scroll_left - 20, 0));
         }
     };
     return ScrollHandler;
@@ -3096,7 +3190,7 @@ exports["default"] = ScrollHandler;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3211,7 +3305,7 @@ exports["default"] = SelectNodeHandler;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3241,8 +3335,8 @@ var NodeElement = /** @class */ (function () {
         this.$element = jQuery(node.element);
     };
     NodeElement.prototype.addDropHint = function (position) {
-        if (position === node_1.Position.Inside) {
-            return new BorderDropHint(this.$element);
+        if (this.mustShowBorderDropHint(position)) {
+            return new BorderDropHint(this.$element, this.tree_widget._getScrollLeft());
         }
         else {
             return new GhostDropHint(this.node, this.$element, position);
@@ -3274,6 +3368,9 @@ var NodeElement = /** @class */ (function () {
     };
     NodeElement.prototype.getLi = function () {
         return this.$element;
+    };
+    NodeElement.prototype.mustShowBorderDropHint = function (position) {
+        return position === node_1.Position.Inside;
     };
     return NodeElement;
 }());
@@ -3350,13 +3447,8 @@ var FolderElement = /** @class */ (function (_super) {
             }
         }
     };
-    FolderElement.prototype.addDropHint = function (position) {
-        if (!this.node.is_open && position === node_1.Position.Inside) {
-            return new BorderDropHint(this.$element);
-        }
-        else {
-            return new GhostDropHint(this.node, this.$element, position);
-        }
+    FolderElement.prototype.mustShowBorderDropHint = function (position) {
+        return !this.node.is_open && position === node_1.Position.Inside;
     };
     FolderElement.prototype.getButton = function () {
         return this.$element
@@ -3367,15 +3459,15 @@ var FolderElement = /** @class */ (function (_super) {
 }(NodeElement));
 exports.FolderElement = FolderElement;
 var BorderDropHint = /** @class */ (function () {
-    function BorderDropHint($element) {
+    function BorderDropHint($element, scroll_left) {
         var $div = $element.children(".jqtree-element");
-        var width = $element.width() - 4;
+        var el_width = $element.width() || 0;
+        var width = Math.max(el_width + scroll_left - 4, 0);
+        var el_height = $div.outerHeight() || 0;
+        var height = Math.max(el_height - 4, 0);
         this.$hint = jQuery('<span class="jqtree-border"></span>');
         $div.append(this.$hint);
-        this.$hint.css({
-            width: width,
-            height: $div.outerHeight() - 4
-        });
+        this.$hint.css({ width: width, height: height });
     }
     BorderDropHint.prototype.remove = function () {
         this.$hint.remove();
@@ -3421,11 +3513,10 @@ var GhostDropHint = /** @class */ (function () {
     };
     return GhostDropHint;
 }());
-exports.GhostDropHint = GhostDropHint;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3506,28 +3597,28 @@ exports.doGetNodeById = doGetNodeById;
 
 
 /***/ }),
-/* 14 */,
-/* 15 */
+/* 15 */,
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(16);
+module.exports = __webpack_require__(17);
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-__webpack_require__(17);
 __webpack_require__(18);
 __webpack_require__(19);
+__webpack_require__(20);
 QUnit.config.testTimeout = 5000;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3548,14 +3639,14 @@ test("getPosition", function (assert) {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
 var module = QUnit.module, test = QUnit.test;
-var utils_for_test_1 = __webpack_require__(13);
+var utils_for_test_1 = __webpack_require__(14);
 var node_1 = __webpack_require__(0);
 module("Tree");
 test("constructor", function (assert) {
@@ -4036,16 +4127,16 @@ test("getNodeByCallback", function (assert) {
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-__webpack_require__(3);
-var utils_for_test_1 = __webpack_require__(13);
+__webpack_require__(4);
+var utils_for_test_1 = __webpack_require__(14);
 var node_1 = __webpack_require__(0);
-__webpack_require__(20);
+__webpack_require__(21);
 var module = QUnit.module, test = QUnit.test;
 module("jqtree", {
     beforeEach: function () {
@@ -4063,7 +4154,9 @@ test("create jqtree from data", function (assert) {
         data: utils_for_test_1.example_data
     });
     assert.equal($("#tree1").children().length, 1, "number of children on level 0");
-    assert.ok($("#tree1").children().is("ul.jqtree-tree"), "first element is ul.jqtree-tree");
+    assert.ok($("#tree1")
+        .children()
+        .is("ul.jqtree-tree"), "first element is ul.jqtree-tree");
     assert.equal($("#tree1 ul.jqtree-tree > li").length, 2, "number of children on level 1");
     assert.ok($("#tree1 ul.jqtree-tree li:eq(0)").is("li.jqtree-folder.jqtree-closed"), "first child is li.jqtree-folder.jqtree-closed");
     assert.ok($("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element > a.jqtree-toggler").is("a.jqtree-toggler.jqtree-closed"), "button in first folder");
@@ -4813,8 +4906,8 @@ test("mouse events", function (assert) {
     // 2: trigger mouse move to child3
     var child3_offset = $child3.offset();
     $tree.trigger($.Event("mousemove", {
-        pageX: child3_offset.left,
-        pageY: child3_offset.top
+        pageX: child3_offset ? child3_offset.left : 0,
+        pageY: child3_offset ? child3_offset.top : 0
     }));
     $tree.trigger("mouseup");
     assert.equal(utils_for_test_1.formatTitles($tree), "node2 child3 node1 child1 child2");
@@ -4985,7 +5078,7 @@ test("onLoadFailed", function (assert) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
