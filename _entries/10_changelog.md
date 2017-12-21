@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.4.4 (december 21 2017)
 
 * Issue #506: use jQuery alias to fix conflict with Prototype.js
 * Issue #508: handle horizontal scrolling (thanks to Troels Holstein Kaa)
