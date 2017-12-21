@@ -40,7 +40,7 @@ export default class ElementsRenderer {
 
     public renderFromNode(node: Node) {
         // remember current li
-        const $previous_li = $(node.element);
+        const $previous_li = jQuery(node.element);
 
         // create element
         const li = this.createLi(node, node.getLevel());
@@ -86,7 +86,7 @@ export default class ElementsRenderer {
 
     private attachNodeData(node: Node, li: Element) {
         node.element = li;
-        $(li).data("node", node);
+        jQuery(li).data("node", node);
     }
 
     private createUl(is_root_node: boolean) {
@@ -124,7 +124,7 @@ export default class ElementsRenderer {
             : this.createNodeLi(node, level, is_selected);
 
         if (this.tree_widget.options.onCreateLi) {
-            this.tree_widget.options.onCreateLi(node, $(li), is_selected);
+            this.tree_widget.options.onCreateLi(node, jQuery(li), is_selected);
         }
 
         return li;
@@ -301,7 +301,7 @@ export default class ElementsRenderer {
 
             return document.createTextNode(div.innerHTML);
         } else {
-            return $(value)[0];
+            return jQuery(value)[0];
         }
     }
 }

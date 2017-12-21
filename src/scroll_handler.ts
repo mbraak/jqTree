@@ -1,4 +1,5 @@
 import { ITreeWidget, IHitArea } from "./itree_widget";
+import { IPositionInfo } from "./imouse_widget";
 
 export default class ScrollHandler {
     private tree_widget: ITreeWidget;
@@ -14,60 +15,67 @@ export default class ScrollHandler {
     }
 
     public checkScrolling() {
-        this._ensureInit();
-
-        if (this.tree_widget.dnd_handler) {
-            const hovered_area = this.tree_widget.dnd_handler.hovered_area;
-
-            if (hovered_area && hovered_area.top !== this.previous_top) {
-                this.previous_top = hovered_area.top;
-
-                if (this.$scroll_parent) {
-                    this._handleScrollingWithScrollParent(hovered_area);
-                } else {
-                    this._handleScrollingWithDocument(hovered_area);
-                }
-            }
-        }
+        this.ensureInit();
+        this.checkVerticalScrolling();
+        this.checkHorizontalScrolling();
     }
 
-    public scrollTo(top: number) {
-        this._ensureInit();
+    public scrollToY(top: number) {
+        this.ensureInit();
 
         if (this.$scroll_parent) {
             this.$scroll_parent[0].scrollTop = top;
         } else {
-            const tree_top = this.tree_widget.$el.offset().top;
-            $(document).scrollTop(top + tree_top);
+            const offset = this.tree_widget.$el.offset();
+            const tree_top = offset ? offset.top : 0;
+
+            jQuery(document).scrollTop(top + tree_top);
         }
     }
 
     public isScrolledIntoView($element: JQuery): boolean {
-        this._ensureInit();
+        this.ensureInit();
 
-        let element_bottom;
-        let view_bottom;
-        let element_top;
-        let view_top;
+        let element_bottom: number;
+        let view_bottom: number;
+        let element_top: number;
+        let view_top: number;
+
+        const el_height = $element.height() || 0;
 
         if (this.$scroll_parent) {
             view_top = 0;
-            view_bottom = this.$scroll_parent.height();
+            view_bottom = this.$scroll_parent.height() || 0;
 
-            element_top = $element.offset().top - this.scroll_parent_top;
-            element_bottom = element_top + $element.height();
+            const offset = $element.offset();
+            const original_top = offset ? offset.top : 0;
+
+            element_top = original_top - this.scroll_parent_top;
+            element_bottom = element_top + el_height;
         } else {
-            view_top = $(window).scrollTop();
-            view_bottom = view_top + $(window).height();
+            view_top = jQuery(window).scrollTop() || 0;
 
-            element_top = $element.offset().top;
-            element_bottom = element_top + $element.height();
+            const window_height = jQuery(window).height() || 0;
+            view_bottom = view_top + window_height;
+
+            const offset = $element.offset();
+
+            element_top = offset ? offset.top : 0;
+            element_bottom = element_top + el_height;
         }
 
         return element_bottom <= view_bottom && element_top >= view_top;
     }
 
-    private _initScrollParent() {
+    public getScrollLeft(): number {
+        if (!this.$scroll_parent) {
+            return 0;
+        } else {
+            return this.$scroll_parent.scrollLeft() || 0;
+        }
+    }
+
+    private initScrollParent() {
         const getParentWithOverflow = () => {
             const css_attributes = ["overflow", "overflow-y"];
 
@@ -90,7 +98,7 @@ export default class ScrollHandler {
             }
 
             for (const el of this.tree_widget.$el.parents().get()) {
-                const $el = $(el);
+                const $el = jQuery(el);
                 if (hasOverFlow($el)) {
                     return $el;
                 }
@@ -116,7 +124,9 @@ export default class ScrollHandler {
             $scroll_parent[0].tagName !== "HTML"
         ) {
             this.$scroll_parent = $scroll_parent;
-            this.scroll_parent_top = this.$scroll_parent.offset().top;
+
+            const offset = this.$scroll_parent.offset();
+            this.scroll_parent_top = offset ? offset.top : 0;
         } else {
             setDocumentAsScrollParent();
         }
@@ -124,43 +134,131 @@ export default class ScrollHandler {
         this.is_initialized = true;
     }
 
-    private _ensureInit() {
+    private ensureInit() {
         if (!this.is_initialized) {
-            this._initScrollParent();
+            this.initScrollParent();
         }
     }
 
-    private _handleScrollingWithScrollParent(area: IHitArea) {
-        if (!this.$scroll_parent) {
-            return;
-        } else {
-            const distance_bottom =
-                this.scroll_parent_top +
-                this.$scroll_parent[0].offsetHeight -
-                area.bottom;
+    private handleVerticalScrollingWithScrollParent(area: IHitArea) {
+        const scroll_parent = this.$scroll_parent && this.$scroll_parent[0];
 
-            if (distance_bottom < 20) {
-                this.$scroll_parent[0].scrollTop += 20;
-                this.tree_widget.refreshHitAreas();
-                this.previous_top = -1;
-            } else if (area.top - this.scroll_parent_top < 20) {
-                this.$scroll_parent[0].scrollTop -= 20;
-                this.tree_widget.refreshHitAreas();
-                this.previous_top = -1;
+        if (!scroll_parent) {
+            return;
+        }
+
+        const distance_bottom =
+            this.scroll_parent_top + scroll_parent.offsetHeight - area.bottom;
+
+        if (distance_bottom < 20) {
+            scroll_parent.scrollTop += 20;
+            this.tree_widget.refreshHitAreas();
+            this.previous_top = -1;
+        } else if (area.top - this.scroll_parent_top < 20) {
+            scroll_parent.scrollTop -= 20;
+            this.tree_widget.refreshHitAreas();
+            this.previous_top = -1;
+        }
+    }
+
+    private handleVerticalScrollingWithDocument(area: IHitArea) {
+        const scroll_top = jQuery(document).scrollTop() || 0;
+        const distance_top = area.top - scroll_top;
+
+        if (distance_top < 20) {
+            jQuery(document).scrollTop(scroll_top - 20);
+        } else {
+            const window_height = jQuery(window).height() || 0;
+
+            if (window_height - (area.bottom - scroll_top) < 20) {
+                jQuery(document).scrollTop(scroll_top + 20);
             }
         }
     }
 
-    private _handleScrollingWithDocument(area: IHitArea) {
-        const distance_top = area.top - $(document).scrollTop();
+    private checkVerticalScrolling() {
+        const hovered_area =
+            this.tree_widget.dnd_handler &&
+            this.tree_widget.dnd_handler.hovered_area;
 
-        if (distance_top < 20) {
-            $(document).scrollTop($(document).scrollTop() - 20);
-        } else if (
-            $(window).height() - (area.bottom - $(document).scrollTop()) <
-            20
-        ) {
-            $(document).scrollTop($(document).scrollTop() + 20);
+        if (hovered_area && hovered_area.top !== this.previous_top) {
+            this.previous_top = hovered_area.top;
+
+            if (this.$scroll_parent) {
+                this.handleVerticalScrollingWithScrollParent(hovered_area);
+            } else {
+                this.handleVerticalScrollingWithDocument(hovered_area);
+            }
+        }
+    }
+
+    private checkHorizontalScrolling() {
+        const position_info =
+            this.tree_widget.dnd_handler &&
+            this.tree_widget.dnd_handler.position_info;
+
+        if (!position_info) {
+            return;
+        }
+
+        if (this.$scroll_parent) {
+            this.handleHorizontalScrollingWithParent(position_info);
+        } else {
+            this.handleHorizontalScrollingWithDocument(position_info);
+        }
+    }
+
+    private handleHorizontalScrollingWithParent(position_info: IPositionInfo) {
+        const $scroll_parent = this.$scroll_parent;
+        const scroll_parent_offset = $scroll_parent && $scroll_parent.offset();
+
+        if (!($scroll_parent && scroll_parent_offset)) {
+            return;
+        }
+
+        const scroll_parent = $scroll_parent[0];
+
+        const can_scroll_right =
+            scroll_parent.scrollLeft + scroll_parent.clientWidth <
+            scroll_parent.scrollWidth;
+        const can_scroll_left = scroll_parent.scrollLeft > 0;
+
+        const right_edge =
+            scroll_parent_offset.left + scroll_parent.clientWidth;
+        const left_edge = scroll_parent_offset.left;
+        const is_near_right_edge = position_info.page_x > right_edge - 20;
+        const is_near_left_edge = position_info.page_x < left_edge + 20;
+
+        if (is_near_right_edge && can_scroll_right) {
+            scroll_parent.scrollLeft = Math.min(
+                scroll_parent.scrollLeft + 20,
+                scroll_parent.scrollWidth
+            );
+        } else if (is_near_left_edge && can_scroll_left) {
+            scroll_parent.scrollLeft = Math.max(
+                scroll_parent.scrollLeft - 20,
+                0
+            );
+        }
+    }
+
+    private handleHorizontalScrollingWithDocument(
+        position_info: IPositionInfo
+    ) {
+        const $document = jQuery(document);
+
+        const scroll_left = $document.scrollLeft() || 0;
+        const window_width = jQuery(window).width() || 0;
+
+        const can_scroll_left = scroll_left > 0;
+
+        const is_near_right_edge = position_info.page_x > window_width - 20;
+        const is_near_left_edge = position_info.page_x - scroll_left < 20;
+
+        if (is_near_right_edge) {
+            $document.scrollLeft(scroll_left + 20);
+        } else if (is_near_left_edge && can_scroll_left) {
+            $document.scrollLeft(Math.max(scroll_left - 20, 0));
         }
     }
 }

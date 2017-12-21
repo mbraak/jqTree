@@ -1,11 +1,7 @@
 {
     "compileOnSave": false,
-    "exclude": [
-        "_site",
-        "node_modules"
-    ],
+    "exclude": ["_site", "node_modules"],
     "compilerOptions": {
-        "typeRoots" : ["./typings/globals"],
         "moduleResolution": "node",
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -13,6 +9,7 @@
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "strict": true
     }
 }

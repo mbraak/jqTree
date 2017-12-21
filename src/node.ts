@@ -188,7 +188,7 @@ export class Node {
     var index = getChildIndex(node);
     */
     public getChildIndex(node: Node) {
-        return $.inArray(node, this.children);
+        return jQuery.inArray(node, this.children);
     }
 
     /*

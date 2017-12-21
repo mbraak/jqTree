@@ -1,3 +1,4 @@
+import * as jQuery from "jquery";
 import { Position, Node, getPositionName } from "./node";
 import { html_escape } from "./util";
 import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itree_widget";
@@ -8,9 +9,9 @@ export class DragAndDropHandler {
     public is_dragging: boolean;
     public current_item: INodeElement | null;
     public hovered_area: IHitArea | null;
+    public position_info: IPositionInfo | null;
 
     private tree_widget: ITreeWidget;
-    private $ghost: JQuery | null;
     private drag_element: DragElement | null;
     private previous_ghost: IDropHint | null;
     private open_folder_timer: number | null;
@@ -19,14 +20,14 @@ export class DragAndDropHandler {
         this.tree_widget = tree_widget;
 
         this.hovered_area = null;
-        this.$ghost = null;
         this.hit_areas = [];
         this.is_dragging = false;
         this.current_item = null;
+        this.position_info = null;
     }
 
     public mouseCapture(position_info: IPositionInfo): boolean | null {
-        const $element = $(position_info.target);
+        const $element = jQuery(position_info.target);
 
         if (!this.mustCaptureElement($element)) {
             return null;
@@ -70,7 +71,9 @@ export class DragAndDropHandler {
         } else {
             this.refresh();
 
-            const offset = $(position_info.target).offset();
+            const offset = jQuery(position_info.target).offset();
+            const left = offset ? offset.left : 0;
+            const top = offset ? offset.top : 0;
 
             const node = this.current_item.node;
 
@@ -80,12 +83,13 @@ export class DragAndDropHandler {
 
             this.drag_element = new DragElement(
                 node_name,
-                position_info.page_x - offset.left,
-                position_info.page_y - offset.top,
+                position_info.page_x - left,
+                position_info.page_y - top,
                 this.tree_widget.element
             );
 
             this.is_dragging = true;
+            this.position_info = position_info;
             this.current_item.$element.addClass("jqtree-moving");
             return true;
         }
@@ -96,6 +100,7 @@ export class DragAndDropHandler {
             return false;
         } else {
             this.drag_element.move(position_info.page_x, position_info.page_y);
+            this.position_info = position_info;
 
             const area = this.findHoveredArea(
                 position_info.page_x,
@@ -154,6 +159,7 @@ export class DragAndDropHandler {
         }
 
         this.is_dragging = false;
+        this.position_info = null;
 
         if (!this.hovered_area && current_item) {
             if (this.tree_widget.options.onDragStop) {
@@ -354,15 +360,24 @@ export class DragAndDropHandler {
 
     private getTreeDimensions() {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
-        // for some to drag-and-drop the last element.
+        // to drag-and-drop after the last element.
         const offset = this.tree_widget.element.offset();
 
-        return {
-            left: offset.left,
-            top: offset.top,
-            right: offset.left + this.tree_widget.element.width(),
-            bottom: offset.top + this.tree_widget.element.height() + 16
-        };
+        if (!offset) {
+            return { left: 0, top: 0, right: 0, bottom: 0 };
+        } else {
+            const el = this.tree_widget.element;
+            const width = el.width() || 0;
+            const height = el.height() || 0;
+            const left = offset.left + this.tree_widget._getScrollLeft();
+
+            return {
+                left,
+                top: offset.top,
+                right: left + width,
+                bottom: offset.top + height + 16
+            };
+        }
     }
 }
 
@@ -383,7 +398,7 @@ abstract class VisibleNodeIterator {
             let $element: JQuery | null = null;
 
             if (node.element) {
-                $element = $(node.element);
+                $element = jQuery(node.element);
 
                 if (!$element.is(":visible")) {
                     return;
@@ -548,7 +563,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             this.addPosition(
                 node,
                 Position.Before,
-                this.getTop($(node.element))
+                this.getTop(jQuery(node.element))
             );
         }
     }
@@ -581,7 +596,9 @@ export class HitAreasGenerator extends VisibleNodeIterator {
     }
 
     private getTop($element: JQuery): number {
-        return $element.offset().top;
+        const offset = $element.offset();
+
+        return offset ? offset.top : 0;
     }
 
     private addPosition(node: Node, position: number, top: number) {
@@ -625,7 +642,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
     }
 }
 
-export class DragElement {
+class DragElement {
     private offset_x: number;
     private offset_y: number;
     private $element: JQuery;
@@ -639,7 +656,7 @@ export class DragElement {
         this.offset_x = offset_x;
         this.offset_y = offset_y;
 
-        this.$element = $(
+        this.$element = jQuery(
             `<span class=\"jqtree-title jqtree-dragging\">${node_name}</span>`
         );
         this.$element.css("position", "absolute");

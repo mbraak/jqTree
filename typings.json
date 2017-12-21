@@ -1,7 +1,0 @@
-{
-  "globalDependencies": {
-    "jquery": "registry:dt/jquery#1.10.0+20170123093700",
-    "jquery-mockjax": "registry:dt/jquery-mockjax#2.0.1+20160915014424",
-    "qunit": "registry:dt/qunit#2.0.1+20161119044246"
-  }
-}

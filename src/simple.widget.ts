@@ -5,7 +5,7 @@ export default class SimpleWidget {
         const getDataKey = () => `simple_widget_${widget_name}`;
 
         function getWidgetData(el: Element, data_key: string) {
-            const widget = $.data(el, data_key);
+            const widget = jQuery.data(el, data_key);
 
             if (widget && widget instanceof SimpleWidget) {
                 return widget;
@@ -23,8 +23,8 @@ export default class SimpleWidget {
                 if (!existing_widget) {
                     const widget = new widget_class(el, options);
 
-                    if (!$.data(el, data_key)) {
-                        $.data(el, data_key, widget);
+                    if (!jQuery.data(el, data_key)) {
+                        jQuery.data(el, data_key, widget);
                     }
 
                     // Call init after setting data, so we can call methods
@@ -45,7 +45,7 @@ export default class SimpleWidget {
                     widget.destroy();
                 }
 
-                $.removeData(el, data_key);
+                jQuery.removeData(el, data_key);
             }
         }
 
@@ -57,7 +57,7 @@ export default class SimpleWidget {
             let result = null;
 
             for (const el of $el.get()) {
-                const widget = $.data(el, getDataKey());
+                const widget = jQuery.data(el, getDataKey());
 
                 if (widget && widget instanceof SimpleWidget) {
                     const widget_function = widget[function_name];
@@ -75,7 +75,7 @@ export default class SimpleWidget {
         }
 
         // tslint:disable-next-line: only-arrow-functions
-        $.fn[widget_name] = function(
+        (jQuery.fn as any)[widget_name] = function(
             this: JQuery,
             argument1: any,
             ...args: any[]
@@ -106,10 +106,10 @@ export default class SimpleWidget {
     protected $el: JQuery;
 
     constructor(el: Element, options: any) {
-        this.$el = $(el);
+        this.$el = jQuery(el);
 
         const defaults = (this.constructor as typeof SimpleWidget).defaults;
-        this.options = $.extend({}, defaults, options);
+        this.options = jQuery.extend({}, defaults, options);
     }
 
     public destroy() {

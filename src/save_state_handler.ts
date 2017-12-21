@@ -101,7 +101,7 @@ export default class SaveStateHandler {
     }
 
     private _parseState(json_data: any) {
-        const state = $.parseJSON(json_data);
+        const state = jQuery.parseJSON(json_data);
 
         // Check if selected_node is an int (instead of an array)
         if (state && state.selected_node && isInt(state.selected_node)) {

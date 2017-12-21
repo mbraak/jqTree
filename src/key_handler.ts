@@ -13,12 +13,15 @@ export default class KeyHandler {
         this.tree_widget = tree_widget;
 
         if (tree_widget.options.keyboardSupport) {
-            $(document).on("keydown.jqtree", $.proxy(this.handleKeyDown, this));
+            jQuery(document).on(
+                "keydown.jqtree",
+                jQuery.proxy(this.handleKeyDown, this)
+            );
         }
     }
 
     public deinit() {
-        $(document).off("keydown.jqtree");
+        jQuery(document).off("keydown.jqtree");
     }
 
     public moveDown() {
@@ -76,7 +79,7 @@ export default class KeyHandler {
         }
     }
 
-    public handleKeyDown(e: JQueryEventObject) {
+    public handleKeyDown(e: JQuery.Event) {
         if (!this.canHandleKeyboard()) {
             return true;
         } else {
@@ -110,7 +113,7 @@ export default class KeyHandler {
             if (
                 this.tree_widget.scroll_handler &&
                 !this.tree_widget.scroll_handler.isScrolledIntoView(
-                    $(node.element).find(".jqtree-element")
+                    jQuery(node.element).find(".jqtree-element")
                 )
             ) {
                 this.tree_widget.scrollToNode(node);
