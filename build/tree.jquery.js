@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.4.3
+ * JqTree 1.4.4
  * 
  * Copyright 2017 Marco Braak
  * 
@@ -1774,7 +1774,7 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.3";
+var version = "1.4.4";
 exports["default"] = version;
 
 
