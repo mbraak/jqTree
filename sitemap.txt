@@ -11,3 +11,4 @@ https://mbraak.github.io/jqTree/examples/09_custom_html/
 https://mbraak.github.io/jqTree/examples/10_icon_buttons/
 https://mbraak.github.io/jqTree/examples/11_right-to-left/
 https://mbraak.github.io/jqTree/examples/12_button_on_right/
+https://mbraak.github.io/jqTree/examples/13_drag_outside/
