@@ -11,8 +11,7 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "test":
-            "karma start --browsers PhantomJS --single-run && tslint src/*.ts src_test/*.ts",
+        "test": "karma start --browsers PhantomJS --single-run",
         "lint": "tslint src/*.ts src_test/*.ts",
         "watch": "webpack",
         "production":
@@ -27,7 +26,7 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
-        "@types/jquery": "^3.2.17",
+        "@types/jquery": "^3.2.18",
         "@types/jquery-mockjax": "^2.0.31",
         "@types/qunit": "^2.0.31",
         "connect": "^3.6.5",
@@ -36,9 +35,9 @@
         "gulp-rename": "^1.2.2",
         "gulp-sass": "^3.1.0",
         "gulp-typescript": "^3.2.3",
-        "jquery-mockjax": "^2.2.2",
+        "jquery-mockjax": "^2.3.0",
         "jsonfile": "^4.0.0",
-        "karma": "^1.7.1",
+        "karma": "^2.0.0",
         "karma-chrome-launcher": "^2.1.1",
         "karma-cli": "^1.0.1",
         "karma-firefox-launcher": "^1.1.0",
@@ -47,13 +46,13 @@
         "karma-webpack": "^2.0.9",
         "lodash.template": "^4.4.0",
         "phantomjs-prebuilt": "^2.1.16",
-        "prettier": "^1.9.2",
+        "prettier": "^1.10.2",
         "qunitjs": "^2.4.1",
         "serve-static": "^1.13.0",
         "ts-loader": "^3.2.0",
-        "tslint": "^5.8.0",
+        "tslint": "^5.9.1",
         "typescript": "^2.6.2",
         "webpack": "^3.10.0",
-        "webpack-dev-server": "^2.9.7"
+        "webpack-dev-server": "^2.11.0"
     }
 }
