@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+* Issue #515: do not use deprecated jquery functions
+
 ##### 1.4.4 (december 21 2017)
 
 * Issue #506: use jQuery alias to fix conflict with Prototype.js
@@ -30,8 +34,8 @@ name: changelog
 * Issue #481: fixed error that occured when opening an invalid node (thanks to
   Luciano Deriu)
 * Issue #482: changed keyboard logic (thanks to bnsblue)
-  * Set focus to the selected node.
-  * The keyboard is active if a tree node has the focus.
+    * Set focus to the selected node.
+    * The keyboard is active if a tree node has the focus.
 
 ##### 1.3.8 (april 12 2017)
 
@@ -68,7 +72,7 @@ name: changelog
 * Issue 420: Set the correct aria-level after updating a node (thanks to Fermin
   Gallego)
 * Issue 426 and 427: Make it possible to append a subtree using appendNode
-  * also works for addNodeAfter, addNodeBefore, prependNode and updateNode
+    * also works for addNodeAfter, addNodeBefore, prependNode and updateNode
 
 ##### 1.3.2 (march 3 2016)
 

@@ -13,10 +13,7 @@ export default class KeyHandler {
         this.tree_widget = tree_widget;
 
         if (tree_widget.options.keyboardSupport) {
-            jQuery(document).on(
-                "keydown.jqtree",
-                jQuery.proxy(this.handleKeyDown, this)
-            );
+            jQuery(document).on("keydown.jqtree", this.handleKeyDown);
         }
     }
 
@@ -79,7 +76,26 @@ export default class KeyHandler {
         }
     }
 
-    public handleKeyDown(e: JQuery.Event) {
+    public selectNode(node: Node | null) {
+        if (!node) {
+            return true;
+        } else {
+            this.tree_widget.selectNode(node);
+
+            if (
+                this.tree_widget.scroll_handler &&
+                !this.tree_widget.scroll_handler.isScrolledIntoView(
+                    jQuery(node.element).find(".jqtree-element")
+                )
+            ) {
+                this.tree_widget.scrollToNode(node);
+            }
+
+            return false;
+        }
+    }
+
+    private handleKeyDown = (e: JQuery.Event) => {
         if (!this.canHandleKeyboard()) {
             return true;
         } else {
@@ -102,26 +118,7 @@ export default class KeyHandler {
                     return true;
             }
         }
-    }
-
-    public selectNode(node: Node | null) {
-        if (!node) {
-            return true;
-        } else {
-            this.tree_widget.selectNode(node);
-
-            if (
-                this.tree_widget.scroll_handler &&
-                !this.tree_widget.scroll_handler.isScrolledIntoView(
-                    jQuery(node.element).find(".jqtree-element")
-                )
-            ) {
-                this.tree_widget.scrollToNode(node);
-            }
-
-            return false;
-        }
-    }
+    };
 
     private canHandleKeyboard(): boolean {
         return (
