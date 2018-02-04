@@ -20,7 +20,7 @@ $('#tree1').tree({
     dragAndDrop: true
 });
 
-$('#tree1').bind(
+$('#tree1').on(
     'tree.move',
     function(event) {
         console.log('moved_node', event.move_info.moved_node);
@@ -34,7 +34,7 @@ $('#tree1').bind(
 You can prevent the move by calling **event.preventDefault()**
 
 {% highlight js %}
-$('#tree1').bind(
+$('#tree1').on(
     'tree.move',
     function(event) {
         event.preventDefault();
@@ -45,7 +45,7 @@ $('#tree1').bind(
 You can later call **event.move_info.move_info.do_move()** to move the node. This way you can ask the user before moving the node:
 
 {% highlight js %}
-$('#tree1').bind(
+$('#tree1').on(
     'tree.move',
     function(event) {
         event.preventDefault();
@@ -60,7 +60,7 @@ $('#tree1').bind(
 Note that if you want to serialise the tree, for example to POST back to a server, you need to let tree complete the move first:
 
 {% highlight js %}
-$('#tree1').bind(
+$('#tree1').on(
     'tree.move',
     function(event)
     {

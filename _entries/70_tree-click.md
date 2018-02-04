@@ -15,7 +15,7 @@ $('#tree1').tree({
 });
 
 // bind 'tree.click' event
-$('#tree1').bind(
+$('#tree1').on(
     'tree.click',
     function(event) {
         // The clicked node is 'event.node'
@@ -28,7 +28,7 @@ $('#tree1').bind(
 The default action is to select the node. You can prevent the selection by calling **preventDefault**:
 
 {% highlight js %}
-$('#tree1').bind(
+$('#tree1').on(
     'tree.click',
     function(event) {
         event.preventDefault();

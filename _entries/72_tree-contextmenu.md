@@ -10,7 +10,7 @@ Triggered when the user right-clicks a tree node. The event contains the followi
 
 {% highlight js %}
 // bind 'tree.contextmenu' event
-$('#tree1').bind(
+$('#tree1').on(
     'tree.contextmenu',
     function(event) {
         // The clicked node is 'event.node'

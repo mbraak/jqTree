@@ -9,7 +9,7 @@ The **tree.dblclick** is fired when a tree node is double-clicked. The event con
 * **click_event**: the original click event
 
 {% highlight js %}
-$('#tree1').bind(
+$('#tree1').on(
     'tree.dblclick',
     function(event) {
         // event.node is the clicked node
