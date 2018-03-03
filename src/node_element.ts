@@ -37,7 +37,7 @@ export class NodeElement implements INodeElement {
         }
     }
 
-    public select() {
+    public select(mustSetFocus: boolean) {
         const $li = this.getLi();
 
         $li.addClass("jqtree-selected");
@@ -46,7 +46,9 @@ export class NodeElement implements INodeElement {
         const $span = this.getSpan();
         $span.attr("tabindex", this.tree_widget.options.tabIndex);
 
-        $span.focus();
+        if (mustSetFocus) {
+            $span.focus();
+        }
     }
 
     public deselect() {

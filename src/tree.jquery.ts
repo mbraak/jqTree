@@ -335,11 +335,12 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    public addToSelection(node: Node): JQuery {
+    public addToSelection(node: Node, mustSetFocus: boolean = true): JQuery {
         if (node && this.select_node_handler) {
             this.select_node_handler.addToSelection(node);
 
-            this._getNodeElementForNode(node).select();
+            this._getNodeElementForNode(node).select(mustSetFocus);
+
             this._saveState();
         }
 
@@ -942,7 +943,7 @@ class JqTreeWidget extends MouseWidget {
         if (node) {
             const node_element = this._getNodeElementForNode(node);
             if (node_element) {
-                node_element.select();
+                node_element.select(true);
             }
         }
     }
