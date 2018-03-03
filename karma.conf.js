@@ -3,27 +3,32 @@
 
 module.exports = function(config) {
     config.set({
-
         // base path that will be used to resolve all patterns (eg. files, exclude)
-        basePath: '',
+        basePath: "",
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['qunit'],
+        frameworks: ["qunit"],
 
         // list of files / patterns to load in the browser
         files: [
-            { pattern: 'static/bower_components/jquery/dist/jquery.min.js', watched: false },
-            { pattern: 'static/bower_components/jquery-mockjax/dist/jquery.mockjax.js', watched: false },
-            { pattern: 'src_test/test.ts', watched: false }
+            {
+                pattern: "static/bower_components/jquery/dist/jquery.min.js",
+                watched: false
+            },
+            {
+                pattern:
+                    "static/bower_components/jquery-mockjax/dist/jquery.mockjax.js",
+                watched: false
+            },
+            { pattern: "src_test/test.ts", watched: false }
         ],
 
         // list of files to exclude
-        exclude: [
-        ],
+        exclude: [],
 
         preprocessors: {
-            'src_test/test.ts': ['webpack']
+            "src_test/test.ts": ["webpack"]
         },
 
         webpack: {
@@ -31,27 +36,29 @@ module.exports = function(config) {
                 extensions: [".ts", ".js"]
             },
             module: {
-                loaders: [
+                rules: [
                     {
                         test: /\.ts$/,
-                        loader: "ts-loader",
-                        exclude: /node_modules/
+                        exclude: /node_modules/,
+                        use: {
+                            loader: "ts-loader"
+                        }
                     }
                 ]
             },
             externals: {
-                "jquery": "jQuery"
+                jquery: "jQuery"
             }
         },
 
         mime: {
-            'text/x-typescript': ['ts','tsx']
+            "text/x-typescript": ["ts", "tsx"]
         },
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
+        reporters: ["progress"],
 
         // web server port
         port: 9876,
@@ -68,7 +75,7 @@ module.exports = function(config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome', 'Firefox', 'PhantomJS', 'IE8 - WinXP'],
+        browsers: ["Chrome", "Firefox", "PhantomJS", "IE8 - WinXP"],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
