@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.4.5 (march 14 2018)
 
 *   Issue #515: do not use deprecated jquery functions
 *   Issue #520: add mustSetFocus parameter to addToSelection (thanks to Romario Costegillio)
