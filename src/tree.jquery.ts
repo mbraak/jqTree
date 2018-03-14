@@ -138,7 +138,7 @@ class JqTreeWidget extends MouseWidget {
         loadDataFromUrl(node1, function() { console.log('finished'); });
     */
     public loadDataFromUrl(param1?: any, param2?: any, param3?: any): JQuery {
-        if (jQuery.type(param1) === "string") {
+        if (typeof param1 === "string") {
             // first parameter is url
             this._loadDataFromUrl(param1, param2, param3);
         } else {
@@ -335,11 +335,12 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    public addToSelection(node: Node): JQuery {
+    public addToSelection(node: Node, mustSetFocus: boolean = true): JQuery {
         if (node && this.select_node_handler) {
             this.select_node_handler.addToSelection(node);
 
-            this._getNodeElementForNode(node).select();
+            this._getNodeElementForNode(node).select(mustSetFocus);
+
             this._saveState();
         }
 
@@ -567,14 +568,11 @@ class JqTreeWidget extends MouseWidget {
 
         this._initData();
 
-        this.element.click(jQuery.proxy(this._click, this));
-        this.element.dblclick(jQuery.proxy(this._dblclick, this));
+        this.element.click(this._handleClick);
+        this.element.dblclick(this._handleDblclick);
 
         if (this.options.useContextMenu) {
-            this.element.on(
-                "contextmenu",
-                jQuery.proxy(this._contextmenu, this)
-            );
+            this.element.on("contextmenu", this._handleContextmenu);
         }
     }
 
@@ -666,9 +664,9 @@ class JqTreeWidget extends MouseWidget {
             return url_info;
         };
 
-        if (jQuery.isFunction(data_url)) {
+        if (typeof data_url === "function") {
             return data_url(node);
-        } else if (jQuery.type(data_url) === "string") {
+        } else if (typeof data_url === "string") {
             return getUrlFromString();
         } else {
             return data_url;
@@ -842,7 +840,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _click(e: JQuery.Event) {
+    private _handleClick = (e: JQuery.Event) => {
         const click_target = this._getClickTarget(e.target);
 
         if (click_target) {
@@ -863,9 +861,9 @@ class JqTreeWidget extends MouseWidget {
                 }
             }
         }
-    }
+    };
 
-    private _dblclick(e: JQuery.Event) {
+    private _handleDblclick = (e: JQuery.Event) => {
         const click_target = this._getClickTarget(e.target);
 
         if (click_target && click_target.type === "label") {
@@ -874,7 +872,7 @@ class JqTreeWidget extends MouseWidget {
                 click_event: e
             });
         }
-    }
+    };
 
     private _getClickTarget(element: EventTarget) {
         const $target = jQuery(element);
@@ -915,7 +913,7 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _contextmenu(e: JQuery.Event) {
+    private _handleContextmenu = (e: JQuery.Event) => {
         const $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
         if ($div.length) {
             const node = this._getNode($div);
@@ -932,7 +930,7 @@ class JqTreeWidget extends MouseWidget {
         }
 
         return null;
-    }
+    };
 
     private _saveState() {
         if (this.options.saveState && this.save_state_handler) {
@@ -945,7 +943,7 @@ class JqTreeWidget extends MouseWidget {
         if (node) {
             const node_element = this._getNodeElementForNode(node);
             if (node_element) {
-                node_element.select();
+                node_element.select(true);
             }
         }
     }
@@ -1118,7 +1116,7 @@ class JqTreeWidget extends MouseWidget {
         };
 
         const parseUrlInfo = () => {
-            if (jQuery.type(url_info) === "string") {
+            if (typeof url_info === "string") {
                 return { url: url_info };
             }
 
@@ -1133,13 +1131,13 @@ class JqTreeWidget extends MouseWidget {
             removeLoadingClass();
             this._loadData(data, parent_node);
 
-            if (on_finished && jQuery.isFunction(on_finished)) {
+            if (on_finished && typeof on_finished === "function") {
                 on_finished();
             }
         };
 
         const getDataFromResponse = (response: any) =>
-            jQuery.isArray(response) || typeof response === "object"
+            response instanceof Array || typeof response === "object"
                 ? response
                 : response != null ? jQuery.parseJSON(response) : [];
 
@@ -1187,7 +1185,7 @@ class JqTreeWidget extends MouseWidget {
         if (!url_info) {
             removeLoadingClass();
             return;
-        } else if (jQuery.isArray(url_info)) {
+        } else if (url_info instanceof Array) {
             handeLoadData(url_info);
             return;
         } else {

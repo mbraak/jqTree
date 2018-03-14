@@ -10,7 +10,7 @@ If a node is selected, then **event.node** contains the selected node.
 If a node is deselected, then the **event.node** property is null.
 
 {% highlight js %}
-$('#tree1').bind(
+$('#tree1').on(
     'tree.select',
     function(event) {
         if (event.node) {

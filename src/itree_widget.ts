@@ -70,7 +70,7 @@ export interface INodeElement {
     $element: JQuery;
 
     addDropHint: (position: Position) => IDropHint;
-    select: () => void;
+    select: (mustSetFocus: boolean) => void;
     deselect: () => void;
 }
 

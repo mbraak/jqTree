@@ -2,6 +2,7 @@
     "compileOnSave": false,
     "exclude": ["_site", "node_modules"],
     "compilerOptions": {
+        "lib": ["es2015", "es2015.iterable", "dom"],
         "moduleResolution": "node",
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -10,6 +11,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "strictNullChecks": true,
+        "strictPropertyInitialization": false,
         "strict": true
     }
 }
