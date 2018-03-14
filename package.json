@@ -26,9 +26,9 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
-        "@types/jquery": "^3.3.0",
+        "@types/jquery": "^3.3.1",
         "@types/jquery-mockjax": "^2.0.31",
-        "@types/qunit": "^2.0.31",
+        "@types/qunit": "^2.5.0",
         "connect": "^3.6.6",
         "coveralls": "^3.0.0",
         "gulp": "^3.9.1",
@@ -49,11 +49,11 @@
         "prettier": "^1.11.1",
         "qunit": "^2.5.1",
         "serve-static": "^1.13.2",
-        "ts-loader": "^4.0.0",
+        "ts-loader": "^4.0.1",
         "tslint": "^5.9.1",
         "typescript": "^2.7.2",
-        "webpack": "^4.0.1",
-        "webpack-cli": "^2.0.9",
-        "webpack-dev-server": "^3.1.0"
+        "webpack": "^4.1.1",
+        "webpack-cli": "^2.0.12",
+        "webpack-dev-server": "^3.1.1"
     }
 }
