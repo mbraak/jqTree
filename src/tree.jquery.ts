@@ -646,6 +646,12 @@ class JqTreeWidget extends MouseWidget {
         const getUrlFromString = () => {
             const url_info: any = { url: data_url };
 
+            setUrlInfoData(url_info);
+
+            return url_info;
+        };
+
+        const setUrlInfoData = (url_info: any) => {
             if (node && node.id) {
                 // Load on demand of a subtree; add node parameter
                 const data = { node: node.id };
@@ -660,14 +666,15 @@ class JqTreeWidget extends MouseWidget {
                     url_info["data"] = data;
                 }
             }
-
-            return url_info;
         };
 
         if (typeof data_url === "function") {
             return data_url(node);
         } else if (typeof data_url === "string") {
             return getUrlFromString();
+        } else if (typeof data_url === "object") {
+            setUrlInfoData(data_url);
+            return data_url;
         } else {
             return data_url;
         }
@@ -1139,7 +1146,9 @@ class JqTreeWidget extends MouseWidget {
         const getDataFromResponse = (response: any) =>
             response instanceof Array || typeof response === "object"
                 ? response
-                : response != null ? jQuery.parseJSON(response) : [];
+                : response != null
+                    ? jQuery.parseJSON(response)
+                    : [];
 
         const filterData = (data: any) =>
             this.options.dataFilter ? this.options.dataFilter(data) : data;
