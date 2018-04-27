@@ -15,7 +15,7 @@
         "lint": "tslint src/*.ts src_test/*.ts",
         "watch": "webpack",
         "production":
-            "webpack --config webpack.config.production --mode production && gulp && cp build/tree.jquery.js .",
+            "webpack --config webpack.config.production --mode production && cp build/tree.jquery.js . && webpack --config webpack.config.production.debug --mode production && cp build/tree.jquery.js ./tree.jquery.debug.js && gulp",
         "karma": "karma start --browsers PhantomJS",
         "jekyll-build": "bundle exec jekyll build",
         "jekyll-serve": "bundle exec jekyll serve",

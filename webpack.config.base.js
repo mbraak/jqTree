@@ -1,16 +1,14 @@
-var fs = require ("fs");
+var fs = require("fs");
 var path = require("path");
 var webpack = require("webpack");
 var template = require("lodash.template");
 var jsonfile = require("jsonfile");
 
-
-module.exports = function(debug) {
+module.exports = function(debug, minimize) {
     function getHeader() {
         if (debug) {
             return "";
-        }
-        else {
+        } else {
             var header_template = fs.readFileSync("./src/header.txt", "utf8");
             var package = jsonfile.readFileSync("package.json");
 
@@ -47,19 +45,19 @@ module.exports = function(debug) {
             ]
         },
         externals: {
-            "jquery": "jQuery"
+            jquery: "jQuery"
+        },
+        optimization: {
+            minimize: minimize
         }
     };
 
     if (debug) {
         config["devtool"] = "source-map";
         config["watch"] = true;
-    }
-    else {
-        config["plugins"] = [
-            new webpack.BannerPlugin(getHeader())
-        ];
+    } else {
+        config["plugins"] = [new webpack.BannerPlugin(getHeader())];
     }
 
     return config;
-}
+};
