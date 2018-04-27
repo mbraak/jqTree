@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+*   Issue #525: add debug build (tree.jquery.debug.js) (thanks to Yurayko)
+*   Issue #526: correctly load on demand if dataUrl is an object (thanks to Yurayko)
+
 ##### 1.4.5 (march 14 2018)
 
 *   Issue #515: do not use deprecated jquery functions
