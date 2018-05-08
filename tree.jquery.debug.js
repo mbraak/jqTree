@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.4.5
+ * JqTree 1.4.6
  * 
  * Copyright 2018 Marco Braak
  * 
@@ -2529,7 +2529,7 @@ var DragElement = /** @class */ (function () {
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.5";
+var version = "1.4.6";
 exports["default"] = version;
 
 
