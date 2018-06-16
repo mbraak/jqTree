@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development
+##### 1.4.7 (june 16 2018)
 
 -   Issue #531: updateNode must trigger tree.refresh (thanks to TivoSoho)
 
