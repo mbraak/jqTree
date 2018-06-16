@@ -2,7 +2,10 @@
     "name": "jqtree",
     "version": "1.4.7",
     "description": "Tree widget for jQuery",
-    "keywords": ["jquery-plugin", "tree"],
+    "keywords": [
+        "jquery-plugin",
+        "tree"
+    ],
     "license": "Apache-2.0",
     "main": "./lib/tree.jquery.js",
     "types": "./src/tree.jquery.d.ts",
@@ -14,13 +17,13 @@
         "test": "karma start --browsers ChromeHeadlessNoSandbox --single-run",
         "lint": "tslint src/*.ts src_test/*.ts",
         "watch": "webpack",
-        "production":
-            "webpack --config webpack.config.production --mode production && cp build/tree.jquery.js . && webpack --config webpack.config.production.debug --mode production && cp build/tree.jquery.js ./tree.jquery.debug.js && gulp",
+        "production": "webpack --config webpack.config.production --mode production && cp build/tree.jquery.js . && webpack --config webpack.config.production.debug --mode production && cp build/tree.jquery.js ./tree.jquery.debug.js && gulp",
         "karma": "karma start --browsers PhantomJS",
         "jekyll-build": "bundle exec jekyll build",
         "jekyll-serve": "bundle exec jekyll serve",
         "devserver": "webpack-dev-server --mode development",
-        "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4"
+        "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
+        "coveralls": "coveralls < coverage/lcov.info"
     },
     "dependencies": {
         "jquery": ">=1.9"
@@ -35,11 +38,13 @@
         "gulp-rename": "^1.2.3",
         "gulp-sass": "^4.0.1",
         "gulp-typescript": "^4.0.2",
+        "istanbul-instrumenter-loader": "^3.0.1",
         "jquery-mockjax": "^2.3.0",
         "jsonfile": "^4.0.0",
         "karma": "^2.0.3",
         "karma-chrome-launcher": "^2.1.1",
         "karma-cli": "^1.0.1",
+        "karma-coverage-istanbul-reporter": "^2.0.1",
         "karma-qunit": "^2.1.0",
         "karma-webpack": "^3.0.0",
         "lodash.template": "^4.4.0",

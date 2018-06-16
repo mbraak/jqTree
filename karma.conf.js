@@ -43,6 +43,14 @@ module.exports = function(config) {
                         use: {
                             loader: "ts-loader"
                         }
+                    },
+                    {
+                        test: /\.ts$/,
+                        exclude: /node_modules/,
+                        use: {
+                            loader: "istanbul-instrumenter-loader"
+                        },
+                        enforce: 'post'
                     }
                 ]
             },
@@ -58,7 +66,11 @@ module.exports = function(config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ["progress"],
+        reporters: ["progress", "coverage-istanbul"],
+
+        coverageIstanbulReporter: {
+            reports: [ 'text-summary', 'lcov' ]
+        },
 
         // web server port
         port: 9876,

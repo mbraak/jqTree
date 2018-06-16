@@ -7,4 +7,4 @@ addons:
 before_script:
   - npm install
 script:
-  - yarn run test
+  - yarn run test && yarn run coveralls
