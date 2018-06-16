@@ -1,7 +1,6 @@
 {
     "name": "jqtree-docs",
     "dependencies": {
-        "blanket": "1.1.7",
         "bootstrap": "3.3.7",
         "fontawesome": "5.0.8",
         "jquery": "3.3.1",

@@ -69,7 +69,7 @@ module.exports = function(config) {
         reporters: ["progress", "coverage-istanbul"],
 
         coverageIstanbulReporter: {
-            reports: [ 'text-summary', 'lcov' ]
+            reports: [ "text-summary", "lcov" ]
         },
 
         // web server port
@@ -91,8 +91,8 @@ module.exports = function(config) {
 
         customLaunchers: {
             ChromeHeadlessNoSandbox: {
-                base: 'ChromeHeadless',
-                flags: ['--no-sandbox']
+                base: "ChromeHeadless",
+                flags: ["--no-sandbox"]
             }
         },
 
