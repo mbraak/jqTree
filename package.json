@@ -2,7 +2,10 @@
     "name": "jqtree",
     "version": "1.4.7",
     "description": "Tree widget for jQuery",
-    "keywords": ["jquery-plugin", "tree"],
+    "keywords": [
+        "jquery-plugin",
+        "tree"
+    ],
     "license": "Apache-2.0",
     "main": "./lib/tree.jquery.js",
     "types": "./src/tree.jquery.d.ts",
@@ -11,16 +14,16 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "test": "karma start --browsers PhantomJS --single-run",
+        "test": "karma start --browsers ChromeHeadlessNoSandbox --single-run",
         "lint": "tslint src/*.ts src_test/*.ts",
         "watch": "webpack",
-        "production":
-            "webpack --config webpack.config.production --mode production && cp build/tree.jquery.js . && webpack --config webpack.config.production.debug --mode production && cp build/tree.jquery.js ./tree.jquery.debug.js && gulp",
+        "production": "webpack --config webpack.config.production --mode production && cp build/tree.jquery.js . && webpack --config webpack.config.production.debug --mode production && cp build/tree.jquery.js ./tree.jquery.debug.js && gulp",
         "karma": "karma start --browsers PhantomJS",
         "jekyll-build": "bundle exec jekyll build",
         "jekyll-serve": "bundle exec jekyll serve",
         "devserver": "webpack-dev-server --mode development",
-        "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4"
+        "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
+        "coveralls": "coveralls < coverage/lcov.info"
     },
     "dependencies": {
         "jquery": ">=1.9"
@@ -29,26 +32,23 @@
         "@types/jquery": "^3.3.2",
         "@types/jquery-mockjax": "^2.0.31",
         "@types/qunit": "^2.5.1",
-        "connect": "^3.6.6",
         "coveralls": "^3.0.1",
         "gulp": "^3.9.1",
         "gulp-rename": "^1.2.3",
         "gulp-sass": "^4.0.1",
         "gulp-typescript": "^4.0.2",
+        "istanbul-instrumenter-loader": "^3.0.1",
         "jquery-mockjax": "^2.3.0",
         "jsonfile": "^4.0.0",
         "karma": "^2.0.3",
         "karma-chrome-launcher": "^2.1.1",
         "karma-cli": "^1.0.1",
-        "karma-firefox-launcher": "^1.1.0",
-        "karma-phantomjs-launcher": "^1.0.4",
+        "karma-coverage-istanbul-reporter": "^2.0.1",
         "karma-qunit": "^2.1.0",
         "karma-webpack": "^3.0.0",
         "lodash.template": "^4.4.0",
-        "phantomjs-prebuilt": "^2.1.16",
         "prettier": "^1.13.5",
         "qunit": "^2.6.1",
-        "serve-static": "^1.13.2",
         "ts-loader": "^4.4.1",
         "tslint": "^5.10.0",
         "typescript": "^2.9.1",
