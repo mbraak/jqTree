@@ -315,7 +315,7 @@ class JqTreeWidget extends MouseWidget {
             }
         }
 
-        this.renderer.renderFromNode(node);
+        this._refreshElements(node);
         this._selectCurrentNode();
 
         return this.element;
