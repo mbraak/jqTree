@@ -18,7 +18,7 @@
         "lint": "tslint src/*.ts src_test/*.ts",
         "watch": "webpack",
         "production": "webpack --config webpack.config.production --mode production && cp build/tree.jquery.js . && webpack --config webpack.config.production.debug --mode production && cp build/tree.jquery.js ./tree.jquery.debug.js && gulp",
-        "karma": "karma start --browsers PhantomJS",
+        "karma": "karma start",
         "jekyll-build": "bundle exec jekyll build",
         "jekyll-serve": "bundle exec jekyll serve",
         "devserver": "webpack-dev-server --mode development",
@@ -29,7 +29,7 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
-        "@types/jquery": "^3.3.2",
+        "@types/jquery": "^3.3.4",
         "@types/jquery-mockjax": "^2.0.31",
         "@types/qunit": "^2.5.1",
         "coveralls": "^3.0.1",
@@ -38,9 +38,9 @@
         "gulp-sass": "^4.0.1",
         "gulp-typescript": "^4.0.2",
         "istanbul-instrumenter-loader": "^3.0.1",
-        "jquery-mockjax": "^2.3.0",
+        "jquery-mockjax": "^2.4.0",
         "jsonfile": "^4.0.0",
-        "karma": "^2.0.3",
+        "karma": "^2.0.4",
         "karma-chrome-launcher": "^2.1.1",
         "karma-cli": "^1.0.1",
         "karma-coverage-istanbul-reporter": "^2.0.1",
@@ -53,7 +53,7 @@
         "tslint": "^5.10.0",
         "typescript": "^2.9.1",
         "webpack": "^4.12.0",
-        "webpack-cli": "^3.0.7",
+        "webpack-cli": "^3.0.8",
         "webpack-dev-server": "^3.1.3"
     }
 }
