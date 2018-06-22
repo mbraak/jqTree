@@ -8,7 +8,7 @@ import {
 
 export class NodeElement implements INodeElement {
     public node: Node;
-    public $element: JQuery;
+    public $element: JQuery<any>;
     protected tree_widget: ITreeWidget;
 
     constructor(node: Node, tree_widget: ITreeWidget) {

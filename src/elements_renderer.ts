@@ -293,7 +293,7 @@ export default class ElementsRenderer {
         }
     }
 
-    private createButtonElement(value: string | Element) {
+    private createButtonElement(value: string | Element): IconElement {
         if (typeof value === "string") {
             // convert value to html
             const div = document.createElement("div");

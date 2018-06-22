@@ -189,7 +189,7 @@ export class DragAndDropHandler {
         }
     }
 
-    private mustCaptureElement($element: JQuery) {
+    private mustCaptureElement($element: JQuery<any>) {
         return !$element.is("input,select,textarea");
     }
 
@@ -395,7 +395,7 @@ abstract class VisibleNodeIterator {
             let must_iterate_inside =
                 (node.is_open || !node.element) && node.hasChildren();
 
-            let $element: JQuery | null = null;
+            let $element: JQuery<any> | null = null;
 
             if (node.element) {
                 $element = jQuery(node.element);
@@ -595,7 +595,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    private getTop($element: JQuery): number {
+    private getTop($element: JQuery<any>): number {
         const offset = $element.offset();
 
         return offset ? offset.top : 0;

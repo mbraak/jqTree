@@ -8,7 +8,7 @@ import {
     isNodeOpen,
     isNodeClosed
 } from "./utils_for_test";
-import { Node, getPositionName } from "../src/node";
+import { getPositionName } from "../src/node";
 import "../src/itree_widget";
 
 const { module, test } = QUnit;
@@ -75,7 +75,7 @@ test("toggle", (assert: Assert) => {
     // create tree
     const $tree = $("#tree1");
     let $node1: JQuery;
-    let node1: Node;
+    let node1: INode;
 
     $tree.tree({
         data: example_data
@@ -131,7 +131,12 @@ test("click event", (assert: Assert) => {
         if (select_count === 1) {
             assert.equal(e.node.name, "node1");
 
-            assert.equal($tree.tree("getSelectedNode").name, "node1");
+            const selectedNode = $tree.tree("getSelectedNode");
+            assert.ok(selectedNode);
+
+            if (selectedNode) {
+                assert.equal(selectedNode.name, "node1");
+            }
 
             // deselect
             $text_span.click();
@@ -176,7 +181,7 @@ test("saveState", (assert: Assert) => {
 
     // nodes are initially closed
     const tree = $tree.tree("getTree");
-    tree.iterate((node: Node) => {
+    tree.iterate(node => {
         assert.ok(!node.is_open, "jqtree-closed");
         return true;
     });
@@ -192,7 +197,7 @@ test("saveState", (assert: Assert) => {
 
     // node2 is selected
     assert.equal(
-        $tree.tree("getSelectedNode").name,
+        ($tree.tree("getSelectedNode") as INode).name,
         "node2",
         "getSelectedNode (1)"
     );
@@ -207,7 +212,7 @@ test("saveState", (assert: Assert) => {
 
     // node2 is selected
     assert.equal(
-        $tree.tree("getSelectedNode").name,
+        ($tree.tree("getSelectedNode") as INode).name,
         "node2",
         "getSelectedNode (2)"
     );
@@ -232,7 +237,7 @@ test("getSelectedNode", (assert: Assert) => {
 
     // node1 is selected
     assert.equal(
-        $tree.tree("getSelectedNode").name,
+        ($tree.tree("getSelectedNode") as INode).name,
         "node1",
         "getSelectedNode"
     );
@@ -287,7 +292,7 @@ test("loadData", (assert: Assert) => {
     // - load new data under node 'child3'
     $tree.tree("loadData", example_data);
 
-    const child3 = $tree.tree("getNodeByName", "child3");
+    const child3 = $tree.tree("getNodeByName", "child3") as INode;
 
     const data = [
         { label: "c4", id: 200 },
@@ -330,7 +335,12 @@ test("loadData", (assert: Assert) => {
     const c5 = $tree.tree("getNodeByName", "c5");
     $tree.tree("selectNode", c5);
 
-    assert.equal($tree.tree("getSelectedNode").name, "c5");
+    let selectedNode = $tree.tree("getSelectedNode");
+    assert.ok(selectedNode);
+
+    if (selectedNode) {
+        assert.equal(selectedNode.name, "c5");
+    }
 
     const data2 = [{ label: "c7" }, { label: "c8" }];
     $tree.tree("loadData", data2, child3);
@@ -341,7 +351,12 @@ test("loadData", (assert: Assert) => {
     // - select c7; load new data under child3; note that c7 has no id
     $tree.tree("selectNode", $tree.tree("getNodeByName", "c7"));
 
-    assert.equal($tree.tree("getSelectedNode").name, "c7");
+    selectedNode = $tree.tree("getSelectedNode");
+    assert.ok(selectedNode);
+
+    if (selectedNode) {
+        assert.equal(selectedNode.name, "c7");
+    }
 
     $tree.tree("loadData", ["c9"], child3);
 
@@ -350,10 +365,15 @@ test("loadData", (assert: Assert) => {
     // - select c9 (which has no id); load new nodes under child2
     $tree.tree("selectNode", $tree.tree("getNodeByName", "c9"));
 
-    const child2 = $tree.tree("getNodeByName", "child2");
+    const child2 = $tree.tree("getNodeByName", "child2") as INode;
     $tree.tree("loadData", ["c10"], child2);
 
-    assert.equal($tree.tree("getSelectedNode").name, "c9");
+    selectedNode = $tree.tree("getSelectedNode");
+    assert.ok(selectedNode);
+
+    if (selectedNode) {
+        assert.equal(selectedNode.name, "c9");
+    }
 });
 
 test("openNode and closeNode", (assert: Assert) => {
@@ -363,7 +383,7 @@ test("openNode and closeNode", (assert: Assert) => {
         data: example_data
     });
 
-    const node2 = $tree.tree("getNodeByName", "node2");
+    const node2 = $tree.tree("getNodeByName", "node2") as INode;
     assert.equal(node2.name, "node2");
     assert.equal(node2.is_open, undefined);
 
@@ -378,8 +398,8 @@ test("openNode and closeNode", (assert: Assert) => {
     assert.equal(isNodeClosed($(node2.element)), true);
 
     // 3. open child1
-    const node1 = $tree.tree("getNodeByName", "node1");
-    const child1 = $tree.tree("getNodeByName", "child1");
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
+    const child1 = $tree.tree("getNodeByName", "child1") as INode;
 
     // add a child to child1 so it is a folder
     $tree.tree("appendNode", "child1a", child1);
@@ -406,12 +426,12 @@ function test_open_node_with_callback(
         data: example_data
     });
 
-    const node2 = $tree.tree("getNodeByName", "node2");
+    const node2 = $tree.tree("getNodeByName", "node2") as INode;
 
     // open node2
     const done = assert.async();
 
-    function handleOpenNode(node: Node) {
+    function handleOpenNode(node: INode) {
         assert.equal(node.name, "node2");
         assert.ok(node.is_open);
 
@@ -459,8 +479,8 @@ test("selectNode", (assert: Assert) => {
     assert.equal(child3.is_open, undefined);
 
     // -- select node 'child3', which is a child of 'node2'; must_open_parents = true
-    $tree.tree("selectNode", child3, true);
-    assert.equal($tree.tree("getSelectedNode").name, "child3");
+    $tree.tree("selectNode", child3);
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "child3");
 
     assert.equal(node1.is_open, undefined);
     assert.equal(node2.is_open, true);
@@ -468,7 +488,7 @@ test("selectNode", (assert: Assert) => {
 
     // -- select node 'node1'
     $tree.tree("selectNode", node1);
-    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1");
 
     // -- is 'node1' selected?
     assert.equal($tree.tree("isNodeSelected", node1), true);
@@ -494,7 +514,7 @@ test("selectNode when another node is selected", (assert: Assert) => {
 
     // -- select node 'node2'
     $tree.tree("selectNode", node2);
-    assert.equal($tree.tree("getSelectedNode").name, "node2");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node2");
 
     // -- setting event
     // -- is node 'node2' named 'deselected_node' in object's attributes?
@@ -507,7 +527,7 @@ test("selectNode when another node is selected", (assert: Assert) => {
 
     // -- select node 'node1'; node 'node2' is selected before it
     $tree.tree("selectNode", node1);
-    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1");
 
     assert.equal($tree.tree("isNodeSelected", node1), true);
 
@@ -555,16 +575,16 @@ test("getNodeById", (assert: Assert) => {
     $tree.tree({
         data: example_data
     });
-    const node2 = $tree.tree("getNodeByName", "node2");
+    const node2 = $tree.tree("getNodeByName", "node2") as INode;
 
     // 1. get 'node2' by id
-    assert.equal($tree.tree("getNodeById", 124).name, "node2");
+    assert.equal(($tree.tree("getNodeById", 124) as INode).name, "node2");
 
     // 2. get id that does not exist
     assert.equal($tree.tree("getNodeById", 333), null);
 
     // 3. get id by string
-    assert.equal($tree.tree("getNodeById", "124").name, "node2");
+    assert.equal(($tree.tree("getNodeById", "124") as INode).name, "node2");
 
     // 4. add node with string id; search by int
     $tree.tree("appendNode", {
@@ -572,8 +592,8 @@ test("getNodeById", (assert: Assert) => {
         id: "234"
     });
 
-    assert.equal($tree.tree("getNodeById", 234).name, "abc");
-    assert.equal($tree.tree("getNodeById", "234").name, "abc");
+    assert.equal(($tree.tree("getNodeById", 234) as INode).name, "abc");
+    assert.equal(($tree.tree("getNodeById", "234") as INode).name, "abc");
 
     // 5. load subtree in node2
     const subtree_data = [
@@ -587,8 +607,8 @@ test("getNodeById", (assert: Assert) => {
     const t = $tree.tree("getTree");
     assert.notEqual(t, null);
 
-    assert.equal($tree.tree("getNodeById", 200).name, "sub1");
-    assert.equal($tree.tree("getNodeById", 201).name, "sub2");
+    assert.equal(($tree.tree("getNodeById", 200) as INode).name, "sub1");
+    assert.equal(($tree.tree("getNodeById", 201) as INode).name, "sub2");
 });
 
 test("autoOpen", (assert: Assert) => {
@@ -671,7 +691,7 @@ test("onCreateLi", (assert: Assert) => {
     const $tree = $("#tree1");
     $tree.tree({
         data: example_data,
-        onCreateLi: (node: Node, $li: JQuery) => {
+        onCreateLi: (node: INode, $li: JQuery) => {
             const $span = $li.children(".jqtree-element").find("span");
             $span.html(`_${node.name}_`);
         }
@@ -699,7 +719,7 @@ test("save state", (assert: Assert) => {
 
     // 2. select node -> state is saved
     $tree.tree("selectNode", tree.children[0]);
-    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1");
 
     // 3. init tree again
     $tree.tree("destroy");
@@ -710,7 +730,7 @@ test("save state", (assert: Assert) => {
         saveState: "my_tree"
     });
 
-    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1");
 });
 
 test("generate hit areas", (assert: Assert) => {
@@ -722,7 +742,7 @@ test("generate hit areas", (assert: Assert) => {
 
     // 1. get hit areas
     const node = $tree.tree("getNodeById", 123);
-    const hit_areas = $tree.tree("testGenerateHitAreas", node);
+    const hit_areas = ($tree as any).tree("testGenerateHitAreas", node);
 
     const strings = $.map(hit_areas, hit_area => {
         const position_name = getPositionName(hit_area.position);
@@ -740,10 +760,10 @@ test("removeNode", (assert: Assert) => {
     });
 
     // 1. Remove selected node; node is 'child1'
-    const child1 = $tree.tree("getNodeByName", "child1");
+    const child1 = $tree.tree("getNodeByName", "child1") as INode;
     $tree.tree("selectNode", child1);
 
-    assert.equal($tree.tree("getSelectedNode").name, "child1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "child1");
 
     $tree.tree("removeNode", child1);
 
@@ -755,7 +775,7 @@ test("removeNode", (assert: Assert) => {
     // 2. No node is selected; remove child3
     $tree.tree("loadData", example_data);
 
-    const child3 = $tree.tree("getNodeByName", "child3");
+    const child3 = $tree.tree("getNodeByName", "child3") as INode;
     $tree.tree("removeNode", child3);
 
     assert.equal(formatTitles($tree), "node1 child1 child2 node2");
@@ -766,7 +786,7 @@ test("removeNode", (assert: Assert) => {
     $tree.tree("loadData", example_data);
 
     const child1a = $tree.tree("getNodeByName", "child1");
-    const node1 = $tree.tree("getNodeByName", "node1");
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
 
     $tree.tree("selectNode", child1a);
 
@@ -778,7 +798,7 @@ test("removeNode", (assert: Assert) => {
     // 4. Remove unselected node without an id
     $tree.tree("loadData", example_data2);
 
-    const c1 = $tree.tree("getNodeByName", "c1");
+    const c1 = $tree.tree("getNodeByName", "c1") as INode;
 
     $tree.tree("removeNode", c1);
 
@@ -792,7 +812,7 @@ test("appendNode", (assert: Assert) => {
         data: example_data
     });
 
-    const node1 = $tree.tree("getNodeByName", "node1");
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
 
     // 1. Add child3 to node1
     $tree.tree("appendNode", "child3", node1);
@@ -800,7 +820,7 @@ test("appendNode", (assert: Assert) => {
     assert.equal(formatTitles($(node1.element)), "node1 child1 child2 child3");
 
     // 2. Add child4 to child1
-    const child1 = $tree.tree("getNodeByName", "child1");
+    const child1 = $tree.tree("getNodeByName", "child1") as INode;
 
     // Node 'child1' does not have a toggler button
     assert.equal(
@@ -826,7 +846,7 @@ test("prependNode", (assert: Assert) => {
         data: example_data
     });
 
-    const node1 = $tree.tree("getNodeByName", "node1");
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
 
     // 1. Prepend child0 to node1
     $tree.tree("prependNode", "child0", node1);
@@ -842,7 +862,10 @@ test("init event for local data", (assert: Assert) => {
 
     $tree.on("tree.init", () => {
         // Check that we can call functions in 'tree.init' event
-        assert.equal($tree.tree("getNodeByName", "node2").name, "node2");
+        assert.equal(
+            ($tree.tree("getNodeByName", "node2") as INode).name,
+            "node2"
+        );
 
         done();
     });
@@ -866,7 +889,10 @@ test("init event for ajax", (assert: Assert) => {
     });
 
     $tree.on("tree.init", () => {
-        assert.equal($tree.tree("getNodeByName", "node2").name, "node2");
+        assert.equal(
+            ($tree.tree("getNodeByName", "node2") as INode).name,
+            "node2"
+        );
 
         done();
     });
@@ -886,7 +912,7 @@ test("updateNode", (assert: Assert) => {
     assert.equal(formatTitles($tree), "node1 child1 child2 node2 child3");
 
     // -- update label
-    const node2 = $tree.tree("getNodeByName", "node2");
+    const node2 = $tree.tree("getNodeByName", "node2") as INode;
     $tree.tree("updateNode", node2, "CHANGED");
 
     assert.equal(formatTitles($tree), "node1 child1 child2 CHANGED child3");
@@ -911,14 +937,14 @@ test("updateNode", (assert: Assert) => {
     assert.equal(node2.name, "xyz");
 
     // get node by id
-    const node_555 = $tree.tree("getNodeById", 555);
+    const node_555 = $tree.tree("getNodeById", 555) as INode;
     assert.equal(node_555.name, "xyz");
 
     const node_124 = $tree.tree("getNodeById", 124);
     assert.equal(node_124, undefined);
 
     // update child1
-    const child1 = $tree.tree("getNodeByName", "child1");
+    const child1 = $tree.tree("getNodeByName", "child1") as INode;
 
     $tree.tree("updateNode", child1, "child1a");
 
@@ -958,10 +984,10 @@ test("moveNode", (assert: Assert) => {
 
     $tree.tree({ data: example_data });
 
-    const child1 = $tree.tree("getNodeByName", "child1");
-    const child2 = $tree.tree("getNodeByName", "child2");
-    const node1 = $tree.tree("getNodeByName", "node1");
-    const node2 = $tree.tree("getNodeByName", "node2");
+    const child1 = $tree.tree("getNodeByName", "child1") as INode;
+    const child2 = $tree.tree("getNodeByName", "child2") as INode;
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
+    const node2 = $tree.tree("getNodeByName", "node2") as INode;
 
     // -- Move child1 after node2
     $tree.tree("moveNode", child1, node2, "after");
@@ -1009,14 +1035,14 @@ test("load on demand", (assert: Assert) => {
     });
 
     // -- open node
-    function handleOpenNode(node: Node) {
+    function handleOpenNode(node: INode) {
         assert.equal(node.name, "node1");
         assert.equal(formatTitles($tree), "node1 child1", "4");
 
         done();
     }
 
-    const node1 = $tree.tree("getNodeByName", "node1");
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
     assert.equal(formatTitles($tree), "node1", "1");
 
     $tree.tree("openNode", node1, handleOpenNode);
@@ -1027,7 +1053,7 @@ test("addNodeAfter", (assert: Assert) => {
     const $tree = $("#tree1");
 
     $tree.tree({ data: example_data });
-    const node1 = $tree.tree("getNodeByName", "node1");
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
 
     // -- add node after node1
     $tree.tree("addNodeAfter", "node3", node1);
@@ -1040,7 +1066,7 @@ test("addNodeBefore", (assert: Assert) => {
     const $tree = $("#tree1");
 
     $tree.tree({ data: example_data });
-    const node1 = $tree.tree("getNodeByName", "node1");
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
 
     // -- add node before node1
     $tree.tree("addNodeBefore", "node3", node1);
@@ -1053,7 +1079,7 @@ test("addParentNode", (assert: Assert) => {
     const $tree = $("#tree1");
 
     $tree.tree({ data: example_data });
-    const child3 = $tree.tree("getNodeByName", "child3");
+    const child3 = $tree.tree("getNodeByName", "child3") as INode;
 
     // -- add parent to child3
     $tree.tree("addParentNode", "node3", child3);
@@ -1072,7 +1098,7 @@ test("mouse events", (assert: Assert) => {
     $tree.tree("setMouseDelay", 0);
 
     function getTitleElement(node_name: string) {
-        const node = $tree.tree("getNodeByName", node_name);
+        const node = $tree.tree("getNodeByName", node_name) as INode;
         const $el = $(node.element);
         return $($el.find(".jqtree-title"));
     }
@@ -1102,8 +1128,8 @@ test("multiple select", (assert: Assert) => {
     const $tree = $("#tree1");
     $tree.tree({ data: example_data });
 
-    const child1 = $tree.tree("getNodeByName", "child1");
-    const child2 = $tree.tree("getNodeByName", "child2");
+    const child1 = $tree.tree("getNodeByName", "child1") as INode;
+    const child2 = $tree.tree("getNodeByName", "child2") as INode;
 
     // -- add nodes to selection
     // todo: more nodes as parameters?
@@ -1112,8 +1138,8 @@ test("multiple select", (assert: Assert) => {
     $tree.tree("addToSelection", child2);
 
     // -- get selected nodes
-    const selected_nodes = $tree.tree("getSelectedNodes");
-    assert.equal(formatNodes(selected_nodes), "child1 child2");
+    const selectedNodes = $tree.tree("getSelectedNodes");
+    assert.equal(formatNodes(selectedNodes), "child1 child2");
 });
 
 test("keyboard", (assert: Assert) => {
@@ -1126,7 +1152,7 @@ test("keyboard", (assert: Assert) => {
 
     $tree.tree({ data: example_data });
 
-    const node1 = $tree.tree("getNodeByName", "node1");
+    const node1 = $tree.tree("getNodeByName", "node1") as INode;
 
     // select node1
     $tree.tree("selectNode", node1);
@@ -1134,29 +1160,29 @@ test("keyboard", (assert: Assert) => {
 
     // - move down; -> node2
     keyDown(40);
-    assert.equal($tree.tree("getSelectedNode").name, "node2");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node2");
 
     // - move up; -> back to node1
     keyDown(38);
-    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1");
 
     // - move right; open node1
     keyDown(39);
     assert.equal(node1.is_open, true);
-    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1");
 
     // - down -> child1
     keyDown(40);
-    assert.equal($tree.tree("getSelectedNode").name, "child1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "child1");
 
     // - up -> node1
     keyDown(38);
-    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1");
 
     // - left ->  close
     keyDown(37);
     assert.equal(node1.is_open, false);
-    assert.equal($tree.tree("getSelectedNode").name, "node1");
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1");
 });
 
 test("getNodesByProperty", (assert: Assert) => {
@@ -1165,7 +1191,7 @@ test("getNodesByProperty", (assert: Assert) => {
     $tree.tree({
         data: example_data
     });
-    const node2 = $tree.tree("getNodeByName", "node2");
+    const node2 = $tree.tree("getNodeByName", "node2") as INode;
 
     // 1. get 'node1' by property
     assert.equal(
@@ -1293,11 +1319,19 @@ test("getNodeByHtmlElement", (assert: Assert) => {
 
     // Get node for jquery element
     const node = $tree.tree("getNodeByHtmlElement", $el);
-    assert.equal(node.name, "node1");
+    assert.ok(node);
+
+    if (node) {
+        assert.equal(node.name, "node1");
+    }
 
     // Same for html element
     const node2 = $tree.tree("getNodeByHtmlElement", $el[0]);
-    assert.equal(node2.name, "node1");
+    assert.ok(node2);
+
+    if (node2) {
+        assert.equal(node2.name, "node1");
+    }
 });
 
 test("onLoadFailed", (assert: Assert) => {

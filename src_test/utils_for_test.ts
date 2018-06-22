@@ -44,13 +44,13 @@ export const example_data2 = [
     }
 ];
 
-export function formatNodes(nodes: Node[]) {
+export function formatNodes(nodes: INode[]) {
     const strings = nodes.map(node => node.name);
 
     return strings.join(" ");
 }
 
-export function isNodeClosed($node: JQuery) {
+export function isNodeClosed($node: JQuery<any>) {
     return (
         $node.is("li.jqtree-folder.jqtree-closed") &&
         $node.find("a:eq(0)").is("a.jqtree-toggler.jqtree-closed") &&
@@ -58,7 +58,7 @@ export function isNodeClosed($node: JQuery) {
     );
 }
 
-export function isNodeOpen($node: JQuery) {
+export function isNodeOpen($node: JQuery<any>) {
     return (
         $node.is("li.jqtree-folder") &&
         $node.find("a:eq(0)").is("a.jqtree-toggler") &&
@@ -68,7 +68,7 @@ export function isNodeOpen($node: JQuery) {
     );
 }
 
-export function formatTitles($node: JQuery) {
+export function formatTitles($node: JQuery<any>) {
     const titles = $node.find(".jqtree-title").map((_, el) => $(el).text());
     return titles.toArray().join(" ");
 }
