@@ -10,6 +10,7 @@
         "semicolon": [true, "always", "ignore-bound-class-methods"],
         "space-before-function-parent": false,
         "trailing-comma": false,
+        "unified-signatures": false,
         "variable-name": false
     }
 }
