@@ -885,7 +885,7 @@ var FolderElement = /** @class */ (function (_super) {
             $button.html("");
             var button_el = $button.get(0);
             if (button_el) {
-                var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+                var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(true);
                 button_el.appendChild(icon);
             }
             var doOpen = function () {
@@ -920,7 +920,7 @@ var FolderElement = /** @class */ (function (_super) {
             $button.html("");
             var button_el = $button.get(0);
             if (button_el) {
-                var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+                var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(true);
                 button_el.appendChild(icon);
             }
             var doClose = function () {
@@ -2772,7 +2772,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
         return new_node;
     };
-    JqTreeWidget.prototype.removeNode = function (node) {
+    JqTreeWidget.prototype.removeNode = function (inode) {
+        var node = inode;
         if (node.parent && this.select_node_handler) {
             this.select_node_handler.removeFromSelection(node, true); // including children
             node.remove();
@@ -2787,7 +2788,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return node;
     };
     JqTreeWidget.prototype.prependNode = function (new_node_info, parent_node_param) {
-        var parent_node = !parent_node_param ? this.tree : parent_node_param;
+        var parent_node = !parent_node_param
+            ? this.tree
+            : parent_node_param;
         var node = parent_node.prepend(new_node_info);
         this._refreshElements(parent_node);
         return node;
@@ -3331,9 +3334,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
             this.options.onLoading(is_loading, node, $el);
         }
     };
-    JqTreeWidget.prototype._selectNode = function (node, must_toggle) {
+    JqTreeWidget.prototype._selectNode = function (inode, must_toggle) {
         var _this = this;
         if (must_toggle === void 0) { must_toggle = false; }
+        var node = inode;
         if (!this.select_node_handler) {
             return;
         }
@@ -3426,8 +3430,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
         var url_info = url_info_param;
         var addLoadingClass = function () {
             $el = parent_node ? jQuery(parent_node.element) : _this.element;
-            $el.addClass("jqtree-loading");
-            _this._notifyLoading(true, parent_node, $el);
+            if ($el) {
+                $el.addClass("jqtree-loading");
+                _this._notifyLoading(true, parent_node, $el);
+            }
         };
         var removeLoadingClass = function () {
             if ($el) {

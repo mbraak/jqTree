@@ -885,7 +885,7 @@ var FolderElement = /** @class */ (function (_super) {
             $button.html("");
             var button_el = $button.get(0);
             if (button_el) {
-                var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(false);
+                var icon = this.tree_widget.renderer.opened_icon_element.cloneNode(true);
                 button_el.appendChild(icon);
             }
             var doOpen = function () {
@@ -920,7 +920,7 @@ var FolderElement = /** @class */ (function (_super) {
             $button.html("");
             var button_el = $button.get(0);
             if (button_el) {
-                var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(false);
+                var icon = this.tree_widget.renderer.closed_icon_element.cloneNode(true);
                 button_el.appendChild(icon);
             }
             var doClose = function () {
@@ -2772,7 +2772,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
         return new_node;
     };
-    JqTreeWidget.prototype.removeNode = function (node) {
+    JqTreeWidget.prototype.removeNode = function (inode) {
+        var node = inode;
         if (node.parent && this.select_node_handler) {
             this.select_node_handler.removeFromSelection(node, true); // including children
             node.remove();
@@ -2787,7 +2788,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return node;
     };
     JqTreeWidget.prototype.prependNode = function (new_node_info, parent_node_param) {
-        var parent_node = !parent_node_param ? this.tree : parent_node_param;
+        var parent_node = !parent_node_param
+            ? this.tree
+            : parent_node_param;
         var node = parent_node.prepend(new_node_info);
         this._refreshElements(parent_node);
         return node;
@@ -3331,9 +3334,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
             this.options.onLoading(is_loading, node, $el);
         }
     };
-    JqTreeWidget.prototype._selectNode = function (node, must_toggle) {
+    JqTreeWidget.prototype._selectNode = function (inode, must_toggle) {
         var _this = this;
         if (must_toggle === void 0) { must_toggle = false; }
+        var node = inode;
         if (!this.select_node_handler) {
             return;
         }
@@ -3426,8 +3430,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
         var url_info = url_info_param;
         var addLoadingClass = function () {
             $el = parent_node ? jQuery(parent_node.element) : _this.element;
-            $el.addClass("jqtree-loading");
-            _this._notifyLoading(true, parent_node, $el);
+            if ($el) {
+                $el.addClass("jqtree-loading");
+                _this._notifyLoading(true, parent_node, $el);
+            }
         };
         var removeLoadingClass = function () {
             if ($el) {
@@ -3722,7 +3728,11 @@ test("click event", function (assert) {
         select_count += 1;
         if (select_count === 1) {
             assert.equal(e.node.name, "node1");
-            assert.equal($tree.tree("getSelectedNode").name, "node1");
+            var selectedNode = $tree.tree("getSelectedNode");
+            assert.ok(selectedNode);
+            if (selectedNode) {
+                assert.equal(selectedNode.name, "node1");
+            }
             // deselect
             $text_span.click();
         }
@@ -3855,21 +3865,33 @@ test("loadData", function (assert) {
     // - select node 'c5' and load new data under 'child3'
     var c5 = $tree.tree("getNodeByName", "c5");
     $tree.tree("selectNode", c5);
-    assert.equal($tree.tree("getSelectedNode").name, "c5");
+    var selectedNode = $tree.tree("getSelectedNode");
+    assert.ok(selectedNode);
+    if (selectedNode) {
+        assert.equal(selectedNode.name, "c5");
+    }
     var data2 = [{ label: "c7" }, { label: "c8" }];
     $tree.tree("loadData", data2, child3);
     // c5 must be deselected
     assert.equal($tree.tree("getSelectedNode"), false);
     // - select c7; load new data under child3; note that c7 has no id
     $tree.tree("selectNode", $tree.tree("getNodeByName", "c7"));
-    assert.equal($tree.tree("getSelectedNode").name, "c7");
+    selectedNode = $tree.tree("getSelectedNode");
+    assert.ok(selectedNode);
+    if (selectedNode) {
+        assert.equal(selectedNode.name, "c7");
+    }
     $tree.tree("loadData", ["c9"], child3);
     assert.equal($tree.tree("getSelectedNode"), false);
     // - select c9 (which has no id); load new nodes under child2
     $tree.tree("selectNode", $tree.tree("getNodeByName", "c9"));
     var child2 = $tree.tree("getNodeByName", "child2");
     $tree.tree("loadData", ["c10"], child2);
-    assert.equal($tree.tree("getSelectedNode").name, "c9");
+    selectedNode = $tree.tree("getSelectedNode");
+    assert.ok(selectedNode);
+    if (selectedNode) {
+        assert.equal(selectedNode.name, "c9");
+    }
 });
 test("openNode and closeNode", function (assert) {
     // setup
@@ -3949,7 +3971,7 @@ test("selectNode", function (assert) {
     assert.equal(node2.is_open, undefined);
     assert.equal(child3.is_open, undefined);
     // -- select node 'child3', which is a child of 'node2'; must_open_parents = true
-    $tree.tree("selectNode", child3, true);
+    $tree.tree("selectNode", child3);
     assert.equal($tree.tree("getSelectedNode").name, "child3");
     assert.equal(node1.is_open, undefined);
     assert.equal(node2.is_open, true);
@@ -4439,8 +4461,8 @@ test("multiple select", function (assert) {
     $tree.tree("addToSelection", child1);
     $tree.tree("addToSelection", child2);
     // -- get selected nodes
-    var selected_nodes = $tree.tree("getSelectedNodes");
-    assert.equal(utils_for_test_1.formatNodes(selected_nodes), "child1 child2");
+    var selectedNodes = $tree.tree("getSelectedNodes");
+    assert.equal(utils_for_test_1.formatNodes(selectedNodes), "child1 child2");
 });
 test("keyboard", function (assert) {
     // setup
@@ -4567,10 +4589,16 @@ test("getNodeByHtmlElement", function (assert) {
     var $el = $(".jqtree-title");
     // Get node for jquery element
     var node = $tree.tree("getNodeByHtmlElement", $el);
-    assert.equal(node.name, "node1");
+    assert.ok(node);
+    if (node) {
+        assert.equal(node.name, "node1");
+    }
     // Same for html element
     var node2 = $tree.tree("getNodeByHtmlElement", $el[0]);
-    assert.equal(node2.name, "node1");
+    assert.ok(node2);
+    if (node2) {
+        assert.equal(node2.name, "node1");
+    }
 });
 test("onLoadFailed", function (assert) {
     $.mockjax({
