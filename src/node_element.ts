@@ -99,7 +99,7 @@ export class FolderElement extends NodeElement {
 
             if (button_el) {
                 const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(
-                    false
+                    true
                 );
 
                 button_el.appendChild(icon);
@@ -141,7 +141,7 @@ export class FolderElement extends NodeElement {
 
             if (button_el) {
                 const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(
-                    false
+                    true
                 );
 
                 button_el.appendChild(icon);

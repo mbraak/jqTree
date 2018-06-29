@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development
+
+-   Issue #537: SVG xlink as openedIcon/closedIcon disappear after click (thanks to Terry Ouyang)
+
 ##### 1.4.7 (june 16 2018)
 
 -   Issue #531: updateNode must trigger tree.refresh (thanks to TivoSoho)
