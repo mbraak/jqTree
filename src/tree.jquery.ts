@@ -17,7 +17,7 @@ import { INodeElement, IHitArea, OnFinishOpenNode } from "./itree_widget";
 type CanSelectNode = (node: INode) => boolean;
 type SetFromStorage = (data: string) => void;
 type GetFromStorage = () => any;
-type CreateLi = (node: INode, el: JQuery) => void;
+type CreateLi = (node: INode, el: JQuery, is_selected: boolean) => void;
 type IsMoveHandler = (el: JQuery) => boolean;
 type CanMoveNode = CanSelectNode;
 type CanMoveNodeTo = (
