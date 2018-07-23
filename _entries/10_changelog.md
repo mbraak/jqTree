@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development
+##### 1.4.8 (july 23 2018)
 
 -   Issue #537: SVG xlink as openedIcon/closedIcon disappear after click (thanks to Terry Ouyang)
 -   Issue #538: add typescript type definitions
