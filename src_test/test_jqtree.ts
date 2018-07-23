@@ -295,11 +295,11 @@ test("loadData", (assert: Assert) => {
     const child3 = $tree.tree("getNodeByName", "child3") as INode;
 
     const data = [
-        { label: "c4", id: 200 },
+        { name: "c4", id: 200 },
         {
-            label: "c5",
+            name: "c5",
             id: 201,
-            children: [{ label: "c6", id: 202 }]
+            children: [{ name: "c6", id: 202 }]
         }
     ];
     $tree.tree("loadData", data, child3);
@@ -342,7 +342,7 @@ test("loadData", (assert: Assert) => {
         assert.equal(selectedNode.name, "c5");
     }
 
-    const data2 = [{ label: "c7" }, { label: "c8" }];
+    const data2 = [{ name: "c7" }, { name: "c8" }];
     $tree.tree("loadData", data2, child3);
 
     // c5 must be deselected
@@ -588,7 +588,7 @@ test("getNodeById", (assert: Assert) => {
 
     // 4. add node with string id; search by int
     $tree.tree("appendNode", {
-        label: "abc",
+        name: "abc",
         id: "234"
     });
 
@@ -598,9 +598,9 @@ test("getNodeById", (assert: Assert) => {
     // 5. load subtree in node2
     const subtree_data = [
         {
-            label: "sub1",
+            name: "sub1",
             id: 200,
-            children: [{ label: "sub2", id: 201 }]
+            children: [{ name: "sub2", id: 201 }]
         }
     ];
     $tree.tree("loadData", subtree_data, node2);
@@ -621,11 +621,11 @@ test("autoOpen", (assert: Assert) => {
             function(this: Element) {
                 const $li = $(this);
                 if ($li.is(".jqtree-folder") && !$li.is(".jqtree-closed")) {
-                    const label = $li
+                    const name = $li
                         .children(".jqtree-element")
                         .find("span")
                         .text();
-                    open_nodes.push(label);
+                    open_nodes.push(name);
                 }
             }
         );
@@ -643,14 +643,14 @@ test("autoOpen", (assert: Assert) => {
     */
     const data = [
         {
-            label: "l1n1",
+            name: "l1n1",
             children: [
                 "l2n1",
                 {
-                    label: "l2n2",
+                    name: "l2n2",
                     children: [
                         {
-                            label: "l3n1",
+                            name: "l3n1",
                             children: ["l4n1"]
                         }
                     ]
@@ -911,7 +911,7 @@ test("updateNode", (assert: Assert) => {
 
     assert.equal(formatTitles($tree), "node1 child1 child2 node2 child3");
 
-    // -- update label
+    // -- update name
     const node2 = $tree.tree("getNodeByName", "node2") as INode;
     $tree.tree("updateNode", node2, "CHANGED");
 
@@ -1008,7 +1008,7 @@ test("load on demand", (assert: Assert) => {
         data: [
             {
                 id: 1,
-                label: "node1",
+                name: "node1",
                 load_on_demand: true
             }
         ],
@@ -1023,7 +1023,7 @@ test("load on demand", (assert: Assert) => {
         this.responseText = [
             {
                 id: 2,
-                label: "child1"
+                name: "child1"
             }
         ];
     }
@@ -1213,7 +1213,7 @@ test("getNodesByProperty", (assert: Assert) => {
 
     // 4. add node with string id; search by int
     $tree.tree("appendNode", {
-        label: "abc",
+        name: "abc",
         id: "234",
         str_property: "111",
         int_property: 111
@@ -1231,10 +1231,10 @@ test("getNodesByProperty", (assert: Assert) => {
     // 5. load subtree in node2
     const subtree_data = [
         {
-            label: "sub1",
+            name: "sub1",
             id: 200,
             int_property: 222,
-            children: [{ label: "sub2", id: 201, int_property: 444 }]
+            children: [{ name: "sub2", id: 201, int_property: 444 }]
         }
     ];
     $tree.tree("loadData", subtree_data, node2);

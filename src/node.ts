@@ -121,14 +121,14 @@ export class Node {
     Structure of data is:
     [
         {
-            label: 'node1',
+            name: 'node1',
             children: [
-                { label: 'child1' },
-                { label: 'child2' }
+                { name: 'child1' },
+                { name: 'child2' }
             ]
         },
         {
-            label: 'node2'
+            name: 'node2'
         }
     ]
     */
