@@ -171,8 +171,8 @@ test("iterate", (assert: Assert) => {
     tree.loadFromData(example_data);
 
     // iterate over all the nodes
-    const nodes: Node[] = [];
-    tree.iterate((node: Node) => {
+    const nodes: INode[] = [];
+    tree.iterate((node: INode) => {
         nodes.push(node);
         return true;
     });
@@ -184,8 +184,8 @@ test("iterate", (assert: Assert) => {
     );
 
     // iterate over nodes on first level
-    const nodes2: Node[] = [];
-    tree.iterate((node: Node) => {
+    const nodes2: INode[] = [];
+    tree.iterate((node: INode) => {
         nodes2.push(node);
         return false;
     });
@@ -199,7 +199,7 @@ test("iterate", (assert: Assert) => {
 
     // test level parameter
     const nodes3: string[] = [];
-    tree.iterate((node: Node, level: number) => {
+    tree.iterate((node: INode, level: number) => {
         nodes3.push(`${node.name} ${level}`);
         return true;
     });

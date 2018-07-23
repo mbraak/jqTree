@@ -1,4 +1,1 @@
-// tslint:disable-next-line: interface-name
-interface JQuery {
-    tree: any;
-}
+/// <reference path="./tree.jquery.d.ts" />

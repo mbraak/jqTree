@@ -103,7 +103,7 @@ export default class SimpleWidget {
 
     public options: any;
 
-    protected $el: JQuery;
+    protected $el: JQuery<any>;
 
     constructor(el: Element, options: any) {
         this.$el = jQuery(el);

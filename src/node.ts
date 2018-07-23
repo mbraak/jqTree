@@ -19,7 +19,7 @@ export const position_names: IPositions = {
     none: Position.None
 };
 
-type IterateCallback = (node: Node, level: number) => boolean;
+type IterateCallback = (node: INode, level: number) => boolean;
 
 export function getPositionName(position: Position): string {
     for (const name in position_names) {
@@ -317,8 +317,8 @@ export class Node {
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
         let result = null;
 
-        this.iterate((node: Node) => {
-            if (callback(node)) {
+        this.iterate((node: INode) => {
+            if (callback(node as Node)) {
                 result = node;
                 return false;
             } else {
@@ -469,8 +469,8 @@ export class Node {
     }
 
     public removeChildren() {
-        this.iterate((child: Node) => {
-            this.tree.removeNodeFromIndex(child);
+        this.iterate((child: INode) => {
+            this.tree.removeNodeFromIndex(child as Node);
             return true;
         });
 
@@ -510,9 +510,9 @@ export class Node {
     public filter(f: (node: Node) => boolean): Node[] {
         const result: Node[] = [];
 
-        this.iterate((node: Node) => {
-            if (f(node)) {
-                result.push(node);
+        this.iterate((node: INode) => {
+            if (f(node as Node)) {
+                result.push(node as Node);
             }
 
             return true;

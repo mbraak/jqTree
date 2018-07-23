@@ -1,7 +1,7 @@
 import { Node, NodeId, Position } from "./node";
 import { IPositionInfo } from "./imouse_widget";
 
-export type IconElement = Text | HTMLElement;
+export type IconElement = Text | Element;
 
 export type OnFinishOpenNode = (node: Node) => void;
 
@@ -23,7 +23,7 @@ export interface IElementsRenderer {
 }
 
 export interface IScrollHandler {
-    isScrolledIntoView: ($element: JQuery) => boolean;
+    isScrolledIntoView: ($element: JQuery<any>) => boolean;
 }
 
 export interface ISelectNodeHandler {
@@ -51,7 +51,7 @@ export interface ITreeWidget {
         on_finished: OnFinishOpenNode | null
     ) => void;
     _refreshElements: (from_node: Node | null) => void;
-    _getNodeElement: ($element: JQuery) => INodeElement | null;
+    _getNodeElement: ($element: JQuery<any>) => INodeElement | null;
     _getNodeElementForNode: (node: Node) => INodeElement;
     _containsElement: (element: Element) => boolean;
     _getScrollLeft: () => number;

@@ -34,7 +34,7 @@ export default class SaveStateHandler {
         const getOpenNodeIds = () => {
             const open_nodes: NodeId[] = [];
 
-            this.tree_widget.tree.iterate((node: Node) => {
+            this.tree_widget.tree.iterate((node: INode) => {
                 if (node.is_open && node.id && node.hasChildren()) {
                     open_nodes.push(node.id);
                 }
