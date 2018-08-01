@@ -8,7 +8,7 @@ name: functions-addnodeafter
 Add a new node after this existing node.
 
 {% highlight js %}
-var node1 = $('#tree1', 'getNodeByName', 'node1');
+var node1 = $('#tree1').tree('getNodeByName', 'node1');
 $('#tree1').tree(
     'addNodeAfter',
     {
