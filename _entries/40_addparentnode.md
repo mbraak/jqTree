@@ -8,7 +8,7 @@ name: functions-addparentnode
 Add a new node as parent of this existing node.
 
 {% highlight js %}
-var node1 = $('#tree1', 'getNodeByName', 'node1');
+var node1 = $('#tree1').tree('getNodeByName', 'node1');
 $('#tree1').tree(
     'addParentNode',
     {
