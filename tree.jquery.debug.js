@@ -99,7 +99,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -116,16 +116,16 @@ var Position;
     Position[Position["Inside"] = 3] = "Inside";
     Position[Position["None"] = 4] = "None";
 })(Position = exports.Position || (exports.Position = {}));
-exports.position_names = {
+var positionNames = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
     none: Position.None
 };
 function getPositionName(position) {
-    for (var name_1 in exports.position_names) {
-        if (exports.position_names.hasOwnProperty(name_1)) {
-            if (exports.position_names[name_1] === position) {
+    for (var name_1 in positionNames) {
+        if (positionNames.hasOwnProperty(name_1)) {
+            if (positionNames[name_1] === position) {
                 return name_1;
             }
         }
@@ -133,10 +133,7 @@ function getPositionName(position) {
     return "";
 }
 exports.getPositionName = getPositionName;
-function getPosition(name) {
-    return exports.position_names[name];
-}
-exports.getPosition = getPosition;
+exports.getPosition = function (name) { return positionNames[name]; };
 var Node = /** @class */ (function () {
     function Node(o, is_root, node_class) {
         if (is_root === void 0) { is_root = false; }
@@ -202,14 +199,14 @@ var Node = /** @class */ (function () {
     Structure of data is:
     [
         {
-            label: 'node1',
+            name: 'node1',
             children: [
-                { label: 'child1' },
-                { label: 'child2' }
+                { name: 'child1' },
+                { name: 'child2' }
             ]
         },
         {
-            label: 'node2'
+            name: 'node2'
         }
     ]
     */
@@ -654,16 +651,10 @@ exports.Node = Node;
 "use strict";
 
 exports.__esModule = true;
-function isInt(n) {
-    return typeof n === "number" && n % 1 === 0;
-}
-exports.isInt = isInt;
-function isFunction(v) {
-    return typeof v === "function";
-}
-exports.isFunction = isFunction;
+exports.isInt = function (n) { return typeof n === "number" && n % 1 === 0; };
+exports.isFunction = function (v) { return typeof v === "function"; };
 // Escape a string for HTML interpolation; copied from underscore js
-function html_escape(text) {
+exports.htmlEscape = function (text) {
     return ("" + text)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -671,17 +662,8 @@ function html_escape(text) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#x27;")
         .replace(/\//g, "&#x2F;");
-}
-exports.html_escape = html_escape;
-function getBoolString(value) {
-    if (value) {
-        return "true";
-    }
-    else {
-        return "false";
-    }
-}
-exports.getBoolString = getBoolString;
+};
+exports.getBoolString = function (value) { return (value ? "true" : "false"); };
 
 
 /***/ }),
@@ -803,9 +785,12 @@ exports["default"] = SimpleWidget;
 "use strict";
 
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -817,15 +802,16 @@ var version_1 = __webpack_require__(5);
 var jQuery = __webpack_require__(2);
 var drag_and_drop_handler_1 = __webpack_require__(6);
 var elements_renderer_1 = __webpack_require__(7);
-var key_handler_1 = __webpack_require__(8);
-var mouse_widget_1 = __webpack_require__(9);
-var save_state_handler_1 = __webpack_require__(10);
-var scroll_handler_1 = __webpack_require__(11);
-var select_node_handler_1 = __webpack_require__(12);
+var data_loader_1 = __webpack_require__(8);
+var key_handler_1 = __webpack_require__(9);
+var mouse_widget_1 = __webpack_require__(10);
+var save_state_handler_1 = __webpack_require__(11);
+var scroll_handler_1 = __webpack_require__(12);
+var select_node_handler_1 = __webpack_require__(13);
 var simple_widget_1 = __webpack_require__(3);
 var node_1 = __webpack_require__(0);
 var util_1 = __webpack_require__(1);
-var node_element_1 = __webpack_require__(13);
+var node_element_1 = __webpack_require__(14);
 var JqTreeWidget = /** @class */ (function (_super) {
     __extends(JqTreeWidget, _super);
     function JqTreeWidget() {
@@ -1231,6 +1217,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             this.options.closedIcon = this._getDefaultClosedIcon();
         }
         this.renderer = new elements_renderer_1["default"](this);
+        this.dataLoader = new data_loader_1["default"](this);
         if (save_state_handler_1["default"] != null) {
             this.save_state_handler = new save_state_handler_1["default"](this);
         }
@@ -1577,11 +1564,6 @@ var JqTreeWidget = /** @class */ (function (_super) {
             }
         }
     };
-    JqTreeWidget.prototype._notifyLoading = function (is_loading, node, $el) {
-        if (this.options.onLoading) {
-            this.options.onLoading(is_loading, node, $el);
-        }
-    };
     JqTreeWidget.prototype._selectNode = function (inode, must_toggle) {
         var _this = this;
         if (must_toggle === void 0) { must_toggle = false; }
@@ -1672,88 +1654,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
         parent_node.is_loading = false;
         this._refreshElements(parent_node);
     };
-    JqTreeWidget.prototype._loadDataFromUrl = function (url_info_param, parent_node, on_finished) {
-        var _this = this;
-        var $el = null;
-        var url_info = url_info_param;
-        var addLoadingClass = function () {
-            $el = parent_node ? jQuery(parent_node.element) : _this.element;
-            if ($el) {
-                $el.addClass("jqtree-loading");
-                _this._notifyLoading(true, parent_node, $el);
-            }
-        };
-        var removeLoadingClass = function () {
-            if ($el) {
-                $el.removeClass("jqtree-loading");
-                _this._notifyLoading(false, parent_node, $el);
-            }
-        };
-        var parseUrlInfo = function () {
-            if (typeof url_info === "string") {
-                return { url: url_info };
-            }
-            if (!url_info.method) {
-                url_info.method = "get";
-            }
-            return url_info;
-        };
-        var handeLoadData = function (data) {
-            removeLoadingClass();
-            _this._loadData(data, parent_node);
-            if (on_finished && typeof on_finished === "function") {
-                on_finished();
-            }
-        };
-        var getDataFromResponse = function (response) {
-            return response instanceof Array || typeof response === "object"
-                ? response
-                : response != null
-                    ? jQuery.parseJSON(response)
-                    : [];
-        };
-        var filterData = function (data) {
-            return _this.options.dataFilter ? _this.options.dataFilter(data) : data;
-        };
-        var handleSuccess = function (response) {
-            var data = filterData(getDataFromResponse(response));
-            handeLoadData(data);
-        };
-        var handleError = function (response) {
-            removeLoadingClass();
-            if (_this.options.onLoadFailed) {
-                _this.options.onLoadFailed(response);
-            }
-        };
-        var loadDataFromUrlInfo = function () {
-            var _url_info = parseUrlInfo();
-            jQuery.ajax(jQuery.extend({}, _url_info, {
-                method: url_info.method != null
-                    ? url_info.method.toUpperCase()
-                    : "GET",
-                cache: false,
-                dataType: "json",
-                success: handleSuccess,
-                error: handleError
-            }));
-        };
-        if (!url_info_param) {
-            // Generate url for node
-            url_info = this._getDataUrlInfo(parent_node);
-        }
-        addLoadingClass();
-        if (!url_info) {
-            removeLoadingClass();
-            return;
-        }
-        else if (url_info instanceof Array) {
-            handeLoadData(url_info);
-            return;
-        }
-        else {
-            loadDataFromUrlInfo();
-            return;
-        }
+    JqTreeWidget.prototype._loadDataFromUrl = function (urlInfoParam, parentNode, onFinished) {
+        var urlInfo = urlInfoParam || this._getDataUrlInfo(parentNode);
+        this.dataLoader.loadFromUrl(urlInfo, parentNode, onFinished);
     };
     JqTreeWidget.prototype._loadFolderOnDemand = function (node, slide, on_finished) {
         var _this = this;
@@ -1823,9 +1726,12 @@ exports["default"] = version;
 "use strict";
 
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -1883,7 +1789,7 @@ var DragAndDropHandler = /** @class */ (function () {
             var top_1 = offset ? offset.top : 0;
             var node = this.current_item.node;
             var node_name = this.tree_widget.options.autoEscape
-                ? util_1.html_escape(node.name)
+                ? util_1.htmlEscape(node.name)
                 : node.name;
             this.drag_element = new DragElement(node_name, position_info.page_x - left, position_info.page_y - top_1, this.tree_widget.element);
             this.is_dragging = true;
@@ -2487,7 +2393,7 @@ var ElementsRenderer = /** @class */ (function () {
     };
     ElementsRenderer.prototype.escapeIfNecessary = function (value) {
         if (this.tree_widget.options.autoEscape) {
-            return util_1.html_escape(value);
+            return util_1.htmlEscape(value);
         }
         else {
             return value;
@@ -2511,6 +2417,98 @@ exports["default"] = ElementsRenderer;
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var DataLoader = /** @class */ (function () {
+    function DataLoader(treeWidget) {
+        this.treeWidget = treeWidget;
+    }
+    DataLoader.prototype.loadFromUrl = function (urlInfo, parentNode, onFinished) {
+        var _this = this;
+        if (!urlInfo) {
+            return;
+        }
+        var $el = this.getDomElement(parentNode);
+        this.addLoadingClass($el);
+        this.notifyLoading(true, parentNode, $el);
+        var stopLoading = function () {
+            _this.removeLoadingClass($el);
+            _this.notifyLoading(false, parentNode, $el);
+        };
+        var handleSuccess = function (data) {
+            stopLoading();
+            _this.treeWidget.loadData(_this.parseData(data), parentNode);
+            if (onFinished && typeof onFinished === "function") {
+                onFinished();
+            }
+        };
+        var handleError = function (jqXHR) {
+            stopLoading();
+            var onLoadFailed = _this.treeWidget.options.onLoadFailed;
+            if (onLoadFailed) {
+                onLoadFailed(jqXHR);
+            }
+        };
+        this.submitRequest(urlInfo, handleSuccess, handleError);
+    };
+    DataLoader.prototype.addLoadingClass = function ($el) {
+        if ($el) {
+            $el.addClass("jqtree-loading");
+        }
+    };
+    DataLoader.prototype.removeLoadingClass = function ($el) {
+        if ($el) {
+            $el.removeClass("jqtree-loading");
+        }
+    };
+    DataLoader.prototype.getDomElement = function (parentNode) {
+        if (parentNode) {
+            return jQuery(parentNode.element);
+        }
+        else {
+            return this.treeWidget.element;
+        }
+    };
+    DataLoader.prototype.notifyLoading = function (isLoading, node, $el) {
+        var onLoading = this.treeWidget.options.onLoading;
+        if (onLoading) {
+            onLoading(isLoading, node, $el);
+        }
+        this.treeWidget._triggerEvent("tree.loading_data", {
+            isLoading: isLoading,
+            node: node,
+            $el: $el
+        });
+    };
+    DataLoader.prototype.submitRequest = function (urlInfo, handleSuccess, handleError) {
+        var ajaxSettings = jQuery.extend({ method: "GET" }, typeof urlInfo === "string" ? { url: urlInfo } : urlInfo, {
+            cache: false,
+            dataType: "json",
+            success: handleSuccess,
+            error: handleError
+        });
+        ajaxSettings.method = ajaxSettings.method.toUpperCase();
+        jQuery.ajax(ajaxSettings);
+    };
+    DataLoader.prototype.parseData = function (data) {
+        var dataFilter = this.treeWidget.options.dataFilter;
+        var parsedData = data instanceof Array || typeof data === "object"
+            ? data
+            : data != null
+                ? jQuery.parseJSON(data)
+                : [];
+        return dataFilter ? dataFilter(parsedData) : parsedData;
+    };
+    return DataLoader;
+}());
+exports["default"] = DataLoader;
+
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2635,15 +2633,18 @@ exports["default"] = KeyHandler;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -2798,7 +2799,7 @@ exports["default"] = MouseWidget;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3020,7 +3021,7 @@ exports["default"] = SaveStateHandler;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3230,7 +3231,7 @@ exports["default"] = ScrollHandler;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3345,15 +3346,18 @@ exports["default"] = SelectNodeHandler;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -3558,8 +3562,8 @@ var GhostDropHint = /** @class */ (function () {
 
 
 /***/ }),
-/* 14 */,
-/* 15 */
+/* 15 */,
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(4);
