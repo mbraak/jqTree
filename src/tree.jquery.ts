@@ -2,6 +2,7 @@ import __version__ from "./version";
 import * as jQuery from "jquery";
 import { DragAndDropHandler } from "./drag_and_drop_handler";
 import ElementsRenderer from "./elements_renderer";
+import DataLoader, { HandleFinishedLoading } from "./data_loader";
 import KeyHandler from "./key_handler";
 import MouseWidget from "./mouse.widget";
 import { IPositionInfo } from "./imouse_widget";
@@ -29,7 +30,6 @@ type HandleLoadFailed = (response: any) => void;
 type HandleDataFilter = (data: any) => any;
 type HandleDrag = (node: INode, event: JQueryEventObject | Touch) => void;
 type HandleLoadData = (is_loading: boolean, node: INode, $el: JQuery) => void;
-type HandleFinishedLoading = () => void;
 
 class JqTreeWidget extends MouseWidget {
     protected static defaults = {
@@ -78,6 +78,7 @@ class JqTreeWidget extends MouseWidget {
     public tree: Node;
     public dnd_handler: DragAndDropHandler | null;
     public renderer: ElementsRenderer;
+    public dataLoader: DataLoader;
     public scroll_handler: ScrollHandler | null;
     public select_node_handler: SelectNodeHandler | null;
 
@@ -545,6 +546,7 @@ class JqTreeWidget extends MouseWidget {
         }
 
         this.renderer = new ElementsRenderer(this);
+        this.dataLoader = new DataLoader(this);
 
         if (SaveStateHandler != null) {
             this.save_state_handler = new SaveStateHandler(this);
@@ -990,16 +992,6 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _notifyLoading(
-        is_loading: boolean,
-        node: Node | null,
-        $el: JQuery
-    ) {
-        if (this.options.onLoading) {
-            this.options.onLoading(is_loading, node, $el);
-        }
-    }
-
     private _selectNode(inode: INode, must_toggle: boolean = false) {
         const node = inode as Node;
 
@@ -1106,109 +1098,13 @@ class JqTreeWidget extends MouseWidget {
     }
 
     private _loadDataFromUrl(
-        url_info_param: any,
-        parent_node: Node | null,
-        on_finished: HandleFinishedLoading | null
+        urlInfoParam: any,
+        parentNode: Node | null,
+        onFinished: HandleFinishedLoading | null
     ) {
-        let $el: JQuery<any> | null = null;
-        let url_info = url_info_param;
+        const urlInfo = urlInfoParam || this._getDataUrlInfo(parentNode);
 
-        const addLoadingClass = () => {
-            $el = parent_node ? jQuery(parent_node.element) : this.element;
-
-            if ($el) {
-                $el.addClass("jqtree-loading");
-                this._notifyLoading(true, parent_node, $el);
-            }
-        };
-
-        const removeLoadingClass = () => {
-            if ($el) {
-                $el.removeClass("jqtree-loading");
-
-                this._notifyLoading(false, parent_node, $el);
-            }
-        };
-
-        const parseUrlInfo = () => {
-            if (typeof url_info === "string") {
-                return { url: url_info };
-            }
-
-            if (!url_info.method) {
-                url_info.method = "get";
-            }
-
-            return url_info;
-        };
-
-        const handeLoadData = (data: any) => {
-            removeLoadingClass();
-            this._loadData(data, parent_node);
-
-            if (on_finished && typeof on_finished === "function") {
-                on_finished();
-            }
-        };
-
-        const getDataFromResponse = (response: any) =>
-            response instanceof Array || typeof response === "object"
-                ? response
-                : response != null
-                    ? jQuery.parseJSON(response)
-                    : [];
-
-        const filterData = (data: any) =>
-            this.options.dataFilter ? this.options.dataFilter(data) : data;
-
-        const handleSuccess = (response: any) => {
-            const data = filterData(getDataFromResponse(response));
-
-            handeLoadData(data);
-        };
-
-        const handleError = (response: any) => {
-            removeLoadingClass();
-
-            if (this.options.onLoadFailed) {
-                this.options.onLoadFailed(response);
-            }
-        };
-
-        const loadDataFromUrlInfo = () => {
-            const _url_info = parseUrlInfo();
-
-            jQuery.ajax(
-                jQuery.extend({}, _url_info, {
-                    method:
-                        url_info.method != null
-                            ? url_info.method.toUpperCase()
-                            : "GET",
-                    cache: false,
-                    dataType: "json",
-                    success: handleSuccess,
-                    error: handleError
-                })
-            );
-        };
-
-        if (!url_info_param) {
-            // Generate url for node
-            url_info = this._getDataUrlInfo(parent_node);
-        }
-
-        addLoadingClass();
-
-        if (!url_info) {
-            removeLoadingClass();
-            return;
-        } else if (url_info instanceof Array) {
-            handeLoadData(url_info);
-            return;
-        } else {
-            loadDataFromUrlInfo();
-            return;
-        }
+        this.dataLoader.loadFromUrl(urlInfo, parentNode, onFinished);
     }
 
     private _loadFolderOnDemand(

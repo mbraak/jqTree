@@ -63,6 +63,7 @@ export interface ITreeWidget {
     scrollToNode: (node: Node) => JQuery;
     getNodeById: (node_id: NodeId) => Node | null;
     getSelectedNodes: () => Node[];
+    loadData(data: any, parent_node: Node | null): JQuery;
 }
 
 export interface INodeElement {
