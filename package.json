@@ -29,7 +29,7 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
-        "@types/jquery": "^3.3.5",
+        "@types/jquery": "^3.3.6",
         "@types/jquery-mockjax": "^2.0.31",
         "@types/qunit": "^2.5.2",
         "coveralls": "^3.0.2",
@@ -40,20 +40,20 @@
         "istanbul-instrumenter-loader": "^3.0.1",
         "jquery-mockjax": "^2.5.0",
         "jsonfile": "^4.0.0",
-        "karma": "^2.0.5",
+        "karma": "^3.0.0",
         "karma-chrome-launcher": "^2.1.1",
         "karma-cli": "^1.0.1",
-        "karma-coverage-istanbul-reporter": "^2.0.1",
+        "karma-coverage-istanbul-reporter": "^2.0.2",
         "karma-qunit": "^2.1.0",
         "karma-webpack": "^3.0.0",
         "lodash.template": "^4.4.0",
-        "prettier": "^1.14.0",
-        "qunit": "^2.6.1",
-        "ts-loader": "^4.4.2",
+        "prettier": "^1.14.2",
+        "qunit": "^2.6.2",
+        "ts-loader": "^4.5.0",
         "tslint": "^5.11.0",
-        "typescript": "^3.0.1",
-        "webpack": "^4.16.4",
+        "typescript": "^3.0.3",
+        "webpack": "^4.17.1",
         "webpack-cli": "^3.1.0",
-        "webpack-dev-server": "^3.1.5"
+        "webpack-dev-server": "^3.1.7"
     }
 }
