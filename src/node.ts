@@ -12,7 +12,7 @@ interface IPositions {
     [key: string]: Position;
 }
 
-export const position_names: IPositions = {
+const positionNames: IPositions = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
@@ -22,9 +22,9 @@ export const position_names: IPositions = {
 type IterateCallback = (node: INode, level: number) => boolean;
 
 export function getPositionName(position: Position): string {
-    for (const name in position_names) {
-        if (position_names.hasOwnProperty(name)) {
-            if (position_names[name] === position) {
+    for (const name in positionNames) {
+        if (positionNames.hasOwnProperty(name)) {
+            if (positionNames[name] === position) {
                 return name;
             }
         }
@@ -33,9 +33,7 @@ export function getPositionName(position: Position): string {
     return "";
 }
 
-export function getPosition(name: string): Position {
-    return position_names[name];
-}
+export const getPosition = (name: string): Position => positionNames[name];
 
 export class Node {
     public id: NodeId;
@@ -44,7 +42,7 @@ export class Node {
     public parent: Node | null;
     public id_mapping: any;
     public tree: Node;
-    public node_class: any; // todo: type class?
+    public node_class: any;
     public load_on_demand: boolean;
     public is_open: boolean;
     public element: Element;

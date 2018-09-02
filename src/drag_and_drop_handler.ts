@@ -1,6 +1,6 @@
 import * as jQuery from "jquery";
 import { Position, Node, getPositionName } from "./node";
-import { html_escape } from "./util";
+import { htmlEscape } from "./util";
 import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itree_widget";
 import { IPositionInfo } from "./imouse_widget";
 
@@ -78,7 +78,7 @@ export class DragAndDropHandler {
             const node = this.current_item.node;
 
             const node_name: string = this.tree_widget.options.autoEscape
-                ? html_escape(node.name)
+                ? htmlEscape(node.name)
                 : node.name;
 
             this.drag_element = new DragElement(

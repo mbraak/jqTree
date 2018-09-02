@@ -1,4 +1,4 @@
-import { html_escape, getBoolString } from "./util";
+import { htmlEscape, getBoolString } from "./util";
 import { Node } from "./node";
 import { ITreeWidget, IconElement } from "./itree_widget";
 
@@ -287,7 +287,7 @@ export default class ElementsRenderer {
 
     private escapeIfNecessary(value: string): string {
         if (this.tree_widget.options.autoEscape) {
-            return html_escape(value);
+            return htmlEscape(value);
         } else {
             return value;
         }
