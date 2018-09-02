@@ -76,6 +76,12 @@ export default class DataLoader {
         if (onLoading) {
             onLoading(isLoading, node, $el);
         }
+
+        this.treeWidget._triggerEvent("tree.loading_data", {
+            isLoading,
+            node,
+            $el
+        });
     }
 
     private submitRequest(

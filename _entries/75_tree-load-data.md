@@ -3,7 +3,7 @@ title: tree.load_data
 name: event-load-data
 ---
 
-Called when data is loaded using ajax.
+Called after data is loaded using ajax.
 
 {% highlight js %}
 $('#tree1').on(

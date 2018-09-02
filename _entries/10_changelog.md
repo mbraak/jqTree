@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development
+
+-   Issue #532: add tree.loading_data event
+
 ##### 1.4.8 (july 23 2018)
 
 -   Issue #537: SVG xlink as openedIcon/closedIcon disappear after click (thanks to Terry Ouyang)
