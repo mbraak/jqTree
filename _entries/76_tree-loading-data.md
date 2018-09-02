@@ -19,7 +19,7 @@ Example code:
 
 {% highlight js %}
 $('#tree1').on(
-    'tree.loadings_data',
+    'tree.loading_data',
     function(e) {
         console.log(e.isLoading, e.node, e.$el);
     }
