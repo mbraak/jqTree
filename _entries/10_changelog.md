@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development
+##### 1.4.9 (september 9 2018)
 
 -   Issue #532: add tree.loading_data event
 

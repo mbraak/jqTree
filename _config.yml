@@ -11,7 +11,7 @@ collections:
   examples:
     output: true
 
-jqtree_version: 1.4.8
+jqtree_version: 1.4.9
 
 # Build settings
 markdown: kramdown
