@@ -131,10 +131,10 @@ export default class KeyHandler {
     private isFocusOnTree(): boolean {
         const active_element = document.activeElement;
 
-        return (
+        return Boolean(
             active_element &&
-            active_element.tagName === "SPAN" &&
-            this.tree_widget._containsElement(active_element)
+                active_element.tagName === "SPAN" &&
+                this.tree_widget._containsElement(active_element)
         );
     }
 }
