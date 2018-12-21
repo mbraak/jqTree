@@ -9,22 +9,22 @@ node1
 */
 import { Node } from "../src/node";
 
-export const example_data = [
+export const exampleData = [
     {
         label: "node1",
         id: 123, // extra data
-        int_property: 1,
-        str_property: "1",
+        intProperty: 1,
+        strProperty: "1",
         children: [
-            { label: "child1", id: 125, int_property: 2 },
+            { label: "child1", id: 125, intProperty: 2 },
             { label: "child2", id: 126 }
         ]
     },
     {
         label: "node2",
         id: 124,
-        int_property: 3,
-        str_property: "3",
+        intProperty: 3,
+        strProperty: "3",
         children: [{ label: "child3", id: 127 }]
     }
 ];
@@ -37,7 +37,7 @@ example data 2:
 ---c2
 */
 
-export const example_data2 = [
+export const exampleData2 = [
     {
         label: "main",
         children: [{ label: "c1" }, { label: "c2" }]

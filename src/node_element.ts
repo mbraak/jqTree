@@ -9,18 +9,18 @@ import {
 export class NodeElement implements INodeElement {
     public node: Node;
     public $element: JQuery<any>;
-    protected tree_widget: ITreeWidget;
+    protected treeWidget: ITreeWidget;
 
-    constructor(node: Node, tree_widget: ITreeWidget) {
-        this.init(node, tree_widget);
+    constructor(node: Node, treeWidget: ITreeWidget) {
+        this.init(node, treeWidget);
     }
 
-    public init(node: Node, tree_widget: ITreeWidget) {
+    public init(node: Node, treeWidget: ITreeWidget) {
         this.node = node;
-        this.tree_widget = tree_widget;
+        this.treeWidget = treeWidget;
 
         if (!node.element) {
-            node.element = this.tree_widget.element.get(0);
+            node.element = this.treeWidget.element.get(0);
         }
 
         this.$element = jQuery(node.element);
@@ -30,7 +30,7 @@ export class NodeElement implements INodeElement {
         if (this.mustShowBorderDropHint(position)) {
             return new BorderDropHint(
                 this.$element,
-                this.tree_widget._getScrollLeft()
+                this.treeWidget._getScrollLeft()
             );
         } else {
             return new GhostDropHint(this.node, this.$element, position);
@@ -44,7 +44,7 @@ export class NodeElement implements INodeElement {
         $li.attr("aria-selected", "true");
 
         const $span = this.getSpan();
-        $span.attr("tabindex", this.tree_widget.options.tabIndex);
+        $span.attr("tabindex", this.treeWidget.options.tabIndex);
 
         if (mustSetFocus) {
             $span.focus();
@@ -84,87 +84,92 @@ export class NodeElement implements INodeElement {
 
 export class FolderElement extends NodeElement {
     public open(
-        on_finished: OnFinishOpenNode | null,
+        onFinished: OnFinishOpenNode | null,
         slide = true,
         animationSpeed = "fast"
     ) {
-        if (!this.node.is_open) {
-            this.node.is_open = true;
+        if (this.node.is_open) {
+            return;
+        }
 
-            const $button = this.getButton();
-            $button.removeClass("jqtree-closed");
-            $button.html("");
+        this.node.is_open = true;
 
-            const button_el = $button.get(0);
+        const $button = this.getButton();
+        $button.removeClass("jqtree-closed");
+        $button.html("");
 
-            if (button_el) {
-                const icon = this.tree_widget.renderer.opened_icon_element.cloneNode(
-                    true
-                );
+        const button_el = $button.get(0);
 
-                button_el.appendChild(icon);
+        if (button_el) {
+            const icon = this.treeWidget.renderer.openedIconElement.cloneNode(
+                true
+            );
+
+            button_el.appendChild(icon);
+        }
+
+        const doOpen = () => {
+            const $li = this.getLi();
+            $li.removeClass("jqtree-closed");
+
+            const $span = this.getSpan();
+            $span.attr("aria-expanded", "true");
+
+            if (onFinished) {
+                onFinished(this.node);
             }
 
-            const doOpen = () => {
-                const $li = this.getLi();
-                $li.removeClass("jqtree-closed");
+            this.treeWidget._triggerEvent("tree.open", {
+                node: this.node
+            });
+        };
 
-                const $span = this.getSpan();
-                $span.attr("aria-expanded", "true");
-
-                if (on_finished) {
-                    on_finished(this.node);
-                }
-
-                this.tree_widget._triggerEvent("tree.open", {
-                    node: this.node
-                });
-            };
-
-            if (slide) {
-                this.getUl().slideDown(animationSpeed, doOpen);
-            } else {
-                this.getUl().show();
-                doOpen();
-            }
+        if (slide) {
+            this.getUl().slideDown(animationSpeed, doOpen);
+        } else {
+            this.getUl().show();
+            doOpen();
         }
     }
 
     public close(slide: boolean = true, animationSpeed = "fast") {
-        if (this.node.is_open) {
-            this.node.is_open = false;
-            const $button = this.getButton();
-            $button.addClass("jqtree-closed");
-            $button.html("");
+        if (!this.node.is_open) {
+            return;
+        }
 
-            const button_el = $button.get(0);
+        this.node.is_open = false;
 
-            if (button_el) {
-                const icon = this.tree_widget.renderer.closed_icon_element.cloneNode(
-                    true
-                );
+        const $button = this.getButton();
+        $button.addClass("jqtree-closed");
+        $button.html("");
 
-                button_el.appendChild(icon);
-            }
+        const button_el = $button.get(0);
 
-            const doClose = () => {
-                const $li = this.getLi();
-                $li.addClass("jqtree-closed");
+        if (button_el) {
+            const icon = this.treeWidget.renderer.closedIconElement.cloneNode(
+                true
+            );
 
-                const $span = this.getSpan();
-                $span.attr("aria-expanded", "false");
+            button_el.appendChild(icon);
+        }
 
-                this.tree_widget._triggerEvent("tree.close", {
-                    node: this.node
-                });
-            };
+        const doClose = () => {
+            const $li = this.getLi();
+            $li.addClass("jqtree-closed");
 
-            if (slide) {
-                this.getUl().slideUp(animationSpeed, doClose);
-            } else {
-                this.getUl().hide();
-                doClose();
-            }
+            const $span = this.getSpan();
+            $span.attr("aria-expanded", "false");
+
+            this.treeWidget._triggerEvent("tree.close", {
+                node: this.node
+            });
+        };
+
+        if (slide) {
+            this.getUl().slideUp(animationSpeed, doClose);
+        } else {
+            this.getUl().hide();
+            doClose();
         }
     }
 
@@ -182,14 +187,14 @@ export class FolderElement extends NodeElement {
 export class BorderDropHint implements IDropHint {
     private $hint: JQuery;
 
-    constructor($element: JQuery, scroll_left: number) {
+    constructor($element: JQuery, scrollLeft: number) {
         const $div = $element.children(".jqtree-element");
 
-        const el_width = $element.width() || 0;
-        const width = Math.max(el_width + scroll_left - 4, 0);
+        const elWidth = $element.width() || 0;
+        const width = Math.max(elWidth + scrollLeft - 4, 0);
 
-        const el_height = $div.outerHeight() || 0;
-        const height = Math.max(el_height - 4, 0);
+        const elHeight = $div.outerHeight() || 0;
+        const height = Math.max(elHeight - 4, 0);
 
         this.$hint = jQuery('<span class="jqtree-border"></span>');
         $div.append(this.$hint);

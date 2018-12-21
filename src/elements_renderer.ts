@@ -3,36 +3,36 @@ import { Node } from "./node";
 import { ITreeWidget, IconElement } from "./itree_widget";
 
 export default class ElementsRenderer {
-    public opened_icon_element: IconElement;
-    public closed_icon_element: IconElement;
-    private tree_widget: ITreeWidget;
+    public openedIconElement: IconElement;
+    public closedIconElement: IconElement;
+    private treeWidget: ITreeWidget;
 
-    constructor(tree_widget: ITreeWidget) {
-        this.tree_widget = tree_widget;
+    constructor(treeWidget: ITreeWidget) {
+        this.treeWidget = treeWidget;
 
-        this.opened_icon_element = this.createButtonElement(
-            tree_widget.options.openedIcon
+        this.openedIconElement = this.createButtonElement(
+            treeWidget.options.openedIcon
         );
-        this.closed_icon_element = this.createButtonElement(
-            tree_widget.options.closedIcon
+        this.closedIconElement = this.createButtonElement(
+            treeWidget.options.closedIcon
         );
     }
 
-    public render(from_node: Node | null) {
-        if (from_node && from_node.parent) {
-            this.renderFromNode(from_node);
+    public render(fromNode: Node | null) {
+        if (fromNode && fromNode.parent) {
+            this.renderFromNode(fromNode);
         } else {
             this.renderFromRoot();
         }
     }
 
     public renderFromRoot() {
-        const $element = this.tree_widget.element;
+        const $element = this.treeWidget.element;
         $element.empty();
 
         this.createDomElements(
             $element[0],
-            this.tree_widget.tree.children,
+            this.treeWidget.tree.children,
             true,
             1
         );
@@ -40,17 +40,17 @@ export default class ElementsRenderer {
 
     public renderFromNode(node: Node) {
         // remember current li
-        const $previous_li = jQuery(node.element);
+        const $previousLi = jQuery(node.element);
 
         // create element
         const li = this.createLi(node, node.getLevel());
         this.attachNodeData(node, li);
 
         // add element to dom
-        $previous_li.after(li);
+        $previousLi.after(li);
 
         // remove previous li
-        $previous_li.remove();
+        $previousLi.remove();
 
         // create children
         if (node.children) {
@@ -66,10 +66,10 @@ export default class ElementsRenderer {
     private createDomElements(
         element: Element,
         children: Node[],
-        is_root_node: boolean,
+        isRootNode: boolean,
         level: number
     ) {
-        const ul = this.createUl(is_root_node);
+        const ul = this.createUl(isRootNode);
         element.appendChild(ul);
 
         for (const child of children) {
@@ -89,24 +89,24 @@ export default class ElementsRenderer {
         jQuery(li).data("node", node);
     }
 
-    private createUl(is_root_node: boolean) {
-        let class_string;
+    private createUl(isRootNode: boolean) {
+        let classString;
         let role;
 
-        if (!is_root_node) {
-            class_string = "";
+        if (!isRootNode) {
+            classString = "";
             role = "group";
         } else {
-            class_string = "jqtree-tree";
+            classString = "jqtree-tree";
             role = "tree";
 
-            if (this.tree_widget.options.rtl) {
-                class_string += " jqtree-rtl";
+            if (this.treeWidget.options.rtl) {
+                classString += " jqtree-rtl";
             }
         }
 
         const ul = document.createElement("ul");
-        ul.className = `jqtree_common ${class_string}`;
+        ul.className = `jqtree_common ${classString}`;
 
         ul.setAttribute("role", role);
 
@@ -114,33 +114,33 @@ export default class ElementsRenderer {
     }
 
     private createLi(node: Node, level: number) {
-        const is_selected = Boolean(
-            this.tree_widget.select_node_handler &&
-                this.tree_widget.select_node_handler.isNodeSelected(node)
+        const isSelected = Boolean(
+            this.treeWidget.selectNodeHandler &&
+                this.treeWidget.selectNodeHandler.isNodeSelected(node)
         );
 
         const li = node.isFolder()
-            ? this.createFolderLi(node, level, is_selected)
-            : this.createNodeLi(node, level, is_selected);
+            ? this.createFolderLi(node, level, isSelected)
+            : this.createNodeLi(node, level, isSelected);
 
-        if (this.tree_widget.options.onCreateLi) {
-            this.tree_widget.options.onCreateLi(node, jQuery(li), is_selected);
+        if (this.treeWidget.options.onCreateLi) {
+            this.treeWidget.options.onCreateLi(node, jQuery(li), isSelected);
         }
 
         return li;
     }
 
-    private createFolderLi(node: Node, level: number, is_selected: boolean) {
-        const button_classes = this.getButtonClasses(node);
-        const folder_classes = this.getFolderClasses(node, is_selected);
+    private createFolderLi(node: Node, level: number, isSelected: boolean) {
+        const buttonClasses = this.getButtonClasses(node);
+        const folderClasses = this.getFolderClasses(node, isSelected);
 
-        const icon_element = node.is_open
-            ? this.opened_icon_element
-            : this.closed_icon_element;
+        const iconElement = node.is_open
+            ? this.openedIconElement
+            : this.closedIconElement;
 
         // li
         const li = document.createElement("li");
-        li.className = `jqtree_common ${folder_classes}`;
+        li.className = `jqtree_common ${folderClasses}`;
         li.setAttribute("role", "presentation");
 
         // div
@@ -151,16 +151,16 @@ export default class ElementsRenderer {
         li.appendChild(div);
 
         // button link
-        const button_link = document.createElement("a");
-        button_link.className = button_classes;
+        const buttonLink = document.createElement("a");
+        buttonLink.className = buttonClasses;
 
-        button_link.appendChild(icon_element.cloneNode(true));
+        buttonLink.appendChild(iconElement.cloneNode(true));
 
-        button_link.setAttribute("role", "presentation");
-        button_link.setAttribute("aria-hidden", "true");
+        buttonLink.setAttribute("role", "presentation");
+        buttonLink.setAttribute("aria-hidden", "true");
 
-        if (this.tree_widget.options.buttonLeft) {
-            div.appendChild(button_link);
+        if (this.treeWidget.options.buttonLeft) {
+            div.appendChild(buttonLink);
         }
 
         // title span
@@ -168,31 +168,31 @@ export default class ElementsRenderer {
             this.createTitleSpan(
                 node.name,
                 level,
-                is_selected,
+                isSelected,
                 node.is_open,
                 true
             )
         );
 
-        if (!this.tree_widget.options.buttonLeft) {
-            div.appendChild(button_link);
+        if (!this.treeWidget.options.buttonLeft) {
+            div.appendChild(buttonLink);
         }
 
         return li;
     }
 
-    private createNodeLi(node: Node, level: number, is_selected: boolean) {
-        const li_classes = ["jqtree_common"];
+    private createNodeLi(node: Node, level: number, isSelected: boolean) {
+        const liClasses = ["jqtree_common"];
 
-        if (is_selected) {
-            li_classes.push("jqtree-selected");
+        if (isSelected) {
+            liClasses.push("jqtree-selected");
         }
 
-        const class_string = li_classes.join(" ");
+        const classString = liClasses.join(" ");
 
         // li
         const li = document.createElement("li");
-        li.className = class_string;
+        li.className = classString;
         li.setAttribute("role", "presentation");
 
         // div
@@ -207,7 +207,7 @@ export default class ElementsRenderer {
             this.createTitleSpan(
                 node.name,
                 level,
-                is_selected,
+                isSelected,
                 node.is_open,
                 false
             )
@@ -217,38 +217,38 @@ export default class ElementsRenderer {
     }
 
     private createTitleSpan(
-        node_name: string,
+        nodeName: string,
         level: number,
-        is_selected: boolean,
-        is_open: boolean,
-        is_folder: boolean
+        isSelected: boolean,
+        isOpen: boolean,
+        isFolder: boolean
     ) {
-        const title_span = document.createElement("span");
+        const titleSpan = document.createElement("span");
 
         let classes = "jqtree-title jqtree_common";
 
-        if (is_folder) {
+        if (isFolder) {
             classes += " jqtree-title-folder";
         }
 
-        title_span.className = classes;
+        titleSpan.className = classes;
 
-        title_span.setAttribute("role", "treeitem");
-        title_span.setAttribute("aria-level", `${level}`);
+        titleSpan.setAttribute("role", "treeitem");
+        titleSpan.setAttribute("aria-level", `${level}`);
 
-        title_span.setAttribute("aria-selected", getBoolString(is_selected));
-        title_span.setAttribute("aria-expanded", getBoolString(is_open));
+        titleSpan.setAttribute("aria-selected", getBoolString(isSelected));
+        titleSpan.setAttribute("aria-expanded", getBoolString(isOpen));
 
-        if (is_selected) {
-            title_span.setAttribute(
+        if (isSelected) {
+            titleSpan.setAttribute(
                 "tabindex",
-                this.tree_widget.options.tabIndex
+                this.treeWidget.options.tabIndex
             );
         }
 
-        title_span.innerHTML = this.escapeIfNecessary(node_name);
+        titleSpan.innerHTML = this.escapeIfNecessary(nodeName);
 
-        return title_span;
+        return titleSpan;
     }
 
     private getButtonClasses(node: Node) {
@@ -258,7 +258,7 @@ export default class ElementsRenderer {
             classes.push("jqtree-closed");
         }
 
-        if (this.tree_widget.options.buttonLeft) {
+        if (this.treeWidget.options.buttonLeft) {
             classes.push("jqtree-toggler-left");
         } else {
             classes.push("jqtree-toggler-right");
@@ -267,14 +267,14 @@ export default class ElementsRenderer {
         return classes.join(" ");
     }
 
-    private getFolderClasses(node: Node, is_selected: boolean): string {
+    private getFolderClasses(node: Node, isSelected: boolean): string {
         const classes = ["jqtree-folder"];
 
         if (!node.is_open) {
             classes.push("jqtree-closed");
         }
 
-        if (is_selected) {
+        if (isSelected) {
             classes.push("jqtree-selected");
         }
 
@@ -286,7 +286,7 @@ export default class ElementsRenderer {
     }
 
     private escapeIfNecessary(value: string): string {
-        if (this.tree_widget.options.autoEscape) {
+        if (this.treeWidget.options.autoEscape) {
             return htmlEscape(value);
         } else {
             return value;

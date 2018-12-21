@@ -3,28 +3,28 @@ import { ITreeWidget } from "./itree_widget";
 import { Node, NodeId } from "./node";
 
 export default class SaveStateHandler {
-    private tree_widget: ITreeWidget;
+    private treeWidget: ITreeWidget;
     private _supportsLocalStorage: boolean | null;
 
-    constructor(tree_widget: ITreeWidget) {
-        this.tree_widget = tree_widget;
+    constructor(treeWidget: ITreeWidget) {
+        this.treeWidget = treeWidget;
     }
 
     public saveState() {
         const state = JSON.stringify(this.getState());
 
-        if (this.tree_widget.options.onSetStateFromStorage) {
-            this.tree_widget.options.onSetStateFromStorage(state);
+        if (this.treeWidget.options.onSetStateFromStorage) {
+            this.treeWidget.options.onSetStateFromStorage(state);
         } else if (this.supportsLocalStorage()) {
             localStorage.setItem(this.getKeyName(), state);
         }
     }
 
     public getStateFromStorage() {
-        const json_data = this._loadFromStorage();
+        const jsonData = this._loadFromStorage();
 
-        if (json_data) {
-            return this._parseState(json_data);
+        if (jsonData) {
+            return this._parseState(jsonData);
         } else {
             return null;
         }
@@ -32,20 +32,20 @@ export default class SaveStateHandler {
 
     public getState(): any {
         const getOpenNodeIds = () => {
-            const open_nodes: NodeId[] = [];
+            const openNodes: NodeId[] = [];
 
-            this.tree_widget.tree.iterate((node: INode) => {
+            this.treeWidget.tree.iterate((node: INode) => {
                 if (node.is_open && node.id && node.hasChildren()) {
-                    open_nodes.push(node.id);
+                    openNodes.push(node.id);
                 }
                 return true;
             });
 
-            return open_nodes;
+            return openNodes;
         };
 
         const getSelectedNodeIds = () =>
-            this.tree_widget.getSelectedNodes().map((n: Node) => n.id);
+            this.treeWidget.getSelectedNodes().map((n: Node) => n.id);
 
         return {
             open_nodes: getOpenNodeIds(),
@@ -63,10 +63,10 @@ export default class SaveStateHandler {
         if (!state) {
             return false;
         } else {
-            let must_load_on_demand = false;
+            let mustLoadOnDemand = false;
 
             if (state.open_nodes) {
-                must_load_on_demand = this._openInitialNodes(state.open_nodes);
+                mustLoadOnDemand = this._openInitialNodes(state.open_nodes);
             }
 
             if (state.selected_node) {
@@ -74,7 +74,7 @@ export default class SaveStateHandler {
                 this._selectInitialNodes(state.selected_node);
             }
 
-            return must_load_on_demand;
+            return mustLoadOnDemand;
         }
     }
 
@@ -100,8 +100,8 @@ export default class SaveStateHandler {
         }
     }
 
-    private _parseState(json_data: any) {
-        const state = jQuery.parseJSON(json_data);
+    private _parseState(jsonData: any) {
+        const state = jQuery.parseJSON(jsonData);
 
         // Check if selected_node is an int (instead of an array)
         if (state && state.selected_node && isInt(state.selected_node)) {
@@ -113,42 +113,42 @@ export default class SaveStateHandler {
     }
 
     private _loadFromStorage() {
-        if (this.tree_widget.options.onGetStateFromStorage) {
-            return this.tree_widget.options.onGetStateFromStorage();
+        if (this.treeWidget.options.onGetStateFromStorage) {
+            return this.treeWidget.options.onGetStateFromStorage();
         } else if (this.supportsLocalStorage()) {
             return localStorage.getItem(this.getKeyName());
         }
     }
 
-    private _openInitialNodes(node_ids: any[]): boolean {
-        let must_load_on_demand = false;
+    private _openInitialNodes(nodeIds: any[]): boolean {
+        let mustLoadOnDemand = false;
 
-        for (const node_id of node_ids) {
-            const node = this.tree_widget.getNodeById(node_id);
+        for (const node_id of nodeIds) {
+            const node = this.treeWidget.getNodeById(node_id);
 
             if (node) {
                 if (!node.load_on_demand) {
                     node.is_open = true;
                 } else {
-                    must_load_on_demand = true;
+                    mustLoadOnDemand = true;
                 }
             }
         }
 
-        return must_load_on_demand;
+        return mustLoadOnDemand;
     }
 
-    private _selectInitialNodes(node_ids: NodeId[]): boolean {
+    private _selectInitialNodes(nodeIds: NodeId[]): boolean {
         let select_count = 0;
 
-        for (const node_id of node_ids) {
-            const node = this.tree_widget.getNodeById(node_id);
+        for (const node_id of nodeIds) {
+            const node = this.treeWidget.getNodeById(node_id);
 
             if (node) {
                 select_count += 1;
 
-                if (this.tree_widget.select_node_handler) {
-                    this.tree_widget.select_node_handler.addToSelection(node);
+                if (this.treeWidget.selectNodeHandler) {
+                    this.treeWidget.selectNodeHandler.addToSelection(node);
                 }
             }
         }
@@ -157,59 +157,59 @@ export default class SaveStateHandler {
     }
 
     private _resetSelection() {
-        const select_node_handler = this.tree_widget.select_node_handler;
+        const selectNodeHandler = this.treeWidget.selectNodeHandler;
 
-        if (select_node_handler) {
-            const selected_nodes = select_node_handler.getSelectedNodes();
+        if (selectNodeHandler) {
+            const selectedNodes = selectNodeHandler.getSelectedNodes();
 
-            selected_nodes.forEach(node => {
-                select_node_handler.removeFromSelection(node);
+            selectedNodes.forEach(node => {
+                selectNodeHandler.removeFromSelection(node);
             });
         }
     }
 
     private _setInitialStateOnDemand(
-        node_ids_param: NodeId[],
-        selected_nodes: NodeId[],
-        cb_finished: () => void
+        nodeIdsParam: NodeId[],
+        selectedNodes: NodeId[],
+        cbFinished: () => void
     ) {
-        let loading_count = 0;
-        let node_ids = node_ids_param;
+        let loadingCount = 0;
+        let nodeIds = nodeIdsParam;
 
         const openNodes = () => {
-            const new_nodes_ids = [];
+            const newNodesIds = [];
 
-            for (const node_id of node_ids) {
-                const node = this.tree_widget.getNodeById(node_id);
+            for (const node_id of nodeIds) {
+                const node = this.treeWidget.getNodeById(node_id);
 
                 if (!node) {
-                    new_nodes_ids.push(node_id);
+                    newNodesIds.push(node_id);
                 } else {
                     if (!node.is_loading) {
                         if (node.load_on_demand) {
                             loadAndOpenNode(node);
                         } else {
-                            this.tree_widget._openNode(node, false, null);
+                            this.treeWidget._openNode(node, false, null);
                         }
                     }
                 }
             }
 
-            node_ids = new_nodes_ids;
+            nodeIds = newNodesIds;
 
-            if (this._selectInitialNodes(selected_nodes)) {
-                this.tree_widget._refreshElements(null);
+            if (this._selectInitialNodes(selectedNodes)) {
+                this.treeWidget._refreshElements(null);
             }
 
-            if (loading_count === 0) {
-                cb_finished();
+            if (loadingCount === 0) {
+                cbFinished();
             }
         };
 
         const loadAndOpenNode = (node: Node) => {
-            loading_count += 1;
-            this.tree_widget._openNode(node, false, () => {
-                loading_count -= 1;
+            loadingCount += 1;
+            this.treeWidget._openNode(node, false, () => {
+                loadingCount -= 1;
                 openNodes();
             });
         };
@@ -218,8 +218,8 @@ export default class SaveStateHandler {
     }
 
     private getKeyName(): string {
-        if (typeof this.tree_widget.options.saveState === "string") {
-            return this.tree_widget.options.saveState;
+        if (typeof this.treeWidget.options.saveState === "string") {
+            return this.treeWidget.options.saveState;
         } else {
             return "tree";
         }

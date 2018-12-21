@@ -1,11 +1,11 @@
 export default class SimpleWidget {
     [key: string]: any;
 
-    public static register(widget_class: any, widget_name: string) {
-        const getDataKey = () => `simple_widget_${widget_name}`;
+    public static register(widgetClass: any, widgetName: string) {
+        const getDataKey = () => `simple_widget_${widgetName}`;
 
-        function getWidgetData(el: Element, data_key: string) {
-            const widget = jQuery.data(el, data_key);
+        function getWidgetData(el: Element, dataKey: string) {
+            const widget = jQuery.data(el, dataKey);
 
             if (widget && widget instanceof SimpleWidget) {
                 return widget;
@@ -15,16 +15,16 @@ export default class SimpleWidget {
         }
 
         function createWidget($el: JQuery, options: object) {
-            const data_key = getDataKey();
+            const dataKey = getDataKey();
 
             for (const el of $el.get()) {
-                const existing_widget = getWidgetData(el, data_key);
+                const existingWidget = getWidgetData(el, dataKey);
 
-                if (!existing_widget) {
-                    const widget = new widget_class(el, options);
+                if (!existingWidget) {
+                    const widget = new widgetClass(el, options);
 
-                    if (!jQuery.data(el, data_key)) {
-                        jQuery.data(el, data_key, widget);
+                    if (!jQuery.data(el, dataKey)) {
+                        jQuery.data(el, dataKey, widget);
                     }
 
                     // Call init after setting data, so we can call methods
@@ -36,22 +36,22 @@ export default class SimpleWidget {
         }
 
         function destroyWidget($el: JQuery) {
-            const data_key = getDataKey();
+            const dataKey = getDataKey();
 
             for (const el of $el.get()) {
-                const widget = getWidgetData(el, data_key);
+                const widget = getWidgetData(el, dataKey);
 
                 if (widget) {
                     widget.destroy();
                 }
 
-                jQuery.removeData(el, data_key);
+                jQuery.removeData(el, dataKey);
             }
         }
 
         function callFunction(
             $el: JQuery,
-            function_name: string,
+            functionName: string,
             args: any[]
         ): any {
             let result = null;
@@ -60,13 +60,13 @@ export default class SimpleWidget {
                 const widget = jQuery.data(el, getDataKey());
 
                 if (widget && widget instanceof SimpleWidget) {
-                    const widget_function = widget[function_name];
+                    const widgetFunction = widget[functionName];
 
                     if (
-                        widget_function &&
-                        typeof widget_function === "function"
+                        widgetFunction &&
+                        typeof widgetFunction === "function"
                     ) {
-                        result = widget_function.apply(widget, args);
+                        result = widgetFunction.apply(widget, args);
                     }
                 }
             }
@@ -75,7 +75,7 @@ export default class SimpleWidget {
         }
 
         // tslint:disable-next-line: only-arrow-functions
-        (jQuery.fn as any)[widget_name] = function(
+        (jQuery.fn as any)[widgetName] = function(
             this: JQuery,
             argument1: any,
             ...args: any[]
@@ -86,14 +86,14 @@ export default class SimpleWidget {
                 const options = argument1;
                 return createWidget($el, options);
             } else if (typeof argument1 === "string" && argument1[0] !== "_") {
-                const function_name = argument1;
+                const functionName = argument1;
 
-                if (function_name === "destroy") {
+                if (functionName === "destroy") {
                     return destroyWidget($el);
-                } else if (function_name === "get_widget_class") {
-                    return widget_class;
+                } else if (functionName === "get_widget_class") {
+                    return widgetClass;
                 } else {
-                    return callFunction($el, function_name, args);
+                    return callFunction($el, functionName, args);
                 }
             }
         };

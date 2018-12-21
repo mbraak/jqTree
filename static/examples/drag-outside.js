@@ -1,7 +1,7 @@
 $.mockjax({
     url: "*",
     response: function(options) {
-        this.responseText = ExampleData.example_data;
+        this.responseText = ExampleData.exampleData;
     },
     responseTime: 0
 });

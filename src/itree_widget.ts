@@ -13,13 +13,13 @@ export interface IHitArea {
 }
 
 export interface IDragAndDropHandler {
-    hovered_area: IHitArea | null;
-    position_info: IPositionInfo | null;
+    hoveredArea: IHitArea | null;
+    positionInfo: IPositionInfo | null;
 }
 
 export interface IElementsRenderer {
-    opened_icon_element: IconElement;
-    closed_icon_element: IconElement;
+    openedIconElement: IconElement;
+    closedIconElement: IconElement;
 }
 
 export interface IScrollHandler {
@@ -39,18 +39,18 @@ export interface ITreeWidget {
     options: any;
     tree: Node;
 
-    dnd_handler: IDragAndDropHandler | null;
+    dndHandler: IDragAndDropHandler | null;
     renderer: IElementsRenderer;
-    scroll_handler: IScrollHandler | null;
-    select_node_handler: ISelectNodeHandler | null;
+    scrollHandler: IScrollHandler | null;
+    selectNodeHandler: ISelectNodeHandler | null;
 
-    _triggerEvent: (event_name: string, values?: any) => JQuery.Event;
+    _triggerEvent: (eventName: string, values?: any) => JQuery.Event;
     _openNode: (
         node: Node,
         slide: boolean,
-        on_finished: OnFinishOpenNode | null
+        onFinished: OnFinishOpenNode | null
     ) => void;
-    _refreshElements: (from_node: Node | null) => void;
+    _refreshElements: (fromNode: Node | null) => void;
     _getNodeElement: ($element: JQuery<any>) => INodeElement | null;
     _getNodeElementForNode: (node: Node) => INodeElement;
     _containsElement: (element: Element) => boolean;
@@ -58,12 +58,12 @@ export interface ITreeWidget {
     refreshHitAreas: () => JQuery;
     getSelectedNode: () => Node | false;
     openNode: (node: Node, param1?: any, param2?: any) => JQuery;
-    closeNode: (node: Node, slide_param?: any) => JQuery;
+    closeNode: (node: Node, slideParam?: any) => JQuery;
     selectNode: (node: Node) => JQuery;
     scrollToNode: (node: Node) => JQuery;
-    getNodeById: (node_id: NodeId) => Node | null;
+    getNodeById: (nodeId: NodeId) => Node | null;
     getSelectedNodes: () => Node[];
-    loadData(data: any, parent_node: Node | null): JQuery;
+    loadData(data: any, parentNode: Node | null): JQuery;
 }
 
 export interface INodeElement {

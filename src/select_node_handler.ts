@@ -2,64 +2,64 @@ import { Node } from "./node";
 import { ITreeWidget } from "./itree_widget";
 
 export default class SelectNodeHandler {
-    private tree_widget: ITreeWidget;
-    private selected_nodes: any;
-    private selected_single_node: Node | null;
+    private treeWidget: ITreeWidget;
+    private selectedNodes: any;
+    private selectedSingleNode: Node | null;
 
     constructor(tree_widget: ITreeWidget) {
-        this.tree_widget = tree_widget;
+        this.treeWidget = tree_widget;
         this.clear();
     }
 
     public getSelectedNode(): Node | false {
-        const selected_nodes = this.getSelectedNodes();
+        const selectedNodes = this.getSelectedNodes();
 
-        if (selected_nodes.length) {
-            return selected_nodes[0];
+        if (selectedNodes.length) {
+            return selectedNodes[0];
         } else {
             return false;
         }
     }
 
     public getSelectedNodes(): Node[] {
-        if (this.selected_single_node) {
-            return [this.selected_single_node];
+        if (this.selectedSingleNode) {
+            return [this.selectedSingleNode];
         } else {
-            const selected_nodes = [];
+            const selectedNodes = [];
 
-            for (const id in this.selected_nodes) {
-                if (this.selected_nodes.hasOwnProperty(id)) {
-                    const node = this.tree_widget.getNodeById(id);
+            for (const id in this.selectedNodes) {
+                if (this.selectedNodes.hasOwnProperty(id)) {
+                    const node = this.treeWidget.getNodeById(id);
                     if (node) {
-                        selected_nodes.push(node);
+                        selectedNodes.push(node);
                     }
                 }
             }
 
-            return selected_nodes;
+            return selectedNodes;
         }
     }
 
     public getSelectedNodesUnder(parent: Node) {
-        if (this.selected_single_node) {
-            if (parent.isParentOf(this.selected_single_node)) {
-                return [this.selected_single_node];
+        if (this.selectedSingleNode) {
+            if (parent.isParentOf(this.selectedSingleNode)) {
+                return [this.selectedSingleNode];
             } else {
                 return [];
             }
         } else {
-            const selected_nodes = [];
+            const selectedNodes = [];
 
-            for (const id in this.selected_nodes) {
-                if (this.selected_nodes.hasOwnProperty(id)) {
-                    const node = this.tree_widget.getNodeById(id);
+            for (const id in this.selectedNodes) {
+                if (this.selectedNodes.hasOwnProperty(id)) {
+                    const node = this.treeWidget.getNodeById(id);
                     if (node && parent.isParentOf(node)) {
-                        selected_nodes.push(node);
+                        selectedNodes.push(node);
                     }
                 }
             }
 
-            return selected_nodes;
+            return selectedNodes;
         }
     }
 
@@ -67,37 +67,37 @@ export default class SelectNodeHandler {
         if (!node) {
             return false;
         } else if (node.id != null) {
-            if (this.selected_nodes[node.id]) {
+            if (this.selectedNodes[node.id]) {
                 return true;
             } else {
                 return false;
             }
-        } else if (this.selected_single_node) {
-            return this.selected_single_node.element === node.element;
+        } else if (this.selectedSingleNode) {
+            return this.selectedSingleNode.element === node.element;
         } else {
             return false;
         }
     }
 
     public clear() {
-        this.selected_nodes = {};
-        this.selected_single_node = null;
+        this.selectedNodes = {};
+        this.selectedSingleNode = null;
     }
 
-    public removeFromSelection(node: Node, include_children: boolean = false) {
+    public removeFromSelection(node: Node, includeChildren: boolean = false) {
         if (node.id == null) {
             if (
-                this.selected_single_node &&
-                node.element === this.selected_single_node.element
+                this.selectedSingleNode &&
+                node.element === this.selectedSingleNode.element
             ) {
-                this.selected_single_node = null;
+                this.selectedSingleNode = null;
             }
         } else {
-            delete this.selected_nodes[node.id];
+            delete this.selectedNodes[node.id];
 
-            if (include_children) {
+            if (includeChildren) {
                 node.iterate(() => {
-                    delete this.selected_nodes[node.id];
+                    delete this.selectedNodes[node.id];
                     return true;
                 });
             }
@@ -106,9 +106,9 @@ export default class SelectNodeHandler {
 
     public addToSelection(node: Node) {
         if (node.id != null) {
-            this.selected_nodes[node.id] = true;
+            this.selectedNodes[node.id] = true;
         } else {
-            this.selected_single_node = node;
+            this.selectedSingleNode = node;
         }
     }
 }

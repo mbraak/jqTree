@@ -21,7 +21,7 @@ const positionNames: IPositions = {
 
 type IterateCallback = (node: INode, level: number) => boolean;
 
-export function getPositionName(position: Position): string {
+export const getPositionName = (position: Position): string => {
     for (const name in positionNames) {
         if (positionNames.hasOwnProperty(name)) {
             if (positionNames[name] === position) {
@@ -31,7 +31,7 @@ export function getPositionName(position: Position): string {
     }
 
     return "";
-}
+};
 
 export const getPosition = (name: string): Position => positionNames[name];
 
@@ -40,9 +40,9 @@ export class Node {
     public name: string;
     public children: Node[];
     public parent: Node | null;
-    public id_mapping: any;
+    public idMapping: any;
     public tree: Node;
-    public node_class: any;
+    public nodeClass: any;
     public load_on_demand: boolean;
     public is_open: boolean;
     public element: Element;
@@ -50,11 +50,7 @@ export class Node {
 
     [key: string]: any;
 
-    constructor(
-        o: object | string,
-        is_root: boolean = false,
-        node_class = Node
-    ) {
+    constructor(o: object | string, isRoot: boolean = false, nodeClass = Node) {
         this.name = "";
 
         this.setData(o);
@@ -62,10 +58,10 @@ export class Node {
         this.children = [];
         this.parent = null;
 
-        if (is_root) {
-            this.id_mapping = {};
+        if (isRoot) {
+            this.idMapping = {};
             this.tree = this;
-            this.node_class = node_class;
+            this.nodeClass = nodeClass;
         }
     }
 
@@ -134,7 +130,7 @@ export class Node {
         this.removeChildren();
 
         for (const o of data) {
-            const node = new this.tree.node_class(o);
+            const node = new this.tree.nodeClass(o);
             this.addChild(node);
 
             if (typeof o === "object" && o["children"]) {
@@ -245,31 +241,31 @@ export class Node {
     // move node1 after node2
     tree.moveNode(node1, node2, Position.AFTER);
     */
-    public moveNode(moved_node: Node, target_node: Node, position: number) {
-        if (!moved_node.parent || moved_node.isParentOf(target_node)) {
+    public moveNode(movedNode: Node, targetNode: Node, position: number) {
+        if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
             // - Or, parent is empty
             return;
         } else {
-            moved_node.parent._removeChild(moved_node);
+            movedNode.parent._removeChild(movedNode);
 
             if (position === Position.After) {
-                if (target_node.parent) {
-                    target_node.parent.addChildAtPosition(
-                        moved_node,
-                        target_node.parent.getChildIndex(target_node) + 1
+                if (targetNode.parent) {
+                    targetNode.parent.addChildAtPosition(
+                        movedNode,
+                        targetNode.parent.getChildIndex(targetNode) + 1
                     );
                 }
             } else if (position === Position.Before) {
-                if (target_node.parent) {
-                    target_node.parent.addChildAtPosition(
-                        moved_node,
-                        target_node.parent.getChildIndex(target_node)
+                if (targetNode.parent) {
+                    targetNode.parent.addChildAtPosition(
+                        movedNode,
+                        targetNode.parent.getChildIndex(targetNode)
                     );
                 }
             } else if (position === Position.Inside) {
                 // move inside as first child
-                target_node.addChildAtPosition(moved_node, 0);
+                targetNode.addChildAtPosition(movedNode, 0);
             }
         }
     }
@@ -277,10 +273,10 @@ export class Node {
     /*
     Get the tree as data.
     */
-    public getData(include_parent = false): any[] {
+    public getData(includeParent = false): any[] {
         function getDataFromNodes(nodes: Node[]): any[] {
             return nodes.map(node => {
-                const tmp_node: any = {};
+                const tmpNode: any = {};
 
                 for (const k in node) {
                     if (
@@ -289,19 +285,19 @@ export class Node {
                         Object.prototype.hasOwnProperty.call(node, k)
                     ) {
                         const v = node[k];
-                        tmp_node[k] = v;
+                        tmpNode[k] = v;
                     }
                 }
 
                 if (node.hasChildren()) {
-                    tmp_node["children"] = getDataFromNodes(node.children);
+                    tmpNode["children"] = getDataFromNodes(node.children);
                 }
 
-                return tmp_node;
+                return tmpNode;
             });
         }
 
-        if (include_parent) {
+        if (includeParent) {
             return getDataFromNodes([this]);
         } else {
             return getDataFromNodes(this.children);
@@ -327,63 +323,63 @@ export class Node {
         return result;
     }
 
-    public addAfter(node_info: any): Node | null {
+    public addAfter(nodeInfo: any): Node | null {
         if (!this.parent) {
             return null;
         } else {
-            const node = new this.tree.node_class(node_info);
+            const node = new this.tree.nodeClass(nodeInfo);
 
             const child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index + 1);
 
             if (
-                typeof node_info === "object" &&
-                node_info["children"] &&
-                node_info["children"].length
+                typeof nodeInfo === "object" &&
+                nodeInfo["children"] &&
+                nodeInfo["children"].length
             ) {
-                node.loadFromData(node_info["children"]);
+                node.loadFromData(nodeInfo["children"]);
             }
 
             return node;
         }
     }
 
-    public addBefore(node_info: any): Node | null {
+    public addBefore(nodeInfo: any): Node | null {
         if (!this.parent) {
             return null;
         } else {
-            const node = new this.tree.node_class(node_info);
+            const node = new this.tree.nodeClass(nodeInfo);
 
             const child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index);
 
             if (
-                typeof node_info === "object" &&
-                node_info["children"] &&
-                node_info["children"].length
+                typeof nodeInfo === "object" &&
+                nodeInfo["children"] &&
+                nodeInfo["children"].length
             ) {
-                node.loadFromData(node_info["children"]);
+                node.loadFromData(nodeInfo["children"]);
             }
 
             return node;
         }
     }
 
-    public addParent(node_info: any): Node | null {
+    public addParent(nodeInfo: any): Node | null {
         if (!this.parent) {
             return null;
         } else {
-            const new_parent = new this.tree.node_class(node_info);
-            new_parent._setParent(this.tree);
-            const original_parent = this.parent;
+            const newParent = new this.tree.nodeClass(nodeInfo);
+            newParent._setParent(this.tree);
+            const originalParent = this.parent;
 
-            for (const child of original_parent.children) {
-                new_parent.addChild(child);
+            for (const child of originalParent.children) {
+                newParent.addChild(child);
             }
 
-            original_parent.children = [];
-            original_parent.addChild(new_parent);
-            return new_parent;
+            originalParent.children = [];
+            originalParent.addChild(newParent);
+            return newParent;
         }
     }
 
@@ -394,31 +390,31 @@ export class Node {
         }
     }
 
-    public append(node_info: any): Node {
-        const node = new this.tree.node_class(node_info);
+    public append(nodeInfo: any): Node {
+        const node = new this.tree.nodeClass(nodeInfo);
         this.addChild(node);
 
         if (
-            typeof node_info === "object" &&
-            node_info["children"] &&
-            node_info["children"].length
+            typeof nodeInfo === "object" &&
+            nodeInfo["children"] &&
+            nodeInfo["children"].length
         ) {
-            node.loadFromData(node_info["children"]);
+            node.loadFromData(nodeInfo["children"]);
         }
 
         return node;
     }
 
-    public prepend(node_info: any): Node {
-        const node = new this.tree.node_class(node_info);
+    public prepend(nodeInfo: any): Node {
+        const node = new this.tree.nodeClass(nodeInfo);
         this.addChildAtPosition(node, 0);
 
         if (
-            typeof node_info === "object" &&
-            node_info["children"] &&
-            node_info["children"].length
+            typeof nodeInfo === "object" &&
+            nodeInfo["children"] &&
+            nodeInfo["children"].length
         ) {
-            node.loadFromData(node_info["children"]);
+            node.loadFromData(nodeInfo["children"]);
         }
 
         return node;
@@ -450,19 +446,19 @@ export class Node {
         return level;
     }
 
-    public getNodeById(node_id: NodeId): Node | null {
-        return this.id_mapping[node_id];
+    public getNodeById(nodeId: NodeId): Node | null {
+        return this.idMapping[nodeId];
     }
 
     public addNodeToIndex(node: Node) {
         if (node.id != null) {
-            this.id_mapping[node.id] = node;
+            this.idMapping[node.id] = node;
         }
     }
 
     public removeNodeFromIndex(node: Node) {
         if (node.id != null) {
-            delete this.id_mapping[node.id];
+            delete this.idMapping[node.id];
         }
     }
 
@@ -479,9 +475,9 @@ export class Node {
         if (!this.parent) {
             return null;
         } else {
-            const previous_index = this.parent.getChildIndex(this) - 1;
-            if (previous_index >= 0) {
-                return this.parent.children[previous_index];
+            const previousIndex = this.parent.getChildIndex(this) - 1;
+            if (previousIndex >= 0) {
+                return this.parent.children[previousIndex];
             } else {
                 return null;
             }
@@ -492,9 +488,9 @@ export class Node {
         if (!this.parent) {
             return null;
         } else {
-            const next_index = this.parent.getChildIndex(this) + 1;
-            if (next_index < this.parent.children.length) {
-                return this.parent.children[next_index];
+            const nextIndex = this.parent.getChildIndex(this) + 1;
+            if (nextIndex < this.parent.children.length) {
+                return this.parent.children[nextIndex];
             } else {
                 return null;
             }
@@ -519,18 +515,18 @@ export class Node {
         return result;
     }
 
-    public getNextNode(include_children = true): Node | null {
-        if (include_children && this.hasChildren() && this.is_open) {
+    public getNextNode(includeChildren = true): Node | null {
+        if (includeChildren && this.hasChildren() && this.is_open) {
             // First child
             return this.children[0];
         } else {
             if (!this.parent) {
                 return null;
             } else {
-                const next_sibling = this.getNextSibling();
-                if (next_sibling) {
+                const nextSibling = this.getNextSibling();
+                if (nextSibling) {
                     // Next sibling
-                    return next_sibling;
+                    return nextSibling;
                 } else {
                     // Next node of parent
                     return this.parent.getNextNode(false);
@@ -543,17 +539,17 @@ export class Node {
         if (!this.parent) {
             return null;
         } else {
-            const previous_sibling = this.getPreviousSibling();
-            if (previous_sibling) {
+            const previousSibling = this.getPreviousSibling();
+            if (previousSibling) {
                 if (
-                    !previous_sibling.hasChildren() ||
-                    !previous_sibling.is_open
+                    !previousSibling.hasChildren() ||
+                    !previousSibling.is_open
                 ) {
                     // Previous sibling
-                    return previous_sibling;
+                    return previousSibling;
                 } else {
                     // Last child of previous sibling
-                    return previous_sibling.getLastChild();
+                    return previousSibling.getLastChild();
                 }
             } else {
                 return this.getParent();
@@ -577,28 +573,28 @@ export class Node {
         if (!this.hasChildren()) {
             return null;
         } else {
-            const last_child = this.children[this.children.length - 1];
-            if (!last_child.hasChildren() || !last_child.is_open) {
-                return last_child;
+            const lastChild = this.children[this.children.length - 1];
+            if (!lastChild.hasChildren() || !lastChild.is_open) {
+                return lastChild;
             } else {
-                return last_child.getLastChild();
+                return lastChild.getLastChild();
             }
         }
     }
 
     // Init Node from data without making it the root of the tree
     public initFromData(data: any) {
-        const addNode = (node_data: any) => {
-            this.setData(node_data);
+        const addNode = (nodeData: any) => {
+            this.setData(nodeData);
 
-            if (node_data["children"]) {
-                addChildren(node_data["children"]);
+            if (nodeData["children"]) {
+                addChildren(nodeData["children"]);
             }
         };
 
-        const addChildren = (children_data: any[]) => {
-            for (const child of children_data) {
-                const node = new this.tree.node_class("");
+        const addChildren = (childrenData: any[]) => {
+            for (const child of childrenData) {
+                const node = new this.tree.nodeClass("");
                 node.initFromData(child);
                 this.addChild(node);
             }

@@ -1,6 +1,6 @@
 var ExampleData = {};
 
-ExampleData.example_data = [
+ExampleData.exampleData = [
     {
         name: "Saurischia",
         id: 1,
@@ -79,7 +79,7 @@ ExampleData.example_data = [
 
 ExampleData.getFirstLevelData = function(nodes) {
     if (!nodes) {
-        nodes = ExampleData.example_data;
+        nodes = ExampleData.exampleData;
     }
 
     var data = [];
@@ -119,7 +119,7 @@ ExampleData.getChildrenOfNode = function(node_id) {
         });
     }
 
-    iterate(ExampleData.example_data);
+    iterate(ExampleData.exampleData);
 
     return ExampleData.getFirstLevelData(result.children);
 };
