@@ -38,8 +38,6 @@ pre {
 #scroll-container {
   height: 200px;
   overflow-y: scroll;
-  position: relative;
-  /* ie7 fix */
   -ms-user-select: none;
   user-select: none;
   margin-bottom: 16px; }
@@ -56,5 +54,5 @@ pre {
       margin-left: 0; }
   .block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element,
   .block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
-    background: #97BDD6;
+    background: #97bdd6;
     text-shadow: none; }

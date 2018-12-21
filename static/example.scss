@@ -51,7 +51,6 @@ pre {
 #scroll-container {
     height: 200px;
     overflow-y: scroll;
-    position: relative;  /* ie7 fix */
     -ms-user-select: none;
     user-select: none;
     margin-bottom: 16px;
@@ -78,7 +77,7 @@ pre {
         li.jqtree-selected {
             > .jqtree-element,
             > .jqtree-element:hover {
-                background: #97BDD6;
+                background: #97bdd6;
                 text-shadow: none;
             }
         }
