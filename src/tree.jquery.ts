@@ -852,7 +852,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     private _handleClick = (e: JQuery.Event) => {
-        const clickTarget = this._getClickTarget(e.target);
+        const clickTarget = this._getClickTarget((e as any).target);
 
         if (clickTarget) {
             if (clickTarget.type === "button") {
@@ -875,7 +875,7 @@ class JqTreeWidget extends MouseWidget {
     };
 
     private _handleDblclick = (e: JQuery.Event) => {
-        const clickTarget = this._getClickTarget(e.target);
+        const clickTarget = this._getClickTarget((e as any).target);
 
         if (clickTarget && clickTarget.type === "label") {
             this._triggerEvent("tree.dblclick", {
@@ -925,7 +925,9 @@ class JqTreeWidget extends MouseWidget {
     }
 
     private _handleContextmenu = (e: JQuery.Event) => {
-        const $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
+        const $div = jQuery((e as any).target).closest(
+            "ul.jqtree-tree .jqtree-element"
+        );
         if ($div.length) {
             const node = this._getNode($div);
             if (node) {

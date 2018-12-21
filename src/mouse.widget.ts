@@ -131,10 +131,10 @@ abstract class MouseWidget extends SimpleWidget {
 
     private _getPositionInfo(e: JQuery.Event | Touch): IPositionInfo {
         return {
-            page_x: e.pageX,
-            page_y: e.pageY,
-            target: e.target,
-            original_event: e
+            pageX: e.pageX,
+            pageY: e.pageY,
+            target: (e as any).target,
+            originalEvent: e
         };
     }
 
@@ -155,7 +155,7 @@ abstract class MouseWidget extends SimpleWidget {
     }
 
     private touchStart = (e: JQuery.Event) => {
-        const touchEvent = e.originalEvent as TouchEvent;
+        const touchEvent = (e as any).originalEvent as TouchEvent;
 
         if (touchEvent.touches.length > 1) {
             return;
@@ -167,7 +167,7 @@ abstract class MouseWidget extends SimpleWidget {
     };
 
     private touchMove = (e: JQuery.Event) => {
-        const touchEvent = e.originalEvent as TouchEvent;
+        const touchEvent = (e as any).originalEvent as TouchEvent;
 
         if (touchEvent.touches.length > 1) {
             return;
@@ -179,7 +179,7 @@ abstract class MouseWidget extends SimpleWidget {
     };
 
     private touchEnd = (e: JQuery.Event) => {
-        const touchEvent = e.originalEvent as TouchEvent;
+        const touchEvent = (e as any).originalEvent as TouchEvent;
 
         if (touchEvent.touches.length > 1) {
             return;

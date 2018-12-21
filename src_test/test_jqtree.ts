@@ -1108,14 +1108,22 @@ test("mouse events", (assert: Assert) => {
 
     // -- Move node1 inside child3
     // 1: trigger mousedown event on node1
-    $node1.trigger($.Event("mousedown", { which: 1 }));
+    const node1Offset = $node1.offset() || { left: 0, top: 0 };
+
+    $node1.trigger(
+        $.Event("mousedown", {
+            which: 1,
+            pageX: node1Offset.left,
+            pageY: node1Offset.top
+        })
+    );
 
     // 2: trigger mouse move to child3
-    const child3_offset = $child3.offset();
+    const child3Offset = $child3.offset() || { left: 0, top: 0 };
     $tree.trigger(
         $.Event("mousemove", {
-            pageX: child3_offset ? child3_offset.left : 0,
-            pageY: child3_offset ? child3_offset.top : 0
+            pageX: child3Offset.left,
+            pageY: child3Offset.top
         })
     );
     $tree.trigger("mouseup");

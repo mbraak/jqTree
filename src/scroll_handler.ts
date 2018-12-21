@@ -209,6 +209,13 @@ export default class ScrollHandler {
     }
 
     private handleHorizontalScrollingWithParent(positionInfo: IPositionInfo) {
+        if (
+            positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined
+        ) {
+            return;
+        }
+
         const $scrollParent = this.$scrollParent;
         const scrollParentOffset = $scrollParent && $scrollParent.offset();
 
@@ -225,8 +232,8 @@ export default class ScrollHandler {
 
         const rightEdge = scrollParentOffset.left + scrollParent.clientWidth;
         const leftEdge = scrollParentOffset.left;
-        const isNearRightEdge = positionInfo.page_x > rightEdge - 20;
-        const isNearLeftEdge = positionInfo.page_x < leftEdge + 20;
+        const isNearRightEdge = positionInfo.pageX > rightEdge - 20;
+        const isNearLeftEdge = positionInfo.pageX < leftEdge + 20;
 
         if (isNearRightEdge && canScrollRight) {
             scrollParent.scrollLeft = Math.min(
@@ -239,6 +246,13 @@ export default class ScrollHandler {
     }
 
     private handleHorizontalScrollingWithDocument(positionInfo: IPositionInfo) {
+        if (
+            positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined
+        ) {
+            return;
+        }
+
         const $document = jQuery(document);
 
         const scrollLeft = $document.scrollLeft() || 0;
@@ -246,8 +260,8 @@ export default class ScrollHandler {
 
         const canScrollLeft = scrollLeft > 0;
 
-        const isNearRightEdge = positionInfo.page_x > windowWidth - 20;
-        const isNearLeftEdge = positionInfo.page_x - scrollLeft < 20;
+        const isNearRightEdge = positionInfo.pageX > windowWidth - 20;
+        const isNearLeftEdge = positionInfo.pageX - scrollLeft < 20;
 
         if (isNearRightEdge) {
             $document.scrollLeft(scrollLeft + 20);

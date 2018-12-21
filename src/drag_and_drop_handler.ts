@@ -66,7 +66,11 @@ export class DragAndDropHandler {
     }
 
     public mouseStart(positionInfo: IPositionInfo): boolean {
-        if (!this.currentItem) {
+        if (
+            !this.currentItem ||
+            positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined
+        ) {
             return false;
         } else {
             this.refresh();
@@ -83,8 +87,8 @@ export class DragAndDropHandler {
 
             this.dragElement = new DragElement(
                 nodeName,
-                positionInfo.page_x - left,
-                positionInfo.page_y - top,
+                positionInfo.pageX - left,
+                positionInfo.pageY - top,
                 this.treeWidget.element
             );
 
@@ -96,15 +100,20 @@ export class DragAndDropHandler {
     }
 
     public mouseDrag(positionInfo: IPositionInfo): boolean {
-        if (!this.currentItem || !this.dragElement) {
+        if (
+            !this.currentItem ||
+            !this.dragElement ||
+            positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined
+        ) {
             return false;
         } else {
-            this.dragElement.move(positionInfo.page_x, positionInfo.page_y);
+            this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
             this.positionInfo = positionInfo;
 
             const area = this.findHoveredArea(
-                positionInfo.page_x,
-                positionInfo.page_y
+                positionInfo.pageX,
+                positionInfo.pageY
             );
             const canMoveTo = this.canMoveToArea(area);
 
@@ -135,7 +144,7 @@ export class DragAndDropHandler {
                 if (this.treeWidget.options.onDragMove) {
                     this.treeWidget.options.onDragMove(
                         this.currentItem.node,
-                        positionInfo.original_event
+                        positionInfo.originalEvent
                     );
                 }
             }
@@ -165,7 +174,7 @@ export class DragAndDropHandler {
             if (this.treeWidget.options.onDragStop) {
                 this.treeWidget.options.onDragStop(
                     currentItem.node,
-                    positionInfo.original_event
+                    positionInfo.originalEvent
                 );
             }
         }
@@ -348,7 +357,7 @@ export class DragAndDropHandler {
                     position: getPositionName(position),
                     previous_parent,
                     do_move: doMove,
-                    original_event: positionInfo.original_event
+                    original_event: positionInfo.originalEvent
                 }
             });
 
@@ -639,8 +648,8 @@ export class HitAreasGenerator extends VisibleNodeIterator {
 }
 
 class DragElement {
-    private offset_x: number;
-    private offset_y: number;
+    private offsetX: number;
+    private offsetY: number;
     private $element: JQuery;
 
     constructor(
@@ -649,8 +658,8 @@ class DragElement {
         offset_y: number,
         $tree: JQuery
     ) {
-        this.offset_x = offset_x;
-        this.offset_y = offset_y;
+        this.offsetX = offset_x;
+        this.offsetY = offset_y;
 
         this.$element = jQuery(
             `<span class=\"jqtree-title jqtree-dragging\">${node_name}</span>`
@@ -659,10 +668,10 @@ class DragElement {
         $tree.append(this.$element);
     }
 
-    public move(page_x: number, page_y: number) {
+    public move(pageX: number, pageY: number) {
         this.$element.offset({
-            left: page_x - this.offset_x,
-            top: page_y - this.offset_y
+            left: pageX - this.offsetX,
+            top: pageY - this.offsetY
         });
     }
 
