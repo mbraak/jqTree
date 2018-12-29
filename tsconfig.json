@@ -1,6 +1,7 @@
 {
     "compileOnSave": false,
     "exclude": ["_site", "node_modules"],
+    "include": ["src/**/*"],
     "compilerOptions": {
         "lib": ["es2015", "es2015.iterable", "dom"],
         "moduleResolution": "node",
@@ -10,6 +11,7 @@
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "outDir": "lib",
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
         "strict": true
