@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### Development version
+
+-   Issue #554: fix wrapping of long node titles
+
 ##### 1.4.9 (september 9 2018)
 
 -   Issue #532: add tree.loading_data event

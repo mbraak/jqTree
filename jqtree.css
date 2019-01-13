@@ -50,6 +50,7 @@ ul.jqtree-tree {
     ul.jqtree-tree .jqtree-element {
         cursor: pointer;
         position: relative;
+        display: flex;
     }
 
     ul.jqtree-tree .jqtree-title {
