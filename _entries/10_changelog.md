@@ -6,6 +6,7 @@ name: changelog
 ##### Development version
 
 -   Issue #554: fix wrapping of long node titles
+-   Issue #557: devserver serves fom root
 
 ##### 1.4.9 (september 9 2018)
 
@@ -267,7 +268,7 @@ name: changelog
     'post' method (thanks to Rodrigo Rosenfeld Rosas)
 -   Issue 81: getSelectedNode must return false if node is removed
 -   Issue 82: Autoscroll for drag-and-drop
--   Issue 84: Fix correct type param in $.ajax() (thanks to Rodrigo Rosenfeld
+-   Issue 84: Fix correct type param in \$.ajax() (thanks to Rodrigo Rosenfeld
     Rosas)
 -   Issue 85: Option to turn slide animation on or off
 -   Issue 86: The openNode function must automatically open parents

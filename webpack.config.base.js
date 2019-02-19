@@ -49,6 +49,13 @@ module.exports = function(debug, minimize) {
         },
         optimization: {
             minimize: minimize
+        },
+        devServer: {
+            contentBase: [
+                path.join(__dirname, "devserver"),
+                path.join(__dirname, "static"),
+                __dirname
+            ]
         }
     };
 
