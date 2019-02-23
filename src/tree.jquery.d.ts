@@ -56,14 +56,14 @@ interface IJQTreePlugin {
     (
         behavior: "addNodeBefore",
         newNodeInfo: any,
-        existingNode?: INode
+        existingNode: INode
     ): Node | null;
     (
         behavior: "addParentNode",
         newNodeInfo: any,
         existingNode: INode
     ): INode | null;
-    (behavior: "addToSelection", node: INode): JQuery;
+    (behavior: "addToSelection", node: INode, mustSetFocus?: boolean): JQuery;
     (behavior: "appendNode", newNodeInfo: any, parentNode?: INode): INode;
     (behavior: "closeNode", node: INode, slide?: boolean): JQuery;
     (behavior: "destroy"): void;
@@ -96,7 +96,9 @@ interface IJQTreePlugin {
         onFinished?: (node: INode) => void
     ): JQuery;
     (behavior: "prependNode", newNodeInfo: any, parentNode?: INode): INode;
+    (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
+    (behavior: "scrollToNode", node: INode): JQuery;
     (behavior: "selectNode", node: INode | null): JQuery;
     (behavior: "setMouseDelay", delay: number): void;
     (behavior: "toggle", node: INode, slideParam?: boolean): JQuery;
