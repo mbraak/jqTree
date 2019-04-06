@@ -1,7 +1,7 @@
 $(function() {
     var $tree = $("#tree1");
     $tree.tree({
-        data: ExampleData.example_data,
+        data: ExampleData.exampleData,
         autoOpen: true
     });
     $tree.on("tree.click", function(e) {

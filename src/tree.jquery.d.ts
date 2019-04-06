@@ -50,21 +50,21 @@ interface IJQTreePlugin {
     (options: IJQTreeOptions): JQuery;
     (
         behavior: "addNodeAfter",
-        new_node_info: any,
-        existing_node: INode
+        newNodeInfo: any,
+        existingNode: INode
     ): INode | null;
     (
         behavior: "addNodeBefore",
-        new_node_info: any,
-        existing_node?: INode
+        newNodeInfo: any,
+        existingNode: INode
     ): Node | null;
     (
         behavior: "addParentNode",
-        new_node_info: any,
-        existing_node: INode
+        newNodeInfo: any,
+        existingNode: INode
     ): INode | null;
-    (behavior: "addToSelection", node: INode): JQuery;
-    (behavior: "appendNode", new_node_info: any, parent_node?: INode): INode;
+    (behavior: "addToSelection", node: INode, mustSetFocus?: boolean): JQuery;
+    (behavior: "appendNode", newNodeInfo: any, parentNode?: INode): INode;
     (behavior: "closeNode", node: INode, slide?: boolean): JQuery;
     (behavior: "destroy"): void;
     (behavior: "getNodeByHtmlElement", element: Element | JQuery): INode | null;
@@ -75,11 +75,11 @@ interface IJQTreePlugin {
     (behavior: "getSelectedNodes"): INode[];
     (behavior: "getTree"): INode;
     (behavior: "isNodeSelected", node: INode): boolean;
-    (behavior: "loadData", data: any, parent_node?: INode): JQuery;
+    (behavior: "loadData", data: any, parentNode?: INode): JQuery;
     (
         behavior: "moveNode",
         node: INode,
-        target_node: INode,
+        targetNode: INode,
         position: string
     ): JQuery;
     (behavior: "openNode", node: INode): JQuery;
@@ -87,19 +87,21 @@ interface IJQTreePlugin {
     (
         behavior: "openNode",
         node: INode,
-        on_finished: (node: INode) => void
+        onFinished: (node: INode) => void
     ): JQuery;
     (
         behavior: "openNode",
         node: INode,
         slide: boolean,
-        on_finished?: (node: INode) => void
+        onFinished?: (node: INode) => void
     ): JQuery;
-    (behavior: "prependNode", new_node_info: any, parent_node?: INode): INode;
+    (behavior: "prependNode", newNodeInfo: any, parentNode?: INode): INode;
+    (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
+    (behavior: "scrollToNode", node: INode): JQuery;
     (behavior: "selectNode", node: INode | null): JQuery;
     (behavior: "setMouseDelay", delay: number): void;
-    (behavior: "toggle", node: INode, slide_param?: boolean): JQuery;
+    (behavior: "toggle", node: INode, slideParam?: boolean): JQuery;
     (behavior: "toJson"): string;
     (behavior: "updateNode", node: INode, data: any): JQuery;
 }

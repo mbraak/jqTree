@@ -7,12 +7,12 @@ export default class KeyHandler {
     private static RIGHT = 39;
     private static DOWN = 40;
 
-    private tree_widget: ITreeWidget;
+    private treeWidget: ITreeWidget;
 
-    constructor(tree_widget: ITreeWidget) {
-        this.tree_widget = tree_widget;
+    constructor(treeWidget: ITreeWidget) {
+        this.treeWidget = treeWidget;
 
-        if (tree_widget.options.keyboardSupport) {
+        if (treeWidget.options.keyboardSupport) {
             jQuery(document).on("keydown.jqtree", this.handleKeyDown);
         }
     }
@@ -22,7 +22,7 @@ export default class KeyHandler {
     }
 
     public moveDown() {
-        const node = this.tree_widget.getSelectedNode();
+        const node = this.treeWidget.getSelectedNode();
 
         if (node) {
             return this.selectNode(node.getNextNode());
@@ -32,7 +32,7 @@ export default class KeyHandler {
     }
 
     public moveUp() {
-        const node = this.tree_widget.getSelectedNode();
+        const node = this.treeWidget.getSelectedNode();
 
         if (node) {
             return this.selectNode(node.getPreviousNode());
@@ -42,7 +42,7 @@ export default class KeyHandler {
     }
 
     public moveRight() {
-        const node = this.tree_widget.getSelectedNode();
+        const node = this.treeWidget.getSelectedNode();
 
         if (!node) {
             return true;
@@ -55,20 +55,20 @@ export default class KeyHandler {
                 return this.selectNode(node.getNextNode());
             } else {
                 // Right expands a closed node
-                this.tree_widget.openNode(node);
+                this.treeWidget.openNode(node);
                 return false;
             }
         }
     }
 
     public moveLeft() {
-        const node = this.tree_widget.getSelectedNode();
+        const node = this.treeWidget.getSelectedNode();
 
         if (!node) {
             return true;
         } else if (node.isFolder() && node.is_open) {
             // Left on an open node closes the node
-            this.tree_widget.closeNode(node);
+            this.treeWidget.closeNode(node);
             return false;
         } else {
             // Left on a closed or end node moves focus to the node's parent
@@ -80,15 +80,15 @@ export default class KeyHandler {
         if (!node) {
             return true;
         } else {
-            this.tree_widget.selectNode(node);
+            this.treeWidget.selectNode(node);
 
             if (
-                this.tree_widget.scroll_handler &&
-                !this.tree_widget.scroll_handler.isScrolledIntoView(
+                this.treeWidget.scrollHandler &&
+                !this.treeWidget.scrollHandler.isScrolledIntoView(
                     jQuery(node.element).find(".jqtree-element")
                 )
             ) {
-                this.tree_widget.scrollToNode(node);
+                this.treeWidget.scrollToNode(node);
             }
 
             return false;
@@ -122,19 +122,19 @@ export default class KeyHandler {
 
     private canHandleKeyboard(): boolean {
         return (
-            this.tree_widget.options.keyboardSupport &&
+            this.treeWidget.options.keyboardSupport &&
             this.isFocusOnTree() &&
-            this.tree_widget.getSelectedNode() != null
+            this.treeWidget.getSelectedNode() != null
         );
     }
 
     private isFocusOnTree(): boolean {
-        const active_element = document.activeElement;
+        const activeElement = document.activeElement;
 
-        return (
-            active_element &&
-            active_element.tagName === "SPAN" &&
-            this.tree_widget._containsElement(active_element)
+        return Boolean(
+            activeElement &&
+                activeElement.tagName === "SPAN" &&
+                this.treeWidget._containsElement(activeElement)
         );
     }
 }

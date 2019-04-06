@@ -1,6 +1,6 @@
 export interface IPositionInfo {
-    page_x: number;
-    page_y: number;
+    pageX: number | undefined;
+    pageY: number | undefined;
     target: Element | EventTarget;
-    original_event: JQuery.Event | Touch;
+    originalEvent: JQuery.Event | Touch;
 }

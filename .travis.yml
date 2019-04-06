@@ -1,10 +1,10 @@
 language: node_js
 node_js:
-  - "node"
+    - "node"
 sudo: false
 addons:
-  chrome: stable
+    chrome: stable
 before_script:
-  - npm install
+    - npm install
 script:
-  - yarn run test && yarn run coveralls
+    - yarn run production && yarn run test && yarn run coveralls

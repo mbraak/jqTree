@@ -3,6 +3,16 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.4.10 (april 6 2019)
+
+-   Issue #554: fix wrapping of long node titles
+-   Issue #557: devserver serves from root
+-   Issue #558: check for null parameters
+
+##### 1.4.9 (september 9 2018)
+
+-   Issue #532: add tree.loading_data event
+
 ##### 1.4.8 (july 23 2018)
 
 -   Issue #537: SVG xlink as openedIcon/closedIcon disappear after click (thanks to Terry Ouyang)
@@ -259,7 +269,7 @@ name: changelog
     'post' method (thanks to Rodrigo Rosenfeld Rosas)
 -   Issue 81: getSelectedNode must return false if node is removed
 -   Issue 82: Autoscroll for drag-and-drop
--   Issue 84: Fix correct type param in $.ajax() (thanks to Rodrigo Rosenfeld
+-   Issue 84: Fix correct type param in \$.ajax() (thanks to Rodrigo Rosenfeld
     Rosas)
 -   Issue 85: Option to turn slide animation on or off
 -   Issue 86: The openNode function must automatically open parents

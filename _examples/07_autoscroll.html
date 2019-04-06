@@ -12,13 +12,11 @@ css: example.css
 
 <h1>Example 7 - autoscroll</h1>
 
-<div id="scroll-container">
-    <div id="tree1"></div>
-</div>
+<div id="scroll-container"><div id="tree1"></div></div>
 
 <p>
-    This is an example of autoscroll. The tree will scroll automatically if you drag an item outside of the tree.
-    <br />
+    This is an example of autoscroll. The tree will scroll automatically if you
+    drag an item outside of the tree. <br />
     Autoscroll will work automatically. There is no option for it.
 </p>
 
@@ -34,16 +32,13 @@ css: example.css
 
 {% highlight css %}
 #scroll-container {
-  height: 200px;
-  overflow-y: scroll;
-  user-select: none;
+    height: 200px;
+    overflow-y: scroll;
+    user-select: none;
 }
 {% endhighlight %}
 
 <h3>js</h3>
 
-{% highlight js %}
-$('#tree1').tree({
-    data: ExampleData.example_data
-});
-{% endhighlight %}
+{% highlight js %} $('#tree1').tree({ data: ExampleData.exampleData }); {%
+endhighlight %}
