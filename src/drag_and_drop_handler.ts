@@ -311,7 +311,7 @@ export class DragAndDropHandler {
 
         this.stopOpenFolderTimer();
 
-        this.openFolderTimer = setTimeout(
+        this.openFolderTimer = window.setTimeout(
             openFolder,
             this.treeWidget.options.openFolderDelay
         );

@@ -95,7 +95,7 @@ abstract class MouseWidget extends SimpleWidget {
             clearTimeout(this.mouseDelayTimer);
         }
 
-        this.mouseDelayTimer = setTimeout(() => {
+        this.mouseDelayTimer = window.setTimeout(() => {
             this.isMouseDelayMet = true;
         }, this.mouseDelay);
 
