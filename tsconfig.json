@@ -12,6 +12,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "outDir": "lib",
+        "rootDir": "src",
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
         "strict": true
