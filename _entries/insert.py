@@ -41,6 +41,6 @@ for i in range(insert_index - 1, len(file_tuples)):
 
     new_filename = '%02d_%s' % (i + 2, filepart)
 
-    print 'rename %s to %s' % (old_filename, new_filename)
+    print('rename %s to %s' % (old_filename, new_filename))
 
     os.rename(old_filename, new_filename)
