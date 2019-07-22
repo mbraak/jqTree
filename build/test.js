@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.4.10
+ * JqTree 1.4.11
  * 
  * Copyright 2019 Marco Braak
  * 
@@ -796,6 +796,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 exports.__esModule = true;
 var version_1 = __webpack_require__(5);
 var jQuery = __webpack_require__(2);
@@ -832,7 +843,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                         click_event: e
                     });
                     if (!event_1.isDefaultPrevented()) {
-                        _this._selectNode(node, true);
+                        _this._selectNode(node);
                     }
                 }
             }
@@ -880,8 +891,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.getTree = function () {
         return this.tree;
     };
-    JqTreeWidget.prototype.selectNode = function (node) {
-        this._selectNode(node, false);
+    JqTreeWidget.prototype.selectNode = function (node, optionsParam) {
+        this._selectNode(node, optionsParam);
         return this.element;
     };
     JqTreeWidget.prototype.getSelectedNode = function () {
@@ -1092,7 +1103,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         var node = inode;
         if (this.selectNodeHandler) {
             this.selectNodeHandler.addToSelection(node);
-            this._getNodeElementForNode(node).select(mustSetFocus || true);
+            this._getNodeElementForNode(node).select(mustSetFocus === undefined ? true : mustSetFocus);
             this._saveState();
         }
         return this.element;
@@ -1602,12 +1613,13 @@ var JqTreeWidget = /** @class */ (function (_super) {
             }
         }
     };
-    JqTreeWidget.prototype._selectNode = function (inode, mustToggle) {
+    JqTreeWidget.prototype._selectNode = function (inode, optionsParam) {
         var _this = this;
-        if (mustToggle === void 0) { mustToggle = false; }
         if (!this.selectNodeHandler) {
             return;
         }
+        var defaultOptions = { mustSetFocus: true, mustToggle: true };
+        var selectOptions = __assign({}, defaultOptions, (optionsParam || {}));
         var canSelect = function () {
             if (_this.options.onCanSelectNode) {
                 return (_this.options.selectable &&
@@ -1639,7 +1651,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
         var node = inode;
         if (this.selectNodeHandler.isNodeSelected(node)) {
-            if (mustToggle) {
+            if (selectOptions.mustToggle) {
                 this._deselectCurrentNode();
                 this._triggerEvent("tree.select", {
                     node: null,
@@ -1650,7 +1662,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         else {
             var deselected_node = this.getSelectedNode();
             this._deselectCurrentNode();
-            this.addToSelection(node);
+            this.addToSelection(node, selectOptions.mustSetFocus);
             this._triggerEvent("tree.select", {
                 node: node,
                 deselected_node: deselected_node
@@ -1753,7 +1765,7 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.10";
+var version = "1.4.11";
 exports["default"] = version;
 
 

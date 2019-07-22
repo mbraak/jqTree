@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.4.11 (july 22 2019)
+
+-   Issue #571: add options to selectNode
+
 ##### 1.4.10 (april 6 2019)
 
 -   Issue #554: fix wrapping of long node titles

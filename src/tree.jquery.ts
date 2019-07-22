@@ -31,6 +31,11 @@ type HandleDataFilter = (data: any) => any;
 type HandleDrag = (node: INode, event: JQueryEventObject | Touch) => void;
 type HandleLoadData = (is_loading: boolean, node: INode, $el: JQuery) => void;
 
+interface ISelectNodeOptions {
+    mustToggle?: boolean;
+    mustSetFocus?: boolean;
+}
+
 const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";
 
@@ -109,8 +114,11 @@ class JqTreeWidget extends MouseWidget {
         return this.tree as INode;
     }
 
-    public selectNode(node: INode | null): JQuery {
-        this._selectNode(node, false);
+    public selectNode(
+        node: INode | null,
+        optionsParam?: ISelectNodeOptions
+    ): JQuery {
+        this._selectNode(node, optionsParam);
         return this.element;
     }
 
@@ -386,7 +394,9 @@ class JqTreeWidget extends MouseWidget {
         if (this.selectNodeHandler) {
             this.selectNodeHandler.addToSelection(node);
 
-            this._getNodeElementForNode(node).select(mustSetFocus || true);
+            this._getNodeElementForNode(node).select(
+                mustSetFocus === undefined ? true : mustSetFocus
+            );
 
             this._saveState();
         }
@@ -922,7 +932,7 @@ class JqTreeWidget extends MouseWidget {
                 });
 
                 if (!event.isDefaultPrevented()) {
-                    this._selectNode(node, true);
+                    this._selectNode(node);
                 }
             }
         }
@@ -1046,10 +1056,16 @@ class JqTreeWidget extends MouseWidget {
         }
     }
 
-    private _selectNode(inode: INode | null, mustToggle: boolean = false) {
+    private _selectNode(
+        inode: INode | null,
+        optionsParam?: ISelectNodeOptions
+    ) {
         if (!this.selectNodeHandler) {
             return;
         }
+
+        const defaultOptions = { mustSetFocus: true, mustToggle: true };
+        const selectOptions = { ...defaultOptions, ...(optionsParam || {}) };
 
         const canSelect = () => {
             if (this.options.onCanSelectNode) {
@@ -1090,7 +1106,7 @@ class JqTreeWidget extends MouseWidget {
         const node = inode as Node;
 
         if (this.selectNodeHandler.isNodeSelected(node)) {
-            if (mustToggle) {
+            if (selectOptions.mustToggle) {
                 this._deselectCurrentNode();
                 this._triggerEvent("tree.select", {
                     node: null,
@@ -1100,7 +1116,7 @@ class JqTreeWidget extends MouseWidget {
         } else {
             const deselected_node = this.getSelectedNode();
             this._deselectCurrentNode();
-            this.addToSelection(node);
+            this.addToSelection(node, selectOptions.mustSetFocus);
 
             this._triggerEvent("tree.select", {
                 node,
