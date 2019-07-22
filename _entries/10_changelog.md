@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.4.11 (july 22 2019)
 
 -   Issue #571: add options to selectNode
 
