@@ -1,13 +1,6 @@
 import "../src/tree.jquery";
 
-import {
-    exampleData,
-    exampleData2,
-    formatNodes,
-    formatTitles,
-    isNodeOpen,
-    isNodeClosed
-} from "./utils_for_test";
+import { exampleData, exampleData2, formatNodes, formatTitles, isNodeOpen, isNodeClosed } from "./utils_for_test";
 import { getPositionName } from "../src/node";
 import "../src/itree_widget";
 
@@ -32,40 +25,59 @@ test("create jqtree from data", (assert: Assert) => {
         data: exampleData
     });
 
-    assert.equal(
-        $("#tree1").children().length,
-        1,
-        "number of children on level 0"
-    );
+    assert.equal($("#tree1").children().length, 1, "number of children on level 0");
     assert.ok(
         $("#tree1")
             .children()
             .is("ul.jqtree-tree"),
         "first element is ul.jqtree-tree"
     );
-    assert.equal(
-        $("#tree1 ul.jqtree-tree > li").length,
-        2,
-        "number of children on level 1"
-    );
+    assert.equal($("#tree1 ul.jqtree-tree > li").length, 2, "number of children on level 1");
     assert.ok(
-        $("#tree1 ul.jqtree-tree li:eq(0)").is(
-            "li.jqtree-folder.jqtree-closed"
-        ),
+        $("#tree1 ul.jqtree-tree li:eq(0)").is("li.jqtree-folder.jqtree-closed"),
         "first child is li.jqtree-folder.jqtree-closed"
     );
     assert.ok(
-        $(
-            "#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element > a.jqtree-toggler"
-        ).is("a.jqtree-toggler.jqtree-closed"),
+        $("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element > a.jqtree-toggler").is("a.jqtree-toggler.jqtree-closed"),
         "button in first folder"
     );
-    assert.equal(
-        $(
-            "#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element span.jqtree-title"
-        ).text(),
-        "node1"
-    );
+    assert.equal($("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element span.jqtree-title").text(), "node1");
+});
+
+const nodeWithEmptyChildren = {
+    id: 1,
+    name: "abc",
+    children: []
+};
+
+test("node with empty children is not a folder (with showEmptyFolder false)", (assert: Assert) => {
+    $("#tree1").tree({
+        data: [nodeWithEmptyChildren],
+        showEmptyFolder: false
+    });
+
+    assert.equal($(".jqtree-title").text(), "abc");
+    assert.equal($(".jqtree-folder").length, 0);
+});
+
+test("node with empty children is a folder (with showEmptyFolder true)", (assert: Assert) => {
+    $("#tree1").tree({
+        data: [nodeWithEmptyChildren],
+        showEmptyFolder: true
+    });
+
+    assert.equal($(".jqtree-title").text(), "abc");
+    assert.equal($(".jqtree-folder").length, 1);
+});
+
+test("node without children property is not a folder (with showEmptyFolder true)", (assert: Assert) => {
+    $("#tree1").tree({
+        data: [{ id: 1, name: "abc" }],
+        showEmptyFolder: true
+    });
+
+    assert.equal($(".jqtree-title").text(), "abc");
+    assert.equal($(".jqtree-folder").length, 0);
 });
 
 test("toggle", (assert: Assert) => {
@@ -196,11 +208,7 @@ test("saveState", (assert: Assert) => {
     $tree.tree("selectNode", tree.children[1]);
 
     // node2 is selected
-    assert.equal(
-        ($tree.tree("getSelectedNode") as INode).name,
-        "node2",
-        "getSelectedNode (1)"
-    );
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node2", "getSelectedNode (1)");
 
     // create tree again
     $tree.tree("destroy");
@@ -211,11 +219,7 @@ test("saveState", (assert: Assert) => {
     assert.ok(!tree2.children[1].is_open, "node2 is closed");
 
     // node2 is selected
-    assert.equal(
-        ($tree.tree("getSelectedNode") as INode).name,
-        "node2",
-        "getSelectedNode (2)"
-    );
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node2", "getSelectedNode (2)");
 });
 
 test("getSelectedNode", (assert: Assert) => {
@@ -236,11 +240,7 @@ test("getSelectedNode", (assert: Assert) => {
     $tree.tree("selectNode", node1);
 
     // node1 is selected
-    assert.equal(
-        ($tree.tree("getSelectedNode") as INode).name,
-        "node1",
-        "getSelectedNode"
-    );
+    assert.equal(($tree.tree("getSelectedNode") as INode).name, "node1", "getSelectedNode");
 });
 
 test("toJson", (assert: Assert) => {
@@ -275,19 +275,13 @@ test("loadData", (assert: Assert) => {
     });
 
     // first node is 'node1'
-    assert.equal(
-        $tree.find("> ul > li:first .jqtree-element:first > span").text(),
-        "node1"
-    );
+    assert.equal($tree.find("> ul > li:first .jqtree-element:first > span").text(), "node1");
 
     // - load new data
     $tree.tree("loadData", exampleData2);
 
     // first node is 'main'
-    assert.equal(
-        $tree.find("> ul > li:first .jqtree-element:first > span").text(),
-        "main"
-    );
+    assert.equal($tree.find("> ul > li:first .jqtree-element:first > span").text(), "main");
 
     // - load new data under node 'child3'
     $tree.tree("loadData", exampleData);
@@ -326,10 +320,7 @@ test("loadData", (assert: Assert) => {
     );
 
     // Node 'child3' must have toggler button
-    assert.ok(
-        $child3.prev().is("a.jqtree-toggler"),
-        "node 'child3' must have toggler button"
-    );
+    assert.ok($child3.prev().is("a.jqtree-toggler"), "node 'child3' must have toggler button");
 
     // - select node 'c5' and load new data under 'child3'
     const c5 = $tree.tree("getNodeByName", "c5");
@@ -415,11 +406,7 @@ test("openNode and closeNode", (assert: Assert) => {
     assert.equal(child1.is_open, true);
 });
 
-function test_open_node_with_callback(
-    slide: any,
-    includeSlideParam: boolean,
-    assert: Assert
-) {
+function test_open_node_with_callback(slide: any, includeSlideParam: boolean, assert: Assert) {
     // setup
     const $tree = $("#tree1");
     $tree.tree({
@@ -545,9 +532,7 @@ test("click toggler", (assert: Assert) => {
         selectable: true
     });
 
-    const $title = $tree
-        .find("li:eq(0)")
-        .find("> .jqtree-element > span.jqtree-title");
+    const $title = $tree.find("li:eq(0)").find("> .jqtree-element > span.jqtree-title");
     assert.equal($title.text(), "node1");
     const $toggler = $title.prev();
     assert.ok($toggler.is("a.jqtree-toggler.jqtree-closed"));
@@ -823,20 +808,14 @@ test("appendNode", (assert: Assert) => {
     const child1 = $tree.tree("getNodeByName", "child1") as INode;
 
     // Node 'child1' does not have a toggler button
-    assert.equal(
-        $(child1.element).find("> .jqtree-element > .jqtree-toggler").length,
-        0
-    );
+    assert.equal($(child1.element).find("> .jqtree-element > .jqtree-toggler").length, 0);
 
     $tree.tree("appendNode", "child4", child1);
 
     assert.equal(formatTitles($(child1.element)), "child1 child4");
 
     // Node 'child1' must get a toggler button
-    assert.equal(
-        $(child1.element).find("> .jqtree-element > .jqtree-toggler").length,
-        1
-    );
+    assert.equal($(child1.element).find("> .jqtree-element > .jqtree-toggler").length, 1);
 });
 
 test("prependNode", (assert: Assert) => {
@@ -862,10 +841,7 @@ test("init event for local data", (assert: Assert) => {
 
     $tree.on("tree.init", () => {
         // Check that we can call functions in 'tree.init' event
-        assert.equal(
-            ($tree.tree("getNodeByName", "node2") as INode).name,
-            "node2"
-        );
+        assert.equal(($tree.tree("getNodeByName", "node2") as INode).name, "node2");
 
         done();
     });
@@ -889,10 +865,7 @@ test("init event for ajax", (assert: Assert) => {
     });
 
     $tree.on("tree.init", () => {
-        assert.equal(
-            ($tree.tree("getNodeByName", "node2") as INode).name,
-            "node2"
-        );
+        assert.equal(($tree.tree("getNodeByName", "node2") as INode).name, "node2");
 
         done();
     });
@@ -963,10 +936,7 @@ test("updateNode", (assert: Assert) => {
         children: [{ id: 5, name: "child1-1" }]
     });
 
-    assert.equal(
-        formatTitles($tree),
-        "node1 child1 child1-1 child2 xyz child3"
-    );
+    assert.equal(formatTitles($tree), "node1 child1 child1-1 child2 xyz child3");
 
     // remove children
     $tree.tree("updateNode", child1, {
@@ -1202,22 +1172,13 @@ test("getNodesByProperty", (assert: Assert) => {
     const node2 = $tree.tree("getNodeByName", "node2") as INode;
 
     // 1. get 'node1' by property
-    assert.equal(
-        $tree.tree("getNodesByProperty", "intProperty", 1)[0].name,
-        "node1"
-    );
+    assert.equal($tree.tree("getNodesByProperty", "intProperty", 1)[0].name, "node1");
 
     // 2. get property that does not exist in any node
-    assert.equal(
-        $tree.tree("getNodesByProperty", "intProperty", 123).length,
-        0
-    );
+    assert.equal($tree.tree("getNodesByProperty", "intProperty", 123).length, 0);
 
     // 3. get string property
-    assert.equal(
-        $tree.tree("getNodesByProperty", "strProperty", "1")[0].name,
-        "node1"
-    );
+    assert.equal($tree.tree("getNodesByProperty", "strProperty", "1")[0].name, "node1");
 
     // 4. add node with string id; search by int
     $tree.tree("appendNode", {
@@ -1227,14 +1188,8 @@ test("getNodesByProperty", (assert: Assert) => {
         intProperty: 111
     });
 
-    assert.equal(
-        $tree.tree("getNodesByProperty", "intProperty", 111)[0].name,
-        "abc"
-    );
-    assert.equal(
-        $tree.tree("getNodesByProperty", "strProperty", "111")[0].name,
-        "abc"
-    );
+    assert.equal($tree.tree("getNodesByProperty", "intProperty", 111)[0].name, "abc");
+    assert.equal($tree.tree("getNodesByProperty", "strProperty", "111")[0].name, "abc");
 
     // 5. load subtree in node2
     const subtreeData = [
@@ -1249,14 +1204,8 @@ test("getNodesByProperty", (assert: Assert) => {
     const t = $tree.tree("getTree");
     assert.notEqual(t, null);
 
-    assert.equal(
-        $tree.tree("getNodesByProperty", "intProperty", 222)[0].name,
-        "sub1"
-    );
-    assert.equal(
-        $tree.tree("getNodesByProperty", "intProperty", 444)[0].name,
-        "sub2"
-    );
+    assert.equal($tree.tree("getNodesByProperty", "intProperty", 222)[0].name, "sub1");
+    assert.equal($tree.tree("getNodesByProperty", "intProperty", 444)[0].name, "sub2");
 });
 
 test("dataUrl extra options", (assert: Assert) => {
