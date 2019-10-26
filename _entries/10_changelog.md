@@ -9,13 +9,13 @@ name: changelog
 
 ##### 1.4.10 (april 6 2019)
 
--   Issue #554: fix wrapping of long node titles
--   Issue #557: devserver serves from root
+-   Issue #554: fix wrapping of long node titles (thanks to Damian Kulp)
+-   Issue #557: devserver serves from root (thanks to Aaron Gray)
 -   Issue #558: check for null parameters
 
 ##### 1.4.9 (september 9 2018)
 
--   Issue #532: add tree.loading_data event
+-   Issue #532: add tree.loading_data event (thanks to Theo Bot)
 
 ##### 1.4.8 (july 23 2018)
 
