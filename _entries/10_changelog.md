@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development
+
+- Issue #579: have icon for empty folders (thanks to Andrew Hinde)
+
 ##### 1.4.11 (july 22 2019)
 
 -   Issue #571: add options to selectNode
