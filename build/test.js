@@ -138,6 +138,7 @@ var Node = /** @class */ (function () {
         if (isRoot === void 0) { isRoot = false; }
         if (nodeClass === void 0) { nodeClass = Node; }
         this.name = "";
+        this.isEmptyFolder = false;
         this.setData(o);
         this.children = [];
         this.parent = null;
@@ -216,7 +217,12 @@ var Node = /** @class */ (function () {
             var node = new this.tree.nodeClass(o);
             this.addChild(node);
             if (typeof o === "object" && o["children"]) {
-                node.loadFromData(o["children"]);
+                if (o["children"].length === 0) {
+                    node.isEmptyFolder = true;
+                }
+                else {
+                    node.loadFromData(o["children"]);
+                }
             }
         }
     };
@@ -346,8 +352,7 @@ var Node = /** @class */ (function () {
             return nodes.map(function (node) {
                 var tmpNode = {};
                 for (var k in node) {
-                    if (["parent", "children", "element", "tree"].indexOf(k) ===
-                        -1 &&
+                    if (["parent", "children", "element", "tree", "isEmptyFolder"].indexOf(k) === -1 &&
                         Object.prototype.hasOwnProperty.call(node, k)) {
                         var v = node[k];
                         tmpNode[k] = v;
@@ -390,9 +395,7 @@ var Node = /** @class */ (function () {
             var node = new this.tree.nodeClass(nodeInfo);
             var child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index + 1);
-            if (typeof nodeInfo === "object" &&
-                nodeInfo["children"] &&
-                nodeInfo["children"].length) {
+            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
             return node;
@@ -406,9 +409,7 @@ var Node = /** @class */ (function () {
             var node = new this.tree.nodeClass(nodeInfo);
             var child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index);
-            if (typeof nodeInfo === "object" &&
-                nodeInfo["children"] &&
-                nodeInfo["children"].length) {
+            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
             return node;
@@ -440,9 +441,7 @@ var Node = /** @class */ (function () {
     Node.prototype.append = function (nodeInfo) {
         var node = new this.tree.nodeClass(nodeInfo);
         this.addChild(node);
-        if (typeof nodeInfo === "object" &&
-            nodeInfo["children"] &&
-            nodeInfo["children"].length) {
+        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
             node.loadFromData(nodeInfo["children"]);
         }
         return node;
@@ -450,9 +449,7 @@ var Node = /** @class */ (function () {
     Node.prototype.prepend = function (nodeInfo) {
         var node = new this.tree.nodeClass(nodeInfo);
         this.addChildAtPosition(node, 0);
-        if (typeof nodeInfo === "object" &&
-            nodeInfo["children"] &&
-            nodeInfo["children"].length) {
+        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
             node.loadFromData(nodeInfo["children"]);
         }
         return node;
@@ -568,8 +565,7 @@ var Node = /** @class */ (function () {
         else {
             var previousSibling = this.getPreviousSibling();
             if (previousSibling) {
-                if (!previousSibling.hasChildren() ||
-                    !previousSibling.is_open) {
+                if (!previousSibling.hasChildren() || !previousSibling.is_open) {
                     // Previous sibling
                     return previousSibling;
                 }
@@ -984,7 +980,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
         var slide = slideParam == null ? this.options.slide : slideParam;
-        if (node.isFolder()) {
+        if (node.isFolder() || node.isEmptyFolder) {
             new node_element_1.FolderElement(node, this).close(slide, this.options.animationSpeed);
             this._saveState();
         }
@@ -1050,9 +1046,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return node;
     };
     JqTreeWidget.prototype.prependNode = function (newNodeInfo, parentNodeParam) {
-        var parentNode = !parentNodeParam
-            ? this.tree
-            : parentNodeParam;
+        var parentNode = !parentNodeParam ? this.tree : parentNodeParam;
         var node = parentNode.prepend(newNodeInfo);
         this._refreshElements(parentNode);
         return node;
@@ -1206,7 +1200,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             var folder_element = new node_element_1.FolderElement(_node, _this);
             folder_element.open(_onFinished, _slide, _this.options.animationSpeed);
         };
-        if (node.isFolder()) {
+        if (node.isFolder() || node.isEmptyFolder) {
             if (node.load_on_demand) {
                 this._loadFolderOnDemand(node, slide, onFinished);
             }
@@ -1619,11 +1613,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return;
         }
         var defaultOptions = { mustSetFocus: true, mustToggle: true };
-        var selectOptions = __assign({}, defaultOptions, (optionsParam || {}));
+        var selectOptions = __assign(__assign({}, defaultOptions), (optionsParam || {}));
         var canSelect = function () {
             if (_this.options.onCanSelectNode) {
-                return (_this.options.selectable &&
-                    _this.options.onCanSelectNode(inode));
+                return _this.options.selectable && _this.options.onCanSelectNode(inode);
             }
             else {
                 return _this.options.selectable;
@@ -1751,6 +1744,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         onDragStop: null,
         buttonLeft: true,
         onLoading: null,
+        showEmptyFolder: false,
         tabIndex: 0
     };
     return JqTreeWidget;
@@ -2343,9 +2337,9 @@ var ElementsRenderer = /** @class */ (function () {
         return ul;
     };
     ElementsRenderer.prototype.createLi = function (node, level) {
-        var isSelected = Boolean(this.treeWidget.selectNodeHandler &&
-            this.treeWidget.selectNodeHandler.isNodeSelected(node));
-        var li = node.isFolder()
+        var isSelected = Boolean(this.treeWidget.selectNodeHandler && this.treeWidget.selectNodeHandler.isNodeSelected(node));
+        var mustShowFolder = node.isFolder() || (node.isEmptyFolder && this.treeWidget.options.showEmptyFolder);
+        var li = mustShowFolder
             ? this.createFolderLi(node, level, isSelected)
             : this.createNodeLi(node, level, isSelected);
         if (this.treeWidget.options.onCreateLi) {
@@ -2356,9 +2350,7 @@ var ElementsRenderer = /** @class */ (function () {
     ElementsRenderer.prototype.createFolderLi = function (node, level, isSelected) {
         var buttonClasses = this.getButtonClasses(node);
         var folderClasses = this.getFolderClasses(node, isSelected);
-        var iconElement = node.is_open
-            ? this.openedIconElement
-            : this.closedIconElement;
+        var iconElement = node.is_open ? this.openedIconElement : this.closedIconElement;
         // li
         var li = document.createElement("li");
         li.className = "jqtree_common " + folderClasses;
@@ -3765,6 +3757,35 @@ test("create jqtree from data", function (assert) {
     assert.ok($("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element > a.jqtree-toggler").is("a.jqtree-toggler.jqtree-closed"), "button in first folder");
     assert.equal($("#tree1 ul.jqtree-tree li:eq(0) > .jqtree-element span.jqtree-title").text(), "node1");
 });
+var nodeWithEmptyChildren = {
+    id: 1,
+    name: "abc",
+    children: []
+};
+test("node with empty children is not a folder (with showEmptyFolder false)", function (assert) {
+    $("#tree1").tree({
+        data: [nodeWithEmptyChildren],
+        showEmptyFolder: false
+    });
+    assert.equal($(".jqtree-title").text(), "abc");
+    assert.equal($(".jqtree-folder").length, 0);
+});
+test("node with empty children is a folder (with showEmptyFolder true)", function (assert) {
+    $("#tree1").tree({
+        data: [nodeWithEmptyChildren],
+        showEmptyFolder: true
+    });
+    assert.equal($(".jqtree-title").text(), "abc");
+    assert.equal($(".jqtree-folder").length, 1);
+});
+test("node without children property is not a folder (with showEmptyFolder true)", function (assert) {
+    $("#tree1").tree({
+        data: [{ id: 1, name: "abc" }],
+        showEmptyFolder: true
+    });
+    assert.equal($(".jqtree-title").text(), "abc");
+    assert.equal($(".jqtree-folder").length, 0);
+});
 test("toggle", function (assert) {
     // setup
     var done = assert.async();
@@ -4103,9 +4124,7 @@ test("click toggler", function (assert) {
         data: utils_for_test_1.exampleData,
         selectable: true
     });
-    var $title = $tree
-        .find("li:eq(0)")
-        .find("> .jqtree-element > span.jqtree-title");
+    var $title = $tree.find("li:eq(0)").find("> .jqtree-element > span.jqtree-title");
     assert.equal($title.text(), "node1");
     var $toggler = $title.prev();
     assert.ok($toggler.is("a.jqtree-toggler.jqtree-closed"));

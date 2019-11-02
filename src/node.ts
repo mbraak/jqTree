@@ -47,11 +47,13 @@ export class Node {
     public is_open: boolean;
     public element: Element;
     public is_loading: boolean;
+    public isEmptyFolder: boolean;
 
     [key: string]: any;
 
     constructor(o: object | string, isRoot: boolean = false, nodeClass = Node) {
         this.name = "";
+        this.isEmptyFolder = false;
 
         this.setData(o);
 
@@ -134,7 +136,11 @@ export class Node {
             this.addChild(node);
 
             if (typeof o === "object" && o["children"]) {
-                node.loadFromData(o["children"]);
+                if (o["children"].length === 0) {
+                    node.isEmptyFolder = true;
+                } else {
+                    node.loadFromData(o["children"]);
+                }
             }
         }
     }
@@ -251,17 +257,11 @@ export class Node {
 
             if (position === Position.After) {
                 if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(
-                        movedNode,
-                        targetNode.parent.getChildIndex(targetNode) + 1
-                    );
+                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
                 }
             } else if (position === Position.Before) {
                 if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(
-                        movedNode,
-                        targetNode.parent.getChildIndex(targetNode)
-                    );
+                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
                 }
             } else if (position === Position.Inside) {
                 // move inside as first child
@@ -280,8 +280,7 @@ export class Node {
 
                 for (const k in node) {
                     if (
-                        ["parent", "children", "element", "tree"].indexOf(k) ===
-                            -1 &&
+                        ["parent", "children", "element", "tree", "isEmptyFolder"].indexOf(k) === -1 &&
                         Object.prototype.hasOwnProperty.call(node, k)
                     ) {
                         const v = node[k];
@@ -332,11 +331,7 @@ export class Node {
             const child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index + 1);
 
-            if (
-                typeof nodeInfo === "object" &&
-                nodeInfo["children"] &&
-                nodeInfo["children"].length
-            ) {
+            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
 
@@ -353,11 +348,7 @@ export class Node {
             const child_index = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, child_index);
 
-            if (
-                typeof nodeInfo === "object" &&
-                nodeInfo["children"] &&
-                nodeInfo["children"].length
-            ) {
+            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
 
@@ -394,11 +385,7 @@ export class Node {
         const node = new this.tree.nodeClass(nodeInfo);
         this.addChild(node);
 
-        if (
-            typeof nodeInfo === "object" &&
-            nodeInfo["children"] &&
-            nodeInfo["children"].length
-        ) {
+        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
             node.loadFromData(nodeInfo["children"]);
         }
 
@@ -409,11 +396,7 @@ export class Node {
         const node = new this.tree.nodeClass(nodeInfo);
         this.addChildAtPosition(node, 0);
 
-        if (
-            typeof nodeInfo === "object" &&
-            nodeInfo["children"] &&
-            nodeInfo["children"].length
-        ) {
+        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
             node.loadFromData(nodeInfo["children"]);
         }
 
@@ -541,10 +524,7 @@ export class Node {
         } else {
             const previousSibling = this.getPreviousSibling();
             if (previousSibling) {
-                if (
-                    !previousSibling.hasChildren() ||
-                    !previousSibling.is_open
-                ) {
+                if (!previousSibling.hasChildren() || !previousSibling.is_open) {
                     // Previous sibling
                     return previousSibling;
                 } else {

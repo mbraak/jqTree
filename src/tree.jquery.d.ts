@@ -6,6 +6,7 @@ interface INode {
     is_open: boolean;
     element: Element;
     load_on_demand: boolean | null;
+    isEmptyFolder: boolean;
 
     [key: string]: any;
 
@@ -41,6 +42,7 @@ interface IJQTreeOptions {
     selectable?: boolean;
     saveState?: boolean | string;
     slide?: boolean;
+    showEmptyFolder?: boolean;
     tabIndex?: number;
     useContextMenu?: boolean;
 }
@@ -48,21 +50,9 @@ interface IJQTreeOptions {
 interface IJQTreePlugin {
     (): JQuery;
     (options: IJQTreeOptions): JQuery;
-    (
-        behavior: "addNodeAfter",
-        newNodeInfo: any,
-        existingNode: INode
-    ): INode | null;
-    (
-        behavior: "addNodeBefore",
-        newNodeInfo: any,
-        existingNode: INode
-    ): Node | null;
-    (
-        behavior: "addParentNode",
-        newNodeInfo: any,
-        existingNode: INode
-    ): INode | null;
+    (behavior: "addNodeAfter", newNodeInfo: any, existingNode: INode): INode | null;
+    (behavior: "addNodeBefore", newNodeInfo: any, existingNode: INode): Node | null;
+    (behavior: "addParentNode", newNodeInfo: any, existingNode: INode): INode | null;
     (behavior: "addToSelection", node: INode, mustSetFocus?: boolean): JQuery;
     (behavior: "appendNode", newNodeInfo: any, parentNode?: INode): INode;
     (behavior: "closeNode", node: INode, slide?: boolean): JQuery;
@@ -76,25 +66,11 @@ interface IJQTreePlugin {
     (behavior: "getTree"): INode;
     (behavior: "isNodeSelected", node: INode): boolean;
     (behavior: "loadData", data: any, parentNode?: INode): JQuery;
-    (
-        behavior: "moveNode",
-        node: INode,
-        targetNode: INode,
-        position: string
-    ): JQuery;
+    (behavior: "moveNode", node: INode, targetNode: INode, position: string): JQuery;
     (behavior: "openNode", node: INode): JQuery;
     (behavior: "openNode", node: INode, slide: boolean): JQuery;
-    (
-        behavior: "openNode",
-        node: INode,
-        onFinished: (node: INode) => void
-    ): JQuery;
-    (
-        behavior: "openNode",
-        node: INode,
-        slide: boolean,
-        onFinished?: (node: INode) => void
-    ): JQuery;
+    (behavior: "openNode", node: INode, onFinished: (node: INode) => void): JQuery;
+    (behavior: "openNode", node: INode, slide: boolean, onFinished?: (node: INode) => void): JQuery;
     (behavior: "prependNode", newNodeInfo: any, parentNode?: INode): INode;
     (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
