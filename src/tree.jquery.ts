@@ -293,8 +293,9 @@ class JqTreeWidget extends MouseWidget {
         if (node.parent && this.selectNodeHandler) {
             this.selectNodeHandler.removeFromSelection(node, true); // including children
 
+            const parent = node.parent;
             node.remove();
-            this._refreshElements(node.parent);
+            this._refreshElements(parent);
         }
 
         return this.element;

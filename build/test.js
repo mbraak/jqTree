@@ -1034,8 +1034,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
         var node = inode;
         if (node.parent && this.selectNodeHandler) {
             this.selectNodeHandler.removeFromSelection(node, true); // including children
+            var parent_1 = node.parent;
             node.remove();
-            this._refreshElements(node.parent);
+            this._refreshElements(parent_1);
         }
         return this.element;
     };
@@ -1205,13 +1206,13 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 this._loadFolderOnDemand(node, slide, onFinished);
             }
             else {
-                var parent_1 = node.parent;
-                while (parent_1) {
+                var parent_2 = node.parent;
+                while (parent_2) {
                     // nb: do not open root element
-                    if (parent_1.parent) {
-                        doOpenNode(parent_1, false, null);
+                    if (parent_2.parent) {
+                        doOpenNode(parent_2, false, null);
                     }
-                    parent_1 = parent_1.parent;
+                    parent_2 = parent_2.parent;
                 }
                 doOpenNode(node, slide, onFinished);
                 this._saveState();
