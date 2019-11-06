@@ -12,11 +12,11 @@ abstract class MouseWidget extends SimpleWidget {
     private mouseDelayTimer: number | null;
     private isMouseDelayMet: boolean;
 
-    public setMouseDelay(mouseDelay: number) {
+    public setMouseDelay(mouseDelay: number): void {
         this.mouseDelay = mouseDelay;
     }
 
-    protected _init() {
+    protected _init(): void {
         this.$el.on("mousedown.mousewidget", this.mouseDown);
         this.$el.on("touchstart.mousewidget", this.touchStart);
 
@@ -27,7 +27,7 @@ abstract class MouseWidget extends SimpleWidget {
         this.mouseDownInfo = null;
     }
 
-    protected _deinit() {
+    protected _deinit(): void {
         this.$el.off("mousedown.mousewidget");
         this.$el.off("touchstart.mousewidget");
 
@@ -36,9 +36,7 @@ abstract class MouseWidget extends SimpleWidget {
         $document.off("mouseup.mousewidget");
     }
 
-    protected abstract _mouseCapture(
-        positionInfo: IPositionInfo
-    ): boolean | null;
+    protected abstract _mouseCapture(positionInfo: IPositionInfo): boolean | null;
 
     protected abstract _mouseStart(positionInfo: IPositionInfo): boolean;
 
@@ -46,7 +44,7 @@ abstract class MouseWidget extends SimpleWidget {
 
     protected abstract _mouseStop(positionInfo: IPositionInfo): void;
 
-    private mouseDown = (e: JQuery.Event) => {
+    private mouseDown = (e: JQuery.Event): boolean | undefined => {
         // Is left mouse button?
         if (e.which !== 1) {
             return;
@@ -61,7 +59,7 @@ abstract class MouseWidget extends SimpleWidget {
         return result;
     };
 
-    private _handleMouseDown(positionInfo: IPositionInfo) {
+    private _handleMouseDown(positionInfo: IPositionInfo): true | undefined {
         // We may have missed mouseup (out of window)
         if (this.isMouseStarted) {
             this._handleMouseUp(positionInfo);
@@ -78,7 +76,7 @@ abstract class MouseWidget extends SimpleWidget {
         return true;
     }
 
-    private _handleStartMouse() {
+    private _handleStartMouse(): void {
         const $document = jQuery(document);
         $document.on("mousemove.mousewidget", this.mouseMove);
         $document.on("touchmove.mousewidget", this.touchMove);
@@ -90,7 +88,7 @@ abstract class MouseWidget extends SimpleWidget {
         }
     }
 
-    private _startMouseDelayTimer() {
+    private _startMouseDelayTimer(): void {
         if (this.mouseDelayTimer) {
             clearTimeout(this.mouseDelayTimer);
         }
@@ -102,8 +100,7 @@ abstract class MouseWidget extends SimpleWidget {
         this.isMouseDelayMet = false;
     }
 
-    private mouseMove = (e: JQuery.Event) =>
-        this._handleMouseMove(e, this._getPositionInfo(e));
+    private mouseMove = (e: JQuery.Event) => this._handleMouseMove(e, this._getPositionInfo(e));
 
     private _handleMouseMove(e: JQuery.Event, positionInfo: IPositionInfo) {
         if (this.isMouseStarted) {
@@ -116,8 +113,7 @@ abstract class MouseWidget extends SimpleWidget {
         }
 
         if (this.mouseDownInfo) {
-            this.isMouseStarted =
-                this._mouseStart(this.mouseDownInfo) !== false;
+            this.isMouseStarted = this._mouseStart(this.mouseDownInfo) !== false;
         }
 
         if (this.isMouseStarted) {
@@ -138,10 +134,9 @@ abstract class MouseWidget extends SimpleWidget {
         };
     }
 
-    private mouseUp = (e: JQuery.Event) =>
-        this._handleMouseUp(this._getPositionInfo(e));
+    private mouseUp = (e: JQuery.Event): void => this._handleMouseUp(this._getPositionInfo(e));
 
-    private _handleMouseUp(positionInfo: IPositionInfo) {
+    private _handleMouseUp(positionInfo: IPositionInfo): void {
         const $document = jQuery(document);
         $document.off("mousemove.mousewidget");
         $document.off("touchmove.mousewidget");

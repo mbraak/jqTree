@@ -33,10 +33,7 @@ export class DragAndDropHandler {
             return null;
         }
 
-        if (
-            this.treeWidget.options.onIsMoveHandle &&
-            !this.treeWidget.options.onIsMoveHandle($element)
-        ) {
+        if (this.treeWidget.options.onIsMoveHandle && !this.treeWidget.options.onIsMoveHandle($element)) {
             return null;
         }
 
@@ -52,7 +49,7 @@ export class DragAndDropHandler {
         return this.currentItem != null;
     }
 
-    public generateHitAreas() {
+    public generateHitAreas(): void {
         if (!this.currentItem) {
             this.hitAreas = [];
         } else {
@@ -66,11 +63,7 @@ export class DragAndDropHandler {
     }
 
     public mouseStart(positionInfo: IPositionInfo): boolean {
-        if (
-            !this.currentItem ||
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
+        if (!this.currentItem || positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
             return false;
         } else {
             this.refresh();
@@ -81,9 +74,7 @@ export class DragAndDropHandler {
 
             const node = this.currentItem.node;
 
-            const nodeName: string = this.treeWidget.options.autoEscape
-                ? htmlEscape(node.name)
-                : node.name;
+            const nodeName: string = this.treeWidget.options.autoEscape ? htmlEscape(node.name) : node.name;
 
             this.dragElement = new DragElement(
                 nodeName,
@@ -111,10 +102,7 @@ export class DragAndDropHandler {
             this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
             this.positionInfo = positionInfo;
 
-            const area = this.findHoveredArea(
-                positionInfo.pageX,
-                positionInfo.pageY
-            );
+            const area = this.findHoveredArea(positionInfo.pageX, positionInfo.pageY);
             const canMoveTo = this.canMoveToArea(area);
 
             if (canMoveTo && area) {
@@ -142,10 +130,7 @@ export class DragAndDropHandler {
 
             if (!area) {
                 if (this.treeWidget.options.onDragMove) {
-                    this.treeWidget.options.onDragMove(
-                        this.currentItem.node,
-                        positionInfo.originalEvent
-                    );
+                    this.treeWidget.options.onDragMove(this.currentItem.node, positionInfo.originalEvent);
                 }
             }
 
@@ -153,7 +138,7 @@ export class DragAndDropHandler {
         }
     }
 
-    public mouseStop(positionInfo: IPositionInfo) {
+    public mouseStop(positionInfo: IPositionInfo): boolean {
         this.moveItem(positionInfo);
         this.clear();
         this.removeHover();
@@ -172,25 +157,20 @@ export class DragAndDropHandler {
 
         if (!this.hoveredArea && currentItem) {
             if (this.treeWidget.options.onDragStop) {
-                this.treeWidget.options.onDragStop(
-                    currentItem.node,
-                    positionInfo.originalEvent
-                );
+                this.treeWidget.options.onDragStop(currentItem.node, positionInfo.originalEvent);
             }
         }
 
         return false;
     }
 
-    public refresh() {
+    public refresh(): void {
         this.removeHitAreas();
 
         if (this.currentItem) {
             this.generateHitAreas();
 
-            this.currentItem = this.treeWidget._getNodeElementForNode(
-                this.currentItem.node
-            );
+            this.currentItem = this.treeWidget._getNodeElementForNode(this.currentItem.node);
 
             if (this.isDragging) {
                 this.currentItem.$element.addClass("jqtree-moving");
@@ -198,7 +178,7 @@ export class DragAndDropHandler {
         }
     }
 
-    private mustCaptureElement($element: JQuery<any>) {
+    private mustCaptureElement($element: JQuery<any>): boolean {
         return !$element.is("input,select,textarea");
     }
 
@@ -206,55 +186,45 @@ export class DragAndDropHandler {
         if (!area || !this.currentItem) {
             return false;
         } else if (this.treeWidget.options.onCanMoveTo) {
-            const position_name = getPositionName(area.position);
+            const positionName = getPositionName(area.position);
 
-            return this.treeWidget.options.onCanMoveTo(
-                this.currentItem.node,
-                area.node,
-                position_name
-            );
+            return this.treeWidget.options.onCanMoveTo(this.currentItem.node, area.node, positionName);
         } else {
             return true;
         }
     }
 
-    private removeHitAreas() {
+    private removeHitAreas(): void {
         this.hitAreas = [];
     }
 
-    private clear() {
+    private clear(): void {
         if (this.dragElement) {
             this.dragElement.remove();
             this.dragElement = null;
         }
     }
 
-    private removeDropHint() {
+    private removeDropHint(): void {
         if (this.previousGhost) {
             this.previousGhost.remove();
         }
     }
 
-    private removeHover() {
+    private removeHover(): void {
         this.hoveredArea = null;
     }
 
     private findHoveredArea(x: number, y: number): IHitArea | null {
         const dimensions = this.getTreeDimensions();
 
-        if (
-            x < dimensions.left ||
-            y < dimensions.top ||
-            x > dimensions.right ||
-            y > dimensions.bottom
-        ) {
+        if (x < dimensions.left || y < dimensions.top || x > dimensions.right || y > dimensions.bottom) {
             return null;
         }
 
         let low = 0;
         let high = this.hitAreas.length;
         while (low < high) {
-            // tslint:disable-next-line: no-bitwise
             const mid = (low + high) >> 1;
             const area = this.hitAreas[mid];
 
@@ -270,17 +240,13 @@ export class DragAndDropHandler {
         return null;
     }
 
-    private mustOpenFolderTimer(area: IHitArea) {
+    private mustOpenFolderTimer(area: IHitArea): boolean {
         const node = area.node;
 
-        return (
-            node.isFolder() &&
-            !node.is_open &&
-            area.position === Position.Inside
-        );
+        return node.isFolder() && !node.is_open && area.position === Position.Inside;
     }
 
-    private updateDropHint() {
+    private updateDropHint(): void {
         if (!this.hoveredArea) {
             return;
         }
@@ -289,77 +255,64 @@ export class DragAndDropHandler {
         this.removeDropHint();
 
         // add new drop hint
-        const node_element = this.treeWidget._getNodeElementForNode(
-            this.hoveredArea.node
-        );
-        this.previousGhost = node_element.addDropHint(
-            this.hoveredArea.position
-        );
+        const nodeElement = this.treeWidget._getNodeElementForNode(this.hoveredArea.node);
+        this.previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
     }
 
-    private startOpenFolderTimer(folder: Node) {
-        const openFolder = () => {
-            this.treeWidget._openNode(
-                folder,
-                this.treeWidget.options.slide,
-                () => {
-                    this.refresh();
-                    this.updateDropHint();
-                }
-            );
+    private startOpenFolderTimer(folder: Node): void {
+        const openFolder = (): void => {
+            this.treeWidget._openNode(folder, this.treeWidget.options.slide, () => {
+                this.refresh();
+                this.updateDropHint();
+            });
         };
 
         this.stopOpenFolderTimer();
 
-        this.openFolderTimer = window.setTimeout(
-            openFolder,
-            this.treeWidget.options.openFolderDelay
-        );
+        this.openFolderTimer = window.setTimeout(openFolder, this.treeWidget.options.openFolderDelay);
     }
 
-    private stopOpenFolderTimer() {
+    private stopOpenFolderTimer(): void {
         if (this.openFolderTimer) {
             clearTimeout(this.openFolderTimer);
             this.openFolderTimer = null;
         }
     }
 
-    private moveItem(positionInfo: IPositionInfo) {
+    private moveItem(positionInfo: IPositionInfo): void {
         if (
             this.currentItem &&
             this.hoveredArea &&
             this.hoveredArea.position !== Position.None &&
             this.canMoveToArea(this.hoveredArea)
         ) {
-            const moved_node = this.currentItem.node;
-            const target_node = this.hoveredArea.node;
+            const movedNode = this.currentItem.node;
+            const targetNode = this.hoveredArea.node;
             const position = this.hoveredArea.position;
-            const previous_parent = moved_node.parent;
+            const previousParent = movedNode.parent;
 
             if (position === Position.Inside) {
-                this.hoveredArea.node.is_open = true;
+                this.hoveredArea.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
             }
 
-            const doMove = () => {
-                this.treeWidget.tree.moveNode(
-                    moved_node,
-                    target_node,
-                    position
-                );
+            const doMove = (): void => {
+                this.treeWidget.tree.moveNode(movedNode, targetNode, position);
                 this.treeWidget.element.empty();
                 this.treeWidget._refreshElements(null);
             };
 
+            /* eslint-disable @typescript-eslint/camelcase */
             const event = this.treeWidget._triggerEvent("tree.move", {
                 move_info: {
-                    moved_node,
-                    target_node,
+                    moved_node: movedNode,
+                    target_node: targetNode,
                     position: getPositionName(position),
-                    previous_parent,
+                    previous_parent: previousParent,
                     do_move: doMove,
                     original_event: positionInfo.originalEvent
                 }
             });
+            /* eslint-enable @typescript-eslint/camelcase */
 
             if (!event.isDefaultPrevented()) {
                 doMove();
@@ -367,7 +320,7 @@ export class DragAndDropHandler {
         }
     }
 
-    private getTreeDimensions() {
+    private getTreeDimensions(): any {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
         const offset = this.treeWidget.element.offset();
@@ -397,12 +350,11 @@ abstract class VisibleNodeIterator {
         this.tree = tree;
     }
 
-    protected iterate() {
+    protected iterate(): void {
         let isFirstNode = true;
 
-        const _iterateNode = (node: Node, nextNode: Node | null) => {
-            let mustIterateInside =
-                (node.is_open || !node.element) && node.hasChildren();
+        const _iterateNode = (node: Node, nextNode: Node | null): void => {
+            let mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
 
             let $element: JQuery<any> | null = null;
 
@@ -430,9 +382,9 @@ abstract class VisibleNodeIterator {
             }
 
             if (mustIterateInside) {
-                const children_length = node.children.length;
+                const childrenLength = node.children.length;
                 node.children.forEach((_, i) => {
-                    if (i === children_length - 1) {
+                    if (i === childrenLength - 1) {
                         _iterateNode(node.children[i], null);
                     } else {
                         _iterateNode(node.children[i], node.children[i + 1]);
@@ -448,11 +400,7 @@ abstract class VisibleNodeIterator {
         _iterateNode(this.tree, null);
     }
 
-    protected abstract handleNode(
-        node: Node,
-        next_node: Node | null,
-        $element: JQuery
-    ): void;
+    protected abstract handleNode(node: Node, nextNode: Node | null, $element: JQuery): void;
 
     /*
     override
@@ -462,16 +410,9 @@ abstract class VisibleNodeIterator {
     */
     protected abstract handleOpenFolder(node: Node, $element: JQuery): boolean;
 
-    protected abstract handleClosedFolder(
-        node: Node,
-        nextNode: Node | null,
-        $element: JQuery
-    ): void;
+    protected abstract handleClosedFolder(node: Node, nextNode: Node | null, $element: JQuery): void;
 
-    protected abstract handleAfterOpenFolder(
-        node: Node,
-        nextNode: Node | null
-    ): void;
+    protected abstract handleAfterOpenFolder(node: Node, nextNode: Node | null): void;
 
     protected abstract handleFirstNode(node: Node): void;
 }
@@ -489,7 +430,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         this.treeBottom = treeBottom;
     }
 
-    public generate() {
+    public generate(): IHitArea[] {
         this.positions = [];
         this.lastTop = 0;
 
@@ -498,7 +439,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return this.generateHitAreas(this.positions);
     }
 
-    protected generateHitAreas(positions: IHitArea[]) {
+    protected generateHitAreas(positions: IHitArea[]): IHitArea[] {
         let previousTop = -1;
         let group = [];
         const hitAreas: IHitArea[] = [];
@@ -506,12 +447,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         for (const position of positions) {
             if (position.top !== previousTop && group.length) {
                 if (group.length) {
-                    this.generateHitAreasForGroup(
-                        hitAreas,
-                        group,
-                        previousTop,
-                        position.top
-                    );
+                    this.generateHitAreasForGroup(hitAreas, group, previousTop, position.top);
                 }
 
                 previousTop = position.top;
@@ -521,17 +457,12 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             group.push(position);
         }
 
-        this.generateHitAreasForGroup(
-            hitAreas,
-            group,
-            previousTop,
-            this.treeBottom
-        );
+        this.generateHitAreasForGroup(hitAreas, group, previousTop, this.treeBottom);
 
         return hitAreas;
     }
 
-    protected handleOpenFolder(node: Node, $element: JQuery) {
+    protected handleOpenFolder(node: Node, $element: JQuery): boolean {
         if (node === this.currentNode) {
             // Cannot move inside current item
             // Stop iterating
@@ -547,7 +478,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return true;
     }
 
-    protected handleClosedFolder(node: Node, nextNode: Node, $element: JQuery) {
+    protected handleClosedFolder(node: Node, nextNode: Node, $element: JQuery): void {
         const top = this.getTop($element);
 
         if (node === this.currentNode) {
@@ -563,18 +494,14 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    protected handleFirstNode(node: Node) {
+    protected handleFirstNode(node: Node): void {
         if (node !== this.currentNode) {
-            this.addPosition(
-                node,
-                Position.Before,
-                this.getTop(jQuery(node.element))
-            );
+            this.addPosition(node, Position.Before, this.getTop(jQuery(node.element)));
         }
     }
 
-    protected handleAfterOpenFolder(node: Node, next_node: Node) {
-        if (node === this.currentNode || next_node === this.currentNode) {
+    protected handleAfterOpenFolder(node: Node, nextNode: Node): void {
+        if (node === this.currentNode || nextNode === this.currentNode) {
             // Cannot move before or after current item
             this.addPosition(node, Position.None, this.lastTop);
         } else {
@@ -582,7 +509,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    protected handleNode(node: Node, nextNode: Node, $element: JQuery) {
+    protected handleNode(node: Node, nextNode: Node, $element: JQuery): void {
         const top = this.getTop($element);
 
         if (node === this.currentNode) {
@@ -606,7 +533,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return offset ? offset.top : 0;
     }
 
-    private addPosition(node: Node, position: number, top: number) {
+    private addPosition(node: Node, position: number, top: number): void {
         const area = {
             top,
             bottom: 0,
@@ -623,25 +550,25 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         positionsInGroup: IHitArea[],
         top: number,
         bottom: number
-    ) {
+    ): void {
         // limit positions in group
-        const position_count = Math.min(positionsInGroup.length, 4);
+        const positionCount = Math.min(positionsInGroup.length, 4);
 
-        const area_height = Math.round((bottom - top) / position_count);
-        let area_top = top;
+        const areaHeight = Math.round((bottom - top) / positionCount);
+        let areaTop = top;
 
         let i = 0;
-        while (i < position_count) {
+        while (i < positionCount) {
             const position = positionsInGroup[i];
 
             hitAreas.push({
-                top: area_top,
-                bottom: area_top + area_height,
+                top: areaTop,
+                bottom: areaTop + areaHeight,
                 node: position.node,
                 position: position.position
             });
 
-            area_top += area_height;
+            areaTop += areaHeight;
             i += 1;
         }
     }
@@ -652,30 +579,23 @@ class DragElement {
     private offsetY: number;
     private $element: JQuery;
 
-    constructor(
-        node_name: string,
-        offset_x: number,
-        offset_y: number,
-        $tree: JQuery
-    ) {
-        this.offsetX = offset_x;
-        this.offsetY = offset_y;
+    constructor(nodeName: string, offsetX: number, offsetY: number, $tree: JQuery) {
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
 
-        this.$element = jQuery(
-            `<span class=\"jqtree-title jqtree-dragging\">${node_name}</span>`
-        );
+        this.$element = jQuery(`<span class=\"jqtree-title jqtree-dragging\">${nodeName}</span>`);
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }
 
-    public move(pageX: number, pageY: number) {
+    public move(pageX: number, pageY: number): void {
         this.$element.offset({
             left: pageX - this.offsetX,
             top: pageY - this.offsetY
         });
     }
 
-    public remove() {
+    public remove(): void {
         this.$element.remove();
     }
 }

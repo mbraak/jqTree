@@ -15,10 +15,7 @@ export const exampleData = [
         id: 123, // extra data
         intProperty: 1,
         strProperty: "1",
-        children: [
-            { label: "child1", id: 125, intProperty: 2 },
-            { label: "child2", id: 126 }
-        ]
+        children: [{ label: "child1", id: 125, intProperty: 2 }, { label: "child2", id: 126 }]
     },
     {
         label: "node2",
@@ -44,13 +41,13 @@ export const exampleData2 = [
     }
 ];
 
-export function formatNodes(nodes: INode[]) {
+export function formatNodes(nodes: INode[]): string {
     const strings = nodes.map(node => node.name);
 
     return strings.join(" ");
 }
 
-export function isNodeClosed($node: JQuery<any>) {
+export function isNodeClosed($node: JQuery<Element>): boolean {
     return (
         $node.is("li.jqtree-folder.jqtree-closed") &&
         $node.find("a:eq(0)").is("a.jqtree-toggler.jqtree-closed") &&
@@ -58,7 +55,7 @@ export function isNodeClosed($node: JQuery<any>) {
     );
 }
 
-export function isNodeOpen($node: JQuery<any>) {
+export function isNodeOpen($node: JQuery<Element>): boolean {
     return (
         $node.is("li.jqtree-folder") &&
         $node.find("a:eq(0)").is("a.jqtree-toggler") &&
@@ -68,7 +65,7 @@ export function isNodeOpen($node: JQuery<any>) {
     );
 }
 
-export function formatTitles($node: JQuery<any>) {
+export function formatTitles($node: JQuery<Element>): string {
     const titles = $node.find(".jqtree-title").map((_, el) => $(el).text());
     return titles.toArray().join(" ");
 }

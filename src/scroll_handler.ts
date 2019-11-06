@@ -8,19 +8,19 @@ export default class ScrollHandler {
     private $scrollParent: JQuery | null;
     private scrollParentTop: number;
 
-    constructor(tree_widget: ITreeWidget) {
-        this.treeWidget = tree_widget;
+    constructor(treeWidget: ITreeWidget) {
+        this.treeWidget = treeWidget;
         this.previousTop = -1;
         this.isInitialized = false;
     }
 
-    public checkScrolling() {
+    public checkScrolling(): void {
         this.ensureInit();
         this.checkVerticalScrolling();
         this.checkHorizontalScrolling();
     }
 
-    public scrollToY(top: number) {
+    public scrollToY(top: number): void {
         this.ensureInit();
 
         if (this.$scrollParent) {
@@ -75,17 +75,14 @@ export default class ScrollHandler {
         }
     }
 
-    private initScrollParent() {
-        const getParentWithOverflow = () => {
+    private initScrollParent(): void {
+        const getParentWithOverflow = (): JQuery | null => {
             const cssAttributes = ["overflow", "overflow-y"];
 
-            const hasOverFlow = ($el: JQuery) => {
+            const hasOverFlow = ($el: JQuery): boolean => {
                 for (const attr of cssAttributes) {
                     const overflowValue = $el.css(attr);
-                    if (
-                        overflowValue === "auto" ||
-                        overflowValue === "scroll"
-                    ) {
+                    if (overflowValue === "auto" || overflowValue === "scroll") {
                         return true;
                     }
                 }
@@ -107,7 +104,7 @@ export default class ScrollHandler {
             return null;
         };
 
-        const setDocumentAsScrollParent = () => {
+        const setDocumentAsScrollParent = (): void => {
             this.scrollParentTop = 0;
             this.$scrollParent = null;
         };
@@ -118,11 +115,7 @@ export default class ScrollHandler {
 
         const $scrollParent = getParentWithOverflow();
 
-        if (
-            $scrollParent &&
-            $scrollParent.length &&
-            $scrollParent[0].tagName !== "HTML"
-        ) {
+        if ($scrollParent && $scrollParent.length && $scrollParent[0].tagName !== "HTML") {
             this.$scrollParent = $scrollParent;
 
             const offset = this.$scrollParent.offset();
@@ -134,21 +127,20 @@ export default class ScrollHandler {
         this.isInitialized = true;
     }
 
-    private ensureInit() {
+    private ensureInit(): void {
         if (!this.isInitialized) {
             this.initScrollParent();
         }
     }
 
-    private handleVerticalScrollingWithScrollParent(area: IHitArea) {
+    private handleVerticalScrollingWithScrollParent(area: IHitArea): void {
         const scrollParent = this.$scrollParent && this.$scrollParent[0];
 
         if (!scrollParent) {
             return;
         }
 
-        const distanceBottom =
-            this.scrollParentTop + scrollParent.offsetHeight - area.bottom;
+        const distanceBottom = this.scrollParentTop + scrollParent.offsetHeight - area.bottom;
 
         if (distanceBottom < 20) {
             scrollParent.scrollTop += 20;
@@ -161,7 +153,7 @@ export default class ScrollHandler {
         }
     }
 
-    private handleVerticalScrollingWithDocument(area: IHitArea) {
+    private handleVerticalScrollingWithDocument(area: IHitArea): void {
         const scrollTop = jQuery(document).scrollTop() || 0;
         const distanceTop = area.top - scrollTop;
 
@@ -176,10 +168,8 @@ export default class ScrollHandler {
         }
     }
 
-    private checkVerticalScrolling() {
-        const hoveredArea =
-            this.treeWidget.dndHandler &&
-            this.treeWidget.dndHandler.hoveredArea;
+    private checkVerticalScrolling(): void {
+        const hoveredArea = this.treeWidget.dndHandler && this.treeWidget.dndHandler.hoveredArea;
 
         if (hoveredArea && hoveredArea.top !== this.previousTop) {
             this.previousTop = hoveredArea.top;
@@ -192,10 +182,8 @@ export default class ScrollHandler {
         }
     }
 
-    private checkHorizontalScrolling() {
-        const positionInfo =
-            this.treeWidget.dndHandler &&
-            this.treeWidget.dndHandler.positionInfo;
+    private checkHorizontalScrolling(): void {
+        const positionInfo = this.treeWidget.dndHandler && this.treeWidget.dndHandler.positionInfo;
 
         if (!positionInfo) {
             return;
@@ -208,11 +196,8 @@ export default class ScrollHandler {
         }
     }
 
-    private handleHorizontalScrollingWithParent(positionInfo: IPositionInfo) {
-        if (
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
+    private handleHorizontalScrollingWithParent(positionInfo: IPositionInfo): void {
+        if (positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
             return;
         }
 
@@ -225,9 +210,7 @@ export default class ScrollHandler {
 
         const scrollParent = $scrollParent[0];
 
-        const canScrollRight =
-            scrollParent.scrollLeft + scrollParent.clientWidth <
-            scrollParent.scrollWidth;
+        const canScrollRight = scrollParent.scrollLeft + scrollParent.clientWidth < scrollParent.scrollWidth;
         const canScrollLeft = scrollParent.scrollLeft > 0;
 
         const rightEdge = scrollParentOffset.left + scrollParent.clientWidth;
@@ -236,20 +219,14 @@ export default class ScrollHandler {
         const isNearLeftEdge = positionInfo.pageX < leftEdge + 20;
 
         if (isNearRightEdge && canScrollRight) {
-            scrollParent.scrollLeft = Math.min(
-                scrollParent.scrollLeft + 20,
-                scrollParent.scrollWidth
-            );
+            scrollParent.scrollLeft = Math.min(scrollParent.scrollLeft + 20, scrollParent.scrollWidth);
         } else if (isNearLeftEdge && canScrollLeft) {
             scrollParent.scrollLeft = Math.max(scrollParent.scrollLeft - 20, 0);
         }
     }
 
-    private handleHorizontalScrollingWithDocument(positionInfo: IPositionInfo) {
-        if (
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
+    private handleHorizontalScrollingWithDocument(positionInfo: IPositionInfo): void {
+        if (positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
             return;
         }
 

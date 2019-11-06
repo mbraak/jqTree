@@ -1,10 +1,5 @@
 import { Position, Node } from "./node";
-import {
-    ITreeWidget,
-    IDropHint,
-    INodeElement,
-    OnFinishOpenNode
-} from "./itree_widget";
+import { ITreeWidget, IDropHint, INodeElement, OnFinishOpenNode } from "./itree_widget";
 
 export class NodeElement implements INodeElement {
     public node: Node;
@@ -15,7 +10,7 @@ export class NodeElement implements INodeElement {
         this.init(node, treeWidget);
     }
 
-    public init(node: Node, treeWidget: ITreeWidget) {
+    public init(node: Node, treeWidget: ITreeWidget): void {
         this.node = node;
         this.treeWidget = treeWidget;
 
@@ -28,16 +23,13 @@ export class NodeElement implements INodeElement {
 
     public addDropHint(position: number): IDropHint {
         if (this.mustShowBorderDropHint(position)) {
-            return new BorderDropHint(
-                this.$element,
-                this.treeWidget._getScrollLeft()
-            );
+            return new BorderDropHint(this.$element, this.treeWidget._getScrollLeft());
         } else {
             return new GhostDropHint(this.node, this.$element, position);
         }
     }
 
-    public select(mustSetFocus: boolean) {
+    public select(mustSetFocus: boolean): void {
         const $li = this.getLi();
 
         $li.addClass("jqtree-selected");
@@ -51,7 +43,7 @@ export class NodeElement implements INodeElement {
         }
     }
 
-    public deselect() {
+    public deselect(): void {
         const $li = this.getLi();
 
         $li.removeClass("jqtree-selected");
@@ -63,17 +55,15 @@ export class NodeElement implements INodeElement {
         $span.blur();
     }
 
-    protected getUl() {
+    protected getUl(): JQuery<any> {
         return this.$element.children("ul:first");
     }
 
-    protected getSpan() {
-        return this.$element
-            .children(".jqtree-element")
-            .find("span.jqtree-title");
+    protected getSpan(): JQuery<any> {
+        return this.$element.children(".jqtree-element").find("span.jqtree-title");
     }
 
-    protected getLi() {
+    protected getLi(): JQuery<any> {
         return this.$element;
     }
 
@@ -83,32 +73,26 @@ export class NodeElement implements INodeElement {
 }
 
 export class FolderElement extends NodeElement {
-    public open(
-        onFinished: OnFinishOpenNode | null,
-        slide = true,
-        animationSpeed = "fast"
-    ) {
+    public open(onFinished: OnFinishOpenNode | null, slide = true, animationSpeed = "fast"): void {
         if (this.node.is_open) {
             return;
         }
 
-        this.node.is_open = true;
+        this.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
 
         const $button = this.getButton();
         $button.removeClass("jqtree-closed");
         $button.html("");
 
-        const button_el = $button.get(0);
+        const buttonEl = $button.get(0);
 
-        if (button_el) {
-            const icon = this.treeWidget.renderer.openedIconElement.cloneNode(
-                true
-            );
+        if (buttonEl) {
+            const icon = this.treeWidget.renderer.openedIconElement.cloneNode(true);
 
-            button_el.appendChild(icon);
+            buttonEl.appendChild(icon);
         }
 
-        const doOpen = () => {
+        const doOpen = (): void => {
             const $li = this.getLi();
             $li.removeClass("jqtree-closed");
 
@@ -132,28 +116,26 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    public close(slide: boolean = true, animationSpeed = "fast") {
+    public close(slide = true, animationSpeed = "fast"): void {
         if (!this.node.is_open) {
             return;
         }
 
-        this.node.is_open = false;
+        this.node.is_open = false; // eslint-disable-line @typescript-eslint/camelcase
 
         const $button = this.getButton();
         $button.addClass("jqtree-closed");
         $button.html("");
 
-        const button_el = $button.get(0);
+        const buttonEl = $button.get(0);
 
-        if (button_el) {
-            const icon = this.treeWidget.renderer.closedIconElement.cloneNode(
-                true
-            );
+        if (buttonEl) {
+            const icon = this.treeWidget.renderer.closedIconElement.cloneNode(true);
 
-            button_el.appendChild(icon);
+            buttonEl.appendChild(icon);
         }
 
-        const doClose = () => {
+        const doClose = (): void => {
             const $li = this.getLi();
             $li.addClass("jqtree-closed");
 
@@ -178,9 +160,7 @@ export class FolderElement extends NodeElement {
     }
 
     private getButton(): JQuery {
-        return this.$element
-            .children(".jqtree-element")
-            .find("a.jqtree-toggler");
+        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
     }
 }
 
@@ -202,7 +182,7 @@ export class BorderDropHint implements IDropHint {
         this.$hint.css({ width, height });
     }
 
-    public remove() {
+    public remove(): void {
         this.$hint.remove();
     }
 }
@@ -234,23 +214,23 @@ class GhostDropHint implements IDropHint {
         }
     }
 
-    public remove() {
+    public remove(): void {
         this.$ghost.remove();
     }
 
-    public moveAfter() {
+    public moveAfter(): void {
         this.$element.after(this.$ghost);
     }
 
-    public moveBefore() {
+    public moveBefore(): void {
         this.$element.before(this.$ghost);
     }
 
-    public moveInsideOpenFolder() {
+    public moveInsideOpenFolder(): void {
         jQuery(this.node.children[0].element).before(this.$ghost);
     }
 
-    public moveInside() {
+    public moveInside(): void {
         this.$element.after(this.$ghost);
         this.$ghost.addClass("jqtree-inside");
     }
