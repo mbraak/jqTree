@@ -28,12 +28,12 @@ interface IJQTreeOptions {
     keyboardSupport?: boolean;
     onCanMove?: (node: INode) => boolean;
     onCanSelectNode?: (node: INode) => boolean;
-    onCreateLi?: (node: INode, el: JQuery, is_selected: boolean) => void;
+    onCreateLi?: (node: INode, el: JQuery, isSelected: boolean) => void;
     onDragMove?: (node: INode, event: JQueryEventObject | Touch) => void;
     onDragStop?: (node: INode, event: JQueryEventObject | Touch) => void;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: any) => void;
-    onLoading?: (is_loading: boolean, node: INode, $el: JQuery) => void;
+    onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => any;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: string | Element;
@@ -82,7 +82,6 @@ interface IJQTreePlugin {
     (behavior: "updateNode", node: INode, data: any): JQuery;
 }
 
-// tslint:disable-next-line: interface-name
 interface JQuery {
     tree: IJQTreePlugin;
 }

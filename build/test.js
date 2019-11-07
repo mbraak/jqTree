@@ -393,8 +393,8 @@ var Node = /** @class */ (function () {
         }
         else {
             var node = new this.tree.nodeClass(nodeInfo);
-            var child_index = this.parent.getChildIndex(this);
-            this.parent.addChildAtPosition(node, child_index + 1);
+            var childIndex = this.parent.getChildIndex(this);
+            this.parent.addChildAtPosition(node, childIndex + 1);
             if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
@@ -407,8 +407,8 @@ var Node = /** @class */ (function () {
         }
         else {
             var node = new this.tree.nodeClass(nodeInfo);
-            var child_index = this.parent.getChildIndex(this);
-            this.parent.addChildAtPosition(node, child_index);
+            var childIndex = this.parent.getChildIndex(this);
+            this.parent.addChildAtPosition(node, childIndex);
             if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
@@ -465,9 +465,9 @@ var Node = /** @class */ (function () {
         return false;
     };
     Node.prototype.getLevel = function () {
-        var level = 0;
-        var node = this;
-        while (node.parent) {
+        var level = 1;
+        var node = this.parent;
+        while (node) {
             level += 1;
             node = node.parent;
         }
@@ -725,35 +725,32 @@ var SimpleWidget = /** @class */ (function () {
                 var widget = jQuery.data(el, getDataKey());
                 if (widget && widget instanceof SimpleWidget) {
                     var widgetFunction = widget[functionName];
-                    if (widgetFunction &&
-                        typeof widgetFunction === "function") {
+                    if (widgetFunction && typeof widgetFunction === "function") {
                         result = widgetFunction.apply(widget, args);
                     }
                 }
             }
             return result;
         }
-        // tslint:disable-next-line: only-arrow-functions
         jQuery.fn[widgetName] = function (argument1) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {
                 args[_i - 1] = arguments[_i];
             }
-            var $el = this;
             if (argument1 === undefined || typeof argument1 === "object") {
                 var options = argument1;
-                return createWidget($el, options);
+                return createWidget(this, options);
             }
             else if (typeof argument1 === "string" && argument1[0] !== "_") {
                 var functionName = argument1;
                 if (functionName === "destroy") {
-                    return destroyWidget($el);
+                    return destroyWidget(this);
                 }
                 else if (functionName === "get_widget_class") {
                     return widgetClass;
                 }
                 else {
-                    return callFunction($el, functionName, args);
+                    return callFunction(this, functionName, args);
                 }
             }
         };
@@ -836,7 +833,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                     var node = clickTarget.node;
                     var event_1 = _this._triggerEvent("tree.click", {
                         node: node,
-                        click_event: e
+                        click_event: e // eslint-disable-line @typescript-eslint/camelcase
                     });
                     if (!event_1.isDefaultPrevented()) {
                         _this._selectNode(node);
@@ -849,7 +846,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             if (clickTarget && clickTarget.type === "label") {
                 _this._triggerEvent("tree.dblclick", {
                     node: clickTarget.node,
-                    click_event: e
+                    click_event: e // eslint-disable-line @typescript-eslint/camelcase
                 });
             }
         };
@@ -862,7 +859,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                     e.stopPropagation();
                     _this._triggerEvent("tree.contextmenu", {
                         node: node,
-                        click_event: e
+                        click_event: e // eslint-disable-line @typescript-eslint/camelcase
                     });
                     return false;
                 }
@@ -902,8 +899,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.toJson = function () {
         return JSON.stringify(this.tree.getData());
     };
-    JqTreeWidget.prototype.loadData = function (data, parent_node) {
-        this._loadData(data, parent_node);
+    JqTreeWidget.prototype.loadData = function (data, parentNode) {
+        this._loadData(data, parentNode);
         return this.element;
     };
     /*
@@ -1056,12 +1053,12 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var id_is_changed = data.id && data.id !== node.id;
-        if (id_is_changed) {
+        var idIsChanged = data.id && data.id !== node.id;
+        if (idIsChanged) {
             this.tree.removeNodeFromIndex(node);
         }
         node.setData(data);
-        if (id_is_changed) {
+        if (idIsChanged) {
             this.tree.addNodeToIndex(node);
         }
         if (typeof data === "object" && data.children) {
@@ -1138,11 +1135,11 @@ var JqTreeWidget = /** @class */ (function (_super) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
         if (this.scrollHandler) {
-            var node_offset = jQuery(node.element).offset();
-            var node_top = node_offset ? node_offset.top : 0;
-            var tree_offset = this.$el.offset();
-            var tree_top = tree_offset ? tree_offset.top : 0;
-            var top_1 = node_top - tree_top;
+            var nodeOffset = jQuery(node.element).offset();
+            var nodeTop = nodeOffset ? nodeOffset.top : 0;
+            var treeOffset = this.$el.offset();
+            var treeTop = treeOffset ? treeOffset.top : 0;
+            var top_1 = nodeTop - treeTop;
             this.scrollHandler.scrollToY(top_1);
         }
         return this.element;
@@ -1198,8 +1195,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
         var _this = this;
         if (slide === void 0) { slide = true; }
         var doOpenNode = function (_node, _slide, _onFinished) {
-            var folder_element = new node_element_1.FolderElement(_node, _this);
-            folder_element.open(_onFinished, _slide, _this.options.animationSpeed);
+            var folderElement = new node_element_1.FolderElement(_node, _this);
+            folderElement.open(_onFinished, _slide, _this.options.animationSpeed);
         };
         if (node.isFolder() || node.isEmptyFolder) {
             if (node.load_on_demand) {
@@ -1340,8 +1337,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
             this._loadData(this.options.data, null);
         }
         else {
-            var data_url = this._getDataUrlInfo(null);
-            if (data_url) {
+            var dataUrl = this._getDataUrlInfo(null);
+            if (dataUrl) {
                 this._loadDataFromUrl(null, null, null);
             }
             else {
@@ -1351,41 +1348,39 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.prototype._getDataUrlInfo = function (node) {
         var _this = this;
-        var data_url = this.options.dataUrl || this.element.data("url");
+        var dataUrl = this.options.dataUrl || this.element.data("url");
         var getUrlFromString = function () {
-            var url_info = { url: data_url };
-            setUrlInfoData(url_info);
-            return url_info;
+            var urlInfo = { url: dataUrl };
+            setUrlInfoData(urlInfo);
+            return urlInfo;
         };
-        var setUrlInfoData = function (url_info) {
+        var setUrlInfoData = function (urlInfo) {
             if (node && node.id) {
                 // Load on demand of a subtree; add node parameter
                 var data = { node: node.id };
-                // tslint:disable-next-line: no-string-literal
-                url_info["data"] = data;
+                urlInfo["data"] = data;
             }
             else {
                 // Add selected_node parameter
-                var selected_node_id = _this._getNodeIdToBeSelected();
-                if (selected_node_id) {
-                    var data = { selected_node: selected_node_id };
-                    // tslint:disable-next-line: no-string-literal
-                    url_info["data"] = data;
+                var selectedNodeId = _this._getNodeIdToBeSelected();
+                if (selectedNodeId) {
+                    var data = { selected_node: selectedNodeId }; // eslint-disable-line @typescript-eslint/camelcase
+                    urlInfo["data"] = data;
                 }
             }
         };
-        if (typeof data_url === "function") {
-            return data_url(node);
+        if (typeof dataUrl === "function") {
+            return dataUrl(node);
         }
-        else if (typeof data_url === "string") {
+        else if (typeof dataUrl === "string") {
             return getUrlFromString();
         }
-        else if (typeof data_url === "object") {
-            setUrlInfoData(data_url);
-            return data_url;
+        else if (typeof dataUrl === "object") {
+            setUrlInfoData(dataUrl);
+            return dataUrl;
         }
         else {
-            return data_url;
+            return dataUrl;
         }
     };
     JqTreeWidget.prototype._getNodeIdToBeSelected = function () {
@@ -1445,7 +1440,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             if (_this.options.autoOpen === false) {
                 return false;
             }
-            var max_level = _this._getAutoOpenMaxLevel();
+            var maxLevel = _this._getAutoOpenMaxLevel();
             var mustLoadOnDemand = false;
             _this.tree.iterate(function (node, level) {
                 if (node.load_on_demand) {
@@ -1456,14 +1451,13 @@ var JqTreeWidget = /** @class */ (function (_super) {
                     return false;
                 }
                 else {
-                    node.is_open = true;
-                    return level !== max_level;
+                    node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                    return level !== maxLevel;
                 }
             });
             return mustLoadOnDemand;
         };
-        // tslint:disable-next-line: prefer-const
-        var _a = restoreState(), isRestored = _a[0], mustLoadOnDemand = _a[1];
+        var _a = restoreState(), isRestored = _a[0], mustLoadOnDemand = _a[1]; // eslint-disable-line prefer-const
         if (!isRestored) {
             mustLoadOnDemand = autoOpenNodes();
         }
@@ -1572,9 +1566,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype._selectCurrentNode = function () {
         var node = this.getSelectedNode();
         if (node) {
-            var node_element = this._getNodeElementForNode(node);
-            if (node_element) {
-                node_element.select(true);
+            var nodeElement = this._getNodeElementForNode(node);
+            if (nodeElement) {
+                nodeElement.select(true);
             }
         }
     };
@@ -1599,8 +1593,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return this.options.rtl;
         }
         else {
-            var data_rtl = this.element.data("rtl");
-            if (data_rtl != null && data_rtl !== false) {
+            var dataRtl = this.element.data("rtl");
+            if (dataRtl != null && dataRtl !== false) {
                 return true;
             }
             else {
@@ -1649,17 +1643,17 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 this._deselectCurrentNode();
                 this._triggerEvent("tree.select", {
                     node: null,
-                    previous_node: node
+                    previous_node: node // eslint-disable-line @typescript-eslint/camelcase
                 });
             }
         }
         else {
-            var deselected_node = this.getSelectedNode();
+            var deselectedNode = this.getSelectedNode();
             this._deselectCurrentNode();
             this.addToSelection(node, selectOptions.mustSetFocus);
             this._triggerEvent("tree.select", {
                 node: node,
-                deselected_node: deselected_node
+                deselected_node: deselectedNode // eslint-disable-line @typescript-eslint/camelcase
             });
             openParents();
         }
@@ -1670,7 +1664,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return;
         }
         else {
-            this._triggerEvent("tree.load_data", { tree_data: data });
+            this._triggerEvent("tree.load_data", { tree_data: data }); // eslint-disable-line @typescript-eslint/camelcase
             if (parentNode) {
                 this._deselectNodes(parentNode);
                 this._loadSubtree(data, parentNode);
@@ -1694,20 +1688,20 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.prototype._loadSubtree = function (data, parentNode) {
         parentNode.loadFromData(data);
-        parentNode.load_on_demand = false;
-        parentNode.is_loading = false;
+        parentNode.load_on_demand = false; // eslint-disable-line @typescript-eslint/camelcase
+        parentNode.is_loading = false; // eslint-disable-line @typescript-eslint/camelcase
         this._refreshElements(parentNode);
     };
     JqTreeWidget.prototype._loadDataFromUrl = function (urlInfoParam, parentNode, onFinished) {
         var urlInfo = urlInfoParam || this._getDataUrlInfo(parentNode);
         this.dataLoader.loadFromUrl(urlInfo, parentNode, onFinished);
     };
-    JqTreeWidget.prototype._loadFolderOnDemand = function (node, slide, on_finished) {
+    JqTreeWidget.prototype._loadFolderOnDemand = function (node, slide, onFinished) {
         var _this = this;
         if (slide === void 0) { slide = true; }
-        node.is_loading = true;
+        node.is_loading = true; // eslint-disable-line @typescript-eslint/camelcase
         this._loadDataFromUrl(null, node, function () {
-            _this._openNode(node, slide, on_finished);
+            _this._openNode(node, slide, onFinished);
         });
     };
     JqTreeWidget.defaults = {
@@ -1801,8 +1795,7 @@ var DragAndDropHandler = /** @class */ (function () {
         if (!this.mustCaptureElement($element)) {
             return null;
         }
-        if (this.treeWidget.options.onIsMoveHandle &&
-            !this.treeWidget.options.onIsMoveHandle($element)) {
+        if (this.treeWidget.options.onIsMoveHandle && !this.treeWidget.options.onIsMoveHandle($element)) {
             return null;
         }
         var nodeElement = this.treeWidget._getNodeElement($element);
@@ -1824,9 +1817,7 @@ var DragAndDropHandler = /** @class */ (function () {
         }
     };
     DragAndDropHandler.prototype.mouseStart = function (positionInfo) {
-        if (!this.currentItem ||
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined) {
+        if (!this.currentItem || positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
             return false;
         }
         else {
@@ -1835,9 +1826,7 @@ var DragAndDropHandler = /** @class */ (function () {
             var left = offset ? offset.left : 0;
             var top_1 = offset ? offset.top : 0;
             var node = this.currentItem.node;
-            var nodeName = this.treeWidget.options.autoEscape
-                ? util_1.htmlEscape(node.name)
-                : node.name;
+            var nodeName = this.treeWidget.options.autoEscape ? util_1.htmlEscape(node.name) : node.name;
             this.dragElement = new DragElement(nodeName, positionInfo.pageX - left, positionInfo.pageY - top_1, this.treeWidget.element);
             this.isDragging = true;
             this.positionInfo = positionInfo;
@@ -1924,8 +1913,8 @@ var DragAndDropHandler = /** @class */ (function () {
             return false;
         }
         else if (this.treeWidget.options.onCanMoveTo) {
-            var position_name = node_1.getPositionName(area.position);
-            return this.treeWidget.options.onCanMoveTo(this.currentItem.node, area.node, position_name);
+            var positionName = node_1.getPositionName(area.position);
+            return this.treeWidget.options.onCanMoveTo(this.currentItem.node, area.node, positionName);
         }
         else {
             return true;
@@ -1950,16 +1939,12 @@ var DragAndDropHandler = /** @class */ (function () {
     };
     DragAndDropHandler.prototype.findHoveredArea = function (x, y) {
         var dimensions = this.getTreeDimensions();
-        if (x < dimensions.left ||
-            y < dimensions.top ||
-            x > dimensions.right ||
-            y > dimensions.bottom) {
+        if (x < dimensions.left || y < dimensions.top || x > dimensions.right || y > dimensions.bottom) {
             return null;
         }
         var low = 0;
         var high = this.hitAreas.length;
         while (low < high) {
-            // tslint:disable-next-line: no-bitwise
             var mid = (low + high) >> 1;
             var area = this.hitAreas[mid];
             if (y < area.top) {
@@ -1976,9 +1961,7 @@ var DragAndDropHandler = /** @class */ (function () {
     };
     DragAndDropHandler.prototype.mustOpenFolderTimer = function (area) {
         var node = area.node;
-        return (node.isFolder() &&
-            !node.is_open &&
-            area.position === node_1.Position.Inside);
+        return node.isFolder() && !node.is_open && area.position === node_1.Position.Inside;
     };
     DragAndDropHandler.prototype.updateDropHint = function () {
         if (!this.hoveredArea) {
@@ -1987,8 +1970,8 @@ var DragAndDropHandler = /** @class */ (function () {
         // remove previous drop hint
         this.removeDropHint();
         // add new drop hint
-        var node_element = this.treeWidget._getNodeElementForNode(this.hoveredArea.node);
-        this.previousGhost = node_element.addDropHint(this.hoveredArea.position);
+        var nodeElement = this.treeWidget._getNodeElementForNode(this.hoveredArea.node);
+        this.previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
     };
     DragAndDropHandler.prototype.startOpenFolderTimer = function (folder) {
         var _this = this;
@@ -2013,28 +1996,30 @@ var DragAndDropHandler = /** @class */ (function () {
             this.hoveredArea &&
             this.hoveredArea.position !== node_1.Position.None &&
             this.canMoveToArea(this.hoveredArea)) {
-            var moved_node_1 = this.currentItem.node;
-            var target_node_1 = this.hoveredArea.node;
+            var movedNode_1 = this.currentItem.node;
+            var targetNode_1 = this.hoveredArea.node;
             var position_1 = this.hoveredArea.position;
-            var previous_parent = moved_node_1.parent;
+            var previousParent = movedNode_1.parent;
             if (position_1 === node_1.Position.Inside) {
-                this.hoveredArea.node.is_open = true;
+                this.hoveredArea.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
             }
             var doMove = function () {
-                _this.treeWidget.tree.moveNode(moved_node_1, target_node_1, position_1);
+                _this.treeWidget.tree.moveNode(movedNode_1, targetNode_1, position_1);
                 _this.treeWidget.element.empty();
                 _this.treeWidget._refreshElements(null);
             };
+            /* eslint-disable @typescript-eslint/camelcase */
             var event_1 = this.treeWidget._triggerEvent("tree.move", {
                 move_info: {
-                    moved_node: moved_node_1,
-                    target_node: target_node_1,
+                    moved_node: movedNode_1,
+                    target_node: targetNode_1,
                     position: node_1.getPositionName(position_1),
-                    previous_parent: previous_parent,
+                    previous_parent: previousParent,
                     do_move: doMove,
                     original_event: positionInfo.originalEvent
                 }
             });
+            /* eslint-enable @typescript-eslint/camelcase */
             if (!event_1.isDefaultPrevented()) {
                 doMove();
             }
@@ -2095,9 +2080,9 @@ var VisibleNodeIterator = /** @class */ (function () {
                 }
             }
             if (mustIterateInside) {
-                var children_length_1 = node.children.length;
+                var childrenLength_1 = node.children.length;
                 node.children.forEach(function (_, i) {
-                    if (i === children_length_1 - 1) {
+                    if (i === childrenLength_1 - 1) {
                         _iterateNode(node.children[i], null);
                     }
                     else {
@@ -2177,8 +2162,8 @@ var HitAreasGenerator = /** @class */ (function (_super) {
             this.addPosition(node, node_1.Position.Before, this.getTop(jQuery(node.element)));
         }
     };
-    HitAreasGenerator.prototype.handleAfterOpenFolder = function (node, next_node) {
-        if (node === this.currentNode || next_node === this.currentNode) {
+    HitAreasGenerator.prototype.handleAfterOpenFolder = function (node, nextNode) {
+        if (node === this.currentNode || nextNode === this.currentNode) {
             // Cannot move before or after current item
             this.addPosition(node, node_1.Position.None, this.lastTop);
         }
@@ -2219,19 +2204,19 @@ var HitAreasGenerator = /** @class */ (function (_super) {
     };
     HitAreasGenerator.prototype.generateHitAreasForGroup = function (hitAreas, positionsInGroup, top, bottom) {
         // limit positions in group
-        var position_count = Math.min(positionsInGroup.length, 4);
-        var area_height = Math.round((bottom - top) / position_count);
-        var area_top = top;
+        var positionCount = Math.min(positionsInGroup.length, 4);
+        var areaHeight = Math.round((bottom - top) / positionCount);
+        var areaTop = top;
         var i = 0;
-        while (i < position_count) {
+        while (i < positionCount) {
             var position = positionsInGroup[i];
             hitAreas.push({
-                top: area_top,
-                bottom: area_top + area_height,
+                top: areaTop,
+                bottom: areaTop + areaHeight,
                 node: position.node,
                 position: position.position
             });
-            area_top += area_height;
+            areaTop += areaHeight;
             i += 1;
         }
     };
@@ -2239,10 +2224,10 @@ var HitAreasGenerator = /** @class */ (function (_super) {
 }(VisibleNodeIterator));
 exports.HitAreasGenerator = HitAreasGenerator;
 var DragElement = /** @class */ (function () {
-    function DragElement(node_name, offset_x, offset_y, $tree) {
-        this.offsetX = offset_x;
-        this.offsetY = offset_y;
-        this.$element = jQuery("<span class=\"jqtree-title jqtree-dragging\">" + node_name + "</span>");
+    function DragElement(nodeName, offsetX, offsetY, $tree) {
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.$element = jQuery("<span class=\"jqtree-title jqtree-dragging\">" + nodeName + "</span>");
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }
@@ -2543,11 +2528,7 @@ var DataLoader = /** @class */ (function () {
     };
     DataLoader.prototype.parseData = function (data) {
         var dataFilter = this.treeWidget.options.dataFilter;
-        var parsedData = data instanceof Array || typeof data === "object"
-            ? data
-            : data != null
-                ? jQuery.parseJSON(data)
-                : [];
+        var parsedData = data instanceof Array || typeof data === "object" ? data : data != null ? jQuery.parseJSON(data) : [];
         return dataFilter ? dataFilter(parsedData) : parsedData;
     };
     return DataLoader;
@@ -2661,15 +2642,11 @@ var KeyHandler = /** @class */ (function () {
         }
     };
     KeyHandler.prototype.canHandleKeyboard = function () {
-        return (this.treeWidget.options.keyboardSupport &&
-            this.isFocusOnTree() &&
-            this.treeWidget.getSelectedNode() != null);
+        return (this.treeWidget.options.keyboardSupport && this.isFocusOnTree() && this.treeWidget.getSelectedNode() != null);
     };
     KeyHandler.prototype.isFocusOnTree = function () {
         var activeElement = document.activeElement;
-        return Boolean(activeElement &&
-            activeElement.tagName === "SPAN" &&
-            this.treeWidget._containsElement(activeElement));
+        return Boolean(activeElement && activeElement.tagName === "SPAN" && this.treeWidget._containsElement(activeElement));
     };
     KeyHandler.LEFT = 37;
     KeyHandler.UP = 38;
@@ -2719,12 +2696,8 @@ var MouseWidget = /** @class */ (function (_super) {
             }
             return result;
         };
-        _this.mouseMove = function (e) {
-            return _this._handleMouseMove(e, _this._getPositionInfo(e));
-        };
-        _this.mouseUp = function (e) {
-            return _this._handleMouseUp(_this._getPositionInfo(e));
-        };
+        _this.mouseMove = function (e) { return _this._handleMouseMove(e, _this._getPositionInfo(e)); };
+        _this.mouseUp = function (e) { return _this._handleMouseUp(_this._getPositionInfo(e)); };
         _this.touchStart = function (e) {
             var touchEvent = e.originalEvent;
             if (touchEvent.touches.length > 1) {
@@ -2811,8 +2784,7 @@ var MouseWidget = /** @class */ (function (_super) {
             return true;
         }
         if (this.mouseDownInfo) {
-            this.isMouseStarted =
-                this._mouseStart(this.mouseDownInfo) !== false;
+            this.isMouseStarted = this._mouseStart(this.mouseDownInfo) !== false;
         }
         if (this.isMouseStarted) {
             this._mouseDrag(positionInfo);
@@ -2888,13 +2860,13 @@ var SaveStateHandler = /** @class */ (function () {
             });
             return openNodes;
         };
-        var getSelectedNodeIds = function () {
-            return _this.treeWidget.getSelectedNodes().map(function (n) { return n.id; });
-        };
+        var getSelectedNodeIds = function () { return _this.treeWidget.getSelectedNodes().map(function (n) { return n.id; }); };
+        /* eslint-disable @typescript-eslint/camelcase */
         return {
             open_nodes: getOpenNodeIds(),
             selected_node: getSelectedNodeIds()
         };
+        /* eslint-enable @typescript-eslint/camelcase */
     };
     /*
     Set initial state
@@ -2918,12 +2890,12 @@ var SaveStateHandler = /** @class */ (function () {
             return mustLoadOnDemand;
         }
     };
-    SaveStateHandler.prototype.setInitialStateOnDemand = function (state, cb_finished) {
+    SaveStateHandler.prototype.setInitialStateOnDemand = function (state, cbFinished) {
         if (state) {
-            this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cb_finished);
+            this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cbFinished);
         }
         else {
-            cb_finished();
+            cbFinished();
         }
     };
     SaveStateHandler.prototype.getNodeIdToBeSelected = function () {
@@ -2940,7 +2912,7 @@ var SaveStateHandler = /** @class */ (function () {
         // Check if selected_node is an int (instead of an array)
         if (state && state.selected_node && util_1.isInt(state.selected_node)) {
             // Convert to array
-            state.selected_node = [state.selected_node];
+            state.selected_node = [state.selected_node]; // eslint-disable-line @typescript-eslint/camelcase
         }
         return state;
     };
@@ -2955,11 +2927,11 @@ var SaveStateHandler = /** @class */ (function () {
     SaveStateHandler.prototype._openInitialNodes = function (nodeIds) {
         var mustLoadOnDemand = false;
         for (var _i = 0, nodeIds_1 = nodeIds; _i < nodeIds_1.length; _i++) {
-            var node_id = nodeIds_1[_i];
-            var node = this.treeWidget.getNodeById(node_id);
+            var nodeDd = nodeIds_1[_i];
+            var node = this.treeWidget.getNodeById(nodeDd);
             if (node) {
                 if (!node.load_on_demand) {
-                    node.is_open = true;
+                    node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
                 }
                 else {
                     mustLoadOnDemand = true;
@@ -2969,18 +2941,18 @@ var SaveStateHandler = /** @class */ (function () {
         return mustLoadOnDemand;
     };
     SaveStateHandler.prototype._selectInitialNodes = function (nodeIds) {
-        var select_count = 0;
+        var selectCount = 0;
         for (var _i = 0, nodeIds_2 = nodeIds; _i < nodeIds_2.length; _i++) {
-            var node_id = nodeIds_2[_i];
-            var node = this.treeWidget.getNodeById(node_id);
+            var nodeId = nodeIds_2[_i];
+            var node = this.treeWidget.getNodeById(nodeId);
             if (node) {
-                select_count += 1;
+                selectCount += 1;
                 if (this.treeWidget.selectNodeHandler) {
                     this.treeWidget.selectNodeHandler.addToSelection(node);
                 }
             }
         }
-        return select_count !== 0;
+        return selectCount !== 0;
     };
     SaveStateHandler.prototype._resetSelection = function () {
         var selectNodeHandler = this.treeWidget.selectNodeHandler;
@@ -2998,10 +2970,10 @@ var SaveStateHandler = /** @class */ (function () {
         var openNodes = function () {
             var newNodesIds = [];
             for (var _i = 0, nodeIds_3 = nodeIds; _i < nodeIds_3.length; _i++) {
-                var node_id = nodeIds_3[_i];
-                var node = _this.treeWidget.getNodeById(node_id);
+                var nodeId = nodeIds_3[_i];
+                var node = _this.treeWidget.getNodeById(nodeId);
                 if (!node) {
-                    newNodesIds.push(node_id);
+                    newNodesIds.push(nodeId);
                 }
                 else {
                     if (!node.is_loading) {
@@ -3076,8 +3048,8 @@ exports["default"] = SaveStateHandler;
 
 exports.__esModule = true;
 var ScrollHandler = /** @class */ (function () {
-    function ScrollHandler(tree_widget) {
-        this.treeWidget = tree_widget;
+    function ScrollHandler(treeWidget) {
+        this.treeWidget = treeWidget;
         this.previousTop = -1;
         this.isInitialized = false;
     }
@@ -3138,8 +3110,7 @@ var ScrollHandler = /** @class */ (function () {
                 for (var _i = 0, cssAttributes_1 = cssAttributes; _i < cssAttributes_1.length; _i++) {
                     var attr = cssAttributes_1[_i];
                     var overflowValue = $el.css(attr);
-                    if (overflowValue === "auto" ||
-                        overflowValue === "scroll") {
+                    if (overflowValue === "auto" || overflowValue === "scroll") {
                         return true;
                     }
                 }
@@ -3165,9 +3136,7 @@ var ScrollHandler = /** @class */ (function () {
             setDocumentAsScrollParent();
         }
         var $scrollParent = getParentWithOverflow();
-        if ($scrollParent &&
-            $scrollParent.length &&
-            $scrollParent[0].tagName !== "HTML") {
+        if ($scrollParent && $scrollParent.length && $scrollParent[0].tagName !== "HTML") {
             this.$scrollParent = $scrollParent;
             var offset = this.$scrollParent.offset();
             this.scrollParentTop = offset ? offset.top : 0;
@@ -3213,8 +3182,7 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.checkVerticalScrolling = function () {
-        var hoveredArea = this.treeWidget.dndHandler &&
-            this.treeWidget.dndHandler.hoveredArea;
+        var hoveredArea = this.treeWidget.dndHandler && this.treeWidget.dndHandler.hoveredArea;
         if (hoveredArea && hoveredArea.top !== this.previousTop) {
             this.previousTop = hoveredArea.top;
             if (this.$scrollParent) {
@@ -3226,8 +3194,7 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.checkHorizontalScrolling = function () {
-        var positionInfo = this.treeWidget.dndHandler &&
-            this.treeWidget.dndHandler.positionInfo;
+        var positionInfo = this.treeWidget.dndHandler && this.treeWidget.dndHandler.positionInfo;
         if (!positionInfo) {
             return;
         }
@@ -3239,8 +3206,7 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.handleHorizontalScrollingWithParent = function (positionInfo) {
-        if (positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined) {
+        if (positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
             return;
         }
         var $scrollParent = this.$scrollParent;
@@ -3249,8 +3215,7 @@ var ScrollHandler = /** @class */ (function () {
             return;
         }
         var scrollParent = $scrollParent[0];
-        var canScrollRight = scrollParent.scrollLeft + scrollParent.clientWidth <
-            scrollParent.scrollWidth;
+        var canScrollRight = scrollParent.scrollLeft + scrollParent.clientWidth < scrollParent.scrollWidth;
         var canScrollLeft = scrollParent.scrollLeft > 0;
         var rightEdge = scrollParentOffset.left + scrollParent.clientWidth;
         var leftEdge = scrollParentOffset.left;
@@ -3264,8 +3229,7 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.handleHorizontalScrollingWithDocument = function (positionInfo) {
-        if (positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined) {
+        if (positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
             return;
         }
         var $document = jQuery(document);
@@ -3294,8 +3258,8 @@ exports["default"] = ScrollHandler;
 
 exports.__esModule = true;
 var SelectNodeHandler = /** @class */ (function () {
-    function SelectNodeHandler(tree_widget) {
-        this.treeWidget = tree_widget;
+    function SelectNodeHandler(treeWidget) {
+        this.treeWidget = treeWidget;
         this.clear();
     }
     SelectNodeHandler.prototype.getSelectedNode = function () {
@@ -3373,8 +3337,7 @@ var SelectNodeHandler = /** @class */ (function () {
         var _this = this;
         if (includeChildren === void 0) { includeChildren = false; }
         if (node.id == null) {
-            if (this.selectedSingleNode &&
-                node.element === this.selectedSingleNode.element) {
+            if (this.selectedSingleNode && node.element === this.selectedSingleNode.element) {
                 this.selectedSingleNode = null;
             }
         }
@@ -3464,9 +3427,7 @@ var NodeElement = /** @class */ (function () {
         return this.$element.children("ul:first");
     };
     NodeElement.prototype.getSpan = function () {
-        return this.$element
-            .children(".jqtree-element")
-            .find("span.jqtree-title");
+        return this.$element.children(".jqtree-element").find("span.jqtree-title");
     };
     NodeElement.prototype.getLi = function () {
         return this.$element;
@@ -3489,14 +3450,14 @@ var FolderElement = /** @class */ (function (_super) {
         if (this.node.is_open) {
             return;
         }
-        this.node.is_open = true;
+        this.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
         var $button = this.getButton();
         $button.removeClass("jqtree-closed");
         $button.html("");
-        var button_el = $button.get(0);
-        if (button_el) {
+        var buttonEl = $button.get(0);
+        if (buttonEl) {
             var icon = this.treeWidget.renderer.openedIconElement.cloneNode(true);
-            button_el.appendChild(icon);
+            buttonEl.appendChild(icon);
         }
         var doOpen = function () {
             var $li = _this.getLi();
@@ -3525,14 +3486,14 @@ var FolderElement = /** @class */ (function (_super) {
         if (!this.node.is_open) {
             return;
         }
-        this.node.is_open = false;
+        this.node.is_open = false; // eslint-disable-line @typescript-eslint/camelcase
         var $button = this.getButton();
         $button.addClass("jqtree-closed");
         $button.html("");
-        var button_el = $button.get(0);
-        if (button_el) {
+        var buttonEl = $button.get(0);
+        if (buttonEl) {
             var icon = this.treeWidget.renderer.closedIconElement.cloneNode(true);
-            button_el.appendChild(icon);
+            buttonEl.appendChild(icon);
         }
         var doClose = function () {
             var $li = _this.getLi();
@@ -3555,9 +3516,7 @@ var FolderElement = /** @class */ (function (_super) {
         return !this.node.is_open && position === node_1.Position.Inside;
     };
     FolderElement.prototype.getButton = function () {
-        return this.$element
-            .children(".jqtree-element")
-            .find("a.jqtree-toggler");
+        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
     };
     return FolderElement;
 }(NodeElement));
@@ -3632,10 +3591,7 @@ exports.exampleData = [
         id: 123,
         intProperty: 1,
         strProperty: "1",
-        children: [
-            { label: "child1", id: 125, intProperty: 2 },
-            { label: "child2", id: 126 }
-        ]
+        children: [{ label: "child1", id: 125, intProperty: 2 }, { label: "child2", id: 126 }]
     },
     {
         label: "node2",
@@ -3792,8 +3748,8 @@ test("toggle", function (assert) {
     var done = assert.async();
     // create tree
     var $tree = $("#tree1");
-    var $node1;
-    var node1;
+    var $node1; // eslint-disable-line prefer-const
+    var node1; // eslint-disable-line prefer-const
     $tree.tree({
         data: utils_for_test_1.exampleData
     });
@@ -4027,7 +3983,7 @@ test("openNode and closeNode", function (assert) {
     assert.equal(node1.is_open, true);
     assert.equal(child1.is_open, true);
 });
-function test_open_node_with_callback(slide, includeSlideParam, assert) {
+function testOpenNodeWithCallback(slide, includeSlideParam, assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
@@ -4049,16 +4005,13 @@ function test_open_node_with_callback(slide, includeSlideParam, assert) {
     }
 }
 test("openNode with callback with slide true", function (assert) {
-    test_open_node_with_callback(true, true, assert);
+    testOpenNodeWithCallback(true, true, assert);
 });
 test("openNode with callback with slide false", function (assert) {
-    test_open_node_with_callback(false, true, assert);
-});
-test("openNode with callback with slide null", function (assert) {
-    test_open_node_with_callback(null, true, assert);
+    testOpenNodeWithCallback(false, true, assert);
 });
 test("openNode with callback without slide param", function (assert) {
-    test_open_node_with_callback(null, false, assert);
+    testOpenNodeWithCallback(false, false, assert);
 });
 test("selectNode", function (assert) {
     // setup
@@ -4163,14 +4116,14 @@ test("getNodeById", function (assert) {
     assert.equal($tree.tree("getNodeById", 234).name, "abc");
     assert.equal($tree.tree("getNodeById", "234").name, "abc");
     // 5. load subtree in node2
-    var subtree_data = [
+    var subtreeData = [
         {
             name: "sub1",
             id: 200,
             children: [{ name: "sub2", id: 201 }]
         }
     ];
-    $tree.tree("loadData", subtree_data, node2);
+    $tree.tree("loadData", subtreeData, node2);
     var t = $tree.tree("getTree");
     assert.notEqual(t, null);
     assert.equal($tree.tree("getNodeById", 200).name, "sub1");
@@ -4179,20 +4132,18 @@ test("getNodeById", function (assert) {
 test("autoOpen", function (assert) {
     var $tree = $("#tree1");
     function formatOpenFolders() {
-        var open_nodes = [];
-        $tree.find("li").each(
-        // tslint:disable-next-line: only-arrow-functions
-        function () {
+        var openNodes = [];
+        $tree.find("li").each(function () {
             var $li = $(this);
             if ($li.is(".jqtree-folder") && !$li.is(".jqtree-closed")) {
                 var name_1 = $li
                     .children(".jqtree-element")
                     .find("span")
                     .text();
-                open_nodes.push(name_1);
+                openNodes.push(name_1);
             }
         });
-        return open_nodes.join(";");
+        return openNodes.join(";");
     }
     /*
     -l1n1 (level 0)
@@ -4288,9 +4239,9 @@ test("generate hit areas", function (assert) {
     // 1. get hit areas
     var node = $tree.tree("getNodeById", 123);
     var hitAreas = $tree.tree("testGenerateHitAreas", node);
-    var strings = $.map(hitAreas, function (hit_area) {
-        var position_name = node_1.getPositionName(hit_area.position);
-        return hit_area.node.name + " " + position_name;
+    var strings = $.map(hitAreas, function (hitArea) {
+        var positionName = node_1.getPositionName(hitArea.position);
+        return hitArea.node.name + " " + positionName;
     });
     assert.equal(strings.join(";"), "node1 none;node2 inside;node2 after");
 });
@@ -4415,10 +4366,10 @@ test("updateNode", function (assert) {
     assert.equal(node2.id, 555);
     assert.equal(node2.name, "xyz");
     // get node by id
-    var node_555 = $tree.tree("getNodeById", 555);
-    assert.equal(node_555.name, "xyz");
-    var node_124 = $tree.tree("getNodeById", 124);
-    assert.equal(node_124, undefined);
+    var node555 = $tree.tree("getNodeById", 555);
+    assert.equal(node555.name, "xyz");
+    var node124 = $tree.tree("getNodeById", 124);
+    assert.equal(node124, undefined);
     // update child1
     var child1 = $tree.tree("getNodeByName", "child1");
     $tree.tree("updateNode", child1, "child1a");
@@ -4465,12 +4416,11 @@ test("load on demand", function (assert) {
             {
                 id: 1,
                 name: "node1",
-                load_on_demand: true
+                load_on_demand: true // eslint-disable-line @typescript-eslint/camelcase
             }
         ],
         dataUrl: "/tree/"
     });
-    // tslint:disable-next-line: only-arrow-functions
     function handleResponse(options) {
         assert.equal(options.url, "/tree/", "2");
         assert.deepEqual(options.data, { node: 1 }, "3");
@@ -4532,8 +4482,8 @@ test("mouse events", function (assert) {
         autoOpen: true
     });
     $tree.tree("setMouseDelay", 0);
-    function getTitleElement(node_name) {
-        var node = $tree.tree("getNodeByName", node_name);
+    function getTitleElement(nodeName) {
+        var node = $tree.tree("getNodeByName", nodeName);
         var $el = $(node.element);
         return $($el.find(".jqtree-title"));
     }
@@ -4784,9 +4734,7 @@ test("constructor", function (assert) {
     });
     assert.equal(node2.name, "n2");
     assert.equal(node2.id, 123);
-    // tslint:disable-next-line: no-string-literal
     assert.equal(node2["url"], "/");
-    // tslint:disable-next-line: no-string-literal
     assert.equal(node2["label"], undefined);
     assert.equal(node2.children.length, 0);
     assert.equal(node2.parent, null);
@@ -5032,21 +4980,21 @@ test("addAfter", function (assert) {
     var node2 = utils_for_test_1.doGetNodeByName(tree, "node2");
     node2.addAfter("node_b");
     assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 node_b");
-    var node_b = utils_for_test_1.doGetNodeByName(tree, "node_b");
-    assert.equal(node_b.name, "node_b");
+    var nodeB = utils_for_test_1.doGetNodeByName(tree, "node_b");
+    assert.equal(nodeB.name, "node_b");
     // - Add 'node_a' after node1
     var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
     node1.addAfter("node_a");
     assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b");
     // - Add 'node_c' after node_b; new node is an object
-    if (node_b) {
-        node_b.addAfter({
+    if (nodeB) {
+        nodeB.addAfter({
             label: "node_c",
             id: 789
         });
     }
-    var node_c = utils_for_test_1.doGetNodeByName(tree, "node_c");
-    assert.equal(node_c.id, 789);
+    var nodeC = utils_for_test_1.doGetNodeByName(tree, "node_c");
+    assert.equal(nodeC.id, 789);
     assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b node_c");
     // - Add after root node; this is not possible
     assert.equal(tree.addAfter("node_x"), null);
@@ -5200,12 +5148,12 @@ test("getPreviousSibling", function (assert) {
     var tree = new node_1.Node({}, true);
     tree.loadFromData(utils_for_test_1.exampleData);
     // - getPreviousSibling
-    var previous_sibling = utils_for_test_1.doGetNodeByName(tree, "child2").getPreviousSibling();
-    if (!previous_sibling) {
+    var previousSibling = utils_for_test_1.doGetNodeByName(tree, "child2").getPreviousSibling();
+    if (!previousSibling) {
         assert.ok(false, "Previous sibling not found");
     }
     else {
-        assert.equal(previous_sibling.name, "child1");
+        assert.equal(previousSibling.name, "child1");
     }
     assert.equal(tree.getPreviousSibling(), null);
     assert.equal(utils_for_test_1.doGetNodeByName(tree, "child1").getPreviousSibling(), null);
@@ -5215,12 +5163,12 @@ test("getNextSibling", function (assert) {
     var tree = new node_1.Node({}, true);
     tree.loadFromData(utils_for_test_1.exampleData);
     // - getNextSibling
-    var next_sibling = utils_for_test_1.doGetNodeByName(tree, "node1").getNextSibling();
-    if (!next_sibling) {
+    var nextSibling = utils_for_test_1.doGetNodeByName(tree, "node1").getNextSibling();
+    if (!nextSibling) {
         assert.ok(false, "Next sibling not found");
     }
     else {
-        assert.equal(next_sibling.name, "node2");
+        assert.equal(nextSibling.name, "node2");
     }
     assert.equal(utils_for_test_1.doGetNodeByName(tree, "node2").getNextSibling(), null);
     assert.equal(tree.getNextSibling(), null);

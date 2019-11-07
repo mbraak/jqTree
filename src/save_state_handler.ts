@@ -10,7 +10,7 @@ export default class SaveStateHandler {
         this.treeWidget = treeWidget;
     }
 
-    public saveState() {
+    public saveState(): void {
         const state = JSON.stringify(this.getState());
 
         if (this.treeWidget.options.onSetStateFromStorage) {
@@ -20,7 +20,7 @@ export default class SaveStateHandler {
         }
     }
 
-    public getStateFromStorage() {
+    public getStateFromStorage(): any {
         const jsonData = this._loadFromStorage();
 
         if (jsonData) {
@@ -31,7 +31,7 @@ export default class SaveStateHandler {
     }
 
     public getState(): any {
-        const getOpenNodeIds = () => {
+        const getOpenNodeIds = (): NodeId[] => {
             const openNodes: NodeId[] = [];
 
             this.treeWidget.tree.iterate((node: INode) => {
@@ -44,13 +44,14 @@ export default class SaveStateHandler {
             return openNodes;
         };
 
-        const getSelectedNodeIds = () =>
-            this.treeWidget.getSelectedNodes().map((n: Node) => n.id);
+        const getSelectedNodeIds = (): NodeId[] => this.treeWidget.getSelectedNodes().map((n: Node) => n.id);
 
+        /* eslint-disable @typescript-eslint/camelcase */
         return {
             open_nodes: getOpenNodeIds(),
             selected_node: getSelectedNodeIds()
         };
+        /* eslint-enable @typescript-eslint/camelcase */
     }
 
     /*
@@ -78,19 +79,15 @@ export default class SaveStateHandler {
         }
     }
 
-    public setInitialStateOnDemand(state: any, cb_finished: () => void) {
+    public setInitialStateOnDemand(state: any, cbFinished: () => void): void {
         if (state) {
-            this._setInitialStateOnDemand(
-                state.open_nodes,
-                state.selected_node,
-                cb_finished
-            );
+            this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cbFinished);
         } else {
-            cb_finished();
+            cbFinished();
         }
     }
 
-    public getNodeIdToBeSelected() {
+    public getNodeIdToBeSelected(): any {
         const state = this.getStateFromStorage();
 
         if (state && state.selected_node) {
@@ -100,19 +97,19 @@ export default class SaveStateHandler {
         }
     }
 
-    private _parseState(jsonData: any) {
+    private _parseState(jsonData: any): any {
         const state = jQuery.parseJSON(jsonData);
 
         // Check if selected_node is an int (instead of an array)
         if (state && state.selected_node && isInt(state.selected_node)) {
             // Convert to array
-            state.selected_node = [state.selected_node];
+            state.selected_node = [state.selected_node]; // eslint-disable-line @typescript-eslint/camelcase
         }
 
         return state;
     }
 
-    private _loadFromStorage() {
+    private _loadFromStorage(): any {
         if (this.treeWidget.options.onGetStateFromStorage) {
             return this.treeWidget.options.onGetStateFromStorage();
         } else if (this.supportsLocalStorage()) {
@@ -123,12 +120,12 @@ export default class SaveStateHandler {
     private _openInitialNodes(nodeIds: any[]): boolean {
         let mustLoadOnDemand = false;
 
-        for (const node_id of nodeIds) {
-            const node = this.treeWidget.getNodeById(node_id);
+        for (const nodeDd of nodeIds) {
+            const node = this.treeWidget.getNodeById(nodeDd);
 
             if (node) {
                 if (!node.load_on_demand) {
-                    node.is_open = true;
+                    node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
                 } else {
                     mustLoadOnDemand = true;
                 }
@@ -139,13 +136,13 @@ export default class SaveStateHandler {
     }
 
     private _selectInitialNodes(nodeIds: NodeId[]): boolean {
-        let select_count = 0;
+        let selectCount = 0;
 
-        for (const node_id of nodeIds) {
-            const node = this.treeWidget.getNodeById(node_id);
+        for (const nodeId of nodeIds) {
+            const node = this.treeWidget.getNodeById(nodeId);
 
             if (node) {
-                select_count += 1;
+                selectCount += 1;
 
                 if (this.treeWidget.selectNodeHandler) {
                     this.treeWidget.selectNodeHandler.addToSelection(node);
@@ -153,10 +150,10 @@ export default class SaveStateHandler {
             }
         }
 
-        return select_count !== 0;
+        return selectCount !== 0;
     }
 
-    private _resetSelection() {
+    private _resetSelection(): void {
         const selectNodeHandler = this.treeWidget.selectNodeHandler;
 
         if (selectNodeHandler) {
@@ -168,22 +165,18 @@ export default class SaveStateHandler {
         }
     }
 
-    private _setInitialStateOnDemand(
-        nodeIdsParam: NodeId[],
-        selectedNodes: NodeId[],
-        cbFinished: () => void
-    ) {
+    private _setInitialStateOnDemand(nodeIdsParam: NodeId[], selectedNodes: NodeId[], cbFinished: () => void): void {
         let loadingCount = 0;
         let nodeIds = nodeIdsParam;
 
-        const openNodes = () => {
+        const openNodes = (): void => {
             const newNodesIds = [];
 
-            for (const node_id of nodeIds) {
-                const node = this.treeWidget.getNodeById(node_id);
+            for (const nodeId of nodeIds) {
+                const node = this.treeWidget.getNodeById(nodeId);
 
                 if (!node) {
-                    newNodesIds.push(node_id);
+                    newNodesIds.push(nodeId);
                 } else {
                     if (!node.is_loading) {
                         if (node.load_on_demand) {
@@ -206,7 +199,7 @@ export default class SaveStateHandler {
             }
         };
 
-        const loadAndOpenNode = (node: Node) => {
+        const loadAndOpenNode = (node: Node): void => {
             loadingCount += 1;
             this.treeWidget._openNode(node, false, () => {
                 loadingCount -= 1;
@@ -226,7 +219,7 @@ export default class SaveStateHandler {
     }
 
     private supportsLocalStorage(): boolean {
-        const testSupport = () => {
+        const testSupport = (): boolean => {
             // Is local storage supported?
             if (localStorage == null) {
                 return false;

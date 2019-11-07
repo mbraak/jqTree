@@ -1,4 +1,3 @@
-// tslint:disable: no-string-literal
 export type NodeId = number | string;
 
 export enum Position {
@@ -51,7 +50,7 @@ export class Node {
 
     [key: string]: any;
 
-    constructor(o: object | string, isRoot: boolean = false, nodeClass = Node) {
+    constructor(o: object | string, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.isEmptyFolder = false;
 
@@ -83,8 +82,8 @@ export class Node {
     * This is an internal function; it is not in the docs
     * Does not remove existing node values
     */
-    public setData(o: any) {
-        const setName = (name: string) => {
+    public setData(o: any): void {
+        const setName = (name: string): void => {
             if (name != null) {
                 this.name = name;
             }
@@ -128,7 +127,7 @@ export class Node {
         }
     ]
     */
-    public loadFromData(data: any[]) {
+    public loadFromData(data: any[]): void {
         this.removeChildren();
 
         for (const o of data) {
@@ -152,7 +151,7 @@ export class Node {
         new Node('child1')
     );
     */
-    public addChild(node: Node) {
+    public addChild(node: Node): void {
         this.children.push(node);
         node._setParent(this);
     }
@@ -165,7 +164,7 @@ export class Node {
         1
     );
     */
-    public addChildAtPosition(node: Node, index: number) {
+    public addChildAtPosition(node: Node, index: number): void {
         this.children.splice(index, 0, node);
         node._setParent(this);
     }
@@ -175,7 +174,7 @@ export class Node {
 
     tree.removeChild(tree.children[0]);
     */
-    public removeChild(node: Node) {
+    public removeChild(node: Node): void {
         // remove children from the index
         node.removeChildren();
 
@@ -187,7 +186,7 @@ export class Node {
 
     var index = getChildIndex(node);
     */
-    public getChildIndex(node: Node) {
+    public getChildIndex(node: Node): number {
         return jQuery.inArray(node, this.children);
     }
 
@@ -223,8 +222,8 @@ export class Node {
     );
 
     */
-    public iterate(callback: IterateCallback) {
-        const _iterate = (node: Node, level: number) => {
+    public iterate(callback: IterateCallback): void {
+        const _iterate = (node: Node, level: number): void => {
             if (node.children) {
                 for (const child of node.children) {
                     const result = callback(child, level);
@@ -247,7 +246,7 @@ export class Node {
     // move node1 after node2
     tree.moveNode(node1, node2, Position.AFTER);
     */
-    public moveNode(movedNode: Node, targetNode: Node, position: number) {
+    public moveNode(movedNode: Node, targetNode: Node, position: number): void {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
             // - Or, parent is empty
@@ -328,8 +327,8 @@ export class Node {
         } else {
             const node = new this.tree.nodeClass(nodeInfo);
 
-            const child_index = this.parent.getChildIndex(this);
-            this.parent.addChildAtPosition(node, child_index + 1);
+            const childIndex = this.parent.getChildIndex(this);
+            this.parent.addChildAtPosition(node, childIndex + 1);
 
             if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
@@ -345,8 +344,8 @@ export class Node {
         } else {
             const node = new this.tree.nodeClass(nodeInfo);
 
-            const child_index = this.parent.getChildIndex(this);
-            this.parent.addChildAtPosition(node, child_index);
+            const childIndex = this.parent.getChildIndex(this);
+            this.parent.addChildAtPosition(node, childIndex);
 
             if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
@@ -374,7 +373,7 @@ export class Node {
         }
     }
 
-    public remove() {
+    public remove(): void {
         if (this.parent) {
             this.parent.removeChild(this);
             this.parent = null;
@@ -419,7 +418,7 @@ export class Node {
 
     public getLevel(): number {
         let level = 0;
-        let node: Node = this;
+        let node: Node = this; // eslint-disable-line @typescript-eslint/no-this-alias
 
         while (node.parent) {
             level += 1;
@@ -433,19 +432,19 @@ export class Node {
         return this.idMapping[nodeId];
     }
 
-    public addNodeToIndex(node: Node) {
+    public addNodeToIndex(node: Node): void {
         if (node.id != null) {
             this.idMapping[node.id] = node;
         }
     }
 
-    public removeNodeFromIndex(node: Node) {
+    public removeNodeFromIndex(node: Node): void {
         if (node.id != null) {
             delete this.idMapping[node.id];
         }
     }
 
-    public removeChildren() {
+    public removeChildren(): void {
         this.iterate((child: INode) => {
             this.tree.removeNodeFromIndex(child as Node);
             return true;
@@ -563,8 +562,8 @@ export class Node {
     }
 
     // Init Node from data without making it the root of the tree
-    public initFromData(data: any) {
-        const addNode = (nodeData: any) => {
+    public initFromData(data: any): void {
+        const addNode = (nodeData: any): void => {
             this.setData(nodeData);
 
             if (nodeData["children"]) {
@@ -572,7 +571,7 @@ export class Node {
             }
         };
 
-        const addChildren = (childrenData: any[]) => {
+        const addChildren = (childrenData: any[]): void => {
             for (const child of childrenData) {
                 const node = new this.tree.nodeClass("");
                 node.initFromData(child);
@@ -583,13 +582,13 @@ export class Node {
         addNode(data);
     }
 
-    private _setParent(parent: Node) {
+    private _setParent(parent: Node): void {
         this.parent = parent;
         this.tree = parent.tree;
         this.tree.addNodeToIndex(this);
     }
 
-    private _removeChild(node: Node) {
+    private _removeChild(node: Node): void {
         this.children.splice(this.getChildIndex(node), 1);
         this.tree.removeNodeFromIndex(node);
     }

@@ -1,11 +1,6 @@
 const { module, test } = QUnit;
 
-import {
-    exampleData,
-    formatNodes,
-    doGetNodeByName,
-    doGetNodeById
-} from "./utils_for_test";
+import { exampleData, formatNodes, doGetNodeByName, doGetNodeById } from "./utils_for_test";
 import { Node, Position } from "../src/node";
 
 module("Tree");
@@ -28,31 +23,17 @@ test("constructor", (assert: Assert) => {
 
     assert.equal(node2.name, "n2");
     assert.equal(node2.id, 123);
-    // tslint:disable-next-line: no-string-literal
     assert.equal(node2["url"], "/");
-    // tslint:disable-next-line: no-string-literal
     assert.equal(node2["label"], undefined);
     assert.equal(node2.children.length, 0);
     assert.equal(node2.parent, null);
 });
 
 test("create tree from data", (assert: Assert) => {
-    function checkData(tree: Node) {
-        assert.equal(
-            formatNodes(tree.children),
-            "node1 node2",
-            "nodes on level 1"
-        );
-        assert.equal(
-            formatNodes(tree.children[0].children),
-            "child1 child2",
-            "children of node1"
-        );
-        assert.equal(
-            formatNodes(tree.children[1].children),
-            "child3",
-            "children of node2"
-        );
+    function checkData(tree: Node): void {
+        assert.equal(formatNodes(tree.children), "node1 node2", "nodes on level 1");
+        assert.equal(formatNodes(tree.children[0].children), "child1 child2", "children of node1");
+        assert.equal(formatNodes(tree.children[1].children), "child3", "children of node2");
         assert.equal(tree.children[0].id, 123, "id");
     }
 
@@ -177,11 +158,7 @@ test("iterate", (assert: Assert) => {
         return true;
     });
 
-    assert.equal(
-        formatNodes(nodes),
-        "node1 child1 child2 node2 child3",
-        "all nodes"
-    );
+    assert.equal(formatNodes(nodes), "node1 child1 child2 node2 child3", "all nodes");
 
     // iterate over nodes on first level
     const nodes2: INode[] = [];
@@ -204,10 +181,7 @@ test("iterate", (assert: Assert) => {
         return true;
     });
 
-    assert.equal(
-        nodes3.join(","),
-        "node1 0,child1 1,child2 1,node2 0,child3 1,child4 2"
-    );
+    assert.equal(nodes3.join(","), "node1 0,child1 1,child2 1,node2 0,child3 1,child4 2");
 });
 
 test("moveNode", (assert: Assert) => {
@@ -239,11 +213,7 @@ test("moveNode", (assert: Assert) => {
       ---child3
       child2
     */
-    assert.equal(
-        formatNodes(tree.children),
-        "node1 node2 child2",
-        "tree nodes at first level"
-    );
+    assert.equal(formatNodes(tree.children), "node1 node2 child2", "tree nodes at first level");
     assert.equal(formatNodes(node1.children), "child1", "node1 children");
 
     // move child1 inside node2
@@ -257,11 +227,7 @@ test("moveNode", (assert: Assert) => {
       ---child3
       child2
     */
-    assert.equal(
-        formatNodes(node2.children),
-        "child1 child3",
-        "node2 children"
-    );
+    assert.equal(formatNodes(node2.children), "child1 child3", "node2 children");
     assert.equal(formatNodes(node1.children), "", "node1 has no children");
 
     // move child2 before child1
@@ -274,16 +240,8 @@ test("moveNode", (assert: Assert) => {
       ---child1
       ---child3
     */
-    assert.equal(
-        formatNodes(node2.children),
-        "child2 child1 child3",
-        "node2 children"
-    );
-    assert.equal(
-        formatNodes(tree.children),
-        "node1 node2",
-        "tree nodes at first level"
-    );
+    assert.equal(formatNodes(node2.children), "child2 child1 child3", "node2 children");
+    assert.equal(formatNodes(tree.children), "node1 node2", "tree nodes at first level");
 });
 
 test("initFromData", (assert: Assert) => {
@@ -364,8 +322,8 @@ test("addAfter", (assert: Assert) => {
 
     assert.equal(formatNodes(tree.children), "node1 node2 node_b");
 
-    const node_b = doGetNodeByName(tree, "node_b");
-    assert.equal(node_b.name, "node_b");
+    const nodeB = doGetNodeByName(tree, "node_b");
+    assert.equal(nodeB.name, "node_b");
 
     // - Add 'node_a' after node1
     const node1 = doGetNodeByName(tree, "node1");
@@ -374,20 +332,17 @@ test("addAfter", (assert: Assert) => {
     assert.equal(formatNodes(tree.children), "node1 node_a node2 node_b");
 
     // - Add 'node_c' after node_b; new node is an object
-    if (node_b) {
-        node_b.addAfter({
+    if (nodeB) {
+        nodeB.addAfter({
             label: "node_c",
             id: 789
         });
     }
 
-    const node_c = doGetNodeByName(tree, "node_c");
-    assert.equal(node_c.id, 789);
+    const nodeC = doGetNodeByName(tree, "node_c");
+    assert.equal(nodeC.id, 789);
 
-    assert.equal(
-        formatNodes(tree.children),
-        "node1 node_a node2 node_b node_c"
-    );
+    assert.equal(formatNodes(tree.children), "node1 node_a node2 node_b node_c");
 
     // - Add after root node; this is not possible
     assert.equal(tree.addAfter("node_x"), null);
@@ -590,15 +545,12 @@ test("getPreviousSibling", (assert: Assert) => {
     tree.loadFromData(exampleData);
 
     // - getPreviousSibling
-    const previous_sibling = doGetNodeByName(
-        tree,
-        "child2"
-    ).getPreviousSibling();
+    const previousSibling = doGetNodeByName(tree, "child2").getPreviousSibling();
 
-    if (!previous_sibling) {
+    if (!previousSibling) {
         assert.ok(false, "Previous sibling not found");
     } else {
-        assert.equal(previous_sibling.name, "child1");
+        assert.equal(previousSibling.name, "child1");
     }
 
     assert.equal(tree.getPreviousSibling(), null);
@@ -611,12 +563,12 @@ test("getNextSibling", (assert: Assert) => {
     tree.loadFromData(exampleData);
 
     // - getNextSibling
-    const next_sibling = doGetNodeByName(tree, "node1").getNextSibling();
+    const nextSibling = doGetNodeByName(tree, "node1").getNextSibling();
 
-    if (!next_sibling) {
+    if (!nextSibling) {
         assert.ok(false, "Next sibling not found");
     } else {
-        assert.equal(next_sibling.name, "node2");
+        assert.equal(nextSibling.name, "node2");
     }
 
     assert.equal(doGetNodeByName(tree, "node2").getNextSibling(), null);

@@ -17,11 +17,11 @@ export default class KeyHandler {
         }
     }
 
-    public deinit() {
+    public deinit(): void {
         jQuery(document).off("keydown.jqtree");
     }
 
-    public moveDown() {
+    public moveDown(): boolean {
         const node = this.treeWidget.getSelectedNode();
 
         if (node) {
@@ -31,7 +31,7 @@ export default class KeyHandler {
         }
     }
 
-    public moveUp() {
+    public moveUp(): boolean {
         const node = this.treeWidget.getSelectedNode();
 
         if (node) {
@@ -41,7 +41,7 @@ export default class KeyHandler {
         }
     }
 
-    public moveRight() {
+    public moveRight(): boolean {
         const node = this.treeWidget.getSelectedNode();
 
         if (!node) {
@@ -61,7 +61,7 @@ export default class KeyHandler {
         }
     }
 
-    public moveLeft() {
+    public moveLeft(): boolean {
         const node = this.treeWidget.getSelectedNode();
 
         if (!node) {
@@ -76,7 +76,7 @@ export default class KeyHandler {
         }
     }
 
-    public selectNode(node: Node | null) {
+    public selectNode(node: Node | null): boolean {
         if (!node) {
             return true;
         } else {
@@ -84,9 +84,7 @@ export default class KeyHandler {
 
             if (
                 this.treeWidget.scrollHandler &&
-                !this.treeWidget.scrollHandler.isScrolledIntoView(
-                    jQuery(node.element).find(".jqtree-element")
-                )
+                !this.treeWidget.scrollHandler.isScrolledIntoView(jQuery(node.element).find(".jqtree-element"))
             ) {
                 this.treeWidget.scrollToNode(node);
             }
@@ -95,7 +93,7 @@ export default class KeyHandler {
         }
     }
 
-    private handleKeyDown = (e: JQuery.Event) => {
+    private handleKeyDown = (e: JQuery.Event): boolean => {
         if (!this.canHandleKeyboard()) {
             return true;
         } else {
@@ -122,9 +120,7 @@ export default class KeyHandler {
 
     private canHandleKeyboard(): boolean {
         return (
-            this.treeWidget.options.keyboardSupport &&
-            this.isFocusOnTree() &&
-            this.treeWidget.getSelectedNode() != null
+            this.treeWidget.options.keyboardSupport && this.isFocusOnTree() && this.treeWidget.getSelectedNode() != null
         );
     }
 
@@ -132,9 +128,7 @@ export default class KeyHandler {
         const activeElement = document.activeElement;
 
         return Boolean(
-            activeElement &&
-                activeElement.tagName === "SPAN" &&
-                this.treeWidget._containsElement(activeElement)
+            activeElement && activeElement.tagName === "SPAN" && this.treeWidget._containsElement(activeElement)
         );
     }
 }

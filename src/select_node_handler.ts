@@ -6,8 +6,8 @@ export default class SelectNodeHandler {
     private selectedNodes: any;
     private selectedSingleNode: Node | null;
 
-    constructor(tree_widget: ITreeWidget) {
-        this.treeWidget = tree_widget;
+    constructor(treeWidget: ITreeWidget) {
+        this.treeWidget = treeWidget;
         this.clear();
     }
 
@@ -40,7 +40,7 @@ export default class SelectNodeHandler {
         }
     }
 
-    public getSelectedNodesUnder(parent: Node) {
+    public getSelectedNodesUnder(parent: Node): Node[] {
         if (this.selectedSingleNode) {
             if (parent.isParentOf(this.selectedSingleNode)) {
                 return [this.selectedSingleNode];
@@ -79,17 +79,14 @@ export default class SelectNodeHandler {
         }
     }
 
-    public clear() {
+    public clear(): void {
         this.selectedNodes = {};
         this.selectedSingleNode = null;
     }
 
-    public removeFromSelection(node: Node, includeChildren: boolean = false) {
+    public removeFromSelection(node: Node, includeChildren = false): void {
         if (node.id == null) {
-            if (
-                this.selectedSingleNode &&
-                node.element === this.selectedSingleNode.element
-            ) {
+            if (this.selectedSingleNode && node.element === this.selectedSingleNode.element) {
                 this.selectedSingleNode = null;
             }
         } else {
@@ -104,7 +101,7 @@ export default class SelectNodeHandler {
         }
     }
 
-    public addToSelection(node: Node) {
+    public addToSelection(node: Node): void {
         if (node.id != null) {
             this.selectedNodes[node.id] = true;
         } else {
