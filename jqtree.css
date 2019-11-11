@@ -50,6 +50,7 @@ ul.jqtree-tree {
     ul.jqtree-tree .jqtree-element {
         cursor: pointer;
         position: relative;
+        display: -webkit-box;
         display: flex;
     }
 
@@ -120,6 +121,7 @@ ul.jqtree-tree {
     ul.jqtree-tree li.jqtree-selected > .jqtree-element,
     ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
         background-color: #97BDD6;
+        background: -webkit-gradient(linear, left top, left bottom, from(#BEE0F5), to(#89AFCA));
         background: linear-gradient(#BEE0F5, #89AFCA);
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
     }

@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.4.11
+ * JqTree 1.4.12
  * 
  * Copyright 2019 Marco Braak
  * 
@@ -465,9 +465,9 @@ var Node = /** @class */ (function () {
         return false;
     };
     Node.prototype.getLevel = function () {
-        var level = 1;
-        var node = this.parent;
-        while (node) {
+        var level = 0;
+        var node = this; // eslint-disable-line @typescript-eslint/no-this-alias
+        while (node.parent) {
             level += 1;
             node = node.parent;
         }
@@ -1754,7 +1754,7 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.11";
+var version = "1.4.12";
 exports["default"] = version;
 
 

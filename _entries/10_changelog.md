@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development
+##### 1.4.12 (november 11 2019)
 
 -   Issue #579: have icon for empty folders (thanks to Andrew Hinde)
 -   Issue #583: improve performance of deleting a node (thanks to maltmann-muc)
