@@ -33,6 +33,6 @@ for i, t in enumerate(file_tuples):
     if file_index != expected_index:
         new_filename = '%02d_%s' % (expected_index, filepart)
 
-        print 'rename %s to %s' % (old_filename, new_filename)
+        print('rename %s to %s' % (old_filename, new_filename))
 
         os.rename(old_filename, new_filename)
