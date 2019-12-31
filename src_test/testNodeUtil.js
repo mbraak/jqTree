@@ -12,3 +12,4 @@ test("getPositionName", function (assert) {
 test("getPosition", function (assert) {
     assert.equal(node_1.getPosition("inside"), node_1.Position.Inside);
 });
+//# sourceMappingURL=testNodeUtil.js.map

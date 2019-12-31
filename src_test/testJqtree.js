@@ -992,3 +992,4 @@ test("onLoadFailed", function (assert) {
         onLoadFailed: handleLoadFailed
     });
 });
+//# sourceMappingURL=testJqtree.js.map

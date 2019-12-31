@@ -21,10 +21,10 @@ export default class SaveStateHandler {
     }
 
     public getStateFromStorage(): any {
-        const jsonData = this._loadFromStorage();
+        const jsonData = this.loadFromStorage();
 
         if (jsonData) {
-            return this._parseState(jsonData);
+            return this.parseState(jsonData);
         } else {
             return null;
         }
@@ -68,12 +68,12 @@ export default class SaveStateHandler {
             let mustLoadOnDemand = false;
 
             if (state.open_nodes) {
-                mustLoadOnDemand = this._openInitialNodes(state.open_nodes);
+                mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
             }
 
             if (state.selected_node) {
-                this._resetSelection();
-                this._selectInitialNodes(state.selected_node);
+                this.resetSelection();
+                this.selectInitialNodes(state.selected_node);
             }
 
             return mustLoadOnDemand;
@@ -82,7 +82,7 @@ export default class SaveStateHandler {
 
     public setInitialStateOnDemand(state: any, cbFinished: () => void): void {
         if (state) {
-            this._setInitialStateOnDemand(
+            this.doSetInitialStateOnDemand(
                 state.open_nodes,
                 state.selected_node,
                 cbFinished
@@ -102,7 +102,7 @@ export default class SaveStateHandler {
         }
     }
 
-    private _parseState(jsonData: any): any {
+    private parseState(jsonData: any): any {
         const state = jQuery.parseJSON(jsonData);
 
         // Check if selected_node is an int (instead of an array)
@@ -114,7 +114,7 @@ export default class SaveStateHandler {
         return state;
     }
 
-    private _loadFromStorage(): any {
+    private loadFromStorage(): any {
         if (this.treeWidget.options.onGetStateFromStorage) {
             return this.treeWidget.options.onGetStateFromStorage();
         } else if (this.supportsLocalStorage()) {
@@ -122,7 +122,7 @@ export default class SaveStateHandler {
         }
     }
 
-    private _openInitialNodes(nodeIds: any[]): boolean {
+    private openInitialNodes(nodeIds: any[]): boolean {
         let mustLoadOnDemand = false;
 
         for (const nodeDd of nodeIds) {
@@ -140,7 +140,7 @@ export default class SaveStateHandler {
         return mustLoadOnDemand;
     }
 
-    private _selectInitialNodes(nodeIds: NodeId[]): boolean {
+    private selectInitialNodes(nodeIds: NodeId[]): boolean {
         let selectCount = 0;
 
         for (const nodeId of nodeIds) {
@@ -158,7 +158,7 @@ export default class SaveStateHandler {
         return selectCount !== 0;
     }
 
-    private _resetSelection(): void {
+    private resetSelection(): void {
         const selectNodeHandler = this.treeWidget.selectNodeHandler;
 
         if (selectNodeHandler) {
@@ -170,7 +170,7 @@ export default class SaveStateHandler {
         }
     }
 
-    private _setInitialStateOnDemand(
+    private doSetInitialStateOnDemand(
         nodeIdsParam: NodeId[],
         selectedNodes: NodeId[],
         cbFinished: () => void
@@ -199,7 +199,7 @@ export default class SaveStateHandler {
 
             nodeIds = newNodesIds;
 
-            if (this._selectInitialNodes(selectedNodes)) {
+            if (this.selectInitialNodes(selectedNodes)) {
                 this.treeWidget._refreshElements(null);
             }
 
