@@ -2,7 +2,7 @@
 This widget does the same a the mouse widget in jqueryui.
 */
 import SimpleWidget from "./simple.widget";
-import { IPositionInfo } from "./imouse_widget";
+import { IPositionInfo } from "./imouseWidget";
 
 abstract class MouseWidget extends SimpleWidget {
     public $el: JQuery;
@@ -36,7 +36,9 @@ abstract class MouseWidget extends SimpleWidget {
         $document.off("mouseup.mousewidget");
     }
 
-    protected abstract _mouseCapture(positionInfo: IPositionInfo): boolean | null;
+    protected abstract _mouseCapture(
+        positionInfo: IPositionInfo
+    ): boolean | null;
 
     protected abstract _mouseStart(positionInfo: IPositionInfo): boolean;
 
@@ -100,7 +102,8 @@ abstract class MouseWidget extends SimpleWidget {
         this.isMouseDelayMet = false;
     }
 
-    private mouseMove = (e: JQuery.Event) => this._handleMouseMove(e, this._getPositionInfo(e));
+    private mouseMove = (e: JQuery.Event) =>
+        this._handleMouseMove(e, this._getPositionInfo(e));
 
     private _handleMouseMove(e: JQuery.Event, positionInfo: IPositionInfo) {
         if (this.isMouseStarted) {
@@ -113,7 +116,8 @@ abstract class MouseWidget extends SimpleWidget {
         }
 
         if (this.mouseDownInfo) {
-            this.isMouseStarted = this._mouseStart(this.mouseDownInfo) !== false;
+            this.isMouseStarted =
+                this._mouseStart(this.mouseDownInfo) !== false;
         }
 
         if (this.isMouseStarted) {
@@ -134,7 +138,8 @@ abstract class MouseWidget extends SimpleWidget {
         };
     }
 
-    private mouseUp = (e: JQuery.Event): void => this._handleMouseUp(this._getPositionInfo(e));
+    private mouseUp = (e: JQuery.Event): void =>
+        this._handleMouseUp(this._getPositionInfo(e));
 
     private _handleMouseUp(positionInfo: IPositionInfo): void {
         const $document = jQuery(document);

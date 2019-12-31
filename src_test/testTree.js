@@ -1,7 +1,7 @@
 "use strict";
 exports.__esModule = true;
 var module = QUnit.module, test = QUnit.test;
-var utils_for_test_1 = require("./utils_for_test");
+var utilsForTest_1 = require("./utilsForTest");
 var node_1 = require("../src/node");
 module("Tree");
 test("constructor", function (assert) {
@@ -27,14 +27,14 @@ test("constructor", function (assert) {
 });
 test("create tree from data", function (assert) {
     function checkData(tree) {
-        assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2", "nodes on level 1");
-        assert.equal(utils_for_test_1.formatNodes(tree.children[0].children), "child1 child2", "children of node1");
-        assert.equal(utils_for_test_1.formatNodes(tree.children[1].children), "child3", "children of node2");
+        assert.equal(utilsForTest_1.formatNodes(tree.children), "node1 node2", "nodes on level 1");
+        assert.equal(utilsForTest_1.formatNodes(tree.children[0].children), "child1 child2", "children of node1");
+        assert.equal(utilsForTest_1.formatNodes(tree.children[1].children), "child3", "children of node2");
         assert.equal(tree.children[0].id, 123, "id");
     }
     // - create tree from example data
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     checkData(tree);
     // - create tree from new data format
     var data = [
@@ -57,7 +57,7 @@ test("addChild", function (assert) {
     var tree = new node_1.Node("tree1", true);
     tree.addChild(new node_1.Node("abc"));
     tree.addChild(new node_1.Node("def"));
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc def", "children");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "abc def", "children");
     var node = tree.children[0];
     if (!node.parent) {
         assert.ok(false, "Node has no parent");
@@ -72,7 +72,7 @@ test("addChildAtPosition", function (assert) {
     tree.addChildAtPosition(new node_1.Node("ghi"), 2); // index 2 does not exist
     tree.addChildAtPosition(new node_1.Node("def"), 1);
     tree.addChildAtPosition(new node_1.Node("123"), 0);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "123 abc def ghi", "children");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "123 abc def ghi", "children");
 });
 test("removeChild", function (assert) {
     var tree = new node_1.Node({}, true);
@@ -84,20 +84,20 @@ test("removeChild", function (assert) {
     tree.addChild(ghi);
     var jkl = new node_1.Node({ label: "jkl", id: 4 });
     def.addChild(jkl);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc def ghi", "children");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "abc def ghi", "children");
     assert.equal(tree.idMapping[2].name, "def");
     assert.equal(tree.idMapping[4].name, "jkl");
     // remove 'def'
     tree.removeChild(def);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc ghi", "children");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "abc ghi", "children");
     assert.equal(tree.idMapping[2], null);
     assert.equal(tree.idMapping[4], null);
     // remove 'ghi'
     tree.removeChild(ghi);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "abc", "children");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "abc", "children");
     // remove 'abc'
     tree.removeChild(abc);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "", "children");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "", "children");
 });
 test("getChildIndex", function (assert) {
     // setup
@@ -121,23 +121,23 @@ test("hasChildren", function (assert) {
 });
 test("iterate", function (assert) {
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     // iterate over all the nodes
     var nodes = [];
     tree.iterate(function (node) {
         nodes.push(node);
         return true;
     });
-    assert.equal(utils_for_test_1.formatNodes(nodes), "node1 child1 child2 node2 child3", "all nodes");
+    assert.equal(utilsForTest_1.formatNodes(nodes), "node1 child1 child2 node2 child3", "all nodes");
     // iterate over nodes on first level
     var nodes2 = [];
     tree.iterate(function (node) {
         nodes2.push(node);
         return false;
     });
-    assert.equal(utils_for_test_1.formatNodes(nodes2), "node1 node2", "nodes on first level");
+    assert.equal(utilsForTest_1.formatNodes(nodes2), "node1 node2", "nodes on first level");
     // add child 4
-    var node124 = utils_for_test_1.doGetNodeById(tree, 124);
+    var node124 = utilsForTest_1.doGetNodeById(tree, 124);
     var node3 = node124.children[0];
     node3.addChild(new node_1.Node("child4"));
     // test level parameter
@@ -150,7 +150,7 @@ test("iterate", function (assert) {
 });
 test("moveNode", function (assert) {
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     /*
       node1
       ---child1
@@ -173,8 +173,8 @@ test("moveNode", function (assert) {
       ---child3
       child2
     */
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 child2", "tree nodes at first level");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1", "node1 children");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "node1 node2 child2", "tree nodes at first level");
+    assert.equal(utilsForTest_1.formatNodes(node1.children), "child1", "node1 children");
     // move child1 inside node2
     // this means it's the first child
     tree.moveNode(child1, node2, node_1.Position.Inside);
@@ -185,8 +185,8 @@ test("moveNode", function (assert) {
       ---child3
       child2
     */
-    assert.equal(utils_for_test_1.formatNodes(node2.children), "child1 child3", "node2 children");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "", "node1 has no children");
+    assert.equal(utilsForTest_1.formatNodes(node2.children), "child1 child3", "node2 children");
+    assert.equal(utilsForTest_1.formatNodes(node1.children), "", "node1 has no children");
     // move child2 before child1
     tree.moveNode(child2, child1, node_1.Position.Before);
     /*
@@ -196,8 +196,8 @@ test("moveNode", function (assert) {
       ---child1
       ---child3
     */
-    assert.equal(utils_for_test_1.formatNodes(node2.children), "child2 child1 child3", "node2 children");
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2", "tree nodes at first level");
+    assert.equal(utilsForTest_1.formatNodes(node2.children), "child2 child1 child3", "node2 children");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "node1 node2", "tree nodes at first level");
 });
 test("initFromData", function (assert) {
     var data = {
@@ -213,7 +213,7 @@ test("initFromData", function (assert) {
     var node = new node_1.Node({}, true);
     node.initFromData(data);
     assert.equal(node.name, "main");
-    assert.equal(utils_for_test_1.formatNodes(node.children), "c1 c2", "children");
+    assert.equal(utilsForTest_1.formatNodes(node.children), "c1 c2", "children");
     assert.equal(node.children[1].id, 201);
 });
 test("getData", function (assert) {
@@ -242,7 +242,7 @@ test("getData", function (assert) {
         }
     ]);
     // 3. get data including parent
-    var n1 = utils_for_test_1.doGetNodeByName(node, "n1");
+    var n1 = utilsForTest_1.doGetNodeByName(node, "n1");
     assert.deepEqual(n1.getData(true), [
         {
             name: "n1",
@@ -253,7 +253,7 @@ test("getData", function (assert) {
 test("addAfter", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     /*
     -node1
     ---c1
@@ -261,17 +261,17 @@ test("addAfter", function (assert) {
     -node2
     ---c3
     */
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "node1 node2");
     // - Add 'node_b' after node2
-    var node2 = utils_for_test_1.doGetNodeByName(tree, "node2");
+    var node2 = utilsForTest_1.doGetNodeByName(tree, "node2");
     node2.addAfter("node_b");
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node2 node_b");
-    var nodeB = utils_for_test_1.doGetNodeByName(tree, "node_b");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "node1 node2 node_b");
+    var nodeB = utilsForTest_1.doGetNodeByName(tree, "node_b");
     assert.equal(nodeB.name, "node_b");
     // - Add 'node_a' after node1
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    var node1 = utilsForTest_1.doGetNodeByName(tree, "node1");
     node1.addAfter("node_a");
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "node1 node_a node2 node_b");
     // - Add 'node_c' after node_b; new node is an object
     if (nodeB) {
         nodeB.addAfter({
@@ -279,118 +279,118 @@ test("addAfter", function (assert) {
             id: 789
         });
     }
-    var nodeC = utils_for_test_1.doGetNodeByName(tree, "node_c");
+    var nodeC = utilsForTest_1.doGetNodeByName(tree, "node_c");
     assert.equal(nodeC.id, 789);
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node1 node_a node2 node_b node_c");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "node1 node_a node2 node_b node_c");
     // - Add after root node; this is not possible
     assert.equal(tree.addAfter("node_x"), null);
 });
 test("addBefore", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     // - Add 'node_0' before node1
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    var node1 = utilsForTest_1.doGetNodeByName(tree, "node1");
     node1.addBefore("node0");
-    assert.equal(utils_for_test_1.formatNodes(tree.children), "node0 node1 node2");
+    assert.equal(utilsForTest_1.formatNodes(tree.children), "node0 node1 node2");
     // - Add before root node; this is not possile
     assert.equal(tree.addBefore("x"), null);
 });
 test("addParent", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     // - Add node 'root' as parent of node1
     // Note that node also becomes a child of 'root'
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    var node1 = utilsForTest_1.doGetNodeByName(tree, "node1");
     node1.addParent("root");
-    var root = utils_for_test_1.doGetNodeByName(tree, "root");
-    assert.equal(utils_for_test_1.formatNodes(root.children), "node1 node2");
+    var root = utilsForTest_1.doGetNodeByName(tree, "root");
+    assert.equal(utilsForTest_1.formatNodes(root.children), "node1 node2");
     // - Add parent to root node; not possible
     assert.equal(tree.addParent("x"), null);
 });
 test("remove", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
-    var child1 = utils_for_test_1.doGetNodeByName(tree, "child1");
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2");
+    tree.loadFromData(utilsForTest_1.exampleData);
+    var child1 = utilsForTest_1.doGetNodeByName(tree, "child1");
+    var node1 = utilsForTest_1.doGetNodeByName(tree, "node1");
+    assert.equal(utilsForTest_1.formatNodes(node1.children), "child1 child2");
     assert.equal(child1.parent, node1);
     // 1. Remove child1
     child1.remove();
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child2");
+    assert.equal(utilsForTest_1.formatNodes(node1.children), "child2");
     assert.equal(child1.parent, null);
 });
 test("append", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    tree.loadFromData(utilsForTest_1.exampleData);
+    var node1 = utilsForTest_1.doGetNodeByName(tree, "node1");
     // 1. Append child3 to node1
     node1.append("child3");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2 child3");
+    assert.equal(utilsForTest_1.formatNodes(node1.children), "child1 child2 child3");
     // 2. Append subtree
     node1.append({
         name: "child4",
         children: [{ name: "child5" }]
     });
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child1 child2 child3 child4");
-    var child4 = utils_for_test_1.doGetNodeByName(node1, "child4");
-    assert.equal(utils_for_test_1.formatNodes(child4.children), "child5");
+    assert.equal(utilsForTest_1.formatNodes(node1.children), "child1 child2 child3 child4");
+    var child4 = utilsForTest_1.doGetNodeByName(node1, "child4");
+    assert.equal(utilsForTest_1.formatNodes(child4.children), "child5");
 });
 test("prepend", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
-    var node1 = utils_for_test_1.doGetNodeByName(tree, "node1");
+    tree.loadFromData(utilsForTest_1.exampleData);
+    var node1 = utilsForTest_1.doGetNodeByName(tree, "node1");
     // 1. Prepend child0 to node1
     node1.prepend("child0");
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child0 child1 child2");
+    assert.equal(utilsForTest_1.formatNodes(node1.children), "child0 child1 child2");
     // 2. Prepend subtree
     node1.prepend({
         name: "child3",
         children: [{ name: "child4" }]
     });
-    assert.equal(utils_for_test_1.formatNodes(node1.children), "child3 child0 child1 child2");
-    var child3 = utils_for_test_1.doGetNodeByName(node1, "child3");
-    assert.equal(utils_for_test_1.formatNodes(child3.children), "child4");
+    assert.equal(utilsForTest_1.formatNodes(node1.children), "child3 child0 child1 child2");
+    var child3 = utilsForTest_1.doGetNodeByName(node1, "child3");
+    assert.equal(utilsForTest_1.formatNodes(child3.children), "child4");
 });
 test("getNodeById", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     // 1. Get node with id 124
-    var node = utils_for_test_1.doGetNodeById(tree, 124);
+    var node = utilsForTest_1.doGetNodeById(tree, 124);
     assert.equal(node.name, "node2");
     // 2. Delete node with id 124 and search again
     node.remove();
     assert.equal(tree.getNodeById(124), null);
     // 3. Add node with id 456 and search for it
-    var child3 = utils_for_test_1.doGetNodeByName(tree, "child2");
+    var child3 = utilsForTest_1.doGetNodeByName(tree, "child2");
     child3.append({
         id: 456,
         label: "new node"
     });
-    var node2 = utils_for_test_1.doGetNodeById(tree, 456);
+    var node2 = utilsForTest_1.doGetNodeById(tree, 456);
     assert.equal(node2.name, "new node");
 });
 test("getLevel", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     // 1. get level for node1 and child1
-    assert.equal(utils_for_test_1.doGetNodeByName(tree, "node1").getLevel(), 1);
-    assert.equal(utils_for_test_1.doGetNodeByName(tree, "child1").getLevel(), 2);
+    assert.equal(utilsForTest_1.doGetNodeByName(tree, "node1").getLevel(), 1);
+    assert.equal(utilsForTest_1.doGetNodeByName(tree, "child1").getLevel(), 2);
 });
 test("loadFromData and id mapping", function (assert) {
     // - get node from empty tree
     var tree = new node_1.Node({}, true);
     assert.equal(tree.getNodeById(999), null);
     // - load example data in tree
-    tree.loadFromData(utils_for_test_1.exampleData);
-    assert.equal(utils_for_test_1.doGetNodeById(tree, 124).name, "node2");
-    var child2 = utils_for_test_1.doGetNodeById(tree, 126);
+    tree.loadFromData(utilsForTest_1.exampleData);
+    assert.equal(utilsForTest_1.doGetNodeById(tree, 124).name, "node2");
+    var child2 = utilsForTest_1.doGetNodeById(tree, 126);
     child2.addChild(new node_1.Node({ label: "child4", id: 128 }));
     child2.addChild(new node_1.Node({ label: "child5", id: 129 }));
     // - load data in node child2
@@ -402,13 +402,13 @@ test("loadFromData and id mapping", function (assert) {
 test("removeChildren", function (assert) {
     // - load example data
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     // add child4 and child5
-    var child2 = utils_for_test_1.doGetNodeById(tree, 126);
+    var child2 = utilsForTest_1.doGetNodeById(tree, 126);
     assert.equal(child2.name, "child2");
     child2.addChild(new node_1.Node({ label: "child4", id: 128 }));
     child2.addChild(new node_1.Node({ label: "child5", id: 129 }));
-    assert.equal(utils_for_test_1.doGetNodeById(tree, 128).name, "child4");
+    assert.equal(utilsForTest_1.doGetNodeById(tree, 128).name, "child4");
     // - remove children from child2
     child2.removeChildren();
     assert.equal(tree.getNodeById(128), null);
@@ -423,7 +423,7 @@ test("node with id 0", function (assert) {
             label: "mynode"
         }
     ]);
-    var node = utils_for_test_1.doGetNodeById(tree, 0);
+    var node = utilsForTest_1.doGetNodeById(tree, 0);
     assert.equal(node.name, "mynode");
     // -- remove the node
     node.remove();
@@ -432,9 +432,9 @@ test("node with id 0", function (assert) {
 test("getPreviousSibling", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     // - getPreviousSibling
-    var previousSibling = utils_for_test_1.doGetNodeByName(tree, "child2").getPreviousSibling();
+    var previousSibling = utilsForTest_1.doGetNodeByName(tree, "child2").getPreviousSibling();
     if (!previousSibling) {
         assert.ok(false, "Previous sibling not found");
     }
@@ -442,33 +442,33 @@ test("getPreviousSibling", function (assert) {
         assert.equal(previousSibling.name, "child1");
     }
     assert.equal(tree.getPreviousSibling(), null);
-    assert.equal(utils_for_test_1.doGetNodeByName(tree, "child1").getPreviousSibling(), null);
+    assert.equal(utilsForTest_1.doGetNodeByName(tree, "child1").getPreviousSibling(), null);
 });
 test("getNextSibling", function (assert) {
     // setup
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     // - getNextSibling
-    var nextSibling = utils_for_test_1.doGetNodeByName(tree, "node1").getNextSibling();
+    var nextSibling = utilsForTest_1.doGetNodeByName(tree, "node1").getNextSibling();
     if (!nextSibling) {
         assert.ok(false, "Next sibling not found");
     }
     else {
         assert.equal(nextSibling.name, "node2");
     }
-    assert.equal(utils_for_test_1.doGetNodeByName(tree, "node2").getNextSibling(), null);
+    assert.equal(utilsForTest_1.doGetNodeByName(tree, "node2").getNextSibling(), null);
     assert.equal(tree.getNextSibling(), null);
 });
 test("getNodesByProperty", function (assert) {
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     var nodes = tree.getNodesByProperty("name", "child1");
     assert.equal(nodes.length, 1);
     assert.equal(nodes[0].name, "child1");
 });
 test("getNodeByCallback", function (assert) {
     var tree = new node_1.Node({}, true);
-    tree.loadFromData(utils_for_test_1.exampleData);
+    tree.loadFromData(utilsForTest_1.exampleData);
     var node = tree.getNodeByCallback(function (n) { return n.name === "child1"; });
     if (!node) {
         assert.ok(false, "Node not found");

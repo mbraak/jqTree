@@ -1,5 +1,5 @@
 import { Node } from "./node";
-import { ITreeWidget } from "./itree_widget";
+import { ITreeWidget } from "./itreeWidget";
 
 export default class SelectNodeHandler {
     private treeWidget: ITreeWidget;
@@ -86,7 +86,10 @@ export default class SelectNodeHandler {
 
     public removeFromSelection(node: Node, includeChildren = false): void {
         if (node.id == null) {
-            if (this.selectedSingleNode && node.element === this.selectedSingleNode.element) {
+            if (
+                this.selectedSingleNode &&
+                node.element === this.selectedSingleNode.element
+            ) {
                 this.selectedSingleNode = null;
             }
         } else {

@@ -1,4 +1,4 @@
-import { ITreeWidget } from "./itree_widget";
+import { ITreeWidget } from "./itreeWidget";
 import { Node } from "./node";
 
 export type HandleFinishedLoading = () => void;
@@ -10,7 +10,11 @@ export default class DataLoader {
         this.treeWidget = treeWidget;
     }
 
-    public loadFromUrl(urlInfo: any, parentNode: Node | null, onFinished: HandleFinishedLoading | null): void {
+    public loadFromUrl(
+        urlInfo: any,
+        parentNode: Node | null,
+        onFinished: HandleFinishedLoading | null
+    ): void {
         if (!urlInfo) {
             return;
         }
@@ -66,7 +70,11 @@ export default class DataLoader {
         }
     }
 
-    private notifyLoading(isLoading: boolean, node: Node | null, $el: JQuery): void {
+    private notifyLoading(
+        isLoading: boolean,
+        node: Node | null,
+        $el: JQuery
+    ): void {
         const { onLoading } = this.treeWidget.options;
 
         if (onLoading) {
@@ -105,7 +113,11 @@ export default class DataLoader {
         const { dataFilter } = this.treeWidget.options;
 
         const parsedData =
-            data instanceof Array || typeof data === "object" ? data : data != null ? jQuery.parseJSON(data) : [];
+            data instanceof Array || typeof data === "object"
+                ? data
+                : data != null
+                ? jQuery.parseJSON(data)
+                : [];
 
         return dataFilter ? dataFilter(parsedData) : parsedData;
     }

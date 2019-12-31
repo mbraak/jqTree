@@ -1,5 +1,5 @@
 import { Node } from "./node";
-import { ITreeWidget } from "./itree_widget";
+import { ITreeWidget } from "./itreeWidget";
 
 export default class KeyHandler {
     private static LEFT = 37;
@@ -84,7 +84,9 @@ export default class KeyHandler {
 
             if (
                 this.treeWidget.scrollHandler &&
-                !this.treeWidget.scrollHandler.isScrolledIntoView(jQuery(node.element).find(".jqtree-element"))
+                !this.treeWidget.scrollHandler.isScrolledIntoView(
+                    jQuery(node.element).find(".jqtree-element")
+                )
             ) {
                 this.treeWidget.scrollToNode(node);
             }
@@ -120,7 +122,9 @@ export default class KeyHandler {
 
     private canHandleKeyboard(): boolean {
         return (
-            this.treeWidget.options.keyboardSupport && this.isFocusOnTree() && this.treeWidget.getSelectedNode() != null
+            this.treeWidget.options.keyboardSupport &&
+            this.isFocusOnTree() &&
+            this.treeWidget.getSelectedNode() != null
         );
     }
 
@@ -128,7 +132,9 @@ export default class KeyHandler {
         const activeElement = document.activeElement;
 
         return Boolean(
-            activeElement && activeElement.tagName === "SPAN" && this.treeWidget._containsElement(activeElement)
+            activeElement &&
+                activeElement.tagName === "SPAN" &&
+                this.treeWidget._containsElement(activeElement)
         );
     }
 }

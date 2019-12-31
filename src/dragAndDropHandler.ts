@@ -1,8 +1,8 @@
 import * as jQuery from "jquery";
 import { Position, Node, getPositionName } from "./node";
 import { htmlEscape } from "./util";
-import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itree_widget";
-import { IPositionInfo } from "./imouse_widget";
+import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itreeWidget";
+import { IPositionInfo } from "./imouseWidget";
 
 export class DragAndDropHandler {
     public hitAreas: IHitArea[];
@@ -33,7 +33,10 @@ export class DragAndDropHandler {
             return null;
         }
 
-        if (this.treeWidget.options.onIsMoveHandle && !this.treeWidget.options.onIsMoveHandle($element)) {
+        if (
+            this.treeWidget.options.onIsMoveHandle &&
+            !this.treeWidget.options.onIsMoveHandle($element)
+        ) {
             return null;
         }
 
@@ -63,7 +66,11 @@ export class DragAndDropHandler {
     }
 
     public mouseStart(positionInfo: IPositionInfo): boolean {
-        if (!this.currentItem || positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
+        if (
+            !this.currentItem ||
+            positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined
+        ) {
             return false;
         } else {
             this.refresh();
@@ -74,7 +81,9 @@ export class DragAndDropHandler {
 
             const node = this.currentItem.node;
 
-            const nodeName: string = this.treeWidget.options.autoEscape ? htmlEscape(node.name) : node.name;
+            const nodeName: string = this.treeWidget.options.autoEscape
+                ? htmlEscape(node.name)
+                : node.name;
 
             this.dragElement = new DragElement(
                 nodeName,
@@ -102,7 +111,10 @@ export class DragAndDropHandler {
             this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
             this.positionInfo = positionInfo;
 
-            const area = this.findHoveredArea(positionInfo.pageX, positionInfo.pageY);
+            const area = this.findHoveredArea(
+                positionInfo.pageX,
+                positionInfo.pageY
+            );
             const canMoveTo = this.canMoveToArea(area);
 
             if (canMoveTo && area) {
@@ -130,7 +142,10 @@ export class DragAndDropHandler {
 
             if (!area) {
                 if (this.treeWidget.options.onDragMove) {
-                    this.treeWidget.options.onDragMove(this.currentItem.node, positionInfo.originalEvent);
+                    this.treeWidget.options.onDragMove(
+                        this.currentItem.node,
+                        positionInfo.originalEvent
+                    );
                 }
             }
 
@@ -157,7 +172,10 @@ export class DragAndDropHandler {
 
         if (!this.hoveredArea && currentItem) {
             if (this.treeWidget.options.onDragStop) {
-                this.treeWidget.options.onDragStop(currentItem.node, positionInfo.originalEvent);
+                this.treeWidget.options.onDragStop(
+                    currentItem.node,
+                    positionInfo.originalEvent
+                );
             }
         }
 
@@ -170,7 +188,9 @@ export class DragAndDropHandler {
         if (this.currentItem) {
             this.generateHitAreas();
 
-            this.currentItem = this.treeWidget._getNodeElementForNode(this.currentItem.node);
+            this.currentItem = this.treeWidget._getNodeElementForNode(
+                this.currentItem.node
+            );
 
             if (this.isDragging) {
                 this.currentItem.$element.addClass("jqtree-moving");
@@ -188,7 +208,11 @@ export class DragAndDropHandler {
         } else if (this.treeWidget.options.onCanMoveTo) {
             const positionName = getPositionName(area.position);
 
-            return this.treeWidget.options.onCanMoveTo(this.currentItem.node, area.node, positionName);
+            return this.treeWidget.options.onCanMoveTo(
+                this.currentItem.node,
+                area.node,
+                positionName
+            );
         } else {
             return true;
         }
@@ -218,7 +242,12 @@ export class DragAndDropHandler {
     private findHoveredArea(x: number, y: number): IHitArea | null {
         const dimensions = this.getTreeDimensions();
 
-        if (x < dimensions.left || y < dimensions.top || x > dimensions.right || y > dimensions.bottom) {
+        if (
+            x < dimensions.left ||
+            y < dimensions.top ||
+            x > dimensions.right ||
+            y > dimensions.bottom
+        ) {
             return null;
         }
 
@@ -243,7 +272,11 @@ export class DragAndDropHandler {
     private mustOpenFolderTimer(area: IHitArea): boolean {
         const node = area.node;
 
-        return node.isFolder() && !node.is_open && area.position === Position.Inside;
+        return (
+            node.isFolder() &&
+            !node.is_open &&
+            area.position === Position.Inside
+        );
     }
 
     private updateDropHint(): void {
@@ -255,21 +288,30 @@ export class DragAndDropHandler {
         this.removeDropHint();
 
         // add new drop hint
-        const nodeElement = this.treeWidget._getNodeElementForNode(this.hoveredArea.node);
+        const nodeElement = this.treeWidget._getNodeElementForNode(
+            this.hoveredArea.node
+        );
         this.previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
     }
 
     private startOpenFolderTimer(folder: Node): void {
         const openFolder = (): void => {
-            this.treeWidget._openNode(folder, this.treeWidget.options.slide, () => {
-                this.refresh();
-                this.updateDropHint();
-            });
+            this.treeWidget._openNode(
+                folder,
+                this.treeWidget.options.slide,
+                () => {
+                    this.refresh();
+                    this.updateDropHint();
+                }
+            );
         };
 
         this.stopOpenFolderTimer();
 
-        this.openFolderTimer = window.setTimeout(openFolder, this.treeWidget.options.openFolderDelay);
+        this.openFolderTimer = window.setTimeout(
+            openFolder,
+            this.treeWidget.options.openFolderDelay
+        );
     }
 
     private stopOpenFolderTimer(): void {
@@ -354,7 +396,8 @@ abstract class VisibleNodeIterator {
         let isFirstNode = true;
 
         const _iterateNode = (node: Node, nextNode: Node | null): void => {
-            let mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
+            let mustIterateInside =
+                (node.is_open || !node.element) && node.hasChildren();
 
             let $element: JQuery<any> | null = null;
 
@@ -400,7 +443,11 @@ abstract class VisibleNodeIterator {
         _iterateNode(this.tree, null);
     }
 
-    protected abstract handleNode(node: Node, nextNode: Node | null, $element: JQuery): void;
+    protected abstract handleNode(
+        node: Node,
+        nextNode: Node | null,
+        $element: JQuery
+    ): void;
 
     /*
     override
@@ -410,9 +457,16 @@ abstract class VisibleNodeIterator {
     */
     protected abstract handleOpenFolder(node: Node, $element: JQuery): boolean;
 
-    protected abstract handleClosedFolder(node: Node, nextNode: Node | null, $element: JQuery): void;
+    protected abstract handleClosedFolder(
+        node: Node,
+        nextNode: Node | null,
+        $element: JQuery
+    ): void;
 
-    protected abstract handleAfterOpenFolder(node: Node, nextNode: Node | null): void;
+    protected abstract handleAfterOpenFolder(
+        node: Node,
+        nextNode: Node | null
+    ): void;
 
     protected abstract handleFirstNode(node: Node): void;
 }
@@ -447,7 +501,12 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         for (const position of positions) {
             if (position.top !== previousTop && group.length) {
                 if (group.length) {
-                    this.generateHitAreasForGroup(hitAreas, group, previousTop, position.top);
+                    this.generateHitAreasForGroup(
+                        hitAreas,
+                        group,
+                        previousTop,
+                        position.top
+                    );
                 }
 
                 previousTop = position.top;
@@ -457,7 +516,12 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             group.push(position);
         }
 
-        this.generateHitAreasForGroup(hitAreas, group, previousTop, this.treeBottom);
+        this.generateHitAreasForGroup(
+            hitAreas,
+            group,
+            previousTop,
+            this.treeBottom
+        );
 
         return hitAreas;
     }
@@ -478,7 +542,11 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return true;
     }
 
-    protected handleClosedFolder(node: Node, nextNode: Node, $element: JQuery): void {
+    protected handleClosedFolder(
+        node: Node,
+        nextNode: Node,
+        $element: JQuery
+    ): void {
         const top = this.getTop($element);
 
         if (node === this.currentNode) {
@@ -496,7 +564,11 @@ export class HitAreasGenerator extends VisibleNodeIterator {
 
     protected handleFirstNode(node: Node): void {
         if (node !== this.currentNode) {
-            this.addPosition(node, Position.Before, this.getTop(jQuery(node.element)));
+            this.addPosition(
+                node,
+                Position.Before,
+                this.getTop(jQuery(node.element))
+            );
         }
     }
 
@@ -579,11 +651,18 @@ class DragElement {
     private offsetY: number;
     private $element: JQuery;
 
-    constructor(nodeName: string, offsetX: number, offsetY: number, $tree: JQuery) {
+    constructor(
+        nodeName: string,
+        offsetX: number,
+        offsetY: number,
+        $tree: JQuery
+    ) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
 
-        this.$element = jQuery(`<span class=\"jqtree-title jqtree-dragging\">${nodeName}</span>`);
+        this.$element = jQuery(
+            `<span class=\"jqtree-title jqtree-dragging\">${nodeName}</span>`
+        );
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }

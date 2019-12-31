@@ -1,5 +1,5 @@
 import { isInt } from "./util";
-import { ITreeWidget } from "./itree_widget";
+import { ITreeWidget } from "./itreeWidget";
 import { Node, NodeId } from "./node";
 
 export default class SaveStateHandler {
@@ -44,7 +44,8 @@ export default class SaveStateHandler {
             return openNodes;
         };
 
-        const getSelectedNodeIds = (): NodeId[] => this.treeWidget.getSelectedNodes().map((n: Node) => n.id);
+        const getSelectedNodeIds = (): NodeId[] =>
+            this.treeWidget.getSelectedNodes().map((n: Node) => n.id);
 
         /* eslint-disable @typescript-eslint/camelcase */
         return {
@@ -81,7 +82,11 @@ export default class SaveStateHandler {
 
     public setInitialStateOnDemand(state: any, cbFinished: () => void): void {
         if (state) {
-            this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cbFinished);
+            this._setInitialStateOnDemand(
+                state.open_nodes,
+                state.selected_node,
+                cbFinished
+            );
         } else {
             cbFinished();
         }
@@ -165,7 +170,11 @@ export default class SaveStateHandler {
         }
     }
 
-    private _setInitialStateOnDemand(nodeIdsParam: NodeId[], selectedNodes: NodeId[], cbFinished: () => void): void {
+    private _setInitialStateOnDemand(
+        nodeIdsParam: NodeId[],
+        selectedNodes: NodeId[],
+        cbFinished: () => void
+    ): void {
         let loadingCount = 0;
         let nodeIds = nodeIdsParam;
 

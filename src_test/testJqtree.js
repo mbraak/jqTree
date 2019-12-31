@@ -1,9 +1,9 @@
 "use strict";
 exports.__esModule = true;
 require("../src/tree.jquery");
-var utils_for_test_1 = require("./utils_for_test");
+var utilsForTest_1 = require("./utilsForTest");
 var node_1 = require("../src/node");
-require("../src/itree_widget");
+require("../src/itreeWidget");
 var module = QUnit.module, test = QUnit.test;
 module("jqtree", {
     beforeEach: function () {
@@ -18,7 +18,7 @@ module("jqtree", {
 });
 test("create jqtree from data", function (assert) {
     $("#tree1").tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     assert.equal($("#tree1").children().length, 1, "number of children on level 0");
     assert.ok($("#tree1")
@@ -66,22 +66,22 @@ test("toggle", function (assert) {
     var $node1; // eslint-disable-line prefer-const
     var node1; // eslint-disable-line prefer-const
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     $tree.on("tree.open", function () {
-        assert.ok(!utils_for_test_1.isNodeClosed($node1), "node1 is open");
+        assert.ok(!utilsForTest_1.isNodeClosed($node1), "node1 is open");
         // 2. close node1
         $tree.tree("toggle", node1);
     });
     $tree.on("tree.close", function () {
-        assert.ok(utils_for_test_1.isNodeClosed($node1), "node1 is closed");
+        assert.ok(utilsForTest_1.isNodeClosed($node1), "node1 is closed");
         done();
     });
     var tree = $tree.tree("getTree");
     node1 = tree.children[0];
     $node1 = $tree.find("ul.jqtree-tree li:eq(0)");
     // node1 is initially closed
-    assert.ok(utils_for_test_1.isNodeClosed($node1), "node1 is closed");
+    assert.ok(utilsForTest_1.isNodeClosed($node1), "node1 is closed");
     // 1. open node1
     $tree.tree("toggle", node1);
 });
@@ -90,7 +90,7 @@ test("click event", function (assert) {
     // create tree
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         selectable: true
     });
     var $node1 = $tree.find("ul.jqtree-tree li:first");
@@ -132,7 +132,7 @@ test("saveState", function (assert) {
     }
     function createTree() {
         $tree.tree({
-            data: utils_for_test_1.exampleData,
+            data: utilsForTest_1.exampleData,
             saveState: true,
             onSetStateFromStorage: setState,
             onGetStateFromStorage: getState,
@@ -168,7 +168,7 @@ test("getSelectedNode", function (assert) {
     var $tree = $("#tree1");
     // create tree
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         selectable: true
     });
     // there is no node selected
@@ -184,7 +184,7 @@ test("toJson", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     // 1. call toJson
     assert.equal($tree.tree("toJson"), '[{"name":"node1","id":123,"intProperty":1,"strProperty":"1",' +
@@ -201,17 +201,17 @@ test("loadData", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         autoOpen: true
     });
     // first node is 'node1'
     assert.equal($tree.find("> ul > li:first .jqtree-element:first > span").text(), "node1");
     // - load new data
-    $tree.tree("loadData", utils_for_test_1.exampleData2);
+    $tree.tree("loadData", utilsForTest_1.exampleData2);
     // first node is 'main'
     assert.equal($tree.find("> ul > li:first .jqtree-element:first > span").text(), "main");
     // - load new data under node 'child3'
-    $tree.tree("loadData", utils_for_test_1.exampleData);
+    $tree.tree("loadData", utilsForTest_1.exampleData);
     var child3 = $tree.tree("getNodeByName", "child3");
     var data = [
         { name: "c4", id: 200 },
@@ -272,7 +272,7 @@ test("openNode and closeNode", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     var node2 = $tree.tree("getNodeByName", "node2");
     assert.equal(node2.name, "node2");
@@ -280,11 +280,11 @@ test("openNode and closeNode", function (assert) {
     // 1. open node2
     $tree.tree("openNode", node2, false);
     assert.equal(node2.is_open, true);
-    assert.equal(utils_for_test_1.isNodeOpen($(node2.element)), true);
+    assert.equal(utilsForTest_1.isNodeOpen($(node2.element)), true);
     // 2. close node2
     $tree.tree("closeNode", node2, false);
     assert.equal(node2.is_open, false);
-    assert.equal(utils_for_test_1.isNodeClosed($(node2.element)), true);
+    assert.equal(utilsForTest_1.isNodeClosed($(node2.element)), true);
     // 3. open child1
     var node1 = $tree.tree("getNodeByName", "node1");
     var child1 = $tree.tree("getNodeByName", "child1");
@@ -302,7 +302,7 @@ function testOpenNodeWithCallback(slide, includeSlideParam, assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     var node2 = $tree.tree("getNodeByName", "node2");
     // open node2
@@ -332,7 +332,7 @@ test("selectNode", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         selectable: true
     });
     var node1 = $tree.tree("getTree").children[0];
@@ -363,7 +363,7 @@ test("selectNode when another node is selected", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         selectable: true
     });
     var node1 = $tree.tree("getTree").children[0];
@@ -390,10 +390,12 @@ test("click toggler", function (assert) {
     var done = assert.async();
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         selectable: true
     });
-    var $title = $tree.find("li:eq(0)").find("> .jqtree-element > span.jqtree-title");
+    var $title = $tree
+        .find("li:eq(0)")
+        .find("> .jqtree-element > span.jqtree-title");
     assert.equal($title.text(), "node1");
     var $toggler = $title.prev();
     assert.ok($toggler.is("a.jqtree-toggler.jqtree-closed"));
@@ -414,7 +416,7 @@ test("getNodeById", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     var node2 = $tree.tree("getNodeByName", "node2");
     // 1. get 'node2' by id
@@ -511,7 +513,7 @@ test("onCreateLi", function (assert) {
     // 1. init tree with onCreateLi
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         onCreateLi: function (node, $li) {
             var $span = $li.children(".jqtree-element").find("span");
             $span.html("_" + node.name + "_");
@@ -527,7 +529,7 @@ test("save state", function (assert) {
     // 1. init tree
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         selectable: true,
         saveState: "my_tree"
     });
@@ -539,7 +541,7 @@ test("save state", function (assert) {
     // 3. init tree again
     $tree.tree("destroy");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         selectable: true,
         saveState: "my_tree"
     });
@@ -549,7 +551,7 @@ test("generate hit areas", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     // 1. get hit areas
     var node = $tree.tree("getNodeById", 123);
@@ -564,7 +566,7 @@ test("removeNode", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         selectable: true
     });
     // 1. Remove selected node; node is 'child1'
@@ -572,17 +574,17 @@ test("removeNode", function (assert) {
     $tree.tree("selectNode", child1);
     assert.equal($tree.tree("getSelectedNode").name, "child1");
     $tree.tree("removeNode", child1);
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child2 node2 child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child2 node2 child3");
     // getSelectedNode must now return false
     assert.equal($tree.tree("getSelectedNode"), false);
     // 2. No node is selected; remove child3
-    $tree.tree("loadData", utils_for_test_1.exampleData);
+    $tree.tree("loadData", utilsForTest_1.exampleData);
     var child3 = $tree.tree("getNodeByName", "child3");
     $tree.tree("removeNode", child3);
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 node2");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1 child2 node2");
     assert.equal($tree.tree("getSelectedNode"), false);
     // 3. Remove parent of selected node
-    $tree.tree("loadData", utils_for_test_1.exampleData);
+    $tree.tree("loadData", utilsForTest_1.exampleData);
     var child1a = $tree.tree("getNodeByName", "child1");
     var node1 = $tree.tree("getNodeByName", "node1");
     $tree.tree("selectNode", child1a);
@@ -590,27 +592,27 @@ test("removeNode", function (assert) {
     // node is unselected
     assert.equal($tree.tree("getSelectedNode"), false);
     // 4. Remove unselected node without an id
-    $tree.tree("loadData", utils_for_test_1.exampleData2);
+    $tree.tree("loadData", utilsForTest_1.exampleData2);
     var c1 = $tree.tree("getNodeByName", "c1");
     $tree.tree("removeNode", c1);
-    assert.equal(utils_for_test_1.formatTitles($tree), "main c2");
+    assert.equal(utilsForTest_1.formatTitles($tree), "main c2");
 });
 test("appendNode", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     var node1 = $tree.tree("getNodeByName", "node1");
     // 1. Add child3 to node1
     $tree.tree("appendNode", "child3", node1);
-    assert.equal(utils_for_test_1.formatTitles($(node1.element)), "node1 child1 child2 child3");
+    assert.equal(utilsForTest_1.formatTitles($(node1.element)), "node1 child1 child2 child3");
     // 2. Add child4 to child1
     var child1 = $tree.tree("getNodeByName", "child1");
     // Node 'child1' does not have a toggler button
     assert.equal($(child1.element).find("> .jqtree-element > .jqtree-toggler").length, 0);
     $tree.tree("appendNode", "child4", child1);
-    assert.equal(utils_for_test_1.formatTitles($(child1.element)), "child1 child4");
+    assert.equal(utilsForTest_1.formatTitles($(child1.element)), "child1 child4");
     // Node 'child1' must get a toggler button
     assert.equal($(child1.element).find("> .jqtree-element > .jqtree-toggler").length, 1);
 });
@@ -618,12 +620,12 @@ test("prependNode", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     var node1 = $tree.tree("getNodeByName", "node1");
     // 1. Prepend child0 to node1
     $tree.tree("prependNode", "child0", node1);
-    assert.equal(utils_for_test_1.formatTitles($(node1.element)), "node1 child0 child1 child2");
+    assert.equal(utilsForTest_1.formatTitles($(node1.element)), "node1 child0 child1 child2");
 });
 test("init event for local data", function (assert) {
     // setup
@@ -636,7 +638,7 @@ test("init event for local data", function (assert) {
     });
     // init tree
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
 });
 test("init event for ajax", function (assert) {
@@ -645,7 +647,7 @@ test("init event for ajax", function (assert) {
     var $tree = $("#tree1");
     $.mockjax({
         url: "/tree/",
-        responseText: utils_for_test_1.exampleData,
+        responseText: utilsForTest_1.exampleData,
         logging: false
     });
     $tree.on("tree.init", function () {
@@ -660,19 +662,19 @@ test("init event for ajax", function (assert) {
 test("updateNode", function (assert) {
     // setup
     var $tree = $("#tree1");
-    $tree.tree({ data: utils_for_test_1.exampleData });
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 node2 child3");
+    $tree.tree({ data: utilsForTest_1.exampleData });
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1 child2 node2 child3");
     // -- update name
     var node2 = $tree.tree("getNodeByName", "node2");
     $tree.tree("updateNode", node2, "CHANGED");
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 CHANGED child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1 child2 CHANGED child3");
     assert.equal(node2.name, "CHANGED");
     // -- update data
     $tree.tree("updateNode", node2, {
         name: "xyz",
         tag1: "abc"
     });
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 xyz child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1 child2 xyz child3");
     assert.equal(node2.name, "xyz");
     assert.equal(node2.tag1, "abc");
     // - update id
@@ -688,7 +690,7 @@ test("updateNode", function (assert) {
     // update child1
     var child1 = $tree.tree("getNodeByName", "child1");
     $tree.tree("updateNode", child1, "child1a");
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1a child2 xyz child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1a child2 xyz child3");
     // select child1
     $tree.tree("selectNode", child1);
     $tree.tree("updateNode", child1, "child1b");
@@ -699,26 +701,26 @@ test("updateNode", function (assert) {
         name: "child1",
         children: [{ id: 5, name: "child1-1" }]
     });
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child1-1 child2 xyz child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1 child1-1 child2 xyz child3");
     // remove children
     $tree.tree("updateNode", child1, {
         id: child1.id,
         name: "child1",
         children: []
     });
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 xyz child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1 child2 xyz child3");
 });
 test("moveNode", function (assert) {
     // setup
     var $tree = $("#tree1");
-    $tree.tree({ data: utils_for_test_1.exampleData });
+    $tree.tree({ data: utilsForTest_1.exampleData });
     var child1 = $tree.tree("getNodeByName", "child1");
     var child2 = $tree.tree("getNodeByName", "child2");
     var node1 = $tree.tree("getNodeByName", "node1");
     var node2 = $tree.tree("getNodeByName", "node2");
     // -- Move child1 after node2
     $tree.tree("moveNode", child1, node2, "after");
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child2 node2 child3 child1");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child2 node2 child3 child1");
     // -- Check that illegal moves are skipped
     $tree.tree("moveNode", node1, child2, "inside");
 });
@@ -754,45 +756,45 @@ test("load on demand", function (assert) {
     // -- open node
     function handleOpenNode(node) {
         assert.equal(node.name, "node1");
-        assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1", "4");
+        assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1", "4");
         done();
     }
     var node1 = $tree.tree("getNodeByName", "node1");
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1", "1");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1", "1");
     $tree.tree("openNode", node1, handleOpenNode);
 });
 test("addNodeAfter", function (assert) {
     // setup
     var $tree = $("#tree1");
-    $tree.tree({ data: utils_for_test_1.exampleData });
+    $tree.tree({ data: utilsForTest_1.exampleData });
     var node1 = $tree.tree("getNodeByName", "node1");
     // -- add node after node1
     $tree.tree("addNodeAfter", "node3", node1);
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 node3 node2 child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1 child2 node3 node2 child3");
 });
 test("addNodeBefore", function (assert) {
     // setup
     var $tree = $("#tree1");
-    $tree.tree({ data: utils_for_test_1.exampleData });
+    $tree.tree({ data: utilsForTest_1.exampleData });
     var node1 = $tree.tree("getNodeByName", "node1");
     // -- add node before node1
     $tree.tree("addNodeBefore", "node3", node1);
-    assert.equal(utils_for_test_1.formatTitles($tree), "node3 node1 child1 child2 node2 child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node3 node1 child1 child2 node2 child3");
 });
 test("addParentNode", function (assert) {
     // setup
     var $tree = $("#tree1");
-    $tree.tree({ data: utils_for_test_1.exampleData });
+    $tree.tree({ data: utilsForTest_1.exampleData });
     var child3 = $tree.tree("getNodeByName", "child3");
     // -- add parent to child3
     $tree.tree("addParentNode", "node3", child3);
-    assert.equal(utils_for_test_1.formatTitles($tree), "node1 child1 child2 node2 node3 child3");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node1 child1 child2 node2 node3 child3");
 });
 test("mouse events", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData,
+        data: utilsForTest_1.exampleData,
         dragAndDrop: true,
         autoOpen: true
     });
@@ -819,12 +821,12 @@ test("mouse events", function (assert) {
         pageY: child3Offset.top
     }));
     $tree.trigger("mouseup");
-    assert.equal(utils_for_test_1.formatTitles($tree), "node2 child3 node1 child1 child2");
+    assert.equal(utilsForTest_1.formatTitles($tree), "node2 child3 node1 child1 child2");
 });
 test("multiple select", function (assert) {
     // setup
     var $tree = $("#tree1");
-    $tree.tree({ data: utils_for_test_1.exampleData });
+    $tree.tree({ data: utilsForTest_1.exampleData });
     var child1 = $tree.tree("getNodeByName", "child1");
     var child2 = $tree.tree("getNodeByName", "child2");
     // -- add nodes to selection
@@ -834,7 +836,7 @@ test("multiple select", function (assert) {
     $tree.tree("addToSelection", child2);
     // -- get selected nodes
     var selectedNodes = $tree.tree("getSelectedNodes");
-    assert.equal(utils_for_test_1.formatNodes(selectedNodes), "child1 child2");
+    assert.equal(utilsForTest_1.formatNodes(selectedNodes), "child1 child2");
 });
 test("keyboard", function (assert) {
     // setup
@@ -842,7 +844,7 @@ test("keyboard", function (assert) {
     function keyDown(key) {
         $tree.trigger($.Event("keydown", { which: key }));
     }
-    $tree.tree({ data: utils_for_test_1.exampleData });
+    $tree.tree({ data: utilsForTest_1.exampleData });
     var node1 = $tree.tree("getNodeByName", "node1");
     // select node1
     $tree.tree("selectNode", node1);
@@ -872,7 +874,7 @@ test("getNodesByProperty", function (assert) {
     // setup
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     var node2 = $tree.tree("getNodeByName", "node2");
     // 1. get 'node1' by property
@@ -956,7 +958,7 @@ test("dataUrl is function", function (assert) {
 test("getNodeByHtmlElement", function (assert) {
     var $tree = $("#tree1");
     $tree.tree({
-        data: utils_for_test_1.exampleData
+        data: utilsForTest_1.exampleData
     });
     var $el = $(".jqtree-title");
     // Get node for jquery element
