@@ -593,7 +593,7 @@ class JqTreeWidget extends MouseWidget {
     }
 
     public _getScrollLeft(): number {
-        return (this.scrollHandler && this.scrollHandler.getScrollLeft()) || 0;
+        return this?.scrollHandler?.getScrollLeft() || 0;
     }
 
     protected init(): void {
@@ -722,7 +722,7 @@ class JqTreeWidget extends MouseWidget {
         };
 
         const setUrlInfoData = (urlInfo: any): void => {
-            if (node && node.id) {
+            if (node?.id) {
                 // Load on demand of a subtree; add node parameter
                 const data = { node: node.id };
                 urlInfo["data"] = data;
@@ -940,7 +940,7 @@ class JqTreeWidget extends MouseWidget {
     private handleDblclick = (e: JQuery.Event): void => {
         const clickTarget = this.getClickTarget((e as any).target);
 
-        if (clickTarget && clickTarget.type === "label") {
+        if (clickTarget?.type === "label") {
             this._triggerEvent("tree.dblclick", {
                 node: clickTarget.node,
                 click_event: e // eslint-disable-line @typescript-eslint/camelcase
@@ -1047,7 +1047,7 @@ class JqTreeWidget extends MouseWidget {
         } else {
             const dataRtl = this.element.data("rtl");
 
-            if (dataRtl != null && dataRtl !== false) {
+            if (dataRtl !== null && dataRtl !== false) {
                 return true;
             } else {
                 return false;
