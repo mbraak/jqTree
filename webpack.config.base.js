@@ -60,9 +60,10 @@ module.exports = function(debug, minimize) {
     };
 
     if (debug) {
-        config["devtool"] = "source-map";
+        config["devtool"] = "eval";
         config["watch"] = true;
     } else {
+        config["devtool"] = "source-map";
         config["plugins"] = [new webpack.BannerPlugin(getHeader())];
     }
 
