@@ -1,27 +1,27 @@
-var fs = require("fs");
-var path = require("path");
-var webpack = require("webpack");
-var template = require("lodash.template");
-var jsonfile = require("jsonfile");
+const fs = require("fs");
+const path = require("path");
+const webpack = require("webpack");
+const template = require("lodash.template");
+const jsonfile = require("jsonfile");
 
 module.exports = function(debug, minimize) {
     function getHeader() {
         if (debug) {
             return "";
         } else {
-            var header_template = fs.readFileSync("./src/header.txt", "utf8");
-            var package = jsonfile.readFileSync("package.json");
+            const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");
+            const package = jsonfile.readFileSync("package.json");
 
-            var data = {
+            const data = {
                 version: package.version,
                 year: new Date().getFullYear()
             };
 
-            return template(header_template)(data);
+            return template(headerTemplate)(data);
         }
     }
 
-    var config = {
+    const config = {
         entry: {
             "tree.jquery": ["./src/tree.jquery.ts"],
             test: ["./src_test/test.ts"]
