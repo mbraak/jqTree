@@ -1,7 +1,7 @@
 /*!
  * JqTree 1.4.12
  * 
- * Copyright 2019 Marco Braak
+ * Copyright 2020 Marco Braak
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
