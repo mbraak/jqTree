@@ -1,5 +1,5 @@
 import { Node, NodeId, Position } from "./node";
-import { IPositionInfo } from "./imouse_widget";
+import { IPositionInfo } from "./imouseWidget";
 
 export type IconElement = Text | Element;
 

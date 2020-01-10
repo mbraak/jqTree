@@ -153,7 +153,7 @@ export class Node {
     */
     public addChild(node: Node): void {
         this.children.push(node);
-        node._setParent(this);
+        node.setParent(this);
     }
 
     /*
@@ -166,7 +166,7 @@ export class Node {
     */
     public addChildAtPosition(node: Node, index: number): void {
         this.children.splice(index, 0, node);
-        node._setParent(this);
+        node.setParent(this);
     }
 
     /*
@@ -178,7 +178,7 @@ export class Node {
         // remove children from the index
         node.removeChildren();
 
-        this._removeChild(node);
+        this.doRemoveChild(node);
     }
 
     /*
@@ -252,15 +252,21 @@ export class Node {
             // - Or, parent is empty
             return;
         } else {
-            movedNode.parent._removeChild(movedNode);
+            movedNode.parent.doRemoveChild(movedNode);
 
             if (position === Position.After) {
                 if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
+                    targetNode.parent.addChildAtPosition(
+                        movedNode,
+                        targetNode.parent.getChildIndex(targetNode) + 1
+                    );
                 }
             } else if (position === Position.Before) {
                 if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+                    targetNode.parent.addChildAtPosition(
+                        movedNode,
+                        targetNode.parent.getChildIndex(targetNode)
+                    );
                 }
             } else if (position === Position.Inside) {
                 // move inside as first child
@@ -279,7 +285,13 @@ export class Node {
 
                 for (const k in node) {
                     if (
-                        ["parent", "children", "element", "tree", "isEmptyFolder"].indexOf(k) === -1 &&
+                        [
+                            "parent",
+                            "children",
+                            "element",
+                            "tree",
+                            "isEmptyFolder"
+                        ].indexOf(k) === -1 &&
                         Object.prototype.hasOwnProperty.call(node, k)
                     ) {
                         const v = node[k];
@@ -330,7 +342,11 @@ export class Node {
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
 
-            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+            if (
+                typeof nodeInfo === "object" &&
+                nodeInfo["children"] &&
+                nodeInfo["children"].length
+            ) {
                 node.loadFromData(nodeInfo["children"]);
             }
 
@@ -347,7 +363,11 @@ export class Node {
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
 
-            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+            if (
+                typeof nodeInfo === "object" &&
+                nodeInfo["children"] &&
+                nodeInfo["children"].length
+            ) {
                 node.loadFromData(nodeInfo["children"]);
             }
 
@@ -359,8 +379,8 @@ export class Node {
         if (!this.parent) {
             return null;
         } else {
-            const newParent = new this.tree.nodeClass(nodeInfo);
-            newParent._setParent(this.tree);
+            const newParent: Node = new this.tree.nodeClass(nodeInfo);
+            newParent.setParent(this.tree);
             const originalParent = this.parent;
 
             for (const child of originalParent.children) {
@@ -384,7 +404,11 @@ export class Node {
         const node = new this.tree.nodeClass(nodeInfo);
         this.addChild(node);
 
-        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+        if (
+            typeof nodeInfo === "object" &&
+            nodeInfo["children"] &&
+            nodeInfo["children"].length
+        ) {
             node.loadFromData(nodeInfo["children"]);
         }
 
@@ -395,7 +419,11 @@ export class Node {
         const node = new this.tree.nodeClass(nodeInfo);
         this.addChildAtPosition(node, 0);
 
-        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+        if (
+            typeof nodeInfo === "object" &&
+            nodeInfo["children"] &&
+            nodeInfo["children"].length
+        ) {
             node.loadFromData(nodeInfo["children"]);
         }
 
@@ -523,7 +551,10 @@ export class Node {
         } else {
             const previousSibling = this.getPreviousSibling();
             if (previousSibling) {
-                if (!previousSibling.hasChildren() || !previousSibling.is_open) {
+                if (
+                    !previousSibling.hasChildren() ||
+                    !previousSibling.is_open
+                ) {
                     // Previous sibling
                     return previousSibling;
                 } else {
@@ -582,13 +613,13 @@ export class Node {
         addNode(data);
     }
 
-    private _setParent(parent: Node): void {
+    private setParent(parent: Node): void {
         this.parent = parent;
         this.tree = parent.tree;
         this.tree.addNodeToIndex(this);
     }
 
-    private _removeChild(node: Node): void {
+    private doRemoveChild(node: Node): void {
         this.children.splice(this.getChildIndex(node), 1);
         this.tree.removeNodeFromIndex(node);
     }
