@@ -1,10 +1,10 @@
 export default class SimpleWidget {
     [key: string]: any;
 
-    public static register(widgetClass: any, widgetName: string) {
-        const getDataKey = () => `simple_widget_${widgetName}`;
+    public static register(widgetClass: any, widgetName: string): void {
+        const getDataKey = (): string => `simple_widget_${widgetName}`;
 
-        function getWidgetData(el: Element, dataKey: string) {
+        function getWidgetData(el: Element, dataKey: string): SimpleWidget | null {
             const widget = jQuery.data(el, dataKey);
 
             if (widget && widget instanceof SimpleWidget) {
@@ -14,7 +14,7 @@ export default class SimpleWidget {
             }
         }
 
-        function createWidget($el: JQuery, options: object) {
+        function createWidget($el: JQuery, options: object): JQuery<any> {
             const dataKey = getDataKey();
 
             for (const el of $el.get()) {
@@ -35,7 +35,7 @@ export default class SimpleWidget {
             return $el;
         }
 
-        function destroyWidget($el: JQuery) {
+        function destroyWidget($el: JQuery): void {
             const dataKey = getDataKey();
 
             for (const el of $el.get()) {
@@ -49,11 +49,7 @@ export default class SimpleWidget {
             }
         }
 
-        function callFunction(
-            $el: JQuery,
-            functionName: string,
-            args: any[]
-        ): any {
+        function callFunction($el: JQuery, functionName: string, args: any[]): any {
             let result = null;
 
             for (const el of $el.get()) {
@@ -62,10 +58,7 @@ export default class SimpleWidget {
                 if (widget && widget instanceof SimpleWidget) {
                     const widgetFunction = widget[functionName];
 
-                    if (
-                        widgetFunction &&
-                        typeof widgetFunction === "function"
-                    ) {
+                    if (widgetFunction && typeof widgetFunction === "function") {
                         result = widgetFunction.apply(widget, args);
                     }
                 }
@@ -74,26 +67,19 @@ export default class SimpleWidget {
             return result;
         }
 
-        // tslint:disable-next-line: only-arrow-functions
-        (jQuery.fn as any)[widgetName] = function(
-            this: JQuery,
-            argument1: any,
-            ...args: any[]
-        ) {
-            const $el = this;
-
+        (jQuery.fn as any)[widgetName] = function(this: JQuery, argument1: any, ...args: any[]): any {
             if (argument1 === undefined || typeof argument1 === "object") {
                 const options = argument1;
-                return createWidget($el, options);
+                return createWidget(this, options);
             } else if (typeof argument1 === "string" && argument1[0] !== "_") {
                 const functionName = argument1;
 
                 if (functionName === "destroy") {
-                    return destroyWidget($el);
+                    return destroyWidget(this);
                 } else if (functionName === "get_widget_class") {
                     return widgetClass;
                 } else {
-                    return callFunction($el, functionName, args);
+                    return callFunction(this, functionName, args);
                 }
             }
         };
@@ -112,15 +98,15 @@ export default class SimpleWidget {
         this.options = jQuery.extend({}, defaults, options);
     }
 
-    public destroy() {
+    public destroy(): void {
         this._deinit();
     }
 
-    protected _init() {
+    protected _init(): void {
         //
     }
 
-    protected _deinit() {
+    protected _deinit(): void {
         //
     }
 }

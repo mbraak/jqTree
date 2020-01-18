@@ -10,15 +10,11 @@ export default class ElementsRenderer {
     constructor(treeWidget: ITreeWidget) {
         this.treeWidget = treeWidget;
 
-        this.openedIconElement = this.createButtonElement(
-            treeWidget.options.openedIcon
-        );
-        this.closedIconElement = this.createButtonElement(
-            treeWidget.options.closedIcon
-        );
+        this.openedIconElement = this.createButtonElement(treeWidget.options.openedIcon);
+        this.closedIconElement = this.createButtonElement(treeWidget.options.closedIcon);
     }
 
-    public render(fromNode: Node | null) {
+    public render(fromNode: Node | null): void {
         if (fromNode && fromNode.parent) {
             this.renderFromNode(fromNode);
         } else {
@@ -26,19 +22,14 @@ export default class ElementsRenderer {
         }
     }
 
-    public renderFromRoot() {
+    public renderFromRoot(): void {
         const $element = this.treeWidget.element;
         $element.empty();
 
-        this.createDomElements(
-            $element[0],
-            this.treeWidget.tree.children,
-            true,
-            1
-        );
+        this.createDomElements($element[0], this.treeWidget.tree.children, true, 1);
     }
 
-    public renderFromNode(node: Node) {
+    public renderFromNode(node: Node): void {
         // remember current li
         const $previousLi = jQuery(node.element);
 
@@ -54,21 +45,11 @@ export default class ElementsRenderer {
 
         // create children
         if (node.children) {
-            this.createDomElements(
-                li,
-                node.children,
-                false,
-                node.getLevel() + 1
-            );
+            this.createDomElements(li, node.children, false, node.getLevel() + 1);
         }
     }
 
-    private createDomElements(
-        element: Element,
-        children: Node[],
-        isRootNode: boolean,
-        level: number
-    ) {
+    private createDomElements(element: Element, children: Node[], isRootNode: boolean, level: number): void {
         const ul = this.createUl(isRootNode);
         element.appendChild(ul);
 
@@ -84,12 +65,12 @@ export default class ElementsRenderer {
         }
     }
 
-    private attachNodeData(node: Node, li: Element) {
+    private attachNodeData(node: Node, li: Element): void {
         node.element = li;
         jQuery(li).data("node", node);
     }
 
-    private createUl(isRootNode: boolean) {
+    private createUl(isRootNode: boolean): HTMLUListElement {
         let classString;
         let role;
 
@@ -113,13 +94,14 @@ export default class ElementsRenderer {
         return ul;
     }
 
-    private createLi(node: Node, level: number) {
+    private createLi(node: Node, level: number): HTMLLIElement {
         const isSelected = Boolean(
-            this.treeWidget.selectNodeHandler &&
-                this.treeWidget.selectNodeHandler.isNodeSelected(node)
+            this.treeWidget.selectNodeHandler && this.treeWidget.selectNodeHandler.isNodeSelected(node)
         );
 
-        const li = node.isFolder()
+        const mustShowFolder = node.isFolder() || (node.isEmptyFolder && this.treeWidget.options.showEmptyFolder);
+
+        const li = mustShowFolder
             ? this.createFolderLi(node, level, isSelected)
             : this.createNodeLi(node, level, isSelected);
 
@@ -130,13 +112,11 @@ export default class ElementsRenderer {
         return li;
     }
 
-    private createFolderLi(node: Node, level: number, isSelected: boolean) {
+    private createFolderLi(node: Node, level: number, isSelected: boolean): HTMLLIElement {
         const buttonClasses = this.getButtonClasses(node);
         const folderClasses = this.getFolderClasses(node, isSelected);
 
-        const iconElement = node.is_open
-            ? this.openedIconElement
-            : this.closedIconElement;
+        const iconElement = node.is_open ? this.openedIconElement : this.closedIconElement;
 
         // li
         const li = document.createElement("li");
@@ -164,15 +144,7 @@ export default class ElementsRenderer {
         }
 
         // title span
-        div.appendChild(
-            this.createTitleSpan(
-                node.name,
-                level,
-                isSelected,
-                node.is_open,
-                true
-            )
-        );
+        div.appendChild(this.createTitleSpan(node.name, level, isSelected, node.is_open, true));
 
         if (!this.treeWidget.options.buttonLeft) {
             div.appendChild(buttonLink);
@@ -181,7 +153,7 @@ export default class ElementsRenderer {
         return li;
     }
 
-    private createNodeLi(node: Node, level: number, isSelected: boolean) {
+    private createNodeLi(node: Node, level: number, isSelected: boolean): HTMLLIElement {
         const liClasses = ["jqtree_common"];
 
         if (isSelected) {
@@ -203,15 +175,7 @@ export default class ElementsRenderer {
         li.appendChild(div);
 
         // title span
-        div.appendChild(
-            this.createTitleSpan(
-                node.name,
-                level,
-                isSelected,
-                node.is_open,
-                false
-            )
-        );
+        div.appendChild(this.createTitleSpan(node.name, level, isSelected, node.is_open, false));
 
         return li;
     }
@@ -222,7 +186,7 @@ export default class ElementsRenderer {
         isSelected: boolean,
         isOpen: boolean,
         isFolder: boolean
-    ) {
+    ): HTMLSpanElement {
         const titleSpan = document.createElement("span");
 
         let classes = "jqtree-title jqtree_common";
@@ -240,10 +204,7 @@ export default class ElementsRenderer {
         titleSpan.setAttribute("aria-expanded", getBoolString(isOpen));
 
         if (isSelected) {
-            titleSpan.setAttribute(
-                "tabindex",
-                this.treeWidget.options.tabIndex
-            );
+            titleSpan.setAttribute("tabindex", this.treeWidget.options.tabIndex);
         }
 
         titleSpan.innerHTML = this.escapeIfNecessary(nodeName);
@@ -251,7 +212,7 @@ export default class ElementsRenderer {
         return titleSpan;
     }
 
-    private getButtonClasses(node: Node) {
+    private getButtonClasses(node: Node): string {
         const classes = ["jqtree-toggler", "jqtree_common"];
 
         if (!node.is_open) {

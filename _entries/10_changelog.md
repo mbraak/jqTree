@@ -3,19 +3,24 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.4.12 (november 11 2019)
+
+-   Issue #579: have icon for empty folders (thanks to Andrew Hinde)
+-   Issue #583: improve performance of deleting a node (thanks to maltmann-muc)
+
 ##### 1.4.11 (july 22 2019)
 
 -   Issue #571: add options to selectNode
 
 ##### 1.4.10 (april 6 2019)
 
--   Issue #554: fix wrapping of long node titles
--   Issue #557: devserver serves from root
+-   Issue #554: fix wrapping of long node titles (thanks to Damian Kulp)
+-   Issue #557: devserver serves from root (thanks to Aaron Gray)
 -   Issue #558: check for null parameters
 
 ##### 1.4.9 (september 9 2018)
 
--   Issue #532: add tree.loading_data event
+-   Issue #532: add tree.loading_data event (thanks to Theo Bot)
 
 ##### 1.4.8 (july 23 2018)
 

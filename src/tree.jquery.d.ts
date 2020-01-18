@@ -6,6 +6,7 @@ interface INode {
     is_open: boolean;
     element: Element;
     load_on_demand: boolean | null;
+    isEmptyFolder: boolean;
 
     [key: string]: any;
 
@@ -27,12 +28,12 @@ interface IJQTreeOptions {
     keyboardSupport?: boolean;
     onCanMove?: (node: INode) => boolean;
     onCanSelectNode?: (node: INode) => boolean;
-    onCreateLi?: (node: INode, el: JQuery, is_selected: boolean) => void;
+    onCreateLi?: (node: INode, el: JQuery, isSelected: boolean) => void;
     onDragMove?: (node: INode, event: JQueryEventObject | Touch) => void;
     onDragStop?: (node: INode, event: JQueryEventObject | Touch) => void;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: any) => void;
-    onLoading?: (is_loading: boolean, node: INode, $el: JQuery) => void;
+    onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => any;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: string | Element;
@@ -41,6 +42,7 @@ interface IJQTreeOptions {
     selectable?: boolean;
     saveState?: boolean | string;
     slide?: boolean;
+    showEmptyFolder?: boolean;
     tabIndex?: number;
     useContextMenu?: boolean;
 }
@@ -48,21 +50,9 @@ interface IJQTreeOptions {
 interface IJQTreePlugin {
     (): JQuery;
     (options: IJQTreeOptions): JQuery;
-    (
-        behavior: "addNodeAfter",
-        newNodeInfo: any,
-        existingNode: INode
-    ): INode | null;
-    (
-        behavior: "addNodeBefore",
-        newNodeInfo: any,
-        existingNode: INode
-    ): Node | null;
-    (
-        behavior: "addParentNode",
-        newNodeInfo: any,
-        existingNode: INode
-    ): INode | null;
+    (behavior: "addNodeAfter", newNodeInfo: any, existingNode: INode): INode | null;
+    (behavior: "addNodeBefore", newNodeInfo: any, existingNode: INode): Node | null;
+    (behavior: "addParentNode", newNodeInfo: any, existingNode: INode): INode | null;
     (behavior: "addToSelection", node: INode, mustSetFocus?: boolean): JQuery;
     (behavior: "appendNode", newNodeInfo: any, parentNode?: INode): INode;
     (behavior: "closeNode", node: INode, slide?: boolean): JQuery;
@@ -76,25 +66,11 @@ interface IJQTreePlugin {
     (behavior: "getTree"): INode;
     (behavior: "isNodeSelected", node: INode): boolean;
     (behavior: "loadData", data: any, parentNode?: INode): JQuery;
-    (
-        behavior: "moveNode",
-        node: INode,
-        targetNode: INode,
-        position: string
-    ): JQuery;
+    (behavior: "moveNode", node: INode, targetNode: INode, position: string): JQuery;
     (behavior: "openNode", node: INode): JQuery;
     (behavior: "openNode", node: INode, slide: boolean): JQuery;
-    (
-        behavior: "openNode",
-        node: INode,
-        onFinished: (node: INode) => void
-    ): JQuery;
-    (
-        behavior: "openNode",
-        node: INode,
-        slide: boolean,
-        onFinished?: (node: INode) => void
-    ): JQuery;
+    (behavior: "openNode", node: INode, onFinished: (node: INode) => void): JQuery;
+    (behavior: "openNode", node: INode, slide: boolean, onFinished?: (node: INode) => void): JQuery;
     (behavior: "prependNode", newNodeInfo: any, parentNode?: INode): INode;
     (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
@@ -106,7 +82,6 @@ interface IJQTreePlugin {
     (behavior: "updateNode", node: INode, data: any): JQuery;
 }
 
-// tslint:disable-next-line: interface-name
 interface JQuery {
     tree: IJQTreePlugin;
 }

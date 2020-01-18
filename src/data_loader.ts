@@ -10,11 +10,7 @@ export default class DataLoader {
         this.treeWidget = treeWidget;
     }
 
-    public loadFromUrl(
-        urlInfo: any,
-        parentNode: Node | null,
-        onFinished: HandleFinishedLoading | null
-    ) {
+    public loadFromUrl(urlInfo: any, parentNode: Node | null, onFinished: HandleFinishedLoading | null): void {
         if (!urlInfo) {
             return;
         }
@@ -23,12 +19,12 @@ export default class DataLoader {
         this.addLoadingClass($el);
         this.notifyLoading(true, parentNode, $el);
 
-        const stopLoading = () => {
+        const stopLoading = (): void => {
             this.removeLoadingClass($el);
             this.notifyLoading(false, parentNode, $el);
         };
 
-        const handleSuccess = (data: any) => {
+        const handleSuccess = (data: any): void => {
             stopLoading();
             this.treeWidget.loadData(this.parseData(data), parentNode);
 
@@ -37,7 +33,7 @@ export default class DataLoader {
             }
         };
 
-        const handleError = (jqXHR: any) => {
+        const handleError = (jqXHR: any): void => {
             stopLoading();
 
             const { onLoadFailed } = this.treeWidget.options;
@@ -50,13 +46,13 @@ export default class DataLoader {
         this.submitRequest(urlInfo, handleSuccess, handleError);
     }
 
-    private addLoadingClass($el: JQuery<any>) {
+    private addLoadingClass($el: JQuery<any>): void {
         if ($el) {
             $el.addClass("jqtree-loading");
         }
     }
 
-    private removeLoadingClass($el: JQuery<any>) {
+    private removeLoadingClass($el: JQuery<any>): void {
         if ($el) {
             $el.removeClass("jqtree-loading");
         }
@@ -70,7 +66,7 @@ export default class DataLoader {
         }
     }
 
-    private notifyLoading(isLoading: boolean, node: Node | null, $el: JQuery) {
+    private notifyLoading(isLoading: boolean, node: Node | null, $el: JQuery): void {
         const { onLoading } = this.treeWidget.options;
 
         if (onLoading) {
@@ -88,7 +84,7 @@ export default class DataLoader {
         urlInfo: any,
         handleSuccess: JQuery.Ajax.SuccessCallback<any>,
         handleError: JQuery.Ajax.ErrorCallback<any>
-    ) {
+    ): void {
         const ajaxSettings = jQuery.extend(
             { method: "GET" },
             typeof urlInfo === "string" ? { url: urlInfo } : urlInfo,
@@ -109,11 +105,7 @@ export default class DataLoader {
         const { dataFilter } = this.treeWidget.options;
 
         const parsedData =
-            data instanceof Array || typeof data === "object"
-                ? data
-                : data != null
-                    ? jQuery.parseJSON(data)
-                    : [];
+            data instanceof Array || typeof data === "object" ? data : data != null ? jQuery.parseJSON(data) : [];
 
         return dataFilter ? dataFilter(parsedData) : parsedData;
     }
