@@ -22,7 +22,8 @@
         "jekyll-serve": "bundle exec jekyll serve",
         "devserver": "webpack-dev-server --mode development",
         "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
-        "coveralls": "coveralls < coverage/lcov.info"
+        "coveralls": "coveralls < coverage/lcov.info",
+        "tsc": "tsc --noEmit --project tsconfig.json"
     },
     "dependencies": {
         "jquery": ">=1.9"

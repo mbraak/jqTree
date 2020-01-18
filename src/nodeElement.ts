@@ -1,5 +1,10 @@
 import { Position, Node } from "./node";
-import { ITreeWidget, IDropHint, INodeElement, OnFinishOpenNode } from "./itree_widget";
+import {
+    ITreeWidget,
+    IDropHint,
+    INodeElement,
+    OnFinishOpenNode
+} from "./itreeWidget";
 
 export class NodeElement implements INodeElement {
     public node: Node;
@@ -23,7 +28,10 @@ export class NodeElement implements INodeElement {
 
     public addDropHint(position: number): IDropHint {
         if (this.mustShowBorderDropHint(position)) {
-            return new BorderDropHint(this.$element, this.treeWidget._getScrollLeft());
+            return new BorderDropHint(
+                this.$element,
+                this.treeWidget._getScrollLeft()
+            );
         } else {
             return new GhostDropHint(this.node, this.$element, position);
         }
@@ -60,7 +68,9 @@ export class NodeElement implements INodeElement {
     }
 
     protected getSpan(): JQuery<any> {
-        return this.$element.children(".jqtree-element").find("span.jqtree-title");
+        return this.$element
+            .children(".jqtree-element")
+            .find("span.jqtree-title");
     }
 
     protected getLi(): JQuery<any> {
@@ -73,7 +83,11 @@ export class NodeElement implements INodeElement {
 }
 
 export class FolderElement extends NodeElement {
-    public open(onFinished: OnFinishOpenNode | null, slide = true, animationSpeed = "fast"): void {
+    public open(
+        onFinished: OnFinishOpenNode | null,
+        slide = true,
+        animationSpeed = "fast"
+    ): void {
         if (this.node.is_open) {
             return;
         }
@@ -87,7 +101,9 @@ export class FolderElement extends NodeElement {
         const buttonEl = $button.get(0);
 
         if (buttonEl) {
-            const icon = this.treeWidget.renderer.openedIconElement.cloneNode(true);
+            const icon = this.treeWidget.renderer.openedIconElement.cloneNode(
+                true
+            );
 
             buttonEl.appendChild(icon);
         }
@@ -130,7 +146,9 @@ export class FolderElement extends NodeElement {
         const buttonEl = $button.get(0);
 
         if (buttonEl) {
-            const icon = this.treeWidget.renderer.closedIconElement.cloneNode(true);
+            const icon = this.treeWidget.renderer.closedIconElement.cloneNode(
+                true
+            );
 
             buttonEl.appendChild(icon);
         }
@@ -160,7 +178,9 @@ export class FolderElement extends NodeElement {
     }
 
     private getButton(): JQuery {
-        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
+        return this.$element
+            .children(".jqtree-element")
+            .find("a.jqtree-toggler");
     }
 }
 
