@@ -1,7 +1,7 @@
 /*!
  * JqTree 1.4.12
  * 
- * Copyright 2019 Marco Braak
+ * Copyright 2020 Marco Braak
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -858,9 +858,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
             }
         };
         _this.handleDblclick = function (e) {
-            var _a;
             var clickTarget = _this.getClickTarget(e.target);
-            if (((_a = clickTarget) === null || _a === void 0 ? void 0 : _a.type) === "label") {
+            if ((clickTarget === null || clickTarget === void 0 ? void 0 : clickTarget.type) === "label") {
                 _this._triggerEvent("tree.dblclick", {
                     node: clickTarget.node,
                     click_event: e // eslint-disable-line @typescript-eslint/camelcase
@@ -1265,8 +1264,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return node != null && node.tree === this.tree;
     };
     JqTreeWidget.prototype._getScrollLeft = function () {
-        var _a, _b;
-        return ((_b = (_a = this) === null || _a === void 0 ? void 0 : _a.scrollHandler) === null || _b === void 0 ? void 0 : _b.getScrollLeft()) || 0;
+        var _a;
+        return ((_a = this === null || this === void 0 ? void 0 : this.scrollHandler) === null || _a === void 0 ? void 0 : _a.getScrollLeft()) || 0;
     };
     JqTreeWidget.prototype.init = function () {
         _super.prototype.init.call(this);
@@ -1375,8 +1374,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return urlInfo;
         };
         var setUrlInfoData = function (urlInfo) {
-            var _a;
-            if ((_a = node) === null || _a === void 0 ? void 0 : _a.id) {
+            if (node === null || node === void 0 ? void 0 : node.id) {
                 // Load on demand of a subtree; add node parameter
                 var data = { node: node.id };
                 urlInfo["data"] = data;
