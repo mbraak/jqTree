@@ -29,7 +29,7 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
-        "@types/jquery": "^3.3.33",
+        "@types/jquery": "^3.3.34",
         "@types/jquery-mockjax": "^2.0.31",
         "@types/qunit": "^2.9.0",
         "@typescript-eslint/eslint-plugin": "^2.25.0",
