@@ -1,37 +1,37 @@
-var fs = require("fs");
-var path = require("path");
-var webpack = require("webpack");
-var template = require("lodash.template");
-var jsonfile = require("jsonfile");
+const fs = require("fs");
+const path = require("path");
+const webpack = require("webpack");
+const template = require("lodash.template");
+const jsonfile = require("jsonfile");
 
-module.exports = function(debug, minimize) {
+module.exports = function (debug, minimize) {
     function getHeader() {
         if (debug) {
             return "";
         } else {
-            var header_template = fs.readFileSync("./src/header.txt", "utf8");
-            var package = jsonfile.readFileSync("package.json");
+            const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");
+            const package = jsonfile.readFileSync("package.json");
 
-            var data = {
+            const data = {
                 version: package.version,
-                year: new Date().getFullYear()
+                year: new Date().getFullYear(),
             };
 
-            return template(header_template)(data);
+            return template(headerTemplate)(data);
         }
     }
 
-    var config = {
+    const config = {
         entry: {
             "tree.jquery": ["./src/tree.jquery.ts"],
-            test: ["./src_test/test.ts"]
+            test: ["./src_test/test.ts"],
         },
         output: {
             path: path.resolve(__dirname, "build"),
-            filename: "[name].js"
+            filename: "[name].js",
         },
         resolve: {
-            extensions: [".ts", ".js"]
+            extensions: [".ts", ".js"],
         },
         module: {
             rules: [
@@ -39,24 +39,24 @@ module.exports = function(debug, minimize) {
                     test: /\.ts$/,
                     exclude: /node_modules/,
                     use: {
-                        loader: "ts-loader"
-                    }
-                }
-            ]
+                        loader: "ts-loader",
+                    },
+                },
+            ],
         },
         externals: {
-            jquery: "jQuery"
+            jquery: "jQuery",
         },
         optimization: {
-            minimize: minimize
+            minimize: minimize,
         },
         devServer: {
             contentBase: [
                 path.join(__dirname, "devserver"),
                 path.join(__dirname, "static"),
-                __dirname
-            ]
-        }
+                __dirname,
+            ],
+        },
     };
 
     if (debug) {
