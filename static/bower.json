@@ -2,8 +2,8 @@
     "name": "jqtree-docs",
     "dependencies": {
         "bootstrap": "3.4.1",
-        "fontawesome": "5.12.0",
+        "fontawesome": "5.13.0",
         "jquery": "3.4.1",
-        "jquery-mockjax": "2.5.0"
+        "jquery-mockjax": "2.5.1"
     }
 }
