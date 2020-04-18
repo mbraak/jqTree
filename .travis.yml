@@ -6,4 +6,4 @@ addons:
 before_script:
     - npm install
 script:
-    - yarn run production && yarn run test && yarn run coveralls
+    - npm run production && npm run lint && npm run tsc && npm run test && npm run coveralls
