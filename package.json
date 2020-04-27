@@ -1,63 +1,63 @@
 {
-    "name": "jqtree",
-    "version": "1.4.12",
-    "description": "Tree widget for jQuery",
-    "keywords": [
-        "jquery-plugin",
-        "tree"
-    ],
-    "license": "Apache-2.0",
-    "main": "./lib/tree.jquery.js",
-    "types": "./src/tree.jquery.d.ts",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mbraak/jqtree"
-    },
-    "scripts": {
-        "test": "karma start --browsers ChromeHeadlessNoSandbox --single-run",
-        "lint": "eslint src/ src_test/ --ext .ts,.tsx",
-        "production": "./production",
-        "karma": "karma start",
-        "jekyll-build": "bundle exec jekyll build",
-        "jekyll-serve": "bundle exec jekyll serve",
-        "devserver": "webpack-dev-server --mode development",
-        "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
-        "coveralls": "coveralls < coverage/lcov.info",
-        "tsc": "tsc --noEmit --project tsconfig.json"
-    },
-    "dependencies": {
-        "jquery": ">=1.9"
-    },
-    "devDependencies": {
-        "@types/jquery": "^3.3.35",
-        "@types/jquery-mockjax": "^2.0.31",
-        "@types/qunit": "^2.9.1",
-        "@typescript-eslint/eslint-plugin": "^2.29.0",
-        "@typescript-eslint/parser": "^2.29.0",
-        "autoprefixer": "^9.7.6",
-        "coveralls": "^3.0.13",
-        "eslint": "^6.8.0",
-        "istanbul-instrumenter-loader": "^3.0.1",
-        "jquery-mockjax": "^2.5.0",
-        "jsonfile": "^6.0.1",
-        "karma": "^5.0.2",
-        "karma-chrome-launcher": "^3.1.0",
-        "karma-cli": "^2.0.0",
-        "karma-coverage-istanbul-reporter": "^2.1.0",
-        "karma-qunit": "^4.0.0",
-        "karma-webpack": "^4.0.2",
-        "lodash.template": "^4.5.0",
-        "postcss": "^7.0.27",
-        "postcss-cli": "^7.1.0",
-        "postcss-load-config": "^2.1.0",
-        "postcss-loader": "^3.0.0",
-        "postcss-nested": "^4.2.1",
-        "prettier": "^2.0.5",
-        "qunit": "^2.9.3",
-        "ts-loader": "^7.0.1",
-        "typescript": "^3.8.2",
-        "webpack": "^4.43.0",
-        "webpack-cli": "^3.3.11",
-        "webpack-dev-server": "^3.10.3"
-    }
+  "name": "jqtree",
+  "version": "1.4.12",
+  "description": "Tree widget for jQuery",
+  "keywords": [
+    "jquery-plugin",
+    "tree"
+  ],
+  "license": "Apache-2.0",
+  "main": "./lib/tree.jquery.js",
+  "types": "./src/tree.jquery.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbraak/jqtree"
+  },
+  "scripts": {
+    "test": "karma start --browsers ChromeHeadlessNoSandbox --single-run",
+    "lint": "eslint src/ src_test/ --ext .ts,.tsx",
+    "production": "./production",
+    "karma": "karma start",
+    "jekyll-build": "bundle exec jekyll build",
+    "jekyll-serve": "bundle exec jekyll serve",
+    "devserver": "webpack-dev-server --mode development",
+    "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
+    "coveralls": "coveralls < coverage/lcov.info",
+    "tsc": "tsc --noEmit --project tsconfig.json"
+  },
+  "dependencies": {
+    "jquery": ">=1.9"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.3.35",
+    "@types/jquery-mockjax": "^2.0.31",
+    "@types/qunit": "^2.9.1",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
+    "autoprefixer": "^9.7.6",
+    "coveralls": "^3.1.0",
+    "eslint": "^6.8.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "jquery-mockjax": "^2.5.0",
+    "jsonfile": "^6.0.1",
+    "karma": "^5.0.2",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-cli": "^2.0.0",
+    "karma-coverage-istanbul-reporter": "^2.1.0",
+    "karma-qunit": "^4.0.0",
+    "karma-webpack": "^4.0.2",
+    "lodash.template": "^4.5.0",
+    "postcss": "^7.0.27",
+    "postcss-cli": "^7.1.0",
+    "postcss-load-config": "^2.1.0",
+    "postcss-loader": "^3.0.0",
+    "postcss-nested": "^4.2.1",
+    "prettier": "^2.0.5",
+    "qunit": "^2.9.3",
+    "ts-loader": "^7.0.1",
+    "typescript": "^3.8.2",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  }
 }
