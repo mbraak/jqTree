@@ -43,7 +43,7 @@
     "karma": "^5.0.7",
     "karma-chrome-launcher": "^3.1.0",
     "karma-cli": "^2.0.0",
-    "karma-coverage-istanbul-reporter": "^2.1.0",
+    "karma-coverage-istanbul-reporter": "^3.0.2",
     "karma-qunit": "^4.1.1",
     "karma-webpack": "^4.0.2",
     "lodash.template": "^4.5.0",
