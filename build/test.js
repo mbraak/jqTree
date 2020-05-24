@@ -109,6 +109,7 @@
 "use strict";
 
 exports.__esModule = true;
+exports.Node = exports.getPosition = exports.getPositionName = exports.Position = void 0;
 var Position;
 (function (Position) {
     Position[Position["Before"] = 1] = "Before";
@@ -661,6 +662,7 @@ exports.Node = Node;
 "use strict";
 
 exports.__esModule = true;
+exports.getBoolString = exports.htmlEscape = exports.isFunction = exports.isInt = void 0;
 exports.isInt = function (n) { return typeof n === "number" && n % 1 === 0; };
 exports.isFunction = function (v) { return typeof v === "function"; };
 // Escape a string for HTML interpolation; copied from underscore js
@@ -1798,6 +1800,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
 var jQuery = __webpack_require__(2);
 var node_1 = __webpack_require__(0);
 var util_1 = __webpack_require__(1);
@@ -3441,6 +3444,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+exports.BorderDropHint = exports.FolderElement = exports.NodeElement = void 0;
 var node_1 = __webpack_require__(0);
 var NodeElement = /** @class */ (function () {
     function NodeElement(node, treeWidget) {
@@ -3646,6 +3650,7 @@ var GhostDropHint = /** @class */ (function () {
 "use strict";
 
 exports.__esModule = true;
+exports.doGetNodeById = exports.doGetNodeByName = exports.formatTitles = exports.isNodeOpen = exports.isNodeClosed = exports.formatNodes = exports.exampleData2 = exports.exampleData = void 0;
 exports.exampleData = [
     {
         label: "node1",
