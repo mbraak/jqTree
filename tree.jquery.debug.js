@@ -121,11 +121,11 @@ var positionNames = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
-    none: Position.None
+    none: Position.None,
 };
 exports.getPositionName = function (position) {
     for (var name_1 in positionNames) {
-        if (positionNames.hasOwnProperty(name_1)) {
+        if (Object.prototype.hasOwnProperty.call(positionNames, name_1)) {
             if (positionNames[name_1] === position) {
                 return name_1;
             }
@@ -180,7 +180,7 @@ var Node = /** @class */ (function () {
         }
         else {
             for (var key in o) {
-                if (o.hasOwnProperty(key)) {
+                if (Object.prototype.hasOwnProperty.call(o, key)) {
                     var value = o[key];
                     if (key === "label") {
                         // You can use the 'label' key instead of 'name'; this is a legacy feature
@@ -358,7 +358,7 @@ var Node = /** @class */ (function () {
                         "children",
                         "element",
                         "tree",
-                        "isEmptyFolder"
+                        "isEmptyFolder",
                     ].indexOf(k) === -1 &&
                         Object.prototype.hasOwnProperty.call(node, k)) {
                         var v = node[k];
@@ -2049,8 +2049,8 @@ var DragAndDropHandler = /** @class */ (function () {
                     position: node_1.getPositionName(position_1),
                     previous_parent: previousParent,
                     do_move: doMove,
-                    original_event: positionInfo.originalEvent
-                }
+                    original_event: positionInfo.originalEvent,
+                },
             });
             /* eslint-enable @typescript-eslint/camelcase */
             if (!event_1.isDefaultPrevented()) {
@@ -2074,7 +2074,7 @@ var DragAndDropHandler = /** @class */ (function () {
                 left: left,
                 top: offset.top,
                 right: left + width,
-                bottom: offset.top + height + 16
+                bottom: offset.top + height + 16,
             };
         }
     };
@@ -2230,7 +2230,7 @@ var HitAreasGenerator = /** @class */ (function (_super) {
             top: top,
             bottom: 0,
             node: node,
-            position: position
+            position: position,
         };
         this.positions.push(area);
         this.lastTop = top;
@@ -2247,7 +2247,7 @@ var HitAreasGenerator = /** @class */ (function (_super) {
                 top: areaTop,
                 bottom: areaTop + areaHeight,
                 node: position.node,
-                position: position.position
+                position: position.position,
             });
             areaTop += areaHeight;
             i += 1;
@@ -2267,7 +2267,7 @@ var DragElement = /** @class */ (function () {
     DragElement.prototype.move = function (pageX, pageY) {
         this.$element.offset({
             left: pageX - this.offsetX,
-            top: pageY - this.offsetY
+            top: pageY - this.offsetY,
         });
     };
     DragElement.prototype.remove = function () {
@@ -3337,7 +3337,7 @@ var SelectNodeHandler = /** @class */ (function () {
         else {
             var selectedNodes = [];
             for (var id in this.selectedNodes) {
-                if (this.selectedNodes.hasOwnProperty(id)) {
+                if (Object.prototype.hasOwnProperty.call(this.selectedNodes, id)) {
                     var node = this.treeWidget.getNodeById(id);
                     if (node) {
                         selectedNodes.push(node);
@@ -3359,7 +3359,7 @@ var SelectNodeHandler = /** @class */ (function () {
         else {
             var selectedNodes = [];
             for (var id in this.selectedNodes) {
-                if (this.selectedNodes.hasOwnProperty(id)) {
+                if (Object.prototype.hasOwnProperty.call(this.selectedNodes, id)) {
                     var node = this.treeWidget.getNodeById(id);
                     if (node && parent.isParentOf(node)) {
                         selectedNodes.push(node);
