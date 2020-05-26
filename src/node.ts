@@ -4,7 +4,7 @@ export enum Position {
     Before = 1,
     After,
     Inside,
-    None
+    None,
 }
 
 interface IPositions {
@@ -15,14 +15,14 @@ const positionNames: IPositions = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
-    none: Position.None
+    none: Position.None,
 };
 
 type IterateCallback = (node: INode, level: number) => boolean;
 
 export const getPositionName = (position: Position): string => {
     for (const name in positionNames) {
-        if (positionNames.hasOwnProperty(name)) {
+        if (Object.prototype.hasOwnProperty.call(positionNames, name)) {
             if (positionNames[name] === position) {
                 return name;
             }
@@ -95,7 +95,7 @@ export class Node {
             setName(o);
         } else {
             for (const key in o) {
-                if (o.hasOwnProperty(key)) {
+                if (Object.prototype.hasOwnProperty.call(o, key)) {
                     const value = o[key];
 
                     if (key === "label") {
@@ -280,7 +280,7 @@ export class Node {
     */
     public getData(includeParent = false): any[] {
         function getDataFromNodes(nodes: Node[]): any[] {
-            return nodes.map(node => {
+            return nodes.map((node) => {
                 const tmpNode: any = {};
 
                 for (const k in node) {
@@ -290,7 +290,7 @@ export class Node {
                             "children",
                             "element",
                             "tree",
-                            "isEmptyFolder"
+                            "isEmptyFolder",
                         ].indexOf(k) === -1 &&
                         Object.prototype.hasOwnProperty.call(node, k)
                     ) {

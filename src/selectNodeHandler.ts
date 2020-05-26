@@ -28,7 +28,9 @@ export default class SelectNodeHandler {
             const selectedNodes = [];
 
             for (const id in this.selectedNodes) {
-                if (this.selectedNodes.hasOwnProperty(id)) {
+                if (
+                    Object.prototype.hasOwnProperty.call(this.selectedNodes, id)
+                ) {
                     const node = this.treeWidget.getNodeById(id);
                     if (node) {
                         selectedNodes.push(node);
@@ -51,7 +53,9 @@ export default class SelectNodeHandler {
             const selectedNodes = [];
 
             for (const id in this.selectedNodes) {
-                if (this.selectedNodes.hasOwnProperty(id)) {
+                if (
+                    Object.prototype.hasOwnProperty.call(this.selectedNodes, id)
+                ) {
                     const node = this.treeWidget.getNodeById(id);
                     if (node && parent.isParentOf(node)) {
                         selectedNodes.push(node);

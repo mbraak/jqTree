@@ -351,8 +351,8 @@ export class DragAndDropHandler {
                     position: getPositionName(position),
                     previous_parent: previousParent,
                     do_move: doMove,
-                    original_event: positionInfo.originalEvent
-                }
+                    original_event: positionInfo.originalEvent,
+                },
             });
             /* eslint-enable @typescript-eslint/camelcase */
 
@@ -379,7 +379,7 @@ export class DragAndDropHandler {
                 left,
                 top: offset.top,
                 right: left + width,
-                bottom: offset.top + height + 16
+                bottom: offset.top + height + 16,
             };
         }
     }
@@ -610,7 +610,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             top,
             bottom: 0,
             node,
-            position
+            position,
         };
 
         this.positions.push(area);
@@ -637,7 +637,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
                 top: areaTop,
                 bottom: areaTop + areaHeight,
                 node: position.node,
-                position: position.position
+                position: position.position,
             });
 
             areaTop += areaHeight;
@@ -661,7 +661,7 @@ class DragElement {
         this.offsetY = offsetY;
 
         this.$element = jQuery(
-            `<span class=\"jqtree-title jqtree-dragging\">${nodeName}</span>`
+            `<span class="jqtree-title jqtree-dragging">${nodeName}</span>`
         );
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
@@ -670,7 +670,7 @@ class DragElement {
     public move(pageX: number, pageY: number): void {
         this.$element.offset({
             left: pageX - this.offsetX,
-            top: pageY - this.offsetY
+            top: pageY - this.offsetY,
         });
     }
 
