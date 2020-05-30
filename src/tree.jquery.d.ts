@@ -22,7 +22,7 @@ interface IJQTreeOptions {
     closedIcon?: string | Element;
     data?: any[];
     dataFilter?: (data: any) => any;
-    dataUrl?: string | object;
+    dataUrl?: string | JQuery.AjaxSettings;
     dragAndDrop?: boolean;
     nodeClass?: any;
     keyboardSupport?: boolean;

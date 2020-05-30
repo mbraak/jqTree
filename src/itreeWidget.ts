@@ -33,10 +33,16 @@ export interface ISelectNodeHandler {
     removeFromSelection: (node: Node) => void;
 }
 
+export interface ITreeWidgetOptions {
+    dataFilter?: (data: Record<string, unknown> | Record<string, unknown>[]) => Record<string, unknown> | Record<string, unknown>[];
+    onLoadFailed?: (xhr: JQuery.jqXHR) => void;
+    onLoading?: (isLoading: boolean, node: Node | null, $el: JQuery) => void;
+}
+
 export interface ITreeWidget {
     $el: JQuery;
     element: JQuery;
-    options: any;
+    options: ITreeWidgetOptions;
     tree: Node;
 
     dndHandler: IDragAndDropHandler | null;
