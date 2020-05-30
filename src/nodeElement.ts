@@ -92,7 +92,7 @@ export class FolderElement extends NodeElement {
             return;
         }
 
-        this.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+        this.node.is_open = true;
 
         const $button = this.getButton();
         $button.removeClass("jqtree-closed");
@@ -137,7 +137,7 @@ export class FolderElement extends NodeElement {
             return;
         }
 
-        this.node.is_open = false; // eslint-disable-line @typescript-eslint/camelcase
+        this.node.is_open = false;
 
         const $button = this.getButton();
         $button.addClass("jqtree-closed");

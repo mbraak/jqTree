@@ -34,9 +34,27 @@ export interface ISelectNodeHandler {
 }
 
 export interface ITreeWidgetOptions {
+    autoEscape: boolean;
+    buttonLeft: boolean;
+    closedIcon: string | Element;
     dataFilter?: (data: Record<string, unknown> | Record<string, unknown>[]) => Record<string, unknown> | Record<string, unknown>[];
+    onCanMove?: (node: INode) => boolean;
+    onCanMoveTo?: (node: INode, target: Node, position: string) => boolean;
+    onCreateLi: (node: INode, element: JQuery, isSelected: boolean) => void;
+    onDragMove?: (node: INode, originalEvent: JQuery.Event | Touch) => boolean;
+    onDragStop?: (node: INode, originalEvent: JQuery.Event | Touch) => boolean
+    onGetStateFromStorage?: () => string;
+    onIsMoveHandle?: (element: JQuery<Element | EventTarget>) => boolean;
     onLoadFailed?: (xhr: JQuery.jqXHR) => void;
     onLoading?: (isLoading: boolean, node: Node | null, $el: JQuery) => void;
+    onSetStateFromStorage?: (state: string) => void;
+    openedIcon: string | Element;
+    openFolderDelay: number;
+    rtl: boolean;
+    saveState: boolean | string;
+    showEmptyFolder: boolean;
+    slide: boolean;
+    tabIndex: string;
 }
 
 export interface ITreeWidget {

@@ -4,6 +4,13 @@ import { htmlEscape } from "./util";
 import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itreeWidget";
 import { IPositionInfo } from "./imouseWidget";
 
+interface Dimensions {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+}
+
 export class DragAndDropHandler {
     public hitAreas: IHitArea[];
     public isDragging: boolean;
@@ -334,7 +341,7 @@ export class DragAndDropHandler {
             const previousParent = movedNode.parent;
 
             if (position === Position.Inside) {
-                this.hoveredArea.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                this.hoveredArea.node.is_open = true;
             }
 
             const doMove = (): void => {
@@ -343,7 +350,6 @@ export class DragAndDropHandler {
                 this.treeWidget._refreshElements(null);
             };
 
-            /* eslint-disable @typescript-eslint/camelcase */
             const event = this.treeWidget._triggerEvent("tree.move", {
                 move_info: {
                     moved_node: movedNode,
@@ -354,7 +360,6 @@ export class DragAndDropHandler {
                     original_event: positionInfo.originalEvent,
                 },
             });
-            /* eslint-enable @typescript-eslint/camelcase */
 
             if (!event.isDefaultPrevented()) {
                 doMove();
@@ -362,7 +367,7 @@ export class DragAndDropHandler {
         }
     }
 
-    private getTreeDimensions(): any {
+    private getTreeDimensions(): Dimensions {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
         const offset = this.treeWidget.element.offset();

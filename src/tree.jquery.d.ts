@@ -10,6 +10,7 @@ interface INode {
 
     [key: string]: any;
 
+    hasChildren(): boolean;
     isFolder(): boolean;
     iterate(callback: (node: INode, level: number) => boolean): void;
 }

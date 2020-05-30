@@ -60,7 +60,7 @@ class JqTreeWidget extends MouseWidget {
         onCanMoveTo: null as CanMoveNodeTo | null,
         onLoadFailed: null as HandleLoadFailed | null,
         autoEscape: true,
-        dataUrl: null as any,
+        dataUrl: null as (null | string | Record<string, unknown>),
 
         // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
         // http://www.fileformat.info/info/unicode/char/25ba/index.htm
