@@ -86,7 +86,7 @@ export class FolderElement extends NodeElement {
     public open(
         onFinished: OnFinishOpenNode | null,
         slide = true,
-        animationSpeed = "fast"
+        animationSpeed: JQuery.Duration | string = "fast"
     ): void {
         if (this.node.is_open) {
             return;
@@ -132,7 +132,7 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    public close(slide = true, animationSpeed = "fast"): void {
+    public close(slide = true, animationSpeed: JQuery.Duration | string = "fast"): void {
         if (!this.node.is_open) {
             return;
         }

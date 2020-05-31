@@ -1,9 +1,9 @@
-import { Node } from "./node";
+import { Node, NodeId } from "./node";
 import { ITreeWidget } from "./itreeWidget";
 
 export default class SelectNodeHandler {
     private treeWidget: ITreeWidget;
-    private selectedNodes: any;
+    private selectedNodes: Record<NodeId, boolean>;
     private selectedSingleNode: Node | null;
 
     constructor(treeWidget: ITreeWidget) {

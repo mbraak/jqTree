@@ -1,4 +1,4 @@
-export default class SimpleWidget {
+export default class SimpleWidget<WidgetOptions> {
     public static register(widgetClass: any, widgetName: string): void {
         const getDataKey = (): string => `simple_widget_${widgetName}`;
 
@@ -15,7 +15,7 @@ export default class SimpleWidget {
             }
         }
 
-        function createWidget($el: JQuery, options: object): JQuery<any> {
+        function createWidget($el: JQuery, options: WidgetOptions): JQuery<any> {
             const dataKey = getDataKey();
 
             for (const el of $el.get()) {
@@ -75,7 +75,7 @@ export default class SimpleWidget {
             return result;
         }
 
-        (jQuery.fn as any)[widgetName] = function(
+        (jQuery.fn as any)[widgetName] = function (
             this: JQuery,
             argument1: any,
             ...args: any[]
@@ -99,11 +99,11 @@ export default class SimpleWidget {
 
     protected static defaults = {};
 
-    public options: any;
+    public options: WidgetOptions;
 
     protected $el: JQuery<any>;
 
-    constructor(el: Element, options: any) {
+    constructor(el: Element, options: WidgetOptions) {
         this.$el = jQuery(el);
 
         const defaults = (this.constructor as typeof SimpleWidget).defaults;

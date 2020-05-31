@@ -8,12 +8,15 @@ interface INode {
     load_on_demand: boolean | null;
     isEmptyFolder: boolean;
 
-    [key: string]: any;
+    [key: string]: unknown;
 
     hasChildren(): boolean;
     isFolder(): boolean;
     iterate(callback: (node: INode, level: number) => boolean): void;
 }
+
+type DataUrlFunction = (node: INode | null) => JQuery.AjaxSettings;
+type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
 
 interface IJQTreeOptions {
     animationSpeed?: string | number;
@@ -23,7 +26,7 @@ interface IJQTreeOptions {
     closedIcon?: string | Element;
     data?: any[];
     dataFilter?: (data: any) => any;
-    dataUrl?: string | JQuery.AjaxSettings;
+    dataUrl?: DataUrl;
     dragAndDrop?: boolean;
     nodeClass?: any;
     keyboardSupport?: boolean;

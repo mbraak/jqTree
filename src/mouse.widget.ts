@@ -4,7 +4,7 @@ This widget does the same a the mouse widget in jqueryui.
 import SimpleWidget from "./simple.widget";
 import { IPositionInfo } from "./imouseWidget";
 
-abstract class MouseWidget extends SimpleWidget {
+abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     public $el: JQuery;
     protected isMouseStarted: boolean;
     protected mouseDelay: number;
