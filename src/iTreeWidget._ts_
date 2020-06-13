@@ -1,5 +1,5 @@
 import { Node, NodeId, Position } from "./node";
-import { IPositionInfo } from "./imouseWidget";
+import { PositionInfo } from "./imouseWidget";
 
 export type IconElement = Text | Element;
 
@@ -14,7 +14,7 @@ export interface IHitArea {
 
 export interface IDragAndDropHandler {
     hoveredArea: IHitArea | null;
-    positionInfo: IPositionInfo | null;
+    positionInfo: PositionInfo | null;
 }
 
 export interface IElementsRenderer {
@@ -37,12 +37,14 @@ export interface ITreeWidgetOptions {
     autoEscape: boolean;
     buttonLeft: boolean;
     closedIcon: string | Element;
-    dataFilter?: (data: Record<string, unknown> | Record<string, unknown>[]) => Record<string, unknown> | Record<string, unknown>[];
+    dataFilter?: (
+        data: Record<string, unknown> | Record<string, unknown>[]
+    ) => Record<string, unknown> | Record<string, unknown>[];
     onCanMove?: (node: INode) => boolean;
     onCanMoveTo?: (node: INode, target: Node, position: string) => boolean;
     onCreateLi: (node: INode, element: JQuery, isSelected: boolean) => void;
     onDragMove?: (node: INode, originalEvent: JQuery.Event | Touch) => boolean;
-    onDragStop?: (node: INode, originalEvent: JQuery.Event | Touch) => boolean
+    onDragStop?: (node: INode, originalEvent: JQuery.Event | Touch) => boolean;
     onGetStateFromStorage?: () => string;
     onIsMoveHandle?: (element: JQuery<Element | EventTarget>) => boolean;
     onLoadFailed?: (xhr: JQuery.jqXHR) => void;

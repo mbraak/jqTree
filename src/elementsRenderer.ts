@@ -1,20 +1,22 @@
 import { htmlEscape, getBoolString } from "./util";
 import { Node } from "./node";
-import { ITreeWidget, IconElement } from "./itreeWidget";
+import { JqTreeWidget } from "./tree.jquery";
+
+type IconElement = Text | Element;
 
 export default class ElementsRenderer {
     public openedIconElement: IconElement;
     public closedIconElement: IconElement;
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
 
         this.openedIconElement = this.createButtonElement(
-            treeWidget.options.openedIcon
+            treeWidget.options.openedIcon || "+"
         );
         this.closedIconElement = this.createButtonElement(
-            treeWidget.options.closedIcon
+            treeWidget.options.closedIcon || "-"
         );
     }
 
@@ -116,7 +118,7 @@ export default class ElementsRenderer {
     private createLi(node: Node, level: number): HTMLLIElement {
         const isSelected = Boolean(
             this.treeWidget.selectNodeHandler &&
-            this.treeWidget.selectNodeHandler.isNodeSelected(node)
+                this.treeWidget.selectNodeHandler.isNodeSelected(node)
         );
 
         const mustShowFolder =
@@ -252,10 +254,11 @@ export default class ElementsRenderer {
         titleSpan.setAttribute("aria-expanded", getBoolString(isOpen));
 
         if (isSelected) {
-            titleSpan.setAttribute(
-                "tabindex",
-                this.treeWidget.options.tabIndex
-            );
+            const tabIndex = this.treeWidget.options.tabIndex;
+
+            if (tabIndex !== undefined) {
+                titleSpan.setAttribute("tabindex", `${tabIndex}`);
+            }
         }
 
         titleSpan.innerHTML = this.escapeIfNecessary(nodeName);

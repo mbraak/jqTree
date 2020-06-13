@@ -1,12 +1,12 @@
 import { Node, NodeId } from "./node";
-import { ITreeWidget } from "./itreeWidget";
+import { JqTreeWidget } from "./tree.jquery";
 
 export default class SelectNodeHandler {
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
     private selectedNodes: Record<NodeId, boolean>;
     private selectedSingleNode: Node | null;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
         this.clear();
     }
@@ -101,7 +101,9 @@ export default class SelectNodeHandler {
 
             if (includeChildren) {
                 node.iterate(() => {
-                    delete this.selectedNodes[node.id];
+                    if (node.id != null) {
+                        delete this.selectedNodes[node.id];
+                    }
                     return true;
                 });
             }

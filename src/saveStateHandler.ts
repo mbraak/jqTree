@@ -1,17 +1,17 @@
 import { isInt } from "./util";
-import { ITreeWidget } from "./itreeWidget";
+import { JqTreeWidget } from "./tree.jquery";
 import { Node, NodeId } from "./node";
 
-interface SavedState {
+export interface SavedState {
     open_nodes: NodeId[];
     selected_node: NodeId[];
 }
 
 export default class SaveStateHandler {
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
     private _supportsLocalStorage: boolean | null;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
     }
 
@@ -39,7 +39,7 @@ export default class SaveStateHandler {
         const getOpenNodeIds = (): NodeId[] => {
             const openNodes: NodeId[] = [];
 
-            this.treeWidget.tree.iterate((node: INode) => {
+            this.treeWidget.tree.iterate((node: Node) => {
                 if (node.is_open && node.id && node.hasChildren()) {
                     openNodes.push(node.id);
                 }
@@ -49,12 +49,21 @@ export default class SaveStateHandler {
             return openNodes;
         };
 
-        const getSelectedNodeIds = (): NodeId[] =>
-            this.treeWidget.getSelectedNodes().map((n: Node) => n.id);
+        const getSelectedNodeIds = (): NodeId[] => {
+            const selectedNodeIds: NodeId[] = [];
+
+            this.treeWidget.getSelectedNodes().forEach((node) => {
+                if (node.id != null) {
+                    selectedNodeIds.push(node.id);
+                }
+            });
+
+            return selectedNodeIds;
+        };
 
         return {
             open_nodes: getOpenNodeIds(),
-            selected_node: getSelectedNodeIds()
+            selected_node: getSelectedNodeIds(),
         };
     }
 
@@ -83,7 +92,10 @@ export default class SaveStateHandler {
         }
     }
 
-    public setInitialStateOnDemand(state: SavedState, cbFinished: () => void): void {
+    public setInitialStateOnDemand(
+        state: SavedState,
+        cbFinished: () => void
+    ): void {
         if (state) {
             this.doSetInitialStateOnDemand(
                 state.open_nodes,
@@ -114,7 +126,7 @@ export default class SaveStateHandler {
             state.selected_node = [state.selected_node];
         }
 
-        return state as unknown as SavedState;
+        return (state as unknown) as SavedState;
     }
 
     private loadFromStorage(): string | null {
@@ -169,7 +181,7 @@ export default class SaveStateHandler {
         if (selectNodeHandler) {
             const selectedNodes = selectNodeHandler.getSelectedNodes();
 
-            selectedNodes.forEach(node => {
+            selectedNodes.forEach((node) => {
                 selectNodeHandler.removeFromSelection(node);
             });
         }

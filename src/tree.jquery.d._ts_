@@ -1,21 +1,21 @@
-type NodeId = number | string;
-
-type IterateCallback = (node: INode, level: number) => boolean;
-
-declare class INode {
-    public id?: NodeId;
-    public name: string;
-    public children: INode[];
-    public element: Element;
-    public is_open: boolean;
-    public parent: INode | null;
+interface INode {
+    id: number | string;
+    name: string;
+    children: INode[];
+    parent: INode | null;
+    is_open: boolean;
+    element: Element;
+    load_on_demand: boolean | null;
+    isEmptyFolder: boolean;
 
     [key: string]: unknown;
 
-    public iterate(callback: IterateCallback): void;
+    hasChildren(): boolean;
+    isFolder(): boolean;
+    iterate(callback: (node: INode, level: number) => boolean): void;
 }
 
-type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
+type DataUrlFunction = (node: INode | null) => JQuery.AjaxSettings;
 type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
 
 interface IJQTreeOptions {
@@ -31,13 +31,13 @@ interface IJQTreeOptions {
     nodeClass?: any;
     keyboardSupport?: boolean;
     onCanMove?: (node: INode) => boolean;
-    onCanSelectNode?: (node: Node) => boolean;
+    onCanSelectNode?: (node: INode) => boolean;
     onCreateLi?: (node: INode, el: JQuery, isSelected: boolean) => void;
-    onDragMove?: (node: INode, event: JQuery.Event | Touch) => void;
-    onDragStop?: (node: INode, event: JQuery.Event | Touch) => void;
+    onDragMove?: (node: INode, event: JQueryEventObject | Touch) => void;
+    onDragStop?: (node: INode, event: JQueryEventObject | Touch) => void;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: any) => void;
-    onLoading?: (isLoading: boolean, node: Node, $el: JQuery) => void;
+    onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => any;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: string | Element;
@@ -54,21 +54,9 @@ interface IJQTreeOptions {
 interface IJQTreePlugin {
     (): JQuery;
     (options: IJQTreeOptions): JQuery;
-    (
-        behavior: "addNodeAfter",
-        newNodeInfo: any,
-        existingNode: INode
-    ): INode | null;
-    (
-        behavior: "addNodeBefore",
-        newNodeInfo: any,
-        existingNode: INode
-    ): INode | null;
-    (
-        behavior: "addParentNode",
-        newNodeInfo: any,
-        existingNode: INode
-    ): INode | null;
+    (behavior: "addNodeAfter", newNodeInfo: any, existingNode: INode): INode | null;
+    (behavior: "addNodeBefore", newNodeInfo: any, existingNode: INode): Node | null;
+    (behavior: "addParentNode", newNodeInfo: any, existingNode: INode): INode | null;
     (behavior: "addToSelection", node: INode, mustSetFocus?: boolean): JQuery;
     (behavior: "appendNode", newNodeInfo: any, parentNode?: INode): INode;
     (behavior: "closeNode", node: INode, slide?: boolean): JQuery;
@@ -82,26 +70,12 @@ interface IJQTreePlugin {
     (behavior: "getTree"): INode;
     (behavior: "isNodeSelected", node: INode): boolean;
     (behavior: "loadData", data: any, parentNode?: INode): JQuery;
-    (
-        behavior: "moveNode",
-        node: INode,
-        targetNode: INode,
-        position: string
-    ): JQuery;
+    (behavior: "moveNode", node: INode, targetNode: INode, position: string): JQuery;
     (behavior: "openNode", node: INode): JQuery;
     (behavior: "openNode", node: INode, slide: boolean): JQuery;
-    (
-        behavior: "openNode",
-        node: INode,
-        onFinished: (node: INode) => void
-    ): JQuery;
-    (
-        behavior: "openNode",
-        node: INode,
-        slide: boolean,
-        onFinished?: (node: INode) => void
-    ): JQuery;
-    (behavior: "prependNode", newNodeInfo: any, parentNode?: INode): Node;
+    (behavior: "openNode", node: INode, onFinished: (node: INode) => void): JQuery;
+    (behavior: "openNode", node: INode, slide: boolean, onFinished?: (node: INode) => void): JQuery;
+    (behavior: "prependNode", newNodeInfo: any, parentNode?: INode): INode;
     (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
     (behavior: "scrollToNode", node: INode): JQuery;

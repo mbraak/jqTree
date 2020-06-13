@@ -1,17 +1,17 @@
-import { ITreeWidget } from "./itreeWidget";
-import { Node } from "./node";
+import { DefaultRecord, Node, NodeData } from "./node";
+import { JqTreeWidget } from "./tree.jquery";
 
 export type HandleFinishedLoading = () => void;
 
 export default class DataLoader {
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
     }
 
     public loadFromUrl(
-        urlInfo: string | JQuery.AjaxSettings,
+        urlInfo: string | JQuery.AjaxSettings | null,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null
     ): void {
@@ -41,7 +41,7 @@ export default class DataLoader {
             stopLoading();
 
             if (this.treeWidget.options.onLoadFailed) {
-                this.treeWidget.options.onLoadFailed(jqXHR)
+                this.treeWidget.options.onLoadFailed(jqXHR);
             }
         };
 
@@ -80,7 +80,7 @@ export default class DataLoader {
         this.treeWidget._triggerEvent("tree.loading_data", {
             isLoading,
             node,
-            $el
+            $el,
         });
     }
 
@@ -96,7 +96,7 @@ export default class DataLoader {
                 cache: false,
                 dataType: "json",
                 success: handleSuccess,
-                error: handleError
+                error: handleError,
             }
         );
 
@@ -105,21 +105,23 @@ export default class DataLoader {
         void jQuery.ajax(ajaxSettings);
     }
 
-    private parseData(data: string | Record<string, unknown>): Record<string, unknown> | Record<string, unknown>[] {
+    private parseData(data: NodeData): NodeData[] {
         const { dataFilter } = this.treeWidget.options;
 
-        function getParsedData(): Record<string, unknown> | Record<string, unknown>[] {
-            if (data instanceof Array || typeof data === "object") {
-                return data;
-            } else if (typeof data === 'string') {
-                return jQuery.parseJSON(data) as Record<string, unknown> | Record<string, unknown>[]
+        const getParsedData = (): unknown => {
+            if (typeof data === "string") {
+                return jQuery.parseJSON(data) as unknown;
             } else {
-                return [];
+                return data;
             }
-        }
+        };
 
         const parsedData = getParsedData();
 
-        return dataFilter ? dataFilter(parsedData) : parsedData;
+        if (dataFilter) {
+            return dataFilter(parsedData);
+        } else {
+            return parsedData as DefaultRecord[];
+        }
     }
 }

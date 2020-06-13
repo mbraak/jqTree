@@ -1,21 +1,19 @@
 import { Position, Node } from "./node";
-import {
-    ITreeWidget,
-    IDropHint,
-    INodeElement,
-    OnFinishOpenNode
-} from "./itreeWidget";
+import { JqTreeWidget } from "./tree.jquery";
+import { DropHint } from "./types";
 
-export class NodeElement implements INodeElement {
+export type OnFinishOpenNode = (node: Node) => void;
+
+export class NodeElement {
     public node: Node;
-    public $element: JQuery<any>;
-    protected treeWidget: ITreeWidget;
+    public $element: JQuery<Element>;
+    protected treeWidget: JqTreeWidget;
 
-    constructor(node: Node, treeWidget: ITreeWidget) {
+    constructor(node: Node, treeWidget: JqTreeWidget) {
         this.init(node, treeWidget);
     }
 
-    public init(node: Node, treeWidget: ITreeWidget): void {
+    public init(node: Node, treeWidget: JqTreeWidget): void {
         this.node = node;
         this.treeWidget = treeWidget;
 
@@ -26,7 +24,7 @@ export class NodeElement implements INodeElement {
         this.$element = jQuery(node.element);
     }
 
-    public addDropHint(position: number): IDropHint {
+    public addDropHint(position: number): DropHint {
         if (this.mustShowBorderDropHint(position)) {
             return new BorderDropHint(
                 this.$element,
@@ -44,7 +42,7 @@ export class NodeElement implements INodeElement {
         $li.attr("aria-selected", "true");
 
         const $span = this.getSpan();
-        $span.attr("tabindex", this.treeWidget.options.tabIndex);
+        $span.attr("tabindex", this.treeWidget.options.tabIndex ?? null);
 
         if (mustSetFocus) {
             $span.focus();
@@ -120,7 +118,7 @@ export class FolderElement extends NodeElement {
             }
 
             this.treeWidget._triggerEvent("tree.open", {
-                node: this.node
+                node: this.node,
             });
         };
 
@@ -132,7 +130,10 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    public close(slide = true, animationSpeed: JQuery.Duration | string = "fast"): void {
+    public close(
+        slide = true,
+        animationSpeed: JQuery.Duration | string = "fast"
+    ): void {
         if (!this.node.is_open) {
             return;
         }
@@ -161,7 +162,7 @@ export class FolderElement extends NodeElement {
             $span.attr("aria-expanded", "false");
 
             this.treeWidget._triggerEvent("tree.close", {
-                node: this.node
+                node: this.node,
             });
         };
 
@@ -184,10 +185,10 @@ export class FolderElement extends NodeElement {
     }
 }
 
-export class BorderDropHint implements IDropHint {
-    private $hint: JQuery;
+export class BorderDropHint implements DropHint {
+    private $hint: JQuery<Element>;
 
-    constructor($element: JQuery, scrollLeft: number) {
+    constructor($element: JQuery<Element>, scrollLeft: number) {
         const $div = $element.children(".jqtree-element");
 
         const elWidth = $element.width() || 0;
@@ -207,12 +208,12 @@ export class BorderDropHint implements IDropHint {
     }
 }
 
-class GhostDropHint implements IDropHint {
-    private $element: JQuery;
+class GhostDropHint implements DropHint {
+    private $element: JQuery<Element>;
     private node: Node;
     private $ghost: JQuery;
 
-    constructor(node: Node, $element: JQuery, position: number) {
+    constructor(node: Node, $element: JQuery<Element>, position: number) {
         this.$element = $element;
 
         this.node = node;

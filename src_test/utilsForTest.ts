@@ -15,15 +15,18 @@ export const exampleData = [
         id: 123, // extra data
         intProperty: 1,
         strProperty: "1",
-        children: [{ label: "child1", id: 125, intProperty: 2 }, { label: "child2", id: 126 }]
+        children: [
+            { label: "child1", id: 125, intProperty: 2 },
+            { label: "child2", id: 126 },
+        ],
     },
     {
         label: "node2",
         id: 124,
         intProperty: 3,
         strProperty: "3",
-        children: [{ label: "child3", id: 127 }]
-    }
+        children: [{ label: "child3", id: 127 }],
+    },
 ];
 
 /*
@@ -37,12 +40,12 @@ example data 2:
 export const exampleData2 = [
     {
         label: "main",
-        children: [{ label: "c1" }, { label: "c2" }]
-    }
+        children: [{ label: "c1" }, { label: "c2" }],
+    },
 ];
 
 export function formatNodes(nodes: INode[]): string {
-    const strings = nodes.map(node => node.name);
+    const strings = nodes.map((node) => node.name);
 
     return strings.join(" ");
 }
@@ -89,3 +92,12 @@ export function doGetNodeById(tree: Node, id: string | number): Node {
 
     return result;
 }
+
+export const getSelectedNodeName = ($tree: JQuery<HTMLElement>): string => {
+    const node = $tree.tree("getSelectedNode");
+    if (node) {
+        return node.name;
+    } else {
+        return "";
+    }
+};
