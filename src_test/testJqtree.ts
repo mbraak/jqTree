@@ -626,7 +626,7 @@ test("getNodeById", (assert: Assert) => {
     assert.equal(getNodeById($tree, 124).name, "node2");
 
     // 2. get id that does not exist
-    assert.equal(getNodeById($tree, 333), null);
+    assert.equal($tree.tree("getNodeById", 333), null);
 
     // 3. get id by string
     assert.equal(getNodeById($tree, "124").name, "node2");
