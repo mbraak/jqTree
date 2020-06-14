@@ -32,6 +32,7 @@ interface FolderEvent {
 const getNodeByName = ($tree: JQuery, name: string): INode => {
     const node = $tree.tree("getNodeByName", name);
 
+    /* istanbul ignore if */
     if (!node) {
         throw "Node is null";
     }
@@ -42,6 +43,7 @@ const getNodeByName = ($tree: JQuery, name: string): INode => {
 const getNodeById = ($tree: JQuery, id: NodeId): INode => {
     const node = $tree.tree("getNodeById", id);
 
+    /* istanbul ignore if */
     if (!node) {
         throw "Node is null";
     }

@@ -86,11 +86,12 @@ test("addChild", (assert: Assert) => {
 
     const node = tree.children[0];
 
+    /* istanbul ignore if */
     if (!node.parent) {
-        assert.ok(false, "Node has no parent");
-    } else {
-        assert.equal(node.parent.name, "tree1", "parent of node");
+        throw "Node has no parent";
     }
+
+    assert.equal(node.parent.name, "tree1", "parent of node");
 });
 
 test("addChildAtPosition", (assert: Assert) => {
@@ -593,11 +594,12 @@ test("getPreviousSibling", (assert: Assert) => {
         "child2"
     ).getPreviousSibling();
 
+    /* istanbul ignore if */
     if (!previousSibling) {
-        assert.ok(false, "Previous sibling not found");
-    } else {
-        assert.equal(previousSibling.name, "child1");
+        throw "Previous sibling not found";
     }
+
+    assert.equal(previousSibling.name, "child1");
 
     assert.equal(tree.getPreviousSibling(), null);
     assert.equal(doGetNodeByName(tree, "child1").getPreviousSibling(), null);
@@ -611,11 +613,12 @@ test("getNextSibling", (assert: Assert) => {
     // - getNextSibling
     const nextSibling = doGetNodeByName(tree, "node1").getNextSibling();
 
+    /* istanbul ignore if */
     if (!nextSibling) {
-        assert.ok(false, "Next sibling not found");
-    } else {
-        assert.equal(nextSibling.name, "node2");
+        throw "Next sibling not found";
     }
+
+    assert.equal(nextSibling.name, "node2");
 
     assert.equal(doGetNodeByName(tree, "node2").getNextSibling(), null);
     assert.equal(tree.getNextSibling(), null);
@@ -637,9 +640,10 @@ test("getNodeByCallback", (assert: Assert) => {
 
     const node = tree.getNodeByCallback((n: Node) => n.name === "child1");
 
+    /* istanbul ignore if */
     if (!node) {
-        assert.ok(false, "Node not found");
-    } else {
-        assert.equal(node.name, "child1");
+        throw "Node not found";
     }
+
+    assert.equal(node.name, "child1");
 });

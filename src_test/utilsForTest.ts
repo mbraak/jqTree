@@ -74,30 +74,34 @@ export function formatTitles($node: JQuery<Element>): string {
 }
 
 export function doGetNodeByName(tree: Node, name: string): Node {
-    const result = tree.getNodeByName(name);
+    const node = tree.getNodeByName(name);
 
-    if (!result) {
+    /* istanbul ignore if */
+    if (!node) {
         throw Error(`Node with name '${name}' not found`);
     }
 
-    return result;
+    return node;
 }
 
 export function doGetNodeById(tree: Node, id: string | number): Node {
-    const result = tree.getNodeById(id);
+    const node = tree.getNodeById(id);
 
-    if (!result) {
+    /* istanbul ignore if */
+    if (!node) {
         throw Error(`Node with id '${id}' not found`);
     }
 
-    return result;
+    return node;
 }
 
 export const getSelectedNodeName = ($tree: JQuery<HTMLElement>): string => {
     const node = $tree.tree("getSelectedNode");
-    if (node) {
-        return node.name;
-    } else {
-        return "";
+
+    /* istanbul ignore if */
+    if (!node) {
+        throw Error("There is no node selected");
     }
+
+    return node.name;
 };
