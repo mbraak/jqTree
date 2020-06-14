@@ -182,7 +182,7 @@ var Node = /** @class */ (function () {
             for (var key in o) {
                 if (Object.prototype.hasOwnProperty.call(o, key)) {
                     var value = o[key];
-                    if (key === "label") {
+                    if (key === "label" && typeof value === "string") {
                         // You can use the 'label' key instead of 'name'; this is a legacy feature
                         setName(value);
                     }
@@ -217,7 +217,9 @@ var Node = /** @class */ (function () {
             var o = data_1[_i];
             var node = new this.tree.nodeClass(o);
             this.addChild(node);
-            if (typeof o === "object" && o["children"]) {
+            if (typeof o === "object" &&
+                o["children"] &&
+                o["children"] instanceof Array) {
                 if (o["children"].length === 0) {
                     node.isEmptyFolder = true;
                 }
@@ -404,6 +406,7 @@ var Node = /** @class */ (function () {
             this.parent.addChildAtPosition(node, childIndex + 1);
             if (typeof nodeInfo === "object" &&
                 nodeInfo["children"] &&
+                nodeInfo["children"] instanceof Array &&
                 nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
@@ -420,6 +423,7 @@ var Node = /** @class */ (function () {
             this.parent.addChildAtPosition(node, childIndex);
             if (typeof nodeInfo === "object" &&
                 nodeInfo["children"] &&
+                nodeInfo["children"] instanceof Array &&
                 nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
@@ -454,6 +458,7 @@ var Node = /** @class */ (function () {
         this.addChild(node);
         if (typeof nodeInfo === "object" &&
             nodeInfo["children"] &&
+            nodeInfo["children"] instanceof Array &&
             nodeInfo["children"].length) {
             node.loadFromData(nodeInfo["children"]);
         }
@@ -464,6 +469,7 @@ var Node = /** @class */ (function () {
         this.addChildAtPosition(node, 0);
         if (typeof nodeInfo === "object" &&
             nodeInfo["children"] &&
+            nodeInfo["children"] instanceof Array &&
             nodeInfo["children"].length) {
             node.loadFromData(nodeInfo["children"]);
         }
@@ -627,7 +633,10 @@ var Node = /** @class */ (function () {
         var _this = this;
         var addNode = function (nodeData) {
             _this.setData(nodeData);
-            if (nodeData["children"]) {
+            if (typeof nodeData === "object" &&
+                nodeData["children"] &&
+                nodeData["children"] instanceof Array &&
+                nodeData["children"].length) {
                 addChildren(nodeData["children"]);
             }
         };
@@ -691,87 +700,96 @@ module.exports = jQuery;
 "use strict";
 
 exports.__esModule = true;
+var register = function (widgetClass, widgetName) {
+    var getDataKey = function () { return "simple_widget_" + widgetName; };
+    var getWidgetData = function (el, dataKey) {
+        var widget = jQuery.data(el, dataKey);
+        if (widget && widget instanceof SimpleWidget) {
+            return widget;
+        }
+        else {
+            return null;
+        }
+    };
+    var createWidget = function ($el, options) {
+        var dataKey = getDataKey();
+        for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+            var el = _a[_i];
+            var existingWidget = getWidgetData(el, dataKey);
+            if (!existingWidget) {
+                var simpleWidgetClass = widgetClass;
+                var widget = new simpleWidgetClass(el, options);
+                if (!jQuery.data(el, dataKey)) {
+                    jQuery.data(el, dataKey, widget);
+                }
+                // Call init after setting data, so we can call methods
+                widget.init();
+            }
+        }
+        return $el;
+    };
+    var destroyWidget = function ($el) {
+        var dataKey = getDataKey();
+        for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+            var el = _a[_i];
+            var widget = getWidgetData(el, dataKey);
+            if (widget) {
+                widget.destroy();
+            }
+            jQuery.removeData(el, dataKey);
+        }
+    };
+    var callFunction = function ($el, functionName, args) {
+        var result = null;
+        for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+            var el = _a[_i];
+            var widget = jQuery.data(el, getDataKey());
+            if (widget && widget instanceof SimpleWidget) {
+                var simpleWidget = widget;
+                var widgetFunction = simpleWidget[functionName];
+                if (widgetFunction && typeof widgetFunction === "function") {
+                    result = widgetFunction.apply(widget, args);
+                }
+            }
+        }
+        return result;
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    jQuery.fn[widgetName] = function (argument1) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        if (!argument1) {
+            return createWidget(this, null);
+        }
+        else if (typeof argument1 === "object") {
+            var options = argument1;
+            return createWidget(this, options);
+        }
+        else if (typeof argument1 === "string" && argument1[0] !== "_") {
+            var functionName = argument1;
+            if (functionName === "destroy") {
+                return destroyWidget(this);
+            }
+            else if (functionName === "get_widget_class") {
+                return widgetClass;
+            }
+            else {
+                return callFunction(this, functionName, args);
+            }
+        }
+    };
+};
 var SimpleWidget = /** @class */ (function () {
     function SimpleWidget(el, options) {
         this.$el = jQuery(el);
-        var defaults = this.constructor.defaults;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        var defaults = this.constructor["defaults"];
         this.options = jQuery.extend({}, defaults, options);
     }
     SimpleWidget.register = function (widgetClass, widgetName) {
-        var getDataKey = function () { return "simple_widget_" + widgetName; };
-        function getWidgetData(el, dataKey) {
-            var widget = jQuery.data(el, dataKey);
-            if (widget && widget instanceof SimpleWidget) {
-                return widget;
-            }
-            else {
-                return null;
-            }
-        }
-        function createWidget($el, options) {
-            var dataKey = getDataKey();
-            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
-                var el = _a[_i];
-                var existingWidget = getWidgetData(el, dataKey);
-                if (!existingWidget) {
-                    var widget = new widgetClass(el, options);
-                    if (!jQuery.data(el, dataKey)) {
-                        jQuery.data(el, dataKey, widget);
-                    }
-                    // Call init after setting data, so we can call methods
-                    widget.init();
-                }
-            }
-            return $el;
-        }
-        function destroyWidget($el) {
-            var dataKey = getDataKey();
-            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
-                var el = _a[_i];
-                var widget = getWidgetData(el, dataKey);
-                if (widget) {
-                    widget.destroy();
-                }
-                jQuery.removeData(el, dataKey);
-            }
-        }
-        function callFunction($el, functionName, args) {
-            var result = null;
-            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
-                var el = _a[_i];
-                var widget = jQuery.data(el, getDataKey());
-                if (widget && widget instanceof SimpleWidget) {
-                    var widgetFunction = widget[functionName];
-                    if (widgetFunction &&
-                        typeof widgetFunction === "function") {
-                        result = widgetFunction.apply(widget, args);
-                    }
-                }
-            }
-            return result;
-        }
-        jQuery.fn[widgetName] = function (argument1) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            if (argument1 === undefined || typeof argument1 === "object") {
-                var options = argument1;
-                return createWidget(this, options);
-            }
-            else if (typeof argument1 === "string" && argument1[0] !== "_") {
-                var functionName = argument1;
-                if (functionName === "destroy") {
-                    return destroyWidget(this);
-                }
-                else if (functionName === "get_widget_class") {
-                    return widgetClass;
-                }
-                else {
-                    return callFunction(this, functionName, args);
-                }
-            }
-        };
+        register(widgetClass, widgetName);
     };
     SimpleWidget.prototype.destroy = function () {
         this.deinit();
@@ -819,6 +837,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 exports.__esModule = true;
+exports.JqTreeWidget = void 0;
 var version_1 = __webpack_require__(5);
 var jQuery = __webpack_require__(2);
 var dragAndDropHandler_1 = __webpack_require__(6);
@@ -851,7 +870,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                     var node = clickTarget.node;
                     var event_1 = _this._triggerEvent("tree.click", {
                         node: node,
-                        click_event: e // eslint-disable-line @typescript-eslint/camelcase
+                        click_event: e,
                     });
                     if (!event_1.isDefaultPrevented()) {
                         _this.doSelectNode(node);
@@ -864,7 +883,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             if ((clickTarget === null || clickTarget === void 0 ? void 0 : clickTarget.type) === "label") {
                 _this._triggerEvent("tree.dblclick", {
                     node: clickTarget.node,
-                    click_event: e // eslint-disable-line @typescript-eslint/camelcase
+                    click_event: e,
                 });
             }
         };
@@ -877,7 +896,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                     e.stopPropagation();
                     _this._triggerEvent("tree.contextmenu", {
                         node: node,
-                        click_event: e // eslint-disable-line @typescript-eslint/camelcase
+                        click_event: e,
                     });
                     return false;
                 }
@@ -887,10 +906,11 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return _this;
     }
     JqTreeWidget.prototype.toggle = function (node, slideParam) {
+        if (slideParam === void 0) { slideParam = null; }
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var slide = slideParam == null ? this.options.slide : slideParam;
+        var slide = slideParam !== null && slideParam !== void 0 ? slideParam : this.options.slide;
         if (node.is_open) {
             this.closeNode(node, slide);
         }
@@ -938,7 +958,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.loadDataFromUrl = function (param1, param2, param3) {
         if (typeof param1 === "string") {
             // first parameter is url
-            this.doLoadDataFromUrl(param1, param2, param3);
+            this.doLoadDataFromUrl(param1, param2, param3 !== null && param3 !== void 0 ? param3 : null);
         }
         else {
             // first parameter is not url
@@ -971,6 +991,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
         var parseParams = function () {
+            var _a;
             var onFinished;
             var slide;
             if (util_1.isFunction(param1)) {
@@ -982,7 +1003,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 onFinished = param2;
             }
             if (slide == null) {
-                slide = _this.options.slide;
+                slide = (_a = _this.options.slide) !== null && _a !== void 0 ? _a : false;
             }
             return [slide, onFinished];
         };
@@ -994,7 +1015,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var slide = slideParam == null ? this.options.slide : slideParam;
+        var slide = slideParam !== null && slideParam !== void 0 ? slideParam : this.options.slide;
         if (node.isFolder() || node.isEmptyFolder) {
             new nodeElement_1.FolderElement(node, this).close(slide, this.options.animationSpeed);
             this.saveState();
@@ -1042,11 +1063,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
         return newNode;
     };
-    JqTreeWidget.prototype.removeNode = function (inode) {
-        if (!inode) {
+    JqTreeWidget.prototype.removeNode = function (node) {
+        if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var node = inode;
         if (node.parent && this.selectNodeHandler) {
             this.selectNodeHandler.removeFromSelection(node, true); // including children
             var parent_1 = node.parent;
@@ -1062,9 +1082,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return node;
     };
     JqTreeWidget.prototype.prependNode = function (newNodeInfo, parentNodeParam) {
-        var parentNode = !parentNodeParam
-            ? this.tree
-            : parentNodeParam;
+        var parentNode = parentNodeParam !== null && parentNodeParam !== void 0 ? parentNodeParam : this.tree;
         var node = parentNode.prepend(newNodeInfo);
         this._refreshElements(parentNode);
         return node;
@@ -1073,7 +1091,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var idIsChanged = data.id && data.id !== node.id;
+        var idIsChanged = typeof data === "object" && data.id && data.id !== node.id;
         if (idIsChanged) {
             this.tree.removeNodeFromIndex(node);
         }
@@ -1081,7 +1099,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (idIsChanged) {
             this.tree.addNodeToIndex(node);
         }
-        if (typeof data === "object" && data.children) {
+        if (typeof data === "object" &&
+            data["children"] &&
+            data["children"] instanceof Array) {
             node.removeChildren();
             if (data.children.length) {
                 node.loadFromData(data.children);
@@ -1107,12 +1127,14 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (this.saveStateHandler) {
             return this.saveStateHandler.getStateFromStorage();
         }
+        else {
+            return null;
+        }
     };
-    JqTreeWidget.prototype.addToSelection = function (inode, mustSetFocus) {
-        if (!inode) {
+    JqTreeWidget.prototype.addToSelection = function (node, mustSetFocus) {
+        if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var node = inode;
         if (this.selectNodeHandler) {
             this.selectNodeHandler.addToSelection(node);
             this._getNodeElementForNode(node).select(mustSetFocus === undefined ? true : mustSetFocus);
@@ -1167,6 +1189,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.getState = function () {
         if (this.saveStateHandler) {
             return this.saveStateHandler.getState();
+        }
+        else {
+            return null;
         }
     };
     JqTreeWidget.prototype.setState = function (state) {
@@ -1275,7 +1300,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         this.mouseDelay = 300;
         this.isInitialized = false;
         this.options.rtl = this.getRtlOption();
-        if (this.options.closedIcon === null) {
+        if (this.options.closedIcon == null) {
             this.options.closedIcon = this.getDefaultClosedIcon();
         }
         this.renderer = new elementsRenderer_1["default"](this);
@@ -1370,8 +1395,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.getDataUrlInfo = function (node) {
         var _this = this;
         var dataUrl = this.options.dataUrl || this.element.data("url");
-        var getUrlFromString = function () {
-            var urlInfo = { url: dataUrl };
+        var getUrlFromString = function (url) {
+            var urlInfo = { url: url };
             setUrlInfoData(urlInfo);
             return urlInfo;
         };
@@ -1385,7 +1410,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 // Add selected_node parameter
                 var selectedNodeId = _this.getNodeIdToBeSelected();
                 if (selectedNodeId) {
-                    var data = { selected_node: selectedNodeId }; // eslint-disable-line @typescript-eslint/camelcase
+                    var data = { selected_node: selectedNodeId };
                     urlInfo["data"] = data;
                 }
             }
@@ -1394,14 +1419,14 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return dataUrl(node);
         }
         else if (typeof dataUrl === "string") {
-            return getUrlFromString();
+            return getUrlFromString(dataUrl);
         }
-        else if (typeof dataUrl === "object") {
+        else if (dataUrl && typeof dataUrl === "object") {
             setUrlInfoData(dataUrl);
             return dataUrl;
         }
         else {
-            return dataUrl;
+            return null;
         }
     };
     JqTreeWidget.prototype.getNodeIdToBeSelected = function () {
@@ -1420,6 +1445,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 _this._triggerEvent("tree.init");
             }
         };
+        if (!this.options.nodeClass) {
+            return;
+        }
         this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
         if (this.selectNodeHandler) {
             this.selectNodeHandler.clear();
@@ -1472,7 +1500,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                     return false;
                 }
                 else {
-                    node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                    node.is_open = true;
                     return level !== maxLevel;
                 }
             });
@@ -1540,8 +1568,14 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (this.options.autoOpen === true) {
             return -1;
         }
-        else {
+        else if (typeof this.options.autoOpen === "number") {
+            return this.options.autoOpen;
+        }
+        else if (typeof this.options.autoOpen === "string") {
             return parseInt(this.options.autoOpen, 10);
+        }
+        else {
+            return 0;
         }
     };
     JqTreeWidget.prototype.getClickTarget = function (element) {
@@ -1552,7 +1586,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             if (node) {
                 return {
                     type: "button",
-                    node: node
+                    node: node,
                 };
             }
         }
@@ -1563,7 +1597,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 if (node) {
                     return {
                         type: "label",
-                        node: node
+                        node: node,
                     };
                 }
             }
@@ -1623,49 +1657,48 @@ var JqTreeWidget = /** @class */ (function (_super) {
             }
         }
     };
-    JqTreeWidget.prototype.doSelectNode = function (inode, optionsParam) {
+    JqTreeWidget.prototype.doSelectNode = function (node, optionsParam) {
         var _this = this;
         if (!this.selectNodeHandler) {
+            return;
+        }
+        var saveState = function () {
+            if (_this.options.saveState && _this.saveStateHandler) {
+                _this.saveStateHandler.saveState();
+            }
+        };
+        if (!node) {
+            // Called with empty node -> deselect current node
+            this.deselectCurrentNode();
+            saveState();
             return;
         }
         var defaultOptions = { mustSetFocus: true, mustToggle: true };
         var selectOptions = __assign(__assign({}, defaultOptions), (optionsParam || {}));
         var canSelect = function () {
             if (_this.options.onCanSelectNode) {
-                return (_this.options.selectable &&
-                    _this.options.onCanSelectNode(inode));
+                return (_this.options.selectable === true &&
+                    _this.options.onCanSelectNode(node));
             }
             else {
-                return _this.options.selectable;
+                return _this.options.selectable === true;
             }
         };
         var openParents = function () {
-            var parent = inode.parent;
+            var parent = node.parent;
             if (parent && parent.parent && !parent.is_open) {
                 _this.openNode(parent, false);
             }
         };
-        var saveState = function () {
-            if (_this.options.saveState && _this.saveStateHandler) {
-                _this.saveStateHandler.saveState();
-            }
-        };
-        if (!inode) {
-            // Called with empty node -> deselect current node
-            this.deselectCurrentNode();
-            saveState();
-            return;
-        }
         if (!canSelect()) {
             return;
         }
-        var node = inode;
         if (this.selectNodeHandler.isNodeSelected(node)) {
             if (selectOptions.mustToggle) {
                 this.deselectCurrentNode();
                 this._triggerEvent("tree.select", {
                     node: null,
-                    previous_node: node // eslint-disable-line @typescript-eslint/camelcase
+                    previous_node: node,
                 });
             }
         }
@@ -1675,7 +1708,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             this.addToSelection(node, selectOptions.mustSetFocus);
             this._triggerEvent("tree.select", {
                 node: node,
-                deselected_node: deselectedNode // eslint-disable-line @typescript-eslint/camelcase
+                deselected_node: deselectedNode,
             });
             openParents();
         }
@@ -1686,7 +1719,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return;
         }
         else {
-            this._triggerEvent("tree.load_data", { tree_data: data }); // eslint-disable-line @typescript-eslint/camelcase
+            this._triggerEvent("tree.load_data", { tree_data: data });
             if (parentNode) {
                 this.deselectNodes(parentNode);
                 this.loadSubtree(data, parentNode);
@@ -1710,8 +1743,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.prototype.loadSubtree = function (data, parentNode) {
         parentNode.loadFromData(data);
-        parentNode.load_on_demand = false; // eslint-disable-line @typescript-eslint/camelcase
-        parentNode.is_loading = false; // eslint-disable-line @typescript-eslint/camelcase
+        parentNode.load_on_demand = false;
+        parentNode.is_loading = false;
         this._refreshElements(parentNode);
     };
     JqTreeWidget.prototype.doLoadDataFromUrl = function (urlInfoParam, parentNode, onFinished) {
@@ -1721,7 +1754,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.loadFolderOnDemand = function (node, slide, onFinished) {
         var _this = this;
         if (slide === void 0) { slide = true; }
-        node.is_loading = true; // eslint-disable-line @typescript-eslint/camelcase
+        node.is_loading = true;
         this.doLoadDataFromUrl(null, node, function () {
             _this._openNode(node, slide, onFinished);
         });
@@ -1733,39 +1766,40 @@ var JqTreeWidget = /** @class */ (function (_super) {
         dragAndDrop: false,
         selectable: true,
         useContextMenu: true,
-        onCanSelectNode: null,
-        onSetStateFromStorage: null,
-        onGetStateFromStorage: null,
-        onCreateLi: null,
-        onIsMoveHandle: null,
+        onCanSelectNode: undefined,
+        onSetStateFromStorage: undefined,
+        onGetStateFromStorage: undefined,
+        onCreateLi: undefined,
+        onIsMoveHandle: undefined,
         // Can this node be moved?
-        onCanMove: null,
+        onCanMove: undefined,
         // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanMoveTo: null,
-        onLoadFailed: null,
+        onCanMoveTo: undefined,
+        onLoadFailed: undefined,
         autoEscape: true,
-        dataUrl: null,
+        dataUrl: undefined,
         // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
         // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-        closedIcon: null,
+        closedIcon: undefined,
         // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
         // http://www.fileformat.info/info/unicode/char/25bc/index.htm
         openedIcon: "&#x25bc;",
         slide: true,
         nodeClass: node_1.Node,
-        dataFilter: null,
+        dataFilter: undefined,
         keyboardSupport: true,
         openFolderDelay: 500,
         rtl: false,
-        onDragMove: null,
-        onDragStop: null,
+        onDragMove: undefined,
+        onDragStop: undefined,
         buttonLeft: true,
-        onLoading: null,
+        onLoading: undefined,
         showEmptyFolder: false,
-        tabIndex: 0
+        tabIndex: 0,
     };
     return JqTreeWidget;
 }(mouse_widget_1["default"]));
+exports.JqTreeWidget = JqTreeWidget;
 simple_widget_1["default"].register(JqTreeWidget, "tree");
 
 
@@ -2034,14 +2068,13 @@ var DragAndDropHandler = /** @class */ (function () {
             var position_1 = this.hoveredArea.position;
             var previousParent = movedNode_1.parent;
             if (position_1 === node_1.Position.Inside) {
-                this.hoveredArea.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                this.hoveredArea.node.is_open = true;
             }
             var doMove = function () {
                 _this.treeWidget.tree.moveNode(movedNode_1, targetNode_1, position_1);
                 _this.treeWidget.element.empty();
                 _this.treeWidget._refreshElements(null);
             };
-            /* eslint-disable @typescript-eslint/camelcase */
             var event_1 = this.treeWidget._triggerEvent("tree.move", {
                 move_info: {
                     moved_node: movedNode_1,
@@ -2052,7 +2085,6 @@ var DragAndDropHandler = /** @class */ (function () {
                     original_event: positionInfo.originalEvent,
                 },
             });
-            /* eslint-enable @typescript-eslint/camelcase */
             if (!event_1.isDefaultPrevented()) {
                 doMove();
             }
@@ -2288,8 +2320,8 @@ var util_1 = __webpack_require__(1);
 var ElementsRenderer = /** @class */ (function () {
     function ElementsRenderer(treeWidget) {
         this.treeWidget = treeWidget;
-        this.openedIconElement = this.createButtonElement(treeWidget.options.openedIcon);
-        this.closedIconElement = this.createButtonElement(treeWidget.options.closedIcon);
+        this.openedIconElement = this.createButtonElement(treeWidget.options.openedIcon || "+");
+        this.closedIconElement = this.createButtonElement(treeWidget.options.closedIcon || "-");
     }
     ElementsRenderer.prototype.render = function (fromNode) {
         if (fromNode && fromNode.parent) {
@@ -2430,7 +2462,10 @@ var ElementsRenderer = /** @class */ (function () {
         titleSpan.setAttribute("aria-selected", util_1.getBoolString(isSelected));
         titleSpan.setAttribute("aria-expanded", util_1.getBoolString(isOpen));
         if (isSelected) {
-            titleSpan.setAttribute("tabindex", this.treeWidget.options.tabIndex);
+            var tabIndex = this.treeWidget.options.tabIndex;
+            if (tabIndex !== undefined) {
+                titleSpan.setAttribute("tabindex", "" + tabIndex);
+            }
         }
         titleSpan.innerHTML = this.escapeIfNecessary(nodeName);
         return titleSpan;
@@ -2517,9 +2552,8 @@ var DataLoader = /** @class */ (function () {
         };
         var handleError = function (jqXHR) {
             stopLoading();
-            var onLoadFailed = _this.treeWidget.options.onLoadFailed;
-            if (onLoadFailed) {
-                onLoadFailed(jqXHR);
+            if (_this.treeWidget.options.onLoadFailed) {
+                _this.treeWidget.options.onLoadFailed(jqXHR);
             }
         };
         this.submitRequest(urlInfo, handleSuccess, handleError);
@@ -2543,14 +2577,13 @@ var DataLoader = /** @class */ (function () {
         }
     };
     DataLoader.prototype.notifyLoading = function (isLoading, node, $el) {
-        var onLoading = this.treeWidget.options.onLoading;
-        if (onLoading) {
-            onLoading(isLoading, node, $el);
+        if (this.treeWidget.options.onLoading) {
+            this.treeWidget.options.onLoading(isLoading, node, $el);
         }
         this.treeWidget._triggerEvent("tree.loading_data", {
             isLoading: isLoading,
             node: node,
-            $el: $el
+            $el: $el,
         });
     };
     DataLoader.prototype.submitRequest = function (urlInfo, handleSuccess, handleError) {
@@ -2558,19 +2591,28 @@ var DataLoader = /** @class */ (function () {
             cache: false,
             dataType: "json",
             success: handleSuccess,
-            error: handleError
+            error: handleError,
         });
         ajaxSettings.method = ajaxSettings.method.toUpperCase();
-        jQuery.ajax(ajaxSettings);
+        void jQuery.ajax(ajaxSettings);
     };
     DataLoader.prototype.parseData = function (data) {
         var dataFilter = this.treeWidget.options.dataFilter;
-        var parsedData = data instanceof Array || typeof data === "object"
-            ? data
-            : data != null
-                ? jQuery.parseJSON(data)
-                : [];
-        return dataFilter ? dataFilter(parsedData) : parsedData;
+        var getParsedData = function () {
+            if (typeof data === "string") {
+                return jQuery.parseJSON(data);
+            }
+            else {
+                return data;
+            }
+        };
+        var parsedData = getParsedData();
+        if (dataFilter) {
+            return dataFilter(parsedData);
+        }
+        else {
+            return parsedData;
+        }
     };
     return DataLoader;
 }());
@@ -2683,7 +2725,7 @@ var KeyHandler = /** @class */ (function () {
         }
     };
     KeyHandler.prototype.canHandleKeyboard = function () {
-        return (this.treeWidget.options.keyboardSupport &&
+        return ((this.treeWidget.options.keyboardSupport || false) &&
             this.isFocusOnTree() &&
             this.treeWidget.getSelectedNode() != null);
     };
@@ -2731,45 +2773,63 @@ var MouseWidget = /** @class */ (function (_super) {
     function MouseWidget() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.mouseDown = function (e) {
+            var mouseDownEvent = e;
             // Is left mouse button?
-            if (e.which !== 1) {
+            if (mouseDownEvent.which !== 1) {
                 return;
             }
-            var result = _this.handleMouseDown(_this.getPositionInfo(e));
+            var result = _this.handleMouseDown(_this.getPositionInfo(mouseDownEvent));
             if (result) {
-                e.preventDefault();
+                mouseDownEvent.preventDefault();
             }
             return result;
         };
         _this.mouseMove = function (e) {
-            return _this.handleMouseMove(e, _this.getPositionInfo(e));
+            var mouseMoveEvent = e;
+            return _this.handleMouseMove(e, _this.getPositionInfo(mouseMoveEvent));
         };
         _this.mouseUp = function (e) {
-            return _this.handleMouseUp(_this.getPositionInfo(e));
+            var mouseUpEvent = e;
+            _this.handleMouseUp(_this.getPositionInfo(mouseUpEvent));
         };
         _this.touchStart = function (e) {
             var touchEvent = e.originalEvent;
-            if (touchEvent.touches.length > 1) {
-                return;
+            if (!touchEvent) {
+                return false;
             }
-            var touch = touchEvent.changedTouches[0];
-            return _this.handleMouseDown(_this.getPositionInfo(touch));
+            if (touchEvent.touches.length > 1) {
+                return false;
+            }
+            // todo
+            //const touch = touchEvent.changedTouches[0];
+            //return this.handleMouseDown(this.getPositionInfo(touch));
+            return false;
         };
         _this.touchMove = function (e) {
             var touchEvent = e.originalEvent;
-            if (touchEvent.touches.length > 1) {
-                return;
+            if (!touchEvent) {
+                return false;
             }
-            var touch = touchEvent.changedTouches[0];
-            return _this.handleMouseMove(e, _this.getPositionInfo(touch));
+            if (touchEvent.touches.length > 1) {
+                return false;
+            }
+            // todo
+            //const touch = touchEvent.changedTouches[0];
+            //return this.handleMouseMove(e, this.getPositionInfo(touch));
+            return false;
         };
         _this.touchEnd = function (e) {
             var touchEvent = e.originalEvent;
-            if (touchEvent.touches.length > 1) {
-                return;
+            if (!touchEvent) {
+                return false;
             }
-            var touch = touchEvent.changedTouches[0];
-            return _this.handleMouseUp(_this.getPositionInfo(touch));
+            if (touchEvent.touches.length > 1) {
+                return false;
+            }
+            // todo
+            //const touch = touchEvent.changedTouches[0];
+            //this.handleMouseUp(this.getPositionInfo(touch));
+            return false;
         };
         return _this;
     }
@@ -2799,7 +2859,7 @@ var MouseWidget = /** @class */ (function (_super) {
         }
         this.mouseDownInfo = positionInfo;
         if (!this.mouseCapture(positionInfo)) {
-            return;
+            return false;
         }
         this.handleStartMouse();
         return true;
@@ -2827,7 +2887,8 @@ var MouseWidget = /** @class */ (function (_super) {
     MouseWidget.prototype.handleMouseMove = function (e, positionInfo) {
         if (this.isMouseStarted) {
             this.mouseDrag(positionInfo);
-            return e.preventDefault();
+            e.preventDefault();
+            return false;
         }
         if (this.mouseDelay && !this.isMouseDelayMet) {
             return true;
@@ -2848,7 +2909,7 @@ var MouseWidget = /** @class */ (function (_super) {
             pageX: e.pageX,
             pageY: e.pageY,
             target: e.target,
-            originalEvent: e
+            originalEvent: e,
         };
     };
     MouseWidget.prototype.handleMouseUp = function (positionInfo) {
@@ -2910,14 +2971,18 @@ var SaveStateHandler = /** @class */ (function () {
             return openNodes;
         };
         var getSelectedNodeIds = function () {
-            return _this.treeWidget.getSelectedNodes().map(function (n) { return n.id; });
+            var selectedNodeIds = [];
+            _this.treeWidget.getSelectedNodes().forEach(function (node) {
+                if (node.id != null) {
+                    selectedNodeIds.push(node.id);
+                }
+            });
+            return selectedNodeIds;
         };
-        /* eslint-disable @typescript-eslint/camelcase */
         return {
             open_nodes: getOpenNodeIds(),
-            selected_node: getSelectedNodeIds()
+            selected_node: getSelectedNodeIds(),
         };
-        /* eslint-enable @typescript-eslint/camelcase */
     };
     /*
     Set initial state
@@ -2963,7 +3028,7 @@ var SaveStateHandler = /** @class */ (function () {
         // Check if selected_node is an int (instead of an array)
         if (state && state.selected_node && util_1.isInt(state.selected_node)) {
             // Convert to array
-            state.selected_node = [state.selected_node]; // eslint-disable-line @typescript-eslint/camelcase
+            state.selected_node = [state.selected_node];
         }
         return state;
     };
@@ -2974,6 +3039,9 @@ var SaveStateHandler = /** @class */ (function () {
         else if (this.supportsLocalStorage()) {
             return localStorage.getItem(this.getKeyName());
         }
+        else {
+            return null;
+        }
     };
     SaveStateHandler.prototype.openInitialNodes = function (nodeIds) {
         var mustLoadOnDemand = false;
@@ -2982,7 +3050,7 @@ var SaveStateHandler = /** @class */ (function () {
             var node = this.treeWidget.getNodeById(nodeDd);
             if (node) {
                 if (!node.load_on_demand) {
-                    node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                    node.is_open = true;
                 }
                 else {
                     mustLoadOnDemand = true;
@@ -3405,7 +3473,9 @@ var SelectNodeHandler = /** @class */ (function () {
             delete this.selectedNodes[node.id];
             if (includeChildren) {
                 node.iterate(function () {
-                    delete _this.selectedNodes[node.id];
+                    if (node.id != null) {
+                        delete _this.selectedNodes[node.id];
+                    }
                     return true;
                 });
             }
@@ -3467,11 +3537,12 @@ var NodeElement = /** @class */ (function () {
         }
     };
     NodeElement.prototype.select = function (mustSetFocus) {
+        var _a;
         var $li = this.getLi();
         $li.addClass("jqtree-selected");
         $li.attr("aria-selected", "true");
         var $span = this.getSpan();
-        $span.attr("tabindex", this.treeWidget.options.tabIndex);
+        $span.attr("tabindex", (_a = this.treeWidget.options.tabIndex) !== null && _a !== void 0 ? _a : null);
         if (mustSetFocus) {
             $span.focus();
         }
@@ -3513,7 +3584,7 @@ var FolderElement = /** @class */ (function (_super) {
         if (this.node.is_open) {
             return;
         }
-        this.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+        this.node.is_open = true;
         var $button = this.getButton();
         $button.removeClass("jqtree-closed");
         $button.html("");
@@ -3531,7 +3602,7 @@ var FolderElement = /** @class */ (function (_super) {
                 onFinished(_this.node);
             }
             _this.treeWidget._triggerEvent("tree.open", {
-                node: _this.node
+                node: _this.node,
             });
         };
         if (slide) {
@@ -3549,7 +3620,7 @@ var FolderElement = /** @class */ (function (_super) {
         if (!this.node.is_open) {
             return;
         }
-        this.node.is_open = false; // eslint-disable-line @typescript-eslint/camelcase
+        this.node.is_open = false;
         var $button = this.getButton();
         $button.addClass("jqtree-closed");
         $button.html("");
@@ -3564,7 +3635,7 @@ var FolderElement = /** @class */ (function (_super) {
             var $span = _this.getSpan();
             $span.attr("aria-expanded", "false");
             _this.treeWidget._triggerEvent("tree.close", {
-                node: _this.node
+                node: _this.node,
             });
         };
         if (slide) {
