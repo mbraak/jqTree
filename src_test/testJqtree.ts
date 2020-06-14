@@ -784,6 +784,8 @@ test("generate hit areas", (assert: Assert) => {
 
     // 1. get hit areas
     const node = getNodeById($tree, 123);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const hitAreas = ($tree as any).tree(
         "testGenerateHitAreas",
         node

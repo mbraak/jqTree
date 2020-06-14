@@ -35,7 +35,7 @@ export interface JQTreeOptions {
     onDragMove?: DragMethod;
     onDragStop?: DragMethod;
     onIsMoveHandle?: (el: JQuery) => boolean;
-    onLoadFailed?: (response: any) => void;
+    onLoadFailed?: (response: JQuery.jqXHR) => void;
     onLoading?: HandleLoadingMethod;
     onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;

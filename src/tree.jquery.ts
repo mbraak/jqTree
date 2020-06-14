@@ -124,7 +124,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return JSON.stringify(this.tree.getData());
     }
 
-    public loadData(data: any, parentNode: Node | null): JQuery {
+    public loadData(data: NodeData[], parentNode: Node | null): JQuery {
         this.doLoadData(data, parentNode);
         return this.element;
     }
@@ -143,13 +143,25 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         loadDataFromUrl(null, function() { console.log('finished'); });
         loadDataFromUrl(node1, function() { console.log('finished'); });
     */
-    public loadDataFromUrl(param1?: any, param2?: any, param3?: any): JQuery {
+    public loadDataFromUrl(
+        param1: string | null | Node,
+        param2?: Node | null | HandleFinishedLoading,
+        param3?: HandleFinishedLoading
+    ): JQuery {
         if (typeof param1 === "string") {
             // first parameter is url
-            this.doLoadDataFromUrl(param1, param2, param3);
+            this.doLoadDataFromUrl(
+                param1,
+                param2 as Node | null,
+                param3 ?? null
+            );
         } else {
             // first parameter is not url
-            this.doLoadDataFromUrl(null, param1, param2);
+            this.doLoadDataFromUrl(
+                null,
+                param1,
+                param2 as HandleFinishedLoading | null
+            );
         }
 
         return this.element;
@@ -168,7 +180,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.tree.getNodeByName(name);
     }
 
-    public getNodesByProperty(key: string, value: any): Node[] {
+    public getNodesByProperty(key: string, value: unknown): Node[] {
         return this.tree.getNodesByProperty(key, value);
     }
 
@@ -248,7 +260,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.element;
     }
 
-    public addNodeAfter(newNodeInfo: any, existingNode: Node): Node | null {
+    public addNodeAfter(
+        newNodeInfo: NodeData,
+        existingNode: Node
+    ): Node | null {
         const newNode = existingNode.addAfter(newNodeInfo);
 
         if (newNode) {
@@ -258,7 +273,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return newNode;
     }
 
-    public addNodeBefore(newNodeInfo: any, existingNode: Node): Node | null {
+    public addNodeBefore(
+        newNodeInfo: NodeData,
+        existingNode: Node
+    ): Node | null {
         if (!existingNode) {
             throw Error(PARAM_IS_EMPTY + "existingNode");
         }
@@ -272,7 +290,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return newNode;
     }
 
-    public addParentNode(newNodeInfo: any, existingNode: Node): Node | null {
+    public addParentNode(
+        newNodeInfo: NodeData,
+        existingNode: Node
+    ): Node | null {
         if (!existingNode) {
             throw Error(PARAM_IS_EMPTY + "existingNode");
         }
@@ -302,7 +323,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.element;
     }
 
-    public appendNode(newNodeInfo: any, parentNodeParam?: Node): Node {
+    public appendNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
         const parentNode = parentNodeParam || this.tree;
 
         const node = parentNode.append(newNodeInfo);
@@ -322,12 +343,13 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return node;
     }
 
-    public updateNode(node: Node, data: Record<string, unknown>): JQuery {
+    public updateNode(node: Node, data: NodeData): JQuery {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const idIsChanged = data.id && data.id !== node.id;
+        const idIsChanged =
+            typeof data === "object" && data.id && data.id !== node.id;
 
         if (idIsChanged) {
             this.tree.removeNodeFromIndex(node);
@@ -508,7 +530,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _triggerEvent(eventName: string, values?: any): JQuery.Event {
+    public _triggerEvent(
+        eventName: string,
+        values?: DefaultRecord
+    ): JQuery.Event {
         const event = jQuery.Event(eventName);
         jQuery.extend(event, values);
 
@@ -1126,7 +1151,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         saveState();
     }
 
-    private doLoadData(data: any[] | null, parentNode: Node | null): void {
+    private doLoadData(data: NodeData[] | null, parentNode: Node | null): void {
         if (!data) {
             return;
         } else {
