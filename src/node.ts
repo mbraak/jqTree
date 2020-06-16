@@ -1,5 +1,8 @@
 export type NodeId = number | string;
 
+export type DefaultRecord = Record<string, unknown>;
+export type NodeData = string | DefaultRecord;
+
 export enum Position {
     Before = 1,
     After,
@@ -7,18 +10,18 @@ export enum Position {
     None,
 }
 
-interface IPositions {
+interface Positions {
     [key: string]: Position;
 }
 
-const positionNames: IPositions = {
+const positionNames: Positions = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
     none: Position.None,
 };
 
-type IterateCallback = (node: INode, level: number) => boolean;
+type IterateCallback = (node: Node, level: number) => boolean;
 
 export const getPositionName = (position: Position): string => {
     for (const name in positionNames) {
@@ -34,23 +37,23 @@ export const getPositionName = (position: Position): string => {
 
 export const getPosition = (name: string): Position => positionNames[name];
 
-export class Node {
-    public id: NodeId;
+export class Node implements INode {
+    public id?: NodeId;
     public name: string;
     public children: Node[];
     public parent: Node | null;
-    public idMapping: any;
+    public idMapping: Record<NodeId, Node>;
     public tree: Node;
-    public nodeClass: any;
+    public nodeClass: typeof Node;
     public load_on_demand: boolean;
     public is_open: boolean;
     public element: Element;
     public is_loading: boolean;
     public isEmptyFolder: boolean;
 
-    [key: string]: any;
+    [key: string]: unknown;
 
-    constructor(o: object | string, isRoot = false, nodeClass = Node) {
+    constructor(o: NodeData | null, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.isEmptyFolder = false;
 
@@ -82,7 +85,7 @@ export class Node {
     * This is an internal function; it is not in the docs
     * Does not remove existing node values
     */
-    public setData(o: any): void {
+    public setData(o: NodeData | null): void {
         const setName = (name: string): void => {
             if (name != null) {
                 this.name = name;
@@ -98,7 +101,7 @@ export class Node {
                 if (Object.prototype.hasOwnProperty.call(o, key)) {
                     const value = o[key];
 
-                    if (key === "label") {
+                    if (key === "label" && typeof value === "string") {
                         // You can use the 'label' key instead of 'name'; this is a legacy feature
                         setName(value);
                     } else if (key !== "children") {
@@ -127,14 +130,18 @@ export class Node {
         }
     ]
     */
-    public loadFromData(data: any[]): void {
+    public loadFromData(data: NodeData[]): void {
         this.removeChildren();
 
         for (const o of data) {
             const node = new this.tree.nodeClass(o);
             this.addChild(node);
 
-            if (typeof o === "object" && o["children"]) {
+            if (
+                typeof o === "object" &&
+                o["children"] &&
+                o["children"] instanceof Array
+            ) {
                 if (o["children"].length === 0) {
                     node.isEmptyFolder = true;
                 } else {
@@ -279,9 +286,9 @@ export class Node {
     Get the tree as data.
     */
     public getData(includeParent = false): any[] {
-        function getDataFromNodes(nodes: Node[]): any[] {
+        function getDataFromNodes(nodes: Node[]): Record<string, unknown>[] {
             return nodes.map((node) => {
-                const tmpNode: any = {};
+                const tmpNode: Record<string, unknown> = {};
 
                 for (const k in node) {
                     if (
@@ -321,8 +328,8 @@ export class Node {
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
         let result = null;
 
-        this.iterate((node: INode) => {
-            if (callback(node as Node)) {
+        this.iterate((node: Node) => {
+            if (callback(node)) {
                 result = node;
                 return false;
             } else {
@@ -333,7 +340,7 @@ export class Node {
         return result;
     }
 
-    public addAfter(nodeInfo: any): Node | null {
+    public addAfter(nodeInfo: NodeData): Node | null {
         if (!this.parent) {
             return null;
         } else {
@@ -345,6 +352,7 @@ export class Node {
             if (
                 typeof nodeInfo === "object" &&
                 nodeInfo["children"] &&
+                nodeInfo["children"] instanceof Array &&
                 nodeInfo["children"].length
             ) {
                 node.loadFromData(nodeInfo["children"]);
@@ -354,7 +362,7 @@ export class Node {
         }
     }
 
-    public addBefore(nodeInfo: any): Node | null {
+    public addBefore(nodeInfo: NodeData): Node | null {
         if (!this.parent) {
             return null;
         } else {
@@ -366,6 +374,7 @@ export class Node {
             if (
                 typeof nodeInfo === "object" &&
                 nodeInfo["children"] &&
+                nodeInfo["children"] instanceof Array &&
                 nodeInfo["children"].length
             ) {
                 node.loadFromData(nodeInfo["children"]);
@@ -375,7 +384,7 @@ export class Node {
         }
     }
 
-    public addParent(nodeInfo: any): Node | null {
+    public addParent(nodeInfo: NodeData): Node | null {
         if (!this.parent) {
             return null;
         } else {
@@ -400,13 +409,14 @@ export class Node {
         }
     }
 
-    public append(nodeInfo: any): Node {
+    public append(nodeInfo: NodeData): Node {
         const node = new this.tree.nodeClass(nodeInfo);
         this.addChild(node);
 
         if (
             typeof nodeInfo === "object" &&
             nodeInfo["children"] &&
+            nodeInfo["children"] instanceof Array &&
             nodeInfo["children"].length
         ) {
             node.loadFromData(nodeInfo["children"]);
@@ -415,13 +425,14 @@ export class Node {
         return node;
     }
 
-    public prepend(nodeInfo: any): Node {
+    public prepend(nodeInfo: NodeData): Node {
         const node = new this.tree.nodeClass(nodeInfo);
         this.addChildAtPosition(node, 0);
 
         if (
             typeof nodeInfo === "object" &&
             nodeInfo["children"] &&
+            nodeInfo["children"] instanceof Array &&
             nodeInfo["children"].length
         ) {
             node.loadFromData(nodeInfo["children"]);
@@ -473,8 +484,8 @@ export class Node {
     }
 
     public removeChildren(): void {
-        this.iterate((child: INode) => {
-            this.tree.removeNodeFromIndex(child as Node);
+        this.iterate((child: Node) => {
+            this.tree.removeNodeFromIndex(child);
             return true;
         });
 
@@ -507,16 +518,16 @@ export class Node {
         }
     }
 
-    public getNodesByProperty(key: string, value: any): Node[] {
+    public getNodesByProperty(key: string, value: unknown): Node[] {
         return this.filter((node: Node) => node[key] === value);
     }
 
     public filter(f: (node: Node) => boolean): Node[] {
         const result: Node[] = [];
 
-        this.iterate((node: INode) => {
-            if (f(node as Node)) {
-                result.push(node as Node);
+        this.iterate((node: Node) => {
+            if (f(node)) {
+                result.push(node);
             }
 
             return true;
@@ -593,16 +604,21 @@ export class Node {
     }
 
     // Init Node from data without making it the root of the tree
-    public initFromData(data: any): void {
-        const addNode = (nodeData: any): void => {
+    public initFromData(data: NodeData): void {
+        const addNode = (nodeData: NodeData): void => {
             this.setData(nodeData);
 
-            if (nodeData["children"]) {
+            if (
+                typeof nodeData === "object" &&
+                nodeData["children"] &&
+                nodeData["children"] instanceof Array &&
+                nodeData["children"].length
+            ) {
                 addChildren(nodeData["children"]);
             }
         };
 
-        const addChildren = (childrenData: any[]): void => {
+        const addChildren = (childrenData: NodeData[]): void => {
             for (const child of childrenData) {
                 const node = new this.tree.nodeClass("");
                 node.initFromData(child);

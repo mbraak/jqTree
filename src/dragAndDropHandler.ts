@@ -1,22 +1,30 @@
 import * as jQuery from "jquery";
-import { Position, Node, getPositionName } from "./node";
+import { getPositionName, Node, Position } from "./node";
 import { htmlEscape } from "./util";
-import { ITreeWidget, IHitArea, INodeElement, IDropHint } from "./itreeWidget";
-import { IPositionInfo } from "./imouseWidget";
+import { DropHint, HitArea, PositionInfo } from "./types";
+import { NodeElement } from "./nodeElement";
+import { JqTreeWidget } from "./tree.jquery";
+
+interface Dimensions {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+}
 
 export class DragAndDropHandler {
-    public hitAreas: IHitArea[];
+    public hitAreas: HitArea[];
     public isDragging: boolean;
-    public currentItem: INodeElement | null;
-    public hoveredArea: IHitArea | null;
-    public positionInfo: IPositionInfo | null;
+    public currentItem: NodeElement | null;
+    public hoveredArea: HitArea | null;
+    public positionInfo: PositionInfo | null;
 
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
     private dragElement: DragElement | null;
-    private previousGhost: IDropHint | null;
+    private previousGhost: DropHint | null;
     private openFolderTimer: number | null;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
 
         this.hoveredArea = null;
@@ -26,7 +34,7 @@ export class DragAndDropHandler {
         this.positionInfo = null;
     }
 
-    public mouseCapture(positionInfo: IPositionInfo): boolean | null {
+    public mouseCapture(positionInfo: PositionInfo): boolean | null {
         const $element = jQuery(positionInfo.target);
 
         if (!this.mustCaptureElement($element)) {
@@ -65,7 +73,7 @@ export class DragAndDropHandler {
         }
     }
 
-    public mouseStart(positionInfo: IPositionInfo): boolean {
+    public mouseStart(positionInfo: PositionInfo): boolean {
         if (
             !this.currentItem ||
             positionInfo.pageX === undefined ||
@@ -99,7 +107,7 @@ export class DragAndDropHandler {
         }
     }
 
-    public mouseDrag(positionInfo: IPositionInfo): boolean {
+    public mouseDrag(positionInfo: PositionInfo): boolean {
         if (
             !this.currentItem ||
             !this.dragElement ||
@@ -153,7 +161,7 @@ export class DragAndDropHandler {
         }
     }
 
-    public mouseStop(positionInfo: IPositionInfo): boolean {
+    public mouseStop(positionInfo: PositionInfo): boolean {
         this.moveItem(positionInfo);
         this.clear();
         this.removeHover();
@@ -202,7 +210,7 @@ export class DragAndDropHandler {
         return !$element.is("input,select,textarea");
     }
 
-    private canMoveToArea(area: IHitArea | null): boolean {
+    private canMoveToArea(area: HitArea | null): boolean {
         if (!area || !this.currentItem) {
             return false;
         } else if (this.treeWidget.options.onCanMoveTo) {
@@ -239,7 +247,7 @@ export class DragAndDropHandler {
         this.hoveredArea = null;
     }
 
-    private findHoveredArea(x: number, y: number): IHitArea | null {
+    private findHoveredArea(x: number, y: number): HitArea | null {
         const dimensions = this.getTreeDimensions();
 
         if (
@@ -269,7 +277,7 @@ export class DragAndDropHandler {
         return null;
     }
 
-    private mustOpenFolderTimer(area: IHitArea): boolean {
+    private mustOpenFolderTimer(area: HitArea): boolean {
         const node = area.node;
 
         return (
@@ -321,7 +329,7 @@ export class DragAndDropHandler {
         }
     }
 
-    private moveItem(positionInfo: IPositionInfo): void {
+    private moveItem(positionInfo: PositionInfo): void {
         if (
             this.currentItem &&
             this.hoveredArea &&
@@ -334,7 +342,7 @@ export class DragAndDropHandler {
             const previousParent = movedNode.parent;
 
             if (position === Position.Inside) {
-                this.hoveredArea.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                this.hoveredArea.node.is_open = true;
             }
 
             const doMove = (): void => {
@@ -343,7 +351,6 @@ export class DragAndDropHandler {
                 this.treeWidget._refreshElements(null);
             };
 
-            /* eslint-disable @typescript-eslint/camelcase */
             const event = this.treeWidget._triggerEvent("tree.move", {
                 move_info: {
                     moved_node: movedNode,
@@ -354,7 +361,6 @@ export class DragAndDropHandler {
                     original_event: positionInfo.originalEvent,
                 },
             });
-            /* eslint-enable @typescript-eslint/camelcase */
 
             if (!event.isDefaultPrevented()) {
                 doMove();
@@ -362,7 +368,7 @@ export class DragAndDropHandler {
         }
     }
 
-    private getTreeDimensions(): any {
+    private getTreeDimensions(): Dimensions {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
         const offset = this.treeWidget.element.offset();
@@ -474,7 +480,7 @@ abstract class VisibleNodeIterator {
 export class HitAreasGenerator extends VisibleNodeIterator {
     private currentNode: Node;
     private treeBottom: number;
-    private positions: IHitArea[];
+    private positions: HitArea[];
     private lastTop: number;
 
     constructor(tree: Node, currentNode: Node, treeBottom: number) {
@@ -484,7 +490,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         this.treeBottom = treeBottom;
     }
 
-    public generate(): IHitArea[] {
+    public generate(): HitArea[] {
         this.positions = [];
         this.lastTop = 0;
 
@@ -493,10 +499,10 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         return this.generateHitAreas(this.positions);
     }
 
-    protected generateHitAreas(positions: IHitArea[]): IHitArea[] {
+    protected generateHitAreas(positions: HitArea[]): HitArea[] {
         let previousTop = -1;
         let group = [];
-        const hitAreas: IHitArea[] = [];
+        const hitAreas: HitArea[] = [];
 
         for (const position of positions) {
             if (position.top !== previousTop && group.length) {
@@ -618,8 +624,8 @@ export class HitAreasGenerator extends VisibleNodeIterator {
     }
 
     private generateHitAreasForGroup(
-        hitAreas: IHitArea[],
-        positionsInGroup: IHitArea[],
+        hitAreas: HitArea[],
+        positionsInGroup: HitArea[],
         top: number,
         bottom: number
     ): void {

@@ -1,17 +1,17 @@
-import { ITreeWidget } from "./itreeWidget";
-import { Node } from "./node";
+import { DefaultRecord, Node, NodeData } from "./node";
+import { JqTreeWidget } from "./tree.jquery";
 
 export type HandleFinishedLoading = () => void;
 
 export default class DataLoader {
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
     }
 
     public loadFromUrl(
-        urlInfo: any,
+        urlInfo: string | JQuery.AjaxSettings | null,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null
     ): void {
@@ -37,13 +37,11 @@ export default class DataLoader {
             }
         };
 
-        const handleError = (jqXHR: any): void => {
+        const handleError = (jqXHR: JQuery.jqXHR): void => {
             stopLoading();
 
-            const { onLoadFailed } = this.treeWidget.options;
-
-            if (onLoadFailed) {
-                onLoadFailed(jqXHR);
+            if (this.treeWidget.options.onLoadFailed) {
+                this.treeWidget.options.onLoadFailed(jqXHR);
             }
         };
 
@@ -75,21 +73,19 @@ export default class DataLoader {
         node: Node | null,
         $el: JQuery
     ): void {
-        const { onLoading } = this.treeWidget.options;
-
-        if (onLoading) {
-            onLoading(isLoading, node, $el);
+        if (this.treeWidget.options.onLoading) {
+            this.treeWidget.options.onLoading(isLoading, node, $el);
         }
 
         this.treeWidget._triggerEvent("tree.loading_data", {
             isLoading,
             node,
-            $el
+            $el,
         });
     }
 
     private submitRequest(
-        urlInfo: any,
+        urlInfo: string | JQuery.AjaxSettings,
         handleSuccess: JQuery.Ajax.SuccessCallback<any>,
         handleError: JQuery.Ajax.ErrorCallback<any>
     ): void {
@@ -100,25 +96,32 @@ export default class DataLoader {
                 cache: false,
                 dataType: "json",
                 success: handleSuccess,
-                error: handleError
+                error: handleError,
             }
         );
 
         ajaxSettings.method = ajaxSettings.method.toUpperCase();
 
-        jQuery.ajax(ajaxSettings);
+        void jQuery.ajax(ajaxSettings);
     }
 
-    private parseData(data: any): any {
+    private parseData(data: NodeData): NodeData[] {
         const { dataFilter } = this.treeWidget.options;
 
-        const parsedData =
-            data instanceof Array || typeof data === "object"
-                ? data
-                : data != null
-                ? jQuery.parseJSON(data)
-                : [];
+        const getParsedData = (): unknown => {
+            if (typeof data === "string") {
+                return jQuery.parseJSON(data) as unknown;
+            } else {
+                return data;
+            }
+        };
 
-        return dataFilter ? dataFilter(parsedData) : parsedData;
+        const parsedData = getParsedData();
+
+        if (dataFilter) {
+            return dataFilter(parsedData);
+        } else {
+            return parsedData as DefaultRecord[];
+        }
     }
 }

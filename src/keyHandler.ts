@@ -1,5 +1,5 @@
 import { Node } from "./node";
-import { ITreeWidget } from "./itreeWidget";
+import { JqTreeWidget } from "./tree.jquery";
 
 export default class KeyHandler {
     private static LEFT = 37;
@@ -7,9 +7,9 @@ export default class KeyHandler {
     private static RIGHT = 39;
     private static DOWN = 40;
 
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
 
         if (treeWidget.options.keyboardSupport) {
@@ -122,7 +122,7 @@ export default class KeyHandler {
 
     private canHandleKeyboard(): boolean {
         return (
-            this.treeWidget.options.keyboardSupport &&
+            (this.treeWidget.options.keyboardSupport || false) &&
             this.isFocusOnTree() &&
             this.treeWidget.getSelectedNode() != null
         );

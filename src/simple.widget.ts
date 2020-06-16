@@ -1,112 +1,121 @@
-export default class SimpleWidget {
-    public static register(widgetClass: any, widgetName: string): void {
-        const getDataKey = (): string => `simple_widget_${widgetName}`;
+const register = (widgetClass: unknown, widgetName: string): void => {
+    const getDataKey = (): string => `simple_widget_${widgetName}`;
 
-        function getWidgetData(
-            el: Element,
-            dataKey: string
-        ): SimpleWidget | null {
-            const widget = jQuery.data(el, dataKey);
+    const getWidgetData = (
+        el: Element,
+        dataKey: string
+    ): SimpleWidget<unknown> | null => {
+        const widget = jQuery.data(el, dataKey) as unknown;
+
+        if (widget && widget instanceof SimpleWidget) {
+            return widget;
+        } else {
+            return null;
+        }
+    };
+
+    const createWidget = ($el: JQuery, options: unknown): JQuery => {
+        const dataKey = getDataKey();
+
+        for (const el of $el.get()) {
+            const existingWidget = getWidgetData(el, dataKey);
+
+            if (!existingWidget) {
+                const simpleWidgetClass = widgetClass as typeof SimpleWidget;
+                const widget = new simpleWidgetClass(el, options);
+
+                if (!jQuery.data(el, dataKey)) {
+                    jQuery.data(el, dataKey, widget);
+                }
+
+                // Call init after setting data, so we can call methods
+                widget.init();
+            }
+        }
+
+        return $el;
+    };
+
+    const destroyWidget = ($el: JQuery): void => {
+        const dataKey = getDataKey();
+
+        for (const el of $el.get()) {
+            const widget = getWidgetData(el, dataKey);
+
+            if (widget) {
+                widget.destroy();
+            }
+
+            jQuery.removeData(el, dataKey);
+        }
+    };
+
+    const callFunction = (
+        $el: JQuery,
+        functionName: string,
+        args: unknown[]
+    ): unknown => {
+        let result = null;
+
+        for (const el of $el.get()) {
+            const widget = jQuery.data(el, getDataKey()) as unknown;
 
             if (widget && widget instanceof SimpleWidget) {
-                return widget;
+                const simpleWidget = widget as SimpleWidget<unknown>;
+                const widgetFunction = simpleWidget[functionName];
+
+                if (widgetFunction && typeof widgetFunction === "function") {
+                    result = widgetFunction.apply(widget, args) as unknown;
+                }
+            }
+        }
+
+        return result;
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    (jQuery.fn as any)[widgetName] = function (
+        this: JQuery,
+        argument1: unknown,
+        ...args: unknown[]
+    ) {
+        if (!argument1) {
+            return createWidget(this, null);
+        } else if (typeof argument1 === "object") {
+            const options = argument1 as unknown;
+            return createWidget(this, options);
+        } else if (typeof argument1 === "string" && argument1[0] !== "_") {
+            const functionName = argument1;
+
+            if (functionName === "destroy") {
+                return destroyWidget(this);
+            } else if (functionName === "get_widget_class") {
+                return widgetClass;
             } else {
-                return null;
+                return callFunction(this, functionName, args);
             }
         }
+    };
+};
 
-        function createWidget($el: JQuery, options: object): JQuery<any> {
-            const dataKey = getDataKey();
-
-            for (const el of $el.get()) {
-                const existingWidget = getWidgetData(el, dataKey);
-
-                if (!existingWidget) {
-                    const widget: SimpleWidget = new widgetClass(el, options);
-
-                    if (!jQuery.data(el, dataKey)) {
-                        jQuery.data(el, dataKey, widget);
-                    }
-
-                    // Call init after setting data, so we can call methods
-                    widget.init();
-                }
-            }
-
-            return $el;
-        }
-
-        function destroyWidget($el: JQuery): void {
-            const dataKey = getDataKey();
-
-            for (const el of $el.get()) {
-                const widget = getWidgetData(el, dataKey);
-
-                if (widget) {
-                    widget.destroy();
-                }
-
-                jQuery.removeData(el, dataKey);
-            }
-        }
-
-        function callFunction(
-            $el: JQuery,
-            functionName: string,
-            args: any[]
-        ): any {
-            let result = null;
-
-            for (const el of $el.get()) {
-                const widget = jQuery.data(el, getDataKey());
-
-                if (widget && widget instanceof SimpleWidget) {
-                    const widgetFunction = (widget as any)[functionName];
-
-                    if (
-                        widgetFunction &&
-                        typeof widgetFunction === "function"
-                    ) {
-                        result = widgetFunction.apply(widget, args);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        (jQuery.fn as any)[widgetName] = function(
-            this: JQuery,
-            argument1: any,
-            ...args: any[]
-        ): any {
-            if (argument1 === undefined || typeof argument1 === "object") {
-                const options = argument1;
-                return createWidget(this, options);
-            } else if (typeof argument1 === "string" && argument1[0] !== "_") {
-                const functionName = argument1;
-
-                if (functionName === "destroy") {
-                    return destroyWidget(this);
-                } else if (functionName === "get_widget_class") {
-                    return widgetClass;
-                } else {
-                    return callFunction(this, functionName, args);
-                }
-            }
-        };
+export default class SimpleWidget<WidgetOptions> {
+    public static register(widgetClass: unknown, widgetName: string): void {
+        register(widgetClass, widgetName);
     }
 
-    protected static defaults = {};
+    [key: string]: unknown;
 
-    public options: any;
+    protected static defaults: unknown = {};
+
+    public options: WidgetOptions;
 
     protected $el: JQuery<any>;
 
-    constructor(el: Element, options: any) {
+    constructor(el: Element, options: WidgetOptions) {
         this.$el = jQuery(el);
 
-        const defaults = (this.constructor as typeof SimpleWidget).defaults;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const defaults = (this.constructor as any)["defaults"] as WidgetOptions;
         this.options = jQuery.extend({}, defaults, options);
     }
 
@@ -114,11 +123,11 @@ export default class SimpleWidget {
         this.deinit();
     }
 
-    protected init(): void {
+    public init(): void {
         //
     }
 
-    protected deinit(): void {
+    public deinit(): void {
         //
     }
 }

@@ -1,14 +1,14 @@
-import { ITreeWidget, IHitArea } from "./itreeWidget";
-import { IPositionInfo } from "./imouseWidget";
+import { JqTreeWidget } from "./tree.jquery";
+import { HitArea, PositionInfo } from "./types";
 
 export default class ScrollHandler {
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
     private previousTop: number;
     private isInitialized: boolean;
     private $scrollParent: JQuery | null;
     private scrollParentTop: number;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
         this.previousTop = -1;
         this.isInitialized = false;
@@ -140,7 +140,7 @@ export default class ScrollHandler {
         }
     }
 
-    private handleVerticalScrollingWithScrollParent(area: IHitArea): void {
+    private handleVerticalScrollingWithScrollParent(area: HitArea): void {
         const scrollParent = this.$scrollParent && this.$scrollParent[0];
 
         if (!scrollParent) {
@@ -161,7 +161,7 @@ export default class ScrollHandler {
         }
     }
 
-    private handleVerticalScrollingWithDocument(area: IHitArea): void {
+    private handleVerticalScrollingWithDocument(area: HitArea): void {
         const scrollTop = jQuery(document).scrollTop() || 0;
         const distanceTop = area.top - scrollTop;
 
@@ -209,7 +209,7 @@ export default class ScrollHandler {
     }
 
     private handleHorizontalScrollingWithParent(
-        positionInfo: IPositionInfo
+        positionInfo: PositionInfo
     ): void {
         if (
             positionInfo.pageX === undefined ||
@@ -248,7 +248,7 @@ export default class ScrollHandler {
     }
 
     private handleHorizontalScrollingWithDocument(
-        positionInfo: IPositionInfo
+        positionInfo: PositionInfo
     ): void {
         if (
             positionInfo.pageX === undefined ||

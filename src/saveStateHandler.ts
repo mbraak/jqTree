@@ -1,12 +1,17 @@
 import { isInt } from "./util";
-import { ITreeWidget } from "./itreeWidget";
+import { JqTreeWidget } from "./tree.jquery";
 import { Node, NodeId } from "./node";
 
+export interface SavedState {
+    open_nodes: NodeId[];
+    selected_node: NodeId[];
+}
+
 export default class SaveStateHandler {
-    private treeWidget: ITreeWidget;
+    private treeWidget: JqTreeWidget;
     private _supportsLocalStorage: boolean | null;
 
-    constructor(treeWidget: ITreeWidget) {
+    constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
     }
 
@@ -20,7 +25,7 @@ export default class SaveStateHandler {
         }
     }
 
-    public getStateFromStorage(): any {
+    public getStateFromStorage(): SavedState | null {
         const jsonData = this.loadFromStorage();
 
         if (jsonData) {
@@ -30,11 +35,11 @@ export default class SaveStateHandler {
         }
     }
 
-    public getState(): any {
+    public getState(): SavedState {
         const getOpenNodeIds = (): NodeId[] => {
             const openNodes: NodeId[] = [];
 
-            this.treeWidget.tree.iterate((node: INode) => {
+            this.treeWidget.tree.iterate((node: Node) => {
                 if (node.is_open && node.id && node.hasChildren()) {
                     openNodes.push(node.id);
                 }
@@ -44,15 +49,22 @@ export default class SaveStateHandler {
             return openNodes;
         };
 
-        const getSelectedNodeIds = (): NodeId[] =>
-            this.treeWidget.getSelectedNodes().map((n: Node) => n.id);
+        const getSelectedNodeIds = (): NodeId[] => {
+            const selectedNodeIds: NodeId[] = [];
 
-        /* eslint-disable @typescript-eslint/camelcase */
+            this.treeWidget.getSelectedNodes().forEach((node) => {
+                if (node.id != null) {
+                    selectedNodeIds.push(node.id);
+                }
+            });
+
+            return selectedNodeIds;
+        };
+
         return {
             open_nodes: getOpenNodeIds(),
-            selected_node: getSelectedNodeIds()
+            selected_node: getSelectedNodeIds(),
         };
-        /* eslint-enable @typescript-eslint/camelcase */
     }
 
     /*
@@ -61,7 +73,7 @@ export default class SaveStateHandler {
 
     result: must load on demand
     */
-    public setInitialState(state: any): boolean {
+    public setInitialState(state: SavedState): boolean {
         if (!state) {
             return false;
         } else {
@@ -80,7 +92,10 @@ export default class SaveStateHandler {
         }
     }
 
-    public setInitialStateOnDemand(state: any, cbFinished: () => void): void {
+    public setInitialStateOnDemand(
+        state: SavedState,
+        cbFinished: () => void
+    ): void {
         if (state) {
             this.doSetInitialStateOnDemand(
                 state.open_nodes,
@@ -92,7 +107,7 @@ export default class SaveStateHandler {
         }
     }
 
-    public getNodeIdToBeSelected(): any {
+    public getNodeIdToBeSelected(): NodeId | null {
         const state = this.getStateFromStorage();
 
         if (state && state.selected_node) {
@@ -102,23 +117,25 @@ export default class SaveStateHandler {
         }
     }
 
-    private parseState(jsonData: any): any {
-        const state = jQuery.parseJSON(jsonData);
+    private parseState(jsonData: string): SavedState {
+        const state = jQuery.parseJSON(jsonData) as Record<string, unknown>;
 
         // Check if selected_node is an int (instead of an array)
         if (state && state.selected_node && isInt(state.selected_node)) {
             // Convert to array
-            state.selected_node = [state.selected_node]; // eslint-disable-line @typescript-eslint/camelcase
+            state.selected_node = [state.selected_node];
         }
 
-        return state;
+        return (state as unknown) as SavedState;
     }
 
-    private loadFromStorage(): any {
+    private loadFromStorage(): string | null {
         if (this.treeWidget.options.onGetStateFromStorage) {
             return this.treeWidget.options.onGetStateFromStorage();
         } else if (this.supportsLocalStorage()) {
             return localStorage.getItem(this.getKeyName());
+        } else {
+            return null;
         }
     }
 
@@ -130,7 +147,7 @@ export default class SaveStateHandler {
 
             if (node) {
                 if (!node.load_on_demand) {
-                    node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                    node.is_open = true;
                 } else {
                     mustLoadOnDemand = true;
                 }
@@ -164,7 +181,7 @@ export default class SaveStateHandler {
         if (selectNodeHandler) {
             const selectedNodes = selectNodeHandler.getSelectedNodes();
 
-            selectedNodes.forEach(node => {
+            selectedNodes.forEach((node) => {
                 selectNodeHandler.removeFromSelection(node);
             });
         }

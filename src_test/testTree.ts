@@ -4,7 +4,7 @@ import {
     exampleData,
     formatNodes,
     doGetNodeByName,
-    doGetNodeById
+    doGetNodeById,
 } from "./utilsForTest";
 import { Node, Position } from "../src/node";
 
@@ -23,7 +23,7 @@ test("constructor", (assert: Assert) => {
         id: 123,
         parent: "abc", // parent must be ignored
         children: ["c"], // children must be ignored
-        url: "/"
+        url: "/",
     });
 
     assert.equal(node2.name, "n2");
@@ -64,13 +64,13 @@ test("create tree from data", (assert: Assert) => {
         {
             label: "node1",
             id: 123,
-            children: ["child1", "child2"] // nodes are only defined by a string
+            children: ["child1", "child2"], // nodes are only defined by a string
         },
         {
             label: "node2",
             id: 124,
-            children: ["child3"]
-        }
+            children: ["child3"],
+        },
     ];
     const tree2 = new Node({}, true);
     tree2.loadFromData(data);
@@ -86,11 +86,12 @@ test("addChild", (assert: Assert) => {
 
     const node = tree.children[0];
 
+    /* istanbul ignore if */
     if (!node.parent) {
-        assert.ok(false, "Node has no parent");
-    } else {
-        assert.equal(node.parent.name, "tree1", "parent of node");
+        throw "Node has no parent";
     }
+
+    assert.equal(node.parent.name, "tree1", "parent of node");
 });
 
 test("addChildAtPosition", (assert: Assert) => {
@@ -169,8 +170,8 @@ test("iterate", (assert: Assert) => {
     tree.loadFromData(exampleData);
 
     // iterate over all the nodes
-    const nodes: INode[] = [];
-    tree.iterate((node: INode) => {
+    const nodes: Node[] = [];
+    tree.iterate((node: Node) => {
         nodes.push(node);
         return true;
     });
@@ -182,8 +183,8 @@ test("iterate", (assert: Assert) => {
     );
 
     // iterate over nodes on first level
-    const nodes2: INode[] = [];
-    tree.iterate((node: INode) => {
+    const nodes2: Node[] = [];
+    tree.iterate((node: Node) => {
         nodes2.push(node);
         return false;
     });
@@ -197,7 +198,7 @@ test("iterate", (assert: Assert) => {
 
     // test level parameter
     const nodes3: string[] = [];
-    tree.iterate((node: INode, level: number) => {
+    tree.iterate((node: Node, level: number) => {
         nodes3.push(`${node.name} ${level}`);
         return true;
     });
@@ -291,9 +292,9 @@ test("initFromData", (assert: Assert) => {
             "c1",
             {
                 label: "c2",
-                id: 201
-            }
-        ]
+                id: 201,
+            },
+        ],
     };
     const node = new Node({}, true);
     node.initFromData(data);
@@ -314,20 +315,20 @@ test("getData", (assert: Assert) => {
             label: "n1",
             children: [
                 {
-                    label: "c1"
-                }
-            ]
-        }
+                    label: "c1",
+                },
+            ],
+        },
     ]);
     assert.deepEqual(node.getData(), [
         {
             name: "n1",
             children: [
                 {
-                    name: "c1"
-                }
-            ]
-        }
+                    name: "c1",
+                },
+            ],
+        },
     ]);
 
     // 3. get data including parent
@@ -336,8 +337,8 @@ test("getData", (assert: Assert) => {
     assert.deepEqual(n1.getData(true), [
         {
             name: "n1",
-            children: [{ name: "c1" }]
-        }
+            children: [{ name: "c1" }],
+        },
     ]);
 });
 
@@ -375,7 +376,7 @@ test("addAfter", (assert: Assert) => {
     if (nodeB) {
         nodeB.addAfter({
             label: "node_c",
-            id: 789
+            id: 789,
         });
     }
 
@@ -455,7 +456,7 @@ test("append", (assert: Assert) => {
     // 2. Append subtree
     node1.append({
         name: "child4",
-        children: [{ name: "child5" }]
+        children: [{ name: "child5" }],
     });
 
     assert.equal(formatNodes(node1.children), "child1 child2 child3 child4");
@@ -479,7 +480,7 @@ test("prepend", (assert: Assert) => {
     // 2. Prepend subtree
     node1.prepend({
         name: "child3",
-        children: [{ name: "child4" }]
+        children: [{ name: "child4" }],
     });
 
     assert.equal(formatNodes(node1.children), "child3 child0 child1 child2");
@@ -506,7 +507,7 @@ test("getNodeById", (assert: Assert) => {
     const child3 = doGetNodeByName(tree, "child2");
     child3.append({
         id: 456,
-        label: "new node"
+        label: "new node",
     });
 
     const node2 = doGetNodeById(tree, 456);
@@ -569,8 +570,8 @@ test("node with id 0", (assert: Assert) => {
     tree.loadFromData([
         {
             id: 0,
-            label: "mynode"
-        }
+            label: "mynode",
+        },
     ]);
 
     const node = doGetNodeById(tree, 0);
@@ -593,11 +594,12 @@ test("getPreviousSibling", (assert: Assert) => {
         "child2"
     ).getPreviousSibling();
 
+    /* istanbul ignore if */
     if (!previousSibling) {
-        assert.ok(false, "Previous sibling not found");
-    } else {
-        assert.equal(previousSibling.name, "child1");
+        throw "Previous sibling not found";
     }
+
+    assert.equal(previousSibling.name, "child1");
 
     assert.equal(tree.getPreviousSibling(), null);
     assert.equal(doGetNodeByName(tree, "child1").getPreviousSibling(), null);
@@ -611,11 +613,12 @@ test("getNextSibling", (assert: Assert) => {
     // - getNextSibling
     const nextSibling = doGetNodeByName(tree, "node1").getNextSibling();
 
+    /* istanbul ignore if */
     if (!nextSibling) {
-        assert.ok(false, "Next sibling not found");
-    } else {
-        assert.equal(nextSibling.name, "node2");
+        throw "Next sibling not found";
     }
+
+    assert.equal(nextSibling.name, "node2");
 
     assert.equal(doGetNodeByName(tree, "node2").getNextSibling(), null);
     assert.equal(tree.getNextSibling(), null);
@@ -637,9 +640,10 @@ test("getNodeByCallback", (assert: Assert) => {
 
     const node = tree.getNodeByCallback((n: Node) => n.name === "child1");
 
+    /* istanbul ignore if */
     if (!node) {
-        assert.ok(false, "Node not found");
-    } else {
-        assert.equal(node.name, "child1");
+        throw "Node not found";
     }
+
+    assert.equal(node.name, "child1");
 });
