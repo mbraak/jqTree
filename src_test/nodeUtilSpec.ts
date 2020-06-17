@@ -1,5 +1,11 @@
 import { expect } from "chai";
-import { getPositionName, Position } from "../src/node";
+import { getPosition, getPositionName, Position } from "../src/node";
+
+describe("getPosition", () => {
+    it("returns the position", () => {
+        expect(getPosition("inside")).to.eq(Position.Inside);
+    });
+});
 
 describe("getPositionName", () => {
     it("returns the name of the position", () => {
