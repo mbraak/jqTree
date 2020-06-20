@@ -14,4 +14,10 @@ describe("getPositionName", () => {
         expect(getPositionName(Position.Inside)).to.eq("inside");
         expect(getPositionName(Position.None)).to.eq("none");
     });
+
+    context("with an unknown position", () => {
+        it("returns an empty string", () => {
+            expect(getPositionName(10)).to.eq("");
+        });
+    });
 });

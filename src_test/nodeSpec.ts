@@ -2,6 +2,15 @@ import { expect } from "chai";
 import { Node } from "../src/node";
 
 describe("constructor", () => {
+    context("without parameters", () => {
+        const node = new Node();
+
+        it("creates a node", () => {
+            expect(node.name).to.eq("");
+            expect(node.id).to.be.undefined;
+        });
+    });
+
     context("with a string", () => {
         const node = new Node("n1");
 
@@ -9,6 +18,7 @@ describe("constructor", () => {
             expect(node.name).to.eq("n1");
             expect(node.children).to.be.empty;
             expect(node.parent).to.be.null;
+            expect(node.id).to.be.undefined;
         });
     });
 
