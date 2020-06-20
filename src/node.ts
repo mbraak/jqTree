@@ -53,7 +53,7 @@ export class Node implements INode {
 
     [key: string]: unknown;
 
-    constructor(o: NodeData | null, isRoot = false, nodeClass = Node) {
+    constructor(o: NodeData | null = null, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.isEmptyFolder = false;
 
