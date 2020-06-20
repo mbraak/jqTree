@@ -36,6 +36,14 @@ describe("constructor", () => {
         });
     });
 
+    context("when the name property is null", () => {
+        const node = new Node({ name: null });
+
+        it("sets the name to an empty string", () => {
+            expect(node.name).to.eq("");
+        });
+    });
+
     context("with an object with more properties", () => {
         const node = new Node({
             color: "green",
