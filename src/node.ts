@@ -53,7 +53,7 @@ export class Node implements INode {
 
     [key: string]: unknown;
 
-    constructor(o: NodeData | null, isRoot = false, nodeClass = Node) {
+    constructor(o: NodeData | null = null, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.isEmptyFolder = false;
 
@@ -86,26 +86,22 @@ export class Node implements INode {
     * Does not remove existing node values
     */
     public setData(o: NodeData | null): void {
-        const setName = (name: string): void => {
-            if (name != null) {
-                this.name = name;
-            }
-        };
-
         if (!o) {
             return;
-        } else if (typeof o !== "object") {
-            setName(o);
-        } else {
+        } else if (typeof o === "string") {
+            this.name = o;
+        } else if (typeof o === "object") {
             for (const key in o) {
                 if (Object.prototype.hasOwnProperty.call(o, key)) {
                     const value = o[key];
 
-                    if (key === "label" && typeof value === "string") {
+                    if (key === "label" || key === "name") {
                         // You can use the 'label' key instead of 'name'; this is a legacy feature
-                        setName(value);
-                    } else if (key !== "children") {
-                        // You can't update the children using this function
+                        if (typeof value === "string") {
+                            this.name = value;
+                        }
+                    } else if (key !== "children" && key !== "parent") {
+                        // You can't update the children or the parent using this function
                         this[key] = value;
                     }
                 }
