@@ -1,7 +1,7 @@
 module.exports = {
     coverageDirectory: "coverage",
     preset: "ts-jest",
-    rootDir: "test",
-    setupFilesAfterEnv: ["<rootDir>/setupTests.ts"],
+    rootDir: "src",
+    setupFilesAfterEnv: ["<rootDir>/test/setupTests.ts"],
     testEnvironment: "jsdom",
 };
