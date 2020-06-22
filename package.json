@@ -14,14 +14,14 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "test": "jest --no-cache",
+        "test": "jest --coverage --no-cache",
         "lint": "eslint src/ --ext .ts,.tsx",
         "production": "./production",
         "jekyll-build": "bundle exec jekyll build",
         "jekyll-serve": "bundle exec jekyll serve",
         "devserver": "webpack-dev-server --mode development",
         "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
-        "coveralls": "coveralls < coverage/lcov.info",
+        "coveralls": "coveralls < src/coverage/lcov.info",
         "tsc": "tsc --noEmit --project tsconfig.json"
     },
     "dependencies": {
