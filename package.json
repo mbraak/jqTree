@@ -14,10 +14,9 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "test": "karma start --browsers ChromeHeadlessNoSandbox --single-run",
+        "test": "jest",
         "lint": "eslint src/ src_test/ --ext .ts,.tsx",
         "production": "./production",
-        "karma": "karma start",
         "jekyll-build": "bundle exec jekyll build",
         "jekyll-serve": "bundle exec jekyll serve",
         "devserver": "webpack-dev-server --mode development",
@@ -29,6 +28,7 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
+        "@types/jest": "^26.0.0",
         "@types/jquery": "^3.3.35",
         "@types/jquery-mockjax": "^2.0.31",
         "@types/qunit": "^2.9.1",
@@ -39,6 +39,7 @@
         "eslint": "^7.2.0",
         "eslint-plugin-import": "^2.21.2",
         "istanbul-instrumenter-loader": "^3.0.1",
+        "jest": "^26.0.1",
         "jquery-mockjax": "^2.5.0",
         "jsonfile": "^6.0.1",
         "lodash.template": "^4.5.0",
@@ -48,6 +49,7 @@
         "postcss-loader": "^3.0.0",
         "postcss-nested": "^4.2.1",
         "prettier": "^2.0.5",
+        "ts-jest": "^26.1.1",
         "ts-loader": "^7.0.4",
         "typescript": "^3.9.5",
         "webpack": "^4.43.0",
