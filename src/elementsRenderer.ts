@@ -261,7 +261,7 @@ export default class ElementsRenderer {
             }
         }
 
-        titleSpan.innerHTML = this.escapeIfNecessary(nodeName);
+        titleSpan.textContent = this.escapeIfNecessary(nodeName);
 
         return titleSpan;
     }
