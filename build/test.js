@@ -2467,7 +2467,7 @@ var ElementsRenderer = /** @class */ (function () {
                 titleSpan.setAttribute("tabindex", "" + tabIndex);
             }
         }
-        titleSpan.innerHTML = this.escapeIfNecessary(nodeName);
+        titleSpan.textContent = this.escapeIfNecessary(nodeName);
         return titleSpan;
     };
     ElementsRenderer.prototype.getButtonClasses = function (node) {

@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development
+
+-   Issue #603: improve performance of title rendering (thanks to Bekefi Gergely)
+
 ##### 1.4.12 (november 11 2019)
 
 -   Issue #579: have icon for empty folders (thanks to Andrew Hinde)
