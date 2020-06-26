@@ -390,8 +390,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
         const positionIndex = getPosition(position);
 
-        this.tree.moveNode(node, targetNode, positionIndex);
-        this._refreshElements(null);
+        if (positionIndex !== undefined) {
+            this.tree.moveNode(node, targetNode, positionIndex);
+            this._refreshElements(null);
+        }
+
         return this.element;
     }
 

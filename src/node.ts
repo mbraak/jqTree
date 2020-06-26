@@ -10,11 +10,7 @@ export enum Position {
     None,
 }
 
-interface Positions {
-    [key: string]: Position;
-}
-
-const positionNames: Positions = {
+const positionNames: Record<string, Position> = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
@@ -35,7 +31,8 @@ export const getPositionName = (position: Position): string => {
     return "";
 };
 
-export const getPosition = (name: string): Position => positionNames[name];
+export const getPosition = (name: string): Position | undefined =>
+    positionNames[name];
 
 export class Node implements INode {
     public id?: NodeId;
