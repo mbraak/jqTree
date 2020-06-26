@@ -12,7 +12,7 @@ import {
 import { getPositionName, Node, NodeId } from "../src/node";
 import { HitArea } from "../src/types";
 
-const { module, test } = QUnit;
+const { module, test } = QUnit; // eslint-disable-line @typescript-eslint/unbound-method
 
 interface ClickNodeEvent {
     node: Node;

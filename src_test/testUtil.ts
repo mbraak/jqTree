@@ -1,4 +1,4 @@
-const { module, test } = QUnit;
+const { module, test } = QUnit; // eslint-disable-line @typescript-eslint/unbound-method
 
 import { isInt, isFunction, htmlEscape, getBoolString } from "../src/util";
 
