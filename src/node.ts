@@ -320,6 +320,16 @@ export class Node implements INode {
         return this.getNodeByCallback((node: Node) => node.name === name);
     }
 
+    public getNodeByNameMustExist(name: string): Node {
+        const node = this.getNodeByCallback((n: Node) => n.name === name);
+
+        if (!node) {
+            throw `Node with name ${name} not found`;
+        }
+
+        return node;
+    }
+
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
         let result = null;
 

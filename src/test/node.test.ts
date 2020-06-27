@@ -212,3 +212,23 @@ describe(".loadFromData", () => {
         ]);
     });
 });
+
+describe(".removeChild", () => {
+    let node1: Node;
+
+    beforeEach(() => {
+        const tree = new Node();
+        tree.loadFromData(exampleData);
+
+        node1 = tree.getNodeByNameMustExist("node1");
+        const child1 = tree.getNodeByNameMustExist("child1");
+
+        node1.removeChild(child1);
+    });
+
+    test("removes the child", () => {
+        expect(node1.children).toEqual([
+            expect.objectContaining({ name: "child2" }),
+        ]);
+    });
+});
