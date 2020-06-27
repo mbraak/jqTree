@@ -123,7 +123,7 @@ export class Node implements INode {
         }
     ]
     */
-    public loadFromData(data: NodeData[]): void {
+    public loadFromData(data: NodeData[]): Node {
         this.removeChildren();
 
         for (const o of data) {
@@ -142,6 +142,8 @@ export class Node implements INode {
                 }
             }
         }
+
+        return this;
     }
 
     /*
