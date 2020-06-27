@@ -3,6 +3,82 @@ import exampleData from "./exampleData";
 
 const context = describe;
 
+describe(".addChild", () => {
+    const node = new Node();
+    node.addChild(new Node({ id: 100, name: "child1" }));
+
+    test("adds the child", () => {
+        expect(node.children).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ id: 100, name: "child1" }),
+            ])
+        );
+    });
+
+    test("sets the parent of the child", () => {
+        expect(node.children[0].parent).toEqual(node);
+    });
+});
+
+describe("addChildAtPosition", () => {
+    const child = new Node("new");
+
+    let node: Node;
+
+    beforeEach(() => {
+        node = new Node();
+        node.loadFromData(["child1", "child2"]);
+    });
+
+    context("with index 0", () => {
+        beforeEach(() => {
+            node.addChildAtPosition(child, 0);
+        });
+
+        test("adds at the start", () => {
+            expect(node.children).toEqual([
+                expect.objectContaining({ name: "new" }),
+                expect.objectContaining({ name: "child1" }),
+                expect.objectContaining({ name: "child2" }),
+            ]);
+
+            expect(node.children).toEqual([
+                expect.objectContaining({ name: "new" }),
+                expect.objectContaining({ name: "child1" }),
+                expect.objectContaining({ name: "child2" }),
+            ]);
+        });
+    });
+
+    context("with index 1", () => {
+        beforeEach(() => {
+            node.addChildAtPosition(child, 1);
+        });
+
+        test("inserts at index 1", () => {
+            expect(node.children).toEqual([
+                expect.objectContaining({ name: "child1" }),
+                expect.objectContaining({ name: "new" }),
+                expect.objectContaining({ name: "child2" }),
+            ]);
+        });
+    });
+
+    context("with non existing index", () => {
+        beforeEach(() => {
+            node.addChildAtPosition(child, 99);
+        });
+
+        test("adds add the end", () => {
+            expect(node.children).toEqual([
+                expect.objectContaining({ name: "child1" }),
+                expect.objectContaining({ name: "child2" }),
+                expect.objectContaining({ name: "new" }),
+            ]);
+        });
+    });
+});
+
 describe("constructor", () => {
     context("without parameters", () => {
         const node = new Node();
@@ -113,30 +189,26 @@ describe(".loadFromData", () => {
     tree.loadFromData(exampleData);
 
     test("creates a tree", () => {
-        expect(tree.getData()).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining({
-                    id: 123,
-                    intProperty: 1,
-                    name: "node1",
-                    strProperty: "1",
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    children: expect.arrayContaining([
-                        expect.objectContaining({ id: 125, name: "child1" }),
-                        expect.objectContaining({ id: 126, name: "child2" }),
-                    ]),
-                }),
-                expect.objectContaining({
-                    id: 124,
-                    intProperty: 3,
-                    name: "node2",
-                    strProperty: "3",
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    children: expect.arrayContaining([
-                        expect.objectContaining({ id: 127, name: "child3" }),
-                    ]),
-                }),
-            ])
-        );
+        expect(tree.children).toEqual([
+            expect.objectContaining({
+                id: 123,
+                intProperty: 1,
+                name: "node1",
+                strProperty: "1",
+                children: [
+                    expect.objectContaining({ id: 125, name: "child1" }),
+                    expect.objectContaining({ id: 126, name: "child2" }),
+                ],
+            }),
+            expect.objectContaining({
+                id: 124,
+                intProperty: 3,
+                name: "node2",
+                strProperty: "3",
+                children: [
+                    expect.objectContaining({ id: 127, name: "child3" }),
+                ],
+            }),
+        ]);
     });
 });
