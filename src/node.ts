@@ -40,8 +40,8 @@ export class Node implements INode {
     public children: Node[];
     public parent: Node | null;
     public idMapping: Record<NodeId, Node>;
-    public tree: Node;
-    public nodeClass: typeof Node;
+    public tree?: Node;
+    public nodeClass?: typeof Node;
     public load_on_demand: boolean;
     public is_open: boolean;
     public element: Element;
@@ -127,7 +127,7 @@ export class Node implements INode {
         this.removeChildren();
 
         for (const o of data) {
-            const node = new this.tree.nodeClass(o);
+            const node = this.createNode(o);
             this.addChild(node);
 
             if (
@@ -278,8 +278,8 @@ export class Node implements INode {
     /*
     Get the tree as data.
     */
-    public getData(includeParent = false): any[] {
-        function getDataFromNodes(nodes: Node[]): Record<string, unknown>[] {
+    public getData(includeParent = false): DefaultRecord[] {
+        const getDataFromNodes = (nodes: Node[]): Record<string, unknown>[] => {
             return nodes.map((node) => {
                 const tmpNode: Record<string, unknown> = {};
 
@@ -289,6 +289,8 @@ export class Node implements INode {
                             "parent",
                             "children",
                             "element",
+                            "idMapping",
+                            "nodeClass",
                             "tree",
                             "isEmptyFolder",
                         ].indexOf(k) === -1 &&
@@ -305,7 +307,7 @@ export class Node implements INode {
 
                 return tmpNode;
             });
-        }
+        };
 
         if (includeParent) {
             return getDataFromNodes([this]);
@@ -337,7 +339,7 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const node = new this.tree.nodeClass(nodeInfo);
+            const node = this.createNode(nodeInfo);
 
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
@@ -359,7 +361,7 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const node = new this.tree.nodeClass(nodeInfo);
+            const node = this.createNode(nodeInfo);
 
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
@@ -381,8 +383,11 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const newParent: Node = new this.tree.nodeClass(nodeInfo);
-            newParent.setParent(this.tree);
+            const newParent = this.createNode(nodeInfo);
+
+            if (this.tree) {
+                newParent.setParent(this.tree);
+            }
             const originalParent = this.parent;
 
             for (const child of originalParent.children) {
@@ -403,7 +408,7 @@ export class Node implements INode {
     }
 
     public append(nodeInfo: NodeData): Node {
-        const node = new this.tree.nodeClass(nodeInfo);
+        const node = this.createNode(nodeInfo);
         this.addChild(node);
 
         if (
@@ -419,7 +424,7 @@ export class Node implements INode {
     }
 
     public prepend(nodeInfo: NodeData): Node {
-        const node = new this.tree.nodeClass(nodeInfo);
+        const node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
 
         if (
@@ -478,7 +483,7 @@ export class Node implements INode {
 
     public removeChildren(): void {
         this.iterate((child: Node) => {
-            this.tree.removeNodeFromIndex(child);
+            this.tree?.removeNodeFromIndex(child);
             return true;
         });
 
@@ -613,7 +618,7 @@ export class Node implements INode {
 
         const addChildren = (childrenData: NodeData[]): void => {
             for (const child of childrenData) {
-                const node = new this.tree.nodeClass("");
+                const node = this.createNode();
                 node.initFromData(child);
                 this.addChild(node);
             }
@@ -625,11 +630,20 @@ export class Node implements INode {
     private setParent(parent: Node): void {
         this.parent = parent;
         this.tree = parent.tree;
-        this.tree.addNodeToIndex(this);
+        this.tree?.addNodeToIndex(this);
     }
 
     private doRemoveChild(node: Node): void {
         this.children.splice(this.getChildIndex(node), 1);
-        this.tree.removeNodeFromIndex(node);
+        this.tree?.removeNodeFromIndex(node);
+    }
+
+    private getNodeClass(): typeof Node {
+        return this.nodeClass || this?.tree?.nodeClass || Node;
+    }
+
+    private createNode(nodeData?: NodeData): Node {
+        const nodeClass = this.getNodeClass();
+        return new nodeClass(nodeData);
     }
 }
