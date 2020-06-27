@@ -1,20 +1,20 @@
 const exampleData = [
     {
-        label: "node1",
+        name: "node1",
         id: 123, // extra data
         intProperty: 1,
         strProperty: "1",
         children: [
-            { label: "child1", id: 125, intProperty: 2 },
-            { label: "child2", id: 126 },
+            { name: "child1", id: 125, intProperty: 2 },
+            { name: "child2", id: 126 },
         ],
     },
     {
-        label: "node2",
+        name: "node2",
         id: 124,
         intProperty: 3,
         strProperty: "3",
-        children: [{ label: "child3", id: 127 }],
+        children: [{ name: "child3", id: 127 }],
     },
 ];
 

@@ -1,4 +1,5 @@
 import { Node } from "../node";
+import exampleData from "./exampleData";
 
 const context = describe;
 
@@ -104,5 +105,38 @@ describe("constructor", () => {
             expect(node.name).toBe("n1");
             expect(node.children).toHaveLength(0);
         });
+    });
+});
+
+describe(".loadFromData", () => {
+    const tree = new Node();
+    tree.loadFromData(exampleData);
+
+    test("creates a tree", () => {
+        expect(tree.getData()).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    id: 123,
+                    intProperty: 1,
+                    name: "node1",
+                    strProperty: "1",
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    children: expect.arrayContaining([
+                        expect.objectContaining({ id: 125, name: "child1" }),
+                        expect.objectContaining({ id: 126, name: "child2" }),
+                    ]),
+                }),
+                expect.objectContaining({
+                    id: 124,
+                    intProperty: 3,
+                    name: "node2",
+                    strProperty: "3",
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    children: expect.arrayContaining([
+                        expect.objectContaining({ id: 127, name: "child3" }),
+                    ]),
+                }),
+            ])
+        );
     });
 });
