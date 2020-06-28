@@ -27,7 +27,7 @@ const getTreeNode = ($li: JQuery<HTMLElement>): TreeNode => {
     const name = $span.text();
 
     if ($li.hasClass("jqtree-folder")) {
-        const $ul = singleChild($li, "ul.jqtree_common");
+        const $ul = $li.children("ul.jqtree_common");
 
         return {
             children: getChildren($ul),
