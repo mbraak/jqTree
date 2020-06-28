@@ -29,7 +29,7 @@ describe(".addChild", () => {
     });
 });
 
-describe("addChildAtPosition", () => {
+describe(".addChildAtPosition", () => {
     interface Vars {
         child: Node;
         index: number;
