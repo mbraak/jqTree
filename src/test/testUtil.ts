@@ -12,9 +12,13 @@ const singleChild = (
 ): JQuery<HTMLElement> => {
     const $result = $el.children(selector);
 
+    /* istanbul ignore if */
     if ($result.length === 0) {
         throw `No child found for selector '${selector}'`;
-    } else if ($result.length > 1) {
+    }
+
+    /* istanbul ignore if */
+    if ($result.length > 1) {
         throw `Multiple elements found for selector '${selector}'`;
     }
 
