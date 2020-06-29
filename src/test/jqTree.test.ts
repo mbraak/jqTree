@@ -35,36 +35,38 @@ describe("create with data", () => {
     });
 });
 
-describe("showEmptyFolder option", () => {
-    context("when children attribute is an empty array", () => {
-        interface Vars {
-            showEmptyFolder: boolean;
-        }
+describe("options", () => {
+    describe("showEmptyFolder", () => {
+        context("when children attribute is an empty array", () => {
+            interface Vars {
+                showEmptyFolder: boolean;
+            }
 
-        const given = getGiven<Vars>();
+            const given = getGiven<Vars>();
 
-        beforeEach(() => {
-            $("#tree1").tree({
-                data: [{ name: "parent1", children: [] }],
-                showEmptyFolder: given.showEmptyFolder,
+            beforeEach(() => {
+                $("#tree1").tree({
+                    data: [{ name: "parent1", children: [] }],
+                    showEmptyFolder: given.showEmptyFolder,
+                });
             });
-        });
 
-        context("with showEmptyFolder false", () => {
-            given("showEmptyFolder", () => false);
+            context("with showEmptyFolder false", () => {
+                given("showEmptyFolder", () => false);
 
-            test("creates a child node", () => {
-                expect(treeStructure($("#tree1"))).toEqual(["parent1"]);
+                test("creates a child node", () => {
+                    expect(treeStructure($("#tree1"))).toEqual(["parent1"]);
+                });
             });
-        });
 
-        context("with showEmptyFolder true", () => {
-            given("showEmptyFolder", () => true);
+            context("with showEmptyFolder true", () => {
+                given("showEmptyFolder", () => true);
 
-            test("creates a folder", () => {
-                expect(treeStructure($("#tree1"))).toEqual([
-                    { name: "parent1", children: [], open: false },
-                ]);
+                test("creates a folder", () => {
+                    expect(treeStructure($("#tree1"))).toEqual([
+                        { name: "parent1", children: [], open: false },
+                    ]);
+                });
             });
         });
     });
@@ -72,24 +74,38 @@ describe("showEmptyFolder option", () => {
 
 describe("toggle", () => {
     interface Vars {
+        autoOpen: boolean;
         node1: INode;
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
+    given("autoOpen", () => false);
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
         given.$tree.tree({
+            autoOpen: given.autoOpen,
             data: exampleData,
         });
-        given.$tree.tree("toggle", given.node1, false);
     });
 
-    test("opens the node", () => {
-        expect(jQuery(given.node1.element).hasClass("jqtree-closed")).toBe(
-            false
-        );
+    context("when the node is closed", () => {
+        test("opens the node", () => {
+            expect(given.node1.element).toHaveClass("jqtree-closed");
+            given.$tree.tree("toggle", given.node1, false);
+            expect(given.node1.element).not.toHaveClass("jqtree-closed");
+        });
+    });
+
+    context("when the node is open", () => {
+        given("autoOpen", () => true);
+
+        test("closes the node", () => {
+            expect(given.node1.element).not.toHaveClass("jqtree-closed");
+            given.$tree.tree("toggle", given.node1, false);
+            expect(given.node1.element).toHaveClass("jqtree-closed");
+        });
     });
 });
