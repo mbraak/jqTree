@@ -27,10 +27,10 @@ describe("create with data", () => {
         expect(treeStructure($("#tree1"))).toEqual([
             {
                 name: "node1",
-                open: true,
+                open: false,
                 children: ["child1", "child2"],
             },
-            { name: "node2", open: true, children: ["child3"] },
+            { name: "node2", open: false, children: ["child3"] },
         ]);
     });
 });
@@ -63,9 +63,33 @@ describe("showEmptyFolder option", () => {
 
             test("creates a folder", () => {
                 expect(treeStructure($("#tree1"))).toEqual([
-                    { name: "parent1", children: [], open: true },
+                    { name: "parent1", children: [], open: false },
                 ]);
             });
         });
+    });
+});
+
+describe("toggle", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+        given.$tree.tree("toggle", given.node1, false);
+    });
+
+    test("opens the node", () => {
+        expect(jQuery(given.node1.element).hasClass("jqtree-closed")).toBe(
+            false
+        );
     });
 });

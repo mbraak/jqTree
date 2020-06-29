@@ -180,6 +180,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.tree.getNodeByName(name);
     }
 
+    public getNodeByNameMustExist(name: string): Node {
+        return this.tree.getNodeByNameMustExist(name);
+    }
+
     public getNodesByProperty(key: string, value: unknown): Node[] {
         return this.tree.getNodesByProperty(key, value);
     }

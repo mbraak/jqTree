@@ -36,7 +36,7 @@ const getTreeNode = ($li: JQuery<HTMLElement>): TreeNode => {
         return {
             children: getChildren($ul),
             name,
-            open: $li.hasClass("jqtree-closed"),
+            open: !$li.hasClass("jqtree-closed"),
         };
     } else {
         return name;

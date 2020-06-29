@@ -79,6 +79,7 @@ interface IJQTreePlugin {
     (behavior: "getNodeByHtmlElement", element: Element | JQuery): INode | null;
     (behavior: "getNodeById", id: NodeId): INode | null;
     (behavior: "getNodeByName", name: string): INode | null;
+    (behavior: "getNodeByNameMustExist", name: string): INode;
     (behavior: "getNodesByProperty", key: string, value: unknown): INode[];
     (behavior: "getSelectedNode"): INode | false;
     (behavior: "getSelectedNodes"): INode[];
