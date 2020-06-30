@@ -97,13 +97,12 @@ describe("toggle", () => {
             autoOpen: given.autoOpen,
             data: exampleData,
         });
+        given.$tree.tree("toggle", given.node1, false);
     });
 
     context("when the node is closed", () => {
         test("opens the node", () => {
-            expect(given.node1.element).toHaveClass("jqtree-closed");
-            given.$tree.tree("toggle", given.node1, false);
-            expect(given.node1.element).not.toHaveClass("jqtree-closed");
+            expect(given.node1.element).toBeOpen();
         });
     });
 
@@ -111,9 +110,7 @@ describe("toggle", () => {
         given("autoOpen", () => true);
 
         test("closes the node", () => {
-            expect(given.node1.element).not.toHaveClass("jqtree-closed");
-            given.$tree.tree("toggle", given.node1, false);
-            expect(given.node1.element).toHaveClass("jqtree-closed");
+            expect(given.node1.element).toBeClosed();
         });
     });
 });
