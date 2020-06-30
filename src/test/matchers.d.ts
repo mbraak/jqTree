@@ -1,9 +1,20 @@
 /// <reference types="jest"/>
 
-declare namespace jest {
-    interface Matchers<R> {
-        toHaveTreeStructure(treeStructure: any): boolean;
+declare namespace JQTreeMatchers {
+    interface TreeFolder {
+        name: string;
+        open: boolean;
+        children: TreeNode[];
     }
+
+    export type TreeNode = TreeFolder | string;
+    export type TreeStructure = TreeNode[];
 }
 
-declare module "jest-jqtree-matchers";
+declare namespace jest {
+    interface Matchers<R> {
+        toHaveTreeStructure(
+            treeStructure: JQTreeMatchers.TreeStructure
+        ): boolean;
+    }
+}

@@ -1,9 +1,9 @@
-import { TreeNode, treeStructure } from "./testUtil";
+import { treeStructure } from "./testUtil";
 
 expect.extend({
     toHaveTreeStructure(
         $el: JQuery<HTMLElement>,
-        expectedStructure: TreeNode[]
+        expectedStructure: JQTreeMatchers.TreeStructure
     ) {
         const receivedStructure = treeStructure($el);
 

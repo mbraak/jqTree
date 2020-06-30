@@ -1,11 +1,3 @@
-interface TreeFolder {
-    name: string;
-    open: boolean;
-    children: TreeNode[];
-}
-
-export type TreeNode = TreeFolder | string;
-
 const singleChild = (
     $el: JQuery<HTMLElement>,
     selector: string
@@ -25,7 +17,7 @@ const singleChild = (
     return $result;
 };
 
-const getTreeNode = ($li: JQuery<HTMLElement>): TreeNode => {
+const getTreeNode = ($li: JQuery<HTMLElement>): JQTreeMatchers.TreeNode => {
     const $div = singleChild($li, "div.jqtree-element");
     const $span = singleChild($div, "span.jqtree-title");
     const name = $span.text();
@@ -43,11 +35,13 @@ const getTreeNode = ($li: JQuery<HTMLElement>): TreeNode => {
     }
 };
 
-const getChildren = ($ul: JQuery<HTMLElement>): TreeNode[] =>
+const getChildren = ($ul: JQuery<HTMLElement>): JQTreeMatchers.TreeStructure =>
     $ul
         .children("li.jqtree_common")
-        .map<TreeNode>((_, li) => getTreeNode(jQuery(li)))
+        .map<JQTreeMatchers.TreeNode>((_, li) => getTreeNode(jQuery(li)))
         .get();
 
-export const treeStructure = ($el: JQuery<HTMLElement>): TreeNode[] =>
+export const treeStructure = (
+    $el: JQuery<HTMLElement>
+): JQTreeMatchers.TreeStructure =>
     getChildren(singleChild($el, "ul.jqtree-tree"));
