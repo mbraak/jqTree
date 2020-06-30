@@ -1,7 +1,7 @@
 import * as $ from "jquery";
 import getGiven from "givens";
 import "../tree.jquery";
-import exampleData from "./exampleData";
+import exampleData from "./support/exampleData";
 
 const context = describe;
 

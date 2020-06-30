@@ -1,6 +1,6 @@
 import getGiven from "givens";
 import { Node } from "../node";
-import exampleData from "./exampleData";
+import exampleData from "./support/exampleData";
 
 const context = describe;
 
