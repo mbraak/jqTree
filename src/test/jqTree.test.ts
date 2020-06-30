@@ -114,3 +114,37 @@ describe("toggle", () => {
         });
     });
 });
+
+describe("events", () => {
+    describe("tree.click", () => {
+        interface Vars {
+            node1: INode;
+            $tree: JQuery<HTMLElement>;
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1")
+        );
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
+            });
+        });
+
+        context("when a node is clicked", () => {
+            test("it is fired", (done) => {
+                given.$tree.on("tree.click", (e: unknown) => {
+                    const treeClickEvent = e as ClickNodeEvent;
+
+                    expect(treeClickEvent.node).toBe(given.node1);
+                    done();
+                });
+
+                jQuery(given.node1.element).find("span:first").click();
+            });
+        });
+    });
+});

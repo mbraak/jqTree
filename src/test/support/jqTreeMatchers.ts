@@ -12,6 +12,7 @@ expect.extend({
         const $el = jQuery(el);
         assertJqTreeFolder($el);
 
+        /* istanbul ignore next */
         return {
             message: () => "The node is open",
             pass: $el.hasClass("jqtree-closed"),
@@ -21,6 +22,7 @@ expect.extend({
         const $el = jQuery(el);
         assertJqTreeFolder($el);
 
+        /* istanbul ignore next */
         return {
             message: () => "The node is closed",
             pass: !$el.hasClass("jqtree-closed"),
@@ -33,6 +35,7 @@ expect.extend({
         const $el = jQuery(el);
         const receivedStructure = treeStructure($el);
 
+        /* istanbul ignore next */
         return {
             message: () =>
                 this.utils.printDiffOrStringify(

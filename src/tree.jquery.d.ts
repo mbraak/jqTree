@@ -21,6 +21,11 @@ declare class INode {
 type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
 type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
 
+interface ClickNodeEvent {
+    node: INode;
+    click_event: JQuery.ClickEvent;
+}
+
 interface IJQTreeOptions {
     animationSpeed?: string | number;
     autoEscape?: boolean;
