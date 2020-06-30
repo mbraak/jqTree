@@ -1,4 +1,4 @@
-import { treeStructure } from "./testUtil";
+import treeStructure from "./treeStructure";
 
 const assertJqTreeFolder = ($el: JQuery<HTMLElement>) => {
     /* istanbul ignore if */

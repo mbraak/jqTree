@@ -41,7 +41,9 @@ const getChildren = ($ul: JQuery<HTMLElement>): JQTreeMatchers.TreeStructure =>
         .map<JQTreeMatchers.TreeNode>((_, li) => getTreeNode(jQuery(li)))
         .get();
 
-export const treeStructure = (
+const treeStructure = (
     $el: JQuery<HTMLElement>
 ): JQTreeMatchers.TreeStructure =>
     getChildren(singleChild($el, "ul.jqtree-tree"));
+
+export default treeStructure;
