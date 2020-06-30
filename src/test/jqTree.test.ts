@@ -2,7 +2,6 @@ import * as $ from "jquery";
 import getGiven from "givens";
 import "../tree.jquery";
 import exampleData from "./exampleData";
-import { treeStructure } from "./testUtil";
 
 const context = describe;
 
@@ -17,14 +16,21 @@ afterEach(() => {
 });
 
 describe("create with data", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
     beforeEach(() => {
-        $("#tree1").tree({
+        given.$tree.tree({
             data: exampleData,
         });
     });
 
     test("creates a tree", () => {
-        expect(treeStructure($("#tree1"))).toEqual([
+        expect(given.$tree).toHaveTreeStructure([
             {
                 name: "node1",
                 open: false,
@@ -40,12 +46,14 @@ describe("options", () => {
         context("when children attribute is an empty array", () => {
             interface Vars {
                 showEmptyFolder: boolean;
+                $tree: JQuery<HTMLElement>;
             }
 
             const given = getGiven<Vars>();
+            given("$tree", () => $("#tree1"));
 
             beforeEach(() => {
-                $("#tree1").tree({
+                given.$tree.tree({
                     data: [{ name: "parent1", children: [] }],
                     showEmptyFolder: given.showEmptyFolder,
                 });
@@ -55,7 +63,7 @@ describe("options", () => {
                 given("showEmptyFolder", () => false);
 
                 test("creates a child node", () => {
-                    expect(treeStructure($("#tree1"))).toEqual(["parent1"]);
+                    expect(given.$tree).toHaveTreeStructure(["parent1"]);
                 });
             });
 
@@ -63,7 +71,7 @@ describe("options", () => {
                 given("showEmptyFolder", () => true);
 
                 test("creates a folder", () => {
-                    expect(treeStructure($("#tree1"))).toEqual([
+                    expect(given.$tree).toHaveTreeStructure([
                         { name: "parent1", children: [], open: false },
                     ]);
                 });

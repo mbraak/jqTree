@@ -4,7 +4,7 @@ interface TreeFolder {
     children: TreeNode[];
 }
 
-type TreeNode = TreeFolder | string;
+export type TreeNode = TreeFolder | string;
 
 const singleChild = (
     $el: JQuery<HTMLElement>,
