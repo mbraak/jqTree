@@ -2768,6 +2768,18 @@ exports.__esModule = true;
 This widget does the same a the mouse widget in jqueryui.
 */
 var simple_widget_1 = __webpack_require__(3);
+var getPositionInfoFromMouseEvent = function (e) { return ({
+    pageX: e.pageX,
+    pageY: e.pageY,
+    target: e.target,
+    originalEvent: e,
+}); };
+var getPositionInfoFromTouch = function (touch, e) { return ({
+    pageX: touch.pageX,
+    pageY: touch.pageY,
+    target: touch.target,
+    originalEvent: e,
+}); };
 var MouseWidget = /** @class */ (function (_super) {
     __extends(MouseWidget, _super);
     function MouseWidget() {
@@ -2778,7 +2790,7 @@ var MouseWidget = /** @class */ (function (_super) {
             if (mouseDownEvent.which !== 1) {
                 return;
             }
-            var result = _this.handleMouseDown(_this.getPositionInfo(mouseDownEvent));
+            var result = _this.handleMouseDown(getPositionInfoFromMouseEvent(mouseDownEvent));
             if (result) {
                 mouseDownEvent.preventDefault();
             }
@@ -2786,11 +2798,11 @@ var MouseWidget = /** @class */ (function (_super) {
         };
         _this.mouseMove = function (e) {
             var mouseMoveEvent = e;
-            return _this.handleMouseMove(e, _this.getPositionInfo(mouseMoveEvent));
+            return _this.handleMouseMove(e, getPositionInfoFromMouseEvent(mouseMoveEvent));
         };
         _this.mouseUp = function (e) {
             var mouseUpEvent = e;
-            _this.handleMouseUp(_this.getPositionInfo(mouseUpEvent));
+            _this.handleMouseUp(getPositionInfoFromMouseEvent(mouseUpEvent));
         };
         _this.touchStart = function (e) {
             var touchEvent = e.originalEvent;
@@ -2800,10 +2812,8 @@ var MouseWidget = /** @class */ (function (_super) {
             if (touchEvent.touches.length > 1) {
                 return false;
             }
-            // todo
-            //const touch = touchEvent.changedTouches[0];
-            //return this.handleMouseDown(this.getPositionInfo(touch));
-            return false;
+            var touch = touchEvent.changedTouches[0];
+            return _this.handleMouseDown(getPositionInfoFromTouch(touch, e));
         };
         _this.touchMove = function (e) {
             var touchEvent = e.originalEvent;
@@ -2813,10 +2823,8 @@ var MouseWidget = /** @class */ (function (_super) {
             if (touchEvent.touches.length > 1) {
                 return false;
             }
-            // todo
-            //const touch = touchEvent.changedTouches[0];
-            //return this.handleMouseMove(e, this.getPositionInfo(touch));
-            return false;
+            var touch = touchEvent.changedTouches[0];
+            return _this.handleMouseMove(e, getPositionInfoFromTouch(touch, e));
         };
         _this.touchEnd = function (e) {
             var touchEvent = e.originalEvent;
@@ -2826,9 +2834,8 @@ var MouseWidget = /** @class */ (function (_super) {
             if (touchEvent.touches.length > 1) {
                 return false;
             }
-            // todo
-            //const touch = touchEvent.changedTouches[0];
-            //this.handleMouseUp(this.getPositionInfo(touch));
+            var touch = touchEvent.changedTouches[0];
+            _this.handleMouseUp(getPositionInfoFromTouch(touch, e));
             return false;
         };
         return _this;
@@ -2903,14 +2910,6 @@ var MouseWidget = /** @class */ (function (_super) {
             this.handleMouseUp(positionInfo);
         }
         return !this.isMouseStarted;
-    };
-    MouseWidget.prototype.getPositionInfo = function (e) {
-        return {
-            pageX: e.pageX,
-            pageY: e.pageY,
-            target: e.target,
-            originalEvent: e,
-        };
     };
     MouseWidget.prototype.handleMouseUp = function (positionInfo) {
         var $document = jQuery(document);
