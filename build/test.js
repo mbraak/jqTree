@@ -2836,7 +2836,7 @@ var MouseWidget = /** @class */ (function (_super) {
             }
             var touch = touchEvent.changedTouches[0];
             _this.handleMouseUp(getPositionInfoFromTouch(touch, e));
-            return false;
+            return true;
         };
         return _this;
     }
@@ -2849,7 +2849,7 @@ var MouseWidget = /** @class */ (function (_super) {
         this.isMouseStarted = false;
         this.mouseDelay = 0;
         this.mouseDelayTimer = null;
-        this.isMouseDelayMet = true;
+        this.isMouseDelayMet = false;
         this.mouseDownInfo = null;
     };
     MouseWidget.prototype.deinit = function () {
