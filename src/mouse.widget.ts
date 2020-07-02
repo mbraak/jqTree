@@ -42,7 +42,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         this.isMouseStarted = false;
         this.mouseDelay = 0;
         this.mouseDelayTimer = null;
-        this.isMouseDelayMet = true;
+        this.isMouseDelayMet = false;
         this.mouseDownInfo = null;
     }
 
@@ -224,7 +224,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         const touch = touchEvent.changedTouches[0];
 
         this.handleMouseUp(getPositionInfoFromTouch(touch, e));
-        return false;
+        return true;
     };
 }
 
