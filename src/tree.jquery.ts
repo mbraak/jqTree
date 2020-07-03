@@ -1144,7 +1144,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 });
             }
         } else {
-            const deselectedNode = this.getSelectedNode();
+            const deselectedNode = this.getSelectedNode() || null;
             this.deselectCurrentNode();
             this.addToSelection(node, selectOptions.mustSetFocus);
 

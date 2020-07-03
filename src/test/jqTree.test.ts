@@ -153,10 +153,29 @@ describe("events", () => {
                 const treeClickEvent = e as ClickNodeEvent;
 
                 expect(treeClickEvent.node).toBe(given.node1);
+                expect(treeClickEvent.deselected_node).toBeNull();
                 done();
             });
 
             given.titleSpan.click();
+        });
+
+        context("when the node was selected", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node1);
+            });
+
+            test("it fires tree.select with node is null", (done) => {
+                given.$tree.on("tree.select", (e: unknown) => {
+                    const treeClickEvent = e as ClickNodeEvent;
+
+                    expect(treeClickEvent.node).toBeNull();
+                    expect(treeClickEvent.previous_node).toBe(given.node1);
+                    done();
+                });
+
+                given.titleSpan.click();
+            });
         });
     });
 });

@@ -23,7 +23,9 @@ type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
 
 interface ClickNodeEvent {
     node: INode;
+    deselected_node?: INode | null;
     click_event: JQuery.ClickEvent;
+    previous_node?: INode;
 }
 
 interface IJQTreeOptions {
