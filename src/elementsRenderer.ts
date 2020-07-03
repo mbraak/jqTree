@@ -86,7 +86,7 @@ export default class ElementsRenderer {
         }
     }
 
-    private attachNodeData(node: Node, li: Element): void {
+    private attachNodeData(node: Node, li: HTMLElement): void {
         node.element = li;
         jQuery(li).data("node", node);
     }

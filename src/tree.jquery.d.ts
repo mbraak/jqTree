@@ -9,7 +9,7 @@ declare class INode {
     public id?: NodeId;
     public name: string;
     public children: INode[];
-    public element: Element;
+    public element: HTMLElement;
     public is_open: boolean;
     public parent: INode | null;
 

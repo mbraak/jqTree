@@ -44,7 +44,7 @@ export class Node implements INode {
     public nodeClass?: typeof Node;
     public load_on_demand: boolean;
     public is_open: boolean;
-    public element: Element;
+    public element: HTMLElement;
     public is_loading: boolean;
     public isEmptyFolder: boolean;
 
