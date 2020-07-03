@@ -117,17 +117,19 @@ describe("toggle", () => {
 });
 
 describe("events", () => {
-    describe("tree.click", () => {
+    context("when a node is clicked", () => {
         interface Vars {
             node1: INode;
+            titleSpan: JQuery<HTMLElement>;
             $tree: JQuery<HTMLElement>;
         }
 
         const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
         given("node1", () =>
             given.$tree.tree("getNodeByNameMustExist", "node1")
         );
+        given("titleSpan", () => titleSpan(given.node1.element));
+        given("$tree", () => $("#tree1"));
 
         beforeEach(() => {
             given.$tree.tree({
@@ -135,17 +137,26 @@ describe("events", () => {
             });
         });
 
-        context("when a node is clicked", () => {
-            test("it is fired", (done) => {
-                given.$tree.on("tree.click", (e: unknown) => {
-                    const treeClickEvent = e as ClickNodeEvent;
+        test("it fires tree.click", (done) => {
+            given.$tree.on("tree.click", (e: unknown) => {
+                const treeClickEvent = e as ClickNodeEvent;
 
-                    expect(treeClickEvent.node).toBe(given.node1);
-                    done();
-                });
-
-                titleSpan(given.node1.element).click();
+                expect(treeClickEvent.node).toBe(given.node1);
+                done();
             });
+
+            given.titleSpan.click();
+        });
+
+        test("it fires tree.select", (done) => {
+            given.$tree.on("tree.select", (e: unknown) => {
+                const treeClickEvent = e as ClickNodeEvent;
+
+                expect(treeClickEvent.node).toBe(given.node1);
+                done();
+            });
+
+            given.titleSpan.click();
         });
     });
 });
