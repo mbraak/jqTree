@@ -16,3 +16,12 @@ export const singleChild = (
 
     return $result;
 };
+
+export const titleSpan = (
+    liNode: HTMLElement | JQuery<HTMLElement>
+): JQuery<HTMLElement> => {
+    const $liNode = jQuery(liNode);
+    const $element = singleChild($liNode, "div.jqtree-element ");
+
+    return singleChild($element, "span.jqtree-title");
+};

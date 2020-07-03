@@ -2,6 +2,7 @@ import * as $ from "jquery";
 import getGiven from "givens";
 import "../tree.jquery";
 import exampleData from "./support/exampleData";
+import { titleSpan } from "./support/testUtil";
 
 const context = describe;
 
@@ -143,7 +144,7 @@ describe("events", () => {
                     done();
                 });
 
-                jQuery(given.node1.element).find("span:first").click();
+                titleSpan(given.node1.element).click();
             });
         });
     });
