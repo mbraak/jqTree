@@ -82,3 +82,22 @@ describe("toggle", () => {
         });
     });
 });
+
+describe("toJson", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    test("returns nodes as json", () => {
+        expect(JSON.parse(given.$tree.tree("toJson"))).toEqual(exampleData);
+    });
+});

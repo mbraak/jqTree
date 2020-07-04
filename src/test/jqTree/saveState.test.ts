@@ -51,7 +51,7 @@ context("with an open and a selected node", () => {
     });
 
     test("saves the state", () => {
-        expect(JSON.parse(savedState)).toMatchObject({
+        expect(JSON.parse(savedState)).toEqual({
             open_nodes: [123],
             selected_node: [123],
         });
