@@ -73,12 +73,14 @@ describe("loadData", () => {
 
         test("replaces the whole tree", () => {
             expect(given.$tree).toHaveTreeStructure([
-                {
+                expect.objectContaining({
                     name: "node1",
-                    open: false,
                     children: ["child1", "child2"],
-                },
-                { name: "node2", open: false, children: ["child3"] },
+                }),
+                expect.objectContaining({
+                    name: "node2",
+                    children: ["child3"],
+                }),
             ]);
         });
     });
@@ -90,18 +92,19 @@ describe("loadData", () => {
 
         test("loads the data under the node", () => {
             expect(given.$tree).toHaveTreeStructure([
-                {
+                expect.objectContaining({
                     name: "initial1",
-                    open: false,
                     children: [
-                        {
+                        expect.objectContaining({
                             name: "node1",
-                            open: false,
                             children: ["child1", "child2"],
-                        },
-                        { name: "node2", open: false, children: ["child3"] },
+                        }),
+                        expect.objectContaining({
+                            name: "node2",
+                            children: ["child3"],
+                        }),
                     ],
-                },
+                }),
             ]);
         });
     });

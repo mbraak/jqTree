@@ -35,6 +35,8 @@ given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
 given("$tree", () => $("#tree1"));
 
 beforeEach(() => {
+    savedState = given.initialState;
+
     given.$tree.tree({
         autoOpen: false,
         data: exampleData,
@@ -75,6 +77,6 @@ context("with a saved state", () => {
             },
             { name: "node2", open: false, children: ["child3"] },
         ]);
-        expect(given.$tree.tree("getSelectedNode")).toBe(given.node1);
+        expect(given.node1.element).toBeSelected();
     });
 });

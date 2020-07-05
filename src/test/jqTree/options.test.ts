@@ -44,7 +44,7 @@ describe("showEmptyFolder", () => {
 
             test("creates a folder", () => {
                 expect(given.$tree).toHaveTreeStructure([
-                    { name: "parent1", children: [], open: false },
+                    expect.objectContaining({ name: "parent1", children: [] }),
                 ]);
             });
         });

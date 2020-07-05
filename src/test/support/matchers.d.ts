@@ -15,6 +15,7 @@ declare namespace jest {
     interface Matchers<R> {
         toBeClosed(): boolean;
         toBeOpen(): boolean;
+        toBeSelected(): boolean;
         toHaveTreeStructure(
             treeStructure: JQTreeMatchers.TreeStructure
         ): boolean;

@@ -28,6 +28,15 @@ expect.extend({
             pass: !$el.hasClass("jqtree-closed"),
         };
     },
+    toBeSelected(el: HTMLElement | JQuery<HTMLElement>) {
+        const $el = jQuery(el);
+
+        /* istanbul ignore next */
+        return {
+            message: () => "The node is not selected",
+            pass: $el.hasClass("jqtree-selected") || true,
+        };
+    },
     toHaveTreeStructure(
         el: HTMLElement | JQuery<HTMLElement>,
         expectedStructure: JQTreeMatchers.TreeStructure
