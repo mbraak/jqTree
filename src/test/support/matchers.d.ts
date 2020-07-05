@@ -13,6 +13,7 @@ declare namespace JQTreeMatchers {
 
 declare namespace jest {
     interface Matchers<R> {
+        notToBeSelected(): boolean;
         toBeClosed(): boolean;
         toBeOpen(): boolean;
         toBeSelected(): boolean;

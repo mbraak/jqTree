@@ -8,6 +8,15 @@ const assertJqTreeFolder = ($el: JQuery<HTMLElement>) => {
 };
 
 expect.extend({
+    notToBeSelected(el: HTMLElement | JQuery<HTMLElement>) {
+        const $el = jQuery(el);
+
+        /* istanbul ignore next */
+        return {
+            message: () => "The node is selected",
+            pass: !$el.hasClass("jqtree-selected"),
+        };
+    },
     toBeClosed(el: HTMLElement | JQuery<HTMLElement>) {
         const $el = jQuery(el);
         assertJqTreeFolder($el);
@@ -34,7 +43,7 @@ expect.extend({
         /* istanbul ignore next */
         return {
             message: () => "The node is not selected",
-            pass: $el.hasClass("jqtree-selected") || true,
+            pass: $el.hasClass("jqtree-selected"),
         };
     },
     toHaveTreeStructure(

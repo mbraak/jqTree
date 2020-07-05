@@ -156,6 +156,59 @@ describe("openNode", () => {
     });
 });
 
+describe("selectNode", () => {
+    interface Vars {
+        node1: INode;
+        node2: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("node2", () => given.$tree.tree("getNodeByNameMustExist", "node2"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+            selectable: true,
+        });
+    });
+
+    context("when another node is selected", () => {
+        beforeEach(() => {
+            given.$tree.tree("selectNode", given.node2);
+            given.$tree.tree("selectNode", given.node1);
+        });
+
+        test("selects the node and deselects the previous node", () => {
+            expect(given.node1.element).toBeSelected();
+            expect(given.node2.element).notToBeSelected();
+        });
+    });
+
+    context("when the node is not selected", () => {
+        beforeEach(() => {
+            given.$tree.tree("selectNode", given.node1);
+        });
+
+        test("selects the node", () => {
+            expect(given.node1.element).toBeSelected();
+        });
+    });
+
+    context("when the node is selected", () => {
+        beforeEach(() => {
+            given.$tree.tree("selectNode", given.node1);
+            given.$tree.tree("selectNode", given.node1);
+        });
+
+        test("deselects the node", () => {
+            expect(given.node1.element).notToBeSelected();
+        });
+    });
+});
+
 describe("toggle", () => {
     interface Vars {
         autoOpen: boolean;
