@@ -15,6 +15,29 @@ afterEach(() => {
     $tree.remove();
 });
 
+describe("closeNode", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: true,
+            data: exampleData,
+        });
+        given.$tree.tree("closeNode", given.node1, false);
+    });
+
+    test("closes the node", () => {
+        expect(given.node1.element).toBeClosed();
+    });
+});
+
 describe("getSelectedNode", () => {
     interface Vars {
         node1: INode;
@@ -107,6 +130,29 @@ describe("loadData", () => {
                 }),
             ]);
         });
+    });
+});
+
+describe("openNode", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: false,
+            data: exampleData,
+        });
+        given.$tree.tree("openNode", given.node1, false);
+    });
+
+    test("opens the node", () => {
+        expect(given.node1.element).toBeOpen();
     });
 });
 
