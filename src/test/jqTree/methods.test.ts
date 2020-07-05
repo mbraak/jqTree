@@ -48,6 +48,65 @@ describe("getSelectedNode", () => {
     });
 });
 
+describe("loadData", () => {
+    interface Vars {
+        initialNode: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("initialNode", () =>
+        given.$tree.tree("getNodeByNameMustExist", "initial1")
+    );
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: ["initial1"],
+        });
+    });
+
+    context("when the node parameter is empty", () => {
+        beforeEach(() => {
+            given.$tree.tree("loadData", exampleData);
+        });
+
+        test("replaces the whole tree", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                {
+                    name: "node1",
+                    open: false,
+                    children: ["child1", "child2"],
+                },
+                { name: "node2", open: false, children: ["child3"] },
+            ]);
+        });
+    });
+
+    context("with a node parameter", () => {
+        beforeEach(() => {
+            given.$tree.tree("loadData", exampleData, given.initialNode);
+        });
+
+        test("loads the data under the node", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                {
+                    name: "initial1",
+                    open: false,
+                    children: [
+                        {
+                            name: "node1",
+                            open: false,
+                            children: ["child1", "child2"],
+                        },
+                        { name: "node2", open: false, children: ["child3"] },
+                    ],
+                },
+            ]);
+        });
+    });
+});
+
 describe("toggle", () => {
     interface Vars {
         autoOpen: boolean;
