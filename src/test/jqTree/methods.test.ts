@@ -38,6 +38,41 @@ describe("closeNode", () => {
     });
 });
 
+describe("getNodeById", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    test("returns the node", () => {
+        expect(given.$tree.tree("getNodeById", 127)).toMatchObject({
+            name: "child3",
+        });
+    });
+
+    context("with a string parameter", () => {
+        test("returns the node", () => {
+            expect(given.$tree.tree("getNodeById", "127")).toMatchObject({
+                name: "child3",
+            });
+        });
+    });
+
+    context("when the node doesn't exist", () => {
+        test("returns undefined", () => {
+            expect(given.$tree.tree("getNodeById", 99999)).toBeNull();
+        });
+    });
+});
+
 describe("getSelectedNode", () => {
     interface Vars {
         node1: INode;

@@ -478,7 +478,7 @@ export class Node implements INode {
     }
 
     public getNodeById(nodeId: NodeId): Node | null {
-        return this.idMapping[nodeId];
+        return this.idMapping[nodeId] || null;
     }
 
     public addNodeToIndex(node: Node): void {
