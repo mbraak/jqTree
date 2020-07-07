@@ -238,9 +238,7 @@ describe(".loadFromData", () => {
                 intProperty: 3,
                 name: "node2",
                 strProperty: "3",
-                children: [
-                    expect.objectContaining({ id: 127, name: "child3" }),
-                ],
+                children: [expect.objectContaining({ id: 127, name: "node3" })],
             }),
         ]);
     });

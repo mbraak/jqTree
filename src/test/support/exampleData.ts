@@ -14,7 +14,9 @@ const exampleData = [
         id: 124,
         intProperty: 3,
         strProperty: "3",
-        children: [{ name: "child3", id: 127 }],
+        children: [
+            { name: "node3", id: 127, children: [{ name: "child3", id: 128 }] },
+        ],
     },
 ];
 

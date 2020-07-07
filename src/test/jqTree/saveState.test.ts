@@ -70,12 +70,11 @@ context("with a saved state", () => {
 
     it("restores the state", () => {
         expect(given.$tree).toHaveTreeStructure([
-            {
+            expect.objectContaining({
                 name: "node1",
                 open: true,
-                children: ["child1", "child2"],
-            },
-            { name: "node2", open: false, children: ["child3"] },
+            }),
+            expect.objectContaining({ name: "node2", open: false }),
         ]);
         expect(given.node1.element).toBeSelected();
     });

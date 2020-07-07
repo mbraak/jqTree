@@ -34,7 +34,13 @@ describe("create with data", () => {
                 open: false,
                 children: ["child1", "child2"],
             },
-            { name: "node2", open: false, children: ["child3"] },
+            {
+                name: "node2",
+                open: false,
+                children: [
+                    { name: "node3", open: false, children: ["child3"] },
+                ],
+            },
         ]);
     });
 });

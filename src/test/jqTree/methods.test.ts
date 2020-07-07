@@ -54,14 +54,14 @@ describe("getNodeById", () => {
 
     test("returns the node", () => {
         expect(given.$tree.tree("getNodeById", 127)).toMatchObject({
-            name: "child3",
+            name: "node3",
         });
     });
 
     context("with a string parameter", () => {
         test("returns the node", () => {
             expect(given.$tree.tree("getNodeById", "127")).toMatchObject({
-                name: "child3",
+                name: "node3",
             });
         });
     });
@@ -137,7 +137,7 @@ describe("loadData", () => {
                 }),
                 expect.objectContaining({
                     name: "node2",
-                    children: ["child3"],
+                    children: [expect.objectContaining({ name: "node3" })],
                 }),
             ]);
         });
@@ -157,10 +157,7 @@ describe("loadData", () => {
                             name: "node1",
                             children: ["child1", "child2"],
                         }),
-                        expect.objectContaining({
-                            name: "node2",
-                            children: ["child3"],
-                        }),
+                        expect.objectContaining({ name: "node2" }),
                     ],
                 }),
             ]);
