@@ -17,7 +17,7 @@ afterEach(() => {
 
 describe("autoOpen", () => {
     interface Vars {
-        autoOpen: boolean;
+        autoOpen: boolean | number;
         $tree: JQuery<HTMLElement>;
     }
 
@@ -46,6 +46,40 @@ describe("autoOpen", () => {
         given("autoOpen", () => true);
 
         test("opens all nodes", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", open: true }),
+                expect.objectContaining({
+                    name: "node2",
+                    open: true,
+                    children: [
+                        expect.objectContaining({ name: "node3", open: true }),
+                    ],
+                }),
+            ]);
+        });
+    });
+
+    context("with autoOpen 0", () => {
+        given("autoOpen", () => 0);
+
+        test("opens level 0", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", open: true }),
+                expect.objectContaining({
+                    name: "node2",
+                    open: true,
+                    children: [
+                        expect.objectContaining({ name: "node3", open: false }),
+                    ],
+                }),
+            ]);
+        });
+    });
+
+    context("with autoOpen 1", () => {
+        given("autoOpen", () => 1);
+
+        test("opens levels 1", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
