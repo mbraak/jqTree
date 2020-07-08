@@ -2,6 +2,7 @@ import * as $ from "jquery";
 import getGiven from "givens";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
+import { titleSpan } from "../support/testUtil";
 
 const context = describe;
 
@@ -91,6 +92,31 @@ describe("autoOpen", () => {
                 }),
             ]);
         });
+    });
+});
+
+describe("onCreateLi", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+            onCreateLi: (node: INode, el: JQuery<HTMLElement>) => {
+                titleSpan(el).text(`_${node.name}_`);
+            },
+        });
+    });
+
+    test("is called when creating a node", () => {
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "_node1_" }),
+            expect.objectContaining({ name: "_node2_" }),
+        ]);
     });
 });
 
