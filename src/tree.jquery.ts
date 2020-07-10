@@ -316,13 +316,17 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (node.parent && this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node, true); // including children
-
-            const parent = node.parent;
-            node.remove();
-            this._refreshElements(parent);
+        if (!node.parent) {
+            throw Error("Node has no parent");
         }
+
+        if (this.selectNodeHandler) {
+            this.selectNodeHandler.removeFromSelection(node, true); // including children
+        }
+
+        const parent = node.parent;
+        node.remove();
+        this._refreshElements(parent);
 
         return this.element;
     }
