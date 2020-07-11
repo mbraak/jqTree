@@ -221,6 +221,18 @@ describe("removeNode", () => {
                 }),
             ]);
         });
+
+        context("when the node is selected", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node);
+            });
+
+            test("removes and deselects the node", () => {
+                given.$tree.tree("removeNode", given.node);
+
+                expect(given.$tree.tree("getSelectedNode")).toBe(false);
+            });
+        });
     });
 
     context("with a parent node and its children", () => {
@@ -238,12 +250,23 @@ describe("removeNode", () => {
                 }),
             ]);
         });
+
+        context("when a child node is selected", () => {
+            beforeEach(() => {
+                const child1 = given.$tree.tree(
+                    "getNodeByNameMustExist",
+                    "child1"
+                );
+                given.$tree.tree("selectNode", child1);
+            });
+
+            test("removes the node and deselects the child", () => {
+                given.$tree.tree("removeNode", given.node);
+
+                expect(given.$tree.tree("getSelectedNode")).toBe(false);
+            });
+        });
     });
-    /*
-        todo:
-        * selected child node
-        * parent of selected child 
-    */
 });
 
 describe("selectNode", () => {
