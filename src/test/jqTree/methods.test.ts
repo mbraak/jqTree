@@ -189,26 +189,27 @@ describe("openNode", () => {
 });
 
 describe("removeNode", () => {
-    context("with a child node", () => {
-        interface Vars {
-            child1: INode;
-            $tree: JQuery<HTMLElement>;
-        }
+    interface Vars {
+        node: INode;
+        $tree: JQuery<HTMLElement>;
+    }
 
-        const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
-        given("child1", () =>
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    context("with a child node", () => {
+        given("node", () =>
             given.$tree.tree("getNodeByNameMustExist", "child1")
         );
 
-        beforeEach(() => {
-            given.$tree.tree({
-                data: exampleData,
-            });
-        });
-
         test("removes the node", () => {
-            given.$tree.tree("removeNode", given.child1);
+            given.$tree.tree("removeNode", given.node);
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
@@ -221,9 +222,25 @@ describe("removeNode", () => {
             ]);
         });
     });
+
+    context("with a parent node and its children", () => {
+        given("node", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1")
+        );
+
+        test("removes the node", () => {
+            given.$tree.tree("removeNode", given.node);
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node2",
+                    children: [expect.objectContaining({ name: "node3" })],
+                }),
+            ]);
+        });
+    });
     /*
         todo:
-        * parent node
         * selected child node
         * parent of selected child 
     */
