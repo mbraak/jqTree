@@ -262,6 +262,50 @@ describe("openNode", () => {
     });
 });
 
+describe("prependNode", () => {
+    interface Vars {
+        parent: INode | undefined;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+    given("parent", () => undefined);
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+        given.$tree.tree("prependNode", "prepended-node", given.parent);
+    });
+
+    context("with an empty parent parameter", () => {
+        test("prepends the node to the tree", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                "prepended-node",
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+    });
+
+    context("with a parent node", () => {
+        given("parent", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1")
+        );
+
+        test("prepends the node to the parent", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    children: ["prepended-node", "child1", "child2"],
+                }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+    });
+});
+
 describe("removeNode", () => {
     interface Vars {
         node: INode;
