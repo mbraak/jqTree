@@ -1,8 +1,11 @@
 import * as $ from "jquery";
 import getGiven from "givens";
+import * as mockjaxFactory from "jquery-mockjax";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
+
+const mockjax = mockjaxFactory(jQuery, window);
 
 const context = describe;
 
@@ -14,6 +17,7 @@ afterEach(() => {
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
+    mockjax.clear();
 });
 
 describe("tree.click", () => {
@@ -53,21 +57,47 @@ describe("tree.init", () => {
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
 
-    test("is called", (done) => {
-        given.$tree.on("tree.init", () => {
-            expect(given.$tree.tree("getNodeByName", "node2")).toMatchObject({
-                id: 124,
-                name: "node2",
+    context("with json data", () => {
+        test("is called", (done) => {
+            given.$tree.on("tree.init", () => {
+                expect(
+                    given.$tree.tree("getNodeByName", "node2")
+                ).toMatchObject({
+                    id: 124,
+                    name: "node2",
+                });
+                done();
             });
-            done();
-        });
 
-        given.$tree.tree({
-            data: exampleData,
+            given.$tree.tree({
+                data: exampleData,
+            });
         });
     });
 
-    // todo: when data is loaded by ajax call
+    context("with data loaded from an url", () => {
+        beforeEach(() => {
+            mockjax({
+                url: "/tree/",
+                responseText: exampleData,
+                logging: false,
+            });
+        });
+
+        test("is called", (done) => {
+            given.$tree.on("tree.init", () => {
+                expect(
+                    given.$tree.tree("getNodeByName", "node2")
+                ).toMatchObject({
+                    id: 124,
+                    name: "node2",
+                });
+                done();
+            });
+
+            given.$tree.tree({ dataUrl: "/tree/" });
+        });
+    });
 });
 
 describe("tree.select", () => {
