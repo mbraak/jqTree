@@ -15,6 +15,55 @@ afterEach(() => {
     $tree.remove();
 });
 
+describe("appendNode", () => {
+    interface Vars {
+        parent: INode | undefined;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: true,
+            data: exampleData,
+        });
+
+        given.$tree.tree("appendNode", "appended-node", given.parent);
+    });
+
+    context("with an empty parent parameter", () => {
+        given("parent", () => undefined);
+
+        test("appends the node to the tree", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                }),
+                expect.objectContaining({ name: "node2" }),
+                "appended-node",
+            ]);
+        });
+    });
+
+    context("when appending to a parent node", () => {
+        given("parent", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1")
+        );
+
+        test("appends the node to parent node", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    children: ["child1", "child2", "appended-node"],
+                }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+    });
+});
+
 describe("closeNode", () => {
     interface Vars {
         node1: INode;
