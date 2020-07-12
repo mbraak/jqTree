@@ -17,12 +17,15 @@ afterEach(() => {
 
 describe("appendNode", () => {
     interface Vars {
+        nodeData: NodeData;
         parent: INode | undefined;
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
+    given("parent", () => undefined);
+    given("nodeData", () => "appended-node");
 
     beforeEach(() => {
         given.$tree.tree({
@@ -30,12 +33,10 @@ describe("appendNode", () => {
             data: exampleData,
         });
 
-        given.$tree.tree("appendNode", "appended-node", given.parent);
+        given.$tree.tree("appendNode", given.nodeData, given.parent);
     });
 
     context("with an empty parent parameter", () => {
-        given("parent", () => undefined);
-
         test("appends the node to the tree", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
@@ -60,6 +61,30 @@ describe("appendNode", () => {
                 }),
                 expect.objectContaining({ name: "node2" }),
             ]);
+        });
+    });
+
+    context("when appending a node using an object", () => {
+        given("nodeData", () => ({
+            color: "green",
+            id: 99,
+            name: "appended-using-object",
+        }));
+
+        test("appends the node to the tree", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                }),
+                expect.objectContaining({ name: "node2" }),
+                "appended-using-object",
+            ]);
+        });
+
+        test("sets the properties of the object", () => {
+            expect(given.$tree.tree("getNodeById", 99)).toMatchObject(
+                given.nodeData
+            );
         });
     });
 });
