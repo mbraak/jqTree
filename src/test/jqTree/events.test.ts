@@ -16,7 +16,7 @@ afterEach(() => {
     $tree.remove();
 });
 
-context("when a node is clicked", () => {
+describe("tree.click", () => {
     interface Vars {
         node1: INode;
         titleSpan: JQuery<HTMLElement>;
@@ -34,7 +34,7 @@ context("when a node is clicked", () => {
         });
     });
 
-    test("it fires tree.click", (done) => {
+    test("fires tree.click", (done) => {
         given.$tree.on("tree.click", (e: unknown) => {
             const treeClickEvent = e as ClickNodeEvent;
 
@@ -44,8 +44,27 @@ context("when a node is clicked", () => {
 
         given.titleSpan.click();
     });
+});
 
-    test("it fires tree.select", (done) => {
+describe("tree.select", () => {
+    interface Vars {
+        node1: INode;
+        titleSpan: JQuery<HTMLElement>;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("titleSpan", () => titleSpan(given.node1.element));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    test("fires tree.click", (done) => {
         given.$tree.on("tree.select", (e: unknown) => {
             const treeClickEvent = e as ClickNodeEvent;
 
@@ -62,7 +81,7 @@ context("when a node is clicked", () => {
             given.$tree.tree("selectNode", given.node1);
         });
 
-        test("it fires tree.select with node is null", (done) => {
+        test("fires tree.select with node is null", (done) => {
             given.$tree.on("tree.select", (e: unknown) => {
                 const treeClickEvent = e as ClickNodeEvent;
 
