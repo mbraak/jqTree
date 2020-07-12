@@ -46,6 +46,30 @@ describe("tree.click", () => {
     });
 });
 
+describe("tree.init", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    test("is called", (done) => {
+        given.$tree.on("tree.init", () => {
+            expect(given.$tree.tree("getNodeByName", "node2")).toMatchObject({
+                id: 124,
+                name: "node2",
+            });
+            done();
+        });
+
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    // todo: when data is loaded by ajax call
+});
+
 describe("tree.select", () => {
     interface Vars {
         node1: INode;
