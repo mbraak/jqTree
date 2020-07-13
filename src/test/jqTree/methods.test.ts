@@ -525,7 +525,7 @@ describe("updateNode", () => {
         });
     });
 
-    context("with an object with a name attribute", () => {
+    context("with an object containing a name", () => {
         given("nodeData", () => ({ name: "updated-node" }));
 
         test("updates the name", () => {
@@ -533,6 +533,37 @@ describe("updateNode", () => {
                 expect.objectContaining({ name: "updated-node" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
+        });
+    });
+
+    context("with an object containing an id", () => {
+        given("nodeData", () => ({ id: 999, name: "updated-node" }));
+
+        test("updates the node", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "updated-node" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+            expect(given.$tree.tree("getNodeById", 999)).toMatchObject(
+                given.nodeData
+            );
+        });
+    });
+
+    context("with an object containing a property", () => {
+        given("nodeData", () => ({
+            color: "green",
+            name: "updated-node",
+        }));
+
+        test("updates the node", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "updated-node" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+            expect(given.$tree.tree("getNodeById", 123)).toMatchObject(
+                given.nodeData
+            );
         });
     });
 });
