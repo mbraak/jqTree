@@ -493,3 +493,46 @@ describe("toJson", () => {
         expect(JSON.parse(given.$tree.tree("toJson"))).toEqual(exampleData);
     });
 });
+
+describe("updateNode", () => {
+    interface Vars {
+        node1: INode;
+        nodeData: NodeData;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: true,
+            data: exampleData,
+        });
+
+        given.$tree.tree("updateNode", given.node1, given.nodeData);
+    });
+
+    context("with a string", () => {
+        given("nodeData", () => "updated-node");
+
+        test("updates the name", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "updated-node" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+    });
+
+    context("with an object with a name attribute", () => {
+        given("nodeData", () => ({ name: "updated-node" }));
+
+        test("updates the name", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "updated-node" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+    });
+});
