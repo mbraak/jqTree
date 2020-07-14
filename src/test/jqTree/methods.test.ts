@@ -253,7 +253,7 @@ describe("moveNode", () => {
 
     beforeEach(() => {
         given.$tree.tree({
-            autoOpen: false,
+            autoOpen: true,
             data: exampleData,
         });
         given.$tree.tree("moveNode", given.child1, given.node2, "after");
