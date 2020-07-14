@@ -239,6 +239,40 @@ describe("loadData", () => {
     });
 });
 
+describe("moveNode", () => {
+    interface Vars {
+        child1: INode;
+        node2: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
+    given("node2", () => given.$tree.tree("getNodeByNameMustExist", "node2"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: false,
+            data: exampleData,
+        });
+        given.$tree.tree("moveNode", given.child1, given.node2, "after");
+    });
+
+    test("moves node", () => {
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({
+                name: "node1",
+                children: ["child2"],
+            }),
+            expect.objectContaining({
+                name: "node2",
+            }),
+            "child1",
+        ]);
+    });
+});
+
 describe("openNode", () => {
     interface Vars {
         node1: INode;
