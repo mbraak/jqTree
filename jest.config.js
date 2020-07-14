@@ -1,9 +1,14 @@
 module.exports = {
     coverageDirectory: "coverage",
+    modulePathIgnorePatterns: [
+        "<rootDir>/build/",
+        "<rootDir>/lib/",
+        "<rootDir>/_site/",
+        "<rootDir>/static/",
+    ],
     preset: "ts-jest",
-    rootDir: "src",
     setupFilesAfterEnv: [
-        "<rootDir>/test/support/setupTests.ts",
+        "<rootDir>/src/test/support/setupTests.ts",
         "givens/setup.js",
     ],
     testEnvironment: "jsdom",
