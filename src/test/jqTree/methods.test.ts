@@ -496,13 +496,13 @@ describe("toJson", () => {
 
 describe("updateNode", () => {
     interface Vars {
-        node1: INode;
+        node: INode;
         nodeData: NodeData;
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("node", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
@@ -511,7 +511,7 @@ describe("updateNode", () => {
             data: exampleData,
         });
 
-        given.$tree.tree("updateNode", given.node1, given.nodeData);
+        given.$tree.tree("updateNode", given.node, given.nodeData);
     });
 
     context("with a string", () => {
@@ -537,11 +537,11 @@ describe("updateNode", () => {
     });
 
     context("with an object containing an id", () => {
-        given("nodeData", () => ({ id: 999, name: "updated-node" }));
+        given("nodeData", () => ({ id: 999 }));
 
-        test("updates the node", () => {
+        test("updates the id", () => {
             expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "updated-node" }),
+                expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
             expect(given.$tree.tree("getNodeById", 999)).toMatchObject(
@@ -551,19 +551,53 @@ describe("updateNode", () => {
     });
 
     context("with an object containing a property", () => {
-        given("nodeData", () => ({
-            color: "green",
-            name: "updated-node",
-        }));
+        given("nodeData", () => ({ color: "green" }));
 
         test("updates the node", () => {
             expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "updated-node" }),
+                expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
-            expect(given.$tree.tree("getNodeById", 123)).toMatchObject(
-                given.nodeData
+            expect(given.$tree.tree("getNodeById", 123)).toMatchObject({
+                color: "green",
+                name: "node1",
+            });
+        });
+    });
+
+    context("with an object containing children", () => {
+        context("when adding a child to a child node", () => {
+            given("nodeData", () => ({ children: ["new-child"] }));
+            given("node", () =>
+                given.$tree.tree("getNodeByNameMustExist", "child1")
             );
+
+            test("adds the child node", () => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        name: "node1",
+                        children: [
+                            expect.objectContaining({
+                                name: "child1",
+                                children: ["new-child"],
+                            }),
+                            "child2",
+                        ],
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
+        });
+
+        context("when removing the children", () => {
+            given("nodeData", () => ({ children: [] }));
+
+            test("removes the children", () => {
+                expect(given.$tree).toHaveTreeStructure([
+                    "node1",
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
         });
     });
 });
