@@ -15,6 +15,34 @@ afterEach(() => {
     $tree.remove();
 });
 
+describe("addNodeAfter", () => {
+    interface Vars {
+        node: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+    given("node", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: true,
+            data: exampleData,
+        });
+
+        given.$tree.tree("addNodeAfter", "added-node", given.node);
+    });
+
+    test("adds the node", () => {
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "node1" }),
+            "added-node",
+            expect.objectContaining({ name: "node2" }),
+        ]);
+    });
+});
+
 describe("appendNode", () => {
     interface Vars {
         nodeData: NodeData;
@@ -39,9 +67,7 @@ describe("appendNode", () => {
     context("with an empty parent parameter", () => {
         test("appends the node to the tree", () => {
             expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    name: "node1",
-                }),
+                expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
                 "appended-node",
             ]);
