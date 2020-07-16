@@ -29,6 +29,7 @@
         "jquery": ">=1.9"
     },
     "devDependencies": {
+        "@testing-library/dom": "^7.21.0",
         "@types/jest": "^26.0.0",
         "@types/jquery": "^3.5.0",
         "@types/jquery-mockjax": "^2.0.31",

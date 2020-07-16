@@ -19,9 +19,12 @@ export const singleChild = (
 
 export const titleSpan = (
     liNode: HTMLElement | JQuery<HTMLElement>
-): JQuery<HTMLElement> => {
-    const $liNode = jQuery(liNode);
-    const $element = singleChild($liNode, "div.jqtree-element ");
+): JQuery<HTMLElement> => singleChild(nodeElement(liNode), "span.jqtree-title");
 
-    return singleChild($element, "span.jqtree-title");
-};
+export const togglerLink = (
+    liNode: HTMLElement | JQuery<HTMLElement>
+): JQuery<HTMLElement> => singleChild(nodeElement(liNode), "a.jqtree-toggler");
+
+const nodeElement = (
+    liNode: HTMLElement | JQuery<HTMLElement>
+): JQuery<HTMLElement> => singleChild(jQuery(liNode), "div.jqtree-element ");
