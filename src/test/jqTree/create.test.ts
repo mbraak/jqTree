@@ -29,18 +29,27 @@ describe("create with data", () => {
 
     test("creates a tree", () => {
         expect(given.$tree).toHaveTreeStructure([
-            {
+            expect.objectContaining({
                 name: "node1",
                 open: false,
-                children: ["child1", "child2"],
-            },
-            {
+                selected: false,
+                children: [
+                    expect.objectContaining({ name: "child1" }),
+                    expect.objectContaining({ name: "child2" }),
+                ],
+            }),
+            expect.objectContaining({
                 name: "node2",
                 open: false,
+                selected: false,
                 children: [
-                    { name: "node3", open: false, children: ["child3"] },
+                    expect.objectContaining({
+                        name: "node3",
+                        open: false,
+                        children: [expect.objectContaining({ name: "child3" })],
+                    }),
                 ],
-            },
+            }),
         ]);
     });
 });

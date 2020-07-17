@@ -141,7 +141,9 @@ describe("showEmptyFolder", () => {
             given("showEmptyFolder", () => false);
 
             test("creates a child node", () => {
-                expect(given.$tree).toHaveTreeStructure(["parent1"]);
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "parent1" }),
+                ]);
             });
         });
 

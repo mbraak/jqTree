@@ -85,7 +85,9 @@ context("when a node has load_on_demand in the data", () => {
 
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    children: ["loaded-on-demand"],
+                    children: [
+                        expect.objectContaining({ name: "loaded-on-demand" }),
+                    ],
                     name: "parent-node",
                     open: true,
                 }),

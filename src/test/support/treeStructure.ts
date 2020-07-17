@@ -4,17 +4,24 @@ const getTreeNode = ($li: JQuery<HTMLElement>): JQTreeMatchers.TreeNode => {
     const $div = singleChild($li, "div.jqtree-element");
     const $span = singleChild($div, "span.jqtree-title");
     const name = $span.text();
+    const selected = $li.hasClass("jqtree-selected");
 
     if ($li.hasClass("jqtree-folder")) {
         const $ul = $li.children("ul.jqtree_common");
 
         return {
+            nodeType: "folder",
             children: getChildren($ul),
             name,
             open: !$li.hasClass("jqtree-closed"),
+            selected,
         };
     } else {
-        return name;
+        return {
+            nodeType: "child",
+            name,
+            selected,
+        };
     }
 };
 

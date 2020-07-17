@@ -37,7 +37,7 @@ describe("addNodeAfter", () => {
     test("adds the node", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({ name: "node1" }),
-            "added-node",
+            expect.objectContaining({ name: "added-node" }),
             expect.objectContaining({ name: "node2" }),
         ]);
     });
@@ -64,7 +64,7 @@ describe("addNodeBefore", () => {
 
     test("adds the node", () => {
         expect(given.$tree).toHaveTreeStructure([
-            "added-node",
+            expect.objectContaining({ name: "added-node" }),
             expect.objectContaining({ name: "node1" }),
             expect.objectContaining({ name: "node2" }),
         ]);
@@ -97,11 +97,66 @@ describe("addParentNode", () => {
                 children: [
                     expect.objectContaining({
                         name: "new-parent-node",
-                        children: ["child1", "child2"],
+                        children: [
+                            expect.objectContaining({ name: "child1" }),
+                            expect.objectContaining({ name: "child2" }),
+                        ],
                     }),
                 ],
             }),
             expect.objectContaining({ name: "node2" }),
+        ]);
+    });
+});
+
+describe("addToSelection", () => {
+    interface Vars {
+        child1: INode;
+        child2: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+    given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
+    given("child2", () => given.$tree.tree("getNodeByNameMustExist", "child2"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: true,
+            data: exampleData,
+        });
+
+        given.$tree.tree("addToSelection", given.child1);
+        given.$tree.tree("addToSelection", given.child2);
+    });
+
+    test("selects the nodes", () => {
+        expect(given.$tree.tree("getSelectedNodes")).toEqual(
+            expect.arrayContaining([given.child1, given.child2])
+        );
+    });
+
+    test("renders the nodes correctly", () => {
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({
+                name: "node1",
+                selected: false,
+                children: [
+                    expect.objectContaining({ name: "child1", selected: true }),
+                    expect.objectContaining({ name: "child2", selected: true }),
+                ],
+            }),
+            expect.objectContaining({
+                name: "node2",
+                selected: false,
+                children: [
+                    expect.objectContaining({
+                        name: "node3",
+                        selected: false,
+                    }),
+                ],
+            }),
         ]);
     });
 });
@@ -132,7 +187,7 @@ describe("appendNode", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
-                "appended-node",
+                expect.objectContaining({ name: "appended-node" }),
             ]);
         });
     });
@@ -146,7 +201,11 @@ describe("appendNode", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
-                    children: ["child1", "child2", "appended-node"],
+                    children: [
+                        expect.objectContaining({ name: "child1" }),
+                        expect.objectContaining({ name: "child2" }),
+                        expect.objectContaining({ name: "appended-node" }),
+                    ],
                 }),
                 expect.objectContaining({ name: "node2" }),
             ]);
@@ -166,7 +225,7 @@ describe("appendNode", () => {
                     name: "node1",
                 }),
                 expect.objectContaining({ name: "node2" }),
-                "appended-using-object",
+                expect.objectContaining({ name: "appended-using-object" }),
             ]);
         });
 
@@ -296,7 +355,10 @@ describe("loadData", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
-                    children: ["child1", "child2"],
+                    children: [
+                        expect.objectContaining({ name: "child1" }),
+                        expect.objectContaining({ name: "child2" }),
+                    ],
                 }),
                 expect.objectContaining({
                     name: "node2",
@@ -318,7 +380,10 @@ describe("loadData", () => {
                     children: [
                         expect.objectContaining({
                             name: "node1",
-                            children: ["child1", "child2"],
+                            children: [
+                                expect.objectContaining({ name: "child1" }),
+                                expect.objectContaining({ name: "child2" }),
+                            ],
                         }),
                         expect.objectContaining({ name: "node2" }),
                     ],
@@ -352,12 +417,10 @@ describe("moveNode", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
                 name: "node1",
-                children: ["child2"],
+                children: [expect.objectContaining({ name: "child2" })],
             }),
-            expect.objectContaining({
-                name: "node2",
-            }),
-            "child1",
+            expect.objectContaining({ name: "node2" }),
+            expect.objectContaining({ name: "child1" }),
         ]);
     });
 });
@@ -405,7 +468,7 @@ describe("prependNode", () => {
     context("with an empty parent parameter", () => {
         test("prepends the node to the tree", () => {
             expect(given.$tree).toHaveTreeStructure([
-                "prepended-node",
+                expect.objectContaining({ name: "prepended-node" }),
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
@@ -421,7 +484,11 @@ describe("prependNode", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
-                    children: ["prepended-node", "child1", "child2"],
+                    children: [
+                        expect.objectContaining({ name: "prepended-node" }),
+                        expect.objectContaining({ name: "child1" }),
+                        expect.objectContaining({ name: "child2" }),
+                    ],
                 }),
                 expect.objectContaining({ name: "node2" }),
             ]);
@@ -451,10 +518,11 @@ describe("removeNode", () => {
 
         test("removes the node", () => {
             given.$tree.tree("removeNode", given.node);
+
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
-                    children: ["child2"],
+                    children: [expect.objectContaining({ name: "child2" })],
                 }),
                 expect.objectContaining({
                     name: "node2",
@@ -702,9 +770,13 @@ describe("updateNode", () => {
                         children: [
                             expect.objectContaining({
                                 name: "child1",
-                                children: ["new-child"],
+                                children: [
+                                    expect.objectContaining({
+                                        name: "new-child",
+                                    }),
+                                ],
                             }),
-                            "child2",
+                            expect.objectContaining({ name: "child2" }),
                         ],
                     }),
                     expect.objectContaining({ name: "node2" }),
@@ -717,8 +789,14 @@ describe("updateNode", () => {
 
             test("removes the children", () => {
                 expect(given.$tree).toHaveTreeStructure([
-                    "node1",
-                    expect.objectContaining({ name: "node2" }),
+                    expect.objectContaining({
+                        nodeType: "child",
+                        name: "node1",
+                    }),
+                    expect.objectContaining({
+                        nodeType: "folder",
+                        name: "node2",
+                    }),
                 ]);
             });
         });
