@@ -71,6 +71,41 @@ describe("addNodeBefore", () => {
     });
 });
 
+describe("addParentNode", () => {
+    interface Vars {
+        child1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+    given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: true,
+            data: exampleData,
+        });
+
+        given.$tree.tree("addParentNode", "new-parent-node", given.child1);
+    });
+
+    test("adds the parent node", () => {
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({
+                name: "node1",
+                children: [
+                    expect.objectContaining({
+                        name: "new-parent-node",
+                        children: ["child1", "child2"],
+                    }),
+                ],
+            }),
+            expect.objectContaining({ name: "node2" }),
+        ]);
+    });
+});
+
 describe("appendNode", () => {
     interface Vars {
         nodeData: NodeData;
