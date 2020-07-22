@@ -358,6 +358,47 @@ describe("getSelectedNode", () => {
     });
 });
 
+describe("getSelectedNodes", () => {
+    interface Vars {
+        child1: INode;
+        child2: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
+    given("child2", () => given.$tree.tree("getNodeByNameMustExist", "child2"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    context("when no node is selected", () => {
+        test("returns an empty array", () => {
+            expect(given.$tree.tree("getSelectedNodes")).toHaveLength(0);
+        });
+    });
+
+    context("when nodes are selected", () => {
+        beforeEach(() => {
+            given.$tree.tree("addToSelection", given.child1);
+            given.$tree.tree("addToSelection", given.child2);
+        });
+
+        test("returns the selected nodes", () => {
+            console.log(
+                given.$tree.tree("getSelectedNodes").map((node) => node.name)
+            );
+            expect(given.$tree.tree("getSelectedNodes")).toEqual(
+                expect.arrayContaining([given.child1, given.child2])
+            );
+        });
+    });
+});
+
 describe("loadData", () => {
     interface Vars {
         initialNode: INode;
