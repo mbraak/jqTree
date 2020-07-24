@@ -3,7 +3,7 @@ import getGiven from "givens";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 
-//const context = describe;
+const context = describe;
 
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
@@ -17,27 +17,48 @@ afterEach(() => {
 
 describe("keyboard support", () => {
     interface Vars {
-        node1: INode;
+        initialSelectedNode: INode;
         $tree: JQuery<HTMLElement>;
     }
 
     const KEY_DOWN = 40;
+    const KEY_UP = 38;
 
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
 
     beforeEach(() => {
         given.$tree.tree({ data: exampleData });
-        given.$tree.tree("selectNode", given.node1);
+        given.$tree.tree("selectNode", given.initialSelectedNode);
     });
 
-    test("changes selection", () => {
-        given.$tree.trigger($.Event("keydown", { which: KEY_DOWN }));
+    context("with key down", () => {
+        given("initialSelectedNode", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1")
+        );
 
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({ name: "node1", selected: false }),
-            expect.objectContaining({ name: "node2", selected: true }),
-        ]);
+        test("selects the next node", () => {
+            given.$tree.trigger($.Event("keydown", { which: KEY_DOWN }));
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", selected: false }),
+                expect.objectContaining({ name: "node2", selected: true }),
+            ]);
+        });
+    });
+
+    context("with key up", () => {
+        given("initialSelectedNode", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node2")
+        );
+
+        test("selects the next node", () => {
+            given.$tree.trigger($.Event("keydown", { which: KEY_UP }));
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", selected: true }),
+                expect.objectContaining({ name: "node2", selected: false }),
+            ]);
+        });
     });
 });
