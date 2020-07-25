@@ -1,9 +1,12 @@
 import * as $ from "jquery";
 import getGiven from "givens";
+import * as mockjaxFactory from "jquery-mockjax";
+import { screen } from "@testing-library/dom";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
 
+const mockjax = mockjaxFactory(jQuery, window);
 const context = describe;
 
 beforeEach(() => {
@@ -14,6 +17,7 @@ afterEach(() => {
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
+    mockjax.clear();
 });
 
 describe("autoOpen", () => {
@@ -92,6 +96,33 @@ describe("autoOpen", () => {
                 }),
             ]);
         });
+    });
+});
+
+describe("dataUrl", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        mockjax({
+            logging: false,
+            responseText: exampleData,
+            url: "*",
+        });
+    });
+
+    test("loads data from url", async () => {
+        given.$tree.tree({ dataUrl: "/tree/" });
+
+        await screen.findByText("node1");
+
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "node1" }),
+            expect.objectContaining({ name: "node2" }),
+        ]);
     });
 });
 
