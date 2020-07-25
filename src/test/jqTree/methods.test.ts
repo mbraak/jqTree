@@ -295,6 +295,29 @@ describe("getNodeById", () => {
     });
 });
 
+describe("getNodesByProperty", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    test("gets nodes by property", () => {
+        expect(
+            given.$tree.tree("getNodesByProperty", "intProperty", 1)
+        ).toEqual([given.node1]);
+    });
+});
+
 describe("getSelectedNode", () => {
     interface Vars {
         node: INode;
