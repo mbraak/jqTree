@@ -18,7 +18,7 @@ declare class INode {
     public iterate(callback: IterateCallback): void;
 }
 
-type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
+type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
 type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
 
 interface ClickNodeEvent {

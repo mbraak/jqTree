@@ -100,29 +100,66 @@ describe("autoOpen", () => {
 });
 
 describe("dataUrl", () => {
+    const testCases = [
+        {
+            name: "string",
+            dataUrl: "/tree/",
+        },
+        {
+            name: "object with url and headers",
+            dataUrl: {
+                url: "/tree/",
+                headers: { key1: "value1" },
+            },
+            checkRequest: (settings: MockJaxSettings) => {
+                expect(settings).toMatchObject({
+                    headers: { key1: "value1" },
+                    method: "GET",
+                    url: "/tree/",
+                });
+            },
+        },
+        {
+            name: "function",
+            dataUrl: () => ({ url: "/tree/" }),
+        },
+    ];
+
     interface Vars {
         $tree: JQuery<HTMLElement>;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
 
-    beforeEach(() => {
-        mockjax({
-            logging: false,
-            responseText: exampleData,
-            url: "*",
+    testCases.forEach(({ checkRequest, dataUrl, name }) => {
+        function handleResponse(
+            this: MockJaxSettings,
+            settings: MockJaxSettings
+        ) {
+            if (checkRequest) {
+                checkRequest(settings);
+            }
+
+            this.responseText = exampleData;
+        }
+
+        context(`with ${name}`, () => {
+            test("it loads the data from the url", async () => {
+                mockjax({
+                    url: "/tree/",
+                    response: handleResponse,
+                    logging: false,
+                });
+
+                given.$tree.tree({ dataUrl });
+                await screen.findByText("node1");
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
         });
-    });
-
-    test("loads data from url", async () => {
-        given.$tree.tree({ dataUrl: "/tree/" });
-
-        await screen.findByText("node1");
-
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({ name: "node1" }),
-            expect.objectContaining({ name: "node2" }),
-        ]);
     });
 });
 
