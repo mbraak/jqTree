@@ -1,5 +1,6 @@
 import * as $ from "jquery";
 import getGiven from "givens";
+import { screen } from "@testing-library/dom";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 
@@ -260,6 +261,31 @@ describe("closeNode", () => {
     });
 });
 
+describe("getNodeByHtmlElement", () => {
+    interface Vars {
+        htmlElement: HTMLElement;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("htmlElement", () =>
+        screen.getByText("node1", { selector: ".jqtree-title" })
+    );
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    test("returns the node", () => {
+        expect(
+            given.$tree.tree("getNodeByHtmlElement", given.htmlElement)
+        ).toEqual(expect.objectContaining({ name: "node1" }));
+    });
+});
+
 describe("getNodeById", () => {
     interface Vars {
         $tree: JQuery<HTMLElement>;
@@ -412,9 +438,6 @@ describe("getSelectedNodes", () => {
         });
 
         test("returns the selected nodes", () => {
-            console.log(
-                given.$tree.tree("getSelectedNodes").map((node) => node.name)
-            );
             expect(given.$tree.tree("getSelectedNodes")).toEqual(
                 expect.arrayContaining([given.child1, given.child2])
             );
