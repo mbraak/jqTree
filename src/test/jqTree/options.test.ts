@@ -188,6 +188,35 @@ describe("onCreateLi", () => {
     });
 });
 
+describe("onLoadFailed", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    context("when the loading fails", () => {
+        beforeEach(() => {
+            mockjax({
+                url: "/tree/",
+                responseText: "",
+                status: 500,
+                logging: false,
+            });
+        });
+
+        test("calls onLoadFailed", (done) => {
+            given.$tree.tree({
+                dataUrl: "/tree/",
+                onLoadFailed: () => {
+                    done();
+                },
+            });
+        });
+    });
+});
+
 describe("showEmptyFolder", () => {
     context("when children attribute is an empty array", () => {
         interface Vars {
