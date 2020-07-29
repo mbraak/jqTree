@@ -4,7 +4,7 @@ import exampleData from "./support/exampleData";
 
 const context = describe;
 
-describe(".addChild", () => {
+describe("addChild", () => {
     interface Vars {
         node: Node;
     }
@@ -29,7 +29,7 @@ describe(".addChild", () => {
     });
 });
 
-describe(".addChildAtPosition", () => {
+describe("addChildAtPosition", () => {
     interface Vars {
         child: Node;
         index: number;
@@ -208,7 +208,36 @@ describe("constructor", () => {
     });
 });
 
-describe(".loadFromData", () => {
+describe("getChildIndex", () => {
+    interface Vars {
+        child2: Node;
+        node: Node;
+    }
+    const given = getGiven<Vars>();
+    given("child2", () => new Node("child2"));
+    given("node", () => new Node());
+
+    beforeEach(() => {
+        given.node.addChild(new Node("child1"));
+        given.node.addChild(given.child2);
+        given.node.addChild(new Node("child3"));
+    });
+
+    context("when a child exists", () => {
+        test("it returns the index", () => {
+            expect(given.node.getChildIndex(given.child2)).toBe(1);
+        });
+    });
+
+    context("when a child doesn't exist", () => {
+        test("returns -1", () => {
+            const nonExistingChild = new Node("non-existing");
+            expect(given.node.getChildIndex(nonExistingChild)).toBe(-1);
+        });
+    });
+});
+
+describe("loadFromData", () => {
     interface Vars {
         tree: Node;
     }
@@ -244,7 +273,7 @@ describe(".loadFromData", () => {
     });
 });
 
-describe(".removeChild", () => {
+describe("removeChild", () => {
     interface Vars {
         child1: Node;
         node1: Node;
