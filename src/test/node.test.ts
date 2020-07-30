@@ -237,6 +237,30 @@ describe("getChildIndex", () => {
     });
 });
 
+describe("hasChildren", () => {
+    interface Vars {
+        node: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node", () => new Node());
+
+    context("when a node has children", () => {
+        beforeEach(() => {
+            given.node.addChild(new Node("child1"));
+        });
+
+        test("returns true", () => {
+            expect(given.node.hasChildren()).toEqual(true);
+        });
+    });
+
+    context("when a node doesn't have children", () => {
+        test("returns false", () => {
+            expect(given.node.hasChildren()).toEqual(false);
+        });
+    });
+});
+
 describe("loadFromData", () => {
     interface Vars {
         tree: Node;
