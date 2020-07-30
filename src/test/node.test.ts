@@ -261,6 +261,56 @@ describe("hasChildren", () => {
     });
 });
 
+describe("iterate", () => {
+    interface Vars {
+        tree: Node;
+        visited: [string, number][];
+        visitor: (node: Node, level: number) => boolean;
+    }
+    const given = getGiven<Vars>();
+    given("tree", () => new Node());
+    given("visited", () => []);
+
+    beforeEach(() => {
+        given.tree.loadFromData(exampleData);
+        given.tree.iterate(given.visitor);
+    });
+
+    context("when the visitor function returns true", () => {
+        const visitAllNodes = (node: Node, level: number) => {
+            given.visited.push([node.name, level]);
+            return true;
+        };
+        given("visitor", () => visitAllNodes);
+
+        test("visits all nodes", () => {
+            expect(given.visited).toEqual([
+                ["node1", 0],
+                ["child1", 1],
+                ["child2", 1],
+                ["node2", 0],
+                ["node3", 1],
+                ["child3", 2],
+            ]);
+        });
+    });
+
+    context("when the visitor function returns false", () => {
+        const visitNodes = (node: Node, level: number) => {
+            given.visited.push([node.name, level]);
+            return false;
+        };
+        given("visitor", () => visitNodes);
+
+        test("stops the iteration for the current node", () => {
+            expect(given.visited).toEqual([
+                ["node1", 0],
+                ["node2", 0],
+            ]);
+        });
+    });
+});
+
 describe("loadFromData", () => {
     interface Vars {
         tree: Node;
