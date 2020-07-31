@@ -261,6 +261,36 @@ describe("hasChildren", () => {
     });
 });
 
+describe("initFromData", () => {
+    interface Vars {
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("tree", () => new Node());
+
+    beforeEach(() => {
+        given.tree.initFromData({
+            name: "node1",
+            id: 1,
+            children: [
+                { name: "child1", id: 2 },
+                { name: "child2", id: 3 },
+            ],
+        });
+    });
+
+    test("loads the data", () => {
+        expect(given.tree).toMatchObject({
+            id: 1,
+            name: "node1",
+            children: [
+                expect.objectContaining({ id: 2, name: "child1" }),
+                expect.objectContaining({ id: 3, name: "child2" }),
+            ],
+        });
+    });
+});
+
 describe("iterate", () => {
     interface Vars {
         tree: Node;
