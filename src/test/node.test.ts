@@ -1,5 +1,5 @@
 import getGiven from "givens";
-import { Node } from "../node";
+import { Node, Position } from "../node";
 import exampleData from "./support/exampleData";
 
 const context = describe;
@@ -344,6 +344,93 @@ describe("loadFromData", () => {
                 children: [expect.objectContaining({ id: 127, name: "node3" })],
             }),
         ]);
+    });
+});
+
+describe("moveNode", () => {
+    interface Vars {
+        child1: Node;
+        child2: Node;
+        node2: Node;
+        tree: Node;
+    }
+
+    const given = getGiven<Vars>();
+
+    given("child1", () => given.tree.getNodeByNameMustExist("child1"));
+    given("child2", () => given.tree.getNodeByNameMustExist("child2"));
+    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
+    given("tree", () => new Node());
+
+    beforeEach(() => {
+        given.tree.loadFromData(exampleData);
+    });
+
+    context("when moving after a node", () => {
+        beforeEach(() => {
+            given.tree.moveNode(given.child2, given.node2, Position.After);
+        });
+
+        test("moves the node", () => {
+            expect(given.tree).toMatchObject({
+                name: "",
+                children: [
+                    expect.objectContaining({
+                        name: "node1",
+                        children: [expect.objectContaining({ name: "child1" })],
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                    expect.objectContaining({ name: "child2" }),
+                ],
+            });
+        });
+    });
+
+    context("when moving inside a node", () => {
+        beforeEach(() => {
+            given.tree.moveNode(given.child1, given.node2, Position.Inside);
+        });
+
+        test("moves the node", () => {
+            expect(given.tree).toMatchObject({
+                name: "",
+                children: [
+                    expect.objectContaining({
+                        name: "node1",
+                        children: [expect.objectContaining({ name: "child2" })],
+                    }),
+                    expect.objectContaining({
+                        name: "node2",
+                        children: [
+                            expect.objectContaining({ name: "child1" }),
+                            expect.objectContaining({ name: "node3" }),
+                        ],
+                    }),
+                ],
+            });
+        });
+    });
+
+    context("when moving before a node", () => {
+        beforeEach(() => {
+            given.tree.moveNode(given.child2, given.child1, Position.Before);
+        });
+
+        test("moves the node", () => {
+            expect(given.tree).toMatchObject({
+                name: "",
+                children: [
+                    expect.objectContaining({
+                        name: "node1",
+                        children: [
+                            expect.objectContaining({ name: "child2" }),
+                            expect.objectContaining({ name: "child1" }),
+                        ],
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
+        });
     });
 });
 
