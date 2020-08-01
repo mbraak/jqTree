@@ -390,6 +390,40 @@ describe("initFromData", () => {
     });
 });
 
+describe("isFolder", () => {
+    interface Vars {
+        node: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node", () => new Node());
+
+    context("when the node has no children", () => {
+        it("returns false", () => {
+            expect(given.node.isFolder()).toBe(false);
+        });
+
+        context("when the node is loaded on demand", () => {
+            beforeEach(() => {
+                given.node.load_on_demand = true;
+            });
+
+            it("returns false", () => {
+                expect(given.node.isFolder()).toBe(true);
+            });
+        });
+    });
+
+    context("when the node has a child", () => {
+        beforeEach(() => {
+            given.node.append("child1");
+        });
+
+        it("returns false", () => {
+            expect(given.node.isFolder()).toBe(true);
+        });
+    });
+});
+
 describe("iterate", () => {
     interface Vars {
         tree: Node;

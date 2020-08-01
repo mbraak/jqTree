@@ -53,6 +53,7 @@ export class Node implements INode {
     constructor(o: NodeData | null = null, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.isEmptyFolder = false;
+        this.load_on_demand = false;
 
         this.setData(o);
 
@@ -292,6 +293,7 @@ export class Node implements INode {
                             "children",
                             "element",
                             "idMapping",
+                            "load_on_demand",
                             "nodeClass",
                             "tree",
                             "isEmptyFolder",
