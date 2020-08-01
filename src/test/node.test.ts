@@ -31,6 +31,32 @@ describe("addAfter", () => {
     });
 });
 
+describe("addBefore", () => {
+    interface Vars {
+        node2: Node;
+        tree: Node;
+    }
+
+    const given = getGiven<Vars>();
+    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
+    given("tree", () => new Node());
+
+    beforeEach(() => {
+        given.tree.loadFromData(exampleData);
+        given.node2.addBefore("new node");
+    });
+
+    test("adds after the node", () => {
+        expect(given.tree).toMatchObject({
+            children: [
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "new node" }),
+                expect.objectContaining({ name: "node2" }),
+            ],
+        });
+    });
+});
+
 describe("addChild", () => {
     interface Vars {
         node: Node;
