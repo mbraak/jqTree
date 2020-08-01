@@ -5,6 +5,32 @@ import "jest-extended";
 
 const context = describe;
 
+describe("addAfter", () => {
+    interface Vars {
+        node1: Node;
+        tree: Node;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
+    given("tree", () => new Node());
+
+    beforeEach(() => {
+        given.tree.loadFromData(exampleData);
+        given.node1.addAfter("new node");
+    });
+
+    test("adds after the node", () => {
+        expect(given.tree).toMatchObject({
+            children: [
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "new node" }),
+                expect.objectContaining({ name: "node2" }),
+            ],
+        });
+    });
+});
+
 describe("addChild", () => {
     interface Vars {
         node: Node;
