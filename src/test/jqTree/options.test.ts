@@ -202,18 +202,21 @@ describe("onLoadFailed", () => {
                 url: "/tree/",
                 responseText: "",
                 status: 500,
+                statusText: "Internal server error",
                 logging: false,
             });
         });
 
-        test("calls onLoadFailed", (done) => {
-            given.$tree.tree({
-                dataUrl: "/tree/",
-                onLoadFailed: () => {
-                    done();
-                },
-            });
-        });
+        test("calls onLoadFailed", () =>
+            new Promise((done) => {
+                given.$tree.tree({
+                    dataUrl: "/tree/",
+                    onLoadFailed: (jqXHR) => {
+                        expect(jqXHR.status).toBe(500);
+                        done();
+                    },
+                });
+            }));
     });
 });
 
