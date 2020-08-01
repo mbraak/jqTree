@@ -52,7 +52,7 @@ context("with an open and a selected node", () => {
         given.$tree.tree("openNode", given.node1);
     });
 
-    test("saves the state", () => {
+    it("saves the state", () => {
         expect(JSON.parse(savedState)).toEqual({
             open_nodes: [123],
             selected_node: [123],

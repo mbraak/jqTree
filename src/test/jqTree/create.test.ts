@@ -27,7 +27,7 @@ describe("create with data", () => {
         });
     });
 
-    test("creates a tree", () => {
+    it("creates a tree", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
                 name: "node1",

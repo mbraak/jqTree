@@ -39,7 +39,7 @@ describe("autoOpen", () => {
     context("with autoOpen false", () => {
         given("autoOpen", () => false);
 
-        test("doesn't open any nodes", () => {
+        it("doesn't open any nodes", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: false }),
                 expect.objectContaining({ name: "node2", open: false }),
@@ -50,7 +50,7 @@ describe("autoOpen", () => {
     context("with autoOpen true", () => {
         given("autoOpen", () => true);
 
-        test("opens all nodes", () => {
+        it("opens all nodes", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
@@ -67,7 +67,7 @@ describe("autoOpen", () => {
     context("with autoOpen 0", () => {
         given("autoOpen", () => 0);
 
-        test("opens level 0", () => {
+        it("opens level 0", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
@@ -84,7 +84,7 @@ describe("autoOpen", () => {
     context("with autoOpen 1", () => {
         given("autoOpen", () => 1);
 
-        test("opens levels 1", () => {
+        it("opens levels 1", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
@@ -144,7 +144,7 @@ describe("dataUrl", () => {
         }
 
         context(`with ${name}`, () => {
-            test("it loads the data from the url", async () => {
+            it("loads the data from the url", async () => {
                 mockjax({
                     url: "/tree/",
                     response: handleResponse,
@@ -180,7 +180,7 @@ describe("onCreateLi", () => {
         });
     });
 
-    test("is called when creating a node", () => {
+    it("is called when creating a node", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({ name: "_node1_" }),
             expect.objectContaining({ name: "_node2_" }),
@@ -207,7 +207,7 @@ describe("onLoadFailed", () => {
             });
         });
 
-        test("calls onLoadFailed", () =>
+        it("calls onLoadFailed", () =>
             new Promise((done) => {
                 given.$tree.tree({
                     dataUrl: "/tree/",
@@ -240,7 +240,7 @@ describe("showEmptyFolder", () => {
         context("with showEmptyFolder false", () => {
             given("showEmptyFolder", () => false);
 
-            test("creates a child node", () => {
+            it("creates a child node", () => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({ name: "parent1" }),
                 ]);
@@ -250,7 +250,7 @@ describe("showEmptyFolder", () => {
         context("with showEmptyFolder true", () => {
             given("showEmptyFolder", () => true);
 
-            test("creates a folder", () => {
+            it("creates a folder", () => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({ name: "parent1", children: [] }),
                 ]);

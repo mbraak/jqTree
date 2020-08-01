@@ -35,7 +35,7 @@ describe("addNodeAfter", () => {
         given.$tree.tree("addNodeAfter", "added-node", given.node);
     });
 
-    test("adds the node", () => {
+    it("adds the node", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({ name: "node1" }),
             expect.objectContaining({ name: "added-node" }),
@@ -63,7 +63,7 @@ describe("addNodeBefore", () => {
         given.$tree.tree("addNodeBefore", "added-node", given.node);
     });
 
-    test("adds the node", () => {
+    it("adds the node", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({ name: "added-node" }),
             expect.objectContaining({ name: "node1" }),
@@ -91,7 +91,7 @@ describe("addParentNode", () => {
         given.$tree.tree("addParentNode", "new-parent-node", given.child1);
     });
 
-    test("adds the parent node", () => {
+    it("adds the parent node", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
                 name: "node1",
@@ -132,13 +132,13 @@ describe("addToSelection", () => {
         given.$tree.tree("addToSelection", given.child2);
     });
 
-    test("selects the nodes", () => {
+    it("selects the nodes", () => {
         expect(given.$tree.tree("getSelectedNodes")).toEqual(
             expect.arrayContaining([given.child1, given.child2])
         );
     });
 
-    test("renders the nodes correctly", () => {
+    it("renders the nodes correctly", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
                 name: "node1",
@@ -184,7 +184,7 @@ describe("appendNode", () => {
     });
 
     context("with an empty parent parameter", () => {
-        test("appends the node to the tree", () => {
+        it("appends the node to the tree", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
@@ -198,7 +198,7 @@ describe("appendNode", () => {
             given.$tree.tree("getNodeByNameMustExist", "node1")
         );
 
-        test("appends the node to parent node", () => {
+        it("appends the node to parent node", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
@@ -220,7 +220,7 @@ describe("appendNode", () => {
             name: "appended-using-object",
         }));
 
-        test("appends the node to the tree", () => {
+        it("appends the node to the tree", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
@@ -230,7 +230,7 @@ describe("appendNode", () => {
             ]);
         });
 
-        test("sets the properties of the object", () => {
+        it("sets the properties of the object", () => {
             expect(given.$tree.tree("getNodeById", 99)).toMatchObject(
                 given.nodeData
             );
@@ -256,7 +256,7 @@ describe("closeNode", () => {
         given.$tree.tree("closeNode", given.node1, false);
     });
 
-    test("closes the node", () => {
+    it("closes the node", () => {
         expect(given.node1.element).toBeClosed();
     });
 });
@@ -279,7 +279,7 @@ describe("getNodeByHtmlElement", () => {
         });
     });
 
-    test("returns the node", () => {
+    it("returns the node", () => {
         expect(
             given.$tree.tree("getNodeByHtmlElement", given.htmlElement)
         ).toEqual(expect.objectContaining({ name: "node1" }));
@@ -300,14 +300,14 @@ describe("getNodeById", () => {
         });
     });
 
-    test("returns the node", () => {
+    it("returns the node", () => {
         expect(given.$tree.tree("getNodeById", 127)).toMatchObject({
             name: "node3",
         });
     });
 
     context("with a string parameter", () => {
-        test("returns the node", () => {
+        it("returns the node", () => {
             expect(given.$tree.tree("getNodeById", "127")).toMatchObject({
                 name: "node3",
             });
@@ -315,7 +315,7 @@ describe("getNodeById", () => {
     });
 
     context("when the node doesn't exist", () => {
-        test("returns undefined", () => {
+        it("returns undefined", () => {
             expect(given.$tree.tree("getNodeById", 99999)).toBeNull();
         });
     });
@@ -337,7 +337,7 @@ describe("getNodesByProperty", () => {
         });
     });
 
-    test("gets nodes by property", () => {
+    it("gets nodes by property", () => {
         expect(
             given.$tree.tree("getNodesByProperty", "intProperty", 1)
         ).toEqual([given.node1]);
@@ -367,7 +367,7 @@ describe("getSelectedNode", () => {
         given("treeData", () => exampleData);
 
         context("when no node is selected", () => {
-            test("returns false", () => {
+            it("returns false", () => {
                 expect(given.$tree.tree("getSelectedNode")).toBe(false);
             });
         });
@@ -377,7 +377,7 @@ describe("getSelectedNode", () => {
                 given.$tree.tree("selectNode", given.node);
             });
 
-            test("returns the selected node", () => {
+            it("returns the selected node", () => {
                 expect(given.$tree.tree("getSelectedNode")).toBe(given.node);
             });
         });
@@ -390,7 +390,7 @@ describe("getSelectedNode", () => {
         given("treeData", () => ["without-id1", "without-id2"]);
 
         context("when no node is selected", () => {
-            test("returns false", () => {
+            it("returns false", () => {
                 expect(given.$tree.tree("getSelectedNode")).toBe(false);
             });
         });
@@ -400,7 +400,7 @@ describe("getSelectedNode", () => {
                 given.$tree.tree("selectNode", given.node);
             });
 
-            test("returns the selected node", () => {
+            it("returns the selected node", () => {
                 expect(given.$tree.tree("getSelectedNode")).toBe(given.node);
             });
         });
@@ -426,7 +426,7 @@ describe("getSelectedNodes", () => {
     });
 
     context("when no node is selected", () => {
-        test("returns an empty array", () => {
+        it("returns an empty array", () => {
             expect(given.$tree.tree("getSelectedNodes")).toHaveLength(0);
         });
     });
@@ -437,7 +437,7 @@ describe("getSelectedNodes", () => {
             given.$tree.tree("addToSelection", given.child2);
         });
 
-        test("returns the selected nodes", () => {
+        it("returns the selected nodes", () => {
             expect(given.$tree.tree("getSelectedNodes")).toEqual(
                 expect.arrayContaining([given.child1, given.child2])
             );
@@ -468,7 +468,7 @@ describe("loadData", () => {
             given.$tree.tree("loadData", exampleData);
         });
 
-        test("replaces the whole tree", () => {
+        it("replaces the whole tree", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
@@ -490,7 +490,7 @@ describe("loadData", () => {
             given.$tree.tree("loadData", exampleData, given.initialNode);
         });
 
-        test("loads the data under the node", () => {
+        it("loads the data under the node", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "initial1",
@@ -530,7 +530,7 @@ describe("moveNode", () => {
         given.$tree.tree("moveNode", given.child1, given.node2, "after");
     });
 
-    test("moves node", () => {
+    it("moves node", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
                 name: "node1",
@@ -560,7 +560,7 @@ describe("openNode", () => {
         given.$tree.tree("openNode", given.node1, false);
     });
 
-    test("opens the node", () => {
+    it("opens the node", () => {
         expect(given.node1.element).toBeOpen();
     });
 });
@@ -583,7 +583,7 @@ describe("prependNode", () => {
     });
 
     context("with an empty parent parameter", () => {
-        test("prepends the node to the tree", () => {
+        it("prepends the node to the tree", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "prepended-node" }),
                 expect.objectContaining({ name: "node1" }),
@@ -597,7 +597,7 @@ describe("prependNode", () => {
             given.$tree.tree("getNodeByNameMustExist", "node1")
         );
 
-        test("prepends the node to the parent", () => {
+        it("prepends the node to the parent", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
@@ -633,7 +633,7 @@ describe("removeNode", () => {
             given.$tree.tree("getNodeByNameMustExist", "child1")
         );
 
-        test("removes the node", () => {
+        it("removes the node", () => {
             given.$tree.tree("removeNode", given.node);
 
             expect(given.$tree).toHaveTreeStructure([
@@ -653,7 +653,7 @@ describe("removeNode", () => {
                 given.$tree.tree("selectNode", given.node);
             });
 
-            test("removes and deselects the node", () => {
+            it("removes and deselects the node", () => {
                 given.$tree.tree("removeNode", given.node);
 
                 expect(given.$tree.tree("getSelectedNode")).toBe(false);
@@ -666,7 +666,7 @@ describe("removeNode", () => {
             given.$tree.tree("getNodeByNameMustExist", "node1")
         );
 
-        test("removes the node", () => {
+        it("removes the node", () => {
             given.$tree.tree("removeNode", given.node);
 
             expect(given.$tree).toHaveTreeStructure([
@@ -686,7 +686,7 @@ describe("removeNode", () => {
                 given.$tree.tree("selectNode", child1);
             });
 
-            test("removes the node and deselects the child", () => {
+            it("removes the node and deselects the child", () => {
                 given.$tree.tree("removeNode", given.node);
 
                 expect(given.$tree.tree("getSelectedNode")).toBe(false);
@@ -720,7 +720,7 @@ describe("selectNode", () => {
             given.$tree.tree("selectNode", given.node1);
         });
 
-        test("selects the node and deselects the previous node", () => {
+        it("selects the node and deselects the previous node", () => {
             expect(given.node1.element).toBeSelected();
             expect(given.node2.element).notToBeSelected();
         });
@@ -731,7 +731,7 @@ describe("selectNode", () => {
             given.$tree.tree("selectNode", given.node1);
         });
 
-        test("selects the node", () => {
+        it("selects the node", () => {
             expect(given.node1.element).toBeSelected();
         });
     });
@@ -742,7 +742,7 @@ describe("selectNode", () => {
             given.$tree.tree("selectNode", given.node1);
         });
 
-        test("deselects the node", () => {
+        it("deselects the node", () => {
             expect(given.node1.element).notToBeSelected();
         });
     });
@@ -769,7 +769,7 @@ describe("toggle", () => {
     });
 
     context("when the node is closed", () => {
-        test("opens the node", () => {
+        it("opens the node", () => {
             expect(given.node1.element).toBeOpen();
         });
     });
@@ -777,7 +777,7 @@ describe("toggle", () => {
     context("when the node is open", () => {
         given("autoOpen", () => true);
 
-        test("closes the node", () => {
+        it("closes the node", () => {
             expect(given.node1.element).toBeClosed();
         });
     });
@@ -797,7 +797,7 @@ describe("toJson", () => {
         });
     });
 
-    test("returns nodes as json", () => {
+    it("returns nodes as json", () => {
         expect(JSON.parse(given.$tree.tree("toJson"))).toEqual(exampleData);
     });
 });
@@ -825,7 +825,7 @@ describe("updateNode", () => {
     context("with a string", () => {
         given("nodeData", () => "updated-node");
 
-        test("updates the name", () => {
+        it("updates the name", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "updated-node" }),
                 expect.objectContaining({ name: "node2" }),
@@ -836,7 +836,7 @@ describe("updateNode", () => {
     context("with an object containing a name", () => {
         given("nodeData", () => ({ name: "updated-node" }));
 
-        test("updates the name", () => {
+        it("updates the name", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "updated-node" }),
                 expect.objectContaining({ name: "node2" }),
@@ -847,7 +847,7 @@ describe("updateNode", () => {
     context("with an object containing an id", () => {
         given("nodeData", () => ({ id: 999 }));
 
-        test("updates the id", () => {
+        it("updates the id", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
@@ -861,7 +861,7 @@ describe("updateNode", () => {
     context("with an object containing a property", () => {
         given("nodeData", () => ({ color: "green" }));
 
-        test("updates the node", () => {
+        it("updates the node", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
@@ -880,7 +880,7 @@ describe("updateNode", () => {
                 given.$tree.tree("getNodeByNameMustExist", "child1")
             );
 
-            test("adds the child node", () => {
+            it("adds the child node", () => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({
                         name: "node1",
@@ -904,7 +904,7 @@ describe("updateNode", () => {
         context("when removing the children", () => {
             given("nodeData", () => ({ children: [] }));
 
-            test("removes the children", () => {
+            it("removes the children", () => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({
                         nodeType: "child",

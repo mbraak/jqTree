@@ -38,7 +38,7 @@ describe("tree.click", () => {
         });
     });
 
-    test("fires tree.click", () =>
+    it("fires tree.click", () =>
         new Promise((done) => {
             given.$tree.on("tree.click", (e: unknown) => {
                 const treeClickEvent = e as ClickNodeEvent;
@@ -59,7 +59,7 @@ describe("tree.init", () => {
     given("$tree", () => $("#tree1"));
 
     context("with json data", () => {
-        test("is called", () =>
+        it("is called", () =>
             new Promise((done) => {
                 given.$tree.on("tree.init", () => {
                     expect(
@@ -86,7 +86,7 @@ describe("tree.init", () => {
             });
         });
 
-        test("is called", () =>
+        it("is called", () =>
             new Promise((done) => {
                 given.$tree.on("tree.init", () => {
                     expect(
@@ -121,7 +121,7 @@ describe("tree.select", () => {
         });
     });
 
-    test("fires tree.click", () =>
+    it("fires tree.click", () =>
         new Promise((done) => {
             given.$tree.on("tree.select", (e: unknown) => {
                 const treeClickEvent = e as ClickNodeEvent;
@@ -139,7 +139,7 @@ describe("tree.select", () => {
             given.$tree.tree("selectNode", given.node1);
         });
 
-        test("fires tree.select with node is null", () =>
+        it("fires tree.select with node is null", () =>
             new Promise((done) => {
                 given.$tree.on("tree.select", (e: unknown) => {
                     const treeClickEvent = e as ClickNodeEvent;

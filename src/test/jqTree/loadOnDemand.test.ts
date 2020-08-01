@@ -43,7 +43,7 @@ context("when a node has load_on_demand in the data", () => {
         });
     });
 
-    test("creates a parent node without children", () => {
+    it("creates a parent node without children", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
                 children: [],
@@ -78,7 +78,7 @@ context("when a node has load_on_demand in the data", () => {
             given.$tree.tree("getNodeByNameMustExist", "parent-node")
         );
 
-        test("loads the subtree", async () => {
+        it("loads the subtree", async () => {
             togglerLink(given.node.element).click();
 
             await screen.findByText("loaded-on-demand");

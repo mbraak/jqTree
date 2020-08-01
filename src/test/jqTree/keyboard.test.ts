@@ -41,7 +41,7 @@ describe("keyboard support", () => {
         );
         given("pressedKey", () => KEY_DOWN);
 
-        test("selects the next node", () => {
+        it("selects the next node", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", selected: false }),
                 expect.objectContaining({ name: "node2", selected: true }),
@@ -55,7 +55,7 @@ describe("keyboard support", () => {
         );
         given("pressedKey", () => KEY_UP);
 
-        test("selects the next node", () => {
+        it("selects the next node", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", selected: true }),
                 expect.objectContaining({ name: "node2", selected: false }),
@@ -69,7 +69,7 @@ describe("keyboard support", () => {
         );
         given("pressedKey", () => KEY_RIGHT);
 
-        test("opens the node", () => {
+        it("opens the node", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",

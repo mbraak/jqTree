@@ -20,7 +20,7 @@ describe("addAfter", () => {
         given.node1.addAfter("new node");
     });
 
-    test("adds after the node", () => {
+    it("adds after the node", () => {
         expect(given.tree).toMatchObject({
             children: [
                 expect.objectContaining({ name: "node1" }),
@@ -46,7 +46,7 @@ describe("addBefore", () => {
         given.node2.addBefore("new node");
     });
 
-    test("adds after the node", () => {
+    it("adds after the node", () => {
         expect(given.tree).toMatchObject({
             children: [
                 expect.objectContaining({ name: "node1" }),
@@ -69,7 +69,7 @@ describe("addChild", () => {
         given.node.addChild(new Node({ id: 100, name: "child1" }));
     });
 
-    test("adds the child", () => {
+    it("adds the child", () => {
         expect(given.node.children).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({ id: 100, name: "child1" }),
@@ -77,7 +77,7 @@ describe("addChild", () => {
         );
     });
 
-    test("sets the parent of the child", () => {
+    it("sets the parent of the child", () => {
         expect(given.node.children[0].parent).toEqual(given.node);
     });
 });
@@ -101,7 +101,7 @@ describe("addChildAtPosition", () => {
     context("with index 0", () => {
         given("index", () => 0);
 
-        test("adds at the start", () => {
+        it("adds at the start", () => {
             expect(given.node.children).toEqual([
                 expect.objectContaining({ name: "new" }),
                 expect.objectContaining({ name: "child1" }),
@@ -119,7 +119,7 @@ describe("addChildAtPosition", () => {
     context("with index 1", () => {
         given("index", () => 1);
 
-        test("inserts at index 1", () => {
+        it("inserts at index 1", () => {
             expect(given.node.children).toEqual([
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "new" }),
@@ -131,7 +131,7 @@ describe("addChildAtPosition", () => {
     context("with non existing index", () => {
         given("index", () => 99);
 
-        test("adds add the end", () => {
+        it("adds add the end", () => {
             expect(given.node.children).toEqual([
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
@@ -154,7 +154,7 @@ describe("constructor", () => {
     );
 
     context("without parameters", () => {
-        test("creates a node", () => {
+        it("creates a node", () => {
             expect(given.node.name).toBe("");
             expect(given.node.id).toBeUndefined();
         });
@@ -163,7 +163,7 @@ describe("constructor", () => {
     context("with a string", () => {
         given("params", () => "n1");
 
-        test("creates a node", () => {
+        it("creates a node", () => {
             expect(given.node).toMatchObject({
                 name: "n1",
                 children: [],
@@ -179,7 +179,7 @@ describe("constructor", () => {
             name: "n1",
         }));
 
-        test("creates a node", () => {
+        it("creates a node", () => {
             expect(given.node).toMatchObject({
                 id: 123,
                 name: "n1",
@@ -192,7 +192,7 @@ describe("constructor", () => {
             name: null,
         }));
 
-        test("sets the name to an empty string", () => {
+        it("sets the name to an empty string", () => {
             expect(given.node.name).toBe("");
         });
     });
@@ -205,7 +205,7 @@ describe("constructor", () => {
             url: "/abc",
         }));
 
-        test("creates a node", () => {
+        it("creates a node", () => {
             expect(given.node).toMatchObject({
                 color: "green",
                 id: 123,
@@ -222,7 +222,7 @@ describe("constructor", () => {
             url: "/",
         }));
 
-        test("creates a node", () => {
+        it("creates a node", () => {
             expect(given.node).toMatchObject({
                 id: 123,
                 name: "n1",
@@ -241,7 +241,7 @@ describe("constructor", () => {
             parent: "abc",
         }));
 
-        test("doesn't set the parent", () => {
+        it("doesn't set the parent", () => {
             expect(given.node.name).toBe("n1");
             expect(given.node.parent).toBeNull();
         });
@@ -253,7 +253,7 @@ describe("constructor", () => {
             children: ["c"],
         }));
 
-        test("doesn't set the children", () => {
+        it("doesn't set the children", () => {
             // todo: match object?
             expect(given.node.name).toBe("n1");
             expect(given.node.children).toHaveLength(0);
@@ -277,13 +277,13 @@ describe("getChildIndex", () => {
     });
 
     context("when a child exists", () => {
-        test("it returns the index", () => {
+        it("returns the index", () => {
             expect(given.node.getChildIndex(given.child2)).toBe(1);
         });
     });
 
     context("when a child doesn't exist", () => {
-        test("returns -1", () => {
+        it("returns -1", () => {
             const nonExistingChild = new Node("non-existing");
             expect(given.node.getChildIndex(nonExistingChild)).toBe(-1);
         });
@@ -301,7 +301,7 @@ describe("getData", () => {
         given.tree.loadFromData(exampleData);
     });
 
-    test("returns the tree data", () => {
+    it("returns the tree data", () => {
         expect(given.tree.getData()).toEqual([
             expect.objectContaining({
                 name: "node1",
@@ -314,7 +314,7 @@ describe("getData", () => {
         ]);
     });
 
-    test("doesn't include internal attributes", () => {
+    it("doesn't include internal attributes", () => {
         expect(given.tree.getData()[0]).not.toContainAnyKeys([
             "element",
             "isEmptyFolder",
@@ -323,7 +323,7 @@ describe("getData", () => {
     });
 
     context("with includeParent parameter", () => {
-        test("returns the tree data including the node itself", () => {
+        it("returns the tree data including the node itself", () => {
             expect(given.tree.getData(true)).toEqual([
                 expect.objectContaining({
                     children: [
@@ -348,13 +348,13 @@ describe("hasChildren", () => {
             given.node.addChild(new Node("child1"));
         });
 
-        test("returns true", () => {
+        it("returns true", () => {
             expect(given.node.hasChildren()).toEqual(true);
         });
     });
 
     context("when a node doesn't have children", () => {
-        test("returns false", () => {
+        it("returns false", () => {
             expect(given.node.hasChildren()).toEqual(false);
         });
     });
@@ -378,7 +378,7 @@ describe("initFromData", () => {
         });
     });
 
-    test("loads the data", () => {
+    it("loads the data", () => {
         expect(given.tree).toMatchObject({
             id: 1,
             name: "node1",
@@ -412,7 +412,7 @@ describe("iterate", () => {
         };
         given("visitor", () => visitAllNodes);
 
-        test("visits all nodes", () => {
+        it("visits all nodes", () => {
             expect(given.visited).toEqual([
                 ["node1", 0],
                 ["child1", 1],
@@ -431,7 +431,7 @@ describe("iterate", () => {
         };
         given("visitor", () => visitNodes);
 
-        test("stops the iteration for the current node", () => {
+        it("stops the iteration for the current node", () => {
             expect(given.visited).toEqual([
                 ["node1", 0],
                 ["node2", 0],
@@ -453,7 +453,7 @@ describe("loadFromData", () => {
         given.tree.loadFromData(exampleData);
     });
 
-    test("creates a tree", () => {
+    it("creates a tree", () => {
         expect(given.tree.children).toEqual([
             expect.objectContaining({
                 id: 123,
@@ -500,7 +500,7 @@ describe("moveNode", () => {
             given.tree.moveNode(given.child2, given.node2, Position.After);
         });
 
-        test("moves the node", () => {
+        it("moves the node", () => {
             expect(given.tree).toMatchObject({
                 name: "",
                 children: [
@@ -520,7 +520,7 @@ describe("moveNode", () => {
             given.tree.moveNode(given.child1, given.node2, Position.Inside);
         });
 
-        test("moves the node", () => {
+        it("moves the node", () => {
             expect(given.tree).toMatchObject({
                 name: "",
                 children: [
@@ -545,7 +545,7 @@ describe("moveNode", () => {
             given.tree.moveNode(given.child2, given.child1, Position.Before);
         });
 
-        test("moves the node", () => {
+        it("moves the node", () => {
             expect(given.tree).toMatchObject({
                 name: "",
                 children: [
@@ -580,7 +580,7 @@ describe("removeChild", () => {
         given.node1.removeChild(given.child1);
     });
 
-    test("removes the child", () => {
+    it("removes the child", () => {
         expect(given.node1.children).toEqual([
             expect.objectContaining({ name: "child2" }),
         ]);
