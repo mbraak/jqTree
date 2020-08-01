@@ -1,6 +1,7 @@
 import getGiven from "givens";
 import { Node, Position } from "../node";
 import exampleData from "./support/exampleData";
+import "jest-extended";
 
 const context = describe;
 
@@ -233,6 +234,52 @@ describe("getChildIndex", () => {
         test("returns -1", () => {
             const nonExistingChild = new Node("non-existing");
             expect(given.node.getChildIndex(nonExistingChild)).toBe(-1);
+        });
+    });
+});
+
+describe("getData", () => {
+    interface Vars {
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("tree", () => new Node());
+
+    beforeEach(() => {
+        given.tree.loadFromData(exampleData);
+    });
+
+    test("returns the tree data", () => {
+        expect(given.tree.getData()).toEqual([
+            expect.objectContaining({
+                name: "node1",
+                children: [
+                    expect.objectContaining({ name: "child1" }),
+                    expect.objectContaining({ name: "child2" }),
+                ],
+            }),
+            expect.objectContaining({ name: "node2" }),
+        ]);
+    });
+
+    test("doesn't include internal attributes", () => {
+        expect(given.tree.getData()[0]).not.toContainAnyKeys([
+            "element",
+            "isEmptyFolder",
+            "parent",
+        ]);
+    });
+
+    context("with includeParent parameter", () => {
+        test("returns the tree data including the node itself", () => {
+            expect(given.tree.getData(true)).toEqual([
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({ name: "node1" }),
+                        expect.objectContaining({ name: "node2" }),
+                    ],
+                }),
+            ]);
         });
     });
 });

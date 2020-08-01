@@ -10,6 +10,7 @@ module.exports = {
     setupFilesAfterEnv: [
         "<rootDir>/src/test/support/setupTests.ts",
         "givens/setup.js",
+        "jest-extended",
     ],
     testEnvironment: "jsdom",
 };
