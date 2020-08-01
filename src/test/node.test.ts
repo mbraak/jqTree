@@ -514,6 +514,7 @@ describe("moveNode", () => {
     interface Vars {
         child1: Node;
         child2: Node;
+        node1: Node;
         node2: Node;
         tree: Node;
     }
@@ -522,6 +523,7 @@ describe("moveNode", () => {
 
     given("child1", () => given.tree.getNodeByNameMustExist("child1"));
     given("child2", () => given.tree.getNodeByNameMustExist("child2"));
+    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
     given("node2", () => given.tree.getNodeByNameMustExist("node2"));
     given("tree", () => new Node());
 
@@ -530,11 +532,11 @@ describe("moveNode", () => {
     });
 
     context("when moving after a node", () => {
-        beforeEach(() => {
-            given.tree.moveNode(given.child2, given.node2, Position.After);
-        });
-
         it("moves the node", () => {
+            expect(
+                given.tree.moveNode(given.child2, given.node2, Position.After)
+            ).toBe(true);
+
             expect(given.tree).toMatchObject({
                 name: "",
                 children: [
@@ -550,11 +552,11 @@ describe("moveNode", () => {
     });
 
     context("when moving inside a node", () => {
-        beforeEach(() => {
-            given.tree.moveNode(given.child1, given.node2, Position.Inside);
-        });
-
         it("moves the node", () => {
+            expect(
+                given.tree.moveNode(given.child1, given.node2, Position.Inside)
+            ).toBe(true);
+
             expect(given.tree).toMatchObject({
                 name: "",
                 children: [
@@ -575,11 +577,11 @@ describe("moveNode", () => {
     });
 
     context("when moving before a node", () => {
-        beforeEach(() => {
-            given.tree.moveNode(given.child2, given.child1, Position.Before);
-        });
-
         it("moves the node", () => {
+            expect(
+                given.tree.moveNode(given.child2, given.child1, Position.Before)
+            ).toBe(true);
+
             expect(given.tree).toMatchObject({
                 name: "",
                 children: [
@@ -588,6 +590,27 @@ describe("moveNode", () => {
                         children: [
                             expect.objectContaining({ name: "child2" }),
                             expect.objectContaining({ name: "child1" }),
+                        ],
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
+        });
+    });
+
+    context("when the moved node is a parent of the target node", () => {
+        it("doesn't move the node", () => {
+            expect(
+                given.tree.moveNode(given.node1, given.child1, Position.Before)
+            ).toBe(false);
+
+            expect(given.tree).toMatchObject({
+                children: [
+                    expect.objectContaining({
+                        name: "node1",
+                        children: [
+                            expect.objectContaining({ name: "child1" }),
+                            expect.objectContaining({ name: "child2" }),
                         ],
                     }),
                     expect.objectContaining({ name: "node2" }),

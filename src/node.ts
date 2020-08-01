@@ -249,31 +249,49 @@ export class Node implements INode {
     // move node1 after node2
     tree.moveNode(node1, node2, Position.AFTER);
     */
-    public moveNode(movedNode: Node, targetNode: Node, position: number): void {
+    public moveNode(
+        movedNode: Node,
+        targetNode: Node,
+        position: number
+    ): boolean {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
             // - Or, parent is empty
-            return;
+            return false;
         } else {
             movedNode.parent.doRemoveChild(movedNode);
 
-            if (position === Position.After) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(
-                        movedNode,
-                        targetNode.parent.getChildIndex(targetNode) + 1
-                    );
+            switch (position) {
+                case Position.After: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(
+                            movedNode,
+                            targetNode.parent.getChildIndex(targetNode) + 1
+                        );
+                        return true;
+                    }
+                    return false;
                 }
-            } else if (position === Position.Before) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(
-                        movedNode,
-                        targetNode.parent.getChildIndex(targetNode)
-                    );
+
+                case Position.Before: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(
+                            movedNode,
+                            targetNode.parent.getChildIndex(targetNode)
+                        );
+                        return true;
+                    }
+                    return false;
                 }
-            } else if (position === Position.Inside) {
-                // move inside as first child
-                targetNode.addChildAtPosition(movedNode, 0);
+
+                case Position.Inside: {
+                    // move inside as first child
+                    targetNode.addChildAtPosition(movedNode, 0);
+                    return true;
+                }
+
+                default:
+                    return false;
             }
         }
     }
