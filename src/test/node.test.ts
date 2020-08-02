@@ -141,6 +141,41 @@ describe("addChildAtPosition", () => {
     });
 });
 
+describe("addParent", () => {
+    interface Vars {
+        tree: Node;
+        node1: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node1", () => new Node("node1"));
+    given("tree", () => new Node({}, true));
+
+    beforeEach(() => {
+        given.tree.addChild(given.node1);
+        given.node1.append("child1");
+        given.node1.addParent("parent1");
+    });
+
+    it("adds a parent node", () => {
+        expect(given.tree).toMatchObject({
+            name: "",
+            children: [
+                expect.objectContaining({
+                    name: "parent1",
+                    children: [
+                        expect.objectContaining({
+                            name: "node1",
+                            children: [
+                                expect.objectContaining({ name: "child1" }),
+                            ],
+                        }),
+                    ],
+                }),
+            ],
+        });
+    });
+});
+
 describe("constructor", () => {
     interface Vars {
         node: Node;
