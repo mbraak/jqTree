@@ -336,6 +336,36 @@ describe("getData", () => {
     });
 });
 
+describe("getNodeByCallback", () => {
+    interface Vars {
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("tree", () => new Node());
+
+    beforeEach(() => {
+        given.tree.loadFromData(exampleData);
+    });
+
+    context("when a matching node exists", () => {
+        it("returns the node", () => {
+            expect(
+                given.tree.getNodeByCallback((node) =>
+                    node.name.startsWith("chi")
+                )
+            ).toMatchObject({
+                name: "child1",
+            });
+        });
+    });
+
+    context("when no matching node exists", () => {
+        it("returns null", () => {
+            expect(given.tree.getNodeByCallback(() => false)).toBeNull();
+        });
+    });
+});
+
 describe("getNodeByName", () => {
     interface Vars {
         tree: Node;
