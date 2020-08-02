@@ -353,10 +353,12 @@ export class Node implements INode {
     }
 
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
-        let result = null;
+        let result: Node | null = null;
 
         this.iterate((node: Node) => {
-            if (callback(node)) {
+            if (result) {
+                return false;
+            } else if (callback(node)) {
                 result = node;
                 return false;
             } else {

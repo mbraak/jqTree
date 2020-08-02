@@ -363,6 +363,35 @@ describe("getNodeByName", () => {
     });
 });
 
+describe("getNodeByNameMustExist", () => {
+    interface Vars {
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("tree", () => new Node());
+
+    beforeEach(() => {
+        given.tree.loadFromData(exampleData);
+    });
+
+    context("when the node exists", () => {
+        it("returns the node", () => {
+            expect(given.tree.getNodeByNameMustExist("child1")).toMatchObject({
+                id: 125,
+                name: "child1",
+            });
+        });
+    });
+
+    context("when the node doesn't exist", () => {
+        it("throws an exception", () => {
+            expect(() =>
+                given.tree.getNodeByNameMustExist("non-existing")
+            ).toThrow("Node with name non-existing not found");
+        });
+    });
+});
+
 describe("hasChildren", () => {
     interface Vars {
         node: Node;
