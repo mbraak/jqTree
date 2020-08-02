@@ -336,6 +336,33 @@ describe("getData", () => {
     });
 });
 
+describe("getNodeByName", () => {
+    interface Vars {
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("tree", () => new Node());
+
+    beforeEach(() => {
+        given.tree.loadFromData(exampleData);
+    });
+
+    context("when the node exists", () => {
+        it("returns the node", () => {
+            expect(given.tree.getNodeByName("child1")).toMatchObject({
+                id: 125,
+                name: "child1",
+            });
+        });
+    });
+
+    context("when the node doesn't exist", () => {
+        it("returns null", () => {
+            expect(given.tree.getNodeByName("non-existing")).toBeNull();
+        });
+    });
+});
+
 describe("hasChildren", () => {
     interface Vars {
         node: Node;
