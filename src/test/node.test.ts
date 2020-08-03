@@ -174,6 +174,29 @@ describe("addParent", () => {
     });
 });
 
+describe("append", () => {
+    interface Vars {
+        node: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node", () => new Node("node1"));
+
+    beforeEach(() => {
+        given.node.append("child1");
+        given.node.append("child2");
+    });
+
+    it("appends a node", () => {
+        expect(given.node).toMatchObject({
+            name: "node1",
+            children: [
+                expect.objectContaining({ name: "child1" }),
+                expect.objectContaining({ name: "child2" }),
+            ],
+        });
+    });
+});
+
 describe("constructor", () => {
     interface Vars {
         node: Node;
