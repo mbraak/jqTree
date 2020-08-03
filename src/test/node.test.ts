@@ -13,10 +13,9 @@ describe("addAfter", () => {
 
     const given = getGiven<Vars>();
     given("node1", () => given.tree.getNodeByNameMustExist("node1"));
-    given("tree", () => new Node());
+    given("tree", () => new Node().loadFromData(exampleData));
 
     beforeEach(() => {
-        given.tree.loadFromData(exampleData);
         given.node1.addAfter("new node");
     });
 
@@ -39,10 +38,9 @@ describe("addBefore", () => {
 
     const given = getGiven<Vars>();
     given("node2", () => given.tree.getNodeByNameMustExist("node2"));
-    given("tree", () => new Node());
+    given("tree", () => new Node().loadFromData(exampleData));
 
     beforeEach(() => {
-        given.tree.loadFromData(exampleData);
         given.node2.addBefore("new node");
     });
 
@@ -330,11 +328,7 @@ describe("getData", () => {
         tree: Node;
     }
     const given = getGiven<Vars>();
-    given("tree", () => new Node());
-
-    beforeEach(() => {
-        given.tree.loadFromData(exampleData);
-    });
+    given("tree", () => new Node().loadFromData(exampleData));
 
     it("returns the tree data", () => {
         expect(given.tree.getData()).toEqual([
@@ -376,11 +370,7 @@ describe("getNodeByCallback", () => {
         tree: Node;
     }
     const given = getGiven<Vars>();
-    given("tree", () => new Node());
-
-    beforeEach(() => {
-        given.tree.loadFromData(exampleData);
-    });
+    given("tree", () => new Node().loadFromData(exampleData));
 
     context("when a matching node exists", () => {
         it("returns the node", () => {
@@ -406,11 +396,7 @@ describe("getNodeByName", () => {
         tree: Node;
     }
     const given = getGiven<Vars>();
-    given("tree", () => new Node());
-
-    beforeEach(() => {
-        given.tree.loadFromData(exampleData);
-    });
+    given("tree", () => new Node().loadFromData(exampleData));
 
     context("when the node exists", () => {
         it("returns the node", () => {
@@ -552,11 +538,10 @@ describe("iterate", () => {
         visitor: (node: Node, level: number) => boolean;
     }
     const given = getGiven<Vars>();
-    given("tree", () => new Node());
+    given("tree", () => new Node().loadFromData(exampleData));
     given("visited", () => []);
 
     beforeEach(() => {
-        given.tree.loadFromData(exampleData);
         given.tree.iterate(given.visitor);
     });
 
@@ -602,11 +587,7 @@ describe("loadFromData", () => {
 
     const given = getGiven<Vars>();
 
-    given("tree", () => new Node());
-
-    beforeEach(() => {
-        given.tree.loadFromData(exampleData);
-    });
+    given("tree", () => new Node().loadFromData(exampleData));
 
     it("creates a tree", () => {
         expect(given.tree.children).toEqual([
@@ -646,11 +627,7 @@ describe("moveNode", () => {
     given("child2", () => given.tree.getNodeByNameMustExist("child2"));
     given("node1", () => given.tree.getNodeByNameMustExist("node1"));
     given("node2", () => given.tree.getNodeByNameMustExist("node2"));
-    given("tree", () => new Node());
-
-    beforeEach(() => {
-        given.tree.loadFromData(exampleData);
-    });
+    given("tree", () => new Node().loadFromData(exampleData));
 
     context("when moving after a node", () => {
         it("moves the node", () => {
@@ -737,6 +714,32 @@ describe("moveNode", () => {
                     expect.objectContaining({ name: "node2" }),
                 ],
             });
+        });
+    });
+});
+
+describe("remove", () => {
+    interface Vars {
+        child1: Node;
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("child1", () => given.tree.getNodeByNameMustExist("child1"));
+    given("tree", () => new Node().loadFromData(exampleData));
+
+    beforeEach(() => {
+        given.child1.remove();
+    });
+
+    it("removes the node", () => {
+        expect(given.tree).toMatchObject({
+            children: [
+                expect.objectContaining({
+                    name: "node1",
+                    children: [expect.objectContaining({ name: "child2" })],
+                }),
+                expect.objectContaining({ name: "node2" }),
+            ],
         });
     });
 });
