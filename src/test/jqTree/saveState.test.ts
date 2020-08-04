@@ -13,69 +13,91 @@ afterEach(() => {
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
+    localStorage.clear();
 });
 
-let savedState = "";
+describe("local storage", () => {
+    interface Vars {
+        node1: INode;
+        saveState: boolean | string;
+        $tree: JQuery<HTMLElement>;
+    }
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
 
-const setState = (state: string): void => {
-    savedState = state;
-};
+    context("when a node is open and selected", () => {
+        beforeEach(() => {
+            given.$tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+                saveState: given.saveState,
+            });
 
-const getState = (): string => savedState;
+            given.$tree.tree("selectNode", given.node1);
+            given.$tree.tree("openNode", given.node1);
+        });
 
-interface Vars {
-    initialState: string;
-    node1: INode;
-    $tree: JQuery<HTMLElement>;
-}
+        context("when saveState is true", () => {
+            given("saveState", () => true);
 
-const given = getGiven<Vars>();
-given("initialState", () => "");
-given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-given("$tree", () => $("#tree1"));
+            it("saves the state to local storage", () => {
+                expect(localStorage.getItem("tree")).toEqual(
+                    '{"open_nodes":[123],"selected_node":[123]}'
+                );
+            });
+        });
 
-beforeEach(() => {
-    savedState = given.initialState;
+        context("when saveState is a string", () => {
+            given("saveState", () => "my-state");
 
-    given.$tree.tree({
-        autoOpen: false,
-        data: exampleData,
-        onGetStateFromStorage: getState,
-        onSetStateFromStorage: setState,
-        saveState: true,
-    });
-});
+            it("uses the string as a key", () => {
+                expect(localStorage.getItem("my-state")).toEqual(
+                    '{"open_nodes":[123],"selected_node":[123]}'
+                );
+            });
+        });
 
-context("with an open and a selected node", () => {
-    beforeEach(() => {
-        given.$tree.tree("selectNode", given.node1);
-        given.$tree.tree("openNode", given.node1);
-    });
+        context("when saveState is false", () => {
+            given("saveState", () => false);
 
-    it("saves the state", () => {
-        expect(JSON.parse(savedState)).toEqual({
-            open_nodes: [123],
-            selected_node: [123],
+            it("doesn't save to local storage", () => {
+                expect(localStorage.getItem("tree")).toBeNull();
+            });
         });
     });
-});
 
-context("with a saved state", () => {
-    given("initialState", () =>
-        JSON.stringify({
-            open_nodes: [123],
-            selected_node: [123],
-        })
-    );
+    context("when there is a state in the local storage", () => {
+        given("saveState", () => true);
 
-    it("restores the state", () => {
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({
-                name: "node1",
-                open: true,
-            }),
-            expect.objectContaining({ name: "node2", open: false }),
-        ]);
-        expect(given.node1.element).toBeSelected();
+        beforeEach(() => {
+            localStorage.setItem(
+                "tree",
+                '{"open_nodes":[123],"selected_node":[123]}'
+            );
+
+            given.$tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+                saveState: given.saveState,
+            });
+        });
+
+        it("restores the state", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    open: true,
+                    selected: true,
+                }),
+                expect.objectContaining({
+                    name: "node2",
+                    open: false,
+                    selected: false,
+                }),
+            ]);
+        });
     });
 });
