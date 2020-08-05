@@ -714,6 +714,44 @@ describe("prependNode", () => {
     });
 });
 
+describe("reload", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(async () => {
+        mockjax({
+            url: "/tree/",
+            responseText: exampleData,
+            logging: false,
+        });
+
+        given.$tree.tree({ dataUrl: "/tree/" });
+        await screen.findByText("node1");
+
+        given.$tree.tree("removeNode", given.node1);
+    });
+
+    it("reloads the data from the server", async () => {
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "node2" }),
+        ]);
+
+        given.$tree.tree("reload");
+        await screen.findByText("node1");
+
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "node1" }),
+            expect.objectContaining({ name: "node2" }),
+        ]);
+    });
+});
+
 describe("removeNode", () => {
     interface Vars {
         node: INode;

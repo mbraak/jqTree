@@ -118,7 +118,8 @@ interface IJQTreePlugin {
         slide: boolean,
         onFinished?: (node: INode) => void
     ): JQuery;
-    (behavior: "prependNode", newNodeInfo: NodeData, parentNode?: INode): Node;
+    (behavior: "prependNode", newNodeInfo: NodeData, parentNode?: INode): INode;
+    (behavior: "reload"): JQuery;
     (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
     (behavior: "scrollToNode", node: INode): JQuery;
