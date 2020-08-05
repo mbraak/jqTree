@@ -1,9 +1,12 @@
 import * as $ from "jquery";
 import getGiven from "givens";
 import { screen } from "@testing-library/dom";
+import * as mockjaxFactory from "jquery-mockjax";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
+import { each } from "jquery";
 
+const mockjax = mockjaxFactory(jQuery, window);
 const context = describe;
 
 beforeEach(() => {
@@ -14,6 +17,8 @@ afterEach(() => {
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
+    mockjax.clear();
+    localStorage.clear();
 });
 
 describe("addNodeAfter", () => {
@@ -506,6 +511,66 @@ describe("loadData", () => {
                     ],
                 }),
             ]);
+        });
+    });
+});
+
+describe("loadDataFromUrl", () => {
+    interface Vars {
+        initialData: NodeData[];
+        serverData: NodeData[];
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("initialData", () => []);
+    given("serverData", () => exampleData);
+    given("$tree", () => $("#tree1"));
+
+    context("with url parameter", () => {
+        beforeEach(() => {
+            mockjax({
+                url: "/tree/",
+                responseText: given.serverData,
+                logging: false,
+            });
+
+            given.$tree.tree({ data: given.initialData });
+        });
+
+        it("loads the tree", async () => {
+            given.$tree.tree("loadDataFromUrl", "/tree/");
+            await screen.findByText("node1");
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+
+        context("with parent node", () => {
+            given("initialData", () => ["initial1", "initial2"]);
+            given("serverData", () => ["new1", "new2"]);
+
+            it("loads a subtree", async () => {
+                const parentNode = given.$tree.tree(
+                    "getNodeByNameMustExist",
+                    "initial1"
+                );
+                given.$tree.tree("loadDataFromUrl", "/tree/", parentNode);
+                await screen.findByText("new1");
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        name: "initial1",
+                        children: [
+                            expect.objectContaining({ name: "new1" }),
+                            expect.objectContaining({ name: "new2" }),
+                        ],
+                    }),
+                    expect.objectContaining({ name: "initial2" }),
+                ]);
+            });
         });
     });
 });

@@ -99,6 +99,12 @@ interface IJQTreePlugin {
         targetNode: INode,
         position: string
     ): JQuery;
+    (
+        behavior: "loadDataFromUrl",
+        param1: string | null | INode,
+        param2?: INode | null | (() => void),
+        param3?: () => void
+    ): JQuery;
     (behavior: "openNode", node: INode): JQuery;
     (behavior: "openNode", node: INode, slide: boolean): JQuery;
     (
