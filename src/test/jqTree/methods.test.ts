@@ -4,7 +4,6 @@ import { screen } from "@testing-library/dom";
 import * as mockjaxFactory from "jquery-mockjax";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
-import { each } from "jquery";
 
 const mockjax = mockjaxFactory(jQuery, window);
 const context = describe;
