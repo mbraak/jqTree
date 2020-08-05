@@ -265,6 +265,27 @@ describe("closeNode", () => {
     });
 });
 
+describe("getNodeByCallback", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({ data: exampleData });
+    });
+
+    it("returns the node", () => {
+        const callback = (node: INode) => node.name.startsWith("chi");
+
+        expect(given.$tree.tree("getNodeByCallback", callback)).toMatchObject({
+            name: "child1",
+        });
+    });
+});
+
 describe("getNodeByHtmlElement", () => {
     interface Vars {
         htmlElement: HTMLElement;
@@ -278,9 +299,7 @@ describe("getNodeByHtmlElement", () => {
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
+        given.$tree.tree({ data: exampleData });
     });
 
     it("returns the node", () => {

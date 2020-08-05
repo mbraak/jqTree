@@ -83,6 +83,10 @@ interface IJQTreePlugin {
     (behavior: "appendNode", newNodeInfo: NodeData, parentNode?: INode): INode;
     (behavior: "closeNode", node: INode, slide?: boolean): JQuery;
     (behavior: "destroy"): void;
+    (
+        behavior: "getNodeByCallback",
+        callback: (node: INode) => boolean
+    ): INode | null;
     (behavior: "getNodeByHtmlElement", element: Element | JQuery): INode | null;
     (behavior: "getNodeById", id: NodeId): INode | null;
     (behavior: "getNodeByName", name: string): INode | null;
