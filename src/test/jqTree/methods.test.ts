@@ -449,6 +449,27 @@ describe("getSelectedNodes", () => {
     });
 });
 
+describe("getTree", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({ data: exampleData });
+    });
+
+    it("returns the tree", () => {
+        expect(given.$tree.tree("getTree")).toMatchObject({
+            children: [
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ],
+        });
+    });
+});
+
 describe("loadData", () => {
     interface Vars {
         initialNode: INode;
