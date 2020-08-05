@@ -750,6 +750,22 @@ describe("reload", () => {
             expect.objectContaining({ name: "node2" }),
         ]);
     });
+
+    context("with a onFinished parameter", () => {
+        it("calls onFinished", () =>
+            new Promise((resolve) => {
+                const handleFinished = () => {
+                    expect(given.$tree).toHaveTreeStructure([
+                        expect.objectContaining({ name: "node1" }),
+                        expect.objectContaining({ name: "node2" }),
+                    ]);
+
+                    resolve();
+                };
+
+                given.$tree.tree("reload", handleFinished);
+            }));
+    });
 });
 
 describe("removeNode", () => {
