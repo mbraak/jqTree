@@ -537,27 +537,29 @@ describe("loadData", () => {
 
 describe("loadDataFromUrl", () => {
     interface Vars {
+        dataUrl?: string;
         initialData: NodeData[];
         serverData: NodeData[];
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
+    given("dataUrl", () => undefined);
     given("initialData", () => []);
     given("serverData", () => exampleData);
     given("$tree", () => $("#tree1"));
 
-    context("with url parameter", () => {
-        beforeEach(() => {
-            mockjax({
-                url: "/tree/",
-                responseText: given.serverData,
-                logging: false,
-            });
-
-            given.$tree.tree({ data: given.initialData });
+    beforeEach(() => {
+        mockjax({
+            url: "/tree/",
+            responseText: given.serverData,
+            logging: false,
         });
 
+        given.$tree.tree({ data: given.initialData, dataUrl: given.dataUrl });
+    });
+
+    context("with url parameter", () => {
         it("loads the tree", async () => {
             given.$tree.tree("loadDataFromUrl", "/tree/");
             await screen.findByText("node1");
@@ -591,6 +593,20 @@ describe("loadDataFromUrl", () => {
                     expect.objectContaining({ name: "initial2" }),
                 ]);
             });
+        });
+    });
+
+    context("without url parameter", () => {
+        given("dataUrl", () => "/tree/");
+
+        it("loads the data from dataUrl", async () => {
+            given.$tree.tree("loadDataFromUrl");
+            await screen.findByText("node1");
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
         });
     });
 });

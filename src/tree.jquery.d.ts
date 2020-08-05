@@ -101,7 +101,7 @@ interface IJQTreePlugin {
     ): JQuery;
     (
         behavior: "loadDataFromUrl",
-        param1: string | null | INode,
+        param1?: string | null | INode,
         param2?: INode | null | (() => void),
         param3?: () => void
     ): JQuery;
