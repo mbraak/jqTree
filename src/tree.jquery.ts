@@ -100,7 +100,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.element;
     }
 
-    public getTree(): INode {
+    public getTree(): Node {
         return this.tree;
     }
 
@@ -112,7 +112,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.element;
     }
 
-    public getSelectedNode(): INode | false {
+    public getSelectedNode(): Node | false {
         if (this.selectNodeHandler) {
             return this.selectNodeHandler.getSelectedNode();
         } else {
@@ -172,27 +172,27 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.element;
     }
 
-    public getNodeById(nodeId: NodeId): INode | null {
+    public getNodeById(nodeId: NodeId): Node | null {
         return this.tree.getNodeById(nodeId);
     }
 
-    public getNodeByName(name: string): INode | null {
+    public getNodeByName(name: string): Node | null {
         return this.tree.getNodeByName(name);
     }
 
-    public getNodeByNameMustExist(name: string): INode {
+    public getNodeByNameMustExist(name: string): Node {
         return this.tree.getNodeByNameMustExist(name);
     }
 
-    public getNodesByProperty(key: string, value: unknown): INode[] {
+    public getNodesByProperty(key: string, value: unknown): Node[] {
         return this.tree.getNodesByProperty(key, value);
     }
 
-    public getNodeByHtmlElement(element: Element | JQuery): INode | null {
+    public getNodeByHtmlElement(element: Element | JQuery): Node | null {
         return this.getNode(jQuery(element));
     }
 
-    public getNodeByCallback(callback: (node: Node) => boolean): INode | null {
+    public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
         return this.tree.getNodeByCallback(callback);
     }
 
@@ -267,7 +267,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public addNodeAfter(
         newNodeInfo: NodeData,
         existingNode: Node
-    ): INode | null {
+    ): Node | null {
         const newNode = existingNode.addAfter(newNodeInfo);
 
         if (newNode) {
@@ -280,7 +280,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public addNodeBefore(
         newNodeInfo: NodeData,
         existingNode: Node
-    ): INode | null {
+    ): Node | null {
         if (!existingNode) {
             throw Error(PARAM_IS_EMPTY + "existingNode");
         }
@@ -297,7 +297,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public addParentNode(
         newNodeInfo: NodeData,
         existingNode: Node
-    ): INode | null {
+    ): Node | null {
         if (!existingNode) {
             throw Error(PARAM_IS_EMPTY + "existingNode");
         }
@@ -331,7 +331,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.element;
     }
 
-    public appendNode(newNodeInfo: NodeData, parentNodeParam?: Node): INode {
+    public appendNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
         const parentNode = parentNodeParam || this.tree;
 
         const node = parentNode.append(newNodeInfo);
@@ -341,7 +341,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return node;
     }
 
-    public prependNode(newNodeInfo: NodeData, parentNodeParam?: Node): INode {
+    public prependNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
         const parentNode = parentNodeParam ?? this.tree;
 
         const node = parentNode.prepend(newNodeInfo);
@@ -432,7 +432,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.element;
     }
 
-    public getSelectedNodes(): INode[] {
+    public getSelectedNodes(): Node[] {
         if (!this.selectNodeHandler) {
             return [];
         } else {
