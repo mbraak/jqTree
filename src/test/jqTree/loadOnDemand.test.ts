@@ -18,12 +18,14 @@ afterEach(() => {
     $tree.tree("destroy");
     $tree.remove();
     mockjax.clear();
+    localStorage.clear();
 });
 
 context("when a node has load_on_demand in the data", () => {
     interface Vars {
         node: INode;
         $tree: JQuery<HTMLElement>;
+        savedState?: string;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
@@ -36,10 +38,30 @@ context("when a node has load_on_demand in the data", () => {
         },
     ];
 
+    function handleResponse(this: MockJaxSettings, settings: MockJaxSettings) {
+        expect(settings).toMatchObject({
+            data: { node: 1 },
+            method: "GET",
+            url: "/tree/",
+        });
+        this.responseText = [{ id: 2, name: "loaded-on-demand" }];
+    }
+
     beforeEach(() => {
+        if (given.savedState) {
+            localStorage.setItem("tree", given.savedState);
+        }
+
+        mockjax({
+            url: "*",
+            response: handleResponse,
+            logging: false,
+        });
+
         given.$tree.tree({
             data: initialData,
             dataUrl: "/tree/",
+            saveState: true,
         });
     });
 
@@ -54,26 +76,6 @@ context("when a node has load_on_demand in the data", () => {
     });
 
     context("when the node is opened", () => {
-        function handleResponse(
-            this: MockJaxSettings,
-            settings: MockJaxSettings
-        ) {
-            expect(settings).toMatchObject({
-                data: { node: 1 },
-                method: "GET",
-                url: "/tree/",
-            });
-            this.responseText = [{ id: 2, name: "loaded-on-demand" }];
-        }
-
-        beforeEach(() => {
-            mockjax({
-                url: "*",
-                response: handleResponse,
-                logging: false,
-            });
-        });
-
         given("node", () =>
             given.$tree.tree("getNodeByNameMustExist", "parent-node")
         );
@@ -85,11 +87,29 @@ context("when a node has load_on_demand in the data", () => {
 
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
+                    name: "parent-node",
+                    open: true,
                     children: [
                         expect.objectContaining({ name: "loaded-on-demand" }),
                     ],
+                }),
+            ]);
+        });
+    });
+
+    context("with a saved state with an opened node", () => {
+        given("savedState", () => '{"open_nodes":[1],"selected_node":[]}');
+
+        it("opens the node and loads its children on demand", async () => {
+            await screen.findByText("loaded-on-demand");
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
                     name: "parent-node",
                     open: true,
+                    children: [
+                        expect.objectContaining({ name: "loaded-on-demand" }),
+                    ],
                 }),
             ]);
         });
