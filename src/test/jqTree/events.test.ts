@@ -33,9 +33,7 @@ describe("tree.click", () => {
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
+        given.$tree.tree({ data: exampleData });
     });
 
     it("fires tree.click", () =>
@@ -99,6 +97,27 @@ describe("tree.init", () => {
                 });
 
                 given.$tree.tree({ dataUrl: "/tree/" });
+            }));
+    });
+});
+
+describe("tree.load_data", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    context("when the tree is initialized with data", () => {
+        it("fires tree.load_data", () =>
+            new Promise((resolve) => {
+                given.$tree.on("tree.load_data", (e: any) => {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    expect(e.tree_data).toEqual(exampleData);
+                    resolve();
+                });
+
+                given.$tree.tree({ data: exampleData });
             }));
     });
 });
