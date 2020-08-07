@@ -388,6 +388,60 @@ describe("getData", () => {
     });
 });
 
+describe("getLastChild", () => {
+    interface Vars {
+        node: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node", () => new Node());
+
+    context("when a node has no children", () => {
+        it("returns null", () => {
+            expect(given.node.getLastChild()).toBeNull();
+        });
+    });
+
+    context("when a node has children", () => {
+        beforeEach(() => {
+            given.node.append("child1");
+            given.node.append("child2");
+        });
+
+        it("returns the last child", () => {
+            expect(given.node.getLastChild()).toMatchObject({ name: "child2" });
+        });
+
+        context("when its last child is open and has children", () => {
+            beforeEach(() => {
+                const child2 = given.node.children[1];
+                child2.append("child2a");
+                child2.append("child2b");
+            });
+
+            context("and the last child is open", () => {
+                beforeEach(() => {
+                    const child2 = given.node.children[1];
+                    child2.is_open = true;
+                });
+
+                it("returns the last child of that child", () => {
+                    expect(given.node.getLastChild()).toMatchObject({
+                        name: "child2b",
+                    });
+                });
+            });
+
+            context("and the last child is closed", () => {
+                it("returns the last child", () => {
+                    expect(given.node.getLastChild()).toMatchObject({
+                        name: "child2",
+                    });
+                });
+            });
+        });
+    });
+});
+
 describe("getNodeByCallback", () => {
     interface Vars {
         tree: Node;
