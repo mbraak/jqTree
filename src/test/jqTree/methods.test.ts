@@ -933,11 +933,22 @@ describe("selectNode", () => {
     context("when the node is selected", () => {
         beforeEach(() => {
             given.$tree.tree("selectNode", given.node1);
-            given.$tree.tree("selectNode", given.node1);
         });
 
         it("deselects the node", () => {
+            given.$tree.tree("selectNode", given.node1);
             expect(given.node1.element).notToBeSelected();
+        });
+    });
+
+    context("with a null parameter", () => {
+        beforeEach(() => {
+            given.$tree.tree("selectNode", given.node1);
+        });
+
+        it("deselects the current node", () => {
+            given.$tree.tree("selectNode", null);
+            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
         });
     });
 });
