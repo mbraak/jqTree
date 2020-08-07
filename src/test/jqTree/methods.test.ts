@@ -491,20 +491,16 @@ describe("getTree", () => {
 
 describe("loadData", () => {
     interface Vars {
-        initialNode: INode;
+        initialData: NodeData[];
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
-    given("initialNode", () =>
-        given.$tree.tree("getNodeByNameMustExist", "initial1")
-    );
+    given("initialData", () => ["initial1"]);
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
-        given.$tree.tree({
-            data: ["initial1"],
-        });
+        given.$tree.tree({ data: given.initialData });
     });
 
     context("when the node parameter is empty", () => {
@@ -531,7 +527,11 @@ describe("loadData", () => {
 
     context("with a node parameter", () => {
         beforeEach(() => {
-            given.$tree.tree("loadData", exampleData, given.initialNode);
+            given.$tree.tree(
+                "loadData",
+                exampleData,
+                given.$tree.tree("getNodeByNameMustExist", "initial1")
+            );
         });
 
         it("loads the data under the node", () => {
@@ -550,6 +550,26 @@ describe("loadData", () => {
                     ],
                 }),
             ]);
+        });
+    });
+
+    context("with a node parameter which has a selected child", () => {
+        given("initialData", () => exampleData);
+
+        beforeEach(() => {
+            given.$tree.tree(
+                "selectNode",
+                given.$tree.tree("getNodeByNameMustExist", "child1")
+            );
+            given.$tree.tree(
+                "loadData",
+                ["new-child1"],
+                given.$tree.tree("getNodeByNameMustExist", "node1")
+            );
+        });
+
+        it("deselects the node", () => {
+            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
         });
     });
 });
