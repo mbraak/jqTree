@@ -49,6 +49,35 @@ describe("tree.click", () => {
         }));
 });
 
+describe("tree.dblclick", () => {
+    interface Vars {
+        node1: INode;
+        titleSpan: JQuery<HTMLElement>;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("titleSpan", () => titleSpan(given.node1.element));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({ data: exampleData });
+    });
+
+    it("fires tree.dblclick", () =>
+        new Promise((done) => {
+            given.$tree.on("tree.dblclick", (e: unknown) => {
+                const treeClickEvent = e as ClickNodeEvent;
+
+                expect(treeClickEvent.node).toBe(given.node1);
+                done();
+            });
+
+            given.titleSpan.dblclick();
+        }));
+});
+
 describe("tree.init", () => {
     interface Vars {
         $tree: JQuery<HTMLElement>;
