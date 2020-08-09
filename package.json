@@ -23,10 +23,10 @@
         "devserver": "webpack-dev-server --mode development",
         "devserver-with-coverage": "COVERAGE=true webpack-dev-server --mode development",
         "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
-        "coveralls": "coveralls < combined-coverage/lcov.info",
+        "coveralls": "coveralls < combined-coverage/coveralls/lcov.info",
         "tsc": "tsc --noEmit --project tsconfig.json",
         "cypress-run": "start-server-and-test devserver-with-coverage http://localhost:8080 'cypress run'",
-        "merge-coverage": "istanbul-combine -d combined-coverage -p detail -r lcov coverage/coverage-final.json cypress-coverage/coverage-final.json"
+        "merge-coverage": "mkdir combined-coverage && cp jest-coverage/coverage-final.json combined-coverage/jest-coverage.json && cp cypress-coverage/coverage-final.json combined-coverage/cypress-coverage.json && cd combined-coverage && npx istanbul report lcov --include=*.json && cd .."
     },
     "dependencies": {
         "jquery": ">=1.9"
@@ -47,7 +47,6 @@
         "eslint-plugin-import": "^2.22.0",
         "eslint-plugin-jest": "^23.20.0",
         "givens": "^1.3.4",
-        "istanbul-combine": "^0.3.0",
         "istanbul-instrumenter-loader": "^3.0.1",
         "jest": "^26.2.2",
         "jest-extended": "^0.11.5",

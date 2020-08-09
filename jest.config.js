@@ -1,5 +1,5 @@
 module.exports = {
-    coverageDirectory: "coverage",
+    coverageDirectory: "jest-coverage",
     modulePathIgnorePatterns: [
         "<rootDir>/build/",
         "<rootDir>/lib/",
