@@ -5,7 +5,7 @@ describe("JQtree", () => {
 
     it("Displays the tree", () => {
         cy.contains("Saurischia");
-        cy.contains("Ornithischians3");
+        cy.contains("Ornithischians");
         cy.contains("Herrerasaurians").should("be.not.visible");
     });
 
