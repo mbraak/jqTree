@@ -5,3 +5,7 @@ before_script:
     - npm install
 script:
     - npm run production && npm run lint && npm run tsc && npm run test && npm run coveralls && npm run cypress
+cache:
+    npm: true
+    directories:
+        - ~/.cache
