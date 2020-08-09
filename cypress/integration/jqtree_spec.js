@@ -4,9 +4,9 @@ describe("JQtree", () => {
     });
 
     it("Displays the tree", () => {
-        cy.contains("Saurischia");
-        cy.contains("Ornithischians");
-        cy.contains("Herrerasaurians").should("be.not.visible");
+        cy.contains("Saurischia").should("be.visible");
+        cy.contains("Ornithischians").should("be.visible");
+        cy.contains("Coelophysoids").should("be.not.visible");
     });
 
     it("Selects an node", () => {
