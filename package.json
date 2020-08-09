@@ -24,7 +24,7 @@
         "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
         "coveralls": "coveralls < coverage/lcov.info",
         "tsc": "tsc --noEmit --project tsconfig.json",
-        "cypress": "start-server-and-test devserver http://localhost:8080 'cypress run'"
+        "cypress-run": "start-server-and-test devserver http://localhost:8080 'cypress run'"
     },
     "dependencies": {
         "jquery": ">=1.9"
