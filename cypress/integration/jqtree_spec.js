@@ -13,4 +13,12 @@ describe("JQtree", () => {
         cy.contains("Saurischia").click();
         cy.contains("li", "Saurischia").should("have.class", "jqtree-selected");
     });
+
+    it("Opens a node", () => {
+        cy.contains("Coelophysoids").should("not.be.visible");
+        cy.contains(".jqtree-title", "Theropods")
+            .prev(".jqtree-toggler")
+            .click();
+        cy.contains("Coelophysoids").should("be.visible");
+    });
 });
