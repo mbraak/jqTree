@@ -23,7 +23,7 @@
         "devserver": "webpack-dev-server --mode development",
         "devserver-with-coverage": "COVERAGE=true webpack-dev-server --mode development",
         "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
-        "coveralls": "coveralls < combined-coverage/coveralls/lcov.info",
+        "coveralls": "coveralls < combined-coverage/coverage/lcov.info",
         "tsc": "tsc --noEmit --project tsconfig.json",
         "cypress-run": "start-server-and-test devserver-with-coverage http://localhost:8080 'cypress run'",
         "merge-coverage": "mkdir combined-coverage && cp jest-coverage/coverage-final.json combined-coverage/jest-coverage.json && cp cypress-coverage/coverage-final.json combined-coverage/cypress-coverage.json && cd combined-coverage && npx istanbul report lcov --include=*.json && cd .."
