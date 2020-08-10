@@ -1,6 +1,9 @@
 const $tree = $("#tree1");
 
 $tree.tree({
+    animationSpeed: 0,
+    autoOpen: 0,
     data: ExampleData.exampleData,
-    autoOpen: 1
+    dragAndDrop: true,
 });
+$tree.tree("setMouseDelay", 0);

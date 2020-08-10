@@ -4,6 +4,8 @@ const webpack = require("webpack");
 const template = require("lodash.template");
 const jsonfile = require("jsonfile");
 
+const coverage = process.env.COVERAGE;
+
 module.exports = function (debug, minimize) {
     function getHeader() {
         if (debug) {
@@ -39,9 +41,24 @@ module.exports = function (debug, minimize) {
                     exclude: /node_modules/,
                     use: {
                         loader: "ts-loader",
+                        options: coverage
+                            ? {
+                                  compilerOptions: {
+                                      inlineSourceMap: true,
+                                  },
+                              }
+                            : {},
                     },
                 },
-            ],
+                coverage && {
+                    test: /\.ts$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: "istanbul-instrumenter-loader",
+                    },
+                    enforce: "post",
+                },
+            ].filter(Boolean),
         },
         externals: {
             jquery: "jQuery",
