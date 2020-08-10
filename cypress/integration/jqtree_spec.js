@@ -9,12 +9,13 @@ describe("JQtree", () => {
         cy.contains("Saurischia").should("be.visible");
         cy.contains("Ornithischians").should("be.visible");
         cy.contains("Coelophysoids").should("be.not.visible");
-        cy.compareSnapshot("display tree");
+        cy.compareSnapshot("display-tree");
     });
 
     it("Selects an node", () => {
         cy.contains("Saurischia").click();
         cy.contains("li", "Saurischia").should("have.class", "jqtree-selected");
+        cy.compareSnapshot("select-node");
     });
 
     it("Opens a node", () => {
@@ -23,6 +24,7 @@ describe("JQtree", () => {
             .prev(".jqtree-toggler")
             .click();
         cy.contains("Coelophysoids").should("be.visible");
+        cy.compareSnapshot("open-node");
     });
     it("Moves a node", () => {
         cy.contains(".jqtree-title", "Herrerasaurians")
@@ -54,5 +56,7 @@ describe("JQtree", () => {
                     .first()
                     .contains("Heterodontosaurids");
             });
+
+        cy.compareSnapshot("move-node");
     });
 });
