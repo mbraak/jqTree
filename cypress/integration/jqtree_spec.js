@@ -9,6 +9,7 @@ describe("JQtree", () => {
         cy.contains("Saurischia").should("be.visible");
         cy.contains("Ornithischians").should("be.visible");
         cy.contains("Coelophysoids").should("be.not.visible");
+        cy.compareSnapshot("display tree");
     });
 
     it("Selects an node", () => {
