@@ -15,17 +15,61 @@ describe("addAfter", () => {
     given("node1", () => given.tree.getNodeByNameMustExist("node1"));
     given("tree", () => new Node().loadFromData(exampleData));
 
-    beforeEach(() => {
-        given.node1.addAfter("new node");
+    context("when moving after node1", () => {
+        it("returns the new node", () => {
+            expect(given.node1.addAfter("new node")).toMatchObject({
+                name: "new node",
+            });
+        });
+
+        it("adds after the node", () => {
+            given.node1.addAfter("new node");
+
+            expect(given.tree).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "new node" }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
+        });
     });
 
-    it("adds after the node", () => {
-        expect(given.tree).toMatchObject({
-            children: [
-                expect.objectContaining({ name: "node1" }),
-                expect.objectContaining({ name: "new node" }),
-                expect.objectContaining({ name: "node2" }),
-            ],
+    context("when moving after the root node", () => {
+        it("returns null", () => {
+            expect(given.tree.addAfter("new node")).toBeNull();
+        });
+
+        it("doesn't add anything", () => {
+            expect(given.tree).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
+        });
+    });
+
+    context("when adding a node with children", () => {
+        it("adds the children", () => {
+            given.node1.addAfter({
+                name: "new node",
+                children: ["newchild1", "newchild2"],
+            });
+
+            expect(given.tree).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({
+                        name: "new node",
+                        children: [
+                            expect.objectContaining({ name: "newchild1" }),
+                            expect.objectContaining({ name: "newchild2" }),
+                        ],
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
         });
     });
 });
