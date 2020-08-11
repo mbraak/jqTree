@@ -252,7 +252,7 @@ export class Node implements INode {
     public moveNode(
         movedNode: Node,
         targetNode: Node,
-        position: number
+        position: Position
     ): boolean {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node

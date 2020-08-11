@@ -724,6 +724,18 @@ describe("moveNode", () => {
                 ],
             });
         });
+
+        context("when the target is the root node", () => {
+            it("returns false", () => {
+                expect(
+                    given.tree.moveNode(
+                        given.child2,
+                        given.tree,
+                        Position.After
+                    )
+                ).toBe(false);
+            });
+        });
     });
 
     context("when moving inside a node", () => {
@@ -771,6 +783,18 @@ describe("moveNode", () => {
                 ],
             });
         });
+
+        context("when the target is the root node", () => {
+            it("returns false", () => {
+                expect(
+                    given.tree.moveNode(
+                        given.child2,
+                        given.tree,
+                        Position.After
+                    )
+                ).toBe(false);
+            });
+        });
     });
 
     context("when the moved node is a parent of the target node", () => {
@@ -791,6 +815,14 @@ describe("moveNode", () => {
                     expect.objectContaining({ name: "node2" }),
                 ],
             });
+        });
+    });
+
+    context("with position None", () => {
+        it("returns false", () => {
+            expect(
+                given.tree.moveNode(given.child2, given.node2, Position.None)
+            ).toBe(false);
         });
     });
 });
