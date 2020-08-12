@@ -834,7 +834,7 @@ describe("moveNode", () => {
                     given.tree.moveNode(
                         given.child2,
                         given.tree,
-                        Position.After
+                        Position.Before
                     )
                 ).toBe(false);
             });
