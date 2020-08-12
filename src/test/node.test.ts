@@ -84,17 +84,61 @@ describe("addBefore", () => {
     given("node2", () => given.tree.getNodeByNameMustExist("node2"));
     given("tree", () => new Node().loadFromData(exampleData));
 
-    beforeEach(() => {
-        given.node2.addBefore("new node");
+    it("returns the new node", () => {
+        expect(given.node2.addBefore("new node")).toMatchObject({
+            name: "new node",
+        });
     });
 
-    it("adds after the node", () => {
+    it("adds before the node", () => {
+        given.node2.addBefore("new node");
+
         expect(given.tree).toMatchObject({
             children: [
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "new node" }),
                 expect.objectContaining({ name: "node2" }),
             ],
+        });
+    });
+
+    context("with a root node", () => {
+        it("returns null", () => {
+            expect(given.tree.addBefore("new node")).toBeNull();
+        });
+
+        it("does nothing", () => {
+            given.tree.addBefore("new node");
+
+            expect(given.tree).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
+        });
+    });
+
+    context("when adding a node with children", () => {
+        it("adds the children", () => {
+            given.node2.addBefore({
+                name: "new node",
+                children: ["newchild1", "newchild2"],
+            });
+
+            expect(given.tree).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({
+                        name: "new node",
+                        children: [
+                            expect.objectContaining({ name: "newchild1" }),
+                            expect.objectContaining({ name: "newchild2" }),
+                        ],
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
         });
     });
 });
