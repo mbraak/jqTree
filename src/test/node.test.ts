@@ -239,10 +239,11 @@ describe("addParent", () => {
     beforeEach(() => {
         given.tree.addChild(given.node1);
         given.node1.append("child1");
-        given.node1.addParent("parent1");
     });
 
     it("adds a parent node", () => {
+        given.node1.addParent("parent1");
+
         expect(given.tree).toMatchObject({
             name: "",
             children: [
@@ -258,6 +259,18 @@ describe("addParent", () => {
                     ],
                 }),
             ],
+        });
+    });
+
+    it("returns the new node", () => {
+        expect(given.node1.addParent("parent1")).toMatchObject({
+            name: "parent1",
+        });
+    });
+
+    context("with a root node", () => {
+        it("returns null", () => {
+            expect(given.tree.addParent("parent1")).toBeNull();
         });
     });
 });
