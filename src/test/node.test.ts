@@ -282,18 +282,41 @@ describe("append", () => {
     const given = getGiven<Vars>();
     given("node", () => new Node("node1"));
 
-    beforeEach(() => {
+    it("appends a node", () => {
         given.node.append("child1");
         given.node.append("child2");
-    });
 
-    it("appends a node", () => {
         expect(given.node).toMatchObject({
             name: "node1",
             children: [
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
             ],
+        });
+    });
+
+    it("returns the new node", () => {
+        expect(given.node.append("child1")).toMatchObject({ name: "child1" });
+    });
+
+    context("when adding a node with children", () => {
+        it("adds the children", () => {
+            given.node.append({
+                name: "new node",
+                children: ["newchild1", "newchild2"],
+            });
+
+            expect(given.node).toMatchObject({
+                children: [
+                    expect.objectContaining({
+                        name: "new node",
+                        children: [
+                            expect.objectContaining({ name: "newchild1" }),
+                            expect.objectContaining({ name: "newchild2" }),
+                        ],
+                    }),
+                ],
+            });
         });
     });
 });
