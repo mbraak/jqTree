@@ -777,7 +777,7 @@ describe("getPreviousNode", () => {
 
     context("with a tree", () => {
         it("returns null", () => {
-            expect(given.tree.getPreviousSibling()).toBeNull();
+            expect(given.tree.getPreviousNode()).toBeNull();
         });
     });
 
