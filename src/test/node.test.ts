@@ -566,6 +566,36 @@ describe("getLastChild", () => {
     });
 });
 
+describe("getNextSibling", () => {
+    interface Vars {
+        node1: Node;
+        node2: Node;
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
+    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
+    given("tree", () => new Node().loadFromData(exampleData));
+
+    context("with a tree", () => {
+        it("returns null", () => {
+            expect(given.tree.getNextSibling()).toBeNull();
+        });
+    });
+
+    context("when the node is the last child", () => {
+        it("returns null", () => {
+            expect(given.node2.getNextSibling()).toBeNull();
+        });
+    });
+
+    context("when the node is the first child", () => {
+        it("returns the second child", () => {
+            expect(given.node1.getNextSibling()).toBe(given.node2);
+        });
+    });
+});
+
 describe("getNodeByCallback", () => {
     interface Vars {
         tree: Node;
