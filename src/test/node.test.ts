@@ -732,6 +732,38 @@ describe("getNodeByNameMustExist", () => {
     });
 });
 
+describe("getParent", () => {
+    interface Vars {
+        child1: Node;
+        node1: Node;
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("child1", () => given.tree.getNodeByNameMustExist("child1"));
+    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
+    given("tree", () => new Node().loadFromData(exampleData));
+
+    context("with a tree", () => {
+        it("returns null", () => {
+            expect(given.tree.getParent()).toBeNull();
+        });
+    });
+
+    context("with a node on the first level", () => {
+        it("returns null", () => {
+            expect(given.node1.getParent()).toBeNull();
+        });
+    });
+
+    context("with a node on the second level", () => {
+        it("returns the parent", () => {
+            expect(given.child1.getParent()).toMatchObject({
+                name: "node1",
+            });
+        });
+    });
+});
+
 describe("getPreviousNode", () => {
     interface Vars {
         node2: Node;
