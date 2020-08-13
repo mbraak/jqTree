@@ -566,6 +566,68 @@ describe("getLastChild", () => {
     });
 });
 
+describe("getNextNode", () => {
+    interface Vars {
+        includeChildren: boolean;
+        fromNode: Node;
+        nextNode: Node | null;
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("tree", () => new Node().loadFromData(exampleData));
+    given("nextNode", () => given.fromNode.getNextNode(given.includeChildren));
+
+    context("with includeChildren is true", () => {
+        given("includeChildren", () => true);
+
+        context("with a parent node", () => {
+            given("fromNode", () => given.tree.getNodeByNameMustExist("node1"));
+
+            context("when the parent node is closed", () => {
+                it("returns the next sibling", () => {
+                    expect(given.nextNode).toMatchObject({ name: "node2" });
+                });
+            });
+
+            context("when the parent node is open", () => {
+                beforeEach(() => {
+                    given.fromNode.is_open = true;
+                });
+
+                it("returns the first child", () => {
+                    expect(given.nextNode).toMatchObject({ name: "child1" });
+                });
+            });
+        });
+
+        context("with the node is the last child", () => {
+            given("fromNode", () =>
+                given.tree.getNodeByNameMustExist("child2")
+            );
+
+            it("returns the next sibling of the parent", () => {
+                expect(given.nextNode).toMatchObject({ name: "node2" });
+            });
+        });
+    });
+
+    context("with includeChildren is false", () => {
+        given("includeChildren", () => false);
+
+        context("with an open parent node", () => {
+            given("fromNode", () => given.tree.getNodeByNameMustExist("node1"));
+
+            beforeEach(() => {
+                given.fromNode.is_open = true;
+            });
+
+            it("returns the next sibling", () => {
+                expect(given.nextNode).toMatchObject({ name: "node2" });
+            });
+        });
+    });
+});
+
 describe("getNextSibling", () => {
     interface Vars {
         node1: Node;
