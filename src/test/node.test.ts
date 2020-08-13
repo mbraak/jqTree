@@ -732,6 +732,54 @@ describe("getNodeByNameMustExist", () => {
     });
 });
 
+describe("getPreviousNode", () => {
+    interface Vars {
+        node2: Node;
+        node3: Node;
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
+    given("node3", () => given.tree.getNodeByNameMustExist("node3"));
+    given("tree", () => new Node().loadFromData(exampleData));
+
+    context("with a tree", () => {
+        it("returns null", () => {
+            expect(given.tree.getPreviousSibling()).toBeNull();
+        });
+    });
+
+    context("when the previous sibling has children", () => {
+        context("when the previous node is closed", () => {
+            it("returns the previous sibling", () => {
+                expect(given.node2.getPreviousNode()).toMatchObject({
+                    name: "node1",
+                });
+            });
+        });
+
+        context("when the previous node is open", () => {
+            beforeEach(() => {
+                given.tree.getNodeByNameMustExist("node1").is_open = true;
+            });
+
+            it("returns the last child of the previous sibling", () => {
+                expect(given.node2.getPreviousNode()).toMatchObject({
+                    name: "child2",
+                });
+            });
+        });
+    });
+
+    context("with a node that is the first child", () => {
+        it("returns the parent", () => {
+            expect(given.node3.getPreviousNode()).toMatchObject({
+                name: "node2",
+            });
+        });
+    });
+});
+
 describe("getPreviousSibling", () => {
     interface Vars {
         node1: Node;
