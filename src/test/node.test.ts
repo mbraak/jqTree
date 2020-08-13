@@ -620,11 +620,7 @@ describe("getNodeByNameMustExist", () => {
         tree: Node;
     }
     const given = getGiven<Vars>();
-    given("tree", () => new Node());
-
-    beforeEach(() => {
-        given.tree.loadFromData(exampleData);
-    });
+    given("tree", () => new Node().loadFromData(exampleData));
 
     context("when the node exists", () => {
         it("returns the node", () => {
@@ -640,6 +636,36 @@ describe("getNodeByNameMustExist", () => {
             expect(() =>
                 given.tree.getNodeByNameMustExist("non-existing")
             ).toThrow("Node with name non-existing not found");
+        });
+    });
+});
+
+describe("getPreviousSibling", () => {
+    interface Vars {
+        node1: Node;
+        node2: Node;
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
+    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
+    given("tree", () => new Node().loadFromData(exampleData));
+
+    context("with a tree", () => {
+        it("returns null", () => {
+            expect(given.tree.getPreviousSibling()).toBeNull();
+        });
+    });
+
+    context("when the node is the first child", () => {
+        it("returns null", () => {
+            expect(given.node1.getPreviousSibling()).toBeNull();
+        });
+    });
+
+    context("when the node is the second child", () => {
+        it("returns the first child", () => {
+            expect(given.node2.getPreviousSibling()).toBe(given.node1);
         });
     });
 });
