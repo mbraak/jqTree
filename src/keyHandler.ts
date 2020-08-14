@@ -21,58 +21,38 @@ export default class KeyHandler {
         jQuery(document).off("keydown.jqtree");
     }
 
-    public moveDown(): boolean {
-        const node = this.treeWidget.getSelectedNode();
-
-        if (node) {
-            return this.selectNode(node.getNextNode());
-        } else {
-            return false;
-        }
+    public moveDown(selectedNode: Node): boolean {
+        return this.selectNode(selectedNode.getNextNode());
     }
 
-    public moveUp(): boolean {
-        const node = this.treeWidget.getSelectedNode();
-
-        if (node) {
-            return this.selectNode(node.getPreviousNode());
-        } else {
-            return false;
-        }
+    public moveUp(selectedNode: Node): boolean {
+        return this.selectNode(selectedNode.getPreviousNode());
     }
 
-    public moveRight(): boolean {
-        const node = this.treeWidget.getSelectedNode();
-
-        if (!node) {
-            return true;
-        } else if (!node.isFolder()) {
+    public moveRight(selectedNode: Node): boolean {
+        if (!selectedNode.isFolder()) {
             return true;
         } else {
             // folder node
-            if (node.is_open) {
+            if (selectedNode.is_open) {
                 // Right moves to the first child of an open node
-                return this.selectNode(node.getNextNode());
+                return this.selectNode(selectedNode.getNextNode());
             } else {
                 // Right expands a closed node
-                this.treeWidget.openNode(node);
+                this.treeWidget.openNode(selectedNode);
                 return false;
             }
         }
     }
 
-    public moveLeft(): boolean {
-        const node = this.treeWidget.getSelectedNode();
-
-        if (!node) {
-            return true;
-        } else if (node.isFolder() && node.is_open) {
+    public moveLeft(selectedNode: Node): boolean {
+        if (selectedNode.isFolder() && selectedNode.is_open) {
             // Left on an open node closes the node
-            this.treeWidget.closeNode(node);
+            this.treeWidget.closeNode(selectedNode);
             return false;
         } else {
             // Left on a closed or end node moves focus to the node's parent
-            return this.selectNode(node.getParent());
+            return this.selectNode(selectedNode.getParent());
         }
     }
 
@@ -98,33 +78,37 @@ export default class KeyHandler {
     private handleKeyDown = (e: JQuery.Event): boolean => {
         if (!this.canHandleKeyboard()) {
             return true;
-        } else {
-            const key = e.which;
+        }
 
-            switch (key) {
-                case KeyHandler.DOWN:
-                    return this.moveDown();
+        const selectedNode = this.treeWidget.getSelectedNode();
+        if (!selectedNode) {
+            return true;
+        }
 
-                case KeyHandler.UP:
-                    return this.moveUp();
+        const key = e.which;
 
-                case KeyHandler.RIGHT:
-                    return this.moveRight();
+        switch (key) {
+            case KeyHandler.DOWN:
+                return this.moveDown(selectedNode);
 
-                case KeyHandler.LEFT:
-                    return this.moveLeft();
+            case KeyHandler.UP:
+                return this.moveUp(selectedNode);
 
-                default:
-                    return true;
-            }
+            case KeyHandler.RIGHT:
+                return this.moveRight(selectedNode);
+
+            case KeyHandler.LEFT:
+                return this.moveLeft(selectedNode);
+
+            default:
+                return true;
         }
     };
 
     private canHandleKeyboard(): boolean {
         return (
             (this.treeWidget.options.keyboardSupport || false) &&
-            this.isFocusOnTree() &&
-            this.treeWidget.getSelectedNode() != null
+            this.isFocusOnTree()
         );
     }
 

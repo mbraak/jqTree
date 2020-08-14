@@ -511,7 +511,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public moveDown(): JQuery {
         if (this.keyHandler) {
-            this.keyHandler.moveDown();
+            const selectedNode = this.getSelectedNode();
+            if (selectedNode) {
+                this.keyHandler.moveDown(selectedNode);
+            }
         }
 
         return this.element;
@@ -519,7 +522,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public moveUp(): JQuery {
         if (this.keyHandler) {
-            this.keyHandler.moveUp();
+            const selectedNode = this.getSelectedNode();
+            if (selectedNode) {
+                this.keyHandler.moveUp(selectedNode);
+            }
         }
 
         return this.element;
