@@ -27,6 +27,7 @@ describe("keyboard support", () => {
     const KEY_LEFT = 37;
     const KEY_RIGHT = 39;
     const KEY_UP = 38;
+    const KEY_PAGE_UP = 33;
 
     const given = getGiven<Vars>();
     given("autoOpen", () => false);
@@ -66,6 +67,18 @@ describe("keyboard support", () => {
         context("when no node is selected", () => {
             it("does nothing", () => {
                 expect(given.$tree.tree("getSelectedNode")).toBe(false);
+            });
+        });
+
+        context("when the last node is selected", () => {
+            given("initialSelectedNode", () =>
+                given.$tree.tree("getNodeByNameMustExist", "node2")
+            );
+
+            it("keeps the node selected", () => {
+                expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+                    name: "node2",
+                });
             });
         });
     });
@@ -220,6 +233,20 @@ describe("keyboard support", () => {
         context("when no node is selected", () => {
             it("does nothing", () => {
                 expect(given.$tree.tree("getSelectedNode")).toBe(false);
+            });
+        });
+    });
+
+    context("with page up key", () => {
+        given("pressedKey", () => KEY_PAGE_UP);
+
+        given("initialSelectedNode", () =>
+            given.$tree.tree("getNodeByNameMustExist", "child1")
+        );
+
+        it("does nothing", () => {
+            expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+                name: "child1",
             });
         });
     });
