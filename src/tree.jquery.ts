@@ -82,7 +82,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     private isInitialized: boolean;
     private saveStateHandler: SaveStateHandler;
-    private keyHandler: KeyHandler | null;
+    private keyHandler: KeyHandler;
 
     public toggle(node: Node, slideParam: null | boolean = null): JQuery {
         if (!node) {
@@ -474,22 +474,18 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public moveDown(): JQuery {
-        if (this.keyHandler) {
-            const selectedNode = this.getSelectedNode();
-            if (selectedNode) {
-                this.keyHandler.moveDown(selectedNode);
-            }
+        const selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            this.keyHandler.moveDown(selectedNode);
         }
 
         return this.element;
     }
 
     public moveUp(): JQuery {
-        if (this.keyHandler) {
-            const selectedNode = this.getSelectedNode();
-            if (selectedNode) {
-                this.keyHandler.moveUp(selectedNode);
-            }
+        const selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            this.keyHandler.moveUp(selectedNode);
         }
 
         return this.element;
@@ -610,10 +606,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.selectNodeHandler = new SelectNodeHandler(this);
         this.dndHandler = new DragAndDropHandler(this);
         this.scrollHandler = new ScrollHandler(this);
-
-        if (KeyHandler != null && SelectNodeHandler != null) {
-            this.keyHandler = new KeyHandler(this);
-        }
+        this.keyHandler = new KeyHandler(this);
 
         this.initData();
 
@@ -629,9 +622,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.element.empty();
         this.element.off();
 
-        if (this.keyHandler) {
-            this.keyHandler.deinit();
-        }
+        this.keyHandler.deinit();
 
         this.tree = new Node({}, true);
 
