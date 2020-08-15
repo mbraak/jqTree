@@ -81,7 +81,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public selectNodeHandler: SelectNodeHandler | null;
 
     private isInitialized: boolean;
-    private saveStateHandler: SaveStateHandler | null;
+    private saveStateHandler: SaveStateHandler;
     private keyHandler: KeyHandler | null;
 
     public toggle(node: Node, slideParam: null | boolean = null): JQuery {
@@ -407,11 +407,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public getStateFromStorage(): SavedState | null {
-        if (this.saveStateHandler) {
-            return this.saveStateHandler.getStateFromStorage();
-        } else {
-            return null;
-        }
+        return this.saveStateHandler.getStateFromStorage();
     }
 
     public addToSelection(node: Node, mustSetFocus?: boolean): JQuery {
@@ -488,18 +484,12 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public getState(): SavedState | null {
-        if (this.saveStateHandler) {
-            return this.saveStateHandler.getState();
-        } else {
-            return null;
-        }
+        return this.saveStateHandler.getState();
     }
 
     public setState(state: SavedState): JQuery {
-        if (this.saveStateHandler) {
-            this.saveStateHandler.setInitialState(state);
-            this._refreshElements(null);
-        }
+        this.saveStateHandler.setInitialState(state);
+        this._refreshElements(null);
 
         return this.element;
     }
@@ -649,11 +639,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.renderer = new ElementsRenderer(this);
         this.dataLoader = new DataLoader(this);
 
-        if (SaveStateHandler != null) {
-            this.saveStateHandler = new SaveStateHandler(this);
-        } else {
-            this.options.saveState = false;
-        }
+        this.saveStateHandler = new SaveStateHandler(this);
 
         if (SelectNodeHandler != null) {
             this.selectNodeHandler = new SelectNodeHandler(this);
@@ -787,7 +773,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private getNodeIdToBeSelected(): NodeId | null {
-        if (this.options.saveState && this.saveStateHandler) {
+        if (this.options.saveState) {
             return this.saveStateHandler.getNodeIdToBeSelected();
         } else {
             return null;
@@ -835,7 +821,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     private setInitialState(): boolean {
         const restoreState = (): boolean[] => {
             // result: is state restored, must load on demand?
-            if (!(this.options.saveState && this.saveStateHandler)) {
+            if (!this.options.saveState) {
                 return [false, false];
             } else {
                 const state = this.saveStateHandler.getStateFromStorage();
@@ -890,7 +876,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     // Call cb_finished when done
     private setInitialStateOnDemand(cbFinished: () => void): void {
         const restoreState = (): boolean => {
-            if (!(this.options.saveState && this.saveStateHandler)) {
+            if (!this.options.saveState) {
                 return false;
             } else {
                 const state = this.saveStateHandler.getStateFromStorage();
@@ -1053,7 +1039,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     };
 
     private saveState(): void {
-        if (this.options.saveState && this.saveStateHandler) {
+        if (this.options.saveState) {
             this.saveStateHandler.saveState();
         }
     }
@@ -1108,7 +1094,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
 
         const saveState = (): void => {
-            if (this.options.saveState && this.saveStateHandler) {
+            if (this.options.saveState) {
                 this.saveStateHandler.saveState();
             }
         };
