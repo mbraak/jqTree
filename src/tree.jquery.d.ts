@@ -28,6 +28,11 @@ interface ClickNodeEvent {
     previous_node?: INode;
 }
 
+interface SavedState {
+    open_nodes: NodeId[];
+    selected_node: NodeId[];
+}
+
 interface IJQTreeOptions {
     animationSpeed?: string | number;
     autoEscape?: boolean;
@@ -94,6 +99,7 @@ interface IJQTreePlugin {
     (behavior: "getNodesByProperty", key: string, value: unknown): INode[];
     (behavior: "getSelectedNode"): INode | false;
     (behavior: "getSelectedNodes"): INode[];
+    (behavior: "getState"): SavedState | null;
     (behavior: "getStateFromStorage"): INode | null;
     (behavior: "getTree"): INode;
     (behavior: "isNodeSelected", node: INode): boolean;

@@ -468,6 +468,29 @@ describe("getSelectedNodes", () => {
     });
 });
 
+describe("getState", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({ data: exampleData });
+        given.$tree.tree("openNode", given.node1, false);
+    });
+
+    it("returns the state", () => {
+        expect(given.$tree.tree("getState")).toEqual({
+            open_nodes: [123],
+            selected_node: [],
+        });
+    });
+});
+
 describe("getStateFromStorage", () => {
     interface Vars {
         node1: INode;

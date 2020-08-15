@@ -2,11 +2,6 @@ import { isInt } from "./util";
 import { JqTreeWidget } from "./tree.jquery";
 import { Node, NodeId } from "./node";
 
-export interface SavedState {
-    open_nodes: NodeId[];
-    selected_node: NodeId[];
-}
-
 export default class SaveStateHandler {
     private treeWidget: JqTreeWidget;
     private _supportsLocalStorage: boolean | null;
@@ -29,7 +24,7 @@ export default class SaveStateHandler {
         const jsonData = this.loadFromStorage();
 
         if (jsonData) {
-            return this.parseState(jsonData);
+            return (this.parseState(jsonData) as unknown) as SavedState;
         } else {
             return null;
         }
