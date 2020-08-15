@@ -552,7 +552,7 @@ describe("isNodeSelected", () => {
         given.$tree.tree({ data: exampleData });
     });
 
-    context("when the node is not selected", () => {
+    context("when the node is selected", () => {
         beforeEach(() => {
             given.$tree.tree("selectNode", given.node1);
         });
