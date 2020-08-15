@@ -77,7 +77,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public dndHandler: DragAndDropHandler;
     public renderer: ElementsRenderer;
     public dataLoader: DataLoader;
-    public scrollHandler: ScrollHandler | null;
+    public scrollHandler: ScrollHandler;
     public selectNodeHandler: SelectNodeHandler | null;
 
     private isInitialized: boolean;
@@ -462,17 +462,15 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (this.scrollHandler) {
-            const nodeOffset = jQuery(node.element).offset();
-            const nodeTop = nodeOffset ? nodeOffset.top : 0;
+        const nodeOffset = jQuery(node.element).offset();
+        const nodeTop = nodeOffset ? nodeOffset.top : 0;
 
-            const treeOffset = this.$el.offset();
-            const treeTop = treeOffset ? treeOffset.top : 0;
+        const treeOffset = this.$el.offset();
+        const treeTop = treeOffset ? treeOffset.top : 0;
 
-            const top = nodeTop - treeTop;
+        const top = nodeTop - treeTop;
 
-            this.scrollHandler.scrollToY(top);
-        }
+        this.scrollHandler.scrollToY(top);
 
         return this.element;
     }
@@ -608,7 +606,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public _getScrollLeft(): number {
-        return this?.scrollHandler?.getScrollLeft() || 0;
+        return this.scrollHandler.getScrollLeft();
     }
 
     public init(): void {
@@ -634,10 +632,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
 
         this.dndHandler = new DragAndDropHandler(this);
-
-        if (ScrollHandler != null) {
-            this.scrollHandler = new ScrollHandler(this);
-        }
+        this.scrollHandler = new ScrollHandler(this);
 
         if (KeyHandler != null && SelectNodeHandler != null) {
             this.keyHandler = new KeyHandler(this);
@@ -686,9 +681,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         if (this.options.dragAndDrop) {
             const result = this.dndHandler.mouseDrag(positionInfo);
 
-            if (this.scrollHandler) {
-                this.scrollHandler.checkScrolling();
-            }
+            this.scrollHandler.checkScrolling();
             return result;
         } else {
             return false;

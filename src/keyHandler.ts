@@ -63,7 +63,6 @@ export default class KeyHandler {
             this.treeWidget.selectNode(node);
 
             if (
-                this.treeWidget.scrollHandler &&
                 !this.treeWidget.scrollHandler.isScrolledIntoView(
                     jQuery(node.element).find(".jqtree-element")
                 )
