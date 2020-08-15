@@ -177,9 +177,7 @@ export default class ScrollHandler {
     }
 
     private checkVerticalScrolling(): void {
-        const hoveredArea =
-            this.treeWidget.dndHandler &&
-            this.treeWidget.dndHandler.hoveredArea;
+        const hoveredArea = this.treeWidget.dndHandler.hoveredArea;
 
         if (hoveredArea && hoveredArea.top !== this.previousTop) {
             this.previousTop = hoveredArea.top;
@@ -193,9 +191,7 @@ export default class ScrollHandler {
     }
 
     private checkHorizontalScrolling(): void {
-        const positionInfo =
-            this.treeWidget.dndHandler &&
-            this.treeWidget.dndHandler.positionInfo;
+        const positionInfo = this.treeWidget.dndHandler.positionInfo;
 
         if (!positionInfo) {
             return;

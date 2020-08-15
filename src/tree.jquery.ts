@@ -74,7 +74,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public element: JQuery;
     public tree: Node;
-    public dndHandler: DragAndDropHandler | null;
+    public dndHandler: DragAndDropHandler;
     public renderer: ElementsRenderer;
     public dataLoader: DataLoader;
     public scrollHandler: ScrollHandler | null;
@@ -250,17 +250,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public isDragging(): boolean {
-        if (this.dndHandler) {
-            return this.dndHandler.isDragging;
-        } else {
-            return false;
-        }
+        return this.dndHandler.isDragging;
     }
 
     public refreshHitAreas(): JQuery {
-        if (this.dndHandler) {
-            this.dndHandler.refresh();
-        }
+        this.dndHandler.refresh();
         return this.element;
     }
 
@@ -526,15 +520,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public testGenerateHitAreas(movingNode: Node): HitArea[] {
-        if (!this.dndHandler) {
-            return [];
-        } else {
-            this.dndHandler.currentItem = this._getNodeElementForNode(
-                movingNode
-            );
-            this.dndHandler.generateHitAreas();
-            return this.dndHandler.hitAreas;
-        }
+        this.dndHandler.currentItem = this._getNodeElementForNode(movingNode);
+        this.dndHandler.generateHitAreas();
+        return this.dndHandler.hitAreas;
     }
 
     public _triggerEvent(
@@ -645,11 +633,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             this.selectNodeHandler = new SelectNodeHandler(this);
         }
 
-        if (DragAndDropHandler != null) {
-            this.dndHandler = new DragAndDropHandler(this);
-        } else {
-            this.options.dragAndDrop = false;
-        }
+        this.dndHandler = new DragAndDropHandler(this);
 
         if (ScrollHandler != null) {
             this.scrollHandler = new ScrollHandler(this);
@@ -683,7 +667,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     protected mouseCapture(positionInfo: PositionInfo): boolean | null {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseCapture(positionInfo);
         } else {
             return false;
@@ -691,7 +675,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     protected mouseStart(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStart(positionInfo);
         } else {
             return false;
@@ -699,7 +683,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     protected mouseDrag(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             const result = this.dndHandler.mouseDrag(positionInfo);
 
             if (this.scrollHandler) {
@@ -712,7 +696,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     protected mouseStop(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStop(positionInfo);
         } else {
             return false;
@@ -1167,7 +1151,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 this.initTree(data);
             }
 
-            if (this.isDragging() && this.dndHandler) {
+            if (this.isDragging()) {
                 this.dndHandler.refresh();
             }
         }
