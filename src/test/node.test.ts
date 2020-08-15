@@ -1149,6 +1149,48 @@ describe("moveNode", () => {
     });
 });
 
+describe("prepend", () => {
+    interface Vars {
+        node: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node", () => new Node("node1"));
+
+    it("prepends a node", () => {
+        given.node.prepend("child2");
+        given.node.prepend("child1");
+
+        expect(given.node).toMatchObject({
+            name: "node1",
+            children: [
+                expect.objectContaining({ name: "child1" }),
+                expect.objectContaining({ name: "child2" }),
+            ],
+        });
+    });
+
+    context("when prepending a node with children", () => {
+        it("adds the children", () => {
+            given.node.prepend({
+                name: "new node",
+                children: ["newchild1", "newchild2"],
+            });
+
+            expect(given.node).toMatchObject({
+                children: [
+                    expect.objectContaining({
+                        name: "new node",
+                        children: [
+                            expect.objectContaining({ name: "newchild1" }),
+                            expect.objectContaining({ name: "newchild2" }),
+                        ],
+                    }),
+                ],
+            });
+        });
+    });
+});
+
 describe("remove", () => {
     interface Vars {
         child1: Node;
