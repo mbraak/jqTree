@@ -515,6 +515,37 @@ describe("getTree", () => {
     });
 });
 
+describe("isNodeSelected", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({ data: exampleData });
+    });
+
+    context("when the node is not selected", () => {
+        beforeEach(() => {
+            given.$tree.tree("selectNode", given.node1);
+        });
+
+        it("returns true", () => {
+            expect(given.$tree.tree("isNodeSelected", given.node1)).toBeTrue();
+        });
+    });
+
+    context("when the node is not selected", () => {
+        it("returns false", () => {
+            expect(given.$tree.tree("isNodeSelected", given.node1)).toBeFalse();
+        });
+    });
+});
+
 describe("loadData", () => {
     interface Vars {
         initialData: NodeData[];
