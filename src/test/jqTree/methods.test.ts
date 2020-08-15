@@ -697,11 +697,21 @@ describe("openNode", () => {
             autoOpen: false,
             data: exampleData,
         });
-        given.$tree.tree("openNode", given.node1, false);
     });
 
     it("opens the node", () => {
+        given.$tree.tree("openNode", given.node1, false);
+
         expect(given.node1.element).toBeOpen();
+    });
+
+    context("with onFinished parameter", () => {
+        it("calls the function", () =>
+            new Promise((resolve) =>
+                given.$tree.tree("openNode", given.node1, (node) =>
+                    resolve(expect(node).toBe(given.node1))
+                )
+            ));
     });
 });
 
