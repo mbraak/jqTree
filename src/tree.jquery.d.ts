@@ -46,7 +46,7 @@ interface IJQTreeOptions {
     nodeClass?: any;
     keyboardSupport?: boolean;
     onCanMove?: (node: INode) => boolean;
-    onCanSelectNode?: (node: Node) => boolean;
+    onCanSelectNode?: (node: INode) => boolean;
     onCreateLi?: (node: INode, el: JQuery, isSelected: boolean) => void;
     onDragMove?: (node: INode, event: JQuery.Event | Touch) => void;
     onDragStop?: (node: INode, event: JQuery.Event | Touch) => void;

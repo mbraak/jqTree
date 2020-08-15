@@ -164,6 +164,30 @@ describe("dataUrl", () => {
     });
 });
 
+describe("onCanSelectNode", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+            onCanSelectNode: (node: INode) => node.name !== "node1",
+        });
+    });
+
+    it("doesn't select the node", () => {
+        given.$tree.tree("selectNode", given.node1);
+
+        expect(given.$tree.tree("getSelectedNode")).toBe(false);
+    });
+});
+
 describe("onCreateLi", () => {
     interface Vars {
         $tree: JQuery<HTMLElement>;
