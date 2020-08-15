@@ -4,7 +4,7 @@ import * as mockjaxFactory from "jquery-mockjax";
 import { screen } from "@testing-library/dom";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
-import { titleSpan } from "../support/testUtil";
+import { titleSpan, togglerLink } from "../support/testUtil";
 
 const mockjax = mockjaxFactory(jQuery, window);
 const context = describe;
@@ -309,6 +309,37 @@ describe("onLoadFailed", () => {
                     },
                 });
             }));
+    });
+});
+
+describe("rtl", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    context("with the rtl option is true", () => {
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData, rtl: true });
+        });
+
+        it("has a different closed icon", () => {
+            expect(togglerLink(given.node1.element).text()).toEqual("◀");
+        });
+    });
+
+    context("with the rtl data option", () => {
+        beforeEach(() => {
+            given.$tree.attr("data-rtl", "true");
+            given.$tree.tree({ data: exampleData });
+        });
+
+        it("has a different closed icon", () => {
+            expect(togglerLink(given.node1.element).text()).toEqual("◀");
+        });
     });
 });
 

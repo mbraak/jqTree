@@ -63,7 +63,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         dataFilter: undefined,
         keyboardSupport: true,
         openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
-        rtl: false, // right-to-left support; true / false (default)
+        rtl: undefined, // right-to-left support; true / false (default)
         onDragMove: undefined,
         onDragStop: undefined,
         buttonLeft: true,
