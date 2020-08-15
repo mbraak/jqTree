@@ -897,6 +897,16 @@ describe("removeNode", () => {
             });
         });
     });
+
+    context("with a root node", () => {
+        given("node", () => given.$tree.tree("getTree"));
+
+        it("raises an exception", () => {
+            expect(() => given.$tree.tree("removeNode", given.node)).toThrow(
+                "Node has no parent"
+            );
+        });
+    });
 });
 
 describe("selectNode", () => {
