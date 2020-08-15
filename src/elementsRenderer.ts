@@ -117,8 +117,7 @@ export default class ElementsRenderer {
 
     private createLi(node: Node, level: number): HTMLLIElement {
         const isSelected = Boolean(
-            this.treeWidget.selectNodeHandler &&
-                this.treeWidget.selectNodeHandler.isNodeSelected(node)
+            this.treeWidget.selectNodeHandler.isNodeSelected(node)
         );
 
         const mustShowFolder =

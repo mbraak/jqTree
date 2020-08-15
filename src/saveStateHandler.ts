@@ -161,9 +161,7 @@ export default class SaveStateHandler {
             if (node) {
                 selectCount += 1;
 
-                if (this.treeWidget.selectNodeHandler) {
-                    this.treeWidget.selectNodeHandler.addToSelection(node);
-                }
+                this.treeWidget.selectNodeHandler.addToSelection(node);
             }
         }
 
@@ -173,13 +171,11 @@ export default class SaveStateHandler {
     private resetSelection(): void {
         const selectNodeHandler = this.treeWidget.selectNodeHandler;
 
-        if (selectNodeHandler) {
-            const selectedNodes = selectNodeHandler.getSelectedNodes();
+        const selectedNodes = selectNodeHandler.getSelectedNodes();
 
-            selectedNodes.forEach((node) => {
-                selectNodeHandler.removeFromSelection(node);
-            });
-        }
+        selectedNodes.forEach((node) => {
+            selectNodeHandler.removeFromSelection(node);
+        });
     }
 
     private doSetInitialStateOnDemand(

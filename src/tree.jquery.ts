@@ -78,7 +78,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public renderer: ElementsRenderer;
     public dataLoader: DataLoader;
     public scrollHandler: ScrollHandler;
-    public selectNodeHandler: SelectNodeHandler | null;
+    public selectNodeHandler: SelectNodeHandler;
 
     private isInitialized: boolean;
     private saveStateHandler: SaveStateHandler;
@@ -113,11 +113,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public getSelectedNode(): Node | false {
-        if (this.selectNodeHandler) {
-            return this.selectNodeHandler.getSelectedNode();
-        } else {
-            return false;
-        }
+        return this.selectNodeHandler.getSelectedNode();
     }
 
     public toJson(): string {
@@ -314,9 +310,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error("Node has no parent");
         }
 
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node, true); // including children
-        }
+        this.selectNodeHandler.removeFromSelection(node, true); // including children
 
         const parent = node.parent;
         node.remove();
@@ -409,25 +403,19 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.addToSelection(node);
+        this.selectNodeHandler.addToSelection(node);
 
-            this._getNodeElementForNode(node).select(
-                mustSetFocus === undefined ? true : mustSetFocus
-            );
+        this._getNodeElementForNode(node).select(
+            mustSetFocus === undefined ? true : mustSetFocus
+        );
 
-            this.saveState();
-        }
+        this.saveState();
 
         return this.element;
     }
 
     public getSelectedNodes(): Node[] {
-        if (!this.selectNodeHandler) {
-            return [];
-        } else {
-            return this.selectNodeHandler.getSelectedNodes();
-        }
+        return this.selectNodeHandler.getSelectedNodes();
     }
 
     public isNodeSelected(node: Node): boolean {
@@ -435,11 +423,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (!this.selectNodeHandler) {
-            return false;
-        } else {
-            return this.selectNodeHandler.isNodeSelected(node);
-        }
+        return this.selectNodeHandler.isNodeSelected(node);
     }
 
     public removeFromSelection(node: Node): JQuery {
@@ -447,12 +431,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node);
+        this.selectNodeHandler.removeFromSelection(node);
 
-            this._getNodeElementForNode(node).deselect();
-            this.saveState();
-        }
+        this._getNodeElementForNode(node).deselect();
+        this.saveState();
 
         return this.element;
     }
@@ -624,13 +606,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
         this.renderer = new ElementsRenderer(this);
         this.dataLoader = new DataLoader(this);
-
         this.saveStateHandler = new SaveStateHandler(this);
-
-        if (SelectNodeHandler != null) {
-            this.selectNodeHandler = new SelectNodeHandler(this);
-        }
-
+        this.selectNodeHandler = new SelectNodeHandler(this);
         this.dndHandler = new DragAndDropHandler(this);
         this.scrollHandler = new ScrollHandler(this);
 
@@ -775,9 +752,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             this.options.nodeClass
         );
 
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.clear();
-        }
+        this.selectNodeHandler.clear();
 
         this.tree.loadFromData(data);
 
@@ -1066,10 +1041,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         node: Node | null,
         optionsParam?: SelectNodeOptions
     ): void {
-        if (!this.selectNodeHandler) {
-            return;
-        }
-
         const saveState = (): void => {
             if (this.options.saveState) {
                 this.saveStateHandler.saveState();
@@ -1151,13 +1122,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private deselectNodes(parentNode: Node): void {
-        if (this.selectNodeHandler) {
-            const selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(
-                parentNode
-            );
-            for (const n of selectedNodesUnderParent) {
-                this.selectNodeHandler.removeFromSelection(n);
-            }
+        const selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(
+            parentNode
+        );
+        for (const n of selectedNodesUnderParent) {
+            this.selectNodeHandler.removeFromSelection(n);
         }
     }
 
