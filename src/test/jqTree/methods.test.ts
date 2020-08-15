@@ -641,15 +641,47 @@ describe("loadData", () => {
                 "selectNode",
                 given.$tree.tree("getNodeByNameMustExist", "child1")
             );
+        });
+
+        it("deselects the node", () => {
             given.$tree.tree(
                 "loadData",
                 ["new-child1"],
                 given.$tree.tree("getNodeByNameMustExist", "node1")
             );
+
+            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
         });
 
-        it("deselects the node", () => {
-            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+        context("when the selected node doesn't have an id", () => {
+            given("initialData", () => [
+                { name: "node1", children: ["child1", "child2"] },
+                "node2",
+            ]);
+
+            it("deselects the node", () => {
+                given.$tree.tree(
+                    "loadData",
+                    ["new-child1"],
+                    given.$tree.tree("getNodeByNameMustExist", "node1")
+                );
+
+                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+            });
+
+            context("when the selected child is under another node", () => {
+                it("doesn't deselect the node", () => {
+                    given.$tree.tree(
+                        "loadData",
+                        ["new-child1"],
+                        given.$tree.tree("getNodeByNameMustExist", "node2")
+                    );
+
+                    expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+                        name: "child1",
+                    });
+                });
+            });
         });
     });
 });
