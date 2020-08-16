@@ -1020,7 +1020,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         } else {
             const dataRtl = this.element.data("rtl") as unknown;
 
-            if (dataRtl !== null && dataRtl !== false) {
+            if (
+                dataRtl !== null &&
+                dataRtl !== false &&
+                dataRtl !== undefined
+            ) {
                 return true;
             } else {
                 return false;
