@@ -1085,6 +1085,42 @@ describe("selectNode", () => {
     });
 });
 
+describe("setState", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    beforeEach(() => {
+        given.$tree.tree({
+            autoOpen: false,
+            data: exampleData,
+            selectable: true,
+        });
+    });
+    given("$tree", () => $("#tree1"));
+
+    it("sets the state", () => {
+        given.$tree.tree("setState", {
+            open_nodes: [123],
+            selected_node: [123],
+        });
+
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({
+                name: "node1",
+                open: true,
+                selected: true,
+            }),
+            expect.objectContaining({
+                name: "node2",
+                open: false,
+                selected: false,
+            }),
+        ]);
+    });
+});
+
 describe("toggle", () => {
     interface Vars {
         autoOpen: boolean;

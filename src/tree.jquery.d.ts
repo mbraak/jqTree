@@ -136,6 +136,7 @@ interface IJQTreePlugin {
     (behavior: "scrollToNode", node: INode): JQuery;
     (behavior: "selectNode", node: INode | null): JQuery;
     (behavior: "setMouseDelay", delay: number): void;
+    (behavior: "setState", options: DefaultRecord): JQuery;
     (behavior: "toggle", node: INode, slideParam?: boolean): JQuery;
     (behavior: "toJson"): string;
     (behavior: "updateNode", node: INode, data: NodeData): JQuery;
