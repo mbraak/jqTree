@@ -4,6 +4,7 @@ import { screen } from "@testing-library/dom";
 import * as mockjaxFactory from "jquery-mockjax";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
+import { titleSpan } from "../support/testUtil";
 
 const mockjax = mockjaxFactory(jQuery, window);
 const context = describe;
@@ -1081,6 +1082,32 @@ describe("selectNode", () => {
         it("deselects the current node", () => {
             given.$tree.tree("selectNode", null);
             expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+        });
+    });
+});
+
+describe("setOption", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    beforeEach(() => {
+        given.$tree.tree({
+            animationSpeed: 0,
+            data: exampleData,
+            selectable: false,
+        });
+    });
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    it("sets an option", () => {
+        given.$tree.tree("setOption", "selectable", true);
+        titleSpan(given.node1.element).click();
+        expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+            name: "node1",
         });
     });
 });
