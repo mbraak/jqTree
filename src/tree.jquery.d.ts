@@ -105,17 +105,19 @@ interface IJQTreePlugin {
     (behavior: "isNodeSelected", node: INode): boolean;
     (behavior: "loadData", data: NodeData[], parentNode?: INode): JQuery;
     (
-        behavior: "moveNode",
-        node: INode,
-        targetNode: INode,
-        position: string
-    ): JQuery;
-    (
         behavior: "loadDataFromUrl",
         param1?: string | null | INode,
         param2?: INode | null | (() => void),
         param3?: () => void
     ): JQuery;
+    (behavior: "moveDown"): JQuery;
+    (
+        behavior: "moveNode",
+        node: INode,
+        targetNode: INode,
+        position: string
+    ): JQuery;
+    (behavior: "moveUp"): JQuery;
     (behavior: "openNode", node: INode): JQuery;
     (behavior: "openNode", node: INode, slide: boolean): JQuery;
     (

@@ -763,6 +763,28 @@ describe("loadDataFromUrl", () => {
     });
 });
 
+describe("moveDown", () => {
+    interface Vars {
+        node1: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+    const given = getGiven<Vars>();
+    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({ data: exampleData });
+        given.$tree.tree("selectNode", given.node1);
+    });
+
+    it("selects the next node", () => {
+        given.$tree.tree("moveDown");
+        expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+            name: "node2",
+        });
+    });
+});
+
 describe("moveNode", () => {
     interface Vars {
         child1: INode;
@@ -792,6 +814,28 @@ describe("moveNode", () => {
             expect.objectContaining({ name: "node2" }),
             expect.objectContaining({ name: "child1" }),
         ]);
+    });
+});
+
+describe("moveUp", () => {
+    interface Vars {
+        node2: INode;
+        $tree: JQuery<HTMLElement>;
+    }
+    const given = getGiven<Vars>();
+    given("node2", () => given.$tree.tree("getNodeByNameMustExist", "node2"));
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({ data: exampleData });
+        given.$tree.tree("selectNode", given.node2);
+    });
+
+    it("selects the next node", () => {
+        given.$tree.tree("moveUp");
+        expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+            name: "node1",
+        });
     });
 });
 
