@@ -5,6 +5,7 @@ import * as mockjaxFactory from "jquery-mockjax";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
+import __version__ from "../../version";
 
 const mockjax = mockjaxFactory(jQuery, window);
 const context = describe;
@@ -536,6 +537,23 @@ describe("getTree", () => {
                 expect.objectContaining({ name: "node2" }),
             ],
         });
+    });
+});
+
+describe("getVersion", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree();
+    });
+
+    it("returns the version", () => {
+        expect(given.$tree.tree("getVersion")).toBe(__version__);
     });
 });
 
