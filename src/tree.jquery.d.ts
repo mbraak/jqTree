@@ -36,7 +36,7 @@ interface SavedState {
 interface IJQTreeOptions {
     animationSpeed?: string | number;
     autoEscape?: boolean;
-    autoOpen?: boolean | number;
+    autoOpen?: boolean | number | string;
     buttonLeft?: boolean;
     closedIcon?: string | Element;
     data?: NodeData[];
