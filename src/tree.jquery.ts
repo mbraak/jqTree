@@ -495,12 +495,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return __version__;
     }
 
-    public testGenerateHitAreas(movingNode: Node): HitArea[] {
-        this.dndHandler.currentItem = this._getNodeElementForNode(movingNode);
-        this.dndHandler.generateHitAreas();
-        return this.dndHandler.hitAreas;
-    }
-
     public _triggerEvent(
         eventName: string,
         values?: DefaultRecord
