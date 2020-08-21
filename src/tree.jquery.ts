@@ -5,7 +5,7 @@ import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
 import KeyHandler from "./keyHandler";
 import MouseWidget from "./mouse.widget";
-import { HitArea, PositionInfo } from "./types";
+import { PositionInfo } from "./types";
 import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
