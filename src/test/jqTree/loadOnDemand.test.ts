@@ -23,11 +23,13 @@ afterEach(() => {
 
 context("when a node has load_on_demand in the data", () => {
     interface Vars {
+        autoOpen: boolean;
         node: INode;
         $tree: JQuery<HTMLElement>;
         savedState?: string;
     }
     const given = getGiven<Vars>();
+    given("autoOpen", () => false);
     given("$tree", () => $("#tree1"));
 
     const initialData = [
@@ -59,6 +61,7 @@ context("when a node has load_on_demand in the data", () => {
         });
 
         given.$tree.tree({
+            autoOpen: given.autoOpen,
             data: initialData,
             dataUrl: "/tree/",
             saveState: true,
@@ -83,6 +86,24 @@ context("when a node has load_on_demand in the data", () => {
         it("loads the subtree", async () => {
             togglerLink(given.node.element).click();
 
+            await screen.findByText("loaded-on-demand");
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "parent-node",
+                    open: true,
+                    children: [
+                        expect.objectContaining({ name: "loaded-on-demand" }),
+                    ],
+                }),
+            ]);
+        });
+    });
+
+    context("with autoOpen is true", () => {
+        given("autoOpen", () => true);
+
+        it("loads the node on demand", async () => {
             await screen.findByText("loaded-on-demand");
 
             expect(given.$tree).toHaveTreeStructure([
