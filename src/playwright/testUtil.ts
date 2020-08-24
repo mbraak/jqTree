@@ -1,33 +1,63 @@
 import { ElementHandle } from "playwright";
 
-export const expectToBeSelected = async (title: string): Promise<void> =>
-    await findTitleElement(title)
-        .then(isNodeSelected)
-        .then((isSelected) => expect(isSelected).toBe(true));
+export const expectToBeSelected = async (
+    handle: ElementHandle<HTMLElement>
+): Promise<void> => {
+    const isSelected = await isNodeSelected(handle);
+    expect(isSelected).toBe(true);
+};
 
-export const expectToBeOpen = async (title: string): Promise<void> =>
-    await findTitleElement(title)
-        .then(isNodeOpen)
-        .then((isOpen) => expect(isOpen).toBe(true));
+export const expectToBeOpen = async (
+    handle: ElementHandle<HTMLElement>
+): Promise<void> => {
+    const isOpen = await isNodeOpen(handle);
+    expect(isOpen).toBe(true);
+};
 
-export const expectToBeClosed = async (title: string): Promise<void> =>
-    await findTitleElement(title)
-        .then(isNodeOpen)
-        .then((isOpen) => expect(isOpen).toBe(false));
+export const expectToBeClosed = async (
+    handle: ElementHandle<HTMLElement>
+): Promise<void> => {
+    const isOpen = await isNodeOpen(handle);
+    expect(isOpen).toBe(false);
+};
 
 export const findTitleElement = async (
     title: string
 ): Promise<ElementHandle<HTMLElement>> =>
     await findElement(`css=.jqtree-title >> text="${title}"`);
 
-export const openNode = async (title: string): Promise<void> => {
-    const handle = await findTitleElement(title);
-    await handle.evaluate((el) =>
-        el
-            .closest(".jqtree-element")
-            ?.querySelector<HTMLElement>(".jqtree-toggler")
-            ?.click()
-    );
+export const findNodeElement = async (
+    title: string
+): Promise<ElementHandle<HTMLElement>> => {
+    const titleElement = await findTitleElement(title);
+    return await titleElement.evaluateHandle((el) => {
+        const li = el.closest("li");
+
+        if (!li) {
+            throw Error("Node element not found");
+        }
+
+        return li;
+    });
+};
+
+export const openNode = async (
+    handle: ElementHandle<HTMLElement>
+): Promise<void> => {
+    const toggler = await findToggler(handle);
+    await toggler.click();
+};
+
+const findToggler = async (
+    handle: ElementHandle<HTMLElement>
+): Promise<ElementHandle<HTMLElement>> => {
+    const toggler = await handle.$(".jqtree-toggler");
+
+    if (!toggler) {
+        throw Error("Toggler button not found");
+    }
+
+    return toggler as ElementHandle<HTMLElement>;
 };
 
 const findElement = async (
@@ -45,13 +75,61 @@ const findElement = async (
 const isNodeOpen = async (
     handle: ElementHandle<HTMLElement>
 ): Promise<boolean> =>
-    handle.evaluate(
-        (el) => !el.closest("li")?.classList.contains("jqtree-closed")
-    );
+    handle.evaluate((el) => !el.classList.contains("jqtree-closed"));
 
 const isNodeSelected = async (
     handle: ElementHandle<HTMLElement>
 ): Promise<boolean> =>
-    handle.evaluate(
-        (el) => el.closest("li")?.classList.contains("jqtree-selected") ?? false
-    );
+    handle.evaluate((el) => el.classList.contains("jqtree-selected"));
+
+export const selectNode = async (
+    handle: ElementHandle<HTMLElement>
+): Promise<void> => {
+    const titleHandle = await handle.$(".jqtree-title");
+    await titleHandle?.click();
+};
+
+export const getTreeStructure = async (): Promise<
+    JQTreeMatchers.TreeStructure
+> =>
+    await page
+        .evaluate(
+            `
+        function getTreeNode($li) {
+            const $div = $li.children("div.jqtree-element");
+            const $span = $div.children("span.jqtree-title");
+            const name = $span.text();
+            const selected = $li.hasClass("jqtree-selected");
+
+            if ($li.hasClass("jqtree-folder")) {
+                const $ul = $li.children("ul.jqtree_common");
+
+                return {
+                    nodeType: "folder",
+                    children: getChildren($ul),
+                    name,
+                    open: !$li.hasClass("jqtree-closed"),
+                    selected,
+                };
+            } else {
+                return {
+                    nodeType: "child",
+                    name,
+                    selected,
+                };
+            }
+        };
+
+        function getChildren($ul) {
+            return $ul
+                .children("li.jqtree_common")
+                .map((_, li) => {
+                    return getTreeNode(jQuery(li))
+                })
+                .get();
+        };
+
+        JSON.stringify(window.getChildren(jQuery("ul.jqtree-tree")))
+        `
+        )
+        .then((s) => JSON.parse(s as string) as JQTreeMatchers.TreeStructure);
