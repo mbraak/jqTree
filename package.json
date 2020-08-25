@@ -14,8 +14,8 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "test": "start-server-and-test devserver-with-coverage http://localhost:8080 'jest'",
-        "test-with-server": "jest --runInBand",
+        "test": "start-server-and-test devserver-with-coverage http://localhost:8080 'jest --runInBand --coverage --no-cache'",
+        "test-with-server": "jest --runInBand --coverage",
         "test-watch": "jest --watch",
         "lint": "eslint src/ --ext .ts,.tsx",
         "production": "./production",
@@ -24,16 +24,14 @@
         "devserver": "webpack-dev-server --mode development",
         "devserver-with-coverage": "COVERAGE=true webpack-dev-server --mode development",
         "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
-        "coveralls": "coveralls < combined-coverage/coverage/lcov.info",
+        "coveralls": "nyc report --reporter=text-lcov | coveralls",
         "tsc": "tsc --noEmit --project tsconfig.json",
-        "cypress-run": "start-server-and-test devserver-with-coverage http://localhost:8080 'cypress run'",
-        "merge-coverage": "mkdir combined-coverage && cp jest-coverage/coverage-final.json combined-coverage/jest-coverage.json && cp cypress-coverage/coverage-final.json combined-coverage/cypress-coverage.json && cd combined-coverage && istanbul report lcov --include=*.json && cd .."
+        "merge-coverage": "cp coverage/coverage-final.json .nyc_output/coverage_jsdom.json"
     },
     "dependencies": {
         "jquery": ">=1.9"
     },
     "devDependencies": {
-        "@cypress/code-coverage": "^3.8.1",
         "@testing-library/dom": "^7.21.7",
         "@types/jest": "^26.0.8",
         "@types/jquery": "^3.5.0",
@@ -43,14 +41,11 @@
         "@typescript-eslint/parser": "^3.4.0",
         "autoprefixer": "^9.8.4",
         "coveralls": "^3.1.0",
-        "cypress": "^4.12.1",
-        "cypress-visual-regression": "^1.4.0",
         "eslint": "^7.3.1",
         "eslint-plugin-import": "^2.22.0",
         "eslint-plugin-jest": "^23.20.0",
         "expect-playwright": "^0.2.5",
         "givens": "^1.3.4",
-        "istanbul": "^0.4.5",
         "istanbul-instrumenter-loader": "^3.0.1",
         "jest": "^26.2.2",
         "jest-extended": "^0.11.5",
