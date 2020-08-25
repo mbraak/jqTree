@@ -1,5 +1,4 @@
 module.exports = {
-    coverageDirectory: "jest-coverage",
     modulePathIgnorePatterns: [
         "<rootDir>/build/",
         "<rootDir>/lib/",
@@ -13,5 +12,5 @@ module.exports = {
         "jest-extended",
     ],
     testEnvironment: "jsdom",
-    testRegex: "\\/src\\/test\\/.*\\.test2\\.ts",
+    testRegex: "\\/src\\/test\\/.*\\.test\\.ts",
 };
