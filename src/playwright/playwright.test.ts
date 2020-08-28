@@ -1,6 +1,5 @@
 /// <reference types="jest-playwright-preset" />
 /// <reference types="expect-playwright" />
-/// <reference types="expect-playwright" />
 
 import {
     expectToBeClosed,
