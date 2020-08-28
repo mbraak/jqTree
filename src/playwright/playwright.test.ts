@@ -14,6 +14,7 @@ import {
 
 beforeEach(async () => {
     await page.goto("http://localhost:8080/test_index.html");
+    await page.waitForLoadState("domcontentloaded");
 
     await page.evaluate(`
         const $tree = jQuery("#tree1");
