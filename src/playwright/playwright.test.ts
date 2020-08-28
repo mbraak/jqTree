@@ -13,7 +13,19 @@ import {
 } from "./testUtil";
 
 beforeEach(async () => {
-    await page.goto("http://localhost:8080/");
+    await page.goto("http://localhost:8080/test_index.html");
+
+    await page.evaluate(`
+        const $tree = $("#tree1");
+
+        $tree.tree({
+            animationSpeed: 0,
+            autoOpen: 0,
+            data: ExampleData.exampleData,
+            dragAndDrop: true,
+        });
+        $tree.tree("setMouseDelay", 0);
+    `);
 });
 
 it("displays a tree", async () => {
