@@ -184,7 +184,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.tree.getNodesByProperty(key, value);
     }
 
-    public getNodeByHtmlElement(element: Element | JQuery): Node | null {
+    public getNodeByHtmlElement(
+        element: HTMLElement | JQuery<HTMLElement>
+    ): Node | null {
         return this.getNode(jQuery(element));
     }
 
@@ -562,7 +564,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _getNodeElement($element: JQuery): NodeElement | null {
+    public _getNodeElement($element: JQuery<HTMLElement>): NodeElement | null {
         const node = this.getNode($element);
         if (node) {
             return this._getNodeElementForNode(node);
@@ -571,7 +573,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _containsElement(element: Element): boolean {
+    public _containsElement(element: HTMLElement): boolean {
         const node = this.getNode(jQuery(element));
 
         return node != null && node.tree === this.tree;
@@ -923,7 +925,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         const $button = $target.closest(".jqtree-toggler");
 
         if ($button.length) {
-            const node = this.getNode($button);
+            const node = this.getNode($button as JQuery<HTMLElement>);
 
             if (node) {
                 return {
@@ -934,7 +936,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         } else {
             const $el = $target.closest(".jqtree-element");
             if ($el.length) {
-                const node = this.getNode($el);
+                const node = this.getNode($el as JQuery<HTMLElement>);
                 if (node) {
                     return {
                         type: "label",
@@ -947,7 +949,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return null;
     }
 
-    private getNode($element: JQuery<any>): null | Node {
+    private getNode($element: JQuery<HTMLElement>): null | Node {
         const $li = $element.closest("li.jqtree_common");
         if ($li.length === 0) {
             return null;

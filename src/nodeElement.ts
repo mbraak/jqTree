@@ -6,7 +6,7 @@ export type OnFinishOpenNode = (node: Node) => void;
 
 export class NodeElement {
     public node: Node;
-    public $element: JQuery<Element>;
+    public $element: JQuery<HTMLElement>;
     protected treeWidget: JqTreeWidget;
 
     constructor(node: Node, treeWidget: JqTreeWidget) {
@@ -61,17 +61,17 @@ export class NodeElement {
         $span.blur();
     }
 
-    protected getUl(): JQuery<any> {
+    protected getUl(): JQuery<HTMLElement> {
         return this.$element.children("ul:first");
     }
 
-    protected getSpan(): JQuery<any> {
+    protected getSpan(): JQuery<HTMLElement> {
         return this.$element
             .children(".jqtree-element")
             .find("span.jqtree-title");
     }
 
-    protected getLi(): JQuery<any> {
+    protected getLi(): JQuery<HTMLElement> {
         return this.$element;
     }
 

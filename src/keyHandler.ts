@@ -117,7 +117,7 @@ export default class KeyHandler {
         return Boolean(
             activeElement &&
                 activeElement.tagName === "SPAN" &&
-                this.treeWidget._containsElement(activeElement)
+                this.treeWidget._containsElement(activeElement as HTMLElement)
         );
     }
 }

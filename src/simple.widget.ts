@@ -2,7 +2,7 @@ const register = (widgetClass: unknown, widgetName: string): void => {
     const getDataKey = (): string => `simple_widget_${widgetName}`;
 
     const getWidgetData = (
-        el: Element,
+        el: HTMLElement,
         dataKey: string
     ): SimpleWidget<unknown> | null => {
         const widget = jQuery.data(el, dataKey) as unknown;
@@ -109,9 +109,9 @@ export default class SimpleWidget<WidgetOptions> {
 
     public options: WidgetOptions;
 
-    protected $el: JQuery<any>;
+    protected $el: JQuery<HTMLElement>;
 
-    constructor(el: Element, options: WidgetOptions) {
+    constructor(el: HTMLElement, options: WidgetOptions) {
         this.$el = jQuery(el);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
