@@ -16,7 +16,7 @@ beforeEach(async () => {
     await page.goto("http://localhost:8080/test_index.html");
 
     await page.evaluate(`
-        const $tree = $("#tree1");
+        const $tree = jQuery("#tree1");
 
         $tree.tree({
             animationSpeed: 0,
