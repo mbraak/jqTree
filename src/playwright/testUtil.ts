@@ -1,5 +1,12 @@
 import { ElementHandle } from "playwright";
 
+interface ElementHandleBoundingBox {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 export const expectToBeSelected = async (
     handle: ElementHandle<HTMLElement>
 ): Promise<void> => {
@@ -133,3 +140,25 @@ export const getTreeStructure = async (): Promise<
         `
         )
         .then((s) => JSON.parse(s as string) as JQTreeMatchers.TreeStructure);
+
+const getRect = async (
+    handle: ElementHandle<HTMLElement>
+): Promise<ElementHandleBoundingBox> => {
+    const boundingBox = await handle.boundingBox();
+
+    if (!boundingBox) {
+        throw "No bounding box";
+    }
+
+    return boundingBox;
+};
+
+export const dragAndDrop = async (from: string, to: string): Promise<void> => {
+    const fromRect = await findTitleElement(from).then(getRect);
+    const toRect = await findTitleElement(to).then(getRect);
+
+    await page.mouse.move(fromRect.x, fromRect.y);
+    await page.mouse.down();
+    await page.mouse.move(toRect.x, toRect.y);
+    await page.mouse.up();
+};

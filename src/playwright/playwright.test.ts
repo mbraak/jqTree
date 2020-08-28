@@ -2,11 +2,11 @@
 /// <reference types="expect-playwright" />
 
 import {
+    dragAndDrop,
     expectToBeClosed,
     expectToBeOpen,
     expectToBeSelected,
     findNodeElement,
-    findTitleElement,
     getTreeStructure,
     openNode,
     selectNode,
@@ -39,17 +39,7 @@ it("opens a node", async () => {
 });
 
 it("moves a node", async () => {
-    const fromRect = await findTitleElement("Herrerasaurians").then((handle) =>
-        handle.boundingBox()
-    );
-
-    const toRect = await findTitleElement("Ornithischians").then((handle) =>
-        handle.boundingBox()
-    );
-    await page.mouse.move(fromRect?.x || 0, fromRect?.y || 0);
-    await page.mouse.down();
-    await page.mouse.move(toRect?.x || 0, toRect?.y || 0);
-    await page.mouse.up();
+    await dragAndDrop("Herrerasaurians", "Ornithischians");
 
     await getTreeStructure().then((structure) => {
         expect(structure).toEqual([
