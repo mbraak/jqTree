@@ -25,7 +25,6 @@ beforeEach(async () => {
             data: ExampleData.exampleData,
             dragAndDrop: true,
         });
-        $tree.tree("setMouseDelay", 0);
     `);
 });
 
