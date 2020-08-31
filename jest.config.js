@@ -1,16 +1,6 @@
 module.exports = {
-    coverageDirectory: "jest-coverage",
-    modulePathIgnorePatterns: [
-        "<rootDir>/build/",
-        "<rootDir>/lib/",
-        "<rootDir>/_site/",
-        "<rootDir>/static/",
+    projects: [
+        "<rootDir>/jest-browser.config.js",
+        "<rootDir>/jest-jsdom.config.js",
     ],
-    preset: "ts-jest",
-    setupFilesAfterEnv: [
-        "<rootDir>/src/test/support/setupTests.ts",
-        "givens/setup.js",
-        "jest-extended",
-    ],
-    testEnvironment: "jsdom",
 };

@@ -48,19 +48,19 @@ export default class DataLoader {
         this.submitRequest(urlInfo, handleSuccess, handleError);
     }
 
-    private addLoadingClass($el: JQuery<any>): void {
+    private addLoadingClass($el: JQuery<HTMLElement>): void {
         if ($el) {
             $el.addClass("jqtree-loading");
         }
     }
 
-    private removeLoadingClass($el: JQuery<any>): void {
+    private removeLoadingClass($el: JQuery<HTMLElement>): void {
         if ($el) {
             $el.removeClass("jqtree-loading");
         }
     }
 
-    private getDomElement(parentNode: Node | null): JQuery<any> {
+    private getDomElement(parentNode: Node | null): JQuery<HTMLElement> {
         if (parentNode) {
             return jQuery(parentNode.element);
         } else {
