@@ -107,6 +107,10 @@ export default class ElementsRenderer {
             }
         }
 
+        if (this.treeWidget.options.dragAndDrop) {
+            classString += " jqtree-dnd";
+        }
+
         const ul = document.createElement("ul");
         ul.className = `jqtree_common ${classString}`;
 

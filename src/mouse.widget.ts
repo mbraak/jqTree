@@ -154,6 +154,10 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
         if (this.isMouseStarted) {
             this.mouseDrag(positionInfo);
+
+            if (e.cancelable) {
+                e.preventDefault();
+            }
         } else {
             this.handleMouseUp(positionInfo);
         }
@@ -175,18 +179,18 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         }
     }
 
-    private touchStart = (e: TouchEvent): boolean => {
+    private touchStart = (e: TouchEvent): void => {
         if (!e) {
-            return false;
+            return;
         }
 
         if (e.touches.length > 1) {
-            return false;
+            return;
         }
 
         const touch = e.changedTouches[0];
 
-        return this.handleMouseDown(getPositionInfoFromTouch(touch, e));
+        this.handleMouseDown(getPositionInfoFromTouch(touch, e));
     };
 
     private touchMove = (e: TouchEvent): void => {
