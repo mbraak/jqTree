@@ -1,6 +1,7 @@
 /// <reference types="jest-playwright-preset" />
 /// <reference types="expect-playwright" />
 
+import getGiven from "givens";
 import {
     dragAndDrop,
     expectToBeClosed,
@@ -11,6 +12,13 @@ import {
     openNode,
     selectNode,
 } from "./testUtil";
+
+interface Vars {
+    dragAndDrop: boolean;
+}
+
+const given = getGiven<Vars>();
+given("dragAndDrop", () => false);
 
 beforeEach(async () => {
     await page.goto("http://localhost:8080/test_index.html");
@@ -23,7 +31,7 @@ beforeEach(async () => {
             animationSpeed: 0,
             autoOpen: 0,
             data: ExampleData.exampleData,
-            dragAndDrop: true,
+            dragAndDrop: ${given.dragAndDrop},
         });
         $tree.tree("setMouseDelay", 100);
     `);
@@ -51,29 +59,35 @@ it("opens a node", async () => {
     await expectToBeOpen(theropods);
 });
 
-it("moves a node", async () => {
-    await dragAndDrop("Herrerasaurians", "Ornithischians");
+describe("dragAndDrop", () => {
+    given("dragAndDrop", () => true);
 
-    await getTreeStructure().then((structure) => {
-        expect(structure).toEqual([
-            expect.objectContaining({
-                name: "Saurischia",
-                children: [
-                    expect.objectContaining({ name: "Theropods" }),
-                    expect.objectContaining({ name: "Sauropodomorphs" }),
-                ],
-            }),
-            expect.objectContaining({
-                name: "Ornithischians",
-                children: [
-                    expect.objectContaining({ name: "Herrerasaurians" }),
-                    expect.objectContaining({ name: "Heterodontosaurids" }),
-                    expect.objectContaining({ name: "Thyreophorans" }),
-                    expect.objectContaining({ name: "Ornithopods" }),
-                    expect.objectContaining({ name: "Pachycephalosaurians" }),
-                    expect.objectContaining({ name: "Ceratopsians" }),
-                ],
-            }),
-        ]);
+    it("moves a node", async () => {
+        await dragAndDrop("Herrerasaurians", "Ornithischians");
+
+        await getTreeStructure().then((structure) => {
+            expect(structure).toEqual([
+                expect.objectContaining({
+                    name: "Saurischia",
+                    children: [
+                        expect.objectContaining({ name: "Theropods" }),
+                        expect.objectContaining({ name: "Sauropodomorphs" }),
+                    ],
+                }),
+                expect.objectContaining({
+                    name: "Ornithischians",
+                    children: [
+                        expect.objectContaining({ name: "Herrerasaurians" }),
+                        expect.objectContaining({ name: "Heterodontosaurids" }),
+                        expect.objectContaining({ name: "Thyreophorans" }),
+                        expect.objectContaining({ name: "Ornithopods" }),
+                        expect.objectContaining({
+                            name: "Pachycephalosaurians",
+                        }),
+                        expect.objectContaining({ name: "Ceratopsians" }),
+                    ],
+                }),
+            ]);
+        });
     });
 });
