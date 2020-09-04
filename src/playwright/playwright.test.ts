@@ -37,12 +37,14 @@ beforeEach(async () => {
     `);
 });
 
+afterEach(async () => {
+    await jestPlaywright.saveCoverage(page);
+});
+
 it("displays a tree", async () => {
     await expect(page).toHaveText("Saurischia");
     await expect(page).toHaveText("Ornithischians");
     await expect(page).toHaveText("Coelophysoids");
-
-    await jestPlaywright.saveCoverage(page);
 });
 
 it("selects a node", async () => {
@@ -50,8 +52,6 @@ it("selects a node", async () => {
     const saurischia = await findNodeElement("Saurischia");
     await selectNode(saurischia);
     await expectToBeSelected(saurischia);
-
-    await jestPlaywright.saveCoverage(page);
 });
 
 it("opens a node", async () => {
@@ -61,8 +61,6 @@ it("opens a node", async () => {
     await expectToBeClosed(theropods);
     await openNode(theropods);
     await expectToBeOpen(theropods);
-
-    await jestPlaywright.saveCoverage(page);
 });
 
 describe("dragAndDrop", () => {
@@ -95,7 +93,5 @@ describe("dragAndDrop", () => {
                 }),
             ]);
         });
-
-        await jestPlaywright.saveCoverage(page);
     });
 });
