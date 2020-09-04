@@ -4,4 +4,5 @@ module.exports = {
         "<rootDir>/jest-jsdom.config.js",
     ],
     coverageDirectory: "jest-coverage",
+    coverageReporters: [],
 };
