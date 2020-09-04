@@ -27,7 +27,7 @@
         "coveralls": "nyc report --reporter=text-lcov | coveralls",
         "tsc": "tsc --noEmit --project tsconfig.json",
         "merge-coverage": "cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json",
-        "clean-coverage": "rm -rf .nyc_output coverage jest-coverage && jest --clearCache",
+        "clean-coverage": "rm -rf coverage jest-coverage .nyc_output && jest --clearCache",
         "print-coverage": "nyc report"
     },
     "dependencies": {
