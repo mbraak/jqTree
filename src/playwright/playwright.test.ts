@@ -12,6 +12,7 @@ import {
     openNode,
     selectNode,
 } from "./testUtil";
+import { matchScreenshot } from "./visualRegression";
 
 interface Vars {
     dragAndDrop: boolean;
@@ -45,6 +46,8 @@ it("displays a tree", async () => {
     await expect(page).toHaveText("Saurischia");
     await expect(page).toHaveText("Ornithischians");
     await expect(page).toHaveText("Coelophysoids");
+
+    await matchScreenshot("displays_a_tree");
 });
 
 it("selects a node", async () => {
@@ -52,6 +55,8 @@ it("selects a node", async () => {
     const saurischia = await findNodeElement("Saurischia");
     await selectNode(saurischia);
     await expectToBeSelected(saurischia);
+
+    await matchScreenshot("selects_a_node");
 });
 
 it("opens a node", async () => {
@@ -61,6 +66,8 @@ it("opens a node", async () => {
     await expectToBeClosed(theropods);
     await openNode(theropods);
     await expectToBeOpen(theropods);
+
+    await matchScreenshot("opens_a_node");
 });
 
 describe("dragAndDrop", () => {
@@ -93,5 +100,7 @@ describe("dragAndDrop", () => {
                 }),
             ]);
         });
+
+        await matchScreenshot("moves_a_node");
     });
 });
