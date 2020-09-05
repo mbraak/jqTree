@@ -86,7 +86,7 @@ export default class ElementsRenderer {
         }
     }
 
-    private attachNodeData(node: Node, li: Element): void {
+    private attachNodeData(node: Node, li: HTMLElement): void {
         node.element = li;
         jQuery(li).data("node", node);
     }
@@ -121,8 +121,7 @@ export default class ElementsRenderer {
 
     private createLi(node: Node, level: number): HTMLLIElement {
         const isSelected = Boolean(
-            this.treeWidget.selectNodeHandler &&
-                this.treeWidget.selectNodeHandler.isNodeSelected(node)
+            this.treeWidget.selectNodeHandler.isNodeSelected(node)
         );
 
         const mustShowFolder =

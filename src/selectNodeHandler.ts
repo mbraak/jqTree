@@ -67,10 +67,8 @@ export default class SelectNodeHandler {
         }
     }
 
-    public isNodeSelected(node?: Node): boolean {
-        if (!node) {
-            return false;
-        } else if (node.id != null) {
+    public isNodeSelected(node: Node): boolean {
+        if (node.id != null) {
             if (this.selectedNodes[node.id]) {
                 return true;
             } else {
