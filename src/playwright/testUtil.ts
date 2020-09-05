@@ -157,9 +157,15 @@ export const dragAndDrop = async (from: string, to: string): Promise<void> => {
     const fromRect = await findTitleElement(from).then(getRect);
     const toRect = await findTitleElement(to).then(getRect);
 
-    await page.mouse.move(fromRect.x, fromRect.y);
+    await page.mouse.move(
+        fromRect.x + fromRect.width / 2,
+        fromRect.y + fromRect.height / 2
+    );
     await page.mouse.down();
     await page.waitForTimeout(200);
-    await page.mouse.move(toRect.x, toRect.y);
+    await page.mouse.move(
+        toRect.x + toRect.width / 2,
+        toRect.y + toRect.height / 2
+    );
     await page.mouse.up();
 };
