@@ -4,7 +4,9 @@ const webpack = require("webpack");
 const template = require("lodash.template");
 const jsonfile = require("jsonfile");
 
-module.exports = function(debug, minimize) {
+const coverage = process.env.COVERAGE;
+
+module.exports = function (debug, minimize) {
     function getHeader() {
         if (debug) {
             return "";
@@ -14,7 +16,7 @@ module.exports = function(debug, minimize) {
 
             const data = {
                 version: package.version,
-                year: new Date().getFullYear()
+                year: new Date().getFullYear(),
             };
 
             return template(headerTemplate)(data);
@@ -24,14 +26,13 @@ module.exports = function(debug, minimize) {
     const config = {
         entry: {
             "tree.jquery": ["./src/tree.jquery.ts"],
-            test: ["./src_test/test.ts"]
         },
         output: {
             path: path.resolve(__dirname, "build"),
-            filename: "[name].js"
+            filename: "[name].js",
         },
         resolve: {
-            extensions: [".ts", ".js"]
+            extensions: [".ts", ".js"],
         },
         module: {
             rules: [
@@ -39,24 +40,39 @@ module.exports = function(debug, minimize) {
                     test: /\.ts$/,
                     exclude: /node_modules/,
                     use: {
-                        loader: "ts-loader"
-                    }
-                }
-            ]
+                        loader: "ts-loader",
+                        options: coverage
+                            ? {
+                                  compilerOptions: {
+                                      inlineSourceMap: true,
+                                  },
+                              }
+                            : {},
+                    },
+                },
+                coverage && {
+                    test: /\.ts$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: "istanbul-instrumenter-loader",
+                    },
+                    enforce: "post",
+                },
+            ].filter(Boolean),
         },
         externals: {
-            jquery: "jQuery"
+            jquery: "jQuery",
         },
         optimization: {
-            minimize: minimize
+            minimize: minimize,
         },
         devServer: {
             contentBase: [
                 path.join(__dirname, "devserver"),
                 path.join(__dirname, "static"),
-                __dirname
-            ]
-        }
+                __dirname,
+            ],
+        },
     };
 
     if (debug) {

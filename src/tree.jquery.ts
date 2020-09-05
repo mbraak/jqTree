@@ -5,8 +5,8 @@ import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
 import KeyHandler from "./keyHandler";
 import MouseWidget from "./mouse.widget";
-import { HitArea, PositionInfo } from "./types";
-import SaveStateHandler, { SavedState } from "./saveStateHandler";
+import { PositionInfo } from "./types";
+import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
@@ -63,7 +63,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         dataFilter: undefined,
         keyboardSupport: true,
         openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
-        rtl: false, // right-to-left support; true / false (default)
+        rtl: undefined, // right-to-left support; true / false (default)
         onDragMove: undefined,
         onDragStop: undefined,
         buttonLeft: true,
@@ -74,15 +74,15 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public element: JQuery;
     public tree: Node;
-    public dndHandler: DragAndDropHandler | null;
+    public dndHandler: DragAndDropHandler;
     public renderer: ElementsRenderer;
     public dataLoader: DataLoader;
-    public scrollHandler: ScrollHandler | null;
-    public selectNodeHandler: SelectNodeHandler | null;
+    public scrollHandler: ScrollHandler;
+    public selectNodeHandler: SelectNodeHandler;
 
     private isInitialized: boolean;
-    private saveStateHandler: SaveStateHandler | null;
-    private keyHandler: KeyHandler | null;
+    private saveStateHandler: SaveStateHandler;
+    private keyHandler: KeyHandler;
 
     public toggle(node: Node, slideParam: null | boolean = null): JQuery {
         if (!node) {
@@ -113,11 +113,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public getSelectedNode(): Node | false {
-        if (this.selectNodeHandler) {
-            return this.selectNodeHandler.getSelectedNode();
-        } else {
-            return false;
-        }
+        return this.selectNodeHandler.getSelectedNode();
     }
 
     public toJson(): string {
@@ -180,11 +176,17 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.tree.getNodeByName(name);
     }
 
+    public getNodeByNameMustExist(name: string): Node {
+        return this.tree.getNodeByNameMustExist(name);
+    }
+
     public getNodesByProperty(key: string, value: unknown): Node[] {
         return this.tree.getNodesByProperty(key, value);
     }
 
-    public getNodeByHtmlElement(element: Element | JQuery): Node | null {
+    public getNodeByHtmlElement(
+        element: HTMLElement | JQuery<HTMLElement>
+    ): Node | null {
         return this.getNode(jQuery(element));
     }
 
@@ -246,17 +248,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public isDragging(): boolean {
-        if (this.dndHandler) {
-            return this.dndHandler.isDragging;
-        } else {
-            return false;
-        }
+        return this.dndHandler.isDragging;
     }
 
     public refreshHitAreas(): JQuery {
-        if (this.dndHandler) {
-            this.dndHandler.refresh();
-        }
+        this.dndHandler.refresh();
         return this.element;
     }
 
@@ -312,13 +308,15 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (node.parent && this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node, true); // including children
-
-            const parent = node.parent;
-            node.remove();
-            this._refreshElements(parent);
+        if (!node.parent) {
+            throw Error("Node has no parent");
         }
+
+        this.selectNodeHandler.removeFromSelection(node, true); // including children
+
+        const parent = node.parent;
+        node.remove();
+        this._refreshElements(parent);
 
         return this.element;
     }
@@ -390,17 +388,16 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
         const positionIndex = getPosition(position);
 
-        this.tree.moveNode(node, targetNode, positionIndex);
-        this._refreshElements(null);
+        if (positionIndex !== undefined) {
+            this.tree.moveNode(node, targetNode, positionIndex);
+            this._refreshElements(null);
+        }
+
         return this.element;
     }
 
     public getStateFromStorage(): SavedState | null {
-        if (this.saveStateHandler) {
-            return this.saveStateHandler.getStateFromStorage();
-        } else {
-            return null;
-        }
+        return this.saveStateHandler.getStateFromStorage();
     }
 
     public addToSelection(node: Node, mustSetFocus?: boolean): JQuery {
@@ -408,25 +405,19 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.addToSelection(node);
+        this.selectNodeHandler.addToSelection(node);
 
-            this._getNodeElementForNode(node).select(
-                mustSetFocus === undefined ? true : mustSetFocus
-            );
+        this._getNodeElementForNode(node).select(
+            mustSetFocus === undefined ? true : mustSetFocus
+        );
 
-            this.saveState();
-        }
+        this.saveState();
 
         return this.element;
     }
 
     public getSelectedNodes(): Node[] {
-        if (!this.selectNodeHandler) {
-            return [];
-        } else {
-            return this.selectNodeHandler.getSelectedNodes();
-        }
+        return this.selectNodeHandler.getSelectedNodes();
     }
 
     public isNodeSelected(node: Node): boolean {
@@ -434,11 +425,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (!this.selectNodeHandler) {
-            return false;
-        } else {
-            return this.selectNodeHandler.isNodeSelected(node);
-        }
+        return this.selectNodeHandler.isNodeSelected(node);
     }
 
     public removeFromSelection(node: Node): JQuery {
@@ -446,12 +433,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node);
+        this.selectNodeHandler.removeFromSelection(node);
 
-            this._getNodeElementForNode(node).deselect();
-            this.saveState();
-        }
+        this._getNodeElementForNode(node).deselect();
+        this.saveState();
 
         return this.element;
     }
@@ -461,34 +446,26 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (this.scrollHandler) {
-            const nodeOffset = jQuery(node.element).offset();
-            const nodeTop = nodeOffset ? nodeOffset.top : 0;
+        const nodeOffset = jQuery(node.element).offset();
+        const nodeTop = nodeOffset ? nodeOffset.top : 0;
 
-            const treeOffset = this.$el.offset();
-            const treeTop = treeOffset ? treeOffset.top : 0;
+        const treeOffset = this.$el.offset();
+        const treeTop = treeOffset ? treeOffset.top : 0;
 
-            const top = nodeTop - treeTop;
+        const top = nodeTop - treeTop;
 
-            this.scrollHandler.scrollToY(top);
-        }
+        this.scrollHandler.scrollToY(top);
 
         return this.element;
     }
 
     public getState(): SavedState | null {
-        if (this.saveStateHandler) {
-            return this.saveStateHandler.getState();
-        } else {
-            return null;
-        }
+        return this.saveStateHandler.getState();
     }
 
     public setState(state: SavedState): JQuery {
-        if (this.saveStateHandler) {
-            this.saveStateHandler.setInitialState(state);
-            this._refreshElements(null);
-        }
+        this.saveStateHandler.setInitialState(state);
+        this._refreshElements(null);
 
         return this.element;
     }
@@ -499,16 +476,18 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public moveDown(): JQuery {
-        if (this.keyHandler) {
-            this.keyHandler.moveDown();
+        const selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            this.keyHandler.moveDown(selectedNode);
         }
 
         return this.element;
     }
 
     public moveUp(): JQuery {
-        if (this.keyHandler) {
-            this.keyHandler.moveUp();
+        const selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            this.keyHandler.moveUp(selectedNode);
         }
 
         return this.element;
@@ -516,18 +495,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public getVersion(): string {
         return __version__;
-    }
-
-    public testGenerateHitAreas(movingNode: Node): HitArea[] {
-        if (!this.dndHandler) {
-            return [];
-        } else {
-            this.dndHandler.currentItem = this._getNodeElementForNode(
-                movingNode
-            );
-            this.dndHandler.generateHitAreas();
-            return this.dndHandler.hitAreas;
-        }
     }
 
     public _triggerEvent(
@@ -597,7 +564,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _getNodeElement($element: JQuery): NodeElement | null {
+    public _getNodeElement($element: JQuery<HTMLElement>): NodeElement | null {
         const node = this.getNode($element);
         if (node) {
             return this._getNodeElementForNode(node);
@@ -606,14 +573,14 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _containsElement(element: Element): boolean {
+    public _containsElement(element: HTMLElement): boolean {
         const node = this.getNode(jQuery(element));
 
         return node != null && node.tree === this.tree;
     }
 
     public _getScrollLeft(): number {
-        return this?.scrollHandler?.getScrollLeft() || 0;
+        return this.scrollHandler.getScrollLeft();
     }
 
     public init(): void {
@@ -631,30 +598,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
         this.renderer = new ElementsRenderer(this);
         this.dataLoader = new DataLoader(this);
-
-        if (SaveStateHandler != null) {
-            this.saveStateHandler = new SaveStateHandler(this);
-        } else {
-            this.options.saveState = false;
-        }
-
-        if (SelectNodeHandler != null) {
-            this.selectNodeHandler = new SelectNodeHandler(this);
-        }
-
-        if (DragAndDropHandler != null) {
-            this.dndHandler = new DragAndDropHandler(this);
-        } else {
-            this.options.dragAndDrop = false;
-        }
-
-        if (ScrollHandler != null) {
-            this.scrollHandler = new ScrollHandler(this);
-        }
-
-        if (KeyHandler != null && SelectNodeHandler != null) {
-            this.keyHandler = new KeyHandler(this);
-        }
+        this.saveStateHandler = new SaveStateHandler(this);
+        this.selectNodeHandler = new SelectNodeHandler(this);
+        this.dndHandler = new DragAndDropHandler(this);
+        this.scrollHandler = new ScrollHandler(this);
+        this.keyHandler = new KeyHandler(this);
 
         this.initData();
 
@@ -670,9 +618,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.element.empty();
         this.element.off();
 
-        if (this.keyHandler) {
-            this.keyHandler.deinit();
-        }
+        this.keyHandler.deinit();
 
         this.tree = new Node({}, true);
 
@@ -680,7 +626,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     protected mouseCapture(positionInfo: PositionInfo): boolean | null {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseCapture(positionInfo);
         } else {
             return false;
@@ -688,7 +634,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     protected mouseStart(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStart(positionInfo);
         } else {
             return false;
@@ -696,12 +642,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     protected mouseDrag(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             const result = this.dndHandler.mouseDrag(positionInfo);
 
-            if (this.scrollHandler) {
-                this.scrollHandler.checkScrolling();
-            }
+            this.scrollHandler.checkScrolling();
             return result;
         } else {
             return false;
@@ -709,7 +653,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     protected mouseStop(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStop(positionInfo);
         } else {
             return false;
@@ -770,7 +714,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private getNodeIdToBeSelected(): NodeId | null {
-        if (this.options.saveState && this.saveStateHandler) {
+        if (this.options.saveState) {
             return this.saveStateHandler.getNodeIdToBeSelected();
         } else {
             return null;
@@ -795,9 +739,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             this.options.nodeClass
         );
 
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.clear();
-        }
+        this.selectNodeHandler.clear();
 
         this.tree.loadFromData(data);
 
@@ -818,7 +760,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     private setInitialState(): boolean {
         const restoreState = (): boolean[] => {
             // result: is state restored, must load on demand?
-            if (!(this.options.saveState && this.saveStateHandler)) {
+            if (!this.options.saveState) {
                 return [false, false];
             } else {
                 const state = this.saveStateHandler.getStateFromStorage();
@@ -873,7 +815,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     // Call cb_finished when done
     private setInitialStateOnDemand(cbFinished: () => void): void {
         const restoreState = (): boolean => {
-            if (!(this.options.saveState && this.saveStateHandler)) {
+            if (!this.options.saveState) {
                 return false;
             } else {
                 const state = this.saveStateHandler.getStateFromStorage();
@@ -983,7 +925,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         const $button = $target.closest(".jqtree-toggler");
 
         if ($button.length) {
-            const node = this.getNode($button);
+            const node = this.getNode($button as JQuery<HTMLElement>);
 
             if (node) {
                 return {
@@ -994,7 +936,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         } else {
             const $el = $target.closest(".jqtree-element");
             if ($el.length) {
-                const node = this.getNode($el);
+                const node = this.getNode($el as JQuery<HTMLElement>);
                 if (node) {
                     return {
                         type: "label",
@@ -1007,7 +949,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return null;
     }
 
-    private getNode($element: JQuery<any>): null | Node {
+    private getNode($element: JQuery<HTMLElement>): null | Node {
         const $li = $element.closest("li.jqtree_common");
         if ($li.length === 0) {
             return null;
@@ -1036,7 +978,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     };
 
     private saveState(): void {
-        if (this.options.saveState && this.saveStateHandler) {
+        if (this.options.saveState) {
             this.saveStateHandler.saveState();
         }
     }
@@ -1074,7 +1016,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         } else {
             const dataRtl = this.element.data("rtl") as unknown;
 
-            if (dataRtl !== null && dataRtl !== false) {
+            if (
+                dataRtl !== null &&
+                dataRtl !== false &&
+                dataRtl !== undefined
+            ) {
                 return true;
             } else {
                 return false;
@@ -1086,12 +1032,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         node: Node | null,
         optionsParam?: SelectNodeOptions
     ): void {
-        if (!this.selectNodeHandler) {
-            return;
-        }
-
         const saveState = (): void => {
-            if (this.options.saveState && this.saveStateHandler) {
+            if (this.options.saveState) {
                 this.saveStateHandler.saveState();
             }
         };
@@ -1137,7 +1079,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 });
             }
         } else {
-            const deselectedNode = this.getSelectedNode();
+            const deselectedNode = this.getSelectedNode() || null;
             this.deselectCurrentNode();
             this.addToSelection(node, selectOptions.mustSetFocus);
 
@@ -1164,20 +1106,18 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 this.initTree(data);
             }
 
-            if (this.isDragging() && this.dndHandler) {
+            if (this.isDragging()) {
                 this.dndHandler.refresh();
             }
         }
     }
 
     private deselectNodes(parentNode: Node): void {
-        if (this.selectNodeHandler) {
-            const selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(
-                parentNode
-            );
-            for (const n of selectedNodesUnderParent) {
-                this.selectNodeHandler.removeFromSelection(n);
-            }
+        const selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(
+            parentNode
+        );
+        for (const n of selectedNodesUnderParent) {
+            this.selectNodeHandler.removeFromSelection(n);
         }
     }
 

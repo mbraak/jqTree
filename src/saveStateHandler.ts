@@ -2,11 +2,6 @@ import { isInt } from "./util";
 import { JqTreeWidget } from "./tree.jquery";
 import { Node, NodeId } from "./node";
 
-export interface SavedState {
-    open_nodes: NodeId[];
-    selected_node: NodeId[];
-}
-
 export default class SaveStateHandler {
     private treeWidget: JqTreeWidget;
     private _supportsLocalStorage: boolean | null;
@@ -29,7 +24,7 @@ export default class SaveStateHandler {
         const jsonData = this.loadFromStorage();
 
         if (jsonData) {
-            return this.parseState(jsonData);
+            return (this.parseState(jsonData) as unknown) as SavedState;
         } else {
             return null;
         }
@@ -166,9 +161,7 @@ export default class SaveStateHandler {
             if (node) {
                 selectCount += 1;
 
-                if (this.treeWidget.selectNodeHandler) {
-                    this.treeWidget.selectNodeHandler.addToSelection(node);
-                }
+                this.treeWidget.selectNodeHandler.addToSelection(node);
             }
         }
 
@@ -178,13 +171,11 @@ export default class SaveStateHandler {
     private resetSelection(): void {
         const selectNodeHandler = this.treeWidget.selectNodeHandler;
 
-        if (selectNodeHandler) {
-            const selectedNodes = selectNodeHandler.getSelectedNodes();
+        const selectedNodes = selectNodeHandler.getSelectedNodes();
 
-            selectedNodes.forEach((node) => {
-                selectNodeHandler.removeFromSelection(node);
-            });
-        }
+        selectedNodes.forEach((node) => {
+            selectNodeHandler.removeFromSelection(node);
+        });
     }
 
     private doSetInitialStateOnDemand(
