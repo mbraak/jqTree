@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.4.12
+ * JqTree 1.5.0
  * 
  * Copyright 2020 Marco Braak
  * 
@@ -99,11 +99,34 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 16);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.getBoolString = exports.htmlEscape = exports.isFunction = exports.isInt = void 0;
+exports.isInt = function (n) { return typeof n === "number" && n % 1 === 0; };
+exports.isFunction = function (v) { return typeof v === "function"; };
+// Escape a string for HTML interpolation; copied from underscore js
+exports.htmlEscape = function (text) {
+    return ("" + text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#x27;")
+        .replace(/\//g, "&#x2F;");
+};
+exports.getBoolString = function (value) { return (value ? "true" : "false"); };
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -133,13 +156,17 @@ exports.getPositionName = function (position) {
     }
     return "";
 };
-exports.getPosition = function (name) { return positionNames[name]; };
+exports.getPosition = function (name) {
+    return positionNames[name];
+};
 var Node = /** @class */ (function () {
     function Node(o, isRoot, nodeClass) {
+        if (o === void 0) { o = null; }
         if (isRoot === void 0) { isRoot = false; }
         if (nodeClass === void 0) { nodeClass = Node; }
         this.name = "";
         this.isEmptyFolder = false;
+        this.load_on_demand = false;
         this.setData(o);
         this.children = [];
         this.parent = null;
@@ -166,28 +193,24 @@ var Node = /** @class */ (function () {
     * Does not remove existing node values
     */
     Node.prototype.setData = function (o) {
-        var _this = this;
-        var setName = function (name) {
-            if (name != null) {
-                _this.name = name;
-            }
-        };
         if (!o) {
             return;
         }
-        else if (typeof o !== "object") {
-            setName(o);
+        else if (typeof o === "string") {
+            this.name = o;
         }
-        else {
+        else if (typeof o === "object") {
             for (var key in o) {
                 if (Object.prototype.hasOwnProperty.call(o, key)) {
                     var value = o[key];
-                    if (key === "label" && typeof value === "string") {
+                    if (key === "label" || key === "name") {
                         // You can use the 'label' key instead of 'name'; this is a legacy feature
-                        setName(value);
+                        if (typeof value === "string") {
+                            this.name = value;
+                        }
                     }
-                    else if (key !== "children") {
-                        // You can't update the children using this function
+                    else if (key !== "children" && key !== "parent") {
+                        // You can't update the children or the parent using this function
                         this[key] = value;
                     }
                 }
@@ -215,7 +238,7 @@ var Node = /** @class */ (function () {
         this.removeChildren();
         for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
             var o = data_1[_i];
-            var node = new this.tree.nodeClass(o);
+            var node = this.createNode(o);
             this.addChild(node);
             if (typeof o === "object" &&
                 o["children"] &&
@@ -228,6 +251,7 @@ var Node = /** @class */ (function () {
                 }
             }
         }
+        return this;
     };
     /*
     Add child.
@@ -326,23 +350,32 @@ var Node = /** @class */ (function () {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
             // - Or, parent is empty
-            return;
+            return false;
         }
         else {
             movedNode.parent.doRemoveChild(movedNode);
-            if (position === Position.After) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
+            switch (position) {
+                case Position.After: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
+                        return true;
+                    }
+                    return false;
                 }
-            }
-            else if (position === Position.Before) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+                case Position.Before: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+                        return true;
+                    }
+                    return false;
                 }
-            }
-            else if (position === Position.Inside) {
-                // move inside as first child
-                targetNode.addChildAtPosition(movedNode, 0);
+                case Position.Inside: {
+                    // move inside as first child
+                    targetNode.addChildAtPosition(movedNode, 0);
+                    return true;
+                }
+                default:
+                    return false;
             }
         }
     };
@@ -351,7 +384,7 @@ var Node = /** @class */ (function () {
     */
     Node.prototype.getData = function (includeParent) {
         if (includeParent === void 0) { includeParent = false; }
-        function getDataFromNodes(nodes) {
+        var getDataFromNodes = function (nodes) {
             return nodes.map(function (node) {
                 var tmpNode = {};
                 for (var k in node) {
@@ -359,6 +392,9 @@ var Node = /** @class */ (function () {
                         "parent",
                         "children",
                         "element",
+                        "idMapping",
+                        "load_on_demand",
+                        "nodeClass",
                         "tree",
                         "isEmptyFolder",
                     ].indexOf(k) === -1 &&
@@ -372,7 +408,7 @@ var Node = /** @class */ (function () {
                 }
                 return tmpNode;
             });
-        }
+        };
         if (includeParent) {
             return getDataFromNodes([this]);
         }
@@ -383,10 +419,20 @@ var Node = /** @class */ (function () {
     Node.prototype.getNodeByName = function (name) {
         return this.getNodeByCallback(function (node) { return node.name === name; });
     };
+    Node.prototype.getNodeByNameMustExist = function (name) {
+        var node = this.getNodeByCallback(function (n) { return n.name === name; });
+        if (!node) {
+            throw "Node with name " + name + " not found";
+        }
+        return node;
+    };
     Node.prototype.getNodeByCallback = function (callback) {
         var result = null;
         this.iterate(function (node) {
-            if (callback(node)) {
+            if (result) {
+                return false;
+            }
+            else if (callback(node)) {
                 result = node;
                 return false;
             }
@@ -401,7 +447,7 @@ var Node = /** @class */ (function () {
             return null;
         }
         else {
-            var node = new this.tree.nodeClass(nodeInfo);
+            var node = this.createNode(nodeInfo);
             var childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
             if (typeof nodeInfo === "object" &&
@@ -418,7 +464,7 @@ var Node = /** @class */ (function () {
             return null;
         }
         else {
-            var node = new this.tree.nodeClass(nodeInfo);
+            var node = this.createNode(nodeInfo);
             var childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
             if (typeof nodeInfo === "object" &&
@@ -435,8 +481,10 @@ var Node = /** @class */ (function () {
             return null;
         }
         else {
-            var newParent = new this.tree.nodeClass(nodeInfo);
-            newParent.setParent(this.tree);
+            var newParent = this.createNode(nodeInfo);
+            if (this.tree) {
+                newParent.setParent(this.tree);
+            }
             var originalParent = this.parent;
             for (var _i = 0, _a = originalParent.children; _i < _a.length; _i++) {
                 var child = _a[_i];
@@ -454,7 +502,7 @@ var Node = /** @class */ (function () {
         }
     };
     Node.prototype.append = function (nodeInfo) {
-        var node = new this.tree.nodeClass(nodeInfo);
+        var node = this.createNode(nodeInfo);
         this.addChild(node);
         if (typeof nodeInfo === "object" &&
             nodeInfo["children"] &&
@@ -465,7 +513,7 @@ var Node = /** @class */ (function () {
         return node;
     };
     Node.prototype.prepend = function (nodeInfo) {
-        var node = new this.tree.nodeClass(nodeInfo);
+        var node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
         if (typeof nodeInfo === "object" &&
             nodeInfo["children"] &&
@@ -495,7 +543,7 @@ var Node = /** @class */ (function () {
         return level;
     };
     Node.prototype.getNodeById = function (nodeId) {
-        return this.idMapping[nodeId];
+        return this.idMapping[nodeId] || null;
     };
     Node.prototype.addNodeToIndex = function (node) {
         if (node.id != null) {
@@ -510,7 +558,8 @@ var Node = /** @class */ (function () {
     Node.prototype.removeChildren = function () {
         var _this = this;
         this.iterate(function (child) {
-            _this.tree.removeNodeFromIndex(child);
+            var _a;
+            (_a = _this.tree) === null || _a === void 0 ? void 0 : _a.removeNodeFromIndex(child);
             return true;
         });
         this.children = [];
@@ -620,7 +669,7 @@ var Node = /** @class */ (function () {
         }
         else {
             var lastChild = this.children[this.children.length - 1];
-            if (!lastChild.hasChildren() || !lastChild.is_open) {
+            if (!(lastChild.hasChildren() && lastChild.is_open)) {
                 return lastChild;
             }
             else {
@@ -643,7 +692,7 @@ var Node = /** @class */ (function () {
         var addChildren = function (childrenData) {
             for (var _i = 0, childrenData_1 = childrenData; _i < childrenData_1.length; _i++) {
                 var child = childrenData_1[_i];
-                var node = new _this.tree.nodeClass("");
+                var node = _this.createNode();
                 node.initFromData(child);
                 _this.addChild(node);
             }
@@ -651,40 +700,27 @@ var Node = /** @class */ (function () {
         addNode(data);
     };
     Node.prototype.setParent = function (parent) {
+        var _a;
         this.parent = parent;
         this.tree = parent.tree;
-        this.tree.addNodeToIndex(this);
+        (_a = this.tree) === null || _a === void 0 ? void 0 : _a.addNodeToIndex(this);
     };
     Node.prototype.doRemoveChild = function (node) {
+        var _a;
         this.children.splice(this.getChildIndex(node), 1);
-        this.tree.removeNodeFromIndex(node);
+        (_a = this.tree) === null || _a === void 0 ? void 0 : _a.removeNodeFromIndex(node);
+    };
+    Node.prototype.getNodeClass = function () {
+        var _a;
+        return this.nodeClass || ((_a = this === null || this === void 0 ? void 0 : this.tree) === null || _a === void 0 ? void 0 : _a.nodeClass) || Node;
+    };
+    Node.prototype.createNode = function (nodeData) {
+        var nodeClass = this.getNodeClass();
+        return new nodeClass(nodeData);
     };
     return Node;
 }());
 exports.Node = Node;
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-exports.getBoolString = exports.htmlEscape = exports.isFunction = exports.isInt = void 0;
-exports.isInt = function (n) { return typeof n === "number" && n % 1 === 0; };
-exports.isFunction = function (v) { return typeof v === "function"; };
-// Escape a string for HTML interpolation; copied from underscore js
-exports.htmlEscape = function (text) {
-    return ("" + text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;")
-        .replace(/\//g, "&#x2F;");
-};
-exports.getBoolString = function (value) { return (value ? "true" : "false"); };
 
 
 /***/ }),
@@ -810,6 +846,13 @@ exports["default"] = SimpleWidget;
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
+module.exports = __webpack_require__(5);
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 var __extends = (this && this.__extends) || (function () {
@@ -838,20 +881,20 @@ var __assign = (this && this.__assign) || function () {
 };
 exports.__esModule = true;
 exports.JqTreeWidget = void 0;
-var version_1 = __webpack_require__(5);
+var version_1 = __webpack_require__(6);
 var jQuery = __webpack_require__(2);
-var dragAndDropHandler_1 = __webpack_require__(6);
-var elementsRenderer_1 = __webpack_require__(7);
-var dataLoader_1 = __webpack_require__(8);
-var keyHandler_1 = __webpack_require__(9);
-var mouse_widget_1 = __webpack_require__(10);
-var saveStateHandler_1 = __webpack_require__(11);
-var scrollHandler_1 = __webpack_require__(12);
-var selectNodeHandler_1 = __webpack_require__(13);
+var dragAndDropHandler_1 = __webpack_require__(7);
+var elementsRenderer_1 = __webpack_require__(8);
+var dataLoader_1 = __webpack_require__(9);
+var keyHandler_1 = __webpack_require__(10);
+var mouse_widget_1 = __webpack_require__(11);
+var saveStateHandler_1 = __webpack_require__(12);
+var scrollHandler_1 = __webpack_require__(13);
+var selectNodeHandler_1 = __webpack_require__(14);
 var simple_widget_1 = __webpack_require__(3);
-var node_1 = __webpack_require__(0);
-var util_1 = __webpack_require__(1);
-var nodeElement_1 = __webpack_require__(14);
+var node_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(0);
+var nodeElement_1 = __webpack_require__(15);
 var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 var PARAM_IS_EMPTY = "Parameter is empty: ";
 var JqTreeWidget = /** @class */ (function (_super) {
@@ -927,12 +970,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return this.element;
     };
     JqTreeWidget.prototype.getSelectedNode = function () {
-        if (this.selectNodeHandler) {
-            return this.selectNodeHandler.getSelectedNode();
-        }
-        else {
-            return false;
-        }
+        return this.selectNodeHandler.getSelectedNode();
     };
     JqTreeWidget.prototype.toJson = function () {
         return JSON.stringify(this.tree.getData());
@@ -975,6 +1013,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.prototype.getNodeByName = function (name) {
         return this.tree.getNodeByName(name);
+    };
+    JqTreeWidget.prototype.getNodeByNameMustExist = function (name) {
+        return this.tree.getNodeByNameMustExist(name);
     };
     JqTreeWidget.prototype.getNodesByProperty = function (key, value) {
         return this.tree.getNodesByProperty(key, value);
@@ -1023,17 +1064,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return this.element;
     };
     JqTreeWidget.prototype.isDragging = function () {
-        if (this.dndHandler) {
-            return this.dndHandler.isDragging;
-        }
-        else {
-            return false;
-        }
+        return this.dndHandler.isDragging;
     };
     JqTreeWidget.prototype.refreshHitAreas = function () {
-        if (this.dndHandler) {
-            this.dndHandler.refresh();
-        }
+        this.dndHandler.refresh();
         return this.element;
     };
     JqTreeWidget.prototype.addNodeAfter = function (newNodeInfo, existingNode) {
@@ -1067,12 +1101,13 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        if (node.parent && this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node, true); // including children
-            var parent_1 = node.parent;
-            node.remove();
-            this._refreshElements(parent_1);
+        if (!node.parent) {
+            throw Error("Node has no parent");
         }
+        this.selectNodeHandler.removeFromSelection(node, true); // including children
+        var parent = node.parent;
+        node.remove();
+        this._refreshElements(parent);
         return this.element;
     };
     JqTreeWidget.prototype.appendNode = function (newNodeInfo, parentNodeParam) {
@@ -1119,86 +1154,60 @@ var JqTreeWidget = /** @class */ (function (_super) {
             throw Error(PARAM_IS_EMPTY + "targetNode");
         }
         var positionIndex = node_1.getPosition(position);
-        this.tree.moveNode(node, targetNode, positionIndex);
-        this._refreshElements(null);
+        if (positionIndex !== undefined) {
+            this.tree.moveNode(node, targetNode, positionIndex);
+            this._refreshElements(null);
+        }
         return this.element;
     };
     JqTreeWidget.prototype.getStateFromStorage = function () {
-        if (this.saveStateHandler) {
-            return this.saveStateHandler.getStateFromStorage();
-        }
-        else {
-            return null;
-        }
+        return this.saveStateHandler.getStateFromStorage();
     };
     JqTreeWidget.prototype.addToSelection = function (node, mustSetFocus) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.addToSelection(node);
-            this._getNodeElementForNode(node).select(mustSetFocus === undefined ? true : mustSetFocus);
-            this.saveState();
-        }
+        this.selectNodeHandler.addToSelection(node);
+        this._getNodeElementForNode(node).select(mustSetFocus === undefined ? true : mustSetFocus);
+        this.saveState();
         return this.element;
     };
     JqTreeWidget.prototype.getSelectedNodes = function () {
-        if (!this.selectNodeHandler) {
-            return [];
-        }
-        else {
-            return this.selectNodeHandler.getSelectedNodes();
-        }
+        return this.selectNodeHandler.getSelectedNodes();
     };
     JqTreeWidget.prototype.isNodeSelected = function (node) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        if (!this.selectNodeHandler) {
-            return false;
-        }
-        else {
-            return this.selectNodeHandler.isNodeSelected(node);
-        }
+        return this.selectNodeHandler.isNodeSelected(node);
     };
     JqTreeWidget.prototype.removeFromSelection = function (node) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node);
-            this._getNodeElementForNode(node).deselect();
-            this.saveState();
-        }
+        this.selectNodeHandler.removeFromSelection(node);
+        this._getNodeElementForNode(node).deselect();
+        this.saveState();
         return this.element;
     };
     JqTreeWidget.prototype.scrollToNode = function (node) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        if (this.scrollHandler) {
-            var nodeOffset = jQuery(node.element).offset();
-            var nodeTop = nodeOffset ? nodeOffset.top : 0;
-            var treeOffset = this.$el.offset();
-            var treeTop = treeOffset ? treeOffset.top : 0;
-            var top_1 = nodeTop - treeTop;
-            this.scrollHandler.scrollToY(top_1);
-        }
+        var nodeOffset = jQuery(node.element).offset();
+        var nodeTop = nodeOffset ? nodeOffset.top : 0;
+        var treeOffset = this.$el.offset();
+        var treeTop = treeOffset ? treeOffset.top : 0;
+        var top = nodeTop - treeTop;
+        this.scrollHandler.scrollToY(top);
         return this.element;
     };
     JqTreeWidget.prototype.getState = function () {
-        if (this.saveStateHandler) {
-            return this.saveStateHandler.getState();
-        }
-        else {
-            return null;
-        }
+        return this.saveStateHandler.getState();
     };
     JqTreeWidget.prototype.setState = function (state) {
-        if (this.saveStateHandler) {
-            this.saveStateHandler.setInitialState(state);
-            this._refreshElements(null);
-        }
+        this.saveStateHandler.setInitialState(state);
+        this._refreshElements(null);
         return this.element;
     };
     JqTreeWidget.prototype.setOption = function (option, value) {
@@ -1206,29 +1215,21 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return this.element;
     };
     JqTreeWidget.prototype.moveDown = function () {
-        if (this.keyHandler) {
-            this.keyHandler.moveDown();
+        var selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            this.keyHandler.moveDown(selectedNode);
         }
         return this.element;
     };
     JqTreeWidget.prototype.moveUp = function () {
-        if (this.keyHandler) {
-            this.keyHandler.moveUp();
+        var selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            this.keyHandler.moveUp(selectedNode);
         }
         return this.element;
     };
     JqTreeWidget.prototype.getVersion = function () {
         return version_1["default"];
-    };
-    JqTreeWidget.prototype.testGenerateHitAreas = function (movingNode) {
-        if (!this.dndHandler) {
-            return [];
-        }
-        else {
-            this.dndHandler.currentItem = this._getNodeElementForNode(movingNode);
-            this.dndHandler.generateHitAreas();
-            return this.dndHandler.hitAreas;
-        }
     };
     JqTreeWidget.prototype._triggerEvent = function (eventName, values) {
         var event = jQuery.Event(eventName);
@@ -1248,13 +1249,13 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 this.loadFolderOnDemand(node, slide, onFinished);
             }
             else {
-                var parent_2 = node.parent;
-                while (parent_2) {
+                var parent_1 = node.parent;
+                while (parent_1) {
                     // nb: do not open root element
-                    if (parent_2.parent) {
-                        doOpenNode(parent_2, false, null);
+                    if (parent_1.parent) {
+                        doOpenNode(parent_1, false, null);
                     }
-                    parent_2 = parent_2.parent;
+                    parent_1 = parent_1.parent;
                 }
                 doOpenNode(node, slide, onFinished);
                 this.saveState();
@@ -1291,8 +1292,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return node != null && node.tree === this.tree;
     };
     JqTreeWidget.prototype._getScrollLeft = function () {
-        var _a;
-        return ((_a = this === null || this === void 0 ? void 0 : this.scrollHandler) === null || _a === void 0 ? void 0 : _a.getScrollLeft()) || 0;
+        return this.scrollHandler.getScrollLeft();
     };
     JqTreeWidget.prototype.init = function () {
         _super.prototype.init.call(this);
@@ -1305,27 +1305,11 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
         this.renderer = new elementsRenderer_1["default"](this);
         this.dataLoader = new dataLoader_1["default"](this);
-        if (saveStateHandler_1["default"] != null) {
-            this.saveStateHandler = new saveStateHandler_1["default"](this);
-        }
-        else {
-            this.options.saveState = false;
-        }
-        if (selectNodeHandler_1["default"] != null) {
-            this.selectNodeHandler = new selectNodeHandler_1["default"](this);
-        }
-        if (dragAndDropHandler_1.DragAndDropHandler != null) {
-            this.dndHandler = new dragAndDropHandler_1.DragAndDropHandler(this);
-        }
-        else {
-            this.options.dragAndDrop = false;
-        }
-        if (scrollHandler_1["default"] != null) {
-            this.scrollHandler = new scrollHandler_1["default"](this);
-        }
-        if (keyHandler_1["default"] != null && selectNodeHandler_1["default"] != null) {
-            this.keyHandler = new keyHandler_1["default"](this);
-        }
+        this.saveStateHandler = new saveStateHandler_1["default"](this);
+        this.selectNodeHandler = new selectNodeHandler_1["default"](this);
+        this.dndHandler = new dragAndDropHandler_1.DragAndDropHandler(this);
+        this.scrollHandler = new scrollHandler_1["default"](this);
+        this.keyHandler = new keyHandler_1["default"](this);
         this.initData();
         this.element.click(this.handleClick);
         this.element.dblclick(this.handleDblclick);
@@ -1336,14 +1320,12 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.deinit = function () {
         this.element.empty();
         this.element.off();
-        if (this.keyHandler) {
-            this.keyHandler.deinit();
-        }
+        this.keyHandler.deinit();
         this.tree = new node_1.Node({}, true);
         _super.prototype.deinit.call(this);
     };
     JqTreeWidget.prototype.mouseCapture = function (positionInfo) {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseCapture(positionInfo);
         }
         else {
@@ -1351,7 +1333,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
     };
     JqTreeWidget.prototype.mouseStart = function (positionInfo) {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStart(positionInfo);
         }
         else {
@@ -1359,11 +1341,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
     };
     JqTreeWidget.prototype.mouseDrag = function (positionInfo) {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             var result = this.dndHandler.mouseDrag(positionInfo);
-            if (this.scrollHandler) {
-                this.scrollHandler.checkScrolling();
-            }
+            this.scrollHandler.checkScrolling();
             return result;
         }
         else {
@@ -1371,7 +1351,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
     };
     JqTreeWidget.prototype.mouseStop = function (positionInfo) {
-        if (this.options.dragAndDrop && this.dndHandler) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStop(positionInfo);
         }
         else {
@@ -1430,7 +1410,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
     };
     JqTreeWidget.prototype.getNodeIdToBeSelected = function () {
-        if (this.options.saveState && this.saveStateHandler) {
+        if (this.options.saveState) {
             return this.saveStateHandler.getNodeIdToBeSelected();
         }
         else {
@@ -1449,9 +1429,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return;
         }
         this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.clear();
-        }
+        this.selectNodeHandler.clear();
         this.tree.loadFromData(data);
         var mustLoadOnDemand = this.setInitialState();
         this._refreshElements(null);
@@ -1469,7 +1447,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         var _this = this;
         var restoreState = function () {
             // result: is state restored, must load on demand?
-            if (!(_this.options.saveState && _this.saveStateHandler)) {
+            if (!_this.options.saveState) {
                 return [false, false];
             }
             else {
@@ -1517,7 +1495,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.setInitialStateOnDemand = function (cbFinished) {
         var _this = this;
         var restoreState = function () {
-            if (!(_this.options.saveState && _this.saveStateHandler)) {
+            if (!_this.options.saveState) {
                 return false;
             }
             else {
@@ -1614,7 +1592,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
     };
     JqTreeWidget.prototype.saveState = function () {
-        if (this.options.saveState && this.saveStateHandler) {
+        if (this.options.saveState) {
             this.saveStateHandler.saveState();
         }
     };
@@ -1649,7 +1627,9 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
         else {
             var dataRtl = this.element.data("rtl");
-            if (dataRtl !== null && dataRtl !== false) {
+            if (dataRtl !== null &&
+                dataRtl !== false &&
+                dataRtl !== undefined) {
                 return true;
             }
             else {
@@ -1659,11 +1639,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.prototype.doSelectNode = function (node, optionsParam) {
         var _this = this;
-        if (!this.selectNodeHandler) {
-            return;
-        }
         var saveState = function () {
-            if (_this.options.saveState && _this.saveStateHandler) {
+            if (_this.options.saveState) {
                 _this.saveStateHandler.saveState();
             }
         };
@@ -1703,7 +1680,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             }
         }
         else {
-            var deselectedNode = this.getSelectedNode();
+            var deselectedNode = this.getSelectedNode() || null;
             this.deselectCurrentNode();
             this.addToSelection(node, selectOptions.mustSetFocus);
             this._triggerEvent("tree.select", {
@@ -1727,18 +1704,16 @@ var JqTreeWidget = /** @class */ (function (_super) {
             else {
                 this.initTree(data);
             }
-            if (this.isDragging() && this.dndHandler) {
+            if (this.isDragging()) {
                 this.dndHandler.refresh();
             }
         }
     };
     JqTreeWidget.prototype.deselectNodes = function (parentNode) {
-        if (this.selectNodeHandler) {
-            var selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(parentNode);
-            for (var _i = 0, selectedNodesUnderParent_1 = selectedNodesUnderParent; _i < selectedNodesUnderParent_1.length; _i++) {
-                var n = selectedNodesUnderParent_1[_i];
-                this.selectNodeHandler.removeFromSelection(n);
-            }
+        var selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(parentNode);
+        for (var _i = 0, selectedNodesUnderParent_1 = selectedNodesUnderParent; _i < selectedNodesUnderParent_1.length; _i++) {
+            var n = selectedNodesUnderParent_1[_i];
+            this.selectNodeHandler.removeFromSelection(n);
         }
     };
     JqTreeWidget.prototype.loadSubtree = function (data, parentNode) {
@@ -1789,7 +1764,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         dataFilter: undefined,
         keyboardSupport: true,
         openFolderDelay: 500,
-        rtl: false,
+        rtl: undefined,
         onDragMove: undefined,
         onDragStop: undefined,
         buttonLeft: true,
@@ -1804,18 +1779,18 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.12";
+var version = "1.5.0";
 exports["default"] = version;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1836,8 +1811,8 @@ var __extends = (this && this.__extends) || (function () {
 exports.__esModule = true;
 exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
 var jQuery = __webpack_require__(2);
-var node_1 = __webpack_require__(0);
-var util_1 = __webpack_require__(1);
+var node_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(0);
 var DragAndDropHandler = /** @class */ (function () {
     function DragAndDropHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -2310,13 +2285,13 @@ var DragElement = /** @class */ (function () {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(0);
 var ElementsRenderer = /** @class */ (function () {
     function ElementsRenderer(treeWidget) {
         this.treeWidget = treeWidget;
@@ -2388,8 +2363,7 @@ var ElementsRenderer = /** @class */ (function () {
         return ul;
     };
     ElementsRenderer.prototype.createLi = function (node, level) {
-        var isSelected = Boolean(this.treeWidget.selectNodeHandler &&
-            this.treeWidget.selectNodeHandler.isNodeSelected(node));
+        var isSelected = Boolean(this.treeWidget.selectNodeHandler.isNodeSelected(node));
         var mustShowFolder = node.isFolder() ||
             (node.isEmptyFolder && this.treeWidget.options.showEmptyFolder);
         var li = mustShowFolder
@@ -2521,7 +2495,7 @@ exports["default"] = ElementsRenderer;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2620,7 +2594,7 @@ exports["default"] = DataLoader;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2633,20 +2607,22 @@ var KeyHandler = /** @class */ (function () {
             if (!_this.canHandleKeyboard()) {
                 return true;
             }
-            else {
-                var key = e.which;
-                switch (key) {
-                    case KeyHandler.DOWN:
-                        return _this.moveDown();
-                    case KeyHandler.UP:
-                        return _this.moveUp();
-                    case KeyHandler.RIGHT:
-                        return _this.moveRight();
-                    case KeyHandler.LEFT:
-                        return _this.moveLeft();
-                    default:
-                        return true;
-                }
+            var selectedNode = _this.treeWidget.getSelectedNode();
+            if (!selectedNode) {
+                return true;
+            }
+            var key = e.which;
+            switch (key) {
+                case KeyHandler.DOWN:
+                    return _this.moveDown(selectedNode);
+                case KeyHandler.UP:
+                    return _this.moveUp(selectedNode);
+                case KeyHandler.RIGHT:
+                    return _this.moveRight(selectedNode);
+                case KeyHandler.LEFT:
+                    return _this.moveLeft(selectedNode);
+                default:
+                    return true;
             }
         };
         this.treeWidget = treeWidget;
@@ -2657,58 +2633,38 @@ var KeyHandler = /** @class */ (function () {
     KeyHandler.prototype.deinit = function () {
         jQuery(document).off("keydown.jqtree");
     };
-    KeyHandler.prototype.moveDown = function () {
-        var node = this.treeWidget.getSelectedNode();
-        if (node) {
-            return this.selectNode(node.getNextNode());
-        }
-        else {
-            return false;
-        }
+    KeyHandler.prototype.moveDown = function (selectedNode) {
+        return this.selectNode(selectedNode.getNextNode());
     };
-    KeyHandler.prototype.moveUp = function () {
-        var node = this.treeWidget.getSelectedNode();
-        if (node) {
-            return this.selectNode(node.getPreviousNode());
-        }
-        else {
-            return false;
-        }
+    KeyHandler.prototype.moveUp = function (selectedNode) {
+        return this.selectNode(selectedNode.getPreviousNode());
     };
-    KeyHandler.prototype.moveRight = function () {
-        var node = this.treeWidget.getSelectedNode();
-        if (!node) {
-            return true;
-        }
-        else if (!node.isFolder()) {
+    KeyHandler.prototype.moveRight = function (selectedNode) {
+        if (!selectedNode.isFolder()) {
             return true;
         }
         else {
             // folder node
-            if (node.is_open) {
+            if (selectedNode.is_open) {
                 // Right moves to the first child of an open node
-                return this.selectNode(node.getNextNode());
+                return this.selectNode(selectedNode.getNextNode());
             }
             else {
                 // Right expands a closed node
-                this.treeWidget.openNode(node);
+                this.treeWidget.openNode(selectedNode);
                 return false;
             }
         }
     };
-    KeyHandler.prototype.moveLeft = function () {
-        var node = this.treeWidget.getSelectedNode();
-        if (!node) {
-            return true;
-        }
-        else if (node.isFolder() && node.is_open) {
+    KeyHandler.prototype.moveLeft = function (selectedNode) {
+        if (selectedNode.isFolder() && selectedNode.is_open) {
             // Left on an open node closes the node
-            this.treeWidget.closeNode(node);
+            this.treeWidget.closeNode(selectedNode);
             return false;
         }
         else {
             // Left on a closed or end node moves focus to the node's parent
-            return this.selectNode(node.getParent());
+            return this.selectNode(selectedNode.getParent());
         }
     };
     KeyHandler.prototype.selectNode = function (node) {
@@ -2717,8 +2673,7 @@ var KeyHandler = /** @class */ (function () {
         }
         else {
             this.treeWidget.selectNode(node);
-            if (this.treeWidget.scrollHandler &&
-                !this.treeWidget.scrollHandler.isScrolledIntoView(jQuery(node.element).find(".jqtree-element"))) {
+            if (!this.treeWidget.scrollHandler.isScrolledIntoView(jQuery(node.element).find(".jqtree-element"))) {
                 this.treeWidget.scrollToNode(node);
             }
             return false;
@@ -2726,8 +2681,7 @@ var KeyHandler = /** @class */ (function () {
     };
     KeyHandler.prototype.canHandleKeyboard = function () {
         return ((this.treeWidget.options.keyboardSupport || false) &&
-            this.isFocusOnTree() &&
-            this.treeWidget.getSelectedNode() != null);
+            this.isFocusOnTree());
     };
     KeyHandler.prototype.isFocusOnTree = function () {
         var activeElement = document.activeElement;
@@ -2745,7 +2699,7 @@ exports["default"] = KeyHandler;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2928,13 +2882,13 @@ exports["default"] = MouseWidget;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(0);
 var SaveStateHandler = /** @class */ (function () {
     function SaveStateHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -3065,21 +3019,17 @@ var SaveStateHandler = /** @class */ (function () {
             var node = this.treeWidget.getNodeById(nodeId);
             if (node) {
                 selectCount += 1;
-                if (this.treeWidget.selectNodeHandler) {
-                    this.treeWidget.selectNodeHandler.addToSelection(node);
-                }
+                this.treeWidget.selectNodeHandler.addToSelection(node);
             }
         }
         return selectCount !== 0;
     };
     SaveStateHandler.prototype.resetSelection = function () {
         var selectNodeHandler = this.treeWidget.selectNodeHandler;
-        if (selectNodeHandler) {
-            var selectedNodes = selectNodeHandler.getSelectedNodes();
-            selectedNodes.forEach(function (node) {
-                selectNodeHandler.removeFromSelection(node);
-            });
-        }
+        var selectedNodes = selectNodeHandler.getSelectedNodes();
+        selectedNodes.forEach(function (node) {
+            selectNodeHandler.removeFromSelection(node);
+        });
     };
     SaveStateHandler.prototype.doSetInitialStateOnDemand = function (nodeIdsParam, selectedNodes, cbFinished) {
         var _this = this;
@@ -3159,7 +3109,7 @@ exports["default"] = SaveStateHandler;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3303,8 +3253,7 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.checkVerticalScrolling = function () {
-        var hoveredArea = this.treeWidget.dndHandler &&
-            this.treeWidget.dndHandler.hoveredArea;
+        var hoveredArea = this.treeWidget.dndHandler.hoveredArea;
         if (hoveredArea && hoveredArea.top !== this.previousTop) {
             this.previousTop = hoveredArea.top;
             if (this.$scrollParent) {
@@ -3316,8 +3265,7 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.checkHorizontalScrolling = function () {
-        var positionInfo = this.treeWidget.dndHandler &&
-            this.treeWidget.dndHandler.positionInfo;
+        var positionInfo = this.treeWidget.dndHandler.positionInfo;
         if (!positionInfo) {
             return;
         }
@@ -3377,7 +3325,7 @@ exports["default"] = ScrollHandler;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3437,10 +3385,7 @@ var SelectNodeHandler = /** @class */ (function () {
         }
     };
     SelectNodeHandler.prototype.isNodeSelected = function (node) {
-        if (!node) {
-            return false;
-        }
-        else if (node.id != null) {
+        if (node.id != null) {
             if (this.selectedNodes[node.id]) {
                 return true;
             }
@@ -3494,7 +3439,7 @@ exports["default"] = SelectNodeHandler;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3514,7 +3459,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.BorderDropHint = exports.FolderElement = exports.NodeElement = void 0;
-var node_1 = __webpack_require__(0);
+var node_1 = __webpack_require__(1);
 var NodeElement = /** @class */ (function () {
     function NodeElement(node, treeWidget) {
         this.init(node, treeWidget);
@@ -3711,14 +3656,6 @@ var GhostDropHint = /** @class */ (function () {
     };
     return GhostDropHint;
 }());
-
-
-/***/ }),
-/* 15 */,
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(4);
 
 
 /***/ })

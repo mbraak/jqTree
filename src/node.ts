@@ -10,11 +10,7 @@ export enum Position {
     None,
 }
 
-interface Positions {
-    [key: string]: Position;
-}
-
-const positionNames: Positions = {
+const positionNames: Record<string, Position> = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
@@ -35,7 +31,8 @@ export const getPositionName = (position: Position): string => {
     return "";
 };
 
-export const getPosition = (name: string): Position => positionNames[name];
+export const getPosition = (name: string): Position | undefined =>
+    positionNames[name];
 
 export class Node implements INode {
     public id?: NodeId;
@@ -43,19 +40,20 @@ export class Node implements INode {
     public children: Node[];
     public parent: Node | null;
     public idMapping: Record<NodeId, Node>;
-    public tree: Node;
-    public nodeClass: typeof Node;
+    public tree?: Node;
+    public nodeClass?: typeof Node;
     public load_on_demand: boolean;
     public is_open: boolean;
-    public element: Element;
+    public element: HTMLElement;
     public is_loading: boolean;
     public isEmptyFolder: boolean;
 
     [key: string]: unknown;
 
-    constructor(o: NodeData | null, isRoot = false, nodeClass = Node) {
+    constructor(o: NodeData | null = null, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.isEmptyFolder = false;
+        this.load_on_demand = false;
 
         this.setData(o);
 
@@ -86,26 +84,22 @@ export class Node implements INode {
     * Does not remove existing node values
     */
     public setData(o: NodeData | null): void {
-        const setName = (name: string): void => {
-            if (name != null) {
-                this.name = name;
-            }
-        };
-
         if (!o) {
             return;
-        } else if (typeof o !== "object") {
-            setName(o);
-        } else {
+        } else if (typeof o === "string") {
+            this.name = o;
+        } else if (typeof o === "object") {
             for (const key in o) {
                 if (Object.prototype.hasOwnProperty.call(o, key)) {
                     const value = o[key];
 
-                    if (key === "label" && typeof value === "string") {
+                    if (key === "label" || key === "name") {
                         // You can use the 'label' key instead of 'name'; this is a legacy feature
-                        setName(value);
-                    } else if (key !== "children") {
-                        // You can't update the children using this function
+                        if (typeof value === "string") {
+                            this.name = value;
+                        }
+                    } else if (key !== "children" && key !== "parent") {
+                        // You can't update the children or the parent using this function
                         this[key] = value;
                     }
                 }
@@ -130,11 +124,11 @@ export class Node implements INode {
         }
     ]
     */
-    public loadFromData(data: NodeData[]): void {
+    public loadFromData(data: NodeData[]): Node {
         this.removeChildren();
 
         for (const o of data) {
-            const node = new this.tree.nodeClass(o);
+            const node = this.createNode(o);
             this.addChild(node);
 
             if (
@@ -149,6 +143,8 @@ export class Node implements INode {
                 }
             }
         }
+
+        return this;
     }
 
     /*
@@ -253,31 +249,49 @@ export class Node implements INode {
     // move node1 after node2
     tree.moveNode(node1, node2, Position.AFTER);
     */
-    public moveNode(movedNode: Node, targetNode: Node, position: number): void {
+    public moveNode(
+        movedNode: Node,
+        targetNode: Node,
+        position: Position
+    ): boolean {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
             // - Or, parent is empty
-            return;
+            return false;
         } else {
             movedNode.parent.doRemoveChild(movedNode);
 
-            if (position === Position.After) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(
-                        movedNode,
-                        targetNode.parent.getChildIndex(targetNode) + 1
-                    );
+            switch (position) {
+                case Position.After: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(
+                            movedNode,
+                            targetNode.parent.getChildIndex(targetNode) + 1
+                        );
+                        return true;
+                    }
+                    return false;
                 }
-            } else if (position === Position.Before) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(
-                        movedNode,
-                        targetNode.parent.getChildIndex(targetNode)
-                    );
+
+                case Position.Before: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(
+                            movedNode,
+                            targetNode.parent.getChildIndex(targetNode)
+                        );
+                        return true;
+                    }
+                    return false;
                 }
-            } else if (position === Position.Inside) {
-                // move inside as first child
-                targetNode.addChildAtPosition(movedNode, 0);
+
+                case Position.Inside: {
+                    // move inside as first child
+                    targetNode.addChildAtPosition(movedNode, 0);
+                    return true;
+                }
+
+                default:
+                    return false;
             }
         }
     }
@@ -285,8 +299,8 @@ export class Node implements INode {
     /*
     Get the tree as data.
     */
-    public getData(includeParent = false): any[] {
-        function getDataFromNodes(nodes: Node[]): Record<string, unknown>[] {
+    public getData(includeParent = false): DefaultRecord[] {
+        const getDataFromNodes = (nodes: Node[]): Record<string, unknown>[] => {
             return nodes.map((node) => {
                 const tmpNode: Record<string, unknown> = {};
 
@@ -296,6 +310,9 @@ export class Node implements INode {
                             "parent",
                             "children",
                             "element",
+                            "idMapping",
+                            "load_on_demand",
+                            "nodeClass",
                             "tree",
                             "isEmptyFolder",
                         ].indexOf(k) === -1 &&
@@ -312,7 +329,7 @@ export class Node implements INode {
 
                 return tmpNode;
             });
-        }
+        };
 
         if (includeParent) {
             return getDataFromNodes([this]);
@@ -325,11 +342,23 @@ export class Node implements INode {
         return this.getNodeByCallback((node: Node) => node.name === name);
     }
 
+    public getNodeByNameMustExist(name: string): Node {
+        const node = this.getNodeByCallback((n: Node) => n.name === name);
+
+        if (!node) {
+            throw `Node with name ${name} not found`;
+        }
+
+        return node;
+    }
+
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
-        let result = null;
+        let result: Node | null = null;
 
         this.iterate((node: Node) => {
-            if (callback(node)) {
+            if (result) {
+                return false;
+            } else if (callback(node)) {
                 result = node;
                 return false;
             } else {
@@ -344,7 +373,7 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const node = new this.tree.nodeClass(nodeInfo);
+            const node = this.createNode(nodeInfo);
 
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
@@ -366,7 +395,7 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const node = new this.tree.nodeClass(nodeInfo);
+            const node = this.createNode(nodeInfo);
 
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
@@ -388,8 +417,11 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const newParent: Node = new this.tree.nodeClass(nodeInfo);
-            newParent.setParent(this.tree);
+            const newParent = this.createNode(nodeInfo);
+
+            if (this.tree) {
+                newParent.setParent(this.tree);
+            }
             const originalParent = this.parent;
 
             for (const child of originalParent.children) {
@@ -410,7 +442,7 @@ export class Node implements INode {
     }
 
     public append(nodeInfo: NodeData): Node {
-        const node = new this.tree.nodeClass(nodeInfo);
+        const node = this.createNode(nodeInfo);
         this.addChild(node);
 
         if (
@@ -426,7 +458,7 @@ export class Node implements INode {
     }
 
     public prepend(nodeInfo: NodeData): Node {
-        const node = new this.tree.nodeClass(nodeInfo);
+        const node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
 
         if (
@@ -468,7 +500,7 @@ export class Node implements INode {
     }
 
     public getNodeById(nodeId: NodeId): Node | null {
-        return this.idMapping[nodeId];
+        return this.idMapping[nodeId] || null;
     }
 
     public addNodeToIndex(node: Node): void {
@@ -485,7 +517,7 @@ export class Node implements INode {
 
     public removeChildren(): void {
         this.iterate((child: Node) => {
-            this.tree.removeNodeFromIndex(child);
+            this.tree?.removeNodeFromIndex(child);
             return true;
         });
 
@@ -595,7 +627,7 @@ export class Node implements INode {
             return null;
         } else {
             const lastChild = this.children[this.children.length - 1];
-            if (!lastChild.hasChildren() || !lastChild.is_open) {
+            if (!(lastChild.hasChildren() && lastChild.is_open)) {
                 return lastChild;
             } else {
                 return lastChild.getLastChild();
@@ -620,7 +652,7 @@ export class Node implements INode {
 
         const addChildren = (childrenData: NodeData[]): void => {
             for (const child of childrenData) {
-                const node = new this.tree.nodeClass("");
+                const node = this.createNode();
                 node.initFromData(child);
                 this.addChild(node);
             }
@@ -632,11 +664,20 @@ export class Node implements INode {
     private setParent(parent: Node): void {
         this.parent = parent;
         this.tree = parent.tree;
-        this.tree.addNodeToIndex(this);
+        this.tree?.addNodeToIndex(this);
     }
 
     private doRemoveChild(node: Node): void {
         this.children.splice(this.getChildIndex(node), 1);
-        this.tree.removeNodeFromIndex(node);
+        this.tree?.removeNodeFromIndex(node);
+    }
+
+    private getNodeClass(): typeof Node {
+        return this.nodeClass || this?.tree?.nodeClass || Node;
+    }
+
+    private createNode(nodeData?: NodeData): Node {
+        const nodeClass = this.getNodeClass();
+        return new nodeClass(nodeData);
     }
 }

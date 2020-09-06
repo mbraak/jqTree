@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development
+##### 1.5.0 (september 6 2020)
 
 -   Issue #603: improve performance of title rendering (thanks to Bekefi Gergely)
 
