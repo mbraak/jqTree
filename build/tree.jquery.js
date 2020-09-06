@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.4.12
+ * JqTree 1.5.0
  * 
  * Copyright 2020 Marco Braak
  * 
@@ -1785,7 +1785,7 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.12";
+var version = "1.5.0";
 exports["default"] = version;
 
 
