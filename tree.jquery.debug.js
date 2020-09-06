@@ -1,7 +1,7 @@
 /*!
- * JqTree 1.4.12
+ * JqTree 1.5.0
  * 
- * Copyright 2019 Marco Braak
+ * Copyright 2020 Marco Braak
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 16);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -109,6 +109,30 @@
 "use strict";
 
 exports.__esModule = true;
+exports.getBoolString = exports.htmlEscape = exports.isFunction = exports.isInt = void 0;
+exports.isInt = function (n) { return typeof n === "number" && n % 1 === 0; };
+exports.isFunction = function (v) { return typeof v === "function"; };
+// Escape a string for HTML interpolation; copied from underscore js
+exports.htmlEscape = function (text) {
+    return ("" + text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#x27;")
+        .replace(/\//g, "&#x2F;");
+};
+exports.getBoolString = function (value) { return (value ? "true" : "false"); };
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.Node = exports.getPosition = exports.getPositionName = exports.Position = void 0;
 var Position;
 (function (Position) {
     Position[Position["Before"] = 1] = "Before";
@@ -120,11 +144,11 @@ var positionNames = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
-    none: Position.None
+    none: Position.None,
 };
 exports.getPositionName = function (position) {
     for (var name_1 in positionNames) {
-        if (positionNames.hasOwnProperty(name_1)) {
+        if (Object.prototype.hasOwnProperty.call(positionNames, name_1)) {
             if (positionNames[name_1] === position) {
                 return name_1;
             }
@@ -132,13 +156,17 @@ exports.getPositionName = function (position) {
     }
     return "";
 };
-exports.getPosition = function (name) { return positionNames[name]; };
+exports.getPosition = function (name) {
+    return positionNames[name];
+};
 var Node = /** @class */ (function () {
     function Node(o, isRoot, nodeClass) {
+        if (o === void 0) { o = null; }
         if (isRoot === void 0) { isRoot = false; }
         if (nodeClass === void 0) { nodeClass = Node; }
         this.name = "";
         this.isEmptyFolder = false;
+        this.load_on_demand = false;
         this.setData(o);
         this.children = [];
         this.parent = null;
@@ -165,28 +193,24 @@ var Node = /** @class */ (function () {
     * Does not remove existing node values
     */
     Node.prototype.setData = function (o) {
-        var _this = this;
-        var setName = function (name) {
-            if (name != null) {
-                _this.name = name;
-            }
-        };
         if (!o) {
             return;
         }
-        else if (typeof o !== "object") {
-            setName(o);
+        else if (typeof o === "string") {
+            this.name = o;
         }
-        else {
+        else if (typeof o === "object") {
             for (var key in o) {
-                if (o.hasOwnProperty(key)) {
+                if (Object.prototype.hasOwnProperty.call(o, key)) {
                     var value = o[key];
-                    if (key === "label") {
+                    if (key === "label" || key === "name") {
                         // You can use the 'label' key instead of 'name'; this is a legacy feature
-                        setName(value);
+                        if (typeof value === "string") {
+                            this.name = value;
+                        }
                     }
-                    else if (key !== "children") {
-                        // You can't update the children using this function
+                    else if (key !== "children" && key !== "parent") {
+                        // You can't update the children or the parent using this function
                         this[key] = value;
                     }
                 }
@@ -214,9 +238,11 @@ var Node = /** @class */ (function () {
         this.removeChildren();
         for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
             var o = data_1[_i];
-            var node = new this.tree.nodeClass(o);
+            var node = this.createNode(o);
             this.addChild(node);
-            if (typeof o === "object" && o["children"]) {
+            if (typeof o === "object" &&
+                o["children"] &&
+                o["children"] instanceof Array) {
                 if (o["children"].length === 0) {
                     node.isEmptyFolder = true;
                 }
@@ -225,6 +251,7 @@ var Node = /** @class */ (function () {
                 }
             }
         }
+        return this;
     };
     /*
     Add child.
@@ -235,7 +262,7 @@ var Node = /** @class */ (function () {
     */
     Node.prototype.addChild = function (node) {
         this.children.push(node);
-        node._setParent(this);
+        node.setParent(this);
     };
     /*
     Add child at position. Index starts at 0.
@@ -247,7 +274,7 @@ var Node = /** @class */ (function () {
     */
     Node.prototype.addChildAtPosition = function (node, index) {
         this.children.splice(index, 0, node);
-        node._setParent(this);
+        node.setParent(this);
     };
     /*
     Remove child. This also removes the children of the node.
@@ -257,7 +284,7 @@ var Node = /** @class */ (function () {
     Node.prototype.removeChild = function (node) {
         // remove children from the index
         node.removeChildren();
-        this._removeChild(node);
+        this.doRemoveChild(node);
     };
     /*
     Get child index.
@@ -323,23 +350,32 @@ var Node = /** @class */ (function () {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
             // - Or, parent is empty
-            return;
+            return false;
         }
         else {
-            movedNode.parent._removeChild(movedNode);
-            if (position === Position.After) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
+            movedNode.parent.doRemoveChild(movedNode);
+            switch (position) {
+                case Position.After: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
+                        return true;
+                    }
+                    return false;
                 }
-            }
-            else if (position === Position.Before) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+                case Position.Before: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+                        return true;
+                    }
+                    return false;
                 }
-            }
-            else if (position === Position.Inside) {
-                // move inside as first child
-                targetNode.addChildAtPosition(movedNode, 0);
+                case Position.Inside: {
+                    // move inside as first child
+                    targetNode.addChildAtPosition(movedNode, 0);
+                    return true;
+                }
+                default:
+                    return false;
             }
         }
     };
@@ -348,11 +384,20 @@ var Node = /** @class */ (function () {
     */
     Node.prototype.getData = function (includeParent) {
         if (includeParent === void 0) { includeParent = false; }
-        function getDataFromNodes(nodes) {
+        var getDataFromNodes = function (nodes) {
             return nodes.map(function (node) {
                 var tmpNode = {};
                 for (var k in node) {
-                    if (["parent", "children", "element", "tree", "isEmptyFolder"].indexOf(k) === -1 &&
+                    if ([
+                        "parent",
+                        "children",
+                        "element",
+                        "idMapping",
+                        "load_on_demand",
+                        "nodeClass",
+                        "tree",
+                        "isEmptyFolder",
+                    ].indexOf(k) === -1 &&
                         Object.prototype.hasOwnProperty.call(node, k)) {
                         var v = node[k];
                         tmpNode[k] = v;
@@ -363,7 +408,7 @@ var Node = /** @class */ (function () {
                 }
                 return tmpNode;
             });
-        }
+        };
         if (includeParent) {
             return getDataFromNodes([this]);
         }
@@ -374,10 +419,20 @@ var Node = /** @class */ (function () {
     Node.prototype.getNodeByName = function (name) {
         return this.getNodeByCallback(function (node) { return node.name === name; });
     };
+    Node.prototype.getNodeByNameMustExist = function (name) {
+        var node = this.getNodeByCallback(function (n) { return n.name === name; });
+        if (!node) {
+            throw "Node with name " + name + " not found";
+        }
+        return node;
+    };
     Node.prototype.getNodeByCallback = function (callback) {
         var result = null;
         this.iterate(function (node) {
-            if (callback(node)) {
+            if (result) {
+                return false;
+            }
+            else if (callback(node)) {
                 result = node;
                 return false;
             }
@@ -392,10 +447,13 @@ var Node = /** @class */ (function () {
             return null;
         }
         else {
-            var node = new this.tree.nodeClass(nodeInfo);
+            var node = this.createNode(nodeInfo);
             var childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
-            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+            if (typeof nodeInfo === "object" &&
+                nodeInfo["children"] &&
+                nodeInfo["children"] instanceof Array &&
+                nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
             return node;
@@ -406,10 +464,13 @@ var Node = /** @class */ (function () {
             return null;
         }
         else {
-            var node = new this.tree.nodeClass(nodeInfo);
+            var node = this.createNode(nodeInfo);
             var childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
-            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+            if (typeof nodeInfo === "object" &&
+                nodeInfo["children"] &&
+                nodeInfo["children"] instanceof Array &&
+                nodeInfo["children"].length) {
                 node.loadFromData(nodeInfo["children"]);
             }
             return node;
@@ -420,8 +481,10 @@ var Node = /** @class */ (function () {
             return null;
         }
         else {
-            var newParent = new this.tree.nodeClass(nodeInfo);
-            newParent._setParent(this.tree);
+            var newParent = this.createNode(nodeInfo);
+            if (this.tree) {
+                newParent.setParent(this.tree);
+            }
             var originalParent = this.parent;
             for (var _i = 0, _a = originalParent.children; _i < _a.length; _i++) {
                 var child = _a[_i];
@@ -439,17 +502,23 @@ var Node = /** @class */ (function () {
         }
     };
     Node.prototype.append = function (nodeInfo) {
-        var node = new this.tree.nodeClass(nodeInfo);
+        var node = this.createNode(nodeInfo);
         this.addChild(node);
-        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+        if (typeof nodeInfo === "object" &&
+            nodeInfo["children"] &&
+            nodeInfo["children"] instanceof Array &&
+            nodeInfo["children"].length) {
             node.loadFromData(nodeInfo["children"]);
         }
         return node;
     };
     Node.prototype.prepend = function (nodeInfo) {
-        var node = new this.tree.nodeClass(nodeInfo);
+        var node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
-        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+        if (typeof nodeInfo === "object" &&
+            nodeInfo["children"] &&
+            nodeInfo["children"] instanceof Array &&
+            nodeInfo["children"].length) {
             node.loadFromData(nodeInfo["children"]);
         }
         return node;
@@ -474,7 +543,7 @@ var Node = /** @class */ (function () {
         return level;
     };
     Node.prototype.getNodeById = function (nodeId) {
-        return this.idMapping[nodeId];
+        return this.idMapping[nodeId] || null;
     };
     Node.prototype.addNodeToIndex = function (node) {
         if (node.id != null) {
@@ -489,7 +558,8 @@ var Node = /** @class */ (function () {
     Node.prototype.removeChildren = function () {
         var _this = this;
         this.iterate(function (child) {
-            _this.tree.removeNodeFromIndex(child);
+            var _a;
+            (_a = _this.tree) === null || _a === void 0 ? void 0 : _a.removeNodeFromIndex(child);
             return true;
         });
         this.children = [];
@@ -565,7 +635,8 @@ var Node = /** @class */ (function () {
         else {
             var previousSibling = this.getPreviousSibling();
             if (previousSibling) {
-                if (!previousSibling.hasChildren() || !previousSibling.is_open) {
+                if (!previousSibling.hasChildren() ||
+                    !previousSibling.is_open) {
                     // Previous sibling
                     return previousSibling;
                 }
@@ -598,7 +669,7 @@ var Node = /** @class */ (function () {
         }
         else {
             var lastChild = this.children[this.children.length - 1];
-            if (!lastChild.hasChildren() || !lastChild.is_open) {
+            if (!(lastChild.hasChildren() && lastChild.is_open)) {
                 return lastChild;
             }
             else {
@@ -611,54 +682,45 @@ var Node = /** @class */ (function () {
         var _this = this;
         var addNode = function (nodeData) {
             _this.setData(nodeData);
-            if (nodeData["children"]) {
+            if (typeof nodeData === "object" &&
+                nodeData["children"] &&
+                nodeData["children"] instanceof Array &&
+                nodeData["children"].length) {
                 addChildren(nodeData["children"]);
             }
         };
         var addChildren = function (childrenData) {
             for (var _i = 0, childrenData_1 = childrenData; _i < childrenData_1.length; _i++) {
                 var child = childrenData_1[_i];
-                var node = new _this.tree.nodeClass("");
+                var node = _this.createNode();
                 node.initFromData(child);
                 _this.addChild(node);
             }
         };
         addNode(data);
     };
-    Node.prototype._setParent = function (parent) {
+    Node.prototype.setParent = function (parent) {
+        var _a;
         this.parent = parent;
         this.tree = parent.tree;
-        this.tree.addNodeToIndex(this);
+        (_a = this.tree) === null || _a === void 0 ? void 0 : _a.addNodeToIndex(this);
     };
-    Node.prototype._removeChild = function (node) {
+    Node.prototype.doRemoveChild = function (node) {
+        var _a;
         this.children.splice(this.getChildIndex(node), 1);
-        this.tree.removeNodeFromIndex(node);
+        (_a = this.tree) === null || _a === void 0 ? void 0 : _a.removeNodeFromIndex(node);
+    };
+    Node.prototype.getNodeClass = function () {
+        var _a;
+        return this.nodeClass || ((_a = this === null || this === void 0 ? void 0 : this.tree) === null || _a === void 0 ? void 0 : _a.nodeClass) || Node;
+    };
+    Node.prototype.createNode = function (nodeData) {
+        var nodeClass = this.getNodeClass();
+        return new nodeClass(nodeData);
     };
     return Node;
 }());
 exports.Node = Node;
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-exports.isInt = function (n) { return typeof n === "number" && n % 1 === 0; };
-exports.isFunction = function (v) { return typeof v === "function"; };
-// Escape a string for HTML interpolation; copied from underscore js
-exports.htmlEscape = function (text) {
-    return ("" + text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;")
-        .replace(/\//g, "&#x2F;");
-};
-exports.getBoolString = function (value) { return (value ? "true" : "false"); };
 
 
 /***/ }),
@@ -674,94 +736,104 @@ module.exports = jQuery;
 "use strict";
 
 exports.__esModule = true;
+var register = function (widgetClass, widgetName) {
+    var getDataKey = function () { return "simple_widget_" + widgetName; };
+    var getWidgetData = function (el, dataKey) {
+        var widget = jQuery.data(el, dataKey);
+        if (widget && widget instanceof SimpleWidget) {
+            return widget;
+        }
+        else {
+            return null;
+        }
+    };
+    var createWidget = function ($el, options) {
+        var dataKey = getDataKey();
+        for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+            var el = _a[_i];
+            var existingWidget = getWidgetData(el, dataKey);
+            if (!existingWidget) {
+                var simpleWidgetClass = widgetClass;
+                var widget = new simpleWidgetClass(el, options);
+                if (!jQuery.data(el, dataKey)) {
+                    jQuery.data(el, dataKey, widget);
+                }
+                // Call init after setting data, so we can call methods
+                widget.init();
+            }
+        }
+        return $el;
+    };
+    var destroyWidget = function ($el) {
+        var dataKey = getDataKey();
+        for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+            var el = _a[_i];
+            var widget = getWidgetData(el, dataKey);
+            if (widget) {
+                widget.destroy();
+            }
+            jQuery.removeData(el, dataKey);
+        }
+    };
+    var callFunction = function ($el, functionName, args) {
+        var result = null;
+        for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
+            var el = _a[_i];
+            var widget = jQuery.data(el, getDataKey());
+            if (widget && widget instanceof SimpleWidget) {
+                var simpleWidget = widget;
+                var widgetFunction = simpleWidget[functionName];
+                if (widgetFunction && typeof widgetFunction === "function") {
+                    result = widgetFunction.apply(widget, args);
+                }
+            }
+        }
+        return result;
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    jQuery.fn[widgetName] = function (argument1) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        if (!argument1) {
+            return createWidget(this, null);
+        }
+        else if (typeof argument1 === "object") {
+            var options = argument1;
+            return createWidget(this, options);
+        }
+        else if (typeof argument1 === "string" && argument1[0] !== "_") {
+            var functionName = argument1;
+            if (functionName === "destroy") {
+                return destroyWidget(this);
+            }
+            else if (functionName === "get_widget_class") {
+                return widgetClass;
+            }
+            else {
+                return callFunction(this, functionName, args);
+            }
+        }
+    };
+};
 var SimpleWidget = /** @class */ (function () {
     function SimpleWidget(el, options) {
         this.$el = jQuery(el);
-        var defaults = this.constructor.defaults;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        var defaults = this.constructor["defaults"];
         this.options = jQuery.extend({}, defaults, options);
     }
     SimpleWidget.register = function (widgetClass, widgetName) {
-        var getDataKey = function () { return "simple_widget_" + widgetName; };
-        function getWidgetData(el, dataKey) {
-            var widget = jQuery.data(el, dataKey);
-            if (widget && widget instanceof SimpleWidget) {
-                return widget;
-            }
-            else {
-                return null;
-            }
-        }
-        function createWidget($el, options) {
-            var dataKey = getDataKey();
-            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
-                var el = _a[_i];
-                var existingWidget = getWidgetData(el, dataKey);
-                if (!existingWidget) {
-                    var widget = new widgetClass(el, options);
-                    if (!jQuery.data(el, dataKey)) {
-                        jQuery.data(el, dataKey, widget);
-                    }
-                    // Call init after setting data, so we can call methods
-                    widget._init();
-                }
-            }
-            return $el;
-        }
-        function destroyWidget($el) {
-            var dataKey = getDataKey();
-            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
-                var el = _a[_i];
-                var widget = getWidgetData(el, dataKey);
-                if (widget) {
-                    widget.destroy();
-                }
-                jQuery.removeData(el, dataKey);
-            }
-        }
-        function callFunction($el, functionName, args) {
-            var result = null;
-            for (var _i = 0, _a = $el.get(); _i < _a.length; _i++) {
-                var el = _a[_i];
-                var widget = jQuery.data(el, getDataKey());
-                if (widget && widget instanceof SimpleWidget) {
-                    var widgetFunction = widget[functionName];
-                    if (widgetFunction && typeof widgetFunction === "function") {
-                        result = widgetFunction.apply(widget, args);
-                    }
-                }
-            }
-            return result;
-        }
-        jQuery.fn[widgetName] = function (argument1) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            if (argument1 === undefined || typeof argument1 === "object") {
-                var options = argument1;
-                return createWidget(this, options);
-            }
-            else if (typeof argument1 === "string" && argument1[0] !== "_") {
-                var functionName = argument1;
-                if (functionName === "destroy") {
-                    return destroyWidget(this);
-                }
-                else if (functionName === "get_widget_class") {
-                    return widgetClass;
-                }
-                else {
-                    return callFunction(this, functionName, args);
-                }
-            }
-        };
+        register(widgetClass, widgetName);
     };
     SimpleWidget.prototype.destroy = function () {
-        this._deinit();
+        this.deinit();
     };
-    SimpleWidget.prototype._init = function () {
+    SimpleWidget.prototype.init = function () {
         //
     };
-    SimpleWidget.prototype._deinit = function () {
+    SimpleWidget.prototype.deinit = function () {
         //
     };
     SimpleWidget.defaults = {};
@@ -772,6 +844,13 @@ exports["default"] = SimpleWidget;
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(5);
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -801,28 +880,29 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 exports.__esModule = true;
-var version_1 = __webpack_require__(5);
+exports.JqTreeWidget = void 0;
+var version_1 = __webpack_require__(6);
 var jQuery = __webpack_require__(2);
-var drag_and_drop_handler_1 = __webpack_require__(6);
-var elements_renderer_1 = __webpack_require__(7);
-var data_loader_1 = __webpack_require__(8);
-var key_handler_1 = __webpack_require__(9);
-var mouse_widget_1 = __webpack_require__(10);
-var save_state_handler_1 = __webpack_require__(11);
-var scroll_handler_1 = __webpack_require__(12);
-var select_node_handler_1 = __webpack_require__(13);
+var dragAndDropHandler_1 = __webpack_require__(7);
+var elementsRenderer_1 = __webpack_require__(8);
+var dataLoader_1 = __webpack_require__(9);
+var keyHandler_1 = __webpack_require__(10);
+var mouse_widget_1 = __webpack_require__(11);
+var saveStateHandler_1 = __webpack_require__(12);
+var scrollHandler_1 = __webpack_require__(13);
+var selectNodeHandler_1 = __webpack_require__(14);
 var simple_widget_1 = __webpack_require__(3);
-var node_1 = __webpack_require__(0);
-var util_1 = __webpack_require__(1);
-var node_element_1 = __webpack_require__(14);
+var node_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(0);
+var nodeElement_1 = __webpack_require__(15);
 var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 var PARAM_IS_EMPTY = "Parameter is empty: ";
 var JqTreeWidget = /** @class */ (function (_super) {
     __extends(JqTreeWidget, _super);
     function JqTreeWidget() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this._handleClick = function (e) {
-            var clickTarget = _this._getClickTarget(e.target);
+        _this.handleClick = function (e) {
+            var clickTarget = _this.getClickTarget(e.target);
             if (clickTarget) {
                 if (clickTarget.type === "button") {
                     _this.toggle(clickTarget.node, _this.options.slide);
@@ -833,33 +913,33 @@ var JqTreeWidget = /** @class */ (function (_super) {
                     var node = clickTarget.node;
                     var event_1 = _this._triggerEvent("tree.click", {
                         node: node,
-                        click_event: e // eslint-disable-line @typescript-eslint/camelcase
+                        click_event: e,
                     });
                     if (!event_1.isDefaultPrevented()) {
-                        _this._selectNode(node);
+                        _this.doSelectNode(node);
                     }
                 }
             }
         };
-        _this._handleDblclick = function (e) {
-            var clickTarget = _this._getClickTarget(e.target);
-            if (clickTarget && clickTarget.type === "label") {
+        _this.handleDblclick = function (e) {
+            var clickTarget = _this.getClickTarget(e.target);
+            if ((clickTarget === null || clickTarget === void 0 ? void 0 : clickTarget.type) === "label") {
                 _this._triggerEvent("tree.dblclick", {
                     node: clickTarget.node,
-                    click_event: e // eslint-disable-line @typescript-eslint/camelcase
+                    click_event: e,
                 });
             }
         };
-        _this._handleContextmenu = function (e) {
+        _this.handleContextmenu = function (e) {
             var $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
             if ($div.length) {
-                var node = _this._getNode($div);
+                var node = _this.getNode($div);
                 if (node) {
                     e.preventDefault();
                     e.stopPropagation();
                     _this._triggerEvent("tree.contextmenu", {
                         node: node,
-                        click_event: e // eslint-disable-line @typescript-eslint/camelcase
+                        click_event: e,
                     });
                     return false;
                 }
@@ -869,10 +949,11 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return _this;
     }
     JqTreeWidget.prototype.toggle = function (node, slideParam) {
+        if (slideParam === void 0) { slideParam = null; }
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var slide = slideParam == null ? this.options.slide : slideParam;
+        var slide = slideParam !== null && slideParam !== void 0 ? slideParam : this.options.slide;
         if (node.is_open) {
             this.closeNode(node, slide);
         }
@@ -885,22 +966,17 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return this.tree;
     };
     JqTreeWidget.prototype.selectNode = function (node, optionsParam) {
-        this._selectNode(node, optionsParam);
+        this.doSelectNode(node, optionsParam);
         return this.element;
     };
     JqTreeWidget.prototype.getSelectedNode = function () {
-        if (this.selectNodeHandler) {
-            return this.selectNodeHandler.getSelectedNode();
-        }
-        else {
-            return false;
-        }
+        return this.selectNodeHandler.getSelectedNode();
     };
     JqTreeWidget.prototype.toJson = function () {
         return JSON.stringify(this.tree.getData());
     };
     JqTreeWidget.prototype.loadData = function (data, parentNode) {
-        this._loadData(data, parentNode);
+        this.doLoadData(data, parentNode);
         return this.element;
     };
     /*
@@ -920,16 +996,16 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.loadDataFromUrl = function (param1, param2, param3) {
         if (typeof param1 === "string") {
             // first parameter is url
-            this._loadDataFromUrl(param1, param2, param3);
+            this.doLoadDataFromUrl(param1, param2, param3 !== null && param3 !== void 0 ? param3 : null);
         }
         else {
             // first parameter is not url
-            this._loadDataFromUrl(null, param1, param2);
+            this.doLoadDataFromUrl(null, param1, param2);
         }
         return this.element;
     };
     JqTreeWidget.prototype.reload = function (onFinished) {
-        this._loadDataFromUrl(null, null, onFinished);
+        this.doLoadDataFromUrl(null, null, onFinished);
         return this.element;
     };
     JqTreeWidget.prototype.getNodeById = function (nodeId) {
@@ -938,11 +1014,14 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.getNodeByName = function (name) {
         return this.tree.getNodeByName(name);
     };
+    JqTreeWidget.prototype.getNodeByNameMustExist = function (name) {
+        return this.tree.getNodeByNameMustExist(name);
+    };
     JqTreeWidget.prototype.getNodesByProperty = function (key, value) {
         return this.tree.getNodesByProperty(key, value);
     };
     JqTreeWidget.prototype.getNodeByHtmlElement = function (element) {
-        return this._getNode(jQuery(element));
+        return this.getNode(jQuery(element));
     };
     JqTreeWidget.prototype.getNodeByCallback = function (callback) {
         return this.tree.getNodeByCallback(callback);
@@ -953,6 +1032,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
         var parseParams = function () {
+            var _a;
             var onFinished;
             var slide;
             if (util_1.isFunction(param1)) {
@@ -964,7 +1044,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 onFinished = param2;
             }
             if (slide == null) {
-                slide = _this.options.slide;
+                slide = (_a = _this.options.slide) !== null && _a !== void 0 ? _a : false;
             }
             return [slide, onFinished];
         };
@@ -976,25 +1056,18 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var slide = slideParam == null ? this.options.slide : slideParam;
+        var slide = slideParam !== null && slideParam !== void 0 ? slideParam : this.options.slide;
         if (node.isFolder() || node.isEmptyFolder) {
-            new node_element_1.FolderElement(node, this).close(slide, this.options.animationSpeed);
-            this._saveState();
+            new nodeElement_1.FolderElement(node, this).close(slide, this.options.animationSpeed);
+            this.saveState();
         }
         return this.element;
     };
     JqTreeWidget.prototype.isDragging = function () {
-        if (this.dndHandler) {
-            return this.dndHandler.isDragging;
-        }
-        else {
-            return false;
-        }
+        return this.dndHandler.isDragging;
     };
     JqTreeWidget.prototype.refreshHitAreas = function () {
-        if (this.dndHandler) {
-            this.dndHandler.refresh();
-        }
+        this.dndHandler.refresh();
         return this.element;
     };
     JqTreeWidget.prototype.addNodeAfter = function (newNodeInfo, existingNode) {
@@ -1024,17 +1097,17 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
         return newNode;
     };
-    JqTreeWidget.prototype.removeNode = function (inode) {
-        if (!inode) {
+    JqTreeWidget.prototype.removeNode = function (node) {
+        if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var node = inode;
-        if (node.parent && this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node, true); // including children
-            var parent_1 = node.parent;
-            node.remove();
-            this._refreshElements(parent_1);
+        if (!node.parent) {
+            throw Error("Node has no parent");
         }
+        this.selectNodeHandler.removeFromSelection(node, true); // including children
+        var parent = node.parent;
+        node.remove();
+        this._refreshElements(parent);
         return this.element;
     };
     JqTreeWidget.prototype.appendNode = function (newNodeInfo, parentNodeParam) {
@@ -1044,7 +1117,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return node;
     };
     JqTreeWidget.prototype.prependNode = function (newNodeInfo, parentNodeParam) {
-        var parentNode = !parentNodeParam ? this.tree : parentNodeParam;
+        var parentNode = parentNodeParam !== null && parentNodeParam !== void 0 ? parentNodeParam : this.tree;
         var node = parentNode.prepend(newNodeInfo);
         this._refreshElements(parentNode);
         return node;
@@ -1053,7 +1126,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var idIsChanged = data.id && data.id !== node.id;
+        var idIsChanged = typeof data === "object" && data.id && data.id !== node.id;
         if (idIsChanged) {
             this.tree.removeNodeFromIndex(node);
         }
@@ -1061,14 +1134,16 @@ var JqTreeWidget = /** @class */ (function (_super) {
         if (idIsChanged) {
             this.tree.addNodeToIndex(node);
         }
-        if (typeof data === "object" && data.children) {
+        if (typeof data === "object" &&
+            data["children"] &&
+            data["children"] instanceof Array) {
             node.removeChildren();
             if (data.children.length) {
                 node.loadFromData(data.children);
             }
         }
         this._refreshElements(node);
-        this._selectCurrentNode();
+        this.selectCurrentNode();
         return this.element;
     };
     JqTreeWidget.prototype.moveNode = function (node, targetNode, position) {
@@ -1079,81 +1154,60 @@ var JqTreeWidget = /** @class */ (function (_super) {
             throw Error(PARAM_IS_EMPTY + "targetNode");
         }
         var positionIndex = node_1.getPosition(position);
-        this.tree.moveNode(node, targetNode, positionIndex);
-        this._refreshElements(null);
+        if (positionIndex !== undefined) {
+            this.tree.moveNode(node, targetNode, positionIndex);
+            this._refreshElements(null);
+        }
         return this.element;
     };
     JqTreeWidget.prototype.getStateFromStorage = function () {
-        if (this.saveStateHandler) {
-            return this.saveStateHandler.getStateFromStorage();
-        }
+        return this.saveStateHandler.getStateFromStorage();
     };
-    JqTreeWidget.prototype.addToSelection = function (inode, mustSetFocus) {
-        if (!inode) {
+    JqTreeWidget.prototype.addToSelection = function (node, mustSetFocus) {
+        if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        var node = inode;
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.addToSelection(node);
-            this._getNodeElementForNode(node).select(mustSetFocus === undefined ? true : mustSetFocus);
-            this._saveState();
-        }
+        this.selectNodeHandler.addToSelection(node);
+        this._getNodeElementForNode(node).select(mustSetFocus === undefined ? true : mustSetFocus);
+        this.saveState();
         return this.element;
     };
     JqTreeWidget.prototype.getSelectedNodes = function () {
-        if (!this.selectNodeHandler) {
-            return [];
-        }
-        else {
-            return this.selectNodeHandler.getSelectedNodes();
-        }
+        return this.selectNodeHandler.getSelectedNodes();
     };
     JqTreeWidget.prototype.isNodeSelected = function (node) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        if (!this.selectNodeHandler) {
-            return false;
-        }
-        else {
-            return this.selectNodeHandler.isNodeSelected(node);
-        }
+        return this.selectNodeHandler.isNodeSelected(node);
     };
     JqTreeWidget.prototype.removeFromSelection = function (node) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.removeFromSelection(node);
-            this._getNodeElementForNode(node).deselect();
-            this._saveState();
-        }
+        this.selectNodeHandler.removeFromSelection(node);
+        this._getNodeElementForNode(node).deselect();
+        this.saveState();
         return this.element;
     };
     JqTreeWidget.prototype.scrollToNode = function (node) {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
-        if (this.scrollHandler) {
-            var nodeOffset = jQuery(node.element).offset();
-            var nodeTop = nodeOffset ? nodeOffset.top : 0;
-            var treeOffset = this.$el.offset();
-            var treeTop = treeOffset ? treeOffset.top : 0;
-            var top_1 = nodeTop - treeTop;
-            this.scrollHandler.scrollToY(top_1);
-        }
+        var nodeOffset = jQuery(node.element).offset();
+        var nodeTop = nodeOffset ? nodeOffset.top : 0;
+        var treeOffset = this.$el.offset();
+        var treeTop = treeOffset ? treeOffset.top : 0;
+        var top = nodeTop - treeTop;
+        this.scrollHandler.scrollToY(top);
         return this.element;
     };
     JqTreeWidget.prototype.getState = function () {
-        if (this.saveStateHandler) {
-            return this.saveStateHandler.getState();
-        }
+        return this.saveStateHandler.getState();
     };
     JqTreeWidget.prototype.setState = function (state) {
-        if (this.saveStateHandler) {
-            this.saveStateHandler.setInitialState(state);
-            this._refreshElements(null);
-        }
+        this.saveStateHandler.setInitialState(state);
+        this._refreshElements(null);
         return this.element;
     };
     JqTreeWidget.prototype.setOption = function (option, value) {
@@ -1161,29 +1215,21 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return this.element;
     };
     JqTreeWidget.prototype.moveDown = function () {
-        if (this.keyHandler) {
-            this.keyHandler.moveDown();
+        var selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            this.keyHandler.moveDown(selectedNode);
         }
         return this.element;
     };
     JqTreeWidget.prototype.moveUp = function () {
-        if (this.keyHandler) {
-            this.keyHandler.moveUp();
+        var selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            this.keyHandler.moveUp(selectedNode);
         }
         return this.element;
     };
     JqTreeWidget.prototype.getVersion = function () {
         return version_1["default"];
-    };
-    JqTreeWidget.prototype.testGenerateHitAreas = function (movingNode) {
-        if (!this.dndHandler) {
-            return [];
-        }
-        else {
-            this.dndHandler.currentItem = this._getNodeElementForNode(movingNode);
-            this.dndHandler.generateHitAreas();
-            return this.dndHandler.hitAreas;
-        }
     };
     JqTreeWidget.prototype._triggerEvent = function (eventName, values) {
         var event = jQuery.Event(eventName);
@@ -1195,24 +1241,24 @@ var JqTreeWidget = /** @class */ (function (_super) {
         var _this = this;
         if (slide === void 0) { slide = true; }
         var doOpenNode = function (_node, _slide, _onFinished) {
-            var folderElement = new node_element_1.FolderElement(_node, _this);
+            var folderElement = new nodeElement_1.FolderElement(_node, _this);
             folderElement.open(_onFinished, _slide, _this.options.animationSpeed);
         };
         if (node.isFolder() || node.isEmptyFolder) {
             if (node.load_on_demand) {
-                this._loadFolderOnDemand(node, slide, onFinished);
+                this.loadFolderOnDemand(node, slide, onFinished);
             }
             else {
-                var parent_2 = node.parent;
-                while (parent_2) {
+                var parent_1 = node.parent;
+                while (parent_1) {
                     // nb: do not open root element
-                    if (parent_2.parent) {
-                        doOpenNode(parent_2, false, null);
+                    if (parent_1.parent) {
+                        doOpenNode(parent_1, false, null);
                     }
-                    parent_2 = parent_2.parent;
+                    parent_1 = parent_1.parent;
                 }
                 doOpenNode(node, slide, onFinished);
-                this._saveState();
+                this.saveState();
             }
         }
     };
@@ -1226,14 +1272,14 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.prototype._getNodeElementForNode = function (node) {
         if (node.isFolder()) {
-            return new node_element_1.FolderElement(node, this);
+            return new nodeElement_1.FolderElement(node, this);
         }
         else {
-            return new node_element_1.NodeElement(node, this);
+            return new nodeElement_1.NodeElement(node, this);
         }
     };
     JqTreeWidget.prototype._getNodeElement = function ($element) {
-        var node = this._getNode($element);
+        var node = this.getNode($element);
         if (node) {
             return this._getNodeElementForNode(node);
         }
@@ -1242,129 +1288,109 @@ var JqTreeWidget = /** @class */ (function (_super) {
         }
     };
     JqTreeWidget.prototype._containsElement = function (element) {
-        var node = this._getNode(jQuery(element));
+        var node = this.getNode(jQuery(element));
         return node != null && node.tree === this.tree;
     };
     JqTreeWidget.prototype._getScrollLeft = function () {
-        return (this.scrollHandler && this.scrollHandler.getScrollLeft()) || 0;
+        return this.scrollHandler.getScrollLeft();
     };
-    JqTreeWidget.prototype._init = function () {
-        _super.prototype._init.call(this);
+    JqTreeWidget.prototype.init = function () {
+        _super.prototype.init.call(this);
         this.element = this.$el;
         this.mouseDelay = 300;
         this.isInitialized = false;
-        this.options.rtl = this._getRtlOption();
-        if (this.options.closedIcon === null) {
-            this.options.closedIcon = this._getDefaultClosedIcon();
+        this.options.rtl = this.getRtlOption();
+        if (this.options.closedIcon == null) {
+            this.options.closedIcon = this.getDefaultClosedIcon();
         }
-        this.renderer = new elements_renderer_1["default"](this);
-        this.dataLoader = new data_loader_1["default"](this);
-        if (save_state_handler_1["default"] != null) {
-            this.saveStateHandler = new save_state_handler_1["default"](this);
-        }
-        else {
-            this.options.saveState = false;
-        }
-        if (select_node_handler_1["default"] != null) {
-            this.selectNodeHandler = new select_node_handler_1["default"](this);
-        }
-        if (drag_and_drop_handler_1.DragAndDropHandler != null) {
-            this.dndHandler = new drag_and_drop_handler_1.DragAndDropHandler(this);
-        }
-        else {
-            this.options.dragAndDrop = false;
-        }
-        if (scroll_handler_1["default"] != null) {
-            this.scrollHandler = new scroll_handler_1["default"](this);
-        }
-        if (key_handler_1["default"] != null && select_node_handler_1["default"] != null) {
-            this.keyHandler = new key_handler_1["default"](this);
-        }
-        this._initData();
-        this.element.click(this._handleClick);
-        this.element.dblclick(this._handleDblclick);
+        this.renderer = new elementsRenderer_1["default"](this);
+        this.dataLoader = new dataLoader_1["default"](this);
+        this.saveStateHandler = new saveStateHandler_1["default"](this);
+        this.selectNodeHandler = new selectNodeHandler_1["default"](this);
+        this.dndHandler = new dragAndDropHandler_1.DragAndDropHandler(this);
+        this.scrollHandler = new scrollHandler_1["default"](this);
+        this.keyHandler = new keyHandler_1["default"](this);
+        this.initData();
+        this.element.click(this.handleClick);
+        this.element.dblclick(this.handleDblclick);
         if (this.options.useContextMenu) {
-            this.element.on("contextmenu", this._handleContextmenu);
+            this.element.on("contextmenu", this.handleContextmenu);
         }
     };
-    JqTreeWidget.prototype._deinit = function () {
+    JqTreeWidget.prototype.deinit = function () {
         this.element.empty();
         this.element.off();
-        if (this.keyHandler) {
-            this.keyHandler.deinit();
-        }
+        this.keyHandler.deinit();
         this.tree = new node_1.Node({}, true);
-        _super.prototype._deinit.call(this);
+        _super.prototype.deinit.call(this);
     };
-    JqTreeWidget.prototype._mouseCapture = function (positionInfo) {
-        if (this.options.dragAndDrop && this.dndHandler) {
+    JqTreeWidget.prototype.mouseCapture = function (positionInfo) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseCapture(positionInfo);
         }
         else {
             return false;
         }
     };
-    JqTreeWidget.prototype._mouseStart = function (positionInfo) {
-        if (this.options.dragAndDrop && this.dndHandler) {
+    JqTreeWidget.prototype.mouseStart = function (positionInfo) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStart(positionInfo);
         }
         else {
             return false;
         }
     };
-    JqTreeWidget.prototype._mouseDrag = function (positionInfo) {
-        if (this.options.dragAndDrop && this.dndHandler) {
+    JqTreeWidget.prototype.mouseDrag = function (positionInfo) {
+        if (this.options.dragAndDrop) {
             var result = this.dndHandler.mouseDrag(positionInfo);
-            if (this.scrollHandler) {
-                this.scrollHandler.checkScrolling();
-            }
+            this.scrollHandler.checkScrolling();
             return result;
         }
         else {
             return false;
         }
     };
-    JqTreeWidget.prototype._mouseStop = function (positionInfo) {
-        if (this.options.dragAndDrop && this.dndHandler) {
+    JqTreeWidget.prototype.mouseStop = function (positionInfo) {
+        if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStop(positionInfo);
         }
         else {
             return false;
         }
     };
-    JqTreeWidget.prototype._initData = function () {
+    JqTreeWidget.prototype.initData = function () {
         if (this.options.data) {
-            this._loadData(this.options.data, null);
+            this.doLoadData(this.options.data, null);
         }
         else {
-            var dataUrl = this._getDataUrlInfo(null);
+            var dataUrl = this.getDataUrlInfo(null);
             if (dataUrl) {
-                this._loadDataFromUrl(null, null, null);
+                this.doLoadDataFromUrl(null, null, null);
             }
             else {
-                this._loadData([], null);
+                this.doLoadData([], null);
             }
         }
     };
-    JqTreeWidget.prototype._getDataUrlInfo = function (node) {
+    JqTreeWidget.prototype.getDataUrlInfo = function (node) {
         var _this = this;
         var dataUrl = this.options.dataUrl || this.element.data("url");
-        var getUrlFromString = function () {
-            var urlInfo = { url: dataUrl };
+        var getUrlFromString = function (url) {
+            var urlInfo = { url: url };
             setUrlInfoData(urlInfo);
             return urlInfo;
         };
         var setUrlInfoData = function (urlInfo) {
-            if (node && node.id) {
+            if (node === null || node === void 0 ? void 0 : node.id) {
                 // Load on demand of a subtree; add node parameter
                 var data = { node: node.id };
                 urlInfo["data"] = data;
             }
             else {
                 // Add selected_node parameter
-                var selectedNodeId = _this._getNodeIdToBeSelected();
+                var selectedNodeId = _this.getNodeIdToBeSelected();
                 if (selectedNodeId) {
-                    var data = { selected_node: selectedNodeId }; // eslint-disable-line @typescript-eslint/camelcase
+                    var data = { selected_node: selectedNodeId };
                     urlInfo["data"] = data;
                 }
             }
@@ -1373,25 +1399,25 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return dataUrl(node);
         }
         else if (typeof dataUrl === "string") {
-            return getUrlFromString();
+            return getUrlFromString(dataUrl);
         }
-        else if (typeof dataUrl === "object") {
+        else if (dataUrl && typeof dataUrl === "object") {
             setUrlInfoData(dataUrl);
             return dataUrl;
         }
         else {
-            return dataUrl;
+            return null;
         }
     };
-    JqTreeWidget.prototype._getNodeIdToBeSelected = function () {
-        if (this.options.saveState && this.saveStateHandler) {
+    JqTreeWidget.prototype.getNodeIdToBeSelected = function () {
+        if (this.options.saveState) {
             return this.saveStateHandler.getNodeIdToBeSelected();
         }
         else {
             return null;
         }
     };
-    JqTreeWidget.prototype._initTree = function (data) {
+    JqTreeWidget.prototype.initTree = function (data) {
         var _this = this;
         var doInit = function () {
             if (!_this.isInitialized) {
@@ -1399,28 +1425,29 @@ var JqTreeWidget = /** @class */ (function (_super) {
                 _this._triggerEvent("tree.init");
             }
         };
-        this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
-        if (this.selectNodeHandler) {
-            this.selectNodeHandler.clear();
+        if (!this.options.nodeClass) {
+            return;
         }
+        this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
+        this.selectNodeHandler.clear();
         this.tree.loadFromData(data);
-        var mustLoadOnDemand = this._setInitialState();
+        var mustLoadOnDemand = this.setInitialState();
         this._refreshElements(null);
         if (!mustLoadOnDemand) {
             doInit();
         }
         else {
             // Load data on demand and then init the tree
-            this._setInitialStateOnDemand(doInit);
+            this.setInitialStateOnDemand(doInit);
         }
     };
     // Set initial state, either by restoring the state or auto-opening nodes
     // result: must load nodes on demand?
-    JqTreeWidget.prototype._setInitialState = function () {
+    JqTreeWidget.prototype.setInitialState = function () {
         var _this = this;
         var restoreState = function () {
             // result: is state restored, must load on demand?
-            if (!(_this.options.saveState && _this.saveStateHandler)) {
+            if (!_this.options.saveState) {
                 return [false, false];
             }
             else {
@@ -1440,7 +1467,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             if (_this.options.autoOpen === false) {
                 return false;
             }
-            var maxLevel = _this._getAutoOpenMaxLevel();
+            var maxLevel = _this.getAutoOpenMaxLevel();
             var mustLoadOnDemand = false;
             _this.tree.iterate(function (node, level) {
                 if (node.load_on_demand) {
@@ -1451,7 +1478,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
                     return false;
                 }
                 else {
-                    node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                    node.is_open = true;
                     return level !== maxLevel;
                 }
             });
@@ -1465,10 +1492,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     // Set the initial state for nodes that are loaded on demand
     // Call cb_finished when done
-    JqTreeWidget.prototype._setInitialStateOnDemand = function (cbFinished) {
+    JqTreeWidget.prototype.setInitialStateOnDemand = function (cbFinished) {
         var _this = this;
         var restoreState = function () {
-            if (!(_this.options.saveState && _this.saveStateHandler)) {
+            if (!_this.options.saveState) {
                 return false;
             }
             else {
@@ -1483,7 +1510,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
             }
         };
         var autoOpenNodes = function () {
-            var maxLevel = _this._getAutoOpenMaxLevel();
+            var maxLevel = _this.getAutoOpenMaxLevel();
             var loadingCount = 0;
             var loadAndOpenNode = function (node) {
                 loadingCount += 1;
@@ -1515,41 +1542,47 @@ var JqTreeWidget = /** @class */ (function (_super) {
             autoOpenNodes();
         }
     };
-    JqTreeWidget.prototype._getAutoOpenMaxLevel = function () {
+    JqTreeWidget.prototype.getAutoOpenMaxLevel = function () {
         if (this.options.autoOpen === true) {
             return -1;
         }
-        else {
+        else if (typeof this.options.autoOpen === "number") {
+            return this.options.autoOpen;
+        }
+        else if (typeof this.options.autoOpen === "string") {
             return parseInt(this.options.autoOpen, 10);
         }
+        else {
+            return 0;
+        }
     };
-    JqTreeWidget.prototype._getClickTarget = function (element) {
+    JqTreeWidget.prototype.getClickTarget = function (element) {
         var $target = jQuery(element);
         var $button = $target.closest(".jqtree-toggler");
         if ($button.length) {
-            var node = this._getNode($button);
+            var node = this.getNode($button);
             if (node) {
                 return {
                     type: "button",
-                    node: node
+                    node: node,
                 };
             }
         }
         else {
             var $el = $target.closest(".jqtree-element");
             if ($el.length) {
-                var node = this._getNode($el);
+                var node = this.getNode($el);
                 if (node) {
                     return {
                         type: "label",
-                        node: node
+                        node: node,
                     };
                 }
             }
         }
         return null;
     };
-    JqTreeWidget.prototype._getNode = function ($element) {
+    JqTreeWidget.prototype.getNode = function ($element) {
         var $li = $element.closest("li.jqtree_common");
         if ($li.length === 0) {
             return null;
@@ -1558,12 +1591,12 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return $li.data("node");
         }
     };
-    JqTreeWidget.prototype._saveState = function () {
-        if (this.options.saveState && this.saveStateHandler) {
+    JqTreeWidget.prototype.saveState = function () {
+        if (this.options.saveState) {
             this.saveStateHandler.saveState();
         }
     };
-    JqTreeWidget.prototype._selectCurrentNode = function () {
+    JqTreeWidget.prototype.selectCurrentNode = function () {
         var node = this.getSelectedNode();
         if (node) {
             var nodeElement = this._getNodeElementForNode(node);
@@ -1572,13 +1605,13 @@ var JqTreeWidget = /** @class */ (function (_super) {
             }
         }
     };
-    JqTreeWidget.prototype._deselectCurrentNode = function () {
+    JqTreeWidget.prototype.deselectCurrentNode = function () {
         var node = this.getSelectedNode();
         if (node) {
             this.removeFromSelection(node);
         }
     };
-    JqTreeWidget.prototype._getDefaultClosedIcon = function () {
+    JqTreeWidget.prototype.getDefaultClosedIcon = function () {
         if (this.options.rtl) {
             // triangle to the left
             return "&#x25c0;";
@@ -1588,13 +1621,15 @@ var JqTreeWidget = /** @class */ (function (_super) {
             return "&#x25ba;";
         }
     };
-    JqTreeWidget.prototype._getRtlOption = function () {
+    JqTreeWidget.prototype.getRtlOption = function () {
         if (this.options.rtl != null) {
             return this.options.rtl;
         }
         else {
             var dataRtl = this.element.data("rtl");
-            if (dataRtl != null && dataRtl !== false) {
+            if (dataRtl !== null &&
+                dataRtl !== false &&
+                dataRtl !== undefined) {
                 return true;
             }
             else {
@@ -1602,105 +1637,100 @@ var JqTreeWidget = /** @class */ (function (_super) {
             }
         }
     };
-    JqTreeWidget.prototype._selectNode = function (inode, optionsParam) {
+    JqTreeWidget.prototype.doSelectNode = function (node, optionsParam) {
         var _this = this;
-        if (!this.selectNodeHandler) {
+        var saveState = function () {
+            if (_this.options.saveState) {
+                _this.saveStateHandler.saveState();
+            }
+        };
+        if (!node) {
+            // Called with empty node -> deselect current node
+            this.deselectCurrentNode();
+            saveState();
             return;
         }
         var defaultOptions = { mustSetFocus: true, mustToggle: true };
         var selectOptions = __assign(__assign({}, defaultOptions), (optionsParam || {}));
         var canSelect = function () {
             if (_this.options.onCanSelectNode) {
-                return _this.options.selectable && _this.options.onCanSelectNode(inode);
+                return (_this.options.selectable === true &&
+                    _this.options.onCanSelectNode(node));
             }
             else {
-                return _this.options.selectable;
+                return _this.options.selectable === true;
             }
         };
         var openParents = function () {
-            var parent = inode.parent;
+            var parent = node.parent;
             if (parent && parent.parent && !parent.is_open) {
                 _this.openNode(parent, false);
             }
         };
-        var saveState = function () {
-            if (_this.options.saveState && _this.saveStateHandler) {
-                _this.saveStateHandler.saveState();
-            }
-        };
-        if (!inode) {
-            // Called with empty node -> deselect current node
-            this._deselectCurrentNode();
-            saveState();
-            return;
-        }
         if (!canSelect()) {
             return;
         }
-        var node = inode;
         if (this.selectNodeHandler.isNodeSelected(node)) {
             if (selectOptions.mustToggle) {
-                this._deselectCurrentNode();
+                this.deselectCurrentNode();
                 this._triggerEvent("tree.select", {
                     node: null,
-                    previous_node: node // eslint-disable-line @typescript-eslint/camelcase
+                    previous_node: node,
                 });
             }
         }
         else {
-            var deselectedNode = this.getSelectedNode();
-            this._deselectCurrentNode();
+            var deselectedNode = this.getSelectedNode() || null;
+            this.deselectCurrentNode();
             this.addToSelection(node, selectOptions.mustSetFocus);
             this._triggerEvent("tree.select", {
                 node: node,
-                deselected_node: deselectedNode // eslint-disable-line @typescript-eslint/camelcase
+                deselected_node: deselectedNode,
             });
             openParents();
         }
         saveState();
     };
-    JqTreeWidget.prototype._loadData = function (data, parentNode) {
+    JqTreeWidget.prototype.doLoadData = function (data, parentNode) {
         if (!data) {
             return;
         }
         else {
-            this._triggerEvent("tree.load_data", { tree_data: data }); // eslint-disable-line @typescript-eslint/camelcase
+            this._triggerEvent("tree.load_data", { tree_data: data });
             if (parentNode) {
-                this._deselectNodes(parentNode);
-                this._loadSubtree(data, parentNode);
+                this.deselectNodes(parentNode);
+                this.loadSubtree(data, parentNode);
             }
             else {
-                this._initTree(data);
+                this.initTree(data);
             }
-            if (this.isDragging() && this.dndHandler) {
+            if (this.isDragging()) {
                 this.dndHandler.refresh();
             }
         }
     };
-    JqTreeWidget.prototype._deselectNodes = function (parentNode) {
-        if (this.selectNodeHandler) {
-            var selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(parentNode);
-            for (var _i = 0, selectedNodesUnderParent_1 = selectedNodesUnderParent; _i < selectedNodesUnderParent_1.length; _i++) {
-                var n = selectedNodesUnderParent_1[_i];
-                this.selectNodeHandler.removeFromSelection(n);
-            }
+    JqTreeWidget.prototype.deselectNodes = function (parentNode) {
+        var selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(parentNode);
+        for (var _i = 0, selectedNodesUnderParent_1 = selectedNodesUnderParent; _i < selectedNodesUnderParent_1.length; _i++) {
+            var n = selectedNodesUnderParent_1[_i];
+            this.selectNodeHandler.removeFromSelection(n);
         }
     };
-    JqTreeWidget.prototype._loadSubtree = function (data, parentNode) {
+    JqTreeWidget.prototype.loadSubtree = function (data, parentNode) {
         parentNode.loadFromData(data);
-        parentNode.load_on_demand = false; // eslint-disable-line @typescript-eslint/camelcase
-        parentNode.is_loading = false; // eslint-disable-line @typescript-eslint/camelcase
+        parentNode.load_on_demand = false;
+        parentNode.is_loading = false;
         this._refreshElements(parentNode);
     };
-    JqTreeWidget.prototype._loadDataFromUrl = function (urlInfoParam, parentNode, onFinished) {
-        var urlInfo = urlInfoParam || this._getDataUrlInfo(parentNode);
+    JqTreeWidget.prototype.doLoadDataFromUrl = function (urlInfoParam, parentNode, onFinished) {
+        var urlInfo = urlInfoParam || this.getDataUrlInfo(parentNode);
         this.dataLoader.loadFromUrl(urlInfo, parentNode, onFinished);
     };
-    JqTreeWidget.prototype._loadFolderOnDemand = function (node, slide, onFinished) {
+    JqTreeWidget.prototype.loadFolderOnDemand = function (node, slide, onFinished) {
         var _this = this;
         if (slide === void 0) { slide = true; }
-        node.is_loading = true; // eslint-disable-line @typescript-eslint/camelcase
-        this._loadDataFromUrl(null, node, function () {
+        node.is_loading = true;
+        this.doLoadDataFromUrl(null, node, function () {
             _this._openNode(node, slide, onFinished);
         });
     };
@@ -1711,55 +1741,56 @@ var JqTreeWidget = /** @class */ (function (_super) {
         dragAndDrop: false,
         selectable: true,
         useContextMenu: true,
-        onCanSelectNode: null,
-        onSetStateFromStorage: null,
-        onGetStateFromStorage: null,
-        onCreateLi: null,
-        onIsMoveHandle: null,
+        onCanSelectNode: undefined,
+        onSetStateFromStorage: undefined,
+        onGetStateFromStorage: undefined,
+        onCreateLi: undefined,
+        onIsMoveHandle: undefined,
         // Can this node be moved?
-        onCanMove: null,
+        onCanMove: undefined,
         // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanMoveTo: null,
-        onLoadFailed: null,
+        onCanMoveTo: undefined,
+        onLoadFailed: undefined,
         autoEscape: true,
-        dataUrl: null,
+        dataUrl: undefined,
         // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
         // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-        closedIcon: null,
+        closedIcon: undefined,
         // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
         // http://www.fileformat.info/info/unicode/char/25bc/index.htm
         openedIcon: "&#x25bc;",
         slide: true,
         nodeClass: node_1.Node,
-        dataFilter: null,
+        dataFilter: undefined,
         keyboardSupport: true,
         openFolderDelay: 500,
-        rtl: false,
-        onDragMove: null,
-        onDragStop: null,
+        rtl: undefined,
+        onDragMove: undefined,
+        onDragStop: undefined,
         buttonLeft: true,
-        onLoading: null,
+        onLoading: undefined,
         showEmptyFolder: false,
-        tabIndex: 0
+        tabIndex: 0,
     };
     return JqTreeWidget;
 }(mouse_widget_1["default"]));
+exports.JqTreeWidget = JqTreeWidget;
 simple_widget_1["default"].register(JqTreeWidget, "tree");
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var version = "1.4.12";
+var version = "1.5.0";
 exports["default"] = version;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1778,9 +1809,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
 var jQuery = __webpack_require__(2);
-var node_1 = __webpack_require__(0);
-var util_1 = __webpack_require__(1);
+var node_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(0);
 var DragAndDropHandler = /** @class */ (function () {
     function DragAndDropHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -1795,7 +1827,8 @@ var DragAndDropHandler = /** @class */ (function () {
         if (!this.mustCaptureElement($element)) {
             return null;
         }
-        if (this.treeWidget.options.onIsMoveHandle && !this.treeWidget.options.onIsMoveHandle($element)) {
+        if (this.treeWidget.options.onIsMoveHandle &&
+            !this.treeWidget.options.onIsMoveHandle($element)) {
             return null;
         }
         var nodeElement = this.treeWidget._getNodeElement($element);
@@ -1817,7 +1850,9 @@ var DragAndDropHandler = /** @class */ (function () {
         }
     };
     DragAndDropHandler.prototype.mouseStart = function (positionInfo) {
-        if (!this.currentItem || positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
+        if (!this.currentItem ||
+            positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined) {
             return false;
         }
         else {
@@ -1826,7 +1861,9 @@ var DragAndDropHandler = /** @class */ (function () {
             var left = offset ? offset.left : 0;
             var top_1 = offset ? offset.top : 0;
             var node = this.currentItem.node;
-            var nodeName = this.treeWidget.options.autoEscape ? util_1.htmlEscape(node.name) : node.name;
+            var nodeName = this.treeWidget.options.autoEscape
+                ? util_1.htmlEscape(node.name)
+                : node.name;
             this.dragElement = new DragElement(nodeName, positionInfo.pageX - left, positionInfo.pageY - top_1, this.treeWidget.element);
             this.isDragging = true;
             this.positionInfo = positionInfo;
@@ -1939,7 +1976,10 @@ var DragAndDropHandler = /** @class */ (function () {
     };
     DragAndDropHandler.prototype.findHoveredArea = function (x, y) {
         var dimensions = this.getTreeDimensions();
-        if (x < dimensions.left || y < dimensions.top || x > dimensions.right || y > dimensions.bottom) {
+        if (x < dimensions.left ||
+            y < dimensions.top ||
+            x > dimensions.right ||
+            y > dimensions.bottom) {
             return null;
         }
         var low = 0;
@@ -1961,7 +2001,9 @@ var DragAndDropHandler = /** @class */ (function () {
     };
     DragAndDropHandler.prototype.mustOpenFolderTimer = function (area) {
         var node = area.node;
-        return node.isFolder() && !node.is_open && area.position === node_1.Position.Inside;
+        return (node.isFolder() &&
+            !node.is_open &&
+            area.position === node_1.Position.Inside);
     };
     DragAndDropHandler.prototype.updateDropHint = function () {
         if (!this.hoveredArea) {
@@ -2001,14 +2043,13 @@ var DragAndDropHandler = /** @class */ (function () {
             var position_1 = this.hoveredArea.position;
             var previousParent = movedNode_1.parent;
             if (position_1 === node_1.Position.Inside) {
-                this.hoveredArea.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                this.hoveredArea.node.is_open = true;
             }
             var doMove = function () {
                 _this.treeWidget.tree.moveNode(movedNode_1, targetNode_1, position_1);
                 _this.treeWidget.element.empty();
                 _this.treeWidget._refreshElements(null);
             };
-            /* eslint-disable @typescript-eslint/camelcase */
             var event_1 = this.treeWidget._triggerEvent("tree.move", {
                 move_info: {
                     moved_node: movedNode_1,
@@ -2016,10 +2057,9 @@ var DragAndDropHandler = /** @class */ (function () {
                     position: node_1.getPositionName(position_1),
                     previous_parent: previousParent,
                     do_move: doMove,
-                    original_event: positionInfo.originalEvent
-                }
+                    original_event: positionInfo.originalEvent,
+                },
             });
-            /* eslint-enable @typescript-eslint/camelcase */
             if (!event_1.isDefaultPrevented()) {
                 doMove();
             }
@@ -2041,7 +2081,7 @@ var DragAndDropHandler = /** @class */ (function () {
                 left: left,
                 top: offset.top,
                 right: left + width,
-                bottom: offset.top + height + 16
+                bottom: offset.top + height + 16,
             };
         }
     };
@@ -2197,7 +2237,7 @@ var HitAreasGenerator = /** @class */ (function (_super) {
             top: top,
             bottom: 0,
             node: node,
-            position: position
+            position: position,
         };
         this.positions.push(area);
         this.lastTop = top;
@@ -2214,7 +2254,7 @@ var HitAreasGenerator = /** @class */ (function (_super) {
                 top: areaTop,
                 bottom: areaTop + areaHeight,
                 node: position.node,
-                position: position.position
+                position: position.position,
             });
             areaTop += areaHeight;
             i += 1;
@@ -2234,7 +2274,7 @@ var DragElement = /** @class */ (function () {
     DragElement.prototype.move = function (pageX, pageY) {
         this.$element.offset({
             left: pageX - this.offsetX,
-            top: pageY - this.offsetY
+            top: pageY - this.offsetY,
         });
     };
     DragElement.prototype.remove = function () {
@@ -2245,18 +2285,18 @@ var DragElement = /** @class */ (function () {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(0);
 var ElementsRenderer = /** @class */ (function () {
     function ElementsRenderer(treeWidget) {
         this.treeWidget = treeWidget;
-        this.openedIconElement = this.createButtonElement(treeWidget.options.openedIcon);
-        this.closedIconElement = this.createButtonElement(treeWidget.options.closedIcon);
+        this.openedIconElement = this.createButtonElement(treeWidget.options.openedIcon || "+");
+        this.closedIconElement = this.createButtonElement(treeWidget.options.closedIcon || "-");
     }
     ElementsRenderer.prototype.render = function (fromNode) {
         if (fromNode && fromNode.parent) {
@@ -2323,8 +2363,9 @@ var ElementsRenderer = /** @class */ (function () {
         return ul;
     };
     ElementsRenderer.prototype.createLi = function (node, level) {
-        var isSelected = Boolean(this.treeWidget.selectNodeHandler && this.treeWidget.selectNodeHandler.isNodeSelected(node));
-        var mustShowFolder = node.isFolder() || (node.isEmptyFolder && this.treeWidget.options.showEmptyFolder);
+        var isSelected = Boolean(this.treeWidget.selectNodeHandler.isNodeSelected(node));
+        var mustShowFolder = node.isFolder() ||
+            (node.isEmptyFolder && this.treeWidget.options.showEmptyFolder);
         var li = mustShowFolder
             ? this.createFolderLi(node, level, isSelected)
             : this.createNodeLi(node, level, isSelected);
@@ -2336,7 +2377,9 @@ var ElementsRenderer = /** @class */ (function () {
     ElementsRenderer.prototype.createFolderLi = function (node, level, isSelected) {
         var buttonClasses = this.getButtonClasses(node);
         var folderClasses = this.getFolderClasses(node, isSelected);
-        var iconElement = node.is_open ? this.openedIconElement : this.closedIconElement;
+        var iconElement = node.is_open
+            ? this.openedIconElement
+            : this.closedIconElement;
         // li
         var li = document.createElement("li");
         li.className = "jqtree_common " + folderClasses;
@@ -2393,9 +2436,12 @@ var ElementsRenderer = /** @class */ (function () {
         titleSpan.setAttribute("aria-selected", util_1.getBoolString(isSelected));
         titleSpan.setAttribute("aria-expanded", util_1.getBoolString(isOpen));
         if (isSelected) {
-            titleSpan.setAttribute("tabindex", this.treeWidget.options.tabIndex);
+            var tabIndex = this.treeWidget.options.tabIndex;
+            if (tabIndex !== undefined) {
+                titleSpan.setAttribute("tabindex", "" + tabIndex);
+            }
         }
-        titleSpan.innerHTML = this.escapeIfNecessary(nodeName);
+        titleSpan.textContent = this.escapeIfNecessary(nodeName);
         return titleSpan;
     };
     ElementsRenderer.prototype.getButtonClasses = function (node) {
@@ -2449,7 +2495,7 @@ exports["default"] = ElementsRenderer;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2480,9 +2526,8 @@ var DataLoader = /** @class */ (function () {
         };
         var handleError = function (jqXHR) {
             stopLoading();
-            var onLoadFailed = _this.treeWidget.options.onLoadFailed;
-            if (onLoadFailed) {
-                onLoadFailed(jqXHR);
+            if (_this.treeWidget.options.onLoadFailed) {
+                _this.treeWidget.options.onLoadFailed(jqXHR);
             }
         };
         this.submitRequest(urlInfo, handleSuccess, handleError);
@@ -2506,14 +2551,13 @@ var DataLoader = /** @class */ (function () {
         }
     };
     DataLoader.prototype.notifyLoading = function (isLoading, node, $el) {
-        var onLoading = this.treeWidget.options.onLoading;
-        if (onLoading) {
-            onLoading(isLoading, node, $el);
+        if (this.treeWidget.options.onLoading) {
+            this.treeWidget.options.onLoading(isLoading, node, $el);
         }
         this.treeWidget._triggerEvent("tree.loading_data", {
             isLoading: isLoading,
             node: node,
-            $el: $el
+            $el: $el,
         });
     };
     DataLoader.prototype.submitRequest = function (urlInfo, handleSuccess, handleError) {
@@ -2521,15 +2565,28 @@ var DataLoader = /** @class */ (function () {
             cache: false,
             dataType: "json",
             success: handleSuccess,
-            error: handleError
+            error: handleError,
         });
         ajaxSettings.method = ajaxSettings.method.toUpperCase();
-        jQuery.ajax(ajaxSettings);
+        void jQuery.ajax(ajaxSettings);
     };
     DataLoader.prototype.parseData = function (data) {
         var dataFilter = this.treeWidget.options.dataFilter;
-        var parsedData = data instanceof Array || typeof data === "object" ? data : data != null ? jQuery.parseJSON(data) : [];
-        return dataFilter ? dataFilter(parsedData) : parsedData;
+        var getParsedData = function () {
+            if (typeof data === "string") {
+                return jQuery.parseJSON(data);
+            }
+            else {
+                return data;
+            }
+        };
+        var parsedData = getParsedData();
+        if (dataFilter) {
+            return dataFilter(parsedData);
+        }
+        else {
+            return parsedData;
+        }
     };
     return DataLoader;
 }());
@@ -2537,7 +2594,7 @@ exports["default"] = DataLoader;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2550,20 +2607,22 @@ var KeyHandler = /** @class */ (function () {
             if (!_this.canHandleKeyboard()) {
                 return true;
             }
-            else {
-                var key = e.which;
-                switch (key) {
-                    case KeyHandler.DOWN:
-                        return _this.moveDown();
-                    case KeyHandler.UP:
-                        return _this.moveUp();
-                    case KeyHandler.RIGHT:
-                        return _this.moveRight();
-                    case KeyHandler.LEFT:
-                        return _this.moveLeft();
-                    default:
-                        return true;
-                }
+            var selectedNode = _this.treeWidget.getSelectedNode();
+            if (!selectedNode) {
+                return true;
+            }
+            var key = e.which;
+            switch (key) {
+                case KeyHandler.DOWN:
+                    return _this.moveDown(selectedNode);
+                case KeyHandler.UP:
+                    return _this.moveUp(selectedNode);
+                case KeyHandler.RIGHT:
+                    return _this.moveRight(selectedNode);
+                case KeyHandler.LEFT:
+                    return _this.moveLeft(selectedNode);
+                default:
+                    return true;
             }
         };
         this.treeWidget = treeWidget;
@@ -2574,58 +2633,38 @@ var KeyHandler = /** @class */ (function () {
     KeyHandler.prototype.deinit = function () {
         jQuery(document).off("keydown.jqtree");
     };
-    KeyHandler.prototype.moveDown = function () {
-        var node = this.treeWidget.getSelectedNode();
-        if (node) {
-            return this.selectNode(node.getNextNode());
-        }
-        else {
-            return false;
-        }
+    KeyHandler.prototype.moveDown = function (selectedNode) {
+        return this.selectNode(selectedNode.getNextNode());
     };
-    KeyHandler.prototype.moveUp = function () {
-        var node = this.treeWidget.getSelectedNode();
-        if (node) {
-            return this.selectNode(node.getPreviousNode());
-        }
-        else {
-            return false;
-        }
+    KeyHandler.prototype.moveUp = function (selectedNode) {
+        return this.selectNode(selectedNode.getPreviousNode());
     };
-    KeyHandler.prototype.moveRight = function () {
-        var node = this.treeWidget.getSelectedNode();
-        if (!node) {
-            return true;
-        }
-        else if (!node.isFolder()) {
+    KeyHandler.prototype.moveRight = function (selectedNode) {
+        if (!selectedNode.isFolder()) {
             return true;
         }
         else {
             // folder node
-            if (node.is_open) {
+            if (selectedNode.is_open) {
                 // Right moves to the first child of an open node
-                return this.selectNode(node.getNextNode());
+                return this.selectNode(selectedNode.getNextNode());
             }
             else {
                 // Right expands a closed node
-                this.treeWidget.openNode(node);
+                this.treeWidget.openNode(selectedNode);
                 return false;
             }
         }
     };
-    KeyHandler.prototype.moveLeft = function () {
-        var node = this.treeWidget.getSelectedNode();
-        if (!node) {
-            return true;
-        }
-        else if (node.isFolder() && node.is_open) {
+    KeyHandler.prototype.moveLeft = function (selectedNode) {
+        if (selectedNode.isFolder() && selectedNode.is_open) {
             // Left on an open node closes the node
-            this.treeWidget.closeNode(node);
+            this.treeWidget.closeNode(selectedNode);
             return false;
         }
         else {
             // Left on a closed or end node moves focus to the node's parent
-            return this.selectNode(node.getParent());
+            return this.selectNode(selectedNode.getParent());
         }
     };
     KeyHandler.prototype.selectNode = function (node) {
@@ -2634,19 +2673,21 @@ var KeyHandler = /** @class */ (function () {
         }
         else {
             this.treeWidget.selectNode(node);
-            if (this.treeWidget.scrollHandler &&
-                !this.treeWidget.scrollHandler.isScrolledIntoView(jQuery(node.element).find(".jqtree-element"))) {
+            if (!this.treeWidget.scrollHandler.isScrolledIntoView(jQuery(node.element).find(".jqtree-element"))) {
                 this.treeWidget.scrollToNode(node);
             }
             return false;
         }
     };
     KeyHandler.prototype.canHandleKeyboard = function () {
-        return (this.treeWidget.options.keyboardSupport && this.isFocusOnTree() && this.treeWidget.getSelectedNode() != null);
+        return ((this.treeWidget.options.keyboardSupport || false) &&
+            this.isFocusOnTree());
     };
     KeyHandler.prototype.isFocusOnTree = function () {
         var activeElement = document.activeElement;
-        return Boolean(activeElement && activeElement.tagName === "SPAN" && this.treeWidget._containsElement(activeElement));
+        return Boolean(activeElement &&
+            activeElement.tagName === "SPAN" &&
+            this.treeWidget._containsElement(activeElement));
     };
     KeyHandler.LEFT = 37;
     KeyHandler.UP = 38;
@@ -2658,7 +2699,7 @@ exports["default"] = KeyHandler;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2681,91 +2722,120 @@ exports.__esModule = true;
 This widget does the same a the mouse widget in jqueryui.
 */
 var simple_widget_1 = __webpack_require__(3);
+var getPositionInfoFromMouseEvent = function (e) { return ({
+    pageX: e.pageX,
+    pageY: e.pageY,
+    target: e.target,
+    originalEvent: e,
+}); };
+var getPositionInfoFromTouch = function (touch, e) { return ({
+    pageX: touch.pageX,
+    pageY: touch.pageY,
+    target: touch.target,
+    originalEvent: e,
+}); };
 var MouseWidget = /** @class */ (function (_super) {
     __extends(MouseWidget, _super);
     function MouseWidget() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.mouseDown = function (e) {
+            var mouseDownEvent = e;
             // Is left mouse button?
-            if (e.which !== 1) {
+            if (mouseDownEvent.which !== 1) {
                 return;
             }
-            var result = _this._handleMouseDown(_this._getPositionInfo(e));
+            var result = _this.handleMouseDown(getPositionInfoFromMouseEvent(mouseDownEvent));
             if (result) {
-                e.preventDefault();
+                mouseDownEvent.preventDefault();
             }
             return result;
         };
-        _this.mouseMove = function (e) { return _this._handleMouseMove(e, _this._getPositionInfo(e)); };
-        _this.mouseUp = function (e) { return _this._handleMouseUp(_this._getPositionInfo(e)); };
+        _this.mouseMove = function (e) {
+            var mouseMoveEvent = e;
+            return _this.handleMouseMove(e, getPositionInfoFromMouseEvent(mouseMoveEvent));
+        };
+        _this.mouseUp = function (e) {
+            var mouseUpEvent = e;
+            _this.handleMouseUp(getPositionInfoFromMouseEvent(mouseUpEvent));
+        };
         _this.touchStart = function (e) {
             var touchEvent = e.originalEvent;
+            if (!touchEvent) {
+                return false;
+            }
             if (touchEvent.touches.length > 1) {
-                return;
+                return false;
             }
             var touch = touchEvent.changedTouches[0];
-            return _this._handleMouseDown(_this._getPositionInfo(touch));
+            return _this.handleMouseDown(getPositionInfoFromTouch(touch, e));
         };
         _this.touchMove = function (e) {
             var touchEvent = e.originalEvent;
+            if (!touchEvent) {
+                return false;
+            }
             if (touchEvent.touches.length > 1) {
-                return;
+                return false;
             }
             var touch = touchEvent.changedTouches[0];
-            return _this._handleMouseMove(e, _this._getPositionInfo(touch));
+            return _this.handleMouseMove(e, getPositionInfoFromTouch(touch, e));
         };
         _this.touchEnd = function (e) {
             var touchEvent = e.originalEvent;
+            if (!touchEvent) {
+                return false;
+            }
             if (touchEvent.touches.length > 1) {
-                return;
+                return false;
             }
             var touch = touchEvent.changedTouches[0];
-            return _this._handleMouseUp(_this._getPositionInfo(touch));
+            _this.handleMouseUp(getPositionInfoFromTouch(touch, e));
+            return true;
         };
         return _this;
     }
     MouseWidget.prototype.setMouseDelay = function (mouseDelay) {
         this.mouseDelay = mouseDelay;
     };
-    MouseWidget.prototype._init = function () {
+    MouseWidget.prototype.init = function () {
         this.$el.on("mousedown.mousewidget", this.mouseDown);
         this.$el.on("touchstart.mousewidget", this.touchStart);
         this.isMouseStarted = false;
         this.mouseDelay = 0;
         this.mouseDelayTimer = null;
-        this.isMouseDelayMet = true;
+        this.isMouseDelayMet = false;
         this.mouseDownInfo = null;
     };
-    MouseWidget.prototype._deinit = function () {
+    MouseWidget.prototype.deinit = function () {
         this.$el.off("mousedown.mousewidget");
         this.$el.off("touchstart.mousewidget");
         var $document = jQuery(document);
         $document.off("mousemove.mousewidget");
         $document.off("mouseup.mousewidget");
     };
-    MouseWidget.prototype._handleMouseDown = function (positionInfo) {
+    MouseWidget.prototype.handleMouseDown = function (positionInfo) {
         // We may have missed mouseup (out of window)
         if (this.isMouseStarted) {
-            this._handleMouseUp(positionInfo);
+            this.handleMouseUp(positionInfo);
         }
         this.mouseDownInfo = positionInfo;
-        if (!this._mouseCapture(positionInfo)) {
-            return;
+        if (!this.mouseCapture(positionInfo)) {
+            return false;
         }
-        this._handleStartMouse();
+        this.handleStartMouse();
         return true;
     };
-    MouseWidget.prototype._handleStartMouse = function () {
+    MouseWidget.prototype.handleStartMouse = function () {
         var $document = jQuery(document);
         $document.on("mousemove.mousewidget", this.mouseMove);
         $document.on("touchmove.mousewidget", this.touchMove);
         $document.on("mouseup.mousewidget", this.mouseUp);
         $document.on("touchend.mousewidget", this.touchEnd);
         if (this.mouseDelay) {
-            this._startMouseDelayTimer();
+            this.startMouseDelayTimer();
         }
     };
-    MouseWidget.prototype._startMouseDelayTimer = function () {
+    MouseWidget.prototype.startMouseDelayTimer = function () {
         var _this = this;
         if (this.mouseDelayTimer) {
             clearTimeout(this.mouseDelayTimer);
@@ -2775,34 +2845,27 @@ var MouseWidget = /** @class */ (function (_super) {
         }, this.mouseDelay);
         this.isMouseDelayMet = false;
     };
-    MouseWidget.prototype._handleMouseMove = function (e, positionInfo) {
+    MouseWidget.prototype.handleMouseMove = function (e, positionInfo) {
         if (this.isMouseStarted) {
-            this._mouseDrag(positionInfo);
-            return e.preventDefault();
+            this.mouseDrag(positionInfo);
+            e.preventDefault();
+            return false;
         }
         if (this.mouseDelay && !this.isMouseDelayMet) {
             return true;
         }
         if (this.mouseDownInfo) {
-            this.isMouseStarted = this._mouseStart(this.mouseDownInfo) !== false;
+            this.isMouseStarted = this.mouseStart(this.mouseDownInfo) !== false;
         }
         if (this.isMouseStarted) {
-            this._mouseDrag(positionInfo);
+            this.mouseDrag(positionInfo);
         }
         else {
-            this._handleMouseUp(positionInfo);
+            this.handleMouseUp(positionInfo);
         }
         return !this.isMouseStarted;
     };
-    MouseWidget.prototype._getPositionInfo = function (e) {
-        return {
-            pageX: e.pageX,
-            pageY: e.pageY,
-            target: e.target,
-            originalEvent: e
-        };
-    };
-    MouseWidget.prototype._handleMouseUp = function (positionInfo) {
+    MouseWidget.prototype.handleMouseUp = function (positionInfo) {
         var $document = jQuery(document);
         $document.off("mousemove.mousewidget");
         $document.off("touchmove.mousewidget");
@@ -2810,7 +2873,7 @@ var MouseWidget = /** @class */ (function (_super) {
         $document.off("touchend.mousewidget");
         if (this.isMouseStarted) {
             this.isMouseStarted = false;
-            this._mouseStop(positionInfo);
+            this.mouseStop(positionInfo);
         }
     };
     return MouseWidget;
@@ -2819,13 +2882,13 @@ exports["default"] = MouseWidget;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(1);
+var util_1 = __webpack_require__(0);
 var SaveStateHandler = /** @class */ (function () {
     function SaveStateHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -2840,9 +2903,9 @@ var SaveStateHandler = /** @class */ (function () {
         }
     };
     SaveStateHandler.prototype.getStateFromStorage = function () {
-        var jsonData = this._loadFromStorage();
+        var jsonData = this.loadFromStorage();
         if (jsonData) {
-            return this._parseState(jsonData);
+            return this.parseState(jsonData);
         }
         else {
             return null;
@@ -2860,13 +2923,19 @@ var SaveStateHandler = /** @class */ (function () {
             });
             return openNodes;
         };
-        var getSelectedNodeIds = function () { return _this.treeWidget.getSelectedNodes().map(function (n) { return n.id; }); };
-        /* eslint-disable @typescript-eslint/camelcase */
+        var getSelectedNodeIds = function () {
+            var selectedNodeIds = [];
+            _this.treeWidget.getSelectedNodes().forEach(function (node) {
+                if (node.id != null) {
+                    selectedNodeIds.push(node.id);
+                }
+            });
+            return selectedNodeIds;
+        };
         return {
             open_nodes: getOpenNodeIds(),
-            selected_node: getSelectedNodeIds()
+            selected_node: getSelectedNodeIds(),
         };
-        /* eslint-enable @typescript-eslint/camelcase */
     };
     /*
     Set initial state
@@ -2881,18 +2950,18 @@ var SaveStateHandler = /** @class */ (function () {
         else {
             var mustLoadOnDemand = false;
             if (state.open_nodes) {
-                mustLoadOnDemand = this._openInitialNodes(state.open_nodes);
+                mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
             }
             if (state.selected_node) {
-                this._resetSelection();
-                this._selectInitialNodes(state.selected_node);
+                this.resetSelection();
+                this.selectInitialNodes(state.selected_node);
             }
             return mustLoadOnDemand;
         }
     };
     SaveStateHandler.prototype.setInitialStateOnDemand = function (state, cbFinished) {
         if (state) {
-            this._setInitialStateOnDemand(state.open_nodes, state.selected_node, cbFinished);
+            this.doSetInitialStateOnDemand(state.open_nodes, state.selected_node, cbFinished);
         }
         else {
             cbFinished();
@@ -2907,31 +2976,34 @@ var SaveStateHandler = /** @class */ (function () {
             return null;
         }
     };
-    SaveStateHandler.prototype._parseState = function (jsonData) {
+    SaveStateHandler.prototype.parseState = function (jsonData) {
         var state = jQuery.parseJSON(jsonData);
         // Check if selected_node is an int (instead of an array)
         if (state && state.selected_node && util_1.isInt(state.selected_node)) {
             // Convert to array
-            state.selected_node = [state.selected_node]; // eslint-disable-line @typescript-eslint/camelcase
+            state.selected_node = [state.selected_node];
         }
         return state;
     };
-    SaveStateHandler.prototype._loadFromStorage = function () {
+    SaveStateHandler.prototype.loadFromStorage = function () {
         if (this.treeWidget.options.onGetStateFromStorage) {
             return this.treeWidget.options.onGetStateFromStorage();
         }
         else if (this.supportsLocalStorage()) {
             return localStorage.getItem(this.getKeyName());
         }
+        else {
+            return null;
+        }
     };
-    SaveStateHandler.prototype._openInitialNodes = function (nodeIds) {
+    SaveStateHandler.prototype.openInitialNodes = function (nodeIds) {
         var mustLoadOnDemand = false;
         for (var _i = 0, nodeIds_1 = nodeIds; _i < nodeIds_1.length; _i++) {
             var nodeDd = nodeIds_1[_i];
             var node = this.treeWidget.getNodeById(nodeDd);
             if (node) {
                 if (!node.load_on_demand) {
-                    node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+                    node.is_open = true;
                 }
                 else {
                     mustLoadOnDemand = true;
@@ -2940,30 +3012,26 @@ var SaveStateHandler = /** @class */ (function () {
         }
         return mustLoadOnDemand;
     };
-    SaveStateHandler.prototype._selectInitialNodes = function (nodeIds) {
+    SaveStateHandler.prototype.selectInitialNodes = function (nodeIds) {
         var selectCount = 0;
         for (var _i = 0, nodeIds_2 = nodeIds; _i < nodeIds_2.length; _i++) {
             var nodeId = nodeIds_2[_i];
             var node = this.treeWidget.getNodeById(nodeId);
             if (node) {
                 selectCount += 1;
-                if (this.treeWidget.selectNodeHandler) {
-                    this.treeWidget.selectNodeHandler.addToSelection(node);
-                }
+                this.treeWidget.selectNodeHandler.addToSelection(node);
             }
         }
         return selectCount !== 0;
     };
-    SaveStateHandler.prototype._resetSelection = function () {
+    SaveStateHandler.prototype.resetSelection = function () {
         var selectNodeHandler = this.treeWidget.selectNodeHandler;
-        if (selectNodeHandler) {
-            var selectedNodes = selectNodeHandler.getSelectedNodes();
-            selectedNodes.forEach(function (node) {
-                selectNodeHandler.removeFromSelection(node);
-            });
-        }
+        var selectedNodes = selectNodeHandler.getSelectedNodes();
+        selectedNodes.forEach(function (node) {
+            selectNodeHandler.removeFromSelection(node);
+        });
     };
-    SaveStateHandler.prototype._setInitialStateOnDemand = function (nodeIdsParam, selectedNodes, cbFinished) {
+    SaveStateHandler.prototype.doSetInitialStateOnDemand = function (nodeIdsParam, selectedNodes, cbFinished) {
         var _this = this;
         var loadingCount = 0;
         var nodeIds = nodeIdsParam;
@@ -2987,7 +3055,7 @@ var SaveStateHandler = /** @class */ (function () {
                 }
             }
             nodeIds = newNodesIds;
-            if (_this._selectInitialNodes(selectedNodes)) {
+            if (_this.selectInitialNodes(selectedNodes)) {
                 _this.treeWidget._refreshElements(null);
             }
             if (loadingCount === 0) {
@@ -3041,7 +3109,7 @@ exports["default"] = SaveStateHandler;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3110,7 +3178,8 @@ var ScrollHandler = /** @class */ (function () {
                 for (var _i = 0, cssAttributes_1 = cssAttributes; _i < cssAttributes_1.length; _i++) {
                     var attr = cssAttributes_1[_i];
                     var overflowValue = $el.css(attr);
-                    if (overflowValue === "auto" || overflowValue === "scroll") {
+                    if (overflowValue === "auto" ||
+                        overflowValue === "scroll") {
                         return true;
                     }
                 }
@@ -3136,7 +3205,9 @@ var ScrollHandler = /** @class */ (function () {
             setDocumentAsScrollParent();
         }
         var $scrollParent = getParentWithOverflow();
-        if ($scrollParent && $scrollParent.length && $scrollParent[0].tagName !== "HTML") {
+        if ($scrollParent &&
+            $scrollParent.length &&
+            $scrollParent[0].tagName !== "HTML") {
             this.$scrollParent = $scrollParent;
             var offset = this.$scrollParent.offset();
             this.scrollParentTop = offset ? offset.top : 0;
@@ -3182,7 +3253,7 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.checkVerticalScrolling = function () {
-        var hoveredArea = this.treeWidget.dndHandler && this.treeWidget.dndHandler.hoveredArea;
+        var hoveredArea = this.treeWidget.dndHandler.hoveredArea;
         if (hoveredArea && hoveredArea.top !== this.previousTop) {
             this.previousTop = hoveredArea.top;
             if (this.$scrollParent) {
@@ -3194,7 +3265,7 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.checkHorizontalScrolling = function () {
-        var positionInfo = this.treeWidget.dndHandler && this.treeWidget.dndHandler.positionInfo;
+        var positionInfo = this.treeWidget.dndHandler.positionInfo;
         if (!positionInfo) {
             return;
         }
@@ -3206,7 +3277,8 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.handleHorizontalScrollingWithParent = function (positionInfo) {
-        if (positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
+        if (positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined) {
             return;
         }
         var $scrollParent = this.$scrollParent;
@@ -3215,7 +3287,8 @@ var ScrollHandler = /** @class */ (function () {
             return;
         }
         var scrollParent = $scrollParent[0];
-        var canScrollRight = scrollParent.scrollLeft + scrollParent.clientWidth < scrollParent.scrollWidth;
+        var canScrollRight = scrollParent.scrollLeft + scrollParent.clientWidth <
+            scrollParent.scrollWidth;
         var canScrollLeft = scrollParent.scrollLeft > 0;
         var rightEdge = scrollParentOffset.left + scrollParent.clientWidth;
         var leftEdge = scrollParentOffset.left;
@@ -3229,7 +3302,8 @@ var ScrollHandler = /** @class */ (function () {
         }
     };
     ScrollHandler.prototype.handleHorizontalScrollingWithDocument = function (positionInfo) {
-        if (positionInfo.pageX === undefined || positionInfo.pageY === undefined) {
+        if (positionInfo.pageX === undefined ||
+            positionInfo.pageY === undefined) {
             return;
         }
         var $document = jQuery(document);
@@ -3251,7 +3325,7 @@ exports["default"] = ScrollHandler;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3278,7 +3352,7 @@ var SelectNodeHandler = /** @class */ (function () {
         else {
             var selectedNodes = [];
             for (var id in this.selectedNodes) {
-                if (this.selectedNodes.hasOwnProperty(id)) {
+                if (Object.prototype.hasOwnProperty.call(this.selectedNodes, id)) {
                     var node = this.treeWidget.getNodeById(id);
                     if (node) {
                         selectedNodes.push(node);
@@ -3300,7 +3374,7 @@ var SelectNodeHandler = /** @class */ (function () {
         else {
             var selectedNodes = [];
             for (var id in this.selectedNodes) {
-                if (this.selectedNodes.hasOwnProperty(id)) {
+                if (Object.prototype.hasOwnProperty.call(this.selectedNodes, id)) {
                     var node = this.treeWidget.getNodeById(id);
                     if (node && parent.isParentOf(node)) {
                         selectedNodes.push(node);
@@ -3311,10 +3385,7 @@ var SelectNodeHandler = /** @class */ (function () {
         }
     };
     SelectNodeHandler.prototype.isNodeSelected = function (node) {
-        if (!node) {
-            return false;
-        }
-        else if (node.id != null) {
+        if (node.id != null) {
             if (this.selectedNodes[node.id]) {
                 return true;
             }
@@ -3337,7 +3408,8 @@ var SelectNodeHandler = /** @class */ (function () {
         var _this = this;
         if (includeChildren === void 0) { includeChildren = false; }
         if (node.id == null) {
-            if (this.selectedSingleNode && node.element === this.selectedSingleNode.element) {
+            if (this.selectedSingleNode &&
+                node.element === this.selectedSingleNode.element) {
                 this.selectedSingleNode = null;
             }
         }
@@ -3345,7 +3417,9 @@ var SelectNodeHandler = /** @class */ (function () {
             delete this.selectedNodes[node.id];
             if (includeChildren) {
                 node.iterate(function () {
-                    delete _this.selectedNodes[node.id];
+                    if (node.id != null) {
+                        delete _this.selectedNodes[node.id];
+                    }
                     return true;
                 });
             }
@@ -3365,7 +3439,7 @@ exports["default"] = SelectNodeHandler;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3384,7 +3458,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var node_1 = __webpack_require__(0);
+exports.BorderDropHint = exports.FolderElement = exports.NodeElement = void 0;
+var node_1 = __webpack_require__(1);
 var NodeElement = /** @class */ (function () {
     function NodeElement(node, treeWidget) {
         this.init(node, treeWidget);
@@ -3406,11 +3481,12 @@ var NodeElement = /** @class */ (function () {
         }
     };
     NodeElement.prototype.select = function (mustSetFocus) {
+        var _a;
         var $li = this.getLi();
         $li.addClass("jqtree-selected");
         $li.attr("aria-selected", "true");
         var $span = this.getSpan();
-        $span.attr("tabindex", this.treeWidget.options.tabIndex);
+        $span.attr("tabindex", (_a = this.treeWidget.options.tabIndex) !== null && _a !== void 0 ? _a : null);
         if (mustSetFocus) {
             $span.focus();
         }
@@ -3427,7 +3503,9 @@ var NodeElement = /** @class */ (function () {
         return this.$element.children("ul:first");
     };
     NodeElement.prototype.getSpan = function () {
-        return this.$element.children(".jqtree-element").find("span.jqtree-title");
+        return this.$element
+            .children(".jqtree-element")
+            .find("span.jqtree-title");
     };
     NodeElement.prototype.getLi = function () {
         return this.$element;
@@ -3450,7 +3528,7 @@ var FolderElement = /** @class */ (function (_super) {
         if (this.node.is_open) {
             return;
         }
-        this.node.is_open = true; // eslint-disable-line @typescript-eslint/camelcase
+        this.node.is_open = true;
         var $button = this.getButton();
         $button.removeClass("jqtree-closed");
         $button.html("");
@@ -3468,7 +3546,7 @@ var FolderElement = /** @class */ (function (_super) {
                 onFinished(_this.node);
             }
             _this.treeWidget._triggerEvent("tree.open", {
-                node: _this.node
+                node: _this.node,
             });
         };
         if (slide) {
@@ -3486,7 +3564,7 @@ var FolderElement = /** @class */ (function (_super) {
         if (!this.node.is_open) {
             return;
         }
-        this.node.is_open = false; // eslint-disable-line @typescript-eslint/camelcase
+        this.node.is_open = false;
         var $button = this.getButton();
         $button.addClass("jqtree-closed");
         $button.html("");
@@ -3501,7 +3579,7 @@ var FolderElement = /** @class */ (function (_super) {
             var $span = _this.getSpan();
             $span.attr("aria-expanded", "false");
             _this.treeWidget._triggerEvent("tree.close", {
-                node: _this.node
+                node: _this.node,
             });
         };
         if (slide) {
@@ -3516,7 +3594,9 @@ var FolderElement = /** @class */ (function (_super) {
         return !this.node.is_open && position === node_1.Position.Inside;
     };
     FolderElement.prototype.getButton = function () {
-        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
+        return this.$element
+            .children(".jqtree-element")
+            .find("a.jqtree-toggler");
     };
     return FolderElement;
 }(NodeElement));
@@ -3578,13 +3658,6 @@ var GhostDropHint = /** @class */ (function () {
 }());
 
 
-/***/ }),
-/* 15 */,
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(4);
-
-
 /***/ })
 /******/ ]);
+//# sourceMappingURL=tree.jquery.js.map

@@ -1,6 +1,6 @@
-export const isInt = (n: any): boolean => typeof n === "number" && n % 1 === 0;
+export const isInt = (n: unknown): boolean => typeof n === "number" && n % 1 === 0;
 
-export const isFunction = (v: any): boolean => typeof v === "function";
+export const isFunction = (v: unknown): boolean => typeof v === "function";
 
 // Escape a string for HTML interpolation; copied from underscore js
 export const htmlEscape = (text: string): string =>
@@ -12,4 +12,4 @@ export const htmlEscape = (text: string): string =>
         .replace(/'/g, "&#x27;")
         .replace(/\//g, "&#x2F;");
 
-export const getBoolString = (value: any): string => (value ? "true" : "false");
+export const getBoolString = (value: unknown): string => (value ? "true" : "false");

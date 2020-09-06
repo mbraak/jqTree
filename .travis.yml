@@ -1,9 +1,18 @@
 language: node_js
 node_js:
-    - "node"
-addons:
-    chrome: stable
+    - node
 before_script:
     - npm install
-script:
-    - yarn run production && yarn run test && yarn run coveralls
+script: >
+    npm run production &&
+    npm run lint &&
+    npm run tsc &&
+    npm run clean-coverage &&
+    npm run test &&
+    npm run merge-coverage &&
+    npm run print-coverage &&
+    npm run coveralls
+cache:
+    npm: true
+    directories:
+        - ~/.cache

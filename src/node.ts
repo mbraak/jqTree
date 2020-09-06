@@ -1,28 +1,27 @@
 export type NodeId = number | string;
 
+export type DefaultRecord = Record<string, unknown>;
+export type NodeData = string | DefaultRecord;
+
 export enum Position {
     Before = 1,
     After,
     Inside,
-    None
+    None,
 }
 
-interface IPositions {
-    [key: string]: Position;
-}
-
-const positionNames: IPositions = {
+const positionNames: Record<string, Position> = {
     before: Position.Before,
     after: Position.After,
     inside: Position.Inside,
-    none: Position.None
+    none: Position.None,
 };
 
-type IterateCallback = (node: INode, level: number) => boolean;
+type IterateCallback = (node: Node, level: number) => boolean;
 
 export const getPositionName = (position: Position): string => {
     for (const name in positionNames) {
-        if (positionNames.hasOwnProperty(name)) {
+        if (Object.prototype.hasOwnProperty.call(positionNames, name)) {
             if (positionNames[name] === position) {
                 return name;
             }
@@ -32,27 +31,29 @@ export const getPositionName = (position: Position): string => {
     return "";
 };
 
-export const getPosition = (name: string): Position => positionNames[name];
+export const getPosition = (name: string): Position | undefined =>
+    positionNames[name];
 
-export class Node {
-    public id: NodeId;
+export class Node implements INode {
+    public id?: NodeId;
     public name: string;
     public children: Node[];
     public parent: Node | null;
-    public idMapping: any;
-    public tree: Node;
-    public nodeClass: any;
+    public idMapping: Record<NodeId, Node>;
+    public tree?: Node;
+    public nodeClass?: typeof Node;
     public load_on_demand: boolean;
     public is_open: boolean;
-    public element: Element;
+    public element: HTMLElement;
     public is_loading: boolean;
     public isEmptyFolder: boolean;
 
-    [key: string]: any;
+    [key: string]: unknown;
 
-    constructor(o: object | string, isRoot = false, nodeClass = Node) {
+    constructor(o: NodeData | null = null, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.isEmptyFolder = false;
+        this.load_on_demand = false;
 
         this.setData(o);
 
@@ -82,27 +83,23 @@ export class Node {
     * This is an internal function; it is not in the docs
     * Does not remove existing node values
     */
-    public setData(o: any): void {
-        const setName = (name: string): void => {
-            if (name != null) {
-                this.name = name;
-            }
-        };
-
+    public setData(o: NodeData | null): void {
         if (!o) {
             return;
-        } else if (typeof o !== "object") {
-            setName(o);
-        } else {
+        } else if (typeof o === "string") {
+            this.name = o;
+        } else if (typeof o === "object") {
             for (const key in o) {
-                if (o.hasOwnProperty(key)) {
+                if (Object.prototype.hasOwnProperty.call(o, key)) {
                     const value = o[key];
 
-                    if (key === "label") {
+                    if (key === "label" || key === "name") {
                         // You can use the 'label' key instead of 'name'; this is a legacy feature
-                        setName(value);
-                    } else if (key !== "children") {
-                        // You can't update the children using this function
+                        if (typeof value === "string") {
+                            this.name = value;
+                        }
+                    } else if (key !== "children" && key !== "parent") {
+                        // You can't update the children or the parent using this function
                         this[key] = value;
                     }
                 }
@@ -127,14 +124,18 @@ export class Node {
         }
     ]
     */
-    public loadFromData(data: any[]): void {
+    public loadFromData(data: NodeData[]): Node {
         this.removeChildren();
 
         for (const o of data) {
-            const node = new this.tree.nodeClass(o);
+            const node = this.createNode(o);
             this.addChild(node);
 
-            if (typeof o === "object" && o["children"]) {
+            if (
+                typeof o === "object" &&
+                o["children"] &&
+                o["children"] instanceof Array
+            ) {
                 if (o["children"].length === 0) {
                     node.isEmptyFolder = true;
                 } else {
@@ -142,6 +143,8 @@ export class Node {
                 }
             }
         }
+
+        return this;
     }
 
     /*
@@ -153,7 +156,7 @@ export class Node {
     */
     public addChild(node: Node): void {
         this.children.push(node);
-        node._setParent(this);
+        node.setParent(this);
     }
 
     /*
@@ -166,7 +169,7 @@ export class Node {
     */
     public addChildAtPosition(node: Node, index: number): void {
         this.children.splice(index, 0, node);
-        node._setParent(this);
+        node.setParent(this);
     }
 
     /*
@@ -178,7 +181,7 @@ export class Node {
         // remove children from the index
         node.removeChildren();
 
-        this._removeChild(node);
+        this.doRemoveChild(node);
     }
 
     /*
@@ -246,25 +249,49 @@ export class Node {
     // move node1 after node2
     tree.moveNode(node1, node2, Position.AFTER);
     */
-    public moveNode(movedNode: Node, targetNode: Node, position: number): void {
+    public moveNode(
+        movedNode: Node,
+        targetNode: Node,
+        position: Position
+    ): boolean {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
             // - Or, parent is empty
-            return;
+            return false;
         } else {
-            movedNode.parent._removeChild(movedNode);
+            movedNode.parent.doRemoveChild(movedNode);
 
-            if (position === Position.After) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
+            switch (position) {
+                case Position.After: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(
+                            movedNode,
+                            targetNode.parent.getChildIndex(targetNode) + 1
+                        );
+                        return true;
+                    }
+                    return false;
                 }
-            } else if (position === Position.Before) {
-                if (targetNode.parent) {
-                    targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+
+                case Position.Before: {
+                    if (targetNode.parent) {
+                        targetNode.parent.addChildAtPosition(
+                            movedNode,
+                            targetNode.parent.getChildIndex(targetNode)
+                        );
+                        return true;
+                    }
+                    return false;
                 }
-            } else if (position === Position.Inside) {
-                // move inside as first child
-                targetNode.addChildAtPosition(movedNode, 0);
+
+                case Position.Inside: {
+                    // move inside as first child
+                    targetNode.addChildAtPosition(movedNode, 0);
+                    return true;
+                }
+
+                default:
+                    return false;
             }
         }
     }
@@ -272,14 +299,23 @@ export class Node {
     /*
     Get the tree as data.
     */
-    public getData(includeParent = false): any[] {
-        function getDataFromNodes(nodes: Node[]): any[] {
-            return nodes.map(node => {
-                const tmpNode: any = {};
+    public getData(includeParent = false): DefaultRecord[] {
+        const getDataFromNodes = (nodes: Node[]): Record<string, unknown>[] => {
+            return nodes.map((node) => {
+                const tmpNode: Record<string, unknown> = {};
 
                 for (const k in node) {
                     if (
-                        ["parent", "children", "element", "tree", "isEmptyFolder"].indexOf(k) === -1 &&
+                        [
+                            "parent",
+                            "children",
+                            "element",
+                            "idMapping",
+                            "load_on_demand",
+                            "nodeClass",
+                            "tree",
+                            "isEmptyFolder",
+                        ].indexOf(k) === -1 &&
                         Object.prototype.hasOwnProperty.call(node, k)
                     ) {
                         const v = node[k];
@@ -293,7 +329,7 @@ export class Node {
 
                 return tmpNode;
             });
-        }
+        };
 
         if (includeParent) {
             return getDataFromNodes([this]);
@@ -306,11 +342,23 @@ export class Node {
         return this.getNodeByCallback((node: Node) => node.name === name);
     }
 
-    public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
-        let result = null;
+    public getNodeByNameMustExist(name: string): Node {
+        const node = this.getNodeByCallback((n: Node) => n.name === name);
 
-        this.iterate((node: INode) => {
-            if (callback(node as Node)) {
+        if (!node) {
+            throw `Node with name ${name} not found`;
+        }
+
+        return node;
+    }
+
+    public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
+        let result: Node | null = null;
+
+        this.iterate((node: Node) => {
+            if (result) {
+                return false;
+            } else if (callback(node)) {
                 result = node;
                 return false;
             } else {
@@ -321,16 +369,21 @@ export class Node {
         return result;
     }
 
-    public addAfter(nodeInfo: any): Node | null {
+    public addAfter(nodeInfo: NodeData): Node | null {
         if (!this.parent) {
             return null;
         } else {
-            const node = new this.tree.nodeClass(nodeInfo);
+            const node = this.createNode(nodeInfo);
 
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
 
-            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+            if (
+                typeof nodeInfo === "object" &&
+                nodeInfo["children"] &&
+                nodeInfo["children"] instanceof Array &&
+                nodeInfo["children"].length
+            ) {
                 node.loadFromData(nodeInfo["children"]);
             }
 
@@ -338,16 +391,21 @@ export class Node {
         }
     }
 
-    public addBefore(nodeInfo: any): Node | null {
+    public addBefore(nodeInfo: NodeData): Node | null {
         if (!this.parent) {
             return null;
         } else {
-            const node = new this.tree.nodeClass(nodeInfo);
+            const node = this.createNode(nodeInfo);
 
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
 
-            if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+            if (
+                typeof nodeInfo === "object" &&
+                nodeInfo["children"] &&
+                nodeInfo["children"] instanceof Array &&
+                nodeInfo["children"].length
+            ) {
                 node.loadFromData(nodeInfo["children"]);
             }
 
@@ -355,12 +413,15 @@ export class Node {
         }
     }
 
-    public addParent(nodeInfo: any): Node | null {
+    public addParent(nodeInfo: NodeData): Node | null {
         if (!this.parent) {
             return null;
         } else {
-            const newParent = new this.tree.nodeClass(nodeInfo);
-            newParent._setParent(this.tree);
+            const newParent = this.createNode(nodeInfo);
+
+            if (this.tree) {
+                newParent.setParent(this.tree);
+            }
             const originalParent = this.parent;
 
             for (const child of originalParent.children) {
@@ -380,22 +441,32 @@ export class Node {
         }
     }
 
-    public append(nodeInfo: any): Node {
-        const node = new this.tree.nodeClass(nodeInfo);
+    public append(nodeInfo: NodeData): Node {
+        const node = this.createNode(nodeInfo);
         this.addChild(node);
 
-        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+        if (
+            typeof nodeInfo === "object" &&
+            nodeInfo["children"] &&
+            nodeInfo["children"] instanceof Array &&
+            nodeInfo["children"].length
+        ) {
             node.loadFromData(nodeInfo["children"]);
         }
 
         return node;
     }
 
-    public prepend(nodeInfo: any): Node {
-        const node = new this.tree.nodeClass(nodeInfo);
+    public prepend(nodeInfo: NodeData): Node {
+        const node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
 
-        if (typeof nodeInfo === "object" && nodeInfo["children"] && nodeInfo["children"].length) {
+        if (
+            typeof nodeInfo === "object" &&
+            nodeInfo["children"] &&
+            nodeInfo["children"] instanceof Array &&
+            nodeInfo["children"].length
+        ) {
             node.loadFromData(nodeInfo["children"]);
         }
 
@@ -429,7 +500,7 @@ export class Node {
     }
 
     public getNodeById(nodeId: NodeId): Node | null {
-        return this.idMapping[nodeId];
+        return this.idMapping[nodeId] || null;
     }
 
     public addNodeToIndex(node: Node): void {
@@ -445,8 +516,8 @@ export class Node {
     }
 
     public removeChildren(): void {
-        this.iterate((child: INode) => {
-            this.tree.removeNodeFromIndex(child as Node);
+        this.iterate((child: Node) => {
+            this.tree?.removeNodeFromIndex(child);
             return true;
         });
 
@@ -479,16 +550,16 @@ export class Node {
         }
     }
 
-    public getNodesByProperty(key: string, value: any): Node[] {
+    public getNodesByProperty(key: string, value: unknown): Node[] {
         return this.filter((node: Node) => node[key] === value);
     }
 
     public filter(f: (node: Node) => boolean): Node[] {
         const result: Node[] = [];
 
-        this.iterate((node: INode) => {
-            if (f(node as Node)) {
-                result.push(node as Node);
+        this.iterate((node: Node) => {
+            if (f(node)) {
+                result.push(node);
             }
 
             return true;
@@ -523,7 +594,10 @@ export class Node {
         } else {
             const previousSibling = this.getPreviousSibling();
             if (previousSibling) {
-                if (!previousSibling.hasChildren() || !previousSibling.is_open) {
+                if (
+                    !previousSibling.hasChildren() ||
+                    !previousSibling.is_open
+                ) {
                     // Previous sibling
                     return previousSibling;
                 } else {
@@ -553,7 +627,7 @@ export class Node {
             return null;
         } else {
             const lastChild = this.children[this.children.length - 1];
-            if (!lastChild.hasChildren() || !lastChild.is_open) {
+            if (!(lastChild.hasChildren() && lastChild.is_open)) {
                 return lastChild;
             } else {
                 return lastChild.getLastChild();
@@ -562,18 +636,23 @@ export class Node {
     }
 
     // Init Node from data without making it the root of the tree
-    public initFromData(data: any): void {
-        const addNode = (nodeData: any): void => {
+    public initFromData(data: NodeData): void {
+        const addNode = (nodeData: NodeData): void => {
             this.setData(nodeData);
 
-            if (nodeData["children"]) {
+            if (
+                typeof nodeData === "object" &&
+                nodeData["children"] &&
+                nodeData["children"] instanceof Array &&
+                nodeData["children"].length
+            ) {
                 addChildren(nodeData["children"]);
             }
         };
 
-        const addChildren = (childrenData: any[]): void => {
+        const addChildren = (childrenData: NodeData[]): void => {
             for (const child of childrenData) {
-                const node = new this.tree.nodeClass("");
+                const node = this.createNode();
                 node.initFromData(child);
                 this.addChild(node);
             }
@@ -582,14 +661,23 @@ export class Node {
         addNode(data);
     }
 
-    private _setParent(parent: Node): void {
+    private setParent(parent: Node): void {
         this.parent = parent;
         this.tree = parent.tree;
-        this.tree.addNodeToIndex(this);
+        this.tree?.addNodeToIndex(this);
     }
 
-    private _removeChild(node: Node): void {
+    private doRemoveChild(node: Node): void {
         this.children.splice(this.getChildIndex(node), 1);
-        this.tree.removeNodeFromIndex(node);
+        this.tree?.removeNodeFromIndex(node);
+    }
+
+    private getNodeClass(): typeof Node {
+        return this.nodeClass || this?.tree?.nodeClass || Node;
+    }
+
+    private createNode(nodeData?: NodeData): Node {
+        const nodeClass = this.getNodeClass();
+        return new nodeClass(nodeData);
     }
 }

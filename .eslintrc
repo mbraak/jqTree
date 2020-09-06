@@ -1,12 +1,42 @@
 {
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint"],
-    "extends": ["plugin:@typescript-eslint/recommended"],
+    "plugins": ["@typescript-eslint", "import", "jest"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "plugin:import/typescript",
+        "plugin:jest/all"
+    ],
     "rules": {
-        "@typescript-eslint/explicit-function-return-type": 0,
-        "@typescript-eslint/interface-name-prefix": 0,
-        "@typescript-eslint/no-explicit-any": 0,
-        "@typescript-eslint/no-use-before-define": 0,
-        "@typescript-eslint/triple-slash-reference": 0
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/interface-name-prefix": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/prefer-includes": "off",
+        "@typescript-eslint/triple-slash-reference": "off",
+        "@typescript-eslint/prefer-string-starts-ends-with": "off",
+        "@typescript-eslint/restrict-template-expressions": [
+            "error",
+            {
+                "allowNumber": true,
+                "allowBoolean": true,
+                "allowAny": false,
+                "allowNullish": false
+            }
+        ],
+        "jest/consistent-test-it": "off",
+        "jest/prefer-expect-assertions": "off",
+        "jest/no-duplicate-hooks": "off",
+        "jest/no-hooks": "off",
+        "jest/no-identical-title": "off",
+        "jest/prefer-strict-equal": "off",
+        "jest/require-top-level-describe": "off"
+    },
+    "parserOptions": {
+        "project": "./tsconfig.json"
     }
 }
