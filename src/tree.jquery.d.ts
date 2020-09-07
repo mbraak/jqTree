@@ -21,6 +21,7 @@ declare class INode {
 type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
 type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ClickNodeEvent {
     node: INode;
     deselected_node?: INode | null;
@@ -52,7 +53,7 @@ interface IJQTreeOptions {
     onDragStop?: (node: INode, event: JQuery.Event | Touch) => void;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: JQuery.jqXHR) => void;
-    onLoading?: (isLoading: boolean, node: Node, $el: JQuery) => void;
+    onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: string | Element;
