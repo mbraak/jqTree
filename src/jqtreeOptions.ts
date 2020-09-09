@@ -9,7 +9,7 @@ type CreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 type DataFilter = (data: unknown) => NodeData[];
 type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
 type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
-type DragMethod = (node: Node, event: JQuery.Event | Touch) => void;
+type DragMethod = (node: Node, event: Event | Touch) => void;
 type HandleLoadingMethod = (
     isLoading: boolean,
     node: Node | null,

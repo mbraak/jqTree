@@ -14,6 +14,6 @@ export interface HitArea {
 export interface PositionInfo {
     pageX: number | undefined;
     pageY: number | undefined;
-    target: HTMLElement | EventTarget;
-    originalEvent: JQuery.Event;
+    target: HTMLElement;
+    originalEvent: Event;
 }

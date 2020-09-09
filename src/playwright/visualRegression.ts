@@ -11,7 +11,7 @@ export const matchScreenshot = async (testName: string): Promise<void> => {
 
     const expectedImagePath = path.join(
         __dirname,
-        `screenshots/${testName}.png`
+        `screenshots/${testName}_${deviceName || "unknown"}.png`
     );
 
     if (!existsSync(expectedImagePath)) {
@@ -27,21 +27,28 @@ export const matchScreenshot = async (testName: string): Promise<void> => {
         screenshot
     );
 
-    const { width, height } = screenshot;
+    const { width, height } = adjustedExpectedImage;
 
     const diff = new PNG({ width, height });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,  @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const mismatchedPixels = pixelmatch(
         adjustedExpectedImage.data,
         adjustedScreenshot.data,
         diff.data,
-        screenshot.width,
-        screenshot.height,
+        width,
+        height,
         {}
     );
 
     const percentage = (mismatchedPixels / diff.width / diff.height) ** 0.5;
+
+    if (percentage >= 0.1) {
+        await saveFile(
+            path.join(__dirname, `${testName}.png`),
+            PNG.sync.write(adjustedScreenshot)
+        );
+    }
 
     expect(percentage).toBeLessThan(0.1);
 };
@@ -55,7 +62,7 @@ const saveFile = async (filePath: string, buffer: Buffer): Promise<void> => {
     }
 };
 
-export const readPng = async (filePath: string): Promise<PNG> => {
+const readPng = async (filePath: string): Promise<PNG> => {
     const buffer = await readFile(filePath);
     return PNG.sync.read(buffer);
 };
@@ -70,7 +77,7 @@ const adjustImageSize = (image: PNG, width: number, height: number): PNG => {
     return adjustedImage;
 };
 
-export const getImagesOfEqualSize = (image1: PNG, image2: PNG): [PNG, PNG] => {
+const getImagesOfEqualSize = (image1: PNG, image2: PNG): [PNG, PNG] => {
     const width = Math.max(image1.width, image2.width);
     const height = Math.max(image1.height, image2.height);
 

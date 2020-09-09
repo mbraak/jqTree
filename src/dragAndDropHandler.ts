@@ -35,7 +35,7 @@ export class DragAndDropHandler {
     }
 
     public mouseCapture(positionInfo: PositionInfo): boolean | null {
-        const $element = jQuery(positionInfo.target) as JQuery<HTMLElement>;
+        const $element = jQuery(positionInfo.target);
 
         if (!this.mustCaptureElement($element)) {
             return null;
