@@ -63,7 +63,7 @@
         "postcss": "^7.0.32",
         "postcss-cli": "^7.1.0",
         "postcss-load-config": "^2.1.0",
-        "postcss-loader": "^3.0.0",
+        "postcss-loader": "^4.0.1",
         "postcss-nested": "^4.2.1",
         "prettier": "^2.0.5",
         "start-server-and-test": "^1.11.3",
