@@ -57,7 +57,7 @@
         "jsonfile": "^6.0.1",
         "lodash.template": "^4.5.0",
         "pixelmatch": "^5.2.1",
-        "playwright": "1.4.0",
+        "playwright": "^1.4.1",
         "pngjs": "^5.0.0",
         "postcss": "^7.0.32",
         "postcss-cli": "^7.1.0",
