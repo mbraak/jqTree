@@ -21,6 +21,47 @@ afterEach(() => {
     localStorage.clear();
 });
 
+describe("autoEscape", () => {
+    interface Vars {
+        autoEscape: boolean;
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            autoEscape: given.autoEscape,
+            data: ["<span>test</span>"],
+        });
+    });
+
+    context("with autoEscape true", () => {
+        given("autoEscape", () => true);
+
+        it("escapes the node name", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "&lt;span&gt;test&lt;/span&gt;",
+                }),
+            ]);
+        });
+    });
+
+    context("with autoEscape false", () => {
+        given("autoEscape", () => false);
+
+        it("doesn't escape the node name", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "<span>test</span>",
+                }),
+            ]);
+        });
+    });
+});
+
 describe("autoOpen", () => {
     interface Vars {
         autoOpen: boolean | number | string;
