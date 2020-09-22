@@ -1,6 +1,5 @@
 import * as jQuery from "jquery";
 import { getPositionName, Node, Position } from "./node";
-import { htmlEscape } from "./util";
 import { DropHint, HitArea, PositionInfo } from "./types";
 import { NodeElement } from "./nodeElement";
 import { JqTreeWidget } from "./tree.jquery";
@@ -89,15 +88,12 @@ export class DragAndDropHandler {
 
             const node = this.currentItem.node;
 
-            const nodeName: string = this.treeWidget.options.autoEscape
-                ? htmlEscape(node.name)
-                : node.name;
-
             this.dragElement = new DragElement(
-                nodeName,
+                node.name,
                 positionInfo.pageX - left,
                 positionInfo.pageY - top,
-                this.treeWidget.element
+                this.treeWidget.element,
+                this.treeWidget.options.autoEscape ?? true
             );
 
             this.isDragging = true;
@@ -661,14 +657,22 @@ class DragElement {
         nodeName: string,
         offsetX: number,
         offsetY: number,
-        $tree: JQuery
+        $tree: JQuery,
+        autoEscape: boolean
     ) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
 
-        this.$element = jQuery("<span>")
-            .addClass("jqtree-title jqtree-dragging")
-            .text(nodeName);
+        this.$element = jQuery("<span>").addClass(
+            "jqtree-title jqtree-dragging"
+        );
+
+        if (autoEscape) {
+            this.$element.text(nodeName);
+        } else {
+            this.$element.html(nodeName);
+        }
+
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }
