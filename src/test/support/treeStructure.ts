@@ -3,7 +3,7 @@ import { singleChild } from "./testUtil";
 const getTreeNode = ($li: JQuery<HTMLElement>): JQTreeMatchers.TreeNode => {
     const $div = singleChild($li, "div.jqtree-element");
     const $span = singleChild($div, "span.jqtree-title");
-    const name = $span.text();
+    const name = $span.html();
     const selected = $li.hasClass("jqtree-selected");
 
     if ($li.hasClass("jqtree-folder")) {
