@@ -109,29 +109,6 @@
 "use strict";
 
 exports.__esModule = true;
-exports.getBoolString = exports.htmlEscape = exports.isFunction = exports.isInt = void 0;
-exports.isInt = function (n) { return typeof n === "number" && n % 1 === 0; };
-exports.isFunction = function (v) { return typeof v === "function"; };
-// Escape a string for HTML interpolation; copied from underscore js
-exports.htmlEscape = function (text) {
-    return ("" + text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;")
-        .replace(/\//g, "&#x2F;");
-};
-exports.getBoolString = function (value) { return (value ? "true" : "false"); };
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
 exports.Node = exports.getPosition = exports.getPositionName = exports.Position = void 0;
 var Position;
 (function (Position) {
@@ -724,6 +701,23 @@ exports.Node = Node;
 
 
 /***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.getBoolString = exports.isFunction = exports.isInt = void 0;
+exports.isInt = function (n) {
+    return typeof n === "number" && n % 1 === 0;
+};
+exports.isFunction = function (v) { return typeof v === "function"; };
+exports.getBoolString = function (value) {
+    return value ? "true" : "false";
+};
+
+
+/***/ }),
 /* 2 */
 /***/ (function(module, exports) {
 
@@ -892,8 +886,8 @@ var saveStateHandler_1 = __webpack_require__(12);
 var scrollHandler_1 = __webpack_require__(13);
 var selectNodeHandler_1 = __webpack_require__(14);
 var simple_widget_1 = __webpack_require__(3);
-var node_1 = __webpack_require__(1);
-var util_1 = __webpack_require__(0);
+var node_1 = __webpack_require__(0);
+var util_1 = __webpack_require__(1);
 var nodeElement_1 = __webpack_require__(15);
 var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 var PARAM_IS_EMPTY = "Parameter is empty: ";
@@ -1811,8 +1805,7 @@ var __extends = (this && this.__extends) || (function () {
 exports.__esModule = true;
 exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
 var jQuery = __webpack_require__(2);
-var node_1 = __webpack_require__(1);
-var util_1 = __webpack_require__(0);
+var node_1 = __webpack_require__(0);
 var DragAndDropHandler = /** @class */ (function () {
     function DragAndDropHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -1850,6 +1843,7 @@ var DragAndDropHandler = /** @class */ (function () {
         }
     };
     DragAndDropHandler.prototype.mouseStart = function (positionInfo) {
+        var _a;
         if (!this.currentItem ||
             positionInfo.pageX === undefined ||
             positionInfo.pageY === undefined) {
@@ -1861,10 +1855,7 @@ var DragAndDropHandler = /** @class */ (function () {
             var left = offset ? offset.left : 0;
             var top_1 = offset ? offset.top : 0;
             var node = this.currentItem.node;
-            var nodeName = this.treeWidget.options.autoEscape
-                ? util_1.htmlEscape(node.name)
-                : node.name;
-            this.dragElement = new DragElement(nodeName, positionInfo.pageX - left, positionInfo.pageY - top_1, this.treeWidget.element);
+            this.dragElement = new DragElement(node.name, positionInfo.pageX - left, positionInfo.pageY - top_1, this.treeWidget.element, (_a = this.treeWidget.options.autoEscape) !== null && _a !== void 0 ? _a : true);
             this.isDragging = true;
             this.positionInfo = positionInfo;
             this.currentItem.$element.addClass("jqtree-moving");
@@ -2264,12 +2255,16 @@ var HitAreasGenerator = /** @class */ (function (_super) {
 }(VisibleNodeIterator));
 exports.HitAreasGenerator = HitAreasGenerator;
 var DragElement = /** @class */ (function () {
-    function DragElement(nodeName, offsetX, offsetY, $tree) {
+    function DragElement(nodeName, offsetX, offsetY, $tree, autoEscape) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
-        this.$element = jQuery("<span>")
-            .addClass("jqtree-title jqtree-dragging")
-            .text(nodeName);
+        this.$element = jQuery("<span>").addClass("jqtree-title jqtree-dragging");
+        if (autoEscape) {
+            this.$element.text(nodeName);
+        }
+        else {
+            this.$element.html(nodeName);
+        }
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }
@@ -2293,7 +2288,7 @@ var DragElement = /** @class */ (function () {
 "use strict";
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(0);
+var util_1 = __webpack_require__(1);
 var ElementsRenderer = /** @class */ (function () {
     function ElementsRenderer(treeWidget) {
         this.treeWidget = treeWidget;
@@ -2446,7 +2441,12 @@ var ElementsRenderer = /** @class */ (function () {
                 titleSpan.setAttribute("tabindex", "" + tabIndex);
             }
         }
-        titleSpan.textContent = this.escapeIfNecessary(nodeName);
+        if (this.treeWidget.options.autoEscape) {
+            titleSpan.textContent = nodeName;
+        }
+        else {
+            titleSpan.innerHTML = nodeName;
+        }
         return titleSpan;
     };
     ElementsRenderer.prototype.getButtonClasses = function (node) {
@@ -2474,14 +2474,6 @@ var ElementsRenderer = /** @class */ (function () {
             classes.push("jqtree-loading");
         }
         return classes.join(" ");
-    };
-    ElementsRenderer.prototype.escapeIfNecessary = function (value) {
-        if (this.treeWidget.options.autoEscape) {
-            return util_1.htmlEscape(value);
-        }
-        else {
-            return value;
-        }
     };
     ElementsRenderer.prototype.createButtonElement = function (value) {
         if (typeof value === "string") {
@@ -2900,7 +2892,7 @@ exports["default"] = MouseWidget;
 "use strict";
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(0);
+var util_1 = __webpack_require__(1);
 var SaveStateHandler = /** @class */ (function () {
     function SaveStateHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -3471,7 +3463,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.BorderDropHint = exports.FolderElement = exports.NodeElement = void 0;
-var node_1 = __webpack_require__(1);
+var node_1 = __webpack_require__(0);
 var NodeElement = /** @class */ (function () {
     function NodeElement(node, treeWidget) {
         this.init(node, treeWidget);
