@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### Development version
+
+-   Issue #615: fix XSS vulnerability (thanks to Aimeos)
+
 ##### 1.5.0 (september 6 2020)
 
 -   Issue #603: improve performance of title rendering (thanks to Bekefi Gergely)
