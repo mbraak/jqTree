@@ -1,4 +1,4 @@
-import { getBoolString, htmlEscape, isFunction, isInt } from "../util";
+import { getBoolString, isFunction, isInt } from "../util";
 
 describe("getBoolString", () => {
     it("returns true or false", () => {
@@ -6,14 +6,6 @@ describe("getBoolString", () => {
         expect(getBoolString(false)).toBe("false");
         expect(getBoolString(1)).toBe("true");
         expect(getBoolString(null)).toBe("false");
-    });
-});
-
-describe("htmlEscape", () => {
-    it("escapes text in html", () => {
-        expect(htmlEscape("")).toBe("");
-        expect(htmlEscape("test")).toBe("test");
-        expect(htmlEscape("a&b")).toBe("a&amp;b");
     });
 });
 

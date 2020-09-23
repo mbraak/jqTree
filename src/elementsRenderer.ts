@@ -1,4 +1,4 @@
-import { htmlEscape, getBoolString } from "./util";
+import { getBoolString } from "./util";
 import { Node } from "./node";
 import { JqTreeWidget } from "./tree.jquery";
 
@@ -105,6 +105,10 @@ export default class ElementsRenderer {
             if (this.treeWidget.options.rtl) {
                 classString += " jqtree-rtl";
             }
+        }
+
+        if (this.treeWidget.options.dragAndDrop) {
+            classString += " jqtree-dnd";
         }
 
         const ul = document.createElement("ul");
@@ -260,7 +264,11 @@ export default class ElementsRenderer {
             }
         }
 
-        titleSpan.textContent = this.escapeIfNecessary(nodeName);
+        if (this.treeWidget.options.autoEscape) {
+            titleSpan.textContent = nodeName;
+        } else {
+            titleSpan.innerHTML = nodeName;
+        }
 
         return titleSpan;
     }
@@ -297,14 +305,6 @@ export default class ElementsRenderer {
         }
 
         return classes.join(" ");
-    }
-
-    private escapeIfNecessary(value: string): string {
-        if (this.treeWidget.options.autoEscape) {
-            return htmlEscape(value);
-        } else {
-            return value;
-        }
     }
 
     private createButtonElement(value: string | Element): IconElement {

@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.5.1 (september 23 2020)
+
+-   Issue #615: fix XSS vulnerability (thanks to Aimeos)
+-   Issue #618: fix autoescape (thanks to Jorge Casas)
+
 ##### 1.5.0 (september 6 2020)
 
 -   Issue #603: improve performance of title rendering (thanks to Bekefi Gergely)

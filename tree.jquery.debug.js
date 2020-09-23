@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.5.0
+ * JqTree 1.5.1
  * 
  * Copyright 2020 Marco Braak
  * 
@@ -104,29 +104,6 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-exports.getBoolString = exports.htmlEscape = exports.isFunction = exports.isInt = void 0;
-exports.isInt = function (n) { return typeof n === "number" && n % 1 === 0; };
-exports.isFunction = function (v) { return typeof v === "function"; };
-// Escape a string for HTML interpolation; copied from underscore js
-exports.htmlEscape = function (text) {
-    return ("" + text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;")
-        .replace(/\//g, "&#x2F;");
-};
-exports.getBoolString = function (value) { return (value ? "true" : "false"); };
-
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -724,6 +701,23 @@ exports.Node = Node;
 
 
 /***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+exports.getBoolString = exports.isFunction = exports.isInt = void 0;
+exports.isInt = function (n) {
+    return typeof n === "number" && n % 1 === 0;
+};
+exports.isFunction = function (v) { return typeof v === "function"; };
+exports.getBoolString = function (value) {
+    return value ? "true" : "false";
+};
+
+
+/***/ }),
 /* 2 */
 /***/ (function(module, exports) {
 
@@ -859,7 +853,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -892,8 +886,8 @@ var saveStateHandler_1 = __webpack_require__(12);
 var scrollHandler_1 = __webpack_require__(13);
 var selectNodeHandler_1 = __webpack_require__(14);
 var simple_widget_1 = __webpack_require__(3);
-var node_1 = __webpack_require__(1);
-var util_1 = __webpack_require__(0);
+var node_1 = __webpack_require__(0);
+var util_1 = __webpack_require__(1);
 var nodeElement_1 = __webpack_require__(15);
 var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 var PARAM_IS_EMPTY = "Parameter is empty: ";
@@ -1799,7 +1793,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -1811,8 +1805,7 @@ var __extends = (this && this.__extends) || (function () {
 exports.__esModule = true;
 exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
 var jQuery = __webpack_require__(2);
-var node_1 = __webpack_require__(1);
-var util_1 = __webpack_require__(0);
+var node_1 = __webpack_require__(0);
 var DragAndDropHandler = /** @class */ (function () {
     function DragAndDropHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -1850,6 +1843,7 @@ var DragAndDropHandler = /** @class */ (function () {
         }
     };
     DragAndDropHandler.prototype.mouseStart = function (positionInfo) {
+        var _a;
         if (!this.currentItem ||
             positionInfo.pageX === undefined ||
             positionInfo.pageY === undefined) {
@@ -1861,10 +1855,7 @@ var DragAndDropHandler = /** @class */ (function () {
             var left = offset ? offset.left : 0;
             var top_1 = offset ? offset.top : 0;
             var node = this.currentItem.node;
-            var nodeName = this.treeWidget.options.autoEscape
-                ? util_1.htmlEscape(node.name)
-                : node.name;
-            this.dragElement = new DragElement(nodeName, positionInfo.pageX - left, positionInfo.pageY - top_1, this.treeWidget.element);
+            this.dragElement = new DragElement(node.name, positionInfo.pageX - left, positionInfo.pageY - top_1, this.treeWidget.element, (_a = this.treeWidget.options.autoEscape) !== null && _a !== void 0 ? _a : true);
             this.isDragging = true;
             this.positionInfo = positionInfo;
             this.currentItem.$element.addClass("jqtree-moving");
@@ -2264,10 +2255,16 @@ var HitAreasGenerator = /** @class */ (function (_super) {
 }(VisibleNodeIterator));
 exports.HitAreasGenerator = HitAreasGenerator;
 var DragElement = /** @class */ (function () {
-    function DragElement(nodeName, offsetX, offsetY, $tree) {
+    function DragElement(nodeName, offsetX, offsetY, $tree, autoEscape) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
-        this.$element = jQuery("<span class=\"jqtree-title jqtree-dragging\">" + nodeName + "</span>");
+        this.$element = jQuery("<span>").addClass("jqtree-title jqtree-dragging");
+        if (autoEscape) {
+            this.$element.text(nodeName);
+        }
+        else {
+            this.$element.html(nodeName);
+        }
         this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }
@@ -2291,7 +2288,7 @@ var DragElement = /** @class */ (function () {
 "use strict";
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(0);
+var util_1 = __webpack_require__(1);
 var ElementsRenderer = /** @class */ (function () {
     function ElementsRenderer(treeWidget) {
         this.treeWidget = treeWidget;
@@ -2356,6 +2353,9 @@ var ElementsRenderer = /** @class */ (function () {
             if (this.treeWidget.options.rtl) {
                 classString += " jqtree-rtl";
             }
+        }
+        if (this.treeWidget.options.dragAndDrop) {
+            classString += " jqtree-dnd";
         }
         var ul = document.createElement("ul");
         ul.className = "jqtree_common " + classString;
@@ -2441,7 +2441,12 @@ var ElementsRenderer = /** @class */ (function () {
                 titleSpan.setAttribute("tabindex", "" + tabIndex);
             }
         }
-        titleSpan.textContent = this.escapeIfNecessary(nodeName);
+        if (this.treeWidget.options.autoEscape) {
+            titleSpan.textContent = nodeName;
+        }
+        else {
+            titleSpan.innerHTML = nodeName;
+        }
         return titleSpan;
     };
     ElementsRenderer.prototype.getButtonClasses = function (node) {
@@ -2469,14 +2474,6 @@ var ElementsRenderer = /** @class */ (function () {
             classes.push("jqtree-loading");
         }
         return classes.join(" ");
-    };
-    ElementsRenderer.prototype.escapeIfNecessary = function (value) {
-        if (this.treeWidget.options.autoEscape) {
-            return util_1.htmlEscape(value);
-        }
-        else {
-            return value;
-        }
     };
     ElementsRenderer.prototype.createButtonElement = function (value) {
         if (typeof value === "string") {
@@ -2708,7 +2705,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -2739,58 +2736,50 @@ var MouseWidget = /** @class */ (function (_super) {
     function MouseWidget() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.mouseDown = function (e) {
-            var mouseDownEvent = e;
-            // Is left mouse button?
-            if (mouseDownEvent.which !== 1) {
+            // Left mouse button?
+            if (e.button !== 0) {
                 return;
             }
-            var result = _this.handleMouseDown(getPositionInfoFromMouseEvent(mouseDownEvent));
-            if (result) {
-                mouseDownEvent.preventDefault();
+            var result = _this.handleMouseDown(getPositionInfoFromMouseEvent(e));
+            if (result && e.cancelable) {
+                e.preventDefault();
             }
-            return result;
         };
         _this.mouseMove = function (e) {
-            var mouseMoveEvent = e;
-            return _this.handleMouseMove(e, getPositionInfoFromMouseEvent(mouseMoveEvent));
+            _this.handleMouseMove(e, getPositionInfoFromMouseEvent(e));
         };
         _this.mouseUp = function (e) {
-            var mouseUpEvent = e;
-            _this.handleMouseUp(getPositionInfoFromMouseEvent(mouseUpEvent));
+            _this.handleMouseUp(getPositionInfoFromMouseEvent(e));
         };
         _this.touchStart = function (e) {
-            var touchEvent = e.originalEvent;
-            if (!touchEvent) {
-                return false;
+            if (!e) {
+                return;
             }
-            if (touchEvent.touches.length > 1) {
-                return false;
+            if (e.touches.length > 1) {
+                return;
             }
-            var touch = touchEvent.changedTouches[0];
-            return _this.handleMouseDown(getPositionInfoFromTouch(touch, e));
+            var touch = e.changedTouches[0];
+            _this.handleMouseDown(getPositionInfoFromTouch(touch, e));
         };
         _this.touchMove = function (e) {
-            var touchEvent = e.originalEvent;
-            if (!touchEvent) {
-                return false;
+            if (!e) {
+                return;
             }
-            if (touchEvent.touches.length > 1) {
-                return false;
+            if (e.touches.length > 1) {
+                return;
             }
-            var touch = touchEvent.changedTouches[0];
-            return _this.handleMouseMove(e, getPositionInfoFromTouch(touch, e));
+            var touch = e.changedTouches[0];
+            _this.handleMouseMove(e, getPositionInfoFromTouch(touch, e));
         };
         _this.touchEnd = function (e) {
-            var touchEvent = e.originalEvent;
-            if (!touchEvent) {
-                return false;
+            if (!e) {
+                return;
             }
-            if (touchEvent.touches.length > 1) {
-                return false;
+            if (e.touches.length > 1) {
+                return;
             }
-            var touch = touchEvent.changedTouches[0];
+            var touch = e.changedTouches[0];
             _this.handleMouseUp(getPositionInfoFromTouch(touch, e));
-            return true;
         };
         return _this;
     }
@@ -2798,8 +2787,13 @@ var MouseWidget = /** @class */ (function (_super) {
         this.mouseDelay = mouseDelay;
     };
     MouseWidget.prototype.init = function () {
-        this.$el.on("mousedown.mousewidget", this.mouseDown);
-        this.$el.on("touchstart.mousewidget", this.touchStart);
+        var element = this.$el.get(0);
+        element.addEventListener("mousedown", this.mouseDown, {
+            passive: false,
+        });
+        element.addEventListener("touchstart", this.touchStart, {
+            passive: false,
+        });
         this.isMouseStarted = false;
         this.mouseDelay = 0;
         this.mouseDelayTimer = null;
@@ -2807,11 +2801,13 @@ var MouseWidget = /** @class */ (function (_super) {
         this.mouseDownInfo = null;
     };
     MouseWidget.prototype.deinit = function () {
-        this.$el.off("mousedown.mousewidget");
-        this.$el.off("touchstart.mousewidget");
-        var $document = jQuery(document);
-        $document.off("mousemove.mousewidget");
-        $document.off("mouseup.mousewidget");
+        var el = this.$el.get(0);
+        el.removeEventListener("mousedown", this.mouseDown);
+        el.removeEventListener("touchstart", this.touchStart);
+        document.removeEventListener("mousemove", this.mouseMove);
+        document.removeEventListener("touchmove", this.touchMove);
+        document.removeEventListener("mouseup", this.mouseUp);
+        document.removeEventListener("touchend", this.touchEnd);
     };
     MouseWidget.prototype.handleMouseDown = function (positionInfo) {
         // We may have missed mouseup (out of window)
@@ -2826,11 +2822,16 @@ var MouseWidget = /** @class */ (function (_super) {
         return true;
     };
     MouseWidget.prototype.handleStartMouse = function () {
-        var $document = jQuery(document);
-        $document.on("mousemove.mousewidget", this.mouseMove);
-        $document.on("touchmove.mousewidget", this.touchMove);
-        $document.on("mouseup.mousewidget", this.mouseUp);
-        $document.on("touchend.mousewidget", this.touchEnd);
+        document.addEventListener("mousemove", this.mouseMove, {
+            passive: false,
+        });
+        document.addEventListener("touchmove", this.touchMove, {
+            passive: false,
+        });
+        document.addEventListener("mouseup", this.mouseUp, { passive: false });
+        document.addEventListener("touchend", this.touchEnd, {
+            passive: false,
+        });
         if (this.mouseDelay) {
             this.startMouseDelayTimer();
         }
@@ -2848,29 +2849,32 @@ var MouseWidget = /** @class */ (function (_super) {
     MouseWidget.prototype.handleMouseMove = function (e, positionInfo) {
         if (this.isMouseStarted) {
             this.mouseDrag(positionInfo);
-            e.preventDefault();
-            return false;
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+            return;
         }
         if (this.mouseDelay && !this.isMouseDelayMet) {
-            return true;
+            return;
         }
         if (this.mouseDownInfo) {
             this.isMouseStarted = this.mouseStart(this.mouseDownInfo) !== false;
         }
         if (this.isMouseStarted) {
             this.mouseDrag(positionInfo);
+            if (e.cancelable) {
+                e.preventDefault();
+            }
         }
         else {
             this.handleMouseUp(positionInfo);
         }
-        return !this.isMouseStarted;
     };
     MouseWidget.prototype.handleMouseUp = function (positionInfo) {
-        var $document = jQuery(document);
-        $document.off("mousemove.mousewidget");
-        $document.off("touchmove.mousewidget");
-        $document.off("mouseup.mousewidget");
-        $document.off("touchend.mousewidget");
+        document.removeEventListener("mousemove", this.mouseMove);
+        document.removeEventListener("touchmove", this.touchMove);
+        document.removeEventListener("mouseup", this.mouseUp);
+        document.removeEventListener("touchend", this.touchEnd);
         if (this.isMouseStarted) {
             this.isMouseStarted = false;
             this.mouseStop(positionInfo);
@@ -2888,7 +2892,7 @@ exports["default"] = MouseWidget;
 "use strict";
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(0);
+var util_1 = __webpack_require__(1);
 var SaveStateHandler = /** @class */ (function () {
     function SaveStateHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -3448,7 +3452,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -3459,7 +3463,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.BorderDropHint = exports.FolderElement = exports.NodeElement = void 0;
-var node_1 = __webpack_require__(1);
+var node_1 = __webpack_require__(0);
 var NodeElement = /** @class */ (function () {
     function NodeElement(node, treeWidget) {
         this.init(node, treeWidget);
