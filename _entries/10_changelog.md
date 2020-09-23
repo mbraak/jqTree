@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### Development version
+##### 1.5.1 (september 23 2020)
 
 -   Issue #615: fix XSS vulnerability (thanks to Aimeos)
 -   Issue #618: fix autoescape (thanks to Jorge Casas)
