@@ -1,5 +1,5 @@
 /*!
- * JqTree 1.5.0
+ * JqTree 1.5.1
  * 
  * Copyright 2020 Marco Braak
  * 
