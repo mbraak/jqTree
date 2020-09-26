@@ -85,22 +85,25 @@ export default class DataLoader {
     }
 
     private submitRequest(
-        urlInfo: string | JQuery.AjaxSettings,
+        urlInfoInput: string | JQuery.AjaxSettings,
         handleSuccess: JQuery.Ajax.SuccessCallback<any>,
         handleError: JQuery.Ajax.ErrorCallback<any>
     ): void {
-        const ajaxSettings = jQuery.extend(
-            { method: "GET" },
-            typeof urlInfo === "string" ? { url: urlInfo } : urlInfo,
-            {
-                cache: false,
-                dataType: "json",
-                success: handleSuccess,
-                error: handleError,
-            }
-        );
+        const urlInfo =
+            typeof urlInfoInput === "string"
+                ? { url: urlInfoInput }
+                : urlInfoInput;
 
-        ajaxSettings.method = ajaxSettings.method.toUpperCase();
+        const ajaxSettings: JQuery.AjaxSettings = {
+            method: "GET",
+            cache: false,
+            dataType: "json",
+            success: handleSuccess,
+            error: handleError,
+            ...urlInfo,
+        };
+
+        ajaxSettings.method = ajaxSettings.method?.toUpperCase() || "GET";
 
         void jQuery.ajax(ajaxSettings);
     }

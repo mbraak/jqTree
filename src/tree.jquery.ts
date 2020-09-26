@@ -501,9 +501,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         eventName: string,
         values?: DefaultRecord
     ): JQuery.Event {
-        const event = jQuery.Event(eventName);
-        jQuery.extend(event, values);
-
+        const event = jQuery.Event(eventName, values);
         this.element.trigger(event);
         return event;
     }
