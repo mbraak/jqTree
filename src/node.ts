@@ -190,7 +190,7 @@ export class Node implements INode {
     var index = getChildIndex(node);
     */
     public getChildIndex(node: Node): number {
-        return jQuery.inArray(node, this.children);
+        return this.children.indexOf(node);
     }
 
     /*
