@@ -113,7 +113,7 @@ export default class DataLoader {
 
         const getParsedData = (): unknown => {
             if (typeof data === "string") {
-                return jQuery.parseJSON(data) as unknown;
+                return JSON.parse(data) as unknown;
             } else {
                 return data;
             }
