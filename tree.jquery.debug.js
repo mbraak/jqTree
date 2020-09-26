@@ -269,7 +269,7 @@ var Node = /** @class */ (function () {
     var index = getChildIndex(node);
     */
     Node.prototype.getChildIndex = function (node) {
-        return jQuery.inArray(node, this.children);
+        return this.children.indexOf(node);
     };
     /*
     Does the tree have children?
@@ -729,6 +729,17 @@ module.exports = jQuery;
 
 "use strict";
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 exports.__esModule = true;
 var register = function (widgetClass, widgetName) {
     var getDataKey = function () { return "simple_widget_" + widgetName; };
@@ -816,7 +827,7 @@ var SimpleWidget = /** @class */ (function () {
         this.$el = jQuery(el);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         var defaults = this.constructor["defaults"];
-        this.options = jQuery.extend({}, defaults, options);
+        this.options = __assign(__assign({}, defaults), options);
     }
     SimpleWidget.register = function (widgetClass, widgetName) {
         register(widgetClass, widgetName);
@@ -1226,8 +1237,7 @@ var JqTreeWidget = /** @class */ (function (_super) {
         return version_1["default"];
     };
     JqTreeWidget.prototype._triggerEvent = function (eventName, values) {
-        var event = jQuery.Event(eventName);
-        jQuery.extend(event, values);
+        var event = jQuery.Event(eventName, values);
         this.element.trigger(event);
         return event;
     };
@@ -1305,8 +1315,8 @@ var JqTreeWidget = /** @class */ (function (_super) {
         this.scrollHandler = new scrollHandler_1["default"](this);
         this.keyHandler = new keyHandler_1["default"](this);
         this.initData();
-        this.element.click(this.handleClick);
-        this.element.dblclick(this.handleDblclick);
+        this.element.on("click", this.handleClick);
+        this.element.on("dblclick", this.handleDblclick);
         if (this.options.useContextMenu) {
             this.element.on("contextmenu", this.handleContextmenu);
         }
@@ -2497,6 +2507,17 @@ exports["default"] = ElementsRenderer;
 
 "use strict";
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 exports.__esModule = true;
 var DataLoader = /** @class */ (function () {
     function DataLoader(treeWidget) {
@@ -2557,21 +2578,20 @@ var DataLoader = /** @class */ (function () {
             $el: $el,
         });
     };
-    DataLoader.prototype.submitRequest = function (urlInfo, handleSuccess, handleError) {
-        var ajaxSettings = jQuery.extend({ method: "GET" }, typeof urlInfo === "string" ? { url: urlInfo } : urlInfo, {
-            cache: false,
-            dataType: "json",
-            success: handleSuccess,
-            error: handleError,
-        });
-        ajaxSettings.method = ajaxSettings.method.toUpperCase();
+    DataLoader.prototype.submitRequest = function (urlInfoInput, handleSuccess, handleError) {
+        var _a;
+        var urlInfo = typeof urlInfoInput === "string"
+            ? { url: urlInfoInput }
+            : urlInfoInput;
+        var ajaxSettings = __assign({ method: "GET", cache: false, dataType: "json", success: handleSuccess, error: handleError }, urlInfo);
+        ajaxSettings.method = ((_a = ajaxSettings.method) === null || _a === void 0 ? void 0 : _a.toUpperCase()) || "GET";
         void jQuery.ajax(ajaxSettings);
     };
     DataLoader.prototype.parseData = function (data) {
         var dataFilter = this.treeWidget.options.dataFilter;
         var getParsedData = function () {
             if (typeof data === "string") {
-                return jQuery.parseJSON(data);
+                return JSON.parse(data);
             }
             else {
                 return data;
@@ -2981,7 +3001,7 @@ var SaveStateHandler = /** @class */ (function () {
         }
     };
     SaveStateHandler.prototype.parseState = function (jsonData) {
-        var state = jQuery.parseJSON(jsonData);
+        var state = JSON.parse(jsonData);
         // Check if selected_node is an int (instead of an array)
         if (state && state.selected_node && util_1.isInt(state.selected_node)) {
             // Convert to array

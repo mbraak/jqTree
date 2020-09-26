@@ -501,9 +501,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         eventName: string,
         values?: DefaultRecord
     ): JQuery.Event {
-        const event = jQuery.Event(eventName);
-        jQuery.extend(event, values);
-
+        const event = jQuery.Event(eventName, values);
         this.element.trigger(event);
         return event;
     }
@@ -606,8 +604,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
         this.initData();
 
-        this.element.click(this.handleClick);
-        this.element.dblclick(this.handleDblclick);
+        this.element.on("click", this.handleClick);
+        this.element.on("dblclick", this.handleDblclick);
 
         if (this.options.useContextMenu) {
             this.element.on("contextmenu", this.handleContextmenu);
