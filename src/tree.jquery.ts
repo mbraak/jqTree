@@ -606,8 +606,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
         this.initData();
 
-        this.element.click(this.handleClick);
-        this.element.dblclick(this.handleDblclick);
+        this.element.on("click", this.handleClick);
+        this.element.on("dblclick", this.handleDblclick);
 
         if (this.options.useContextMenu) {
             this.element.on("contextmenu", this.handleContextmenu);
