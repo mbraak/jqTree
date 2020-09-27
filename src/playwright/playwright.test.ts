@@ -38,10 +38,6 @@ beforeEach(async () => {
     `);
 });
 
-afterEach(async () => {
-    await jestPlaywright.saveCoverage(page);
-});
-
 it("displays a tree", async () => {
     await expect(page).toHaveText("Saurischia");
     await expect(page).toHaveText("Ornithischians");
