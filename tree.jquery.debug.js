@@ -17,12 +17,33 @@ limitations under the License.
 @license
 
 */
-var jqtree = (function (exports, jQuery$1) {
+var jqtree = (function (exports, jQueryProxy) {
     'use strict';
 
     function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-    var jQuery__default = /*#__PURE__*/_interopDefaultLegacy(jQuery$1);
+    function _interopNamespace(e) {
+        if (e && e.__esModule) return e;
+        var n = Object.create(null);
+        if (e) {
+            Object.keys(e).forEach(function (k) {
+                if (k !== 'default') {
+                    var d = Object.getOwnPropertyDescriptor(e, k);
+                    Object.defineProperty(n, k, d.get ? d : {
+                        enumerable: true,
+                        get: function () {
+                            return e[k];
+                        }
+                    });
+                }
+            });
+        }
+        n['default'] = e;
+        return Object.freeze(n);
+    }
+
+    var jQueryProxy__default = /*#__PURE__*/_interopDefaultLegacy(jQueryProxy);
+    var jQueryProxy__namespace = /*#__PURE__*/_interopNamespace(jQueryProxy);
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -654,6 +675,8 @@ var jqtree = (function (exports, jQuery$1) {
         return Node;
     }());
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    var jQuery$1 = jQueryProxy__default['default'] || jQueryProxy__namespace;
     var DragAndDropHandler = /** @class */ (function () {
         function DragAndDropHandler(treeWidget) {
             this.treeWidget = treeWidget;
@@ -664,7 +687,7 @@ var jqtree = (function (exports, jQuery$1) {
             this.positionInfo = null;
         }
         DragAndDropHandler.prototype.mouseCapture = function (positionInfo) {
-            var $element = jQuery__default['default'](positionInfo.target);
+            var $element = jQuery$1(positionInfo.target);
             if (!this.mustCaptureElement($element)) {
                 return null;
             }
@@ -699,7 +722,7 @@ var jqtree = (function (exports, jQuery$1) {
             }
             else {
                 this.refresh();
-                var offset = jQuery__default['default'](positionInfo.target).offset();
+                var offset = jQuery$1(positionInfo.target).offset();
                 var left = offset ? offset.left : 0;
                 var top_1 = offset ? offset.top : 0;
                 var node = this.currentItem.node;
@@ -937,7 +960,7 @@ var jqtree = (function (exports, jQuery$1) {
                 var mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
                 var $element = null;
                 if (node.element) {
-                    $element = jQuery__default['default'](node.element);
+                    $element = jQuery$1(node.element);
                     if (!$element.is(":visible")) {
                         return;
                     }
@@ -1037,7 +1060,7 @@ var jqtree = (function (exports, jQuery$1) {
         };
         HitAreasGenerator.prototype.handleFirstNode = function (node) {
             if (node !== this.currentNode) {
-                this.addPosition(node, Position.Before, this.getTop(jQuery__default['default'](node.element)));
+                this.addPosition(node, Position.Before, this.getTop(jQuery$1(node.element)));
             }
         };
         HitAreasGenerator.prototype.handleAfterOpenFolder = function (node, nextNode) {
@@ -1104,7 +1127,7 @@ var jqtree = (function (exports, jQuery$1) {
         function DragElement(nodeName, offsetX, offsetY, $tree, autoEscape) {
             this.offsetX = offsetX;
             this.offsetY = offsetY;
-            this.$element = jQuery__default['default']("<span>").addClass("jqtree-title jqtree-dragging");
+            this.$element = jQuery$1("<span>").addClass("jqtree-title jqtree-dragging");
             if (autoEscape) {
                 this.$element.text(nodeName);
             }
@@ -2510,6 +2533,8 @@ var jqtree = (function (exports, jQuery$1) {
         return GhostDropHint;
     }());
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    var jQuery$2 = jQueryProxy__default['default'] || jQueryProxy__namespace;
     var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     var PARAM_IS_EMPTY = "Parameter is empty: ";
     var JqTreeWidget = /** @class */ (function (_super) {
@@ -2546,7 +2571,7 @@ var jqtree = (function (exports, jQuery$1) {
                 }
             };
             _this.handleContextmenu = function (e) {
-                var $div = jQuery__default['default'](e.target).closest("ul.jqtree-tree .jqtree-element");
+                var $div = jQuery$2(e.target).closest("ul.jqtree-tree .jqtree-element");
                 if ($div.length) {
                     var node = _this.getNode($div);
                     if (node) {
@@ -2636,7 +2661,7 @@ var jqtree = (function (exports, jQuery$1) {
             return this.tree.getNodesByProperty(key, value);
         };
         JqTreeWidget.prototype.getNodeByHtmlElement = function (element) {
-            return this.getNode(jQuery__default['default'](element));
+            return this.getNode(jQuery$2(element));
         };
         JqTreeWidget.prototype.getNodeByCallback = function (callback) {
             return this.tree.getNodeByCallback(callback);
@@ -2809,7 +2834,7 @@ var jqtree = (function (exports, jQuery$1) {
             if (!node) {
                 throw Error(NODE_PARAM_IS_EMPTY);
             }
-            var nodeOffset = jQuery__default['default'](node.element).offset();
+            var nodeOffset = jQuery$2(node.element).offset();
             var nodeTop = nodeOffset ? nodeOffset.top : 0;
             var treeOffset = this.$el.offset();
             var treeTop = treeOffset ? treeOffset.top : 0;
@@ -2847,7 +2872,7 @@ var jqtree = (function (exports, jQuery$1) {
             return version;
         };
         JqTreeWidget.prototype._triggerEvent = function (eventName, values) {
-            var event = jQuery__default['default'].Event(eventName, values);
+            var event = jQuery$2.Event(eventName, values);
             this.element.trigger(event);
             return event;
         };
@@ -2902,7 +2927,7 @@ var jqtree = (function (exports, jQuery$1) {
             }
         };
         JqTreeWidget.prototype._containsElement = function (element) {
-            var node = this.getNode(jQuery__default['default'](element));
+            var node = this.getNode(jQuery$2(element));
             return node != null && node.tree === this.tree;
         };
         JqTreeWidget.prototype._getScrollLeft = function () {
@@ -3171,7 +3196,7 @@ var jqtree = (function (exports, jQuery$1) {
             }
         };
         JqTreeWidget.prototype.getClickTarget = function (element) {
-            var $target = jQuery__default['default'](element);
+            var $target = jQuery$2(element);
             var $button = $target.closest(".jqtree-toggler");
             if ($button.length) {
                 var node = this.getNode($button);
