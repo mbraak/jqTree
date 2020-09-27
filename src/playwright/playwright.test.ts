@@ -39,7 +39,12 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-    await jestPlaywright.saveCoverage(page);
+    try {
+        await jestPlaywright.saveCoverage(page);
+    } catch (e) {
+        console.log("Error while saving coverage");
+        throw e;
+    }
 });
 
 it("displays a tree", async () => {
