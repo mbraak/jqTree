@@ -5,6 +5,7 @@ import template from "lodash.template";
 import typescript from "@rollup/plugin-typescript";
 import { terser } from "rollup-plugin-terser";
 import serve from "rollup-plugin-serve";
+import coverage from "rollup-plugin-coverage";
 
 const getBanner = () => {
     const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");
@@ -21,6 +22,7 @@ const getBanner = () => {
 
 const debugBuild = Boolean(process.env.DEBUG_BUILD);
 const devServer = Boolean(process.env.SERVE);
+const includeCoverage = Boolean(process.env.COVERAGE);
 
 const plugins = [typescript()];
 
@@ -33,6 +35,10 @@ if (!debugBuild) {
     plugins.push(terserPlugin);
 }
 
+if (includeCoverage) {
+    plugins.push(coverage());
+}
+
 if (devServer) {
     const servePlugin = serve({
         contentBase: [
@@ -40,6 +46,7 @@ if (devServer) {
             path.join(__dirname, "static"),
             __dirname,
         ],
+        port: 8080,
     });
     plugins.push(servePlugin);
 }
