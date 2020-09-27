@@ -1,5 +1,5 @@
 import __version__ from "./version";
-import * as jQuery from "jquery";
+import jQuery from "jquery";
 import { DragAndDropHandler } from "./dragAndDropHandler";
 import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
