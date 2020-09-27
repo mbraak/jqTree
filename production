@@ -1,4 +1,5 @@
 rollup -c rollup.config.js
+DEBUG_BUILD=true rollup -c rollup.config.js
 tsc --project tsconfig.json &&
 postcss -o jqtree.css jqtree.postcss
 postcss -o static/example.css static/example.postcss
