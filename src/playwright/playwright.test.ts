@@ -3,10 +3,12 @@
 
 import getGiven from "givens";
 import {
+    dragAndDrop,
     expectToBeClosed,
     expectToBeOpen,
     expectToBeSelected,
     findNodeElement,
+    getTreeStructure,
     openNode,
     selectNode,
 } from "./testUtil";
@@ -66,4 +68,39 @@ it("opens a node", async () => {
     await expectToBeOpen(theropods);
 
     await matchScreenshot("opens_a_node");
+});
+
+describe("dragAndDrop", () => {
+    given("dragAndDrop", () => true);
+
+    it("moves a node", async () => {
+        await dragAndDrop("Herrerasaurians", "Ornithischians");
+
+        await getTreeStructure().then((structure) => {
+            expect(structure).toEqual([
+                expect.objectContaining({
+                    name: "Saurischia",
+                    children: [
+                        expect.objectContaining({ name: "Theropods" }),
+                        expect.objectContaining({ name: "Sauropodomorphs" }),
+                    ],
+                }),
+                expect.objectContaining({
+                    name: "Ornithischians",
+                    children: [
+                        expect.objectContaining({ name: "Herrerasaurians" }),
+                        expect.objectContaining({ name: "Heterodontosaurids" }),
+                        expect.objectContaining({ name: "Thyreophorans" }),
+                        expect.objectContaining({ name: "Ornithopods" }),
+                        expect.objectContaining({
+                            name: "Pachycephalosaurians",
+                        }),
+                        expect.objectContaining({ name: "Ceratopsians" }),
+                    ],
+                }),
+            ]);
+        });
+
+        await matchScreenshot("moves_a_node");
+    });
 });
