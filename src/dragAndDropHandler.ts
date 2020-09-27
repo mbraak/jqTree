@@ -1,8 +1,11 @@
-import jQuery from "jquery";
+import * as jQueryProxy from "jquery";
 import { getPositionName, Node, Position } from "./node";
 import { DropHint, HitArea, PositionInfo } from "./types";
 import { NodeElement } from "./nodeElement";
 import { JqTreeWidget } from "./tree.jquery";
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+const jQuery: JQueryStatic = (<any>jQueryProxy).default || jQueryProxy;
 
 interface Dimensions {
     left: number;
