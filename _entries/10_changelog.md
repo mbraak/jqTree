@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### Development
+
+-   Issue #621: decrease build size using Rollup
+
 ##### 1.5.1 (september 23 2020)
 
 -   Issue #615: fix XSS vulnerability (thanks to Aimeos)
