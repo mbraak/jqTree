@@ -5,7 +5,7 @@ import template from "lodash.template";
 import typescript from "@rollup/plugin-typescript";
 import { terser } from "rollup-plugin-terser";
 import serve from "rollup-plugin-serve";
-import coverage from "rollup-plugin-coverage";
+import coverage from "rollup-plugin-istanbul";
 
 const getBanner = () => {
     const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");
@@ -36,7 +36,10 @@ if (!debugBuild) {
 }
 
 if (includeCoverage) {
-    plugins.push(coverage());
+    const coveragePlugin = coverage({
+        esModules: true,
+    });
+    plugins.push(coveragePlugin);
 }
 
 if (devServer) {
