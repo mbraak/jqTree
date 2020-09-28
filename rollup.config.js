@@ -64,6 +64,7 @@ export default {
             jquery: "jQuery",
         },
         name: "jqtree",
+        sourcemap: true,
     },
     external: ["jquery"],
     plugins,
