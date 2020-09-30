@@ -1,12 +1,12 @@
 import * as $ from "jquery";
 import getGiven from "givens";
-import * as mockjaxFactory from "jquery-mockjax";
 import { screen } from "@testing-library/dom";
+import { rest } from "msw";
+import { setupServer } from "msw/node";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan, togglerLink } from "../support/testUtil";
 
-const mockjax = mockjaxFactory(jQuery, window);
 const context = describe;
 
 beforeEach(() => {
@@ -17,7 +17,6 @@ afterEach(() => {
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
-    mockjax.clear();
     localStorage.clear();
 });
 
@@ -159,30 +158,52 @@ describe("autoOpen", () => {
 });
 
 describe("dataUrl", () => {
+    const exampleStructure = [
+        expect.objectContaining({ name: "node1" }),
+        expect.objectContaining({ name: "node2" }),
+    ];
+
     const testCases = [
         {
             name: "string",
             dataUrl: "/tree/",
+            expectedNode: "node1",
+            expectedStructure: exampleStructure,
         },
         {
             name: "object with url and headers",
             dataUrl: {
                 url: "/tree/",
-                headers: { key1: "value1" },
+                headers: { node: "test-node" },
             },
-            checkRequest: (settings: MockJaxSettings) => {
-                expect(settings).toMatchObject({
-                    headers: { key1: "value1" },
-                    method: "GET",
-                    url: "/tree/",
-                });
-            },
+            expectedNode: "test-node",
+            expectedStructure: [expect.objectContaining({ name: "test-node" })],
         },
         {
             name: "function",
             dataUrl: () => ({ url: "/tree/" }),
+            expectedNode: "node1",
+            expectedStructure: exampleStructure,
         },
     ];
+
+    let server: ReturnType<typeof setupServer> | null = null;
+
+    beforeAll(() => {
+        server = setupServer(
+            rest.get("/tree/", (request, response, ctx) => {
+                const nodeName = request.headers.get("node");
+                const data = nodeName ? [nodeName] : exampleData;
+
+                return response(ctx.status(200), ctx.json(data));
+            })
+        );
+        server.listen();
+    });
+
+    afterAll(() => {
+        server?.close();
+    });
 
     interface Vars {
         $tree: JQuery<HTMLElement>;
@@ -190,33 +211,13 @@ describe("dataUrl", () => {
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
 
-    testCases.forEach(({ checkRequest, dataUrl, name }) => {
-        function handleResponse(
-            this: MockJaxSettings,
-            settings: MockJaxSettings
-        ) {
-            if (checkRequest) {
-                checkRequest(settings);
-            }
-
-            this.responseText = exampleData;
-        }
-
+    testCases.forEach(({ dataUrl, expectedNode, expectedStructure, name }) => {
         context(`with ${name}`, () => {
             it("loads the data from the url", async () => {
-                mockjax({
-                    url: "/tree/",
-                    response: handleResponse,
-                    logging: false,
-                });
-
                 given.$tree.tree({ dataUrl });
-                await screen.findByText("node1");
+                await screen.findByText(expectedNode);
 
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "node1" }),
-                    expect.objectContaining({ name: "node2" }),
-                ]);
+                expect(given.$tree).toHaveTreeStructure(expectedStructure);
             });
         });
     });
@@ -347,14 +348,22 @@ describe("onLoadFailed", () => {
     given("$tree", () => $("#tree1"));
 
     context("when the loading fails", () => {
-        beforeEach(() => {
-            mockjax({
-                url: "/tree/",
-                responseText: "",
-                status: 500,
-                statusText: "Internal server error",
-                logging: false,
-            });
+        let server: ReturnType<typeof setupServer> | null = null;
+
+        beforeAll(() => {
+            server = setupServer(
+                rest.get("/tree/", (_request, response, ctx) => {
+                    return response(
+                        ctx.status(500),
+                        ctx.body("Internal server error")
+                    );
+                })
+            );
+            server.listen();
+        });
+
+        afterAll(() => {
+            server?.close();
         });
 
         it("calls onLoadFailed", () =>
