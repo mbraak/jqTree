@@ -15,7 +15,7 @@ module.exports = {
     ],
     launchOptions: {
         headless: true,
+        chromiumSandbox: false,
     },
-    launchType: "LAUNCH",
     collectCoverage: true,
 };

@@ -1,7 +1,5 @@
-webpack --config webpack.config.production --mode production &&
-cp build/tree.jquery.js . &&
-webpack --config webpack.config.production.debug --mode production &&
-cp build/tree.jquery.js ./tree.jquery.debug.js &&
-tsc --project tsconfig.json &&
+rollup -c rollup.config.js
+DEBUG_BUILD=true rollup -c rollup.config.js
+tsc --outDir lib --noEmit false --project tsconfig.json &&
 postcss -o jqtree.css jqtree.postcss
 postcss -o static/example.css static/example.postcss
