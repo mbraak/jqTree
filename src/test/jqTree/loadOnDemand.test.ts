@@ -1,11 +1,10 @@
 import * as $ from "jquery";
 import getGiven from "givens";
 import { screen } from "@testing-library/dom";
-import * as mockjaxFactory from "jquery-mockjax";
+import { rest } from "msw";
+import { setupServer } from "msw/node";
 import "../../tree.jquery";
 import { togglerLink } from "../support/testUtil";
-
-const mockjax = mockjaxFactory(jQuery, window);
 
 const context = describe;
 
@@ -17,9 +16,23 @@ afterEach(() => {
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
-    mockjax.clear();
     localStorage.clear();
 });
+
+const server = setupServer(
+    rest.get("/tree/", (request, response, ctx) => {
+        const parentId = request.url.searchParams.get("node");
+
+        if (parentId === "1") {
+            return response(
+                ctx.status(200),
+                ctx.json([{ id: 2, name: "loaded-on-demand" }])
+            );
+        } else {
+            return response(ctx.status(400));
+        }
+    })
+);
 
 context("when a node has load_on_demand in the data", () => {
     interface Vars {
@@ -40,25 +53,18 @@ context("when a node has load_on_demand in the data", () => {
         },
     ];
 
-    function handleResponse(this: MockJaxSettings, settings: MockJaxSettings) {
-        expect(settings).toMatchObject({
-            data: { node: 1 },
-            method: "GET",
-            url: "/tree/",
-        });
-        this.responseText = [{ id: 2, name: "loaded-on-demand" }];
-    }
+    beforeAll(() => {
+        server.listen();
+    });
+
+    afterAll(() => {
+        server.close();
+    });
 
     beforeEach(() => {
         if (given.savedState) {
             localStorage.setItem("tree", given.savedState);
         }
-
-        mockjax({
-            url: "*",
-            response: handleResponse,
-            logging: false,
-        });
 
         given.$tree.tree({
             autoOpen: given.autoOpen,
@@ -84,7 +90,7 @@ context("when a node has load_on_demand in the data", () => {
         );
 
         it("loads the subtree", async () => {
-            togglerLink(given.node.element).click();
+            togglerLink(given.node.element).trigger("click");
 
             await screen.findByText("loaded-on-demand");
 

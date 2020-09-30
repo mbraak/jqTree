@@ -56,6 +56,7 @@
         "jquery-mockjax": "^2.5.0",
         "jsonfile": "^6.0.1",
         "lodash.template": "^4.5.0",
+        "msw": "^0.21.2",
         "pixelmatch": "^5.2.1",
         "playwright": "^1.4.1",
         "pngjs": "^5.0.0",
