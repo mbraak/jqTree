@@ -352,12 +352,9 @@ describe("onLoadFailed", () => {
 
         beforeAll(() => {
             server = setupServer(
-                rest.get("/tree/", (_request, response, ctx) => {
-                    return response(
-                        ctx.status(500),
-                        ctx.body("Internal server error")
-                    );
-                })
+                rest.get("/tree/", (_request, response, ctx) =>
+                    response(ctx.status(500), ctx.body("Internal server error"))
+                )
             );
             server.listen();
         });
