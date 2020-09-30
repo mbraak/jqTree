@@ -19,21 +19,6 @@ afterEach(() => {
     localStorage.clear();
 });
 
-const server = setupServer(
-    rest.get("/tree/", (request, response, ctx) => {
-        const parentId = request.url.searchParams.get("node");
-
-        if (parentId === "1") {
-            return response(
-                ctx.status(200),
-                ctx.json([{ id: 2, name: "loaded-on-demand" }])
-            );
-        } else {
-            return response(ctx.status(400));
-        }
-    })
-);
-
 context("when a node has load_on_demand in the data", () => {
     interface Vars {
         autoOpen: boolean;
@@ -53,12 +38,29 @@ context("when a node has load_on_demand in the data", () => {
         },
     ];
 
+    let server: ReturnType<typeof setupServer> | null = null;
+
     beforeAll(() => {
+        server = setupServer(
+            rest.get("/tree/", (request, response, ctx) => {
+                const parentId = request.url.searchParams.get("node");
+
+                if (parentId === "1") {
+                    return response(
+                        ctx.status(200),
+                        ctx.json([{ id: 2, name: "loaded-on-demand" }])
+                    );
+                } else {
+                    return response(ctx.status(400));
+                }
+            })
+        );
+
         server.listen();
     });
 
     afterAll(() => {
-        server.close();
+        server?.close();
     });
 
     beforeEach(() => {
