@@ -374,8 +374,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             }
         }
 
+        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
+
         this._refreshElements(node);
-        this.selectCurrentNode();
+        this.selectCurrentNode(mustSetFocus);
 
         return this.element;
     }
@@ -984,12 +986,12 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    private selectCurrentNode(): void {
+    private selectCurrentNode(mustSetFocus: boolean): void {
         const node = this.getSelectedNode();
         if (node) {
             const nodeElement = this._getNodeElementForNode(node);
             if (nodeElement) {
-                nodeElement.select(true);
+                nodeElement.select(mustSetFocus);
             }
         }
     }
