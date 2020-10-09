@@ -374,10 +374,26 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             }
         }
 
+        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
+        const mustSelect = this.isSelectedNodeInSubtree(node);
+
         this._refreshElements(node);
-        this.selectCurrentNode();
+
+        if (mustSelect) {
+            this.selectCurrentNode(mustSetFocus);
+        }
 
         return this.element;
+    }
+
+    private isSelectedNodeInSubtree(subtree: Node): boolean {
+        const selectedNode = this.getSelectedNode();
+
+        if (!selectedNode) {
+            return false;
+        } else {
+            return subtree === selectedNode || subtree.isParentOf(selectedNode);
+        }
     }
 
     public moveNode(node: Node, targetNode: Node, position: string): JQuery {
@@ -984,12 +1000,12 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    private selectCurrentNode(): void {
+    private selectCurrentNode(mustSetFocus: boolean): void {
         const node = this.getSelectedNode();
         if (node) {
             const nodeElement = this._getNodeElementForNode(node);
             if (nodeElement) {
-                nodeElement.select(true);
+                nodeElement.select(mustSetFocus);
             }
         }
     }

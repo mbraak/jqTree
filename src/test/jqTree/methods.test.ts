@@ -1280,12 +1280,14 @@ describe("toJson", () => {
 
 describe("updateNode", () => {
     interface Vars {
+        isSelected: boolean;
         node: INode;
         nodeData: NodeData;
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
+    given("isSelected", () => false);
     given("node", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
@@ -1294,6 +1296,10 @@ describe("updateNode", () => {
             autoOpen: true,
             data: exampleData,
         });
+
+        if (given.isSelected) {
+            given.$tree.tree("selectNode", given.node);
+        }
 
         given.$tree.tree("updateNode", given.node, given.nodeData);
     });
@@ -1392,6 +1398,27 @@ describe("updateNode", () => {
                     }),
                 ]);
             });
+        });
+    });
+
+    context("when the node was selected", () => {
+        given("isSelected", () => true);
+
+        it("keeps the node selected", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+
+        it("keeps the focus on the node", () => {
+            expect(document.activeElement).not.toBeNil();
+            expect(
+                given.$tree.tree(
+                    "getNodeByHtmlElement",
+                    document.activeElement as HTMLElement
+                )
+            ).not.toBeNil();
         });
     });
 });

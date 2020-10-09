@@ -1527,13 +1527,7 @@ var jqtree = (function (exports, jQueryProxy) {
         };
         KeyHandler.prototype.canHandleKeyboard = function () {
             return ((this.treeWidget.options.keyboardSupport || false) &&
-                this.isFocusOnTree());
-        };
-        KeyHandler.prototype.isFocusOnTree = function () {
-            var activeElement = document.activeElement;
-            return Boolean(activeElement &&
-                activeElement.tagName === "SPAN" &&
-                this.treeWidget._containsElement(activeElement));
+                this.treeWidget.selectNodeHandler.isFocusOnTree());
         };
         KeyHandler.LEFT = 37;
         KeyHandler.UP = 38;
@@ -2336,6 +2330,12 @@ var jqtree = (function (exports, jQueryProxy) {
                 this.selectedSingleNode = node;
             }
         };
+        SelectNodeHandler.prototype.isFocusOnTree = function () {
+            var activeElement = document.activeElement;
+            return Boolean(activeElement &&
+                activeElement.tagName === "SPAN" &&
+                this.treeWidget._containsElement(activeElement));
+        };
         return SelectNodeHandler;
     }());
 
@@ -2367,7 +2367,7 @@ var jqtree = (function (exports, jQueryProxy) {
             var $span = this.getSpan();
             $span.attr("tabindex", (_a = this.treeWidget.options.tabIndex) !== null && _a !== void 0 ? _a : null);
             if (mustSetFocus) {
-                $span.focus();
+                $span.trigger("focus");
             }
         };
         NodeElement.prototype.deselect = function () {
@@ -2782,9 +2782,22 @@ var jqtree = (function (exports, jQueryProxy) {
                     node.loadFromData(data.children);
                 }
             }
+            var mustSetFocus = this.selectNodeHandler.isFocusOnTree();
+            var mustSelect = this.isSelectedNodeInSubtree(node);
             this._refreshElements(node);
-            this.selectCurrentNode();
+            if (mustSelect) {
+                this.selectCurrentNode(mustSetFocus);
+            }
             return this.element;
+        };
+        JqTreeWidget.prototype.isSelectedNodeInSubtree = function (subtree) {
+            var selectedNode = this.getSelectedNode();
+            if (!selectedNode) {
+                return false;
+            }
+            else {
+                return subtree === selectedNode || subtree.isParentOf(selectedNode);
+            }
         };
         JqTreeWidget.prototype.moveNode = function (node, targetNode, position) {
             if (!node) {
@@ -3235,12 +3248,12 @@ var jqtree = (function (exports, jQueryProxy) {
                 this.saveStateHandler.saveState();
             }
         };
-        JqTreeWidget.prototype.selectCurrentNode = function () {
+        JqTreeWidget.prototype.selectCurrentNode = function (mustSetFocus) {
             var node = this.getSelectedNode();
             if (node) {
                 var nodeElement = this._getNodeElementForNode(node);
                 if (nodeElement) {
-                    nodeElement.select(true);
+                    nodeElement.select(mustSetFocus);
                 }
             }
         };

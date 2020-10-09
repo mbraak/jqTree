@@ -21,7 +21,7 @@
         "production": "./production",
         "jekyll-build": "bundle exec jekyll build",
         "jekyll-serve": "bundle exec jekyll serve",
-        "devserver": "SERVE=true rollup -c rollup.config.js",
+        "devserver": "SERVE=true rollup -c -w rollup.config.js",
         "devserver-with-coverage": "COVERAGE=true SERVE=true rollup -c rollup.config.js",
         "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
         "coveralls": "nyc report --reporter=text-lcov | coveralls",
