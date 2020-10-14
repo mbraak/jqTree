@@ -129,9 +129,9 @@ export class DragAndDropHandler {
                 this.updateDropHint();
             }
         } else {
-            this.removeHover();
             this.removeDropHint();
             this.stopOpenFolderTimer();
+            this.hoveredArea = area;
         }
 
         if (!area) {
