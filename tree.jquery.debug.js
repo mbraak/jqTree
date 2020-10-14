@@ -704,15 +704,6 @@ var jqtree = (function (exports, jQueryProxy) {
             this.currentItem = nodeElement;
             return this.currentItem != null;
         };
-        DragAndDropHandler.prototype.generateHitAreas = function () {
-            if (!this.currentItem) {
-                this.hitAreas = [];
-            }
-            else {
-                var hitAreasGenerator = new HitAreasGenerator(this.treeWidget.tree, this.currentItem.node, this.getTreeDimensions().bottom);
-                this.hitAreas = hitAreasGenerator.generate();
-            }
-        };
         DragAndDropHandler.prototype.mouseStart = function (positionInfo) {
             var _a;
             if (!this.currentItem ||
@@ -720,18 +711,16 @@ var jqtree = (function (exports, jQueryProxy) {
                 positionInfo.pageY === undefined) {
                 return false;
             }
-            else {
-                this.refresh();
-                var offset = jQuery$1(positionInfo.target).offset();
-                var left = offset ? offset.left : 0;
-                var top_1 = offset ? offset.top : 0;
-                var node = this.currentItem.node;
-                this.dragElement = new DragElement(node.name, positionInfo.pageX - left, positionInfo.pageY - top_1, this.treeWidget.element, (_a = this.treeWidget.options.autoEscape) !== null && _a !== void 0 ? _a : true);
-                this.isDragging = true;
-                this.positionInfo = positionInfo;
-                this.currentItem.$element.addClass("jqtree-moving");
-                return true;
-            }
+            this.refresh();
+            var offset = jQuery$1(positionInfo.target).offset();
+            var left = offset ? offset.left : 0;
+            var top = offset ? offset.top : 0;
+            var node = this.currentItem.node;
+            this.dragElement = new DragElement(node.name, positionInfo.pageX - left, positionInfo.pageY - top, this.treeWidget.element, (_a = this.treeWidget.options.autoEscape) !== null && _a !== void 0 ? _a : true);
+            this.isDragging = true;
+            this.positionInfo = positionInfo;
+            this.currentItem.$element.addClass("jqtree-moving");
+            return true;
         };
         DragAndDropHandler.prototype.mouseDrag = function (positionInfo) {
             if (!this.currentItem ||
@@ -740,39 +729,36 @@ var jqtree = (function (exports, jQueryProxy) {
                 positionInfo.pageY === undefined) {
                 return false;
             }
-            else {
-                this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
-                this.positionInfo = positionInfo;
-                var area = this.findHoveredArea(positionInfo.pageX, positionInfo.pageY);
-                var canMoveTo = this.canMoveToArea(area);
-                if (canMoveTo && area) {
-                    if (!area.node.isFolder()) {
-                        this.stopOpenFolderTimer();
-                    }
-                    if (this.hoveredArea !== area) {
-                        this.hoveredArea = area;
-                        // If this is a closed folder, start timer to open it
-                        if (this.mustOpenFolderTimer(area)) {
-                            this.startOpenFolderTimer(area.node);
-                        }
-                        else {
-                            this.stopOpenFolderTimer();
-                        }
-                        this.updateDropHint();
-                    }
-                }
-                else {
-                    this.removeHover();
-                    this.removeDropHint();
+            this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
+            this.positionInfo = positionInfo;
+            var area = this.findHoveredArea(positionInfo.pageX, positionInfo.pageY);
+            if (area && this.canMoveToArea(area)) {
+                if (!area.node.isFolder()) {
                     this.stopOpenFolderTimer();
                 }
-                if (!area) {
-                    if (this.treeWidget.options.onDragMove) {
-                        this.treeWidget.options.onDragMove(this.currentItem.node, positionInfo.originalEvent);
+                if (this.hoveredArea !== area) {
+                    this.hoveredArea = area;
+                    // If this is a closed folder, start timer to open it
+                    if (this.mustOpenFolderTimer(area)) {
+                        this.startOpenFolderTimer(area.node);
                     }
+                    else {
+                        this.stopOpenFolderTimer();
+                    }
+                    this.updateDropHint();
                 }
-                return true;
             }
+            else {
+                this.removeHover();
+                this.removeDropHint();
+                this.stopOpenFolderTimer();
+            }
+            if (!area) {
+                if (this.treeWidget.options.onDragMove) {
+                    this.treeWidget.options.onDragMove(this.currentItem.node, positionInfo.originalEvent);
+                }
+            }
+            return true;
         };
         DragAndDropHandler.prototype.mouseStop = function (positionInfo) {
             this.moveItem(positionInfo);
@@ -804,20 +790,27 @@ var jqtree = (function (exports, jQueryProxy) {
                 }
             }
         };
+        DragAndDropHandler.prototype.generateHitAreas = function () {
+            if (!this.currentItem) {
+                this.hitAreas = [];
+            }
+            else {
+                var hitAreasGenerator = new HitAreasGenerator(this.treeWidget.tree, this.currentItem.node, this.getTreeDimensions().bottom);
+                this.hitAreas = hitAreasGenerator.generate();
+            }
+        };
         DragAndDropHandler.prototype.mustCaptureElement = function ($element) {
             return !$element.is("input,select,textarea");
         };
         DragAndDropHandler.prototype.canMoveToArea = function (area) {
-            if (!area || !this.currentItem) {
-                return false;
-            }
-            else if (this.treeWidget.options.onCanMoveTo) {
-                var positionName = getPositionName(area.position);
-                return this.treeWidget.options.onCanMoveTo(this.currentItem.node, area.node, positionName);
-            }
-            else {
+            if (!this.treeWidget.options.onCanMoveTo) {
                 return true;
             }
+            if (!this.currentItem) {
+                return false;
+            }
+            var positionName = getPositionName(area.position);
+            return this.treeWidget.options.onCanMoveTo(this.currentItem.node, area.node, positionName);
         };
         DragAndDropHandler.prototype.removeHitAreas = function () {
             this.hitAreas = [];
