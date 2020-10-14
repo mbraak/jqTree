@@ -749,9 +749,9 @@ var jqtree = (function (exports, jQueryProxy) {
                 }
             }
             else {
-                this.removeHover();
                 this.removeDropHint();
                 this.stopOpenFolderTimer();
+                this.hoveredArea = area;
             }
             if (!area) {
                 if (this.treeWidget.options.onDragMove) {
