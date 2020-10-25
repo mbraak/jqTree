@@ -1,5 +1,5 @@
 /*
-JqTree 1.5.1
+JqTree 1.5.2
 
 Copyright 2020 Marco Braak
 
@@ -85,7 +85,7 @@ var jqtree = (function (exports, jQueryProxy) {
         return __assign.apply(this, arguments);
     };
 
-    var version = "1.5.0";
+    var version = "1.5.2";
 
     var Position;
     (function (Position) {

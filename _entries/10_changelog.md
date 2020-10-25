@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### Development
+##### 1.5.2 (october 25 2020)
 
 -   Issue #621: decrease build size using Rollup
 -   Issue #624: updateNode: check if the focus must be reset (thanks to Erik van Eykelen)
