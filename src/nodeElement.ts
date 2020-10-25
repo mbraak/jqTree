@@ -45,7 +45,7 @@ export class NodeElement {
         $span.attr("tabindex", this.treeWidget.options.tabIndex ?? null);
 
         if (mustSetFocus) {
-            $span.focus();
+            $span.trigger("focus");
         }
     }
 

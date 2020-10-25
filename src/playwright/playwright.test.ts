@@ -22,8 +22,16 @@ const given = getGiven<Vars>();
 given("dragAndDrop", () => false);
 
 beforeEach(async () => {
+    await jestPlaywright.resetPage();
+
     await page.goto("http://localhost:8080/test_index.html");
     await page.waitForLoadState("domcontentloaded");
+
+    // Fix error on iphone6 device when collecting coverage
+    await page.evaluate(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        (window as any)["reportCodeCoverage"] = () => null;
+    });
 
     await page.evaluate(`
         const $tree = jQuery("#tree1");

@@ -1,11 +1,10 @@
 import * as $ from "jquery";
 import getGiven from "givens";
-import * as mockjaxFactory from "jquery-mockjax";
+import { rest } from "msw";
+import { setupServer } from "msw/node";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
-
-const mockjax = mockjaxFactory(jQuery, window);
 
 const context = describe;
 
@@ -17,7 +16,6 @@ afterEach(() => {
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
-    mockjax.clear();
 });
 
 describe("tree.click", () => {
@@ -134,12 +132,19 @@ describe("tree.init", () => {
     });
 
     context("with data loaded from an url", () => {
-        beforeEach(() => {
-            mockjax({
-                url: "/tree/",
-                responseText: exampleData,
-                logging: false,
-            });
+        let server: ReturnType<typeof setupServer> | null = null;
+
+        beforeAll(() => {
+            server = setupServer(
+                rest.get("/tree/", (_request, response, ctx) =>
+                    response(ctx.status(200), ctx.json(exampleData))
+                )
+            );
+            server.listen();
+        });
+
+        afterAll(() => {
+            server?.close();
         });
 
         it("is called", () =>

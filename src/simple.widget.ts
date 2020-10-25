@@ -116,7 +116,7 @@ export default class SimpleWidget<WidgetOptions> {
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const defaults = (this.constructor as any)["defaults"] as WidgetOptions;
-        this.options = jQuery.extend({}, defaults, options);
+        this.options = { ...defaults, ...options };
     }
 
     public destroy(): void {

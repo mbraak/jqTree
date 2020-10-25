@@ -115,4 +115,14 @@ export default class SelectNodeHandler {
             this.selectedSingleNode = node;
         }
     }
+
+    public isFocusOnTree(): boolean {
+        const activeElement = document.activeElement;
+
+        return Boolean(
+            activeElement &&
+                activeElement.tagName === "SPAN" &&
+                this.treeWidget._containsElement(activeElement as HTMLElement)
+        );
+    }
 }

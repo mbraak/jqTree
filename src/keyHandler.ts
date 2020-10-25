@@ -107,17 +107,7 @@ export default class KeyHandler {
     private canHandleKeyboard(): boolean {
         return (
             (this.treeWidget.options.keyboardSupport || false) &&
-            this.isFocusOnTree()
-        );
-    }
-
-    private isFocusOnTree(): boolean {
-        const activeElement = document.activeElement;
-
-        return Boolean(
-            activeElement &&
-                activeElement.tagName === "SPAN" &&
-                this.treeWidget._containsElement(activeElement as HTMLElement)
+            this.treeWidget.selectNodeHandler.isFocusOnTree()
         );
     }
 }

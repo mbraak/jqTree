@@ -1,8 +1,11 @@
-import * as jQuery from "jquery";
+import * as jQueryProxy from "jquery";
 import { getPositionName, Node, Position } from "./node";
 import { DropHint, HitArea, PositionInfo } from "./types";
 import { NodeElement } from "./nodeElement";
 import { JqTreeWidget } from "./tree.jquery";
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+const jQuery: JQueryStatic = (<any>jQueryProxy).default || jQueryProxy;
 
 interface Dimensions {
     left: number;
@@ -59,19 +62,6 @@ export class DragAndDropHandler {
         return this.currentItem != null;
     }
 
-    public generateHitAreas(): void {
-        if (!this.currentItem) {
-            this.hitAreas = [];
-        } else {
-            const hitAreasGenerator = new HitAreasGenerator(
-                this.treeWidget.tree,
-                this.currentItem.node,
-                this.getTreeDimensions().bottom
-            );
-            this.hitAreas = hitAreasGenerator.generate();
-        }
-    }
-
     public mouseStart(positionInfo: PositionInfo): boolean {
         if (
             !this.currentItem ||
@@ -79,28 +69,28 @@ export class DragAndDropHandler {
             positionInfo.pageY === undefined
         ) {
             return false;
-        } else {
-            this.refresh();
-
-            const offset = jQuery(positionInfo.target).offset();
-            const left = offset ? offset.left : 0;
-            const top = offset ? offset.top : 0;
-
-            const node = this.currentItem.node;
-
-            this.dragElement = new DragElement(
-                node.name,
-                positionInfo.pageX - left,
-                positionInfo.pageY - top,
-                this.treeWidget.element,
-                this.treeWidget.options.autoEscape ?? true
-            );
-
-            this.isDragging = true;
-            this.positionInfo = positionInfo;
-            this.currentItem.$element.addClass("jqtree-moving");
-            return true;
         }
+
+        this.refresh();
+
+        const offset = jQuery(positionInfo.target).offset();
+        const left = offset ? offset.left : 0;
+        const top = offset ? offset.top : 0;
+
+        const node = this.currentItem.node;
+
+        this.dragElement = new DragElement(
+            node.name,
+            positionInfo.pageX - left,
+            positionInfo.pageY - top,
+            this.treeWidget.element,
+            this.treeWidget.options.autoEscape ?? true
+        );
+
+        this.isDragging = true;
+        this.positionInfo = positionInfo;
+        this.currentItem.$element.addClass("jqtree-moving");
+        return true;
     }
 
     public mouseDrag(positionInfo: PositionInfo): boolean {
@@ -111,50 +101,49 @@ export class DragAndDropHandler {
             positionInfo.pageY === undefined
         ) {
             return false;
-        } else {
-            this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
-            this.positionInfo = positionInfo;
+        }
 
-            const area = this.findHoveredArea(
-                positionInfo.pageX,
-                positionInfo.pageY
-            );
-            const canMoveTo = this.canMoveToArea(area);
+        this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
+        this.positionInfo = positionInfo;
 
-            if (canMoveTo && area) {
-                if (!area.node.isFolder()) {
-                    this.stopOpenFolderTimer();
-                }
+        const area = this.findHoveredArea(
+            positionInfo.pageX,
+            positionInfo.pageY
+        );
 
-                if (this.hoveredArea !== area) {
-                    this.hoveredArea = area;
-
-                    // If this is a closed folder, start timer to open it
-                    if (this.mustOpenFolderTimer(area)) {
-                        this.startOpenFolderTimer(area.node);
-                    } else {
-                        this.stopOpenFolderTimer();
-                    }
-
-                    this.updateDropHint();
-                }
-            } else {
-                this.removeHover();
-                this.removeDropHint();
+        if (area && this.canMoveToArea(area)) {
+            if (!area.node.isFolder()) {
                 this.stopOpenFolderTimer();
             }
 
-            if (!area) {
-                if (this.treeWidget.options.onDragMove) {
-                    this.treeWidget.options.onDragMove(
-                        this.currentItem.node,
-                        positionInfo.originalEvent
-                    );
-                }
-            }
+            if (this.hoveredArea !== area) {
+                this.hoveredArea = area;
 
-            return true;
+                // If this is a closed folder, start timer to open it
+                if (this.mustOpenFolderTimer(area)) {
+                    this.startOpenFolderTimer(area.node);
+                } else {
+                    this.stopOpenFolderTimer();
+                }
+
+                this.updateDropHint();
+            }
+        } else {
+            this.removeDropHint();
+            this.stopOpenFolderTimer();
+            this.hoveredArea = area;
         }
+
+        if (!area) {
+            if (this.treeWidget.options.onDragMove) {
+                this.treeWidget.options.onDragMove(
+                    this.currentItem.node,
+                    positionInfo.originalEvent
+                );
+            }
+        }
+
+        return true;
     }
 
     public mouseStop(positionInfo: PositionInfo): boolean {
@@ -202,24 +191,39 @@ export class DragAndDropHandler {
         }
     }
 
+    private generateHitAreas(): void {
+        if (!this.currentItem) {
+            this.hitAreas = [];
+        } else {
+            const hitAreasGenerator = new HitAreasGenerator(
+                this.treeWidget.tree,
+                this.currentItem.node,
+                this.getTreeDimensions().bottom
+            );
+            this.hitAreas = hitAreasGenerator.generate();
+        }
+    }
+
     private mustCaptureElement($element: JQuery<HTMLElement>): boolean {
         return !$element.is("input,select,textarea");
     }
 
-    private canMoveToArea(area: HitArea | null): boolean {
-        if (!area || !this.currentItem) {
-            return false;
-        } else if (this.treeWidget.options.onCanMoveTo) {
-            const positionName = getPositionName(area.position);
-
-            return this.treeWidget.options.onCanMoveTo(
-                this.currentItem.node,
-                area.node,
-                positionName
-            );
-        } else {
+    private canMoveToArea(area: HitArea): boolean {
+        if (!this.treeWidget.options.onCanMoveTo) {
             return true;
         }
+
+        if (!this.currentItem) {
+            return false;
+        }
+
+        const positionName = getPositionName(area.position);
+
+        return this.treeWidget.options.onCanMoveTo(
+            this.currentItem.node,
+            area.node,
+            positionName
+        );
     }
 
     private removeHitAreas(): void {

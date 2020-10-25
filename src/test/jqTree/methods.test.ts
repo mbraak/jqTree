@@ -1,13 +1,13 @@
 import * as $ from "jquery";
 import getGiven from "givens";
 import { screen } from "@testing-library/dom";
-import * as mockjaxFactory from "jquery-mockjax";
+import { rest } from "msw";
+import { setupServer } from "msw/node";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
 import __version__ from "../../version";
 
-const mockjax = mockjaxFactory(jQuery, window);
 const context = describe;
 
 beforeEach(() => {
@@ -18,7 +18,6 @@ afterEach(() => {
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
-    mockjax.clear();
     localStorage.clear();
 });
 
@@ -707,26 +706,33 @@ describe("loadData", () => {
 
 describe("loadDataFromUrl", () => {
     interface Vars {
-        dataUrl?: string;
         initialData: NodeData[];
         serverData: NodeData[];
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
-    given("dataUrl", () => undefined);
     given("initialData", () => []);
     given("serverData", () => exampleData);
     given("$tree", () => $("#tree1"));
 
-    beforeEach(() => {
-        mockjax({
-            url: "/tree/",
-            responseText: given.serverData,
-            logging: false,
-        });
+    let server: ReturnType<typeof setupServer> | null = null;
 
-        given.$tree.tree({ data: given.initialData, dataUrl: given.dataUrl });
+    beforeAll(() => {
+        server = setupServer(
+            rest.get("/tree/", (_request, response, ctx) => {
+                return response(ctx.status(200), ctx.json(given.serverData));
+            })
+        );
+        server.listen();
+    });
+
+    afterAll(() => {
+        server?.close();
+    });
+
+    beforeEach(() => {
+        given.$tree.tree({ data: given.initialData });
     });
 
     context("with url parameter", () => {
@@ -767,9 +773,8 @@ describe("loadDataFromUrl", () => {
     });
 
     context("without url parameter", () => {
-        given("dataUrl", () => "/tree/");
-
         it("loads the data from dataUrl", async () => {
+            given.$tree.tree("setOption", "dataUrl", "/tree/");
             given.$tree.tree("loadDataFromUrl");
             await screen.findByText("node1");
 
@@ -948,13 +953,22 @@ describe("reload", () => {
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
-    beforeEach(async () => {
-        mockjax({
-            url: "/tree/",
-            responseText: exampleData,
-            logging: false,
-        });
+    let server: ReturnType<typeof setupServer> | null = null;
 
+    beforeAll(() => {
+        server = setupServer(
+            rest.get("/tree/", (_request, response, ctx) =>
+                response(ctx.status(200), ctx.json(exampleData))
+            )
+        );
+        server.listen();
+    });
+
+    afterAll(() => {
+        server?.close();
+    });
+
+    beforeEach(async () => {
         given.$tree.tree({ dataUrl: "/tree/" });
         await screen.findByText("node1");
 
@@ -1266,12 +1280,14 @@ describe("toJson", () => {
 
 describe("updateNode", () => {
     interface Vars {
+        isSelected: boolean;
         node: INode;
         nodeData: NodeData;
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
+    given("isSelected", () => false);
     given("node", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
@@ -1280,6 +1296,10 @@ describe("updateNode", () => {
             autoOpen: true,
             data: exampleData,
         });
+
+        if (given.isSelected) {
+            given.$tree.tree("selectNode", given.node);
+        }
 
         given.$tree.tree("updateNode", given.node, given.nodeData);
     });
@@ -1378,6 +1398,27 @@ describe("updateNode", () => {
                     }),
                 ]);
             });
+        });
+    });
+
+    context("when the node was selected", () => {
+        given("isSelected", () => true);
+
+        it("keeps the node selected", () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+
+        it("keeps the focus on the node", () => {
+            expect(document.activeElement).not.toBeNil();
+            expect(
+                given.$tree.tree(
+                    "getNodeByHtmlElement",
+                    document.activeElement as HTMLElement
+                )
+            ).not.toBeNil();
         });
     });
 });

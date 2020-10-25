@@ -3,6 +3,12 @@ title: Changelog
 name: changelog
 ---
 
+##### 1.5.2 (october 25 2020)
+
+-   Issue #621: decrease build size using Rollup
+-   Issue #624: updateNode: check if the focus must be reset (thanks to Erik van Eykelen)
+-   Issue #626: improve autoScroll when using the onCanMoveTo option (thanks to Dmytro Tarianyk)
+
 ##### 1.5.1 (september 23 2020)
 
 -   Issue #615: fix XSS vulnerability (thanks to Aimeos)

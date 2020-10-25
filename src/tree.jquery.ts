@@ -1,5 +1,5 @@
 import __version__ from "./version";
-import * as jQuery from "jquery";
+import * as jQueryProxy from "jquery";
 import { DragAndDropHandler } from "./dragAndDropHandler";
 import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
@@ -14,6 +14,9 @@ import { Node, NodeId, getPosition, NodeData } from "./node";
 import { isFunction } from "./util";
 import { FolderElement, NodeElement, OnFinishOpenNode } from "./nodeElement";
 import { JQTreeOptions } from "./jqtreeOptions";
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+const jQuery: JQueryStatic = (<any>jQueryProxy).default || jQueryProxy;
 
 interface ClickTarget {
     node: Node;
@@ -371,10 +374,26 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             }
         }
 
+        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
+        const mustSelect = this.isSelectedNodeInSubtree(node);
+
         this._refreshElements(node);
-        this.selectCurrentNode();
+
+        if (mustSelect) {
+            this.selectCurrentNode(mustSetFocus);
+        }
 
         return this.element;
+    }
+
+    private isSelectedNodeInSubtree(subtree: Node): boolean {
+        const selectedNode = this.getSelectedNode();
+
+        if (!selectedNode) {
+            return false;
+        } else {
+            return subtree === selectedNode || subtree.isParentOf(selectedNode);
+        }
     }
 
     public moveNode(node: Node, targetNode: Node, position: string): JQuery {
@@ -501,9 +520,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         eventName: string,
         values?: DefaultRecord
     ): JQuery.Event {
-        const event = jQuery.Event(eventName);
-        jQuery.extend(event, values);
-
+        const event = jQuery.Event(eventName, values);
         this.element.trigger(event);
         return event;
     }
@@ -606,8 +623,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
         this.initData();
 
-        this.element.click(this.handleClick);
-        this.element.dblclick(this.handleDblclick);
+        this.element.on("click", this.handleClick);
+        this.element.on("dblclick", this.handleDblclick);
 
         if (this.options.useContextMenu) {
             this.element.on("contextmenu", this.handleContextmenu);
@@ -983,12 +1000,12 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    private selectCurrentNode(): void {
+    private selectCurrentNode(mustSetFocus: boolean): void {
         const node = this.getSelectedNode();
         if (node) {
             const nodeElement = this._getNodeElementForNode(node);
             if (nodeElement) {
-                nodeElement.select(true);
+                nodeElement.select(mustSetFocus);
             }
         }
     }
