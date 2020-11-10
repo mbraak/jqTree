@@ -39,7 +39,6 @@
         "@types/jest": "^26.0.8",
         "@types/jquery": "^3.5.0",
         "@types/pngjs": "^3.4.2",
-        "@types/wait-on": "^4.0.0",
         "@typescript-eslint/eslint-plugin": "^4.0.1",
         "@typescript-eslint/parser": "^4.0.1",
         "autoprefixer": "^10.0.0",
