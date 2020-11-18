@@ -14,7 +14,7 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "test": "start-server-and-test devserver-with-coverage http://localhost:8080 'jest --runInBand --coverage --no-cache --verbose'",
+        "test": "start-server-and-test 'yarn devserver-with-coverage' http://localhost:8080 'jest --runInBand --coverage --no-cache --verbose'",
         "test-with-server": "jest --runInBand --coverage",
         "test-watch": "jest --watch",
         "lint": "eslint src/ --ext .ts,.tsx",
