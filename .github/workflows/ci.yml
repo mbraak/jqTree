@@ -45,6 +45,11 @@ jobs:
         yarn run merge-coverage
         yarn run print-coverage
     - name: Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          yarn run coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.github_token }}
+        COVERALLS_SERVICE_NAME: github
+        COVERALLS_GIT_COMMIT: ${{ github.sha }}
+        COVERALLS_GIT_BRANCH: ${{ github.ref }}
+        COVERALLS_SERVICE_JOB_ID: ${{ github.run_id }}
