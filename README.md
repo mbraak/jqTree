@@ -1,4 +1,4 @@
-[![Travis Status](https://api.travis-ci.org/mbraak/jqTree.svg)](http://travis-ci.org/mbraak/jqTree) [![Coverage Status](https://img.shields.io/coveralls/mbraak/jqTree.svg)](https://coveralls.io/r/mbraak/jqTree)
+![Build](https://github.com/mbraak/jqTree/workflows/Continuous%20integration/badge.svg) [![Coverage Status](https://img.shields.io/coveralls/mbraak/jqTree.svg)](https://coveralls.io/r/mbraak/jqTree)
 
 [![NPM version](https://img.shields.io/npm/v/jqtree.svg)](https://www.npmjs.com/package/jqtree)
 
