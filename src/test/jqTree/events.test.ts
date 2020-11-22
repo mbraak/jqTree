@@ -43,7 +43,7 @@ describe("tree.click", () => {
                 done();
             });
 
-            given.titleSpan.click();
+            given.titleSpan.trigger("click");
         }));
 });
 
@@ -101,7 +101,7 @@ describe("tree.dblclick", () => {
                 done();
             });
 
-            given.titleSpan.dblclick();
+            given.titleSpan.trigger("dblclick");
         }));
 });
 
@@ -213,7 +213,7 @@ describe("tree.select", () => {
                 done();
             });
 
-            given.titleSpan.click();
+            given.titleSpan.trigger("click");
         }));
 
     context("when the node was selected", () => {
@@ -231,7 +231,7 @@ describe("tree.select", () => {
                     done();
                 });
 
-                given.titleSpan.click();
+                given.titleSpan.trigger("click");
             }));
     });
 });

@@ -1181,7 +1181,7 @@ describe("setOption", () => {
 
     it("sets an option", () => {
         given.$tree.tree("setOption", "selectable", true);
-        titleSpan(given.node1.element).click();
+        titleSpan(given.node1.element).trigger("click");
         expect(given.$tree.tree("getSelectedNode")).toMatchObject({
             name: "node1",
         });
