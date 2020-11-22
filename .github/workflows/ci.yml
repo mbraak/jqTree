@@ -1,55 +1,54 @@
 name: Continuous integration
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
-  runner-job:
+    runner-job:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Check out repository code
-      uses: actions/checkout@v2
-    - name: Setup node
-      uses: actions/setup-node@v1
-      with:
-        node-version: '14'
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-    - name: Cache javascript packages
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
-        restore-keys: |
-         ${{ runner.os }}-yarn-
-    - name: Install packages
-      run: |
-        yarn --prefer-offline
-    - name: Build
-      run: |
-        yarn run production
-    - name: Lint
-      run: |
-        yarn run lint
-    - name: Check types
-      run: |
-        yarn run tsc
-    - name: Run tests
-      run: |
-        yarn run clean-coverage
-        yarn run test
-    - name: Merge coverage
-      run: |
-        yarn run merge-coverage
-        yarn run print-coverage
-    - name: Coveralls
-      run: |
-          yarn run coveralls
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.github_token }}
-        COVERALLS_SERVICE_NAME: github
-        COVERALLS_GIT_COMMIT: ${{ github.sha }}
-        COVERALLS_GIT_BRANCH: ${{ github.ref }}
-        COVERALLS_SERVICE_JOB_ID: ${{ github.run_id }}
+        steps:
+            - name: Check out repository code
+              uses: actions/checkout@v2
+            - name: Setup node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: "14"
+            - name: Get yarn cache directory path
+              id: yarn-cache-dir-path
+              run: echo "::set-output name=dir::$(yarn cache dir)"
+            - name: Cache javascript packages
+              uses: actions/cache@v2
+              with:
+                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+            - name: Install packages
+              run: |
+                  yarn --prefer-offline
+            - name: Build
+              run: |
+                  yarn run production
+            - name: Lint
+              run: |
+                  yarn run lint
+            - name: Check types
+              run: |
+                  yarn run tsc
+            - name: Run tests
+              run: |
+                  yarn run clean-coverage
+                  yarn run test
+            - name: Merge coverage
+              run: |
+                  yarn run merge-coverage
+                  yarn run print-coverage
+            - name: Coveralls
+              run: |
+                  yarn run coveralls
+              env:
+                  COVERALLS_REPO_TOKEN: ${{ secrets.github_token }}
+                  COVERALLS_SERVICE_NAME: github
+                  COVERALLS_GIT_COMMIT: ${{ github.sha }}
+                  COVERALLS_GIT_BRANCH: ${{ github.ref }}
+                  COVERALLS_SERVICE_JOB_ID: ${{ github.run_id }}
