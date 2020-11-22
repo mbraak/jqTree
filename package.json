@@ -70,6 +70,6 @@
         "start-server-and-test": "^1.11.3",
         "ts-jest": "^26.1.4",
         "tslib": "^2.0.1",
-        "typescript": "^4.0.2"
+        "typescript": "^4.1.2"
     }
 }
