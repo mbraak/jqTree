@@ -991,7 +991,7 @@ describe("reload", () => {
 
     context("with a onFinished parameter", () => {
         it("calls onFinished", () =>
-            new Promise((resolve) => {
+            new Promise<void>((resolve) => {
                 const handleFinished = () => {
                     expect(given.$tree).toHaveTreeStructure([
                         expect.objectContaining({ name: "node1" }),
