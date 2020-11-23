@@ -364,7 +364,7 @@ describe("onLoadFailed", () => {
         });
 
         it("calls onLoadFailed", () =>
-            new Promise((done) => {
+            new Promise<void>((done) => {
                 given.$tree.tree({
                     dataUrl: "/tree/",
                     onLoadFailed: (jqXHR) => {

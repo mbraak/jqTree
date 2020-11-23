@@ -35,7 +35,7 @@ describe("tree.click", () => {
     });
 
     it("fires tree.click", () =>
-        new Promise((done) => {
+        new Promise<void>((done) => {
             given.$tree.on("tree.click", (e: unknown) => {
                 const treeClickEvent = e as ClickNodeEvent;
 
@@ -43,7 +43,7 @@ describe("tree.click", () => {
                 done();
             });
 
-            given.titleSpan.click();
+            given.titleSpan.trigger("click");
         }));
 });
 
@@ -64,7 +64,7 @@ describe("tree.contextmenu", () => {
     });
 
     it("fires tree.contextmenu", () =>
-        new Promise((done) => {
+        new Promise<void>((done) => {
             given.$tree.on("tree.contextmenu", (e: unknown) => {
                 const treeClickEvent = e as ClickNodeEvent;
 
@@ -93,7 +93,7 @@ describe("tree.dblclick", () => {
     });
 
     it("fires tree.dblclick", () =>
-        new Promise((done) => {
+        new Promise<void>((done) => {
             given.$tree.on("tree.dblclick", (e: unknown) => {
                 const treeClickEvent = e as ClickNodeEvent;
 
@@ -101,7 +101,7 @@ describe("tree.dblclick", () => {
                 done();
             });
 
-            given.titleSpan.dblclick();
+            given.titleSpan.trigger("dblclick");
         }));
 });
 
@@ -114,7 +114,7 @@ describe("tree.init", () => {
 
     context("with json data", () => {
         it("is called", () =>
-            new Promise((done) => {
+            new Promise<void>((done) => {
                 given.$tree.on("tree.init", () => {
                     expect(
                         given.$tree.tree("getNodeByName", "node2")
@@ -148,7 +148,7 @@ describe("tree.init", () => {
         });
 
         it("is called", () =>
-            new Promise((done) => {
+            new Promise<void>((done) => {
                 given.$tree.on("tree.init", () => {
                     expect(
                         given.$tree.tree("getNodeByName", "node2")
@@ -173,7 +173,7 @@ describe("tree.load_data", () => {
 
     context("when the tree is initialized with data", () => {
         it("fires tree.load_data", () =>
-            new Promise((resolve) => {
+            new Promise<void>((resolve) => {
                 given.$tree.on("tree.load_data", (e: any) => {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     expect(e.tree_data).toEqual(exampleData);
@@ -204,7 +204,7 @@ describe("tree.select", () => {
     });
 
     it("fires tree.click", () =>
-        new Promise((done) => {
+        new Promise<void>((done) => {
             given.$tree.on("tree.select", (e: unknown) => {
                 const treeClickEvent = e as ClickNodeEvent;
 
@@ -213,7 +213,7 @@ describe("tree.select", () => {
                 done();
             });
 
-            given.titleSpan.click();
+            given.titleSpan.trigger("click");
         }));
 
     context("when the node was selected", () => {
@@ -222,7 +222,7 @@ describe("tree.select", () => {
         });
 
         it("fires tree.select with node is null", () =>
-            new Promise((done) => {
+            new Promise<void>((done) => {
                 given.$tree.on("tree.select", (e: unknown) => {
                     const treeClickEvent = e as ClickNodeEvent;
 
@@ -231,7 +231,7 @@ describe("tree.select", () => {
                     done();
                 });
 
-                given.titleSpan.click();
+                given.titleSpan.trigger("click");
             }));
     });
 });
