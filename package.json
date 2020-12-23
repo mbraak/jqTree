@@ -63,7 +63,7 @@
         "postcss-nested": "^5.0.0",
         "prettier": "^2.0.5",
         "rollup": "^2.7.6",
-        "rollup-plugin-istanbul": "^2.0.1",
+        "rollup-plugin-istanbul": "^3.0.0",
         "rollup-plugin-serve": "^1.0.4",
         "rollup-plugin-terser": "^7.0.2",
         "start-server-and-test": "^1.11.3",
