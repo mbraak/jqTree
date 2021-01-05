@@ -106,19 +106,21 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
             passive: false,
         });
 
-        if (this.mouseDelay) {
-            this.startMouseDelayTimer();
+        const mouseDelay = this.getMouseDelay();
+
+        if (mouseDelay) {
+            this.startMouseDelayTimer(mouseDelay);
         }
     }
 
-    private startMouseDelayTimer(): void {
+    private startMouseDelayTimer(mouseDelay: number): void {
         if (this.mouseDelayTimer) {
             clearTimeout(this.mouseDelayTimer);
         }
 
         this.mouseDelayTimer = window.setTimeout(() => {
             this.isMouseDelayMet = true;
-        }, this.getMouseDelay());
+        }, mouseDelay);
 
         this.isMouseDelayMet = false;
     }
