@@ -110,6 +110,8 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
         if (mouseDelay) {
             this.startMouseDelayTimer(mouseDelay);
+        } else {
+            this.isMouseDelayMet = true;
         }
     }
 
@@ -142,7 +144,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
             return;
         }
 
-        if (this.mouseDelay && !this.isMouseDelayMet) {
+        if (!this.isMouseDelayMet) {
             return;
         }
 
