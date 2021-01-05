@@ -1,7 +1,7 @@
 /*
 JqTree 1.5.2
 
-Copyright 2020 Marco Braak
+Copyright 2021 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -1697,9 +1697,6 @@ var jqtree = (function (exports, jQueryProxy) {
             };
             return _this;
         }
-        MouseWidget.prototype.setMouseDelay = function (mouseDelay) {
-            this.mouseDelay = mouseDelay;
-        };
         MouseWidget.prototype.init = function () {
             var element = this.$el.get(0);
             element.addEventListener("mousedown", this.mouseDown, {
@@ -2940,9 +2937,10 @@ var jqtree = (function (exports, jQueryProxy) {
             return this.scrollHandler.getScrollLeft();
         };
         JqTreeWidget.prototype.init = function () {
+            var _a;
             _super.prototype.init.call(this);
             this.element = this.$el;
-            this.mouseDelay = 300;
+            this.mouseDelay = (_a = this.options.startDndDelay) !== null && _a !== void 0 ? _a : 0;
             this.isInitialized = false;
             this.options.rtl = this.getRtlOption();
             if (this.options.closedIcon == null) {
@@ -3409,6 +3407,7 @@ var jqtree = (function (exports, jQueryProxy) {
             dataFilter: undefined,
             keyboardSupport: true,
             openFolderDelay: 500,
+            startDndDelay: 300,
             rtl: undefined,
             onDragMove: undefined,
             onDragStop: undefined,
