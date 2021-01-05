@@ -1746,6 +1746,9 @@ var jqtree = (function (exports, jQueryProxy) {
             if (mouseDelay) {
                 this.startMouseDelayTimer(mouseDelay);
             }
+            else {
+                this.isMouseDelayMet = true;
+            }
         };
         MouseWidget.prototype.startMouseDelayTimer = function (mouseDelay) {
             var _this = this;
@@ -1765,7 +1768,7 @@ var jqtree = (function (exports, jQueryProxy) {
                 }
                 return;
             }
-            if (this.mouseDelay && !this.isMouseDelayMet) {
+            if (!this.isMouseDelayMet) {
                 return;
             }
             if (this.mouseDownInfo) {
