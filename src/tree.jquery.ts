@@ -605,7 +605,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         super.init();
 
         this.element = this.$el;
-        this.mouseDelay = this.options.startDndDelay ?? 0;
         this.isInitialized = false;
 
         this.options.rtl = this.getRtlOption();
@@ -676,6 +675,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         } else {
             return false;
         }
+    }
+
+    protected getMouseDelay(): number {
+        return this.options.startDndDelay ?? 0;
     }
 
     private initData(): void {

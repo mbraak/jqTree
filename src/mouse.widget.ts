@@ -24,7 +24,6 @@ const getPositionInfoFromTouch = (
 abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     public $el: JQuery<HTMLElement>;
     protected isMouseStarted: boolean;
-    protected mouseDelay: number;
     protected mouseDownInfo: PositionInfo | null;
     private mouseDelayTimer: number | null;
     private isMouseDelayMet: boolean;
@@ -39,7 +38,6 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         });
 
         this.isMouseStarted = false;
-        this.mouseDelay = 0;
         this.mouseDelayTimer = null;
         this.isMouseDelayMet = false;
         this.mouseDownInfo = null;
@@ -63,6 +61,8 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     protected abstract mouseDrag(positionInfo: PositionInfo): void;
 
     protected abstract mouseStop(positionInfo: PositionInfo): void;
+
+    protected abstract getMouseDelay(): number;
 
     private mouseDown = (e: MouseEvent): void => {
         // Left mouse button?
@@ -118,7 +118,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
         this.mouseDelayTimer = window.setTimeout(() => {
             this.isMouseDelayMet = true;
-        }, this.mouseDelay);
+        }, this.getMouseDelay());
 
         this.isMouseDelayMet = false;
     }
