@@ -63,6 +63,7 @@ interface IJQTreeOptions {
     saveState?: boolean | string;
     slide?: boolean;
     showEmptyFolder?: boolean;
+    startDndDelay?: number;
     tabIndex?: number;
     useContextMenu?: boolean;
 }

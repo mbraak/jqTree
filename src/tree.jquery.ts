@@ -66,6 +66,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         dataFilter: undefined,
         keyboardSupport: true,
         openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
+        startDndDelay: 300, // The delay for starting dnd (in milliseconds)
         rtl: undefined, // right-to-left support; true / false (default)
         onDragMove: undefined,
         onDragStop: undefined,
@@ -604,7 +605,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         super.init();
 
         this.element = this.$el;
-        this.mouseDelay = 300;
+        this.mouseDelay = this.options.startDndDelay ?? 0;
         this.isInitialized = false;
 
         this.options.rtl = this.getRtlOption();
