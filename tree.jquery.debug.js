@@ -1706,7 +1706,6 @@ var jqtree = (function (exports, jQueryProxy) {
                 passive: false
             });
             this.isMouseStarted = false;
-            this.mouseDelay = 0;
             this.mouseDelayTimer = null;
             this.isMouseDelayMet = false;
             this.mouseDownInfo = null;
@@ -1754,7 +1753,7 @@ var jqtree = (function (exports, jQueryProxy) {
             }
             this.mouseDelayTimer = window.setTimeout(function () {
                 _this.isMouseDelayMet = true;
-            }, this.mouseDelay);
+            }, this.getMouseDelay());
             this.isMouseDelayMet = false;
         };
         MouseWidget.prototype.handleMouseMove = function (e, positionInfo) {
@@ -2937,10 +2936,8 @@ var jqtree = (function (exports, jQueryProxy) {
             return this.scrollHandler.getScrollLeft();
         };
         JqTreeWidget.prototype.init = function () {
-            var _a;
             _super.prototype.init.call(this);
             this.element = this.$el;
-            this.mouseDelay = (_a = this.options.startDndDelay) !== null && _a !== void 0 ? _a : 0;
             this.isInitialized = false;
             this.options.rtl = this.getRtlOption();
             if (this.options.closedIcon == null) {
@@ -3000,6 +2997,10 @@ var jqtree = (function (exports, jQueryProxy) {
             else {
                 return false;
             }
+        };
+        JqTreeWidget.prototype.getMouseDelay = function () {
+            var _a;
+            return (_a = this.options.startDndDelay) !== null && _a !== void 0 ? _a : 0;
         };
         JqTreeWidget.prototype.initData = function () {
             if (this.options.data) {
