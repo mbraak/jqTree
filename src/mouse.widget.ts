@@ -29,10 +29,6 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     private mouseDelayTimer: number | null;
     private isMouseDelayMet: boolean;
 
-    public setMouseDelay(mouseDelay: number): void {
-        this.mouseDelay = mouseDelay;
-    }
-
     public init(): void {
         const element = this.$el.get(0);
         element.addEventListener("mousedown", this.mouseDown, {
