@@ -57,10 +57,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         onLoadFailed: undefined,
         onLoading: undefined,
         onSetStateFromStorage: undefined,
+        openedIcon: "&#x25bc;",
         openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
         // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
         // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-        openedIcon: "&#x25bc;",
         rtl: undefined, // right-to-left support; true / false (default)
         saveState: false, // true / false / string (cookie name)
         selectable: true,
@@ -486,7 +486,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public setOption(option: string, value: unknown): JQuery {
-        (this.options as Record<string, unknown>)[option] = value;
+        ((this.options as unknown) as Record<string, unknown>)[option] = value;
         return this.element;
     }
 
