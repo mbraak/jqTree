@@ -69,6 +69,8 @@ var jqtree = (function (exports, jQueryProxy) {
     };
 
     function __extends(d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3384,42 +3386,41 @@ var jqtree = (function (exports, jQueryProxy) {
         };
         JqTreeWidget.defaults = {
             animationSpeed: "fast",
-            autoOpen: false,
-            saveState: false,
-            dragAndDrop: false,
-            selectable: true,
-            useContextMenu: true,
-            onCanSelectNode: undefined,
-            onSetStateFromStorage: undefined,
-            onGetStateFromStorage: undefined,
-            onCreateLi: undefined,
-            onIsMoveHandle: undefined,
-            // Can this node be moved?
-            onCanMove: undefined,
-            // Can this node be moved to this position? function(moved_node, target_node, position)
-            onCanMoveTo: undefined,
-            onLoadFailed: undefined,
             autoEscape: true,
-            dataUrl: undefined,
+            autoOpen: false,
+            buttonLeft: true,
             // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
             // http://www.fileformat.info/info/unicode/char/25ba/index.htm
             closedIcon: undefined,
-            // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-            // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-            openedIcon: "&#x25bc;",
-            slide: true,
-            nodeClass: Node,
+            data: undefined,
             dataFilter: undefined,
+            dataUrl: undefined,
+            dragAndDrop: false,
             keyboardSupport: true,
-            openFolderDelay: 500,
-            startDndDelay: 300,
-            rtl: undefined,
+            nodeClass: Node,
+            onCanMove: undefined,
+            onCanMoveTo: undefined,
+            onCanSelectNode: undefined,
+            onCreateLi: undefined,
             onDragMove: undefined,
             onDragStop: undefined,
-            buttonLeft: true,
+            onGetStateFromStorage: undefined,
+            onIsMoveHandle: undefined,
+            onLoadFailed: undefined,
             onLoading: undefined,
+            onSetStateFromStorage: undefined,
+            openedIcon: "&#x25bc;",
+            openFolderDelay: 500,
+            // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+            // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+            rtl: undefined,
+            saveState: false,
+            selectable: true,
             showEmptyFolder: false,
-            tabIndex: 0
+            slide: true,
+            startDndDelay: 300,
+            tabIndex: 0,
+            useContextMenu: true
         };
         return JqTreeWidget;
     }(MouseWidget));
