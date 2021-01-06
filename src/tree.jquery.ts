@@ -34,46 +34,41 @@ const PARAM_IS_EMPTY = "Parameter is empty: ";
 export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     protected static defaults: JQTreeOptions = {
         animationSpeed: "fast",
-        autoOpen: false, // true / false / int (open n levels starting at 0)
-        saveState: false, // true / false / string (cookie name)
-        dragAndDrop: false,
-        selectable: true,
-        useContextMenu: true,
-        onCanSelectNode: undefined,
-        onSetStateFromStorage: undefined,
-        onGetStateFromStorage: undefined,
-        onCreateLi: undefined,
-        onIsMoveHandle: undefined,
-
-        // Can this node be moved?
-        onCanMove: undefined,
-
-        // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanMoveTo: undefined,
-        onLoadFailed: undefined,
         autoEscape: true,
-        dataUrl: undefined,
-
+        autoOpen: false, // true / false / int (open n levels starting at 0)
+        buttonLeft: true,
         // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
         // http://www.fileformat.info/info/unicode/char/25ba/index.htm
         closedIcon: undefined,
-
-        // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-        // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-        openedIcon: "&#x25bc;",
-        slide: true, // must display slide animation?
-        nodeClass: Node,
+        data: undefined,
         dataFilter: undefined,
+        dataUrl: undefined,
+        dragAndDrop: false,
         keyboardSupport: true,
-        openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
-        startDndDelay: 300, // The delay for starting dnd (in milliseconds)
-        rtl: undefined, // right-to-left support; true / false (default)
+        nodeClass: Node,
+        onCanMove: undefined, // Can this node be moved?
+        onCanMoveTo: undefined, // Can this node be moved to this position? function(moved_node, target_node, position)
+        onCanSelectNode: undefined,
+        onCreateLi: undefined,
         onDragMove: undefined,
         onDragStop: undefined,
-        buttonLeft: true,
+        onGetStateFromStorage: undefined,
+        onIsMoveHandle: undefined,
+        onLoadFailed: undefined,
         onLoading: undefined,
+        onSetStateFromStorage: undefined,
+        openedIcon: "&#x25bc;",
+        openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
+        // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+        // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+        rtl: undefined, // right-to-left support; true / false (default)
+        saveState: false, // true / false / string (cookie name)
+        selectable: true,
         showEmptyFolder: false,
+        slide: true, // must display slide animation?
+        startDndDelay: 300, // The delay for starting dnd (in milliseconds)
         tabIndex: 0,
+        useContextMenu: true,
     };
 
     public element: JQuery;
@@ -491,7 +486,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public setOption(option: string, value: unknown): JQuery {
-        (this.options as Record<string, unknown>)[option] = value;
+        ((this.options as unknown) as Record<string, unknown>)[option] = value;
         return this.element;
     }
 
