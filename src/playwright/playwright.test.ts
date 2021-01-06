@@ -41,8 +41,8 @@ beforeEach(async () => {
             autoOpen: 0,
             data: ExampleData.exampleData,
             dragAndDrop: ${given.dragAndDrop},
+            startDndDelay: 100,
         });
-        $tree.tree("setMouseDelay", 100);
     `);
 });
 
