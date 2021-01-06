@@ -1,7 +1,7 @@
 /*
 JqTree 1.5.2
 
-Copyright 2020 Marco Braak
+Copyright 2021 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -1697,9 +1697,6 @@ var jqtree = (function (exports, jQueryProxy) {
             };
             return _this;
         }
-        MouseWidget.prototype.setMouseDelay = function (mouseDelay) {
-            this.mouseDelay = mouseDelay;
-        };
         MouseWidget.prototype.init = function () {
             var element = this.$el.get(0);
             element.addEventListener("mousedown", this.mouseDown, {
@@ -1709,7 +1706,6 @@ var jqtree = (function (exports, jQueryProxy) {
                 passive: false
             });
             this.isMouseStarted = false;
-            this.mouseDelay = 0;
             this.mouseDelayTimer = null;
             this.isMouseDelayMet = false;
             this.mouseDownInfo = null;
@@ -1746,18 +1742,22 @@ var jqtree = (function (exports, jQueryProxy) {
             document.addEventListener("touchend", this.touchEnd, {
                 passive: false
             });
-            if (this.mouseDelay) {
-                this.startMouseDelayTimer();
+            var mouseDelay = this.getMouseDelay();
+            if (mouseDelay) {
+                this.startMouseDelayTimer(mouseDelay);
+            }
+            else {
+                this.isMouseDelayMet = true;
             }
         };
-        MouseWidget.prototype.startMouseDelayTimer = function () {
+        MouseWidget.prototype.startMouseDelayTimer = function (mouseDelay) {
             var _this = this;
             if (this.mouseDelayTimer) {
                 clearTimeout(this.mouseDelayTimer);
             }
             this.mouseDelayTimer = window.setTimeout(function () {
                 _this.isMouseDelayMet = true;
-            }, this.mouseDelay);
+            }, mouseDelay);
             this.isMouseDelayMet = false;
         };
         MouseWidget.prototype.handleMouseMove = function (e, positionInfo) {
@@ -1768,7 +1768,7 @@ var jqtree = (function (exports, jQueryProxy) {
                 }
                 return;
             }
-            if (this.mouseDelay && !this.isMouseDelayMet) {
+            if (!this.isMouseDelayMet) {
                 return;
             }
             if (this.mouseDownInfo) {
@@ -2942,7 +2942,6 @@ var jqtree = (function (exports, jQueryProxy) {
         JqTreeWidget.prototype.init = function () {
             _super.prototype.init.call(this);
             this.element = this.$el;
-            this.mouseDelay = 300;
             this.isInitialized = false;
             this.options.rtl = this.getRtlOption();
             if (this.options.closedIcon == null) {
@@ -3002,6 +3001,10 @@ var jqtree = (function (exports, jQueryProxy) {
             else {
                 return false;
             }
+        };
+        JqTreeWidget.prototype.getMouseDelay = function () {
+            var _a;
+            return (_a = this.options.startDndDelay) !== null && _a !== void 0 ? _a : 0;
         };
         JqTreeWidget.prototype.initData = function () {
             if (this.options.data) {
@@ -3409,6 +3412,7 @@ var jqtree = (function (exports, jQueryProxy) {
             dataFilter: undefined,
             keyboardSupport: true,
             openFolderDelay: 500,
+            startDndDelay: 300,
             rtl: undefined,
             onDragMove: undefined,
             onDragStop: undefined,

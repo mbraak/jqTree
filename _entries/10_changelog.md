@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+##### development version
+
+-   Issue #640: add startDndDelay option (thanks to Erik van Eykelen)
+
 ##### 1.5.2 (october 25 2020)
 
 -   Issue #621: decrease build size using Rollup
