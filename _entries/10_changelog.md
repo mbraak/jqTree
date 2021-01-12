@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-##### development version
+##### 1.5.3 (january 12 2021)
 
 -   Issue #640: add startDndDelay option (thanks to Erik van Eykelen)
 
