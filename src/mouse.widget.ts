@@ -24,14 +24,9 @@ const getPositionInfoFromTouch = (
 abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     public $el: JQuery<HTMLElement>;
     protected isMouseStarted: boolean;
-    protected mouseDelay: number;
     protected mouseDownInfo: PositionInfo | null;
     private mouseDelayTimer: number | null;
     private isMouseDelayMet: boolean;
-
-    public setMouseDelay(mouseDelay: number): void {
-        this.mouseDelay = mouseDelay;
-    }
 
     public init(): void {
         const element = this.$el.get(0);
@@ -43,7 +38,6 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         });
 
         this.isMouseStarted = false;
-        this.mouseDelay = 0;
         this.mouseDelayTimer = null;
         this.isMouseDelayMet = false;
         this.mouseDownInfo = null;
@@ -67,6 +61,8 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     protected abstract mouseDrag(positionInfo: PositionInfo): void;
 
     protected abstract mouseStop(positionInfo: PositionInfo): void;
+
+    protected abstract getMouseDelay(): number;
 
     private mouseDown = (e: MouseEvent): void => {
         // Left mouse button?
@@ -110,19 +106,23 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
             passive: false,
         });
 
-        if (this.mouseDelay) {
-            this.startMouseDelayTimer();
+        const mouseDelay = this.getMouseDelay();
+
+        if (mouseDelay) {
+            this.startMouseDelayTimer(mouseDelay);
+        } else {
+            this.isMouseDelayMet = true;
         }
     }
 
-    private startMouseDelayTimer(): void {
+    private startMouseDelayTimer(mouseDelay: number): void {
         if (this.mouseDelayTimer) {
             clearTimeout(this.mouseDelayTimer);
         }
 
         this.mouseDelayTimer = window.setTimeout(() => {
             this.isMouseDelayMet = true;
-        }, this.mouseDelay);
+        }, mouseDelay);
 
         this.isMouseDelayMet = false;
     }
@@ -144,7 +144,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
             return;
         }
 
-        if (this.mouseDelay && !this.isMouseDelayMet) {
+        if (!this.isMouseDelayMet) {
             return;
         }
 

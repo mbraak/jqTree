@@ -5,7 +5,7 @@ import template from "lodash.template";
 import typescript from "@rollup/plugin-typescript";
 import { terser } from "rollup-plugin-terser";
 import serve from "rollup-plugin-serve";
-import coverage from "rollup-plugin-istanbul";
+import coverage from "rollup-plugin-istanbul2";
 
 const getBanner = () => {
     const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");

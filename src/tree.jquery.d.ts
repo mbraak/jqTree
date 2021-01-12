@@ -63,6 +63,7 @@ interface IJQTreeOptions {
     saveState?: boolean | string;
     slide?: boolean;
     showEmptyFolder?: boolean;
+    startDndDelay?: number;
     tabIndex?: number;
     useContextMenu?: boolean;
 }
@@ -139,7 +140,6 @@ interface IJQTreePlugin {
     (behavior: "removeNode", node: INode): JQuery;
     (behavior: "scrollToNode", node: INode): JQuery;
     (behavior: "selectNode", node: INode | null): JQuery;
-    (behavior: "setMouseDelay", delay: number): void;
     (behavior: "setOption", option: string, value: unknown): JQuery;
     (behavior: "setState", options: DefaultRecord): JQuery;
     (behavior: "toggle", node: INode, slideParam?: boolean): JQuery;
