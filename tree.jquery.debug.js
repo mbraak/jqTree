@@ -127,7 +127,7 @@ var jqtree = (function (exports, jQueryProxy) {
             this.children = [];
             this.parent = null;
             if (isRoot) {
-                this.idMapping = {};
+                this.idMapping = new Map();
                 this.tree = this;
                 this.nodeClass = nodeClass;
             }
@@ -499,16 +499,16 @@ var jqtree = (function (exports, jQueryProxy) {
             return level;
         };
         Node.prototype.getNodeById = function (nodeId) {
-            return this.idMapping[nodeId] || null;
+            return this.idMapping.get(nodeId) || null;
         };
         Node.prototype.addNodeToIndex = function (node) {
             if (node.id != null) {
-                this.idMapping[node.id] = node;
+                this.idMapping.set(node.id, node);
             }
         };
         Node.prototype.removeNodeFromIndex = function (node) {
             if (node.id != null) {
-                delete this.idMapping[node.id];
+                this.idMapping["delete"](node.id);
             }
         };
         Node.prototype.removeChildren = function () {
@@ -2226,6 +2226,7 @@ var jqtree = (function (exports, jQueryProxy) {
     var SelectNodeHandler = /** @class */ (function () {
         function SelectNodeHandler(treeWidget) {
             this.treeWidget = treeWidget;
+            this.selectedNodes = new Set();
             this.clear();
         }
         SelectNodeHandler.prototype.getSelectedNode = function () {
@@ -2238,20 +2239,19 @@ var jqtree = (function (exports, jQueryProxy) {
             }
         };
         SelectNodeHandler.prototype.getSelectedNodes = function () {
+            var _this = this;
             if (this.selectedSingleNode) {
                 return [this.selectedSingleNode];
             }
             else {
-                var selectedNodes = [];
-                for (var id in this.selectedNodes) {
-                    if (Object.prototype.hasOwnProperty.call(this.selectedNodes, id)) {
-                        var node = this.treeWidget.getNodeById(id);
-                        if (node) {
-                            selectedNodes.push(node);
-                        }
+                var selectedNodes_1 = [];
+                this.selectedNodes.forEach(function (id) {
+                    var node = _this.treeWidget.getNodeById(id);
+                    if (node) {
+                        selectedNodes_1.push(node);
                     }
-                }
-                return selectedNodes;
+                });
+                return selectedNodes_1;
             }
         };
         SelectNodeHandler.prototype.getSelectedNodesUnder = function (parent) {
@@ -2278,12 +2278,7 @@ var jqtree = (function (exports, jQueryProxy) {
         };
         SelectNodeHandler.prototype.isNodeSelected = function (node) {
             if (node.id != null) {
-                if (this.selectedNodes[node.id]) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return this.selectedNodes.has(node.id);
             }
             else if (this.selectedSingleNode) {
                 return this.selectedSingleNode.element === node.element;
@@ -2293,7 +2288,7 @@ var jqtree = (function (exports, jQueryProxy) {
             }
         };
         SelectNodeHandler.prototype.clear = function () {
-            this.selectedNodes = {};
+            this.selectedNodes.clear();
             this.selectedSingleNode = null;
         };
         SelectNodeHandler.prototype.removeFromSelection = function (node, includeChildren) {
@@ -2306,11 +2301,11 @@ var jqtree = (function (exports, jQueryProxy) {
                 }
             }
             else {
-                delete this.selectedNodes[node.id];
+                this.selectedNodes["delete"](node.id);
                 if (includeChildren) {
                     node.iterate(function () {
                         if (node.id != null) {
-                            delete _this.selectedNodes[node.id];
+                            _this.selectedNodes["delete"](node.id);
                         }
                         return true;
                     });
@@ -2319,7 +2314,7 @@ var jqtree = (function (exports, jQueryProxy) {
         };
         SelectNodeHandler.prototype.addToSelection = function (node) {
             if (node.id != null) {
-                this.selectedNodes[node.id] = true;
+                this.selectedNodes.add(node.id);
             }
             else {
                 this.selectedSingleNode = node;

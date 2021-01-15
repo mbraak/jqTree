@@ -39,7 +39,7 @@ export class Node implements INode {
     public name: string;
     public children: Node[];
     public parent: Node | null;
-    public idMapping: Record<NodeId, Node>;
+    public idMapping: Map<NodeId, Node>;
     public tree?: Node;
     public nodeClass?: typeof Node;
     public load_on_demand: boolean;
@@ -61,7 +61,7 @@ export class Node implements INode {
         this.parent = null;
 
         if (isRoot) {
-            this.idMapping = {};
+            this.idMapping = new Map<NodeId, Node>();
             this.tree = this;
             this.nodeClass = nodeClass;
         }
@@ -500,18 +500,18 @@ export class Node implements INode {
     }
 
     public getNodeById(nodeId: NodeId): Node | null {
-        return this.idMapping[nodeId] || null;
+        return this.idMapping.get(nodeId) || null;
     }
 
     public addNodeToIndex(node: Node): void {
         if (node.id != null) {
-            this.idMapping[node.id] = node;
+            this.idMapping.set(node.id, node);
         }
     }
 
     public removeNodeFromIndex(node: Node): void {
         if (node.id != null) {
-            delete this.idMapping[node.id];
+            this.idMapping.delete(node.id);
         }
     }
 
