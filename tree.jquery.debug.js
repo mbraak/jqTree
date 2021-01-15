@@ -1714,12 +1714,15 @@ var jqtree = (function (exports, jQueryProxy) {
         };
         MouseWidget.prototype.deinit = function () {
             var el = this.$el.get(0);
-            el.removeEventListener("mousedown", this.mouseDown);
-            el.removeEventListener("touchstart", this.touchStart);
-            document.removeEventListener("mousemove", this.mouseMove);
-            document.removeEventListener("touchmove", this.touchMove);
-            document.removeEventListener("mouseup", this.mouseUp);
-            document.removeEventListener("touchend", this.touchEnd);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            el.removeEventListener("mousedown", this.mouseDown, {
+                passive: false
+            });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            el.removeEventListener("touchstart", this.touchStart, {
+                passive: false
+            });
+            this.removeMouseMoveEventListeners();
         };
         MouseWidget.prototype.handleMouseDown = function (positionInfo) {
             // We may have missed mouseup (out of window)
@@ -1758,7 +1761,9 @@ var jqtree = (function (exports, jQueryProxy) {
                 clearTimeout(this.mouseDelayTimer);
             }
             this.mouseDelayTimer = window.setTimeout(function () {
-                _this.isMouseDelayMet = true;
+                if (_this.mouseDownInfo) {
+                    _this.isMouseDelayMet = true;
+                }
             }, mouseDelay);
             this.isMouseDelayMet = false;
         };
@@ -1787,14 +1792,31 @@ var jqtree = (function (exports, jQueryProxy) {
             }
         };
         MouseWidget.prototype.handleMouseUp = function (positionInfo) {
-            document.removeEventListener("mousemove", this.mouseMove);
-            document.removeEventListener("touchmove", this.touchMove);
-            document.removeEventListener("mouseup", this.mouseUp);
-            document.removeEventListener("touchend", this.touchEnd);
+            this.removeMouseMoveEventListeners();
+            this.isMouseDelayMet = false;
+            this.mouseDownInfo = null;
             if (this.isMouseStarted) {
                 this.isMouseStarted = false;
                 this.mouseStop(positionInfo);
             }
+        };
+        MouseWidget.prototype.removeMouseMoveEventListeners = function () {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            document.removeEventListener("mousemove", this.mouseMove, {
+                passive: false
+            });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            document.removeEventListener("touchmove", this.touchMove, {
+                passive: false
+            });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            document.removeEventListener("mouseup", this.mouseUp, {
+                passive: false
+            });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            document.removeEventListener("touchend", this.touchEnd, {
+                passive: false
+            });
         };
         return MouseWidget;
     }(SimpleWidget));
