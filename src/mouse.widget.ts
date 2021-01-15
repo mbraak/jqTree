@@ -45,13 +45,18 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
     public deinit(): void {
         const el = this.$el.get(0);
-        el.removeEventListener("mousedown", this.mouseDown);
-        el.removeEventListener("touchstart", this.touchStart);
 
-        document.removeEventListener("mousemove", this.mouseMove);
-        document.removeEventListener("touchmove", this.touchMove);
-        document.removeEventListener("mouseup", this.mouseUp);
-        document.removeEventListener("touchend", this.touchEnd);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        (el as any).removeEventListener("mousedown", this.mouseDown, {
+            passive: false,
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        (el as any).removeEventListener("touchstart", this.touchStart, {
+            passive: false,
+        });
+
+        this.removeMouseMoveEventListeners();
     }
 
     protected abstract mouseCapture(positionInfo: PositionInfo): boolean | null;
@@ -121,7 +126,9 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         }
 
         this.mouseDelayTimer = window.setTimeout(() => {
-            this.isMouseDelayMet = true;
+            if (this.mouseDownInfo) {
+                this.isMouseDelayMet = true;
+            }
         }, mouseDelay);
 
         this.isMouseDelayMet = false;
@@ -168,15 +175,33 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     };
 
     private handleMouseUp(positionInfo: PositionInfo): void {
-        document.removeEventListener("mousemove", this.mouseMove);
-        document.removeEventListener("touchmove", this.touchMove);
-        document.removeEventListener("mouseup", this.mouseUp);
-        document.removeEventListener("touchend", this.touchEnd);
+        this.removeMouseMoveEventListeners();
+        this.isMouseDelayMet = false;
+        this.mouseDownInfo = null;
 
         if (this.isMouseStarted) {
             this.isMouseStarted = false;
             this.mouseStop(positionInfo);
         }
+    }
+
+    private removeMouseMoveEventListeners() {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        (document as any).removeEventListener("mousemove", this.mouseMove, {
+            passive: false,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        (document as any).removeEventListener("touchmove", this.touchMove, {
+            passive: false,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        (document as any).removeEventListener("mouseup", this.mouseUp, {
+            passive: false,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        (document as any).removeEventListener("touchend", this.touchEnd, {
+            passive: false,
+        });
     }
 
     private touchStart = (e: TouchEvent): void => {
