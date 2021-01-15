@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+#### development version
+
+-   Issue #647: improve performance of internal node lookup
+    -   Changed: getNodeById doesn't convert strings to numbers anymore
+
 ##### 1.5.3 (january 12 2021)
 
 -   Issue #640: add startDndDelay option (thanks to Erik van Eykelen)
