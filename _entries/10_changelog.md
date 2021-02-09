@@ -3,6 +3,12 @@ title: Changelog
 name: changelog
 ---
 
+#### 1.6.0 (february 9 2021)
+
+-   Issue #647: improve performance of internal node lookup
+    -   Changed: getNodeById doesn't convert strings to numbers anymore
+-   Issue #648: fix drag-and-drop on ie11
+
 ##### 1.5.3 (january 12 2021)
 
 -   Issue #640: add startDndDelay option (thanks to Erik van Eykelen)

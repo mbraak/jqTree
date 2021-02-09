@@ -3,11 +3,12 @@ import { JqTreeWidget } from "./tree.jquery";
 
 export default class SelectNodeHandler {
     private treeWidget: JqTreeWidget;
-    private selectedNodes: Record<NodeId, boolean>;
+    private selectedNodes: Set<NodeId>;
     private selectedSingleNode: Node | null;
 
     constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
+        this.selectedNodes = new Set<NodeId>();
         this.clear();
     }
 
@@ -25,18 +26,14 @@ export default class SelectNodeHandler {
         if (this.selectedSingleNode) {
             return [this.selectedSingleNode];
         } else {
-            const selectedNodes = [];
+            const selectedNodes: Node[] = [];
 
-            for (const id in this.selectedNodes) {
-                if (
-                    Object.prototype.hasOwnProperty.call(this.selectedNodes, id)
-                ) {
-                    const node = this.treeWidget.getNodeById(id);
-                    if (node) {
-                        selectedNodes.push(node);
-                    }
+            this.selectedNodes.forEach((id) => {
+                const node = this.treeWidget.getNodeById(id);
+                if (node) {
+                    selectedNodes.push(node);
                 }
-            }
+            });
 
             return selectedNodes;
         }
@@ -69,11 +66,7 @@ export default class SelectNodeHandler {
 
     public isNodeSelected(node: Node): boolean {
         if (node.id != null) {
-            if (this.selectedNodes[node.id]) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.selectedNodes.has(node.id);
         } else if (this.selectedSingleNode) {
             return this.selectedSingleNode.element === node.element;
         } else {
@@ -82,7 +75,7 @@ export default class SelectNodeHandler {
     }
 
     public clear(): void {
-        this.selectedNodes = {};
+        this.selectedNodes.clear();
         this.selectedSingleNode = null;
     }
 
@@ -95,12 +88,12 @@ export default class SelectNodeHandler {
                 this.selectedSingleNode = null;
             }
         } else {
-            delete this.selectedNodes[node.id];
+            this.selectedNodes.delete(node.id);
 
             if (includeChildren) {
                 node.iterate(() => {
                     if (node.id != null) {
-                        delete this.selectedNodes[node.id];
+                        this.selectedNodes.delete(node.id);
                     }
                     return true;
                 });
@@ -110,7 +103,7 @@ export default class SelectNodeHandler {
 
     public addToSelection(node: Node): void {
         if (node.id != null) {
-            this.selectedNodes[node.id] = true;
+            this.selectedNodes.add(node.id);
         } else {
             this.selectedSingleNode = node;
         }

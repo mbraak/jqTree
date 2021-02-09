@@ -312,15 +312,17 @@ describe("getNodeByHtmlElement", () => {
 
 describe("getNodeById", () => {
     interface Vars {
+        data: NodeData[];
         $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
+    given("data", () => exampleData);
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
         given.$tree.tree({
-            data: exampleData,
+            data: given.data,
         });
     });
 
@@ -331,16 +333,38 @@ describe("getNodeById", () => {
     });
 
     context("with a string parameter", () => {
-        it("returns the node", () => {
-            expect(given.$tree.tree("getNodeById", "127")).toMatchObject({
-                name: "node3",
-            });
+        it("doesn't return the node", () => {
+            expect(given.$tree.tree("getNodeById", "127")).toBeNull();
         });
     });
 
     context("when the node doesn't exist", () => {
-        it("returns undefined", () => {
+        it("returns null", () => {
             expect(given.$tree.tree("getNodeById", 99999)).toBeNull();
+        });
+    });
+
+    context("when the data has string ids", () => {
+        given("data", () => [{ id: "123", name: "node1" }]);
+
+        context("with a string parameter", () => {
+            it("returns the node", () => {
+                expect(given.$tree.tree("getNodeById", "123")).toMatchObject({
+                    name: "node1",
+                });
+            });
+        });
+
+        context("with a number parameter", () => {
+            it("doesn't return the node", () => {
+                expect(given.$tree.tree("getNodeById", 123)).toBeNull();
+            });
+        });
+
+        context("when the node doesn't exist", () => {
+            it("returns null", () => {
+                expect(given.$tree.tree("getNodeById", "abc")).toBeNull();
+            });
         });
     });
 });
