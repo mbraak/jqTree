@@ -1,7 +1,7 @@
 /*! jQuery Mockjax
  * A Plugin providing simple and flexible mocking of ajax requests and responses
  * 
- * Version: 2.5.1
+ * Version: 2.6.0
  * Home: https://github.com/jakerella/jquery-mockjax
  * Copyright (c) 2020 Jordan Kasper, formerly appendTo;
  * NOTE: This repository was taken over by Jordan Kasper (@jakerella) October, 2014
@@ -165,32 +165,38 @@
 			return handler( requestSettings );
 		}
 
+		// Apply namespace prefix to the mock handler's url.
+		var namespace = handler.namespace || (typeof(handler.namespace) === 'undefined' && $.mockjaxSettings.namespace);
+
 		// Inspect the URL of the request and check if the mock handler's url
 		// matches the url for this ajax request
 		if ( $.isFunction(handler.url.test) ) {
+			// namespace exists prepend handler.url with namespace
+			if (!!namespace) {
+				namespace = namespace.replace(/(\/+)$/, '');
+				var pattern = handler.url.source.replace(/^(\^+)/, '').replace(/^/, '^(' + namespace + ')?\/?');
+				handler.url = new RegExp(pattern);
+			}
 			// The user provided a regex for the url, test it
 			if ( !handler.url.test( requestSettings.url ) ) {
 				return null;
 			}
 		} else {
 
-			var effecitveUrl = handler.url;
-
-			// Apply namespace prefix to the mock handler's url.
-			var namespace = handler.namespace || (typeof(handler.namespace) === 'undefined' && $.mockjaxSettings.namespace);
+			var effectiveUrl = handler.url;
 
 			if (!!namespace) {
 				var namespacedUrl = [
 					namespace.replace(/(\/+)$/, ''),
 					handler.url.replace(/^(\/+)/, '')
 				].join('/');
-				effecitveUrl = namespacedUrl;
+				effectiveUrl = namespacedUrl;
 			}
 
 			// Look for a simple wildcard '*' or a direct URL match
-			var star = effecitveUrl.indexOf('*');
-			if (effecitveUrl !== requestSettings.url && star === -1 ||
-					!new RegExp(effecitveUrl.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&').replace(/\*/g, '.+')).test(requestSettings.url)) {
+			var star = effectiveUrl.indexOf('*');
+			if (effectiveUrl !== requestSettings.url && star === -1 ||
+					!new RegExp(effectiveUrl.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&').replace(/\*/g, '.+')).test(requestSettings.url)) {
 				return null;
 			}
 		}
