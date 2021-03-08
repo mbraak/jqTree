@@ -678,7 +678,7 @@ var jqtree = (function (exports, jQueryProxy) {
     }());
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    var jQuery$1 = jQueryProxy__default['default'] || jQueryProxy__namespace;
+    var jQuery$2 = jQueryProxy__default['default'] || jQueryProxy__namespace;
     var DragAndDropHandler = /** @class */ (function () {
         function DragAndDropHandler(treeWidget) {
             this.treeWidget = treeWidget;
@@ -689,7 +689,7 @@ var jqtree = (function (exports, jQueryProxy) {
             this.positionInfo = null;
         }
         DragAndDropHandler.prototype.mouseCapture = function (positionInfo) {
-            var $element = jQuery$1(positionInfo.target);
+            var $element = jQuery$2(positionInfo.target);
             if (!this.mustCaptureElement($element)) {
                 return null;
             }
@@ -714,7 +714,7 @@ var jqtree = (function (exports, jQueryProxy) {
                 return false;
             }
             this.refresh();
-            var offset = jQuery$1(positionInfo.target).offset();
+            var offset = jQuery$2(positionInfo.target).offset();
             var left = offset ? offset.left : 0;
             var top = offset ? offset.top : 0;
             var node = this.currentItem.node;
@@ -955,7 +955,7 @@ var jqtree = (function (exports, jQueryProxy) {
                 var mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
                 var $element = null;
                 if (node.element) {
-                    $element = jQuery$1(node.element);
+                    $element = jQuery$2(node.element);
                     if (!$element.is(":visible")) {
                         return;
                     }
@@ -1055,7 +1055,7 @@ var jqtree = (function (exports, jQueryProxy) {
         };
         HitAreasGenerator.prototype.handleFirstNode = function (node) {
             if (node !== this.currentNode) {
-                this.addPosition(node, Position.Before, this.getTop(jQuery$1(node.element)));
+                this.addPosition(node, Position.Before, this.getTop(jQuery$2(node.element)));
             }
         };
         HitAreasGenerator.prototype.handleAfterOpenFolder = function (node, nextNode) {
@@ -1122,7 +1122,7 @@ var jqtree = (function (exports, jQueryProxy) {
         function DragElement(nodeName, offsetX, offsetY, $tree, autoEscape) {
             this.offsetX = offsetX;
             this.offsetY = offsetY;
-            this.$element = jQuery$1("<span>").addClass("jqtree-title jqtree-dragging");
+            this.$element = jQuery$2("<span>").addClass("jqtree-title jqtree-dragging");
             if (autoEscape) {
                 this.$element.text(nodeName);
             }
@@ -2546,7 +2546,7 @@ var jqtree = (function (exports, jQueryProxy) {
     }());
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    var jQuery$2 = jQueryProxy__default['default'] || jQueryProxy__namespace;
+    var jQuery$1 = jQueryProxy__default['default'] || jQueryProxy__namespace;
     var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     var PARAM_IS_EMPTY = "Parameter is empty: ";
     var JqTreeWidget = /** @class */ (function (_super) {
@@ -2583,7 +2583,7 @@ var jqtree = (function (exports, jQueryProxy) {
                 }
             };
             _this.handleContextmenu = function (e) {
-                var $div = jQuery$2(e.target).closest("ul.jqtree-tree .jqtree-element");
+                var $div = jQuery$1(e.target).closest("ul.jqtree-tree .jqtree-element");
                 if ($div.length) {
                     var node = _this.getNode($div);
                     if (node) {
@@ -2673,7 +2673,7 @@ var jqtree = (function (exports, jQueryProxy) {
             return this.tree.getNodesByProperty(key, value);
         };
         JqTreeWidget.prototype.getNodeByHtmlElement = function (element) {
-            return this.getNode(jQuery$2(element));
+            return this.getNode(jQuery$1(element));
         };
         JqTreeWidget.prototype.getNodeByCallback = function (callback) {
             return this.tree.getNodeByCallback(callback);
@@ -2859,7 +2859,7 @@ var jqtree = (function (exports, jQueryProxy) {
             if (!node) {
                 throw Error(NODE_PARAM_IS_EMPTY);
             }
-            var nodeOffset = jQuery$2(node.element).offset();
+            var nodeOffset = jQuery$1(node.element).offset();
             var nodeTop = nodeOffset ? nodeOffset.top : 0;
             var treeOffset = this.$el.offset();
             var treeTop = treeOffset ? treeOffset.top : 0;
@@ -2897,7 +2897,7 @@ var jqtree = (function (exports, jQueryProxy) {
             return version;
         };
         JqTreeWidget.prototype._triggerEvent = function (eventName, values) {
-            var event = jQuery$2.Event(eventName, values);
+            var event = jQuery$1.Event(eventName, values);
             this.element.trigger(event);
             return event;
         };
@@ -2952,7 +2952,7 @@ var jqtree = (function (exports, jQueryProxy) {
             }
         };
         JqTreeWidget.prototype._containsElement = function (element) {
-            var node = this.getNode(jQuery$2(element));
+            var node = this.getNode(jQuery$1(element));
             return node != null && node.tree === this.tree;
         };
         JqTreeWidget.prototype._getScrollLeft = function () {
@@ -3224,7 +3224,7 @@ var jqtree = (function (exports, jQueryProxy) {
             }
         };
         JqTreeWidget.prototype.getClickTarget = function (element) {
-            var $target = jQuery$2(element);
+            var $target = jQuery$1(element);
             var $button = $target.closest(".jqtree-toggler");
             if ($button.length) {
                 var node = this.getNode($button);
