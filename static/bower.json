@@ -3,7 +3,7 @@
     "dependencies": {
         "bootstrap": "3.4.1",
         "fontawesome": "5.15.2",
-        "jquery": "3.5.1",
+        "jquery": "3.6.0",
         "jquery-mockjax": "2.6.0"
     }
 }
