@@ -20,8 +20,6 @@ limitations under the License.
 var jqtree = (function (exports, jQueryProxy) {
     'use strict';
 
-    function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
     function _interopNamespace(e) {
         if (e && e.__esModule) return e;
         var n = Object.create(null);
@@ -42,7 +40,6 @@ var jqtree = (function (exports, jQueryProxy) {
         return Object.freeze(n);
     }
 
-    var jQueryProxy__default = /*#__PURE__*/_interopDefaultLegacy(jQueryProxy);
     var jQueryProxy__namespace = /*#__PURE__*/_interopNamespace(jQueryProxy);
 
     /*! *****************************************************************************
@@ -678,7 +675,7 @@ var jqtree = (function (exports, jQueryProxy) {
     }());
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    var jQuery$2 = jQueryProxy__default['default'] || jQueryProxy__namespace;
+    var jQuery$2 = jQueryProxy__namespace["default"] || jQueryProxy__namespace;
     var DragAndDropHandler = /** @class */ (function () {
         function DragAndDropHandler(treeWidget) {
             this.treeWidget = treeWidget;
@@ -2546,7 +2543,7 @@ var jqtree = (function (exports, jQueryProxy) {
     }());
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    var jQuery$1 = jQueryProxy__default['default'] || jQueryProxy__namespace;
+    var jQuery$1 = jQueryProxy__namespace["default"] || jQueryProxy__namespace;
     var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     var PARAM_IS_EMPTY = "Parameter is empty: ";
     var JqTreeWidget = /** @class */ (function (_super) {
