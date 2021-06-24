@@ -2657,6 +2657,10 @@ var jqtree = (function (exports, jQueryProxy) {
             this.doLoadDataFromUrl(null, null, onFinished);
             return this.element;
         };
+        JqTreeWidget.prototype.refresh = function () {
+            this._refreshElements(null);
+            return this.element;
+        };
         JqTreeWidget.prototype.getNodeById = function (nodeId) {
             return this.tree.getNodeById(nodeId);
         };
