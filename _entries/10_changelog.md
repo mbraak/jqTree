@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+#### development version
+
+- Issues #652 and #655: add filter example
+- Issue #655: add refresh method
+
 #### 1.6.0 (february 9 2021)
 
 -   Issue #647: improve performance of internal node lookup
