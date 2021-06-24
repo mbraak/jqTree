@@ -96,47 +96,46 @@ export const selectNode = async (
     await titleHandle?.click();
 };
 
-export const getTreeStructure = async (): Promise<
-    JQTreeMatchers.TreeStructure
-> =>
+export const getTreeStructure = async (): Promise<JQTreeMatchers.TreeStructure> =>
     await page
         .evaluate(
             `
-        function getTreeNode($li) {
-            const $div = $li.children("div.jqtree-element");
-            const $span = $div.children("span.jqtree-title");
-            const name = $span.text();
-            const selected = $li.hasClass("jqtree-selected");
+            ;
+            function getTreeNode($li) {
+                const $div = $li.children("div.jqtree-element");
+                const $span = $div.children("span.jqtree-title");
+                const name = $span.text();
+                const selected = $li.hasClass("jqtree-selected");
 
-            if ($li.hasClass("jqtree-folder")) {
-                const $ul = $li.children("ul.jqtree_common");
+                if ($li.hasClass("jqtree-folder")) {
+                    const $ul = $li.children("ul.jqtree_common");
 
-                return {
-                    nodeType: "folder",
-                    children: getChildren($ul),
-                    name,
-                    open: !$li.hasClass("jqtree-closed"),
-                    selected,
-                };
-            } else {
-                return {
-                    nodeType: "child",
-                    name,
-                    selected,
-                };
+                    return {
+                        nodeType: "folder",
+                        children: getChildren($ul),
+                        name,
+                        open: !$li.hasClass("jqtree-closed"),
+                        selected,
+                    };
+                } else {
+                    return {
+                        nodeType: "child",
+                        name,
+                        selected,
+                    };
+                }
             }
-        };
 
-        function getChildren($ul) {
-            return $ul
-                .children("li.jqtree_common")
-                .map((_, li) => {
-                    return getTreeNode(jQuery(li))
-                })
-                .get();
-        };
+            function getChildren($ul) {
+                return $ul
+                    .children("li.jqtree_common")
+                    .map((_, li) => {
+                        return getTreeNode(jQuery(li));
+                    })
+                    .get();
+            }
 
-        JSON.stringify(window.getChildren(jQuery("ul.jqtree-tree")))
+            JSON.stringify(window.getChildren(jQuery("ul.jqtree-tree")));
         `
         )
         .then((s) => JSON.parse(s as string) as JQTreeMatchers.TreeStructure);

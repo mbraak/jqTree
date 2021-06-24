@@ -167,6 +167,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return this.element;
     }
 
+    public refresh(): JQuery {
+        this._refreshElements(null);
+        return this.element;
+    }
+
     public getNodeById(nodeId: NodeId): Node | null {
         return this.tree.getNodeById(nodeId);
     }
@@ -486,7 +491,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public setOption(option: string, value: unknown): JQuery {
-        ((this.options as unknown) as Record<string, unknown>)[option] = value;
+        (this.options as unknown as Record<string, unknown>)[option] = value;
         return this.element;
     }
 
@@ -784,9 +789,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 if (!state) {
                     return [false, false];
                 } else {
-                    const mustLoadOnDemand = this.saveStateHandler.setInitialState(
-                        state
-                    );
+                    const mustLoadOnDemand =
+                        this.saveStateHandler.setInitialState(state);
 
                     // return true: the state is restored
                     return [true, mustLoadOnDemand];
@@ -1129,9 +1133,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private deselectNodes(parentNode: Node): void {
-        const selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(
-            parentNode
-        );
+        const selectedNodesUnderParent =
+            this.selectNodeHandler.getSelectedNodesUnder(parentNode);
         for (const n of selectedNodesUnderParent) {
             this.selectNodeHandler.removeFromSelection(n);
         }
