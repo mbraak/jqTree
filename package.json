@@ -35,7 +35,7 @@
     },
     "devDependencies": {
         "@rollup/plugin-typescript": "^8.0.0",
-        "@testing-library/dom": "^7.21.7",
+        "@testing-library/dom": "^8.0.0",
         "@types/jest": "^26.0.8",
         "@types/jquery": "^3.5.0",
         "@types/pngjs": "^6.0.0",
@@ -53,7 +53,7 @@
         "jest-playwright-preset": "^1.6.0",
         "jsonfile": "^6.0.1",
         "lodash.template": "^4.5.0",
-        "msw": "^0.29.0",
+        "msw": "^0.30.0",
         "pixelmatch": "^5.2.1",
         "playwright": "^1.4.1",
         "pngjs": "^6.0.0",
