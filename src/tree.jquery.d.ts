@@ -135,6 +135,7 @@ interface IJQTreePlugin {
         onFinished?: (node: INode) => void
     ): JQuery;
     (behavior: "prependNode", newNodeInfo: NodeData, parentNode?: INode): INode;
+    (behavior: "refresh"): JQuery;
     (behavior: "reload", onFinished?: () => void): JQuery;
     (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
