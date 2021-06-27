@@ -2,10 +2,10 @@ import fs from "fs";
 import path from "path";
 import jsonfile from "jsonfile";
 import template from "lodash.template";
-import typescript from "@rollup/plugin-typescript";
-import { terser } from "rollup-plugin-terser";
+import { babel } from "@rollup/plugin-babel";
+import resolve from "@rollup/plugin-node-resolve";
 import serve from "rollup-plugin-serve";
-import coverage from "rollup-plugin-istanbul2";
+import { terser } from "rollup-plugin-terser";
 
 const getBanner = () => {
     const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");
@@ -22,9 +22,11 @@ const getBanner = () => {
 
 const debugBuild = Boolean(process.env.DEBUG_BUILD);
 const devServer = Boolean(process.env.SERVE);
-const includeCoverage = Boolean(process.env.COVERAGE);
 
-const plugins = [typescript()];
+const resolvePlugin = resolve({ extensions: [".ts"] });
+const babelPlugin = babel({ babelHelpers: "bundled", extensions: [".ts"] });
+
+const plugins = [resolvePlugin, babelPlugin];
 
 if (!debugBuild) {
     const terserPlugin = terser({
@@ -33,13 +35,6 @@ if (!debugBuild) {
         },
     });
     plugins.push(terserPlugin);
-}
-
-if (includeCoverage) {
-    const coveragePlugin = coverage({
-        esModules: true,
-    });
-    plugins.push(coveragePlugin);
 }
 
 if (devServer) {
