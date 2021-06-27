@@ -22,9 +22,19 @@ const getBanner = () => {
 
 const debugBuild = Boolean(process.env.DEBUG_BUILD);
 const devServer = Boolean(process.env.SERVE);
+const includeCoverage = Boolean(process.env.COVERAGE);
 
 const resolvePlugin = resolve({ extensions: [".ts"] });
-const babelPlugin = babel({ babelHelpers: "bundled", extensions: [".ts"] });
+
+const babelConfigFile = includeCoverage
+    ? "babel.coverage.config.json"
+    : "babel.config.json";
+
+const babelPlugin = babel({
+    babelHelpers: "bundled",
+    configFile: path.resolve(__dirname, babelConfigFile),
+    extensions: [".ts"],
+});
 
 const plugins = [resolvePlugin, babelPlugin];
 
