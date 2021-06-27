@@ -967,6 +967,38 @@ describe("prependNode", () => {
     });
 });
 
+describe("refresh", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    it("rerenders the tree", () => {
+        const tree = given.$tree.tree("getTree");
+        tree.children[0].name = "node1a";
+
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "node1" }),
+            expect.objectContaining({ name: "node2" }),
+        ]);
+
+        given.$tree.tree("refresh");
+
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "node1a" }),
+            expect.objectContaining({ name: "node2" }),
+        ]);
+    });
+});
+
 describe("reload", () => {
     interface Vars {
         node1: INode;
