@@ -26,7 +26,7 @@
         "prettier": "prettier src/*.ts src_test/*.ts --write --tab-width 4",
         "coveralls": "nyc report --reporter=text-lcov | coveralls",
         "tsc": "tsc --noEmit --project tsconfig.json",
-        "merge-coverage": "cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json; rm .nyc_output/coverage.json",
+        "merge-coverage": "cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json",
         "clean-coverage": "rm -rf coverage jest-coverage .nyc_output && jest --clearCache",
         "print-coverage": "nyc report"
     },
