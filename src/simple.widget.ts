@@ -109,7 +109,7 @@ export default class SimpleWidget<WidgetOptions> {
 
     public options: WidgetOptions;
 
-    protected $el: JQuery<HTMLElement>;
+    public $el: JQuery<HTMLElement>;
 
     constructor(el: HTMLElement, options: WidgetOptions) {
         this.$el = jQuery(el);

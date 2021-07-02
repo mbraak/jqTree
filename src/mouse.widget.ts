@@ -22,7 +22,6 @@ const getPositionInfoFromTouch = (
 });
 
 abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
-    public $el: JQuery<HTMLElement>;
     protected isMouseStarted: boolean;
     protected mouseDownInfo: PositionInfo | null;
     private mouseDelayTimer: number | null;
