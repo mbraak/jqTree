@@ -17,12 +17,8 @@ limitations under the License.
 @license
 
 */
-var jqtree = (function (exports, jQuery$1) {
+var jqtree = (function (exports) {
   'use strict';
-
-  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-  var jQuery__default = /*#__PURE__*/_interopDefaultLegacy(jQuery$1);
 
   function ownKeys(object, enumerableOnly) {
     var keys = Object.keys(object);
@@ -3755,7 +3751,7 @@ var jqtree = (function (exports, jQuery$1) {
       });
 
       _defineProperty(_assertThisInitialized(_this), "handleContextmenu", function (e) {
-        var $div = jQuery__default['default'](e.target).closest("ul.jqtree-tree .jqtree-element");
+        var $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
 
         if ($div.length) {
           var _node3 = _this.getNode($div);
@@ -3888,7 +3884,7 @@ var jqtree = (function (exports, jQuery$1) {
     }, {
       key: "getNodeByHtmlElement",
       value: function getNodeByHtmlElement(element) {
-        return this.getNode(jQuery__default['default'](element));
+        return this.getNode(jQuery(element));
       }
     }, {
       key: "getNodeByCallback",
@@ -4166,7 +4162,7 @@ var jqtree = (function (exports, jQuery$1) {
           throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        var nodeOffset = jQuery__default['default'](node.element).offset();
+        var nodeOffset = jQuery(node.element).offset();
         var nodeTop = nodeOffset ? nodeOffset.top : 0;
         var treeOffset = this.$el.offset();
         var treeTop = treeOffset ? treeOffset.top : 0;
@@ -4224,7 +4220,7 @@ var jqtree = (function (exports, jQuery$1) {
     }, {
       key: "_triggerEvent",
       value: function _triggerEvent(eventName, values) {
-        var event = jQuery__default['default'].Event(eventName, values);
+        var event = jQuery.Event(eventName, values);
         this.element.trigger(event);
         return event;
       }
@@ -4296,7 +4292,7 @@ var jqtree = (function (exports, jQuery$1) {
     }, {
       key: "_containsElement",
       value: function _containsElement(element) {
-        var node = this.getNode(jQuery__default['default'](element));
+        var node = this.getNode(jQuery(element));
         return node != null && node.tree === this.tree;
       }
     }, {
@@ -4630,7 +4626,7 @@ var jqtree = (function (exports, jQuery$1) {
     }, {
       key: "getClickTarget",
       value: function getClickTarget(element) {
-        var $target = jQuery__default['default'](element);
+        var $target = jQuery(element);
         var $button = $target.closest(".jqtree-toggler");
 
         if ($button.length) {
@@ -4922,5 +4918,5 @@ var jqtree = (function (exports, jQuery$1) {
 
   return exports;
 
-}({}, jQuery));
+}({}));
 //# sourceMappingURL=tree.jquery.debug.js.map
