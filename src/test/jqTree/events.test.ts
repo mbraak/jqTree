@@ -1,4 +1,3 @@
-import * as $ from "jquery";
 import getGiven from "givens";
 import { rest } from "msw";
 import { setupServer } from "msw/node";

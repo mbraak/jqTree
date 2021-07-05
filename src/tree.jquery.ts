@@ -1,5 +1,4 @@
 import __version__ from "./version";
-import * as jQueryProxy from "jquery";
 import { DragAndDropHandler } from "./dragAndDropHandler";
 import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
@@ -14,9 +13,6 @@ import { Node, NodeId, getPosition, NodeData } from "./node";
 import { isFunction } from "./util";
 import { FolderElement, NodeElement, OnFinishOpenNode } from "./nodeElement";
 import { JQTreeOptions } from "./jqtreeOptions";
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-const jQuery: JQueryStatic = (<any>jQueryProxy).default || jQueryProxy;
 
 interface ClickTarget {
     node: Node;

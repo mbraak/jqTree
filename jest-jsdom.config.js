@@ -5,7 +5,6 @@ module.exports = {
         "<rootDir>/_site/",
         "<rootDir>/static/",
     ],
-    preset: "ts-jest",
     setupFilesAfterEnv: [
         "<rootDir>/src/test/support/setupTests.ts",
         "givens/setup.js",

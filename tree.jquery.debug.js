@@ -17,30 +17,8 @@ limitations under the License.
 @license
 
 */
-var jqtree = (function (exports, jQueryProxy) {
+var jqtree = (function (exports) {
   'use strict';
-
-  function _interopNamespace(e) {
-    if (e && e.__esModule) return e;
-    var n = Object.create(null);
-    if (e) {
-      Object.keys(e).forEach(function (k) {
-        if (k !== 'default') {
-          var d = Object.getOwnPropertyDescriptor(e, k);
-          Object.defineProperty(n, k, d.get ? d : {
-            enumerable: true,
-            get: function () {
-              return e[k];
-            }
-          });
-        }
-      });
-    }
-    n['default'] = e;
-    return Object.freeze(n);
-  }
-
-  var jQueryProxy__namespace = /*#__PURE__*/_interopNamespace(jQueryProxy);
 
   function ownKeys(object, enumerableOnly) {
     var keys = Object.keys(object);
@@ -1103,8 +1081,6 @@ var jqtree = (function (exports, jQueryProxy) {
     return Node;
   }();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  var jQuery$2 = jQueryProxy__namespace["default"] || jQueryProxy__namespace;
   var DragAndDropHandler = /*#__PURE__*/function () {
     function DragAndDropHandler(treeWidget) {
       _classCallCheck(this, DragAndDropHandler);
@@ -1138,7 +1114,7 @@ var jqtree = (function (exports, jQueryProxy) {
     _createClass(DragAndDropHandler, [{
       key: "mouseCapture",
       value: function mouseCapture(positionInfo) {
-        var $element = jQuery$2(positionInfo.target);
+        var $element = jQuery(positionInfo.target);
 
         if (!this.mustCaptureElement($element)) {
           return null;
@@ -1169,7 +1145,7 @@ var jqtree = (function (exports, jQueryProxy) {
         }
 
         this.refresh();
-        var offset = jQuery$2(positionInfo.target).offset();
+        var offset = jQuery(positionInfo.target).offset();
         var left = offset ? offset.left : 0;
         var top = offset ? offset.top : 0;
         var node = this.currentItem.node;
@@ -1479,7 +1455,7 @@ var jqtree = (function (exports, jQueryProxy) {
           var $element = null;
 
           if (node.element) {
-            $element = jQuery$2(node.element);
+            $element = jQuery(node.element);
 
             if (!$element.is(":visible")) {
               return;
@@ -1629,7 +1605,7 @@ var jqtree = (function (exports, jQueryProxy) {
       key: "handleFirstNode",
       value: function handleFirstNode(node) {
         if (node !== this.currentNode) {
-          this.addPosition(node, Position.Before, this.getTop(jQuery$2(node.element)));
+          this.addPosition(node, Position.Before, this.getTop(jQuery(node.element)));
         }
       }
     }, {
@@ -1717,7 +1693,7 @@ var jqtree = (function (exports, jQueryProxy) {
 
       this.offsetX = offsetX;
       this.offsetY = offsetY;
-      this.$element = jQuery$2("<span>").addClass("jqtree-title jqtree-dragging");
+      this.$element = jQuery("<span>").addClass("jqtree-title jqtree-dragging");
 
       if (autoEscape) {
         this.$element.text(nodeName);
@@ -3701,8 +3677,6 @@ var jqtree = (function (exports, jQueryProxy) {
     return GhostDropHint;
   }();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  var jQuery$1 = jQueryProxy__namespace["default"] || jQueryProxy__namespace;
   var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
   var PARAM_IS_EMPTY = "Parameter is empty: ";
   var JqTreeWidget = /*#__PURE__*/function (_MouseWidget) {
@@ -3777,7 +3751,7 @@ var jqtree = (function (exports, jQueryProxy) {
       });
 
       _defineProperty(_assertThisInitialized(_this), "handleContextmenu", function (e) {
-        var $div = jQuery$1(e.target).closest("ul.jqtree-tree .jqtree-element");
+        var $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
 
         if ($div.length) {
           var _node3 = _this.getNode($div);
@@ -3910,7 +3884,7 @@ var jqtree = (function (exports, jQueryProxy) {
     }, {
       key: "getNodeByHtmlElement",
       value: function getNodeByHtmlElement(element) {
-        return this.getNode(jQuery$1(element));
+        return this.getNode(jQuery(element));
       }
     }, {
       key: "getNodeByCallback",
@@ -4188,7 +4162,7 @@ var jqtree = (function (exports, jQueryProxy) {
           throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        var nodeOffset = jQuery$1(node.element).offset();
+        var nodeOffset = jQuery(node.element).offset();
         var nodeTop = nodeOffset ? nodeOffset.top : 0;
         var treeOffset = this.$el.offset();
         var treeTop = treeOffset ? treeOffset.top : 0;
@@ -4246,7 +4220,7 @@ var jqtree = (function (exports, jQueryProxy) {
     }, {
       key: "_triggerEvent",
       value: function _triggerEvent(eventName, values) {
-        var event = jQuery$1.Event(eventName, values);
+        var event = jQuery.Event(eventName, values);
         this.element.trigger(event);
         return event;
       }
@@ -4318,7 +4292,7 @@ var jqtree = (function (exports, jQueryProxy) {
     }, {
       key: "_containsElement",
       value: function _containsElement(element) {
-        var node = this.getNode(jQuery$1(element));
+        var node = this.getNode(jQuery(element));
         return node != null && node.tree === this.tree;
       }
     }, {
@@ -4652,7 +4626,7 @@ var jqtree = (function (exports, jQueryProxy) {
     }, {
       key: "getClickTarget",
       value: function getClickTarget(element) {
-        var $target = jQuery$1(element);
+        var $target = jQuery(element);
         var $button = $target.closest(".jqtree-toggler");
 
         if ($button.length) {
@@ -4944,5 +4918,5 @@ var jqtree = (function (exports, jQueryProxy) {
 
   return exports;
 
-}({}, jQuery));
+}({}));
 //# sourceMappingURL=tree.jquery.debug.js.map

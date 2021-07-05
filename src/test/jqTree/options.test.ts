@@ -1,4 +1,3 @@
-import * as $ from "jquery";
 import getGiven from "givens";
 import { screen } from "@testing-library/dom";
 import { rest } from "msw";
