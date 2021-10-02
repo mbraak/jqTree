@@ -248,6 +248,10 @@ export default class ElementsRenderer {
             classes += " jqtree-title-folder";
         }
 
+        classes += ` jqtree-title-button-${
+            this.treeWidget.options.buttonLeft ? "left" : "right"
+        }`;
+
         titleSpan.className = classes;
 
         titleSpan.setAttribute("role", "treeitem");
