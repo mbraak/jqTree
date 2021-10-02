@@ -166,6 +166,8 @@ var jqtree = (function (exports) {
   function _possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
+    } else if (call !== void 0) {
+      throw new TypeError("Derived constructors may only return object or undefined");
     }
 
     return _assertThisInitialized(self);
@@ -1921,6 +1923,7 @@ var jqtree = (function (exports) {
           classes += " jqtree-title-folder";
         }
 
+        classes += " jqtree-title-button-".concat(this.treeWidget.options.buttonLeft ? "left" : "right");
         titleSpan.className = classes;
         titleSpan.setAttribute("role", "treeitem");
         titleSpan.setAttribute("aria-level", "".concat(level));
@@ -4918,5 +4921,5 @@ var jqtree = (function (exports) {
 
   return exports;
 
-}({}));
+})({});
 //# sourceMappingURL=tree.jquery.debug.js.map
