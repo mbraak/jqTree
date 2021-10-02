@@ -855,13 +855,13 @@ describe("hasChildren", () => {
         });
 
         it("returns true", () => {
-            expect(given.node.hasChildren()).toEqual(true);
+            expect(given.node.hasChildren()).toBe(true);
         });
     });
 
     context("when a node doesn't have children", () => {
         it("returns false", () => {
-            expect(given.node.hasChildren()).toEqual(false);
+            expect(given.node.hasChildren()).toBe(false);
         });
     });
 });
