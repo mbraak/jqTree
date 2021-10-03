@@ -1923,6 +1923,7 @@ var jqtree = (function (exports) {
           classes += " jqtree-title-folder";
         }
 
+        classes += " jqtree-title-button-".concat(this.treeWidget.options.buttonLeft ? "left" : "right");
         titleSpan.className = classes;
         titleSpan.setAttribute("role", "treeitem");
         titleSpan.setAttribute("aria-level", "".concat(level));

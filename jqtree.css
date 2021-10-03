@@ -60,10 +60,13 @@ ul.jqtree-tree {
     ul.jqtree-tree .jqtree-title {
         color: #1c4257;
         vertical-align: middle;
+    }
+
+    ul.jqtree-tree .jqtree-title-button-left {
         margin-left: 1.5em;
     }
 
-    ul.jqtree-tree .jqtree-title.jqtree-title-folder {
+    ul.jqtree-tree .jqtree-title-button-left.jqtree-title-folder {
             margin-left: 0;
         }
 

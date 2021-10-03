@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### development version
+
+-   Issue #662: fix left alignment for option buttonLeft: false
+
 #### 1.6.1 (june 24 2021)
 
 -   Issues #652 and #655: add filter example
