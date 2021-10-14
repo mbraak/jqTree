@@ -1,7 +1,6 @@
-export type NodeId = number | string;
-
-export type DefaultRecord = Record<string, unknown>;
-export type NodeData = string | DefaultRecord;
+interface NodeRecordWithChildren extends NodeRecord {
+    children: NodeData[];
+}
 
 export enum Position {
     Before = 1,
@@ -33,6 +32,13 @@ export const getPositionName = (position: Position): string => {
 
 export const getPosition = (name: string): Position | undefined =>
     positionNames[name];
+
+const isNodeRecordWithChildren = (
+    data: NodeData
+): data is NodeRecordWithChildren =>
+    typeof data === "object" &&
+    "children" in data &&
+    data["children"] instanceof Array;
 
 export class Node implements INode {
     public id?: NodeId;
@@ -131,15 +137,11 @@ export class Node implements INode {
             const node = this.createNode(o);
             this.addChild(node);
 
-            if (
-                typeof o === "object" &&
-                o["children"] &&
-                o["children"] instanceof Array
-            ) {
-                if (o["children"].length === 0) {
+            if (isNodeRecordWithChildren(o)) {
+                if (o.children.length === 0) {
                     node.isEmptyFolder = true;
                 } else {
-                    node.loadFromData(o["children"]);
+                    node.loadFromData(o.children);
                 }
             }
         }
@@ -299,7 +301,7 @@ export class Node implements INode {
     /*
     Get the tree as data.
     */
-    public getData(includeParent = false): DefaultRecord[] {
+    public getData(includeParent = false): NodeRecord[] {
         const getDataFromNodes = (nodes: Node[]): Record<string, unknown>[] => {
             return nodes.map((node) => {
                 const tmpNode: Record<string, unknown> = {};
@@ -379,12 +381,10 @@ export class Node implements INode {
             this.parent.addChildAtPosition(node, childIndex + 1);
 
             if (
-                typeof nodeInfo === "object" &&
-                nodeInfo["children"] &&
-                nodeInfo["children"] instanceof Array &&
-                nodeInfo["children"].length
+                isNodeRecordWithChildren(nodeInfo) &&
+                nodeInfo.children.length
             ) {
-                node.loadFromData(nodeInfo["children"]);
+                node.loadFromData(nodeInfo.children);
             }
 
             return node;
@@ -401,12 +401,10 @@ export class Node implements INode {
             this.parent.addChildAtPosition(node, childIndex);
 
             if (
-                typeof nodeInfo === "object" &&
-                nodeInfo["children"] &&
-                nodeInfo["children"] instanceof Array &&
-                nodeInfo["children"].length
+                isNodeRecordWithChildren(nodeInfo) &&
+                nodeInfo.children.length
             ) {
-                node.loadFromData(nodeInfo["children"]);
+                node.loadFromData(nodeInfo.children);
             }
 
             return node;
@@ -445,13 +443,8 @@ export class Node implements INode {
         const node = this.createNode(nodeInfo);
         this.addChild(node);
 
-        if (
-            typeof nodeInfo === "object" &&
-            nodeInfo["children"] &&
-            nodeInfo["children"] instanceof Array &&
-            nodeInfo["children"].length
-        ) {
-            node.loadFromData(nodeInfo["children"]);
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+            node.loadFromData(nodeInfo.children);
         }
 
         return node;
@@ -461,13 +454,8 @@ export class Node implements INode {
         const node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
 
-        if (
-            typeof nodeInfo === "object" &&
-            nodeInfo["children"] &&
-            nodeInfo["children"] instanceof Array &&
-            nodeInfo["children"].length
-        ) {
-            node.loadFromData(nodeInfo["children"]);
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+            node.loadFromData(nodeInfo.children);
         }
 
         return node;
@@ -641,12 +629,10 @@ export class Node implements INode {
             this.setData(nodeData);
 
             if (
-                typeof nodeData === "object" &&
-                nodeData["children"] &&
-                nodeData["children"] instanceof Array &&
-                nodeData["children"].length
+                isNodeRecordWithChildren(nodeData) &&
+                nodeData.children.length
             ) {
-                addChildren(nodeData["children"]);
+                addChildren(nodeData.children);
             }
         };
 

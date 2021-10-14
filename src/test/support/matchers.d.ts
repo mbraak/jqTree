@@ -26,8 +26,6 @@ declare namespace jest {
         toBeClosed(): boolean;
         toBeOpen(): boolean;
         toBeSelected(): boolean;
-        toHaveTreeStructure(
-            treeStructure: JQTreeMatchers.TreeStructure
-        ): boolean;
+        toHaveTreeStructure(treeStructure: any): boolean;
     }
 }

@@ -34,6 +34,7 @@
         "jest/no-hooks": "off",
         "jest/no-identical-title": "off",
         "jest/prefer-strict-equal": "off",
+        "jest/require-hook": "off",
         "jest/require-top-level-describe": "off"
     },
     "parserOptions": {
