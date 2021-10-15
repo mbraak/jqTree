@@ -369,6 +369,11 @@ var jqtree = (function (exports) {
   var getPosition = function getPosition(name) {
     return positionNames[name];
   };
+
+  var isNodeRecordWithChildren = function isNodeRecordWithChildren(data) {
+    return _typeof(data) === "object" && "children" in data && data["children"] instanceof Array;
+  };
+
   var Node = /*#__PURE__*/function () {
     function Node() {
       var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -485,11 +490,11 @@ var jqtree = (function (exports) {
 
             this.addChild(_node);
 
-            if (_typeof(o) === "object" && o["children"] && o["children"] instanceof Array) {
-              if (o["children"].length === 0) {
+            if (isNodeRecordWithChildren(o)) {
+              if (o.children.length === 0) {
                 _node.isEmptyFolder = true;
               } else {
-                _node.loadFromData(o["children"]);
+                _node.loadFromData(o.children);
               }
             }
           }
@@ -738,8 +743,8 @@ var jqtree = (function (exports) {
           var childIndex = this.parent.getChildIndex(this);
           this.parent.addChildAtPosition(_node2, childIndex + 1);
 
-          if (_typeof(nodeInfo) === "object" && nodeInfo["children"] && nodeInfo["children"] instanceof Array && nodeInfo["children"].length) {
-            _node2.loadFromData(nodeInfo["children"]);
+          if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+            _node2.loadFromData(nodeInfo.children);
           }
 
           return _node2;
@@ -756,8 +761,8 @@ var jqtree = (function (exports) {
           var childIndex = this.parent.getChildIndex(this);
           this.parent.addChildAtPosition(_node3, childIndex);
 
-          if (_typeof(nodeInfo) === "object" && nodeInfo["children"] && nodeInfo["children"] instanceof Array && nodeInfo["children"].length) {
-            _node3.loadFromData(nodeInfo["children"]);
+          if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+            _node3.loadFromData(nodeInfo.children);
           }
 
           return _node3;
@@ -810,8 +815,8 @@ var jqtree = (function (exports) {
         var node = this.createNode(nodeInfo);
         this.addChild(node);
 
-        if (_typeof(nodeInfo) === "object" && nodeInfo["children"] && nodeInfo["children"] instanceof Array && nodeInfo["children"].length) {
-          node.loadFromData(nodeInfo["children"]);
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+          node.loadFromData(nodeInfo.children);
         }
 
         return node;
@@ -822,8 +827,8 @@ var jqtree = (function (exports) {
         var node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
 
-        if (_typeof(nodeInfo) === "object" && nodeInfo["children"] && nodeInfo["children"] instanceof Array && nodeInfo["children"].length) {
-          node.loadFromData(nodeInfo["children"]);
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+          node.loadFromData(nodeInfo.children);
         }
 
         return node;
@@ -1020,8 +1025,8 @@ var jqtree = (function (exports) {
         var addNode = function addNode(nodeData) {
           _this2.setData(nodeData);
 
-          if (_typeof(nodeData) === "object" && nodeData["children"] && nodeData["children"] instanceof Array && nodeData["children"].length) {
-            addChildren(nodeData["children"]);
+          if (isNodeRecordWithChildren(nodeData) && nodeData.children.length) {
+            addChildren(nodeData.children);
           }
         };
 
@@ -2825,8 +2830,8 @@ var jqtree = (function (exports) {
 
         try {
           for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var nodeDd = _step.value;
-            var node = this.treeWidget.getNodeById(nodeDd);
+            var nodeId = _step.value;
+            var node = this.treeWidget.getNodeById(nodeId);
 
             if (node) {
               if (!node.load_on_demand) {
