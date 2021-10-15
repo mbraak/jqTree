@@ -9,7 +9,6 @@ import SaveStateHandler, { SavedState } from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
-//import { Node, NodeId, getPosition, NodeData } from "./node";
 import { Node, getPosition } from "./node";
 import { isFunction } from "./util";
 import { FolderElement, NodeElement, OnFinishOpenNode } from "./nodeElement";
