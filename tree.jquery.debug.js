@@ -2533,12 +2533,16 @@ var jqtree = (function (exports) {
       key: "init",
       value: function init() {
         var element = this.$el.get(0);
-        element.addEventListener("mousedown", this.mouseDown, {
-          passive: false
-        });
-        element.addEventListener("touchstart", this.touchStart, {
-          passive: false
-        });
+
+        if (element) {
+          element.addEventListener("mousedown", this.mouseDown, {
+            passive: false
+          });
+          element.addEventListener("touchstart", this.touchStart, {
+            passive: false
+          });
+        }
+
         this.isMouseStarted = false;
         this.mouseDelayTimer = null;
         this.isMouseDelayMet = false;
@@ -2547,15 +2551,19 @@ var jqtree = (function (exports) {
     }, {
       key: "deinit",
       value: function deinit() {
-        var el = this.$el.get(0); // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        var el = this.$el.get(0);
 
-        el.removeEventListener("mousedown", this.mouseDown, {
-          passive: false
-        }); // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        if (el) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          el.removeEventListener("mousedown", this.mouseDown, {
+            passive: false
+          }); // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 
-        el.removeEventListener("touchstart", this.touchStart, {
-          passive: false
-        });
+          el.removeEventListener("touchstart", this.touchStart, {
+            passive: false
+          });
+        }
+
         this.removeMouseMoveEventListeners();
       }
     }, {
@@ -3418,10 +3426,16 @@ var jqtree = (function (exports) {
         this.treeWidget = treeWidget;
 
         if (!node.element) {
-          node.element = this.treeWidget.element.get(0);
+          var element = this.treeWidget.element.get(0);
+
+          if (element) {
+            node.element = element;
+          }
         }
 
-        this.$element = jQuery(node.element);
+        if (node.element) {
+          this.$element = jQuery(node.element);
+        }
       }
     }, {
       key: "addDropHint",
@@ -3672,7 +3686,11 @@ var jqtree = (function (exports) {
     }, {
       key: "moveInsideOpenFolder",
       value: function moveInsideOpenFolder() {
-        jQuery(this.node.children[0].element).before(this.$ghost);
+        var childElement = this.node.children[0].element;
+
+        if (childElement) {
+          jQuery(childElement).before(this.$ghost);
+        }
       }
     }, {
       key: "moveInside",
