@@ -10,17 +10,17 @@ type NodeData = string | NodeRecord;
 
 type IterateCallback = (node: INode, level: number) => boolean;
 
-declare class INode {
-    public id?: NodeId;
-    public name: string;
-    public children: INode[];
-    public element: HTMLElement;
-    public is_open: boolean;
-    public parent: INode | null;
+interface INode {
+    id?: NodeId;
+    name: string;
+    children: INode[];
+    element: HTMLElement;
+    is_open: boolean;
+    parent: INode | null;
 
     [key: string]: unknown;
 
-    public iterate(callback: IterateCallback): void;
+    iterate(callback: IterateCallback): void;
 }
 
 type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
