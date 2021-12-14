@@ -367,18 +367,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             node.removeChildren();
 
             if (data.children.length) {
-                node.loadFromData(data.children);
+                node.loadFromData(data.children as Node[]);
             }
         }
 
-        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
-        const mustSelect = this.isSelectedNodeInSubtree(node);
-
         this._refreshElements(node);
-
-        if (mustSelect) {
-            this.selectCurrentNode(mustSetFocus);
-        }
 
         return this.element;
     }
@@ -565,7 +558,16 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
      from_node: redraw this subtree
     */
     public _refreshElements(fromNode: Node | null): void {
+        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
+        const mustSelect = fromNode
+            ? this.isSelectedNodeInSubtree(fromNode)
+            : false;
+
         this.renderer.render(fromNode);
+
+        if (mustSelect) {
+            this.selectCurrentNode(mustSetFocus);
+        }
 
         this._triggerEvent("tree.refresh");
     }
