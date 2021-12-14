@@ -18,10 +18,16 @@ export class NodeElement {
         this.treeWidget = treeWidget;
 
         if (!node.element) {
-            node.element = this.treeWidget.element.get(0);
+            const element = this.treeWidget.element.get(0);
+
+            if (element) {
+                node.element = element;
+            }
         }
 
-        this.$element = jQuery(node.element);
+        if (node.element) {
+            this.$element = jQuery(node.element);
+        }
     }
 
     public addDropHint(position: number): DropHint {
@@ -99,9 +105,8 @@ export class FolderElement extends NodeElement {
         const buttonEl = $button.get(0);
 
         if (buttonEl) {
-            const icon = this.treeWidget.renderer.openedIconElement.cloneNode(
-                true
-            );
+            const icon =
+                this.treeWidget.renderer.openedIconElement.cloneNode(true);
 
             buttonEl.appendChild(icon);
         }
@@ -147,9 +152,8 @@ export class FolderElement extends NodeElement {
         const buttonEl = $button.get(0);
 
         if (buttonEl) {
-            const icon = this.treeWidget.renderer.closedIconElement.cloneNode(
-                true
-            );
+            const icon =
+                this.treeWidget.renderer.closedIconElement.cloneNode(true);
 
             buttonEl.appendChild(icon);
         }
@@ -248,7 +252,11 @@ class GhostDropHint implements DropHint {
     }
 
     public moveInsideOpenFolder(): void {
-        jQuery(this.node.children[0].element).before(this.$ghost);
+        const childElement = this.node.children[0].element;
+
+        if (childElement) {
+            jQuery(childElement).before(this.$ghost);
+        }
     }
 
     public moveInside(): void {

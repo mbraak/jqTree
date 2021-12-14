@@ -1,6 +1,11 @@
 import { isInt } from "./util";
 import { JqTreeWidget } from "./tree.jquery";
-import { Node, NodeId } from "./node";
+import { Node } from "./node";
+
+export interface SavedState {
+    open_nodes: NodeId[];
+    selected_node: NodeId[];
+}
 
 export default class SaveStateHandler {
     private treeWidget: JqTreeWidget;
@@ -24,7 +29,7 @@ export default class SaveStateHandler {
         const jsonData = this.loadFromStorage();
 
         if (jsonData) {
-            return (this.parseState(jsonData) as unknown) as SavedState;
+            return this.parseState(jsonData) as unknown as SavedState;
         } else {
             return null;
         }
@@ -121,7 +126,7 @@ export default class SaveStateHandler {
             state.selected_node = [state.selected_node];
         }
 
-        return (state as unknown) as SavedState;
+        return state as unknown as SavedState;
     }
 
     private loadFromStorage(): string | null {
@@ -134,11 +139,11 @@ export default class SaveStateHandler {
         }
     }
 
-    private openInitialNodes(nodeIds: any[]): boolean {
+    private openInitialNodes(nodeIds: NodeId[]): boolean {
         let mustLoadOnDemand = false;
 
-        for (const nodeDd of nodeIds) {
-            const node = this.treeWidget.getNodeById(nodeDd);
+        for (const nodeId of nodeIds) {
+            const node = this.treeWidget.getNodeById(nodeId);
 
             if (node) {
                 if (!node.load_on_demand) {
