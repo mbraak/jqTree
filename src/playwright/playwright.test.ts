@@ -51,15 +51,15 @@ afterEach(async () => {
 });
 
 it("displays a tree", async () => {
-    await expect(page).toHaveText("Saurischia");
-    await expect(page).toHaveText("Ornithischians");
-    await expect(page).toHaveText("Coelophysoids");
+    await expect(page).toMatchText("Saurischia");
+    await expect(page).toMatchText("Ornithischians");
+    await expect(page).toMatchText("Coelophysoids");
 
     await matchScreenshot("displays_a_tree");
 });
 
 it("selects a node", async () => {
-    await expect(page).toHaveText("Saurischia");
+    await expect(page).toMatchText("Saurischia");
     const saurischia = await findNodeElement("Saurischia");
     await selectNode(saurischia);
     await expectToBeSelected(saurischia);
@@ -68,7 +68,7 @@ it("selects a node", async () => {
 });
 
 it("opens a node", async () => {
-    await expect(page).toHaveText("Saurischia");
+    await expect(page).toMatchText("Saurischia");
 
     const theropods = await findNodeElement("Theropods");
     await expectToBeClosed(theropods);
