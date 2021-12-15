@@ -1,6 +1,6 @@
 {
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint", "import", "jest"],
+    "plugins": ["@typescript-eslint", "import", "jest", "testing-library"],
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",
@@ -9,7 +9,8 @@
         "plugin:import/errors",
         "plugin:import/warnings",
         "plugin:import/typescript",
-        "plugin:jest/all"
+        "plugin:jest/all",
+        "plugin:testing-library/dom"
     ],
     "rules": {
         "@typescript-eslint/explicit-function-return-type": "off",
