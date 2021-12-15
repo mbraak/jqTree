@@ -1,22 +1,18 @@
 import __version__ from "./version";
-import * as jQueryProxy from "jquery";
 import { DragAndDropHandler } from "./dragAndDropHandler";
 import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
 import KeyHandler from "./keyHandler";
 import MouseWidget from "./mouse.widget";
 import { PositionInfo } from "./types";
-import SaveStateHandler from "./saveStateHandler";
+import SaveStateHandler, { SavedState } from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
-import { Node, NodeId, getPosition, NodeData } from "./node";
+import { Node, getPosition } from "./node";
 import { isFunction } from "./util";
 import { FolderElement, NodeElement, OnFinishOpenNode } from "./nodeElement";
 import { JQTreeOptions } from "./jqtreeOptions";
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-const jQuery: JQueryStatic = (<any>jQueryProxy).default || jQueryProxy;
 
 interface ClickTarget {
     node: Node;
@@ -371,18 +367,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             node.removeChildren();
 
             if (data.children.length) {
-                node.loadFromData(data.children);
+                node.loadFromData(data.children as Node[]);
             }
         }
 
-        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
-        const mustSelect = this.isSelectedNodeInSubtree(node);
-
         this._refreshElements(node);
-
-        if (mustSelect) {
-            this.selectCurrentNode(mustSetFocus);
-        }
 
         return this.element;
     }
@@ -519,7 +508,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public _triggerEvent(
         eventName: string,
-        values?: DefaultRecord
+        values?: Record<string, unknown>
     ): JQuery.Event {
         const event = jQuery.Event(eventName, values);
         this.element.trigger(event);
@@ -533,7 +522,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     ): void {
         const doOpenNode = (
             _node: Node,
-            _slide: any,
+            _slide: boolean,
             _onFinished: OnFinishOpenNode | null
         ): void => {
             const folderElement = new FolderElement(_node, this);
@@ -569,7 +558,16 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
      from_node: redraw this subtree
     */
     public _refreshElements(fromNode: Node | null): void {
+        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
+        const mustSelect = fromNode
+            ? this.isSelectedNodeInSubtree(fromNode)
+            : false;
+
         this.renderer.render(fromNode);
+
+        if (mustSelect) {
+            this.selectCurrentNode(mustSetFocus);
+        }
 
         this._triggerEvent("tree.refresh");
     }
@@ -742,7 +740,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    private initTree(data: any): void {
+    private initTree(data: NodeData[]): void {
         const doInit = (): void => {
             if (!this.isInitialized) {
                 this.isInitialized = true;
@@ -905,7 +903,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    private handleClick = (e: JQuery.ClickEvent): void => {
+    private handleClick = (
+        e: JQuery.ClickEvent<HTMLElement, any, HTMLElement, HTMLElement>
+    ): void => {
         const clickTarget = this.getClickTarget(e.target);
 
         if (clickTarget) {
@@ -928,7 +928,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     };
 
-    private handleDblclick = (e: JQuery.DoubleClickEvent): void => {
+    private handleDblclick = (
+        e: JQuery.DoubleClickEvent<HTMLElement, any, HTMLElement, HTMLElement>
+    ): void => {
         const clickTarget = this.getClickTarget(e.target);
 
         if (clickTarget?.type === "label") {
@@ -978,7 +980,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    private handleContextmenu = (e: JQuery.ContextMenuEvent) => {
+    private handleContextmenu = (
+        e: JQuery.ContextMenuEvent<HTMLElement, any, HTMLElement, HTMLElement>
+    ) => {
         const $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
         if ($div.length) {
             const node = this.getNode($div);
@@ -1140,7 +1144,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    private loadSubtree(data: any[], parentNode: Node): void {
+    private loadSubtree(data: NodeData[], parentNode: Node): void {
         parentNode.loadFromData(data);
 
         parentNode.load_on_demand = false;

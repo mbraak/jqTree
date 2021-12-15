@@ -22,12 +22,10 @@ declare namespace JQTreeMatchers {
 declare namespace jest {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface Matchers<R> {
-        notToBeSelected(): boolean;
         toBeClosed(): boolean;
+        toBeFocused(): boolean;
         toBeOpen(): boolean;
         toBeSelected(): boolean;
-        toHaveTreeStructure(
-            treeStructure: JQTreeMatchers.TreeStructure
-        ): boolean;
+        toHaveTreeStructure(treeStructure: any): boolean;
     }
 }

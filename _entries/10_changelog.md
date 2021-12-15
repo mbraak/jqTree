@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+#### 1.6.2 (december 15 2021)
+
+-   Issue #662: fix left alignment for option buttonLeft: false (thanks to Odungern)
+-   Issue #669: restore focus after load on demand (thanks to Jaccoky)
+
 #### 1.6.1 (june 24 2021)
 
 -   Issues #652 and #655: add filter example

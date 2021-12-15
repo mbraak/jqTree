@@ -1,4 +1,4 @@
-import { Node, NodeData } from "./node";
+import { Node } from "./node";
 
 type CanMoveNodeTo = (
     node: Node,

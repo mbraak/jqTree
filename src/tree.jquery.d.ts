@@ -1,21 +1,26 @@
 type NodeId = number | string;
 
-type DefaultRecord = Record<string, unknown>;
-type NodeData = string | DefaultRecord;
+interface NodeRecord {
+    [key: string]: unknown;
+    id?: NodeId;
+    children?: NodeData[];
+}
+
+type NodeData = string | NodeRecord;
 
 type IterateCallback = (node: INode, level: number) => boolean;
 
-declare class INode {
-    public id?: NodeId;
-    public name: string;
-    public children: INode[];
-    public element: HTMLElement;
-    public is_open: boolean;
-    public parent: INode | null;
+interface INode {
+    id?: NodeId;
+    name: string;
+    children: INode[];
+    element: HTMLElement;
+    is_open: boolean;
+    parent: INode | null;
 
     [key: string]: unknown;
 
-    public iterate(callback: IterateCallback): void;
+    iterate(callback: IterateCallback): void;
 }
 
 type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
@@ -41,7 +46,7 @@ interface IJQTreeOptions {
     buttonLeft?: boolean;
     closedIcon?: string | Element;
     data?: NodeData[];
-    dataFilter?: (data: unknown) => NodeData[];
+    dataFilter?: (data: NodeData[]) => NodeData[];
     dataUrl?: DataUrl;
     dragAndDrop?: boolean;
     nodeClass?: any;
@@ -135,13 +140,14 @@ interface IJQTreePlugin {
         onFinished?: (node: INode) => void
     ): JQuery;
     (behavior: "prependNode", newNodeInfo: NodeData, parentNode?: INode): INode;
+    (behavior: "refresh"): JQuery;
     (behavior: "reload", onFinished?: () => void): JQuery;
     (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
     (behavior: "scrollToNode", node: INode): JQuery;
     (behavior: "selectNode", node: INode | null): JQuery;
     (behavior: "setOption", option: string, value: unknown): JQuery;
-    (behavior: "setState", options: DefaultRecord): JQuery;
+    (behavior: "setState", options: Record<string, unknown>): JQuery;
     (behavior: "toggle", node: INode, slideParam?: boolean): JQuery;
     (behavior: "toJson"): string;
     (behavior: "updateNode", node: INode, data: NodeData): JQuery;

@@ -5,11 +5,10 @@ module.exports = {
         "<rootDir>/_site/",
         "<rootDir>/static/",
     ],
-    preset: "ts-jest",
     setupFilesAfterEnv: [
         "<rootDir>/src/test/support/setupTests.ts",
         "givens/setup.js",
-        "jest-extended",
+        "jest-extended/all",
     ],
     testEnvironment: "jsdom",
     testRegex: "\\/src\\/test\\/.*\\.test\\.ts",

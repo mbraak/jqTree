@@ -1,4 +1,3 @@
-import * as $ from "jquery";
 import getGiven from "givens";
 import { screen } from "@testing-library/dom";
 import { rest } from "msw";
@@ -967,6 +966,38 @@ describe("prependNode", () => {
     });
 });
 
+describe("refresh", () => {
+    interface Vars {
+        $tree: JQuery<HTMLElement>;
+    }
+
+    const given = getGiven<Vars>();
+    given("$tree", () => $("#tree1"));
+
+    beforeEach(() => {
+        given.$tree.tree({
+            data: exampleData,
+        });
+    });
+
+    it("rerenders the tree", () => {
+        const tree = given.$tree.tree("getTree");
+        tree.children[0].name = "node1a";
+
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "node1" }),
+            expect.objectContaining({ name: "node2" }),
+        ]);
+
+        given.$tree.tree("refresh");
+
+        expect(given.$tree).toHaveTreeStructure([
+            expect.objectContaining({ name: "node1a" }),
+            expect.objectContaining({ name: "node2" }),
+        ]);
+    });
+});
+
 describe("reload", () => {
     interface Vars {
         node1: INode;
@@ -1149,7 +1180,7 @@ describe("selectNode", () => {
 
         it("selects the node and deselects the previous node", () => {
             expect(given.node1.element).toBeSelected();
-            expect(given.node2.element).notToBeSelected();
+            expect(given.node2.element).not.toBeSelected();
         });
     });
 
@@ -1170,7 +1201,7 @@ describe("selectNode", () => {
 
         it("deselects the node", () => {
             given.$tree.tree("selectNode", given.node1);
-            expect(given.node1.element).notToBeSelected();
+            expect(given.node1.element).not.toBeSelected();
         });
     });
 
@@ -1436,13 +1467,7 @@ describe("updateNode", () => {
         });
 
         it("keeps the focus on the node", () => {
-            expect(document.activeElement).not.toBeNil();
-            expect(
-                given.$tree.tree(
-                    "getNodeByHtmlElement",
-                    document.activeElement as HTMLElement
-                )
-            ).not.toBeNil();
+            expect(given.node.element).toBeFocused();
         });
     });
 });

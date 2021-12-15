@@ -1,4 +1,4 @@
-import { Node, NodeId } from "./node";
+import { Node } from "./node";
 import { JqTreeWidget } from "./tree.jquery";
 
 export default class SelectNodeHandler {

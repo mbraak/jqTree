@@ -3,6 +3,7 @@
     "exclude": ["_site", "node_modules"],
     "include": ["src/**/*"],
     "compilerOptions": {
+        "esModuleInterop": true,
         "lib": ["es2015", "es2015.iterable", "dom"],
         "moduleResolution": "node",
         "noEmit": true,

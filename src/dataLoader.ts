@@ -1,4 +1,4 @@
-import { DefaultRecord, Node, NodeData } from "./node";
+import { Node } from "./node";
 import { JqTreeWidget } from "./tree.jquery";
 
 export type HandleFinishedLoading = () => void;
@@ -28,7 +28,7 @@ export default class DataLoader {
             this.notifyLoading(false, parentNode, $el);
         };
 
-        const handleSuccess = (data: any): void => {
+        const handleSuccess = (data: string | NodeData[]): void => {
             stopLoading();
             this.treeWidget.loadData(this.parseData(data), parentNode);
 
@@ -108,12 +108,12 @@ export default class DataLoader {
         void jQuery.ajax(ajaxSettings);
     }
 
-    private parseData(data: NodeData): NodeData[] {
+    private parseData(data: string | NodeData[]): NodeData[] {
         const { dataFilter } = this.treeWidget.options;
 
-        const getParsedData = (): unknown => {
+        const getParsedData = () => {
             if (typeof data === "string") {
-                return JSON.parse(data) as unknown;
+                return JSON.parse(data) as NodeData[];
             } else {
                 return data;
             }
@@ -124,7 +124,7 @@ export default class DataLoader {
         if (dataFilter) {
             return dataFilter(parsedData);
         } else {
-            return parsedData as DefaultRecord[];
+            return parsedData;
         }
     }
 }

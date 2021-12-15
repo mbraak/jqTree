@@ -1,4 +1,4 @@
-var ExampleData = {};
+const ExampleData = {};
 
 ExampleData.exampleData = [
     {
@@ -24,10 +24,10 @@ ExampleData.exampleData = [
                             { name: "Oviraptorosaurians", id: 12 },
                             { name: "Dromaeosaurids", id: 13 },
                             { name: "Troodontids", id: 14 },
-                            { name: "Avialans", id: 15 }
-                        ]
-                    }
-                ]
+                            { name: "Avialans", id: 15 },
+                        ],
+                    },
+                ],
             },
             {
                 name: "Sauropodomorphs",
@@ -44,14 +44,14 @@ ExampleData.exampleData = [
                                 id: 20,
                                 children: [
                                     { name: "Brachiosaurids", id: 21 },
-                                    { name: "Titanosaurians", id: 22 }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
+                                    { name: "Titanosaurians", id: 22 },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
     },
     {
         name: "Ornithischians",
@@ -63,57 +63,54 @@ ExampleData.exampleData = [
                 id: 25,
                 children: [
                     { name: "Ankylosaurians", id: 26 },
-                    { name: "Stegosaurians", id: 27 }
-                ]
+                    { name: "Stegosaurians", id: 27 },
+                ],
             },
             {
                 name: "Ornithopods",
                 id: 28,
-                children: [{ name: "Hadrosaurids", id: 29 }]
+                children: [{ name: "Hadrosaurids", id: 29 }],
             },
             { name: "Pachycephalosaurians", id: 30 },
-            { name: "Ceratopsians", id: 31 }
-        ]
-    }
+            { name: "Ceratopsians", id: 31 },
+        ],
+    },
 ];
 
-ExampleData.getFirstLevelData = function(nodes) {
+ExampleData.getFirstLevelData = function (nodes) {
     if (!nodes) {
         nodes = ExampleData.exampleData;
     }
 
-    var data = [];
+    const data = [];
 
-    $.each(nodes, function() {
-        var node = {
-            name: this.name,
-            id: this.id
-        };
+    nodes.forEach(function (node) {
+        const newNode = { id: node.id, name: node.name };
 
-        if (this.children) {
-            node.load_on_demand = true;
+        if (node.children) {
+            newNode.load_on_demand = true;
         }
 
-        data.push(node);
+        data.push(newNode);
     });
 
     return data;
 };
 
-ExampleData.getChildrenOfNode = function(node_id) {
-    var result = null;
+ExampleData.getChildrenOfNode = function (nodeId) {
+    let result = null;
 
     function iterate(nodes) {
-        $.each(nodes, function() {
+        nodes.forEach(function (node) {
             if (result) {
                 return;
             } else {
-                if (this.id == node_id) {
-                    result = this;
+                if (node.id == nodeId) {
+                    result = node;
                 }
 
-                if (this.children) {
-                    iterate(this.children);
+                if (node.children) {
+                    iterate(node.children);
                 }
             }
         });

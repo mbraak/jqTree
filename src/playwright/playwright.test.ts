@@ -51,15 +51,15 @@ afterEach(async () => {
 });
 
 it("displays a tree", async () => {
-    await expect(page).toHaveText("Saurischia");
-    await expect(page).toHaveText("Ornithischians");
-    await expect(page).toHaveText("Coelophysoids");
+    await expect(page).toMatchText(/.*Saurischia.*/);
+    await expect(page).toMatchText(/.*Ornithischians.*/);
+    await expect(page).toMatchText(/.*Coelophysoids.*/);
 
     await matchScreenshot("displays_a_tree");
 });
 
 it("selects a node", async () => {
-    await expect(page).toHaveText("Saurischia");
+    await expect(page).toMatchText(/.*Saurischia.*/);
     const saurischia = await findNodeElement("Saurischia");
     await selectNode(saurischia);
     await expectToBeSelected(saurischia);
@@ -68,7 +68,7 @@ it("selects a node", async () => {
 });
 
 it("opens a node", async () => {
-    await expect(page).toHaveText("Saurischia");
+    await expect(page).toMatchText(/.*Saurischia.*/);
 
     const theropods = await findNodeElement("Theropods");
     await expectToBeClosed(theropods);
@@ -84,30 +84,30 @@ describe("dragAndDrop", () => {
     it("moves a node", async () => {
         await dragAndDrop("Herrerasaurians", "Ornithischians");
 
-        await getTreeStructure().then((structure) => {
-            expect(structure).toEqual([
-                expect.objectContaining({
-                    name: "Saurischia",
-                    children: [
-                        expect.objectContaining({ name: "Theropods" }),
-                        expect.objectContaining({ name: "Sauropodomorphs" }),
-                    ],
-                }),
-                expect.objectContaining({
-                    name: "Ornithischians",
-                    children: [
-                        expect.objectContaining({ name: "Herrerasaurians" }),
-                        expect.objectContaining({ name: "Heterodontosaurids" }),
-                        expect.objectContaining({ name: "Thyreophorans" }),
-                        expect.objectContaining({ name: "Ornithopods" }),
-                        expect.objectContaining({
-                            name: "Pachycephalosaurians",
-                        }),
-                        expect.objectContaining({ name: "Ceratopsians" }),
-                    ],
-                }),
-            ]);
-        });
+        const structure = await getTreeStructure();
+
+        expect(structure).toEqual([
+            expect.objectContaining({
+                name: "Saurischia",
+                children: [
+                    expect.objectContaining({ name: "Theropods" }),
+                    expect.objectContaining({ name: "Sauropodomorphs" }),
+                ],
+            }),
+            expect.objectContaining({
+                name: "Ornithischians",
+                children: [
+                    expect.objectContaining({ name: "Herrerasaurians" }),
+                    expect.objectContaining({ name: "Heterodontosaurids" }),
+                    expect.objectContaining({ name: "Thyreophorans" }),
+                    expect.objectContaining({ name: "Ornithopods" }),
+                    expect.objectContaining({
+                        name: "Pachycephalosaurians",
+                    }),
+                    expect.objectContaining({ name: "Ceratopsians" }),
+                ],
+            }),
+        ]);
 
         await matchScreenshot("moves_a_node");
     });

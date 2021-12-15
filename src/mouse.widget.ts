@@ -22,7 +22,6 @@ const getPositionInfoFromTouch = (
 });
 
 abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
-    public $el: JQuery<HTMLElement>;
     protected isMouseStarted: boolean;
     protected mouseDownInfo: PositionInfo | null;
     private mouseDelayTimer: number | null;
@@ -30,12 +29,15 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
     public init(): void {
         const element = this.$el.get(0);
-        element.addEventListener("mousedown", this.mouseDown, {
-            passive: false,
-        });
-        element.addEventListener("touchstart", this.touchStart, {
-            passive: false,
-        });
+
+        if (element) {
+            element.addEventListener("mousedown", this.mouseDown, {
+                passive: false,
+            });
+            element.addEventListener("touchstart", this.touchStart, {
+                passive: false,
+            });
+        }
 
         this.isMouseStarted = false;
         this.mouseDelayTimer = null;
@@ -46,15 +48,17 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     public deinit(): void {
         const el = this.$el.get(0);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        (el as any).removeEventListener("mousedown", this.mouseDown, {
-            passive: false,
-        });
+        if (el) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            (el as any).removeEventListener("mousedown", this.mouseDown, {
+                passive: false,
+            });
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        (el as any).removeEventListener("touchstart", this.touchStart, {
-            passive: false,
-        });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            (el as any).removeEventListener("touchstart", this.touchStart, {
+                passive: false,
+            });
+        }
 
         this.removeMouseMoveEventListeners();
     }

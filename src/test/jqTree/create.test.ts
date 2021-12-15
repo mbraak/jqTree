@@ -1,4 +1,3 @@
-import * as $ from "jquery";
 import getGiven from "givens";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";

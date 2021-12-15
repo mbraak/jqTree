@@ -1,4 +1,3 @@
-import * as $ from "jquery";
 import getGiven from "givens";
 import { screen } from "@testing-library/dom";
 import { rest } from "msw";
@@ -391,7 +390,7 @@ describe("rtl", () => {
         });
 
         it("has a different closed icon", () => {
-            expect(togglerLink(given.node1.element).text()).toEqual("◀");
+            expect(togglerLink(given.node1.element).text()).toBe("◀");
         });
     });
 
@@ -402,7 +401,7 @@ describe("rtl", () => {
         });
 
         it("has a different closed icon", () => {
-            expect(togglerLink(given.node1.element).text()).toEqual("◀");
+            expect(togglerLink(given.node1.element).text()).toBe("◀");
         });
     });
 });
@@ -434,7 +433,7 @@ describe("saveState", () => {
             given("saveState", () => true);
 
             it("saves the state to local storage", () => {
-                expect(localStorage.getItem("tree")).toEqual(
+                expect(localStorage.getItem("tree")).toBe(
                     '{"open_nodes":[123],"selected_node":[123]}'
                 );
             });
@@ -444,7 +443,7 @@ describe("saveState", () => {
             given("saveState", () => "my-state");
 
             it("uses the string as a key", () => {
-                expect(localStorage.getItem("my-state")).toEqual(
+                expect(localStorage.getItem("my-state")).toBe(
                     '{"open_nodes":[123],"selected_node":[123]}'
                 );
             });
