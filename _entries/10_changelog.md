@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### development version
+#### 1.6.2 (december 15 2021)
 
 -   Issue #662: fix left alignment for option buttonLeft: false (thanks to Odungern)
 -   Issue #669: restore focus after load on demand (thanks to Jaccoky)

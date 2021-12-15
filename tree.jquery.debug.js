@@ -1,5 +1,5 @@
 /*
-JqTree 1.6.1
+JqTree 1.6.2
 
 Copyright 2021 Marco Braak
 
@@ -326,7 +326,7 @@ var jqtree = (function (exports) {
     };
   }
 
-  var version = "1.6.1";
+  var version = "1.6.2";
 
   var Position;
 
