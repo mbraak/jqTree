@@ -1,4 +1,5 @@
 import treeStructure from "./treeStructure";
+import { titleSpan } from "./testUtil";
 
 const assertJqTreeFolder = ($el: JQuery<HTMLElement>) => {
     /* istanbul ignore if */
@@ -8,15 +9,6 @@ const assertJqTreeFolder = ($el: JQuery<HTMLElement>) => {
 };
 
 expect.extend({
-    notToBeSelected(el: HTMLElement | JQuery<HTMLElement>) {
-        const $el = jQuery(el);
-
-        /* istanbul ignore next */
-        return {
-            message: () => "The node is selected",
-            pass: !$el.hasClass("jqtree-selected"),
-        };
-    },
     toBeClosed(el: HTMLElement | JQuery<HTMLElement>) {
         const $el = jQuery(el);
         assertJqTreeFolder($el);
@@ -25,6 +17,13 @@ expect.extend({
         return {
             message: () => "The node is open",
             pass: $el.hasClass("jqtree-closed"),
+        };
+    },
+    toBeFocused(el: HTMLElement | JQuery<HTMLElement>) {
+        /* istanbul ignore next */
+        return {
+            message: () => "The is node is not focused",
+            pass: document.activeElement === titleSpan(el)[0],
         };
     },
     toBeOpen(el: HTMLElement | JQuery<HTMLElement>) {

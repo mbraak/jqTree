@@ -1180,7 +1180,7 @@ describe("selectNode", () => {
 
         it("selects the node and deselects the previous node", () => {
             expect(given.node1.element).toBeSelected();
-            expect(given.node2.element).notToBeSelected();
+            expect(given.node2.element).not.toBeSelected();
         });
     });
 
@@ -1201,7 +1201,7 @@ describe("selectNode", () => {
 
         it("deselects the node", () => {
             given.$tree.tree("selectNode", given.node1);
-            expect(given.node1.element).notToBeSelected();
+            expect(given.node1.element).not.toBeSelected();
         });
     });
 
@@ -1467,13 +1467,7 @@ describe("updateNode", () => {
         });
 
         it("keeps the focus on the node", () => {
-            expect(document.activeElement).not.toBeNil();
-            expect(
-                given.$tree.tree(
-                    "getNodeByHtmlElement",
-                    document.activeElement as HTMLElement
-                )
-            ).not.toBeNil();
+            expect(given.node.element).toBeFocused();
         });
     });
 });

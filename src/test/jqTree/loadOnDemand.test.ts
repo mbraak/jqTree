@@ -105,6 +105,52 @@ context("when a node has load_on_demand in the data", () => {
                 }),
             ]);
         });
+
+        context("when the node is selected and has the focus", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node);
+            });
+
+            it("keeps the node selected and focused", async () => {
+                expect(given.node.element).toBeSelected();
+                expect(given.node.element).toBeFocused();
+
+                togglerLink(given.node.element).trigger("click");
+                await screen.findByText("loaded-on-demand");
+
+                expect(given.node.element).toBeSelected();
+                expect(given.node.element).toBeFocused();
+            });
+        });
+
+        context("when the node is not selected", () => {
+            it("doesn't select the node", async () => {
+                expect(given.node.element).not.toBeSelected();
+
+                togglerLink(given.node.element).trigger("click");
+                await screen.findByText("loaded-on-demand");
+
+                expect(given.node.element).not.toBeSelected();
+            });
+        });
+
+        context("when the node is selected and doesn't have the focus", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node);
+                (document.activeElement as HTMLElement).blur();
+            });
+
+            it("keeps the node selected and not focused", async () => {
+                expect(given.node.element).toBeSelected();
+                expect(given.node.element).not.toBeFocused();
+
+                togglerLink(given.node.element).trigger("click");
+                await screen.findByText("loaded-on-demand");
+
+                expect(given.node.element).toBeSelected();
+                expect(given.node.element).not.toBeFocused();
+            });
+        });
     });
 
     context("with autoOpen is true", () => {
