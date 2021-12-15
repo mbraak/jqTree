@@ -14,6 +14,7 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
+        "ci": "pnpm run lint && yarn run tsc && pnpm run test",
         "test": "start-server-and-test 'yarn devserver-with-coverage' http://localhost:8080 'jest --runInBand --coverage --no-cache --verbose'",
         "test-with-server": "jest --runInBand --coverage",
         "test-watch": "jest --watch",
