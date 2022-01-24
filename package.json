@@ -36,8 +36,8 @@
     },
     "devDependencies": {
         "@babel/cli": "^7.16.8",
-        "@babel/core": "^7.16.10",
-        "@babel/preset-env": "^7.16.10",
+        "@babel/core": "^7.16.12",
+        "@babel/preset-env": "^7.16.11",
         "@babel/preset-typescript": "^7.16.7",
         "@rollup/plugin-babel": "^5.3.0",
         "@rollup/plugin-node-resolve": "^13.1.3",
@@ -55,7 +55,7 @@
         "eslint-plugin-import": "^2.25.4",
         "eslint-plugin-jest": "^25.7.0",
         "eslint-plugin-playwright": "^0.7.1",
-        "eslint-plugin-testing-library": "^5.0.3",
+        "eslint-plugin-testing-library": "^5.0.4",
         "expect-playwright": "^0.8.0",
         "givens": "^1.3.9",
         "jest": "^27.4.7",
@@ -65,18 +65,18 @@
         "lodash.template": "^4.5.0",
         "msw": "^0.36.5",
         "pixelmatch": "^5.2.1",
-        "playwright": "^1.17.2",
+        "playwright": "^1.18.0",
         "pngjs": "^6.0.0",
         "postcss": "^8.4.5",
         "postcss-cli": "^9.1.0",
         "postcss-load-config": "^3.1.1",
         "postcss-nested": "^5.0.6",
         "prettier": "^2.5.1",
-        "rollup": "^2.64.0",
+        "rollup": "^2.66.0",
         "rollup-plugin-serve": "^1.1.0",
         "rollup-plugin-terser": "^7.0.2",
         "start-server-and-test": "^1.14.0",
         "tslib": "^2.3.1",
-        "typescript": "^4.5.4"
+        "typescript": "^4.5.5"
     }
 }
