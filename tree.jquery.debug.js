@@ -1,7 +1,7 @@
 /*
 JqTree 1.6.2
 
-Copyright 2021 Marco Braak
+Copyright 2022 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -101,14 +101,14 @@ var jqtree = (function (exports) {
       throw new TypeError("Super expression must either be null or a function");
     }
 
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        writable: true,
+        configurable: true
+      }
+    });
     Object.defineProperty(subClass, "prototype", {
-      value: Object.create(superClass && superClass.prototype, {
-        constructor: {
-          value: subClass,
-          writable: true,
-          configurable: true
-        }
-      }),
       writable: false
     });
     if (superClass) _setPrototypeOf(subClass, superClass);
