@@ -14,8 +14,8 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "ci": "pnpm run lint && yarn run tsc && pnpm run test",
-        "test": "start-server-and-test 'yarn devserver-with-coverage' http://localhost:8080 'jest --runInBand --coverage --no-cache --verbose'",
+        "ci": "pnpm run lint && pnpm run tsc && pnpm run test",
+        "test": "start-server-and-test 'pnpm devserver-with-coverage' http://localhost:8080 'jest --runInBand --coverage --no-cache --verbose'",
         "test-with-server": "jest --runInBand --coverage",
         "test-watch": "jest --watch",
         "lint": "eslint src/ --ext .ts,.tsx",
@@ -29,7 +29,8 @@
         "tsc": "tsc --noEmit --project tsconfig.json",
         "merge-coverage": "cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json",
         "clean-coverage": "rm -rf coverage jest-coverage .nyc_output && jest --clearCache",
-        "print-coverage": "nyc report"
+        "print-coverage": "nyc report",
+        "playwright": "playwright test"
     },
     "dependencies": {
         "jquery": "^3.6.0"
@@ -39,6 +40,7 @@
         "@babel/core": "^7.17.5",
         "@babel/preset-env": "^7.16.11",
         "@babel/preset-typescript": "^7.16.7",
+        "@playwright/test": "^1.21.1",
         "@rollup/plugin-babel": "^5.3.1",
         "@rollup/plugin-node-resolve": "^13.1.3",
         "@testing-library/dom": "^8.11.3",
@@ -56,17 +58,13 @@
         "eslint-plugin-jest": "^26.1.1",
         "eslint-plugin-playwright": "^0.8.0",
         "eslint-plugin-testing-library": "^5.0.5",
-        "expect-playwright": "^0.8.0",
         "givens": "^1.3.9",
         "jest": "^27.5.1",
         "jest-extended": "^2.0.0",
-        "jest-playwright-preset": "^1.7.0",
         "jsonfile": "^6.1.0",
         "lodash.template": "^4.5.0",
         "msw": "^0.38.1",
-        "pixelmatch": "^5.2.1",
         "playwright": "^1.19.2",
-        "pngjs": "^6.0.0",
         "postcss": "^8.4.7",
         "postcss-cli": "^9.1.0",
         "postcss-load-config": "^3.1.3",

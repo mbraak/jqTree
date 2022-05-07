@@ -1,37 +1,14 @@
-/// <reference types="jest-playwright-preset" />
-/// <reference types="expect-playwright" />
-
-import getGiven from "givens";
+import { test, expect, Page } from "@playwright/test";
 import {
     dragAndDrop,
-    expectToBeClosed,
-    expectToBeOpen,
-    expectToBeSelected,
     findNodeElement,
     getTreeStructure,
-    openNode,
     selectNode,
-} from "./testUtil";
-import { matchScreenshot } from "./visualRegression";
+} from "./testUtils";
 
-interface Vars {
-    dragAndDrop: boolean;
-}
-
-const given = getGiven<Vars>();
-given("dragAndDrop", () => false);
-
-beforeEach(async () => {
-    await jestPlaywright.resetPage();
-
+const initPage = async (page: Page, dragAndDrop: boolean) => {
     await page.goto("http://localhost:8080/test_index.html");
     await page.waitForLoadState("domcontentloaded");
-
-    // Fix error on iphone6 device when collecting coverage
-    await page.evaluate(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        (window as any)["reportCodeCoverage"] = () => null;
-    });
 
     await page.evaluate(`
         const $tree = jQuery("#tree1");
@@ -40,51 +17,44 @@ beforeEach(async () => {
             animationSpeed: 0,
             autoOpen: 0,
             data: ExampleData.exampleData,
-            dragAndDrop: ${given.dragAndDrop},
+            dragAndDrop: ${dragAndDrop},
             startDndDelay: 100,
         });
     `);
+};
+
+test.describe("without dragAndDrop", () => {
+    test.beforeEach(async ({ page }) => {
+        await initPage(page, false);
+    });
+
+    test("displays a tree", async ({ page }) => {
+        await expect(page.locator("body")).toHaveText(/.*Saurischia.*/);
+        await expect(page.locator("body")).toHaveText(/.*Ornithischians.*/);
+        await expect(page.locator("body")).toHaveText(/.*Coelophysoids.*/);
+
+        await expect(page.screenshot()).resolves.toMatchSnapshot();
+    });
+
+    test("selects a node", async ({ page }) => {
+        await expect(page.locator("body")).toHaveText(/.*Saurischia.*/);
+
+        const saurischia = await findNodeElement(page, "Saurischia");
+        await selectNode(saurischia);
+
+        await expect(page.screenshot()).resolves.toMatchSnapshot();
+    });
 });
 
-afterEach(async () => {
-    await jestPlaywright.saveCoverage(page);
-});
+test.describe("with dragAndDrop", () => {
+    test.beforeEach(async ({ page }) => {
+        await initPage(page, true);
+    });
 
-it("displays a tree", async () => {
-    await expect(page).toMatchText(/.*Saurischia.*/);
-    await expect(page).toMatchText(/.*Ornithischians.*/);
-    await expect(page).toMatchText(/.*Coelophysoids.*/);
+    test("moves a node", async ({ page }) => {
+        await dragAndDrop(page, "Herrerasaurians", "Ornithischians");
 
-    await matchScreenshot("displays_a_tree");
-});
-
-it("selects a node", async () => {
-    await expect(page).toMatchText(/.*Saurischia.*/);
-    const saurischia = await findNodeElement("Saurischia");
-    await selectNode(saurischia);
-    await expectToBeSelected(saurischia);
-
-    await matchScreenshot("selects_a_node");
-});
-
-it("opens a node", async () => {
-    await expect(page).toMatchText(/.*Saurischia.*/);
-
-    const theropods = await findNodeElement("Theropods");
-    await expectToBeClosed(theropods);
-    await openNode(theropods);
-    await expectToBeOpen(theropods);
-
-    await matchScreenshot("opens_a_node");
-});
-
-describe("dragAndDrop", () => {
-    given("dragAndDrop", () => true);
-
-    it("moves a node", async () => {
-        await dragAndDrop("Herrerasaurians", "Ornithischians");
-
-        const structure = await getTreeStructure();
+        const structure = await getTreeStructure(page);
 
         expect(structure).toEqual([
             expect.objectContaining({
@@ -109,6 +79,6 @@ describe("dragAndDrop", () => {
             }),
         ]);
 
-        await matchScreenshot("moves_a_node");
+        await expect(page.screenshot()).resolves.toMatchSnapshot();
     });
 });
