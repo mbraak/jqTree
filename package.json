@@ -14,10 +14,9 @@
         "url": "https://github.com/mbraak/jqtree"
     },
     "scripts": {
-        "ci": "pnpm run lint && pnpm run tsc && pnpm run test",
-        "test": "start-server-and-test 'pnpm devserver-with-coverage' http://localhost:8080 'jest --runInBand --coverage --no-cache --verbose'",
-        "test-with-server": "jest --runInBand --coverage",
-        "test-watch": "jest --watch",
+        "ci": "pnpm lint && pnpm tsc && pnpm test",
+        "jest": "jest --runInBand --coverage --no-cache --verbose",
+        "jest-watch": "jest --watch",
         "lint": "eslint src/ --ext .ts,.tsx",
         "production": "./production",
         "jekyll-build": "bundle exec jekyll build",
@@ -30,7 +29,9 @@
         "merge-coverage": "cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json",
         "clean-coverage": "rm -rf coverage jest-coverage .nyc_output && jest --clearCache",
         "print-coverage": "nyc report",
-        "playwright": "playwright test"
+        "playwright": "start-server-and-test 'pnpm devserver-with-coverage' http://localhost:8080 'playwright test'",
+        "playwright_without_server": "playwright test",
+        "test": "pnpm jest && pnpm playwright"
     },
     "dependencies": {
         "jquery": "^3.6.0"

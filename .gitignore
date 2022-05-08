@@ -1,4 +1,2 @@
 node_modules/
-data.lcov
-src/coverage
-cypress/videos
+.DS_Store

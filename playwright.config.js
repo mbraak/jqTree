@@ -1,4 +1,3 @@
-//import { devices } from "@playwright/test";
 const { devices } = require("@playwright/test");
 
 const config = {
