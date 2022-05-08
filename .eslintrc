@@ -30,6 +30,7 @@
         ],
         "jest/consistent-test-it": "off",
         "jest/prefer-expect-assertions": "off",
+        "jest/no-done-callback": "off",
         "jest/no-duplicate-hooks": "off",
         "jest/no-hooks": "off",
         "jest/no-identical-title": "off",
