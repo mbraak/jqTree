@@ -12,6 +12,10 @@ const config = {
             use: { ...devices["iPhone 6"] },
         },
     ],
+    webServer: {
+        command: "pnpm devserver-with-coverage",
+        port: 8080,
+    },
 };
 
 module.exports = config;

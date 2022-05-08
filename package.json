@@ -29,8 +29,7 @@
         "merge-coverage": "cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json",
         "clean-coverage": "rm -rf coverage jest-coverage .nyc_output && jest --clearCache",
         "print-coverage": "nyc report",
-        "playwright": "start-server-and-test 'pnpm devserver-with-coverage' http://localhost:8080 'playwright test'",
-        "playwright_without_server": "playwright test",
+        "playwright": "playwright test",
         "test": "pnpm jest && pnpm playwright"
     },
     "dependencies": {
@@ -74,7 +73,6 @@
         "rollup": "^2.68.0",
         "rollup-plugin-serve": "^1.1.0",
         "rollup-plugin-terser": "^7.0.2",
-        "start-server-and-test": "^1.14.0",
         "tslib": "^2.3.1",
         "typescript": "^4.6.2"
     }
