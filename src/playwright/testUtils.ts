@@ -112,6 +112,7 @@ export const dragAndDrop = async (
         fromRect.y + fromRect.height / 2
     );
     await page.mouse.down();
+    // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(200);
     await page.mouse.move(
         toRect.x + toRect.width / 2,
