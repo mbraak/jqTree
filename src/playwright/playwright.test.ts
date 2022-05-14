@@ -5,6 +5,7 @@ import {
     getTreeStructure,
     selectNode,
 } from "./testUtils";
+import { initCoverage, saveCoverage } from "./coverage";
 
 interface InitPageParameters {
     baseURL?: string;
@@ -32,6 +33,14 @@ const initPage = async ({ baseURL, dragAndDrop, page }: InitPageParameters) => {
         });
     `);
 };
+
+test.beforeEach(async ({ context }) => {
+    await initCoverage(context);
+});
+
+test.afterEach(async ({ context }) => {
+    await saveCoverage(context);
+});
 
 test.describe("without dragAndDrop", () => {
     test.beforeEach(async ({ baseURL, page }) => {
