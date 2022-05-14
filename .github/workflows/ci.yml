@@ -39,9 +39,8 @@ jobs:
               run: |
                   yarn run clean-coverage
                   yarn run test
-            - name: Merge coverage
+            - name: Print coverage
               run: |
-                  yarn run merge-coverage
                   yarn run print-coverage
             - name: Coveralls
               run: |
