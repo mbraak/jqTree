@@ -43,7 +43,9 @@ jobs:
             - name: Run jest tests
               run: pnpm jest
             - name: Run playwright tests
-              run: pnpm playwright
+              run: |
+                npx playwright install
+                pnpm playwright
             - name: Screenshots artifact
               if: always()
               uses: actions/upload-artifact@v3
