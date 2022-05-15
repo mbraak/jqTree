@@ -12,22 +12,23 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v1
               with:
-                  node-version: "14"
-            - name: Get yarn cache directory path
-              id: yarn-cache-dir-path
-              run: echo "::set-output name=dir::$(yarn cache dir)"
-            - name: Cache javascript packages
-              uses: actions/cache@v2
-              with:
-                  path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
+                  node-version: "16"
             - name: Install pnpm
               run: npm install -g pnpm
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              run: |
+                echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+            - uses: actions/cache@v3
+              name: Setup pnpm cache
+              with:
+                path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+                key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+                restore-keys: |
+                  ${{ runner.os }}-pnpm-store-
             - name: Install packages
               run: |
-                  pnpm i --prefer-offline
+                  pnpm install
             - name: Build
               run: |
                   pnpm production
