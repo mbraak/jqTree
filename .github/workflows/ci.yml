@@ -38,11 +38,13 @@ jobs:
             - name: Check types
               run: |
                   pnpm tsc
-            - name: Run tests
-              run: |
-                  pnpm clean-coverage
-                  pnpm test
-            - name: Store artifacts
+            - name: Clean coverage
+              run: pnpm clean-coverage
+            - name: Run jest tests
+              run: pnpm jest
+            - name: Run playwright tests
+              run: pnpm playwright
+            - name: Screenshots artifact
               if: always()
               uses: actions/upload-artifact@v3
               with:
@@ -52,6 +54,11 @@ jobs:
               run: |
                   pnpm merge-coverage
                   pnpm print-coverage
+            - name: Coverage artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: coverage
+                path: .nyc_output
             - name: Coveralls
               run: |
                   pnpm coveralls
