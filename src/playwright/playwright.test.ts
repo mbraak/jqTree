@@ -34,8 +34,13 @@ const initPage = async ({ baseURL, dragAndDrop, page }: InitPageParameters) => {
     `);
 };
 
-test.beforeEach(async ({ context }) => {
+test.beforeEach(async ({ context, page }) => {
     await initCoverage(context);
+
+    await page.evaluate(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        (window as any)["reportCodeCoverage"] = () => null;
+    });
 });
 
 test.afterEach(async ({ context }) => {
