@@ -42,7 +42,7 @@ jobs:
               run: |
                   pnpm clean-coverage
                   pnpm test
-            - name: Store artifcats
+            - name: Store artifacts
               if: always()
               uses: actions/upload-artifact@v3
               with:
