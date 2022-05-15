@@ -8,6 +8,17 @@ const istanbulCLIOutput = path.join(process.cwd(), ".nyc_output");
 const generateUUID = () => crypto.randomBytes(16).toString("hex");
 
 export const initCoverage = async (context: BrowserContext) => {
+    await context.addInitScript(() => {
+        window.addEventListener("beforeunload", () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const anyWindow = window as any;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const coverageData = anyWindow.__coverage__;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            anyWindow.collectIstanbulCoverage(JSON.stringify(coverageData));
+        });
+    });
+
     await fs.promises.mkdir(istanbulCLIOutput, { recursive: true });
 
     await context.exposeFunction(
