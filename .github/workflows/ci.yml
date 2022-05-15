@@ -48,8 +48,9 @@ jobs:
               with:
                 name: screenshots
                 path: src/playwright/playwright.test.ts-snapshots/
-            - name: Print coverage
+            - name: Merge coverage
               run: |
+                  pnpm merge-coverage
                   pnpm print-coverage
             - name: Coveralls
               run: |
