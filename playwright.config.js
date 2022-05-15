@@ -7,10 +7,6 @@ const config = {
             name: "Chromium",
             use: { ...devices["Desktop Chrome"] },
         },
-        {
-            name: "iPhone 6",
-            use: { ...devices["iPhone 6"] },
-        },
     ],
     webServer: {
         command: "pnpm devserver-with-coverage",
