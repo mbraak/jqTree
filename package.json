@@ -63,6 +63,7 @@
         "jsonfile": "^6.1.0",
         "lodash.template": "^4.5.0",
         "msw": "^0.38.1",
+        "nyc": "^15.1.0",
         "playwright": "^1.19.2",
         "postcss": "^8.4.7",
         "postcss-cli": "^9.1.0",
