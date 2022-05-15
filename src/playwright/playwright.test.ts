@@ -52,7 +52,8 @@ test.describe("without dragAndDrop", () => {
         await expect(page.locator("body")).toHaveText(/.*Ornithischians.*/);
         await expect(page.locator("body")).toHaveText(/.*Coelophysoids.*/);
 
-        await expect(page.screenshot()).resolves.toMatchSnapshot();
+        const screenshot = await page.screenshot();
+        expect(screenshot).toMatchSnapshot();
     });
 
     test("selects a node", async ({ page }) => {
@@ -61,7 +62,8 @@ test.describe("without dragAndDrop", () => {
         const saurischia = await findNodeElement(page, "Saurischia");
         await selectNode(saurischia);
 
-        await expect(page.screenshot()).resolves.toMatchSnapshot();
+        const screenshot = await page.screenshot();
+        expect(screenshot).toMatchSnapshot();
     });
 });
 
@@ -98,6 +100,7 @@ test.describe("with dragAndDrop", () => {
             }),
         ]);
 
-        await expect(page.screenshot()).resolves.toMatchSnapshot();
+        const screenshot = await page.screenshot();
+        expect(screenshot).toMatchSnapshot();
     });
 });
