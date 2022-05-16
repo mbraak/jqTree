@@ -26,9 +26,12 @@ const includeCoverage = Boolean(process.env.COVERAGE);
 
 const resolvePlugin = resolve({ extensions: [".ts"] });
 
+/*
 const babelConfigFile = includeCoverage
     ? "babel.coverage.config.json"
     : "babel.config.json";
+*/
+const babelConfigFile = "babel.coverage.config.json";
 
 const babelPlugin = babel({
     babelHelpers: "bundled",
@@ -38,6 +41,7 @@ const babelPlugin = babel({
 
 const plugins = [resolvePlugin, babelPlugin];
 
+/*
 if (!debugBuild) {
     const terserPlugin = terser({
         output: {
@@ -46,6 +50,7 @@ if (!debugBuild) {
     });
     plugins.push(terserPlugin);
 }
+*/
 
 if (devServer) {
     const servePlugin = serve({
