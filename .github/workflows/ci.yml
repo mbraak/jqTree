@@ -43,7 +43,7 @@ jobs:
             - name: Run jest tests
               run: pnpm jest
             - name: Playwright install
-              run: npx playwright install chromium
+              run: PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium
             - name: Run playwright tests
               run: pnpm playwright
             - name: Screenshots artifact
