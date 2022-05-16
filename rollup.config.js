@@ -26,12 +26,9 @@ const includeCoverage = Boolean(process.env.COVERAGE);
 
 const resolvePlugin = resolve({ extensions: [".ts"] });
 
-/*
 const babelConfigFile = includeCoverage
     ? "babel.coverage.config.json"
     : "babel.config.json";
-*/
-const babelConfigFile = "babel.coverage.config.json";
 
 const babelPlugin = babel({
     babelHelpers: "bundled",
