@@ -2,9 +2,6 @@ name: Continuous integration
 
 on: [push]
 
-env:
-  PLAYWRIGHT_BROWSERS_PATH: 0
-
 jobs:
     runner-job:
         runs-on: ubuntu-latest
