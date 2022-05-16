@@ -22,12 +22,17 @@ jobs:
             - uses: actions/cache@v3
               name: Setup pnpm cache
               with:
-                path: |
-                  ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-                  /home/runner/.cache/ms-playwright/
+                path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
                 key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
                 restore-keys: |
                   ${{ runner.os }}-pnpm-store-
+            - uses: actions/cache@v3
+              name: Setup Playwright browsers cache
+              with:
+                path: /home/runner/.cache/ms-playwright/
+                key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+                restore-keys: |
+                  ${{ runner.os }}-playwright-
             - name: Install packages
               run: |
                   pnpm install
