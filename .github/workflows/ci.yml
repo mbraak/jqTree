@@ -42,10 +42,10 @@ jobs:
               run: pnpm clean-coverage
             - name: Run jest tests
               run: pnpm jest
+            - name: Playwright install
+              run: npx playwright install chromium
             - name: Run playwright tests
-              run: |
-                npx playwright install
-                pnpm playwright
+              run: pnpm playwright
             - name: Screenshots artifact
               if: always()
               uses: actions/upload-artifact@v3
