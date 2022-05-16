@@ -29,7 +29,7 @@
         "merge-coverage": "cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json",
         "clean-coverage": "rm -rf .nyc_output && jest --clearCache",
         "print-coverage": "nyc report",
-        "playwright": "rm -f tree.jquery.debug.js && start-server-and-test 'pnpm devserver-with-coverage' http://localhost:8080 'playwright test'",
+        "playwright": "rm -f tree.jquery.js && start-server-and-test 'pnpm devserver-with-coverage' http://localhost:8080 'playwright test'",
         "test": "pnpm jest && pnpm playwright"
     },
     "dependencies": {
