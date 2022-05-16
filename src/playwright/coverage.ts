@@ -28,6 +28,8 @@ export const initCoverage = async (context: BrowserContext) => {
 };
 
 export const saveCoverage = async (context: BrowserContext) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     for (const page of context.pages()) {
         await page.evaluate(() => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
