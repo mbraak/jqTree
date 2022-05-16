@@ -38,7 +38,6 @@ const babelPlugin = babel({
 
 const plugins = [resolvePlugin, babelPlugin];
 
-/*
 if (!debugBuild) {
     const terserPlugin = terser({
         output: {
@@ -47,7 +46,6 @@ if (!debugBuild) {
     });
     plugins.push(terserPlugin);
 }
-*/
 
 if (devServer) {
     const servePlugin = serve({
