@@ -35,12 +35,12 @@ const initPage = async ({ baseURL, dragAndDrop, page }: InitPageParameters) => {
 };
 
 test.beforeEach(async ({ context, page }) => {
-    await page.evaluate("console.log(window.__coverage__)");
     page.on("console", (msg) => console.log(msg.text()));
     await initCoverage(context);
 });
 
-test.afterEach(async ({ context }) => {
+test.afterEach(async ({ context, page }) => {
+    await page.evaluate("console.log(window.__coverage__)");
     await saveCoverage(context);
 });
 
