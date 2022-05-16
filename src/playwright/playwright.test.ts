@@ -16,6 +16,8 @@ const initPage = async ({ dragAndDrop, page }: InitPageParameters) => {
     await page.goto("http://localhost:8080/test_index.html");
     await page.waitForLoadState("domcontentloaded");
 
+    page.on("console", (msg) => console.log(`console: ${msg.text()}`));
+
     await page.evaluate(`
         const $tree = jQuery("#tree1");
 
@@ -27,14 +29,17 @@ const initPage = async ({ dragAndDrop, page }: InitPageParameters) => {
             startDndDelay: 100,
         });
     `);
+
+    await page.evaluate(`
+        console.log(window.__coverage__ ? 'Coverage enabled' : 'Coverage not enabled');
+    `);
 };
 
 test.beforeEach(async ({ context }) => {
     await initCoverage(context);
 });
 
-test.afterEach(async ({ context, page }) => {
-    await page.evaluate("console.log(window.__coverage__)");
+test.afterEach(async ({ context }) => {
     await saveCoverage(context);
 });
 
