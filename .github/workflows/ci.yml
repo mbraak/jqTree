@@ -2,6 +2,9 @@ name: Continuous integration
 
 on: [push]
 
+env:
+  PLAYWRIGHT_BROWSERS_PATH: 0
+
 jobs:
     runner-job:
         runs-on: ubuntu-latest
@@ -43,7 +46,7 @@ jobs:
             - name: Run jest tests
               run: pnpm jest
             - name: Playwright install
-              run: PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium
+              run: npx playwright install chromium
             - name: Run playwright tests
               run: pnpm playwright
             - name: Screenshots artifact
