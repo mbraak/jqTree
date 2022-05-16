@@ -8,17 +8,12 @@ import {
 import { initCoverage, saveCoverage } from "./coverage";
 
 interface InitPageParameters {
-    baseURL?: string;
     dragAndDrop: boolean;
     page: Page;
 }
 
-const initPage = async ({ baseURL, dragAndDrop, page }: InitPageParameters) => {
-    if (!baseURL) {
-        throw new Error("Missing baseURL");
-    }
-
-    await page.goto(`${baseURL}/test_index.html`);
+const initPage = async ({ dragAndDrop, page }: InitPageParameters) => {
+    await page.goto("http://localhost:8080/test_index.html");
     await page.waitForLoadState("domcontentloaded");
 
     await page.evaluate(`
@@ -44,8 +39,8 @@ test.afterEach(async ({ context, page }) => {
 });
 
 test.describe("without dragAndDrop", () => {
-    test.beforeEach(async ({ baseURL, page }) => {
-        await initPage({ baseURL, page, dragAndDrop: false });
+    test.beforeEach(async ({ page }) => {
+        await initPage({ page, dragAndDrop: false });
     });
 
     test("displays a tree", async ({ page }) => {
@@ -69,8 +64,8 @@ test.describe("without dragAndDrop", () => {
 });
 
 test.describe("with dragAndDrop", () => {
-    test.beforeEach(async ({ baseURL, page }) => {
-        await initPage({ baseURL, page, dragAndDrop: true });
+    test.beforeEach(async ({ page }) => {
+        await initPage({ page, dragAndDrop: true });
     });
 
     test("moves a node", async ({ page }) => {
