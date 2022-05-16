@@ -12,11 +12,6 @@ const config = {
         command: "pnpm devserver-with-coverage",
         port: 8080,
     },
-    use: {
-        launchOptions: {
-            chromiumSandbox: false,
-        },
-    },
 };
 
 module.exports = config;
