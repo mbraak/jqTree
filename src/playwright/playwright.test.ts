@@ -34,7 +34,8 @@ const initPage = async ({ baseURL, dragAndDrop, page }: InitPageParameters) => {
     `);
 };
 
-test.beforeEach(async ({ context }) => {
+test.beforeEach(async ({ context, page }) => {
+    page.on("console", (msg) => console.log(msg.text()));
     await initCoverage(context);
 });
 
