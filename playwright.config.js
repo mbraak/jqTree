@@ -8,6 +8,10 @@ const config = {
             use: { ...devices["Desktop Chrome"] },
         },
     ],
+    webServer: {
+        command: "pnpm devserver-with-coverage",
+        port: 8080,
+    },
 };
 
 module.exports = config;
