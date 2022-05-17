@@ -1,37 +1,27 @@
-/// <reference types="jest-playwright-preset" />
-/// <reference types="expect-playwright" />
-
-import getGiven from "givens";
+import { test, expect, Page } from "@playwright/test";
 import {
     dragAndDrop,
-    expectToBeClosed,
-    expectToBeOpen,
-    expectToBeSelected,
     findNodeElement,
     getTreeStructure,
-    openNode,
     selectNode,
-} from "./testUtil";
-import { matchScreenshot } from "./visualRegression";
+} from "./testUtils";
+import { initCoverage, saveCoverage } from "./coverage";
 
-interface Vars {
+interface InitPageParameters {
+    baseURL?: string;
     dragAndDrop: boolean;
+    page: Page;
 }
 
-const given = getGiven<Vars>();
-given("dragAndDrop", () => false);
+const initPage = async ({ baseURL, dragAndDrop, page }: InitPageParameters) => {
+    if (!baseURL) {
+        throw new Error("Missing baseURL");
+    }
 
-beforeEach(async () => {
-    await jestPlaywright.resetPage();
-
-    await page.goto("http://localhost:8080/test_index.html");
+    await page.goto(`${baseURL}/test_index.html`);
     await page.waitForLoadState("domcontentloaded");
 
-    // Fix error on iphone6 device when collecting coverage
-    await page.evaluate(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        (window as any)["reportCodeCoverage"] = () => null;
-    });
+    page.on("console", (msg) => console.log(`console: ${msg.text()}`));
 
     await page.evaluate(`
         const $tree = jQuery("#tree1");
@@ -40,51 +30,58 @@ beforeEach(async () => {
             animationSpeed: 0,
             autoOpen: 0,
             data: ExampleData.exampleData,
-            dragAndDrop: ${given.dragAndDrop},
+            dragAndDrop: ${dragAndDrop},
             startDndDelay: 100,
         });
     `);
+
+    await page.evaluate(`
+        console.log(window.__coverage__ ? 'Coverage enabled' : 'Coverage not enabled');
+    `);
+};
+
+test.beforeEach(async ({ context }) => {
+    await initCoverage(context);
 });
 
-afterEach(async () => {
-    await jestPlaywright.saveCoverage(page);
+test.afterEach(async ({ context }) => {
+    await saveCoverage(context);
 });
 
-it("displays a tree", async () => {
-    await expect(page).toMatchText(/.*Saurischia.*/);
-    await expect(page).toMatchText(/.*Ornithischians.*/);
-    await expect(page).toMatchText(/.*Coelophysoids.*/);
+test.describe("without dragAndDrop", () => {
+    test.beforeEach(async ({ baseURL, page }) => {
+        await initPage({ baseURL, page, dragAndDrop: false });
+    });
 
-    await matchScreenshot("displays_a_tree");
+    test("displays a tree", async ({ page }) => {
+        await expect(page.locator("body")).toHaveText(/.*Saurischia.*/);
+        await expect(page.locator("body")).toHaveText(/.*Ornithischians.*/);
+        await expect(page.locator("body")).toHaveText(/.*Coelophysoids.*/);
+
+        const screenshot = await page.screenshot();
+        expect(screenshot).toMatchSnapshot();
+    });
+
+    test("selects a node", async ({ page }) => {
+        await expect(page.locator("body")).toHaveText(/.*Saurischia.*/);
+
+        const saurischia = await findNodeElement(page, "Saurischia");
+        await selectNode(saurischia);
+
+        const screenshot = await page.screenshot();
+        expect(screenshot).toMatchSnapshot();
+    });
 });
 
-it("selects a node", async () => {
-    await expect(page).toMatchText(/.*Saurischia.*/);
-    const saurischia = await findNodeElement("Saurischia");
-    await selectNode(saurischia);
-    await expectToBeSelected(saurischia);
+test.describe("with dragAndDrop", () => {
+    test.beforeEach(async ({ baseURL, page }) => {
+        await initPage({ baseURL, page, dragAndDrop: true });
+    });
 
-    await matchScreenshot("selects_a_node");
-});
+    test("moves a node", async ({ page }) => {
+        await dragAndDrop(page, "Herrerasaurians", "Ornithischians");
 
-it("opens a node", async () => {
-    await expect(page).toMatchText(/.*Saurischia.*/);
-
-    const theropods = await findNodeElement("Theropods");
-    await expectToBeClosed(theropods);
-    await openNode(theropods);
-    await expectToBeOpen(theropods);
-
-    await matchScreenshot("opens_a_node");
-});
-
-describe("dragAndDrop", () => {
-    given("dragAndDrop", () => true);
-
-    it("moves a node", async () => {
-        await dragAndDrop("Herrerasaurians", "Ornithischians");
-
-        const structure = await getTreeStructure();
+        const structure = await getTreeStructure(page);
 
         expect(structure).toEqual([
             expect.objectContaining({
@@ -109,6 +106,7 @@ describe("dragAndDrop", () => {
             }),
         ]);
 
-        await matchScreenshot("moves_a_node");
+        const screenshot = await page.screenshot();
+        expect(screenshot).toMatchSnapshot();
     });
 });
