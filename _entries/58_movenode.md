@@ -3,13 +3,13 @@ title: moveNode
 name: functions-movenode
 ---
 
-**function moveNode(node, target_node, position);**
+**function moveNode(node, targetNode, position);**
 
 Move a node. Position can be 'before', 'after' or 'inside'.
 
 {% highlight js %}
 var node = $tree.tree('getNodeById', 1);
-var target_node = $tree.tree('getNodeById', 2);
+var targetNode = $tree.tree('getNodeById', 2);
 
-$tree.tree('moveNode', node, target_node, 'after');
+$tree.tree('moveNode', node, targetNode, 'after');
 {% endhighlight %}

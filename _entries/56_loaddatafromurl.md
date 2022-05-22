@@ -5,9 +5,9 @@ name: functions-loaddatafromurl
 
 **function loadDataFromUrl(url);**
 
-**function loadDataFromUrl(url, parent_node);**
+**function loadDataFromUrl(url, parentNode);**
 
-**function loadDataFromUrl(parent_node);**
+**function loadDataFromUrl(parentNode);**
 
 Load data in the tree from an url using ajax. You can **replace the whole tree** or you can **load a subtree**.
 
@@ -39,9 +39,9 @@ $tree.tree('loadDataFromUrl', node);
 
 You can also add an **on_finished** callback parameter that will be called when the data is loaded:
 
-**function loadDataFromUrl(url, parent_node, on_finished);**
+**function loadDataFromUrl(url, parentNode, onFinished);**
 
-**function loadDataFromUrl(parent_node, on_finished);**
+**function loadDataFromUrl(parentNode, onFinished);**
 
 {% highlight js %}
 $('#tree1').tree(

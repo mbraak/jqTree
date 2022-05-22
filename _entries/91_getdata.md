@@ -3,11 +3,11 @@ title: getData
 name: node-functions-getdata
 ---
 
-**function getData(include_parent = false);**
+**function getData(includeParent = false);**
 
 Get the subtree of this node.
 
-**include_parent**
+**includeParent**
 
 * **true**: include node and children
 * **false**: only include children (default)

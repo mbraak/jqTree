@@ -3,7 +3,7 @@ title: addNodeAfter
 name: functions-addnodeafter
 ---
 
-**function addNodeAfter(new_node_info, existing_node);**
+**function addNodeAfter(newNodeInfo, existingNode);**
 
 Add a new node after this existing node.
 

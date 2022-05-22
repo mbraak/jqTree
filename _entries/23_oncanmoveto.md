@@ -9,8 +9,8 @@ You can override this function to determine if a node can be moved to a certain 
 $('#tree1').tree({
     data: data,
     dragAndDrop: true,
-    onCanMoveTo: function(moved_node, target_node, position) {
-        if (target_node.is_menu) {
+    onCanMoveTo: function(movedNode, targetNode, position) {
+        if (targetNode.isMenu) {
             // Example: can move inside menu, not before or after
             return (position == 'inside');
         }

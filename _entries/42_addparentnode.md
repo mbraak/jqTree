@@ -3,7 +3,7 @@ title: addParentNode
 name: functions-addparentnode
 ---
 
-**function addParentNode(new_node_info, existing_node);**
+**function addParentNode(newNodeInfo, existingNode);**
 
 Add a new node as parent of this existing node.
 
