@@ -5,7 +5,7 @@ name: functions-loaddata
 
 **function loadData(data);**
 
-**function loadData(data, parent_node);**
+**function loadData(data, parentNode);**
 
 Load data in the tree. The data is array of nodes.
 
@@ -13,7 +13,7 @@ You can **replace the whole tree** or you can **load a subtree**.
 
 {% highlight js %}
 // Assuming the tree exists
-var new_data = [
+var newData = [
     {
         name: 'node1',
         children: [
@@ -28,7 +28,7 @@ var new_data = [
         ]
     }
 ];
-$('#tree1').tree('loadData', new_data);
+$('#tree1').tree('loadData', newData);
 {% endhighlight %}
 
 Load a subtree:

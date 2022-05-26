@@ -8,5 +8,5 @@ name: functions-gettree
 Get the root node of the tree.
 
 {% highlight js %}
-var tree_data = $('#tree1').tree('getTree');
+var treeData = $('#tree1').tree('getTree');
 {% endhighlight %}

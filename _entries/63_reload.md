@@ -5,11 +5,11 @@ name: functions-reload
 
 **function reload();**
 
-**function reload(on_finished);**
+**function reload(onFinished);**
 
 Reload data from the server.
 
-* Call `on_finished` when the data is loaded.
+* Call `onFinished` when the data is loaded.
 
 {% highlight js %}
 $('#tree1').tree('reload');

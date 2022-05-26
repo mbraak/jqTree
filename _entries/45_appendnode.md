@@ -3,12 +3,12 @@ title: appendNode
 name: functions-appendnode
 ---
 
-**function appendNode(new_node_info, parent_node);**
+**function appendNode(newNodeInfo, parentNode);**
 
-Add a node to this parent node. If **parent_node** is empty, then the new node becomes a root node.
+Add a node to this parent node. If **parentNode** is empty, then the new node becomes a root node.
 
 {% highlight js %}
-var parent_node = $tree.tree('getNodeById', 123);
+var parentNode = $tree.tree('getNodeById', 123);
 
 $tree.tree(
     'appendNode',
@@ -16,7 +16,7 @@ $tree.tree(
         name: 'new_node',
         id: 456
     },
-    parent_node
+    parentNode
 );
 {% endhighlight %}
 
@@ -45,6 +45,6 @@ $tree.tree(
             { name: 'child2', id: 458 }
         ]
     },
-    parent_node
+    parentNode
 );
 {% endhighlight %}

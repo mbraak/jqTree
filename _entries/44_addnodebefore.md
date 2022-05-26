@@ -3,6 +3,6 @@ title: addNodeBefore
 name: functions-addnodebefore
 ---
 
-**function addNodeBefore(new_node_info, existing_node);**
+**function addNodeBefore(newNodeInfo, existingNode);**
 
 Add a new node before this existing node.

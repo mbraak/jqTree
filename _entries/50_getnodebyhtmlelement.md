@@ -3,9 +3,9 @@ title: getNodeByHtmlElement
 name: functions-getnodebyhtmlelement
 ---
 
-**function getNodeByHtmlElement(html_element);**
+**function getNodeByHtmlElement(htmlElement);**
 
-Get a tree node by an html element. The html element should be:
+Get a tree node by an html element. The html htmlElement should be:
 
 * The `li` element for the node
 * Or, an element inside the `li`. For example the `span` for the title.

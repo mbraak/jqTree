@@ -7,14 +7,14 @@ name: functions-opennode
 
 **function openNode(node, slide);**
 
-**function openNode(node, on_finished);**
+**function openNode(node, onFinished);**
 
-**function openNode(node, slide, on_finished);**
+**function openNode(node, slide, onFinished);**
 
 Open this node. The node must have child nodes.
 
 Parameter **slide (optional)**: open the node using a slide animation (default is true).
-Parameter **on_finished (optional)**: callback when the node is opened; this also works for nodes that are loaded lazily
+Parameter **onFinished (optional)**: callback when the node is opened; this also works for nodes that are loaded lazily
 
 {% highlight js %}
 // create tree

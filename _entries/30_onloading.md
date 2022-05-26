@@ -8,10 +8,10 @@ The onLoading parameter is called when the tree data is loading. This gives us t
 Callback looks like this:
 
 ```js
-function (is_loading, node, $el)
+function (isLoading, node, $el)
 ```
 
-* **is_loading**: boolean
+* **isLoading**: boolean
   * true: data is loading
   * false: data is loaded
 * **node**:

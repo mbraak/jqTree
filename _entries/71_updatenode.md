@@ -28,7 +28,7 @@ $tree.tree(
     {
         name: 'new name',
         id: 1,
-        other_property: 'abc'
+        otherProperty: 'abc'
     }
 );
 {% endhighlight %}
