@@ -17,3 +17,6 @@ jqtree_version: 1.6.2
 markdown: kramdown
 permalink: pretty
 exclude: ["node_modules"]
+
+plugins:
+    - jekyll-postcss
