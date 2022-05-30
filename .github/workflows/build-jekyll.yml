@@ -23,4 +23,5 @@ jobs:
           provider: 'github'
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: 'tailwind-docs'
-          
+          jekyll_src: './'
+          jekyll_cfg: '_config.yml'
