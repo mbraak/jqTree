@@ -22,6 +22,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
             node-version: "16"
+      - run: nodepath=$(which node); ln -s $nodepath /usr/bin/node
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Get pnpm store directory
