@@ -18,10 +18,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gems-
 
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-            node-version: "16"
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Get pnpm store directory
