@@ -20,3 +20,6 @@ exclude: ["node_modules", "vendor"]
 
 plugins:
     - jekyll-postcss
+
+postcss:
+    cache: false
