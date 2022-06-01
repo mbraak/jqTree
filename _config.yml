@@ -16,10 +16,4 @@ jqtree_version: 1.6.2
 # Build settings
 markdown: kramdown
 permalink: pretty
-exclude: ["node_modules", "vendor"]
-
-plugins:
-    - jekyll-postcss
-
-postcss:
-    cache: false
+exclude: ["node_modules"]

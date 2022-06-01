@@ -31,7 +31,8 @@
         "clean-coverage": "rm -rf .nyc_output && jest --clearCache",
         "print-coverage": "nyc report",
         "playwright": "pnpm build-with-coverage && playwright test",
-        "test": "pnpm jest && pnpm playwright"
+        "test": "pnpm jest && pnpm playwright",
+        "build_docs_css": "tailwindcss -i docs/documentation.css -o static/documentation.css"
     },
     "dependencies": {
         "jquery": "^3.6.0"
