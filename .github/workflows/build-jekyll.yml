@@ -40,10 +40,7 @@ jobs:
         run: |
             pnpm install
 
-      - uses: jeffreytse/jekyll-deploy-action@v0.3.1
+      - uses: helaili/jekyll-action@v2
         with:
-          provider: 'github'
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: 'tailwind-docs'
-          jekyll_src: './'
-          jekyll_cfg: '_config.yml'
+          target_branch: 'tailwind-docs'
