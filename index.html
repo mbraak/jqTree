@@ -1,14 +1,12 @@
 ---
-layout: frontpage
-js: documentation.js
-css: documentation.css
+layout: page
 ---
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="bs-sidebar hidden-print" id="menu" role="complementary">
+<div class="px-8 absolute">
+    <div class="fixed w-64 inset-x-8 inset-y-4 overflow-y-auto">
+        <div>
             <a href="#jqtree"><h2>jqTree</h2></a>
-            <ul class="nav bs-sidenav">
+            <ul>
                 {% assign level = 0 %}
 
                 {% for entry in site.entries %}
@@ -33,16 +31,29 @@ css: documentation.css
             </ul>
         </div>
     </div>
-    <div class="col-md-9" id="main">
-        {% for entry in site.entries %}
-            {% if entry.hide_title %}
-                <div id="{{ entry.name }}"></div>
-            {% elsif entry.section %}
-                <h3 id="{{ entry.name }}">{{ entry.title }}</h3>
-            {% else %}
-                <h4 id="{{ entry.name }}">{{ entry.title }}</h4>
-            {% endif %}
-            {{ entry.output }}
-        {% endfor %}
+    <div class="pl-64">
+        <div class="bg-gray-50 text-center pt-16 pb-24 px-2">
+            <h1 class="text-gray-900 tracking-tight font-extrabold text-6xl">
+                <span class="text-indigo-600">jqTree</span> is a jQuery widget for displaying a tree
+            </h1>
+            <p class="mt-5 text-xl text-gray-500">
+                It supports json data, loading via ajax and drag-and-drop.
+            </p>
+            <div class="mt-8">
+                <a class="rounded-md shadow text-lg text-white px-10 py-4 bg-indigo-600 hover:bg-indigo-700" href="https://github.com/mbraak/jqTree/tarball/master">Download jqTree</a>
+            </div>
+        </div>
+        <div class="px-8 py-8">
+            {% for entry in site.entries %}
+                {% if entry.hide_title %}
+                    <div id="{{ entry.name }}"></div>
+                {% elsif entry.section %}
+                    <h3 id="{{ entry.name }}">{{ entry.title }}</h3>
+                {% else %}
+                    <h4 id="{{ entry.name }}">{{ entry.title }}</h4>
+                {% endif %}
+                {{ entry.output }}
+            {% endfor %}
+        </div>
     </div>
 </div>
