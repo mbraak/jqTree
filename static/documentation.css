@@ -884,6 +884,13 @@ Ensure the default browser behavior of the `hidden` attribute.
   position: absolute;
 }
 
+.inset-0 {
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+}
+
 .inset-x-8 {
   left: 2rem;
   right: 2rem;
@@ -892,6 +899,14 @@ Ensure the default browser behavior of the `hidden` attribute.
 .inset-y-4 {
   top: 1rem;
   bottom: 1rem;
+}
+
+.left-\[max\(0px\2c calc\(50\%-45rem\)\)\] {
+  left: max(0px,calc(50% - 45rem));
+}
+
+.right-auto {
+  right: auto;
 }
 
 .mx-auto {
@@ -919,12 +934,36 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-bottom: 4rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.ml-8 {
+  margin-left: 2rem;
+}
+
 .block {
   display: block;
 }
 
+.flex {
+  display: flex;
+}
+
 .w-64 {
   width: 16rem;
+}
+
+.w-\[19\.5rem\] {
+  width: 19.5rem;
+}
+
+.max-w-8xl {
+  max-width: 90rem;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .space-y-2 > :not([hidden]) ~ :not([hidden]) {
@@ -989,6 +1028,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-bottom: 2rem;
 }
 
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .pl-4 {
   padding-left: 1rem;
 }
@@ -1003,6 +1047,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pb-24 {
   padding-bottom: 6rem;
+}
+
+.pl-\[19\.5rem\] {
+  padding-left: 19.5rem;
 }
 
 .text-center {
@@ -1027,6 +1075,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
+}
+
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1;
 }
 
 .font-semibold {
