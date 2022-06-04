@@ -4,8 +4,7 @@ layout: page
 
 <div class="px-8 absolute">
     <div class="fixed w-64 inset-x-8 inset-y-4 overflow-y-auto">
-        <div>
-            <a href="#jqtree"><h2>jqTree</h2></a>
+        <nav>
             <ul>
                 {% assign level = 0 %}
 
@@ -15,12 +14,14 @@ layout: page
                                 </ul>
                             </li>
                         {% endif %}
-                        <li>
-                            <a href="#{{ entry.name }}">{{ entry.title }}</a>
-                            <ul class="nav">
+                        <li class="mt-8">
+                            <h5 class="mb-3 font-semibold text-slate-900">{{ entry.title }}</h5>
+                            <ul class="space-y-2 border-l border-slate-100">
                         {% assign level = 1 %}
                     {% else %}
-                        <li><a href="#{{ entry.name }}">{{ entry.title }}</a></li>
+                        <li>
+                            <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#{{ entry.name }}">{{ entry.title }}</a>
+                        </li>
                     {% endif %}
                 {% endfor %}
 
@@ -29,7 +30,7 @@ layout: page
                     </li>
                 {% endif %}
             </ul>
-        </div>
+        </nav>
     </div>
     <div class="pl-64">
         <div class="bg-gray-50 text-center pt-16 pb-24 px-2">
@@ -50,9 +51,11 @@ layout: page
                 {% elsif entry.section %}
                     <h3 id="{{ entry.name }}">{{ entry.title }}</h3>
                 {% else %}
-                    <h4 id="{{ entry.name }}">{{ entry.title }}</h4>
+                    <h4 class="text-4xl font-extrabold text-slate-900 tracking-tight" id="{{ entry.name }}">{{ entry.title }}</h4>
                 {% endif %}
-                {{ entry.output }}
+                <div class="mt-4 mb-16 text-lg text-slate-700">
+                    {{ entry.output }}
+                </div>
             {% endfor %}
         </div>
     </div>
