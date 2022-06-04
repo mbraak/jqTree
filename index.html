@@ -2,7 +2,7 @@
 layout: page
 ---
 
-<div class="px-8 absolute">
+<div class="px-8 absolute antialiased antialiased mx-auto">
     <div class="fixed w-64 inset-x-8 inset-y-4 overflow-y-auto">
         <nav>
             <ul>
@@ -44,7 +44,7 @@ layout: page
                 <a class="rounded-md shadow text-lg text-white px-10 py-4 bg-indigo-600 hover:bg-indigo-700" href="https://github.com/mbraak/jqTree/tarball/master">Download jqTree</a>
             </div>
         </div>
-        <div class="px-8 py-8">
+        <div class="px-8 py-8 max-w-8xl">
             {% for entry in site.entries %}
                 {% if entry.hide_title %}
                     <div id="{{ entry.name }}"></div>
@@ -53,7 +53,7 @@ layout: page
                 {% else %}
                     <h4 class="text-4xl font-extrabold text-slate-900 tracking-tight" id="{{ entry.name }}">{{ entry.title }}</h4>
                 {% endif %}
-                <div class="mt-4 mb-16 text-lg text-slate-700">
+                <div class="mt-4 mb-16 text-lg text-slate-700 doc-entry prose">
                     {{ entry.output }}
                 </div>
             {% endfor %}
