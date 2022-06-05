@@ -9,7 +9,7 @@ name: features
 -   Saves the state
 -   Keyboard support
 -   Lazy loading
--   Works on ie9+, firefox, chrome and safari
+-   Works on ie11+, firefox, chrome and safari
 -   Written in Typescript
 
 The project is [hosted on github](https://github.com/mbraak/jqTree).
