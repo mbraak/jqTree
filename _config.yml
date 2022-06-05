@@ -11,6 +11,13 @@ collections:
     examples:
         output: true
 
+defaults:
+    - scope:
+        path: ""
+        type: "examples"
+      values:
+        layout: "example"
+
 jqtree_version: 1.6.2
 
 # Build settings

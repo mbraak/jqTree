@@ -15,7 +15,7 @@ layout: page
                             </li>
                         {% endif %}
                         <li class="mt-8">
-                            <h5 class="mb-3 font-semibold text-slate-900">{{ entry.title }}</h5>
+                            <a class="mb-3 block font-semibold text-slate-700 hover:text-slate-900" href="#{{ entry.name }}">{{ entry.title }}</a>
                             <ul class="space-y-2 border-l border-slate-100">
                         {% assign level = 1 %}
                     {% else %}
@@ -49,9 +49,9 @@ layout: page
                 {% if entry.hide_title %}
                     <div id="{{ entry.name }}"></div>
                 {% elsif entry.section %}
-                    <h3 id="{{ entry.name }}">{{ entry.title }}</h3>
+                    <h3 class="text-4xl font-extrabold text-slate-900 tracking-tight" id="{{ entry.name }}">{{ entry.title }}</h3>
                 {% else %}
-                    <h4 class="text-4xl font-extrabold text-slate-900 tracking-tight" id="{{ entry.name }}">{{ entry.title }}</h4>
+                    <h4 class="text-xl font-bold text-slate-900 tracking-tight" id="{{ entry.name }}">{{ entry.title }}</h4>
                 {% endif %}
                 <div class="mt-4 mb-16 text-lg text-slate-700 doc-entry prose">
                     {{ entry.output }}

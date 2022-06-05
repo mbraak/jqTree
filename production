@@ -2,4 +2,5 @@ rollup -c rollup.config.js &&
 DEBUG_BUILD=true rollup -c rollup.config.js &&
 babel src --out-dir lib --extensions .ts &&
 postcss -o jqtree.css jqtree.postcss &&
-pnpm build_docs_css
+pnpm build_docs_css &&
+postcss -o static/example.css static/example.postcss
