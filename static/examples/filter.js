@@ -19,12 +19,13 @@ $tree.tree({
 
 $("#search").on("click", () => {
     const searchTerm = $("#search-term").val().toLowerCase();
+    const tree = $tree.tree("getTree");
 
     if (!searchTerm) {
         foundMatch = false;
 
         tree.iterate((node) => {
-            node['openForMatch'] = false;
+            node["openForMatch"] = false;
             node["matches"] = false;
             return true;
         });
@@ -33,7 +34,6 @@ $("#search").on("click", () => {
         return;
     }
 
-    const tree = $tree.tree("getTree");
     foundMatch = false;
 
     tree.iterate((node) => {
