@@ -19,8 +19,6 @@
         "jest-watch": "jest --watch",
         "lint": "eslint src/ --ext .ts,.tsx",
         "production": "./production",
-        "jekyll-build": "bundle exec jekyll build",
-        "jekyll-serve": "bundle exec jekyll serve",
         "devserver": "SERVE=true rollup -c -w rollup.config.js",
         "devserver-with-coverage": "COVERAGE=true SERVE=true rollup -c rollup.config.js",
         "build-with-coverage": "COVERAGE=true rollup -c rollup.config.js",
@@ -31,8 +29,7 @@
         "clean-coverage": "rm -rf .nyc_output && jest --clearCache",
         "print-coverage": "nyc report",
         "playwright": "pnpm build-with-coverage && playwright test",
-        "test": "pnpm jest && pnpm playwright",
-        "build_docs_css": "tailwindcss -i docs/documentation.css -o static/documentation.css"
+        "test": "pnpm jest && pnpm playwright"
     },
     "dependencies": {
         "jquery": "^3.6.0"
@@ -45,7 +42,6 @@
         "@playwright/test": "^1.21.1",
         "@rollup/plugin-babel": "^5.3.1",
         "@rollup/plugin-node-resolve": "^13.1.3",
-        "@tailwindcss/typography": "^0.5.2",
         "@testing-library/dom": "^8.11.3",
         "@types/jest": "^27.4.1",
         "@types/jquery": "^3.5.14",
@@ -78,7 +74,6 @@
         "rollup": "^2.68.0",
         "rollup-plugin-serve": "^1.1.0",
         "rollup-plugin-terser": "^7.0.2",
-        "tailwindcss": "^3.0.24",
         "tslib": "^2.3.1",
         "typescript": "^4.6.2"
     }
