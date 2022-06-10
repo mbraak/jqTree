@@ -58,3 +58,7 @@
 .highlight-node > .jqtree-element > .jqtree-title {
     font-weight: bold;
 }
+
+.jqtree-tree .jqtree-toggler {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
