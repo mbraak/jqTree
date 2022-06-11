@@ -1,0 +1,48 @@
+---
+title: Drag outside tree
+js: examples/drag-outside.js
+---
+
+<p class="flex justify-between">
+    <a href="../12_button_on_right/">&laquo; Example 12</a>
+    <a href="../14_filter/">Example 14 &raquo;</a>
+</p>
+
+<h1>Example 13 - drag node outside tree</h1>
+
+<div id="tree1" class="not-prose" data-url="/example_data/"></div>
+
+<div id="targetDiv">drag here (see the console)</div>
+
+<h3>javascript</h3>
+
+{% highlight js %}
+var targetCollisionDiv = $("#targetDiv");
+
+function isOverTarget(e) {
+    return (
+        e.clientX > targetCollisionDiv.position().left &&
+        e.clientX <
+            targetCollisionDiv.position().left +
+                targetCollisionDiv.width() &&
+        e.clientY > targetCollisionDiv.position().top &&
+        e.clientY <
+            targetCollisionDiv.position().top + targetCollisionDiv.height()
+    );
+}
+
+function handleMove(node, e) {
+    if (isOverTarget(e)) {
+        console.log("the node is over the target div");
+    }
+}
+
+function handleStop(node, e) {
+    console.log("stopped over target: ", isOverTarget(e));
+}
+
+$('#tree1').tree({
+    onDragMove: handleMove,
+    onDragStop: handleStop
+});
+{% endhighlight %}

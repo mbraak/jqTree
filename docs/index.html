@@ -1,0 +1,65 @@
+---
+layout: page
+js: documentation.js
+---
+
+<div class="mx-auto max-w-8xl">
+    <div class="hidden lg:block fixed inset-0 px-8 left-[max(0px,calc(50%-45rem))] right-auto w-[19.5rem] overflow-y-auto">
+        <nav>
+            <ul>
+                {% assign level = 0 %}
+
+                {% for entry in site.entries %}
+                    {% if entry.section %}
+                        {% if level == 1 %}
+                                </ul>
+                            </li>
+                        {% endif %}
+                        <li class="mt-8">
+                            <a class="mb-3 block font-semibold text-slate-700 hover:text-slate-900" href="#{{ entry.name }}">{{ entry.title }}</a>
+                            <ul class="space-y-2 border-l border-slate-100">
+                        {% assign level = 1 %}
+                    {% else %}
+                        <li>
+                            <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#{{ entry.name }}">{{ entry.title }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if level == 1 %}
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    <div class="lg:pl-[19.5rem]">
+        <div class="bg-gray-50 text-center pt-16 pb-24 px-8">
+            <h1 class="text-gray-900 tracking-tight font-extrabold text-6xl">
+                <span class="text-indigo-600">jqTree</span> is a jQuery widget for displaying a tree
+            </h1>
+            <p class="mt-5 text-xl text-gray-500">
+                It supports json data, loading via ajax and drag-and-drop.
+            </p>
+            <div class="mt-8">
+                <a class="rounded-md shadow text-lg text-white px-10 py-4 bg-indigo-600 hover:bg-indigo-700" href="https://github.com/mbraak/jqTree/tarball/master">Download jqTree</a>
+            </div>
+        </div>
+        <div class="px-8 py-8">
+            {% for entry in site.entries %}
+                {% if entry.hide_title %}
+                    <div id="{{ entry.name }}"></div>
+                {% elsif entry.section %}
+                    <h3 class="text-4xl mb-8 font-extrabold text-slate-900 tracking-tight" id="{{ entry.name }}">{{ entry.title }}</h3>
+                {% else %}
+                    <h4 class="text-xl mb-4 font-bold text-slate-900 tracking-tight" id="{{ entry.name }}">{{ entry.title }}</h4>
+                {% endif %}
+                {% if entry.output.size > 1 %}
+                    <div class="mb-16 text-slate-700 doc-entry prose">
+                        {{ entry.output }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
