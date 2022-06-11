@@ -58,10 +58,6 @@ context("when a node has load_on_demand in the data", () => {
         server.listen();
     });
 
-    afterAll(() => {
-        server?.close();
-    });
-
     beforeEach(() => {
         if (given.savedState) {
             localStorage.setItem("tree", given.savedState);
@@ -73,6 +69,10 @@ context("when a node has load_on_demand in the data", () => {
             dataUrl: "/tree/",
             saveState: true,
         });
+    });
+
+    afterAll(() => {
+        server?.close();
     });
 
     it("creates a parent node without children", () => {

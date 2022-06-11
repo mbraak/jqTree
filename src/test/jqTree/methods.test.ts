@@ -750,12 +750,12 @@ describe("loadDataFromUrl", () => {
         server.listen();
     });
 
-    afterAll(() => {
-        server?.close();
-    });
-
     beforeEach(() => {
         given.$tree.tree({ data: given.initialData });
+    });
+
+    afterAll(() => {
+        server?.close();
     });
 
     context("with url parameter", () => {
@@ -1019,15 +1019,15 @@ describe("reload", () => {
         server.listen();
     });
 
-    afterAll(() => {
-        server?.close();
-    });
-
     beforeEach(async () => {
         given.$tree.tree({ dataUrl: "/tree/" });
         await screen.findByText("node1");
 
         given.$tree.tree("removeNode", given.node1);
+    });
+
+    afterAll(() => {
+        server?.close();
     });
 
     it("reloads the data from the server", async () => {
