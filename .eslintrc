@@ -1,6 +1,6 @@
 {
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint", "import", "jest"],
+    "plugins": ["@typescript-eslint", "import"],
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",
@@ -8,8 +8,7 @@
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:import/errors",
         "plugin:import/warnings",
-        "plugin:import/typescript",
-        "plugin:jest/all"
+        "plugin:import/typescript"
     ],
     "rules": {
         "@typescript-eslint/explicit-function-return-type": "off",
@@ -27,15 +26,7 @@
                 "allowAny": false,
                 "allowNullish": false
             }
-        ],
-        "jest/consistent-test-it": "off",
-        "jest/prefer-expect-assertions": "off",
-        "jest/no-duplicate-hooks": "off",
-        "jest/no-hooks": "off",
-        "jest/no-identical-title": "off",
-        "jest/prefer-strict-equal": "off",
-        "jest/require-hook": "off",
-        "jest/require-top-level-describe": "off"
+        ]
     },
     "parserOptions": {
         "project": "./tsconfig.json"

@@ -1,5 +1,5 @@
 {
   "extends": [
-    "plugin:playwright/jest-playwright"
+    "plugin:playwright/playwright-test"
   ]
 }

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="JqTree is a jQuery widget for displaying a tree structure in html" />
+        <link rel="stylesheet" href="{{ site.baseurl }}/static/monokai.css" />
+        <link rel="stylesheet" href="{{ site.baseurl }}/static/bower_components/fontawesome/css/all.min.css" />
+        <link rel="stylesheet" href="{{ site.baseurl }}/static/documentation.css" />
+        <link rel="stylesheet" href="{{ site.baseurl }}/jqtree.css" />
+        <link rel="stylesheet" href="{{ site.baseurl }}/static/example.css" />
+    </head>
+    <body>
+        {{ content }}
+    </body>
+
+    <script src="{{ site.baseurl }}/static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="{{ site.baseurl }}/tree.jquery.js"></script>
+    <script src="{{ site.baseurl }}/static/bower_components/jquery-mockjax/dist/jquery.mockjax.js"></script>
+    <script src="{{ site.baseurl }}/static/example_data.js"></script>
+
+    {% if page.js %}
+        <script src="{{ site.baseurl }}/static/{{ page.js }}"></script>
+    {% endif %}
+</html>
