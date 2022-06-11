@@ -1,24 +1,20 @@
-$(function() {
+$(function () {
     var $tree = $("#tree1");
 
     $tree.tree({
         data: ExampleData.exampleData,
         autoOpen: 1,
-        onCreateLi: function(node, $li) {
+        onCreateLi: function (node, $li) {
             // Append a link to the jqtree-element div.
             // The link has an url '#node-[id]' and a data property 'node-id'.
             $li.find(".jqtree-element").append(
-                '<a href="#node-' +
-                    node.id +
-                    '" class="edit" data-node-id="' +
-                    node.id +
-                    '">edit</a>'
+                `<a href="#node-${node.id}" class="edit underline font-medium ml-2 hover:text-slate-900" data-node-id="${node.id}">edit</a>`
             );
-        }
+        },
     });
 
     // Handle a click on the edit link
-    $tree.on("click", ".edit", function(e) {
+    $tree.on("click", ".edit", function (e) {
         // Get the id from the 'node-id' data property
         var node_id = $(e.target).data("node-id");
 
