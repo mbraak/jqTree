@@ -2,8 +2,8 @@
 title: jqTree
 email: your-email@domain.com
 description: "JqTree docs"
-baseurl: "/jqtree"
-url: "http://mbraak.github.io/jqtree/"
+baseurl: "/jqTree"
+url: "http://mbraak.github.io/jqTree/"
 
 collections:
     entries:
