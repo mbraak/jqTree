@@ -12,7 +12,6 @@ specifiers:
   '@types/debug': ^4.1.7
   '@types/jest': ^28
   '@types/jquery': ^3.5.14
-  '@types/pngjs': ^6.0.1
   '@typescript-eslint/eslint-plugin': ^5.27.1
   '@typescript-eslint/parser': ^5.27.1
   autoprefixer: ^10.4.7
@@ -61,7 +60,6 @@ devDependencies:
   '@types/debug': 4.1.7
   '@types/jest': 28.1.1
   '@types/jquery': 3.5.14
-  '@types/pngjs': 6.0.1
   '@typescript-eslint/eslint-plugin': 5.27.1_aq7uryhocdbvbqum33pitcm3y4
   '@typescript-eslint/parser': 5.27.1_ud6rd4xtew5bv4yhvkvu24pzm4
   autoprefixer: 10.4.7_postcss@8.4.14
@@ -1874,12 +1872,6 @@ packages:
 
   /@types/parse5/6.0.3:
     resolution: {integrity: sha512-SuT16Q1K51EAVPz1K29DJ/sXjhSQ0zjvsypYJ6tlwVsRV9jwW5Adq2ch8Dq8kDBCkYnELS7N7VNCSB5nC56t/g==}
-    dev: true
-
-  /@types/pngjs/6.0.1:
-    resolution: {integrity: sha512-J39njbdW1U/6YyVXvC9+1iflZghP8jgRf2ndYghdJb5xL49LYDB+1EuAxfbuJ2IBbWIL3AjHPQhgaTxT3YaYeg==}
-    dependencies:
-      '@types/node': 17.0.42
     dev: true
 
   /@types/prettier/2.6.3:

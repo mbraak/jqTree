@@ -46,7 +46,6 @@
         "@types/debug": "^4.1.7",
         "@types/jest": "^28",
         "@types/jquery": "^3.5.14",
-        "@types/pngjs": "^6.0.1",
         "@typescript-eslint/eslint-plugin": "^5.27.1",
         "@typescript-eslint/parser": "^5.27.1",
         "autoprefixer": "^10.4.7",
