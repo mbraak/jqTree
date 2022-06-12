@@ -2,7 +2,7 @@ module.exports = {
     modulePathIgnorePatterns: [
         "<rootDir>/build/",
         "<rootDir>/lib/",
-        "<rootDir>/_site/",
+        "<rootDir>/docs/",
         "<rootDir>/static/",
     ],
     setupFilesAfterEnv: [

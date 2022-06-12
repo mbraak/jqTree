@@ -1,5 +1,5 @@
 import getGiven from "givens";
-import { screen } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import "../../tree.jquery";
@@ -9,16 +9,24 @@ import __version__ from "../../version";
 
 const context = describe;
 
+const server = setupServer();
+
+beforeAll(() => server.listen());
+
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
 });
 
 afterEach(() => {
+    server.resetHandlers();
+
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
     localStorage.clear();
 });
+
+afterAll(() => server.close());
 
 describe("addNodeAfter", () => {
     interface Vars {
@@ -739,23 +747,14 @@ describe("loadDataFromUrl", () => {
     given("serverData", () => exampleData);
     given("$tree", () => $("#tree1"));
 
-    let server: ReturnType<typeof setupServer> | null = null;
-
-    beforeAll(() => {
-        server = setupServer(
-            rest.get("/tree/", (_request, response, ctx) => {
-                return response(ctx.status(200), ctx.json(given.serverData));
-            })
-        );
-        server.listen();
-    });
-
     beforeEach(() => {
-        given.$tree.tree({ data: given.initialData });
-    });
+        server.use(
+            rest.get("/tree/", (_request, response, ctx) =>
+                response(ctx.status(200), ctx.json(given.serverData))
+            )
+        );
 
-    afterAll(() => {
-        server?.close();
+        given.$tree.tree({ data: given.initialData });
     });
 
     context("with url parameter", () => {
@@ -909,12 +908,15 @@ describe("openNode", () => {
     });
 
     context("with onFinished parameter", () => {
-        it("calls the function", () =>
-            new Promise((resolve) =>
-                given.$tree.tree("openNode", given.node1, (node) =>
-                    resolve(expect(node).toBe(given.node1))
-                )
-            ));
+        it("calls the function", async () => {
+            const onFinished = jest.fn();
+
+            given.$tree.tree("openNode", given.node1, onFinished);
+
+            await waitFor(() => {
+                expect(onFinished).toHaveBeenCalledWith(given.node1);
+            });
+        });
     });
 });
 
@@ -1008,26 +1010,17 @@ describe("reload", () => {
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
-    let server: ReturnType<typeof setupServer> | null = null;
-
-    beforeAll(() => {
-        server = setupServer(
-            rest.get("/tree/", (_request, response, ctx) =>
+    beforeEach(async () => {
+        server.use(
+            rest.get("/tree2/", (_request, response, ctx) =>
                 response(ctx.status(200), ctx.json(exampleData))
             )
         );
-        server.listen();
-    });
 
-    beforeEach(async () => {
-        given.$tree.tree({ dataUrl: "/tree/" });
+        given.$tree.tree({ dataUrl: "/tree2/" });
         await screen.findByText("node1");
 
         given.$tree.tree("removeNode", given.node1);
-    });
-
-    afterAll(() => {
-        server?.close();
     });
 
     it("reloads the data from the server", async () => {
@@ -1045,19 +1038,18 @@ describe("reload", () => {
     });
 
     context("with a onFinished parameter", () => {
-        it("calls onFinished", () =>
-            new Promise<void>((resolve) => {
-                const handleFinished = () => {
-                    expect(given.$tree).toHaveTreeStructure([
-                        expect.objectContaining({ name: "node1" }),
-                        expect.objectContaining({ name: "node2" }),
-                    ]);
+        it("calls onFinished", async () => {
+            const handleFinished = jest.fn();
 
-                    resolve();
-                };
+            given.$tree.tree("reload", handleFinished);
 
-                given.$tree.tree("reload", handleFinished);
-            }));
+            await waitFor(() => expect(handleFinished).toHaveBeenCalledWith());
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
     });
 });
 
