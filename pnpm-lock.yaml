@@ -9,6 +9,7 @@ specifiers:
   '@rollup/plugin-babel': ^5.3.1
   '@rollup/plugin-node-resolve': ^13.3.0
   '@testing-library/dom': ^8.13.0
+  '@types/debug': ^4.1.7
   '@types/jest': ^28
   '@types/jquery': ^3.5.14
   '@types/pngjs': ^6.0.1
@@ -57,6 +58,7 @@ devDependencies:
   '@rollup/plugin-babel': 5.3.1_wwj6nrjtrryxuar2uaqwelbtjy
   '@rollup/plugin-node-resolve': 13.3.0_rollup@2.75.6
   '@testing-library/dom': 8.13.0
+  '@types/debug': 4.1.7
   '@types/jest': 28.1.1
   '@types/jquery': 3.5.14
   '@types/pngjs': 6.0.1
@@ -1797,6 +1799,12 @@ packages:
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
     dev: true
 
+  /@types/debug/4.1.7:
+    resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
+    dependencies:
+      '@types/ms': 0.7.31
+    dev: true
+
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
     dev: true
@@ -1854,6 +1862,10 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/ms/0.7.31:
+    resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
   /@types/node/17.0.42:

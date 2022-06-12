@@ -43,6 +43,7 @@
         "@rollup/plugin-babel": "^5.3.1",
         "@rollup/plugin-node-resolve": "^13.3.0",
         "@testing-library/dom": "^8.13.0",
+        "@types/debug": "^4.1.7",
         "@types/jest": "^28",
         "@types/jquery": "^3.5.14",
         "@types/pngjs": "^6.0.1",
