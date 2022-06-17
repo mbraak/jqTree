@@ -38,7 +38,7 @@ specifiers:
   postcss-import: ^14.1.0
   postcss-load-config: ^4.0.1
   postcss-nested: ^5.0.6
-  prettier: ^2.7
+  prettier: ^2.7.1
   rollup: ^2.75.6
   rollup-plugin-serve: ^1.1.0
   rollup-plugin-terser: ^7.0.2
@@ -85,7 +85,7 @@ devDependencies:
   postcss-import: 14.1.0_postcss@8.4.14
   postcss-load-config: 4.0.1_postcss@8.4.14
   postcss-nested: 5.0.6_postcss@8.4.14
-  prettier: 2.7.0
+  prettier: 2.7.1
   rollup: 2.75.6
   rollup-plugin-serve: 1.1.0
   rollup-plugin-terser: 7.0.2_rollup@2.75.6
@@ -5342,8 +5342,8 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier/2.7.0:
-    resolution: {integrity: sha512-nwoX4GMFgxoPC6diHvSwmK/4yU8FFH3V8XWtLQrbj4IBsK2pkYhG4kf/ljF/haaZ/aii+wNJqISrCDPgxGWDVQ==}
+  /prettier/2.7.1:
+    resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
