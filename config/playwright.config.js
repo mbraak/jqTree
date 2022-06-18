@@ -1,7 +1,7 @@
 const { devices } = require("@playwright/test");
 
 const config = {
-    testDir: "src/playwright",
+    testDir: "../src/playwright",
     projects: [
         {
             name: "Chromium",
@@ -10,6 +10,7 @@ const config = {
     ],
     webServer: {
         command: "pnpm devserver-with-coverage",
+        cwd: "..",
         port: 8080,
     },
 };
