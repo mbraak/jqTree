@@ -68,12 +68,8 @@ jobs:
               with:
                 name: coverage
                 path: .nyc_output
-            - name: Coveralls
-              run: |
-                  pnpm coveralls
-              env:
-                  COVERALLS_REPO_TOKEN: ${{ secrets.github_token }}
-                  COVERALLS_SERVICE_NAME: github
-                  COVERALLS_GIT_COMMIT: ${{ github.sha }}
-                  COVERALLS_GIT_BRANCH: ${{ github.ref }}
-                  COVERALLS_SERVICE_JOB_ID: ${{ github.run_id }}
+            - name: Codecov
+              uses: codecov/codecov-action@v2
+              with:
+                directory: .nyc_output
+                verbose: true
