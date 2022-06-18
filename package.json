@@ -44,7 +44,7 @@
         "@rollup/plugin-node-resolve": "^13.3.0",
         "@testing-library/dom": "^8.13.0",
         "@types/debug": "^4.1.7",
-        "@types/jest": "^28.1.1",
+        "@types/jest": "^28.1.2",
         "@types/jquery": "^3.5.14",
         "@typescript-eslint/eslint-plugin": "^5.28.0",
         "@typescript-eslint/parser": "^5.28.0",
@@ -52,7 +52,7 @@
         "babel-jest": "^28.1.1",
         "babel-plugin-istanbul": "^6.1.1",
         "coveralls": "^3.1.1",
-        "eslint": "^8.17.0",
+        "eslint": "^8.18.0",
         "eslint-plugin-import": "^2.26.0",
         "eslint-plugin-jest": "^26.5.3",
         "eslint-plugin-playwright": "^0.9.0",
@@ -76,6 +76,6 @@
         "rollup-plugin-serve": "^1.1.0",
         "rollup-plugin-terser": "^7.0.2",
         "tslib": "^2.4.0",
-        "typescript": "^4.7.3"
+        "typescript": "^4.7.4"
     }
 }
