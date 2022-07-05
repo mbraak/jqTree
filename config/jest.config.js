@@ -1,10 +1,12 @@
 module.exports = {
+    coverageDirectory: "jest-coverage",
+    coverageReporters: ["json"],
     modulePathIgnorePatterns: [
-        "<rootDir>/build/",
+        "<rootDir>/docs/_site/",
+        "<rootDir>/docs/static/",
         "<rootDir>/lib/",
-        "<rootDir>/docs/",
-        "<rootDir>/static/",
     ],
+    rootDir: "../",
     setupFilesAfterEnv: [
         "<rootDir>/src/test/support/setupTests.ts",
         "givens/setup.js",
@@ -12,6 +14,7 @@ module.exports = {
     ],
     testEnvironment: "jsdom",
     testRegex: "\\/src\\/test\\/.*\\.test\\.ts",
-    coverageDirectory: "jest-coverage",
-    coverageReporters: ["json"],
+    transform: {
+        "\\.tsx?$": ["babel-jest", { root: __dirname }],
+    },
 };
