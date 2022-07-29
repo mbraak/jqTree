@@ -40,7 +40,7 @@ export interface JQTreeOptions {
     onLoading: HandleLoadingMethod | undefined;
     onSetStateFromStorage: ((data: string) => void) | undefined;
     openedIcon: string | Element;
-    openFolderDelay: number;
+    openFolderDelay: number | false;
     rtl: boolean | undefined;
     selectable: boolean;
     saveState: boolean | string;
