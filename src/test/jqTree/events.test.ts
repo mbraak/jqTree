@@ -7,15 +7,23 @@ import { titleSpan } from "../support/testUtil";
 
 const context = describe;
 
+const server = setupServer();
+
+beforeAll(() => server.listen());
+
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
 });
 
 afterEach(() => {
+    server.resetHandlers();
+
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
 });
+
+afterAll(() => server.close());
 
 describe("tree.click", () => {
     interface Vars {
@@ -131,19 +139,12 @@ describe("tree.init", () => {
     });
 
     context("with data loaded from an url", () => {
-        let server: ReturnType<typeof setupServer> | null = null;
-
-        beforeAll(() => {
-            server = setupServer(
+        beforeEach(() => {
+            server.use(
                 rest.get("/tree/", (_request, response, ctx) =>
                     response(ctx.status(200), ctx.json(exampleData))
                 )
             );
-            server.listen();
-        });
-
-        afterAll(() => {
-            server?.close();
         });
 
         it("is called", () =>
