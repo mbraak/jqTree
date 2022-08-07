@@ -62,7 +62,7 @@ interface IJQTreeOptions {
     onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: string | Element;
-    openFolderDelay?: number;
+    openFolderDelay?: number | false;
     rtl?: boolean;
     selectable?: boolean;
     saveState?: boolean | string;

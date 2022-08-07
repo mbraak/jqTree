@@ -1345,7 +1345,11 @@ var jqtree = (function (exports) {
         };
 
         this.stopOpenFolderTimer();
-        this.openFolderTimer = window.setTimeout(openFolder, this.treeWidget.options.openFolderDelay);
+        var openFolderDelay = this.treeWidget.options.openFolderDelay;
+
+        if (openFolderDelay !== false) {
+          this.openFolderTimer = window.setTimeout(openFolder, openFolderDelay);
+        }
       }
     }, {
       key: "stopOpenFolderTimer",
