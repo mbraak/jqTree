@@ -1,5 +1,5 @@
 import getGiven from "givens";
-import { screen } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import "../../tree.jquery";
@@ -8,16 +8,24 @@ import { titleSpan, togglerLink } from "../support/testUtil";
 
 const context = describe;
 
+const server = setupServer();
+
+beforeAll(() => server.listen());
+
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
 });
 
 afterEach(() => {
+    server.resetHandlers();
+
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
     localStorage.clear();
 });
+
+afterAll(() => server.close());
 
 describe("autoEscape", () => {
     interface Vars {
@@ -186,10 +194,8 @@ describe("dataUrl", () => {
         },
     ];
 
-    let server: ReturnType<typeof setupServer> | null = null;
-
-    beforeAll(() => {
-        server = setupServer(
+    beforeEach(() => {
+        server.use(
             rest.get("/tree/", (request, response, ctx) => {
                 const nodeName = request.headers.get("node");
                 const data = nodeName ? [nodeName] : exampleData;
@@ -197,11 +203,6 @@ describe("dataUrl", () => {
                 return response(ctx.status(200), ctx.json(data));
             })
         );
-        server.listen();
-    });
-
-    afterAll(() => {
-        server?.close();
     });
 
     interface Vars {
@@ -347,31 +348,28 @@ describe("onLoadFailed", () => {
     given("$tree", () => $("#tree1"));
 
     context("when the loading fails", () => {
-        let server: ReturnType<typeof setupServer> | null = null;
-
-        beforeAll(() => {
-            server = setupServer(
+        beforeEach(() => {
+            server.use(
                 rest.get("/tree/", (_request, response, ctx) =>
                     response(ctx.status(500), ctx.body("Internal server error"))
                 )
             );
-            server.listen();
         });
 
-        afterAll(() => {
-            server?.close();
-        });
+        it("calls onLoadFailed", async () => {
+            const onLoadFailed = jest.fn();
 
-        it("calls onLoadFailed", () =>
-            new Promise<void>((done) => {
-                given.$tree.tree({
-                    dataUrl: "/tree/",
-                    onLoadFailed: (jqXHR) => {
-                        expect(jqXHR.status).toBe(500);
-                        done();
-                    },
-                });
-            }));
+            given.$tree.tree({
+                dataUrl: "/tree/",
+                onLoadFailed,
+            });
+
+            await waitFor(() => {
+                expect(onLoadFailed).toHaveBeenCalledWith(
+                    expect.objectContaining({ status: 500 })
+                );
+            });
+        });
     });
 });
 
