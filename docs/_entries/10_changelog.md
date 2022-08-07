@@ -3,9 +3,9 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.6.3 (august 7 2022)
 
-- Issue # 692: openFolderDelay is false disables opening folders during drag and drop
+-   Issue # 692: openFolderDelay is false disables opening folders during drag and drop
 
 #### 1.6.2 (december 15 2021)
 
