@@ -7,16 +7,24 @@ import { togglerLink } from "../support/testUtil";
 
 const context = describe;
 
+const server = setupServer();
+
+beforeAll(() => server.listen());
+
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
 });
 
 afterEach(() => {
+    server.resetHandlers();
+
     const $tree = $("#tree1");
     $tree.tree("destroy");
     $tree.remove();
     localStorage.clear();
 });
+
+afterAll(() => server.close());
 
 context("when a node has load_on_demand in the data", () => {
     interface Vars {
@@ -37,10 +45,8 @@ context("when a node has load_on_demand in the data", () => {
         },
     ];
 
-    let server: ReturnType<typeof setupServer> | null = null;
-
-    beforeAll(() => {
-        server = setupServer(
+    beforeEach(() => {
+        server.use(
             rest.get("/tree/", (request, response, ctx) => {
                 const parentId = request.url.searchParams.get("node");
 
@@ -54,12 +60,6 @@ context("when a node has load_on_demand in the data", () => {
                 }
             })
         );
-
-        server.listen();
-    });
-
-    afterAll(() => {
-        server?.close();
     });
 
     beforeEach(() => {

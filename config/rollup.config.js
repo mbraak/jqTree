@@ -50,9 +50,9 @@ if (!debugBuild) {
 if (devServer) {
     const servePlugin = serve({
         contentBase: [
-            path.join(__dirname, "devserver"),
-            path.join(__dirname, "static"),
-            __dirname,
+            path.join(__dirname, "../devserver"),
+            path.join(__dirname, "../docs/static"),
+            path.join(__dirname, ".."),
         ],
         port: 8080,
     });
