@@ -77,5 +77,3 @@ jobs:
                   COVERALLS_GIT_COMMIT: ${{ github.sha }}
                   COVERALLS_GIT_BRANCH: ${{ github.ref }}
                   COVERALLS_SERVICE_JOB_ID: ${{ github.run_id }}
-            - name: Prune pnpm store
-              run: pnpm store prune
