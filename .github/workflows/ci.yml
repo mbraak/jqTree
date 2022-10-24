@@ -81,4 +81,4 @@ jobs:
               uses: preactjs/compressed-size-action@v2
               with:
                 build-script: "production"
-                pattern: "./tree.jquery.js"
+                pattern: "./lib/**/*.js"
