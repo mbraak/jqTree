@@ -1,0 +1,23 @@
+name: Compressed Size
+on: [push]
+
+jobs:
+  runner-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install packages
+        run: pnpm install
+      - name: Check compressed size
+        uses: preactjs/compressed-size-action@v2
+        with:
+          build-script: "production"
+          pattern: "./lib/**/*.js"
