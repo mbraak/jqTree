@@ -27,7 +27,7 @@ specifiers:
   jest: ^28.1.3
   jest-environment-jsdom: ^28.1.3
   jest-extended: ^3.0.2
-  jquery: ^3.6.1
+  jquery: ^3.6.0
   jsonfile: ^6.1.0
   lodash.template: ^4.5.0
   msw: ^0.44.2
@@ -46,7 +46,7 @@ specifiers:
   typescript: ^4.7.4
 
 dependencies:
-  jquery: 3.6.1
+  jquery: 3.6.0
 
 devDependencies:
   '@babel/cli': 7.18.10_@babel+core@7.18.10
@@ -4533,8 +4533,8 @@ packages:
       - ts-node
     dev: true
 
-  /jquery/3.6.1:
-    resolution: {integrity: sha512-opJeO4nCucVnsjiXOE+/PcCgYw9Gwpvs/a6B1LL/lQhwWwpbVEVYDZ1FokFr8PRc7ghYlrFPuyHuiiDNTQxmcw==}
+  /jquery/3.6.0:
+    resolution: {integrity: sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==}
     dev: false
 
   /js-levenshtein/1.1.6:
