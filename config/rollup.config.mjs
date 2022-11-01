@@ -4,7 +4,7 @@ import template from "lodash.template";
 import { babel } from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
 import serve from "rollup-plugin-serve";
-import { terser } from "@el3um4s/rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 
 const getBanner = () => {
     const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");
