@@ -2,7 +2,7 @@
     "name": "jqtree-docs",
     "dependencies": {
         "fontawesome": "5.15.2",
-        "jquery": "3.6.1",
+        "jquery": "3.6.2",
         "jquery-mockjax": "2.6.0"
     }
 }
