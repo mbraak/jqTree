@@ -74,3 +74,8 @@ jobs:
               with:
                 github-token: ${{ secrets.GITHUB_TOKEN }}
                 path-to-lcov: ./lcov.info
+            - name: Codecov
+              uses: codecov/codecov-action@v3
+              with:
+                directory: .nyc_output
+                verbose: true
