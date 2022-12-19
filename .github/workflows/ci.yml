@@ -38,21 +38,21 @@ jobs:
                   pnpm install
             - name: Build
               run: |
-                  pnpm production
+                  pnpm run production
             - name: Lint
               run: |
-                  pnpm lint
+                  pnpm run lint
             - name: Check types
               run: |
-                  pnpm tsc
+                  pnpm run tsc
             - name: Clean coverage
-              run: pnpm clean-coverage
+              run: pnpm run clean-coverage
             - name: Run jest tests
-              run: pnpm jest
+              run: pnpm run jest
             - name: Playwright install
               run: npx playwright install chromium
             - name: Run playwright tests
-              run: pnpm playwright
+              run: pnpm run playwright
             - name: Screenshots artifact
               if: always()
               uses: actions/upload-artifact@v3
@@ -61,19 +61,21 @@ jobs:
                 path: src/playwright/playwright.test.ts-snapshots/
             - name: Merge coverage
               run: |
-                  pnpm merge-coverage
-                  pnpm print-coverage
+                  pnpm run merge-coverage
+                  pnpm run print-coverage
+                  pnpm run write-coverage
             - name: Coverage artifact
               uses: actions/upload-artifact@v3
               with:
                 name: coverage
                 path: .nyc_output
             - name: Coveralls
-              run: |
-                  pnpm coveralls
-              env:
-                  COVERALLS_REPO_TOKEN: ${{ secrets.github_token }}
-                  COVERALLS_SERVICE_NAME: github
-                  COVERALLS_GIT_COMMIT: ${{ github.sha }}
-                  COVERALLS_GIT_BRANCH: ${{ github.ref }}
-                  COVERALLS_SERVICE_JOB_ID: ${{ github.run_id }}
+              uses: coverallsapp/github-action@master
+              with:
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+                path-to-lcov: ./lcov.info
+            - name: Codecov
+              uses: codecov/codecov-action@v3
+              with:
+                directory: .nyc_output
+                verbose: true
