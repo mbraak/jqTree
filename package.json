@@ -32,7 +32,7 @@
         "test": "pnpm jest && pnpm playwright"
     },
     "dependencies": {
-        "jquery": "^3.6.2"
+        "jquery": "^3.6.3"
     },
     "devDependencies": {
         "@babel/cli": "^7.19.3",
@@ -48,8 +48,8 @@
         "@types/jest": "^29.2.4",
         "@types/jquery": "^3.5.14",
         "@types/node": "^18.11.17",
-        "@typescript-eslint/eslint-plugin": "^5.46.1",
-        "@typescript-eslint/parser": "^5.46.1",
+        "@typescript-eslint/eslint-plugin": "^5.47.0",
+        "@typescript-eslint/parser": "^5.47.0",
         "autoprefixer": "^10.4.13",
         "babel-jest": "^29.3.1",
         "babel-plugin-istanbul": "^6.1.1",
