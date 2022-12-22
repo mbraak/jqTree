@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issue #704: dispatch the tree.load_data after initialing the tree
+
 #### 1.6.3 (august 7 2022)
 
 -   Issue # 692: openFolderDelay is false disables opening folders during drag and drop

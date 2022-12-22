@@ -1118,11 +1118,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private doLoadData(data: NodeData[] | null, parentNode: Node | null): void {
-        if (!data) {
-            return;
-        } else {
-            this._triggerEvent("tree.load_data", { tree_data: data });
-
+        if (data) {
             if (parentNode) {
                 this.deselectNodes(parentNode);
                 this.loadSubtree(data, parentNode);
@@ -1134,6 +1130,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 this.dndHandler.refresh();
             }
         }
+
+        this._triggerEvent("tree.load_data", {
+            tree_data: data,
+            parent_node: parentNode,
+        });
     }
 
     private deselectNodes(parentNode: Node): void {
