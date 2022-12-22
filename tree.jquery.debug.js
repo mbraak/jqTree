@@ -4809,13 +4809,7 @@ var jqtree = (function (exports) {
     }, {
       key: "doLoadData",
       value: function doLoadData(data, parentNode) {
-        if (!data) {
-          return;
-        } else {
-          this._triggerEvent("tree.load_data", {
-            tree_data: data
-          });
-
+        if (data) {
           if (parentNode) {
             this.deselectNodes(parentNode);
             this.loadSubtree(data, parentNode);
@@ -4827,6 +4821,11 @@ var jqtree = (function (exports) {
             this.dndHandler.refresh();
           }
         }
+
+        this._triggerEvent("tree.load_data", {
+          tree_data: data,
+          parent_node: parentNode
+        });
       }
     }, {
       key: "deselectNodes",
