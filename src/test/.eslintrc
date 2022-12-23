@@ -3,10 +3,12 @@
   "extends": ["plugin:jest/all", "plugin:testing-library/dom"],
   "rules": {
     "jest/consistent-test-it": "off",
-    "jest/prefer-expect-assertions": "off",
+    "jest/max-expects": ["off"],
     "jest/no-duplicate-hooks": "off",
     "jest/no-hooks": "off",
     "jest/no-identical-title": "off",
+    "jest/no-standalone-expect": "off",
+    "jest/prefer-expect-assertions": "off",
     "jest/prefer-strict-equal": "off",
     "jest/require-hook": "off",
     "jest/require-top-level-describe": "off"

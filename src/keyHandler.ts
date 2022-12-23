@@ -22,11 +22,11 @@ export default class KeyHandler {
     }
 
     public moveDown(selectedNode: Node): boolean {
-        return this.selectNode(selectedNode.getNextNode());
+        return this.selectNode(selectedNode.getNextVisibleNode());
     }
 
     public moveUp(selectedNode: Node): boolean {
-        return this.selectNode(selectedNode.getPreviousNode());
+        return this.selectNode(selectedNode.getPreviousVisibleNode());
     }
 
     public moveRight(selectedNode: Node): boolean {
@@ -36,7 +36,7 @@ export default class KeyHandler {
             // folder node
             if (selectedNode.is_open) {
                 // Right moves to the first child of an open node
-                return this.selectNode(selectedNode.getNextNode());
+                return this.selectNode(selectedNode.getNextVisibleNode());
             } else {
                 // Right expands a closed node
                 this.treeWidget.openNode(selectedNode);
