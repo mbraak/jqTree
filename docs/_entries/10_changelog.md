@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.7.0 (december 23 2022)
 
 Small breaking change: this release changes the definition of getPreviousNode and getNextNode.
 

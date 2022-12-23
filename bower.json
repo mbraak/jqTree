@@ -1,11 +1,18 @@
 {
     "name": "jqTree",
-    "version": "1.6.3",
-    "main": ["jqtree.css", "jqtree-circle.png", "tree.jquery.js"],
+    "version": "1.7.0",
+    "main": [
+        "jqtree.css",
+        "jqtree-circle.png",
+        "tree.jquery.js"
+    ],
     "dependencies": {
         "jquery": ">=1.9"
     },
     "license": "Apache-2.0",
     "ignore": [],
-    "keywords": ["jquery-plugin", "tree"]
+    "keywords": [
+        "jquery-plugin",
+        "tree"
+    ]
 }
