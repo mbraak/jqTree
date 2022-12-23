@@ -1,5 +1,5 @@
 ---
-title: getNexNode
+title: getNextNode
 name: node-functions-getnextnode
 ---
 
@@ -11,5 +11,5 @@ Get the next node in the tree.
 Returns a node or null.
 
 {% highlight js %}
-var node = node.getNexNode();
+var node = node.getNextNode();
 {% endhighlight %}
