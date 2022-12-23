@@ -566,7 +566,7 @@ describe("getLastChild", () => {
     });
 });
 
-describe("getNextNode", () => {
+describe("getNextVisibleNode", () => {
     interface Vars {
         includeChildren: boolean;
         fromNode: Node;
@@ -575,7 +575,9 @@ describe("getNextNode", () => {
     }
     const given = getGiven<Vars>();
     given("tree", () => new Node().loadFromData(exampleData));
-    given("nextNode", () => given.fromNode.getNextNode(given.includeChildren));
+    given("nextNode", () =>
+        given.fromNode.getNextVisibleNode(given.includeChildren)
+    );
 
     context("with includeChildren is true", () => {
         given("includeChildren", () => true);
@@ -764,7 +766,7 @@ describe("getParent", () => {
     });
 });
 
-describe("getPreviousNode", () => {
+describe("getPreviousVisibleNode", () => {
     interface Vars {
         node2: Node;
         node3: Node;
@@ -777,14 +779,14 @@ describe("getPreviousNode", () => {
 
     context("with a tree", () => {
         it("returns null", () => {
-            expect(given.tree.getPreviousNode()).toBeNull();
+            expect(given.tree.getPreviousVisibleNode()).toBeNull();
         });
     });
 
     context("when the previous sibling has children", () => {
         context("when the previous node is closed", () => {
             it("returns the previous sibling", () => {
-                expect(given.node2.getPreviousNode()).toMatchObject({
+                expect(given.node2.getPreviousVisibleNode()).toMatchObject({
                     name: "node1",
                 });
             });
@@ -796,7 +798,7 @@ describe("getPreviousNode", () => {
             });
 
             it("returns the last child of the previous sibling", () => {
-                expect(given.node2.getPreviousNode()).toMatchObject({
+                expect(given.node2.getPreviousVisibleNode()).toMatchObject({
                     name: "child2",
                 });
             });
@@ -805,7 +807,7 @@ describe("getPreviousNode", () => {
 
     context("with a node that is the first child", () => {
         it("returns the parent", () => {
-            expect(given.node3.getPreviousNode()).toMatchObject({
+            expect(given.node3.getPreviousVisibleNode()).toMatchObject({
                 name: "node2",
             });
         });

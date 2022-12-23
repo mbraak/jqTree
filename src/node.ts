@@ -556,7 +556,7 @@ export class Node implements INode {
         return result;
     }
 
-    public getNextNode(includeChildren = true): Node | null {
+    public getNextVisibleNode(includeChildren = true): Node | null {
         if (includeChildren && this.hasChildren() && this.is_open) {
             // First child
             return this.children[0];
@@ -570,13 +570,13 @@ export class Node implements INode {
                     return nextSibling;
                 } else {
                     // Next node of parent
-                    return this.parent.getNextNode(false);
+                    return this.parent.getNextVisibleNode(false);
                 }
             }
         }
     }
 
-    public getPreviousNode(): Node | null {
+    public getPreviousVisibleNode(): Node | null {
         if (!this.parent) {
             return null;
         } else {
