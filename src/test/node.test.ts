@@ -566,18 +566,73 @@ describe("getLastChild", () => {
     });
 });
 
-describe("getNextVisibleNode", () => {
+describe("getNextNode", () => {
     interface Vars {
-        includeChildren: boolean;
         fromNode: Node;
-        nextNode: Node | null;
         tree: Node;
     }
     const given = getGiven<Vars>();
     given("tree", () => new Node().loadFromData(exampleData));
-    given("nextNode", () =>
-        given.fromNode.getNextVisibleNode(given.includeChildren)
-    );
+
+    context("with a parent node", () => {
+        given("fromNode", () => given.tree.getNodeByNameMustExist("node1"));
+
+        context("when the parent node is closed", () => {
+            it("returns the first child", () => {
+                expect(given.fromNode.getNextNode()).toMatchObject({
+                    name: "child1",
+                });
+            });
+        });
+
+        context("when the parent node is open", () => {
+            beforeEach(() => {
+                given.fromNode.is_open = true;
+            });
+
+            it("returns the first child", () => {
+                expect(given.fromNode.getNextNode()).toMatchObject({
+                    name: "child1",
+                });
+            });
+        });
+    });
+
+    context("with the node is the last child", () => {
+        given("fromNode", () => given.tree.getNodeByNameMustExist("child2"));
+
+        it("returns the next sibling of the parent", () => {
+            expect(given.fromNode.getNextNode()).toMatchObject({
+                name: "node2",
+            });
+        });
+    });
+
+    context("with includeChildren is false", () => {
+        context("with an open parent node", () => {
+            given("fromNode", () => given.tree.getNodeByNameMustExist("node1"));
+
+            beforeEach(() => {
+                given.fromNode.is_open = true;
+            });
+
+            it("returns the next sibling", () => {
+                expect(given.fromNode.getNextNode(false)).toMatchObject({
+                    name: "node2",
+                });
+            });
+        });
+    });
+});
+
+describe("getNextVisibleNode", () => {
+    interface Vars {
+        includeChildren: boolean;
+        fromNode: Node;
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("tree", () => new Node().loadFromData(exampleData));
 
     context("with includeChildren is true", () => {
         given("includeChildren", () => true);
@@ -587,7 +642,9 @@ describe("getNextVisibleNode", () => {
 
             context("when the parent node is closed", () => {
                 it("returns the next sibling", () => {
-                    expect(given.nextNode).toMatchObject({ name: "node2" });
+                    expect(given.fromNode.getNextVisibleNode()).toMatchObject({
+                        name: "node2",
+                    });
                 });
             });
 
@@ -597,7 +654,9 @@ describe("getNextVisibleNode", () => {
                 });
 
                 it("returns the first child", () => {
-                    expect(given.nextNode).toMatchObject({ name: "child1" });
+                    expect(given.fromNode.getNextVisibleNode()).toMatchObject({
+                        name: "child1",
+                    });
                 });
             });
         });
@@ -608,23 +667,9 @@ describe("getNextVisibleNode", () => {
             );
 
             it("returns the next sibling of the parent", () => {
-                expect(given.nextNode).toMatchObject({ name: "node2" });
-            });
-        });
-    });
-
-    context("with includeChildren is false", () => {
-        given("includeChildren", () => false);
-
-        context("with an open parent node", () => {
-            given("fromNode", () => given.tree.getNodeByNameMustExist("node1"));
-
-            beforeEach(() => {
-                given.fromNode.is_open = true;
-            });
-
-            it("returns the next sibling", () => {
-                expect(given.nextNode).toMatchObject({ name: "node2" });
+                expect(given.fromNode.getNextVisibleNode()).toMatchObject({
+                    name: "node2",
+                });
             });
         });
     });
@@ -766,6 +811,54 @@ describe("getParent", () => {
     });
 });
 
+describe("getPreviousNode", () => {
+    interface Vars {
+        node2: Node;
+        node3: Node;
+        tree: Node;
+    }
+    const given = getGiven<Vars>();
+    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
+    given("node3", () => given.tree.getNodeByNameMustExist("node3"));
+    given("tree", () => new Node().loadFromData(exampleData));
+
+    context("with a tree node", () => {
+        it("returns null", () => {
+            expect(given.tree.getPreviousNode()).toBeNull();
+        });
+    });
+
+    context("when the previous sibling has children", () => {
+        context("when the previous node is closed", () => {
+            it("returns the last child of the previous sibling", () => {
+                expect(given.node2.getPreviousNode()).toMatchObject({
+                    name: "child2",
+                });
+            });
+        });
+
+        context("when the previous node is open", () => {
+            beforeEach(() => {
+                given.tree.getNodeByNameMustExist("node1").is_open = true;
+            });
+
+            it("returns the last child of the previous sibling", () => {
+                expect(given.node2.getPreviousNode()).toMatchObject({
+                    name: "child2",
+                });
+            });
+        });
+    });
+
+    context("with a node that is the first child", () => {
+        it("returns the parent", () => {
+            expect(given.node3.getPreviousNode()).toMatchObject({
+                name: "node2",
+            });
+        });
+    });
+});
+
 describe("getPreviousVisibleNode", () => {
     interface Vars {
         node2: Node;
@@ -777,7 +870,7 @@ describe("getPreviousVisibleNode", () => {
     given("node3", () => given.tree.getNodeByNameMustExist("node3"));
     given("tree", () => new Node().loadFromData(exampleData));
 
-    context("with a tree", () => {
+    context("with a tree node", () => {
         it("returns null", () => {
             expect(given.tree.getPreviousVisibleNode()).toBeNull();
         });

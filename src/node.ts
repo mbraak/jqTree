@@ -556,8 +556,24 @@ export class Node implements INode {
         return result;
     }
 
-    public getNextVisibleNode(includeChildren = true): Node | null {
-        if (includeChildren && this.hasChildren() && this.is_open) {
+    public getNextNode(includeChildren = true): Node | null {
+        if (includeChildren && this.hasChildren()) {
+            return this.children[0];
+        } else if (!this.parent) {
+            return null;
+        } else {
+            const nextSibling = this.getNextSibling();
+
+            if (nextSibling) {
+                return nextSibling;
+            } else {
+                return this.parent.getNextNode(false);
+            }
+        }
+    }
+
+    public getNextVisibleNode(): Node | null {
+        if (this.hasChildren() && this.is_open) {
             // First child
             return this.children[0];
         } else {
@@ -570,8 +586,24 @@ export class Node implements INode {
                     return nextSibling;
                 } else {
                     // Next node of parent
-                    return this.parent.getNextVisibleNode(false);
+                    return this.parent.getNextNode(false);
                 }
+            }
+        }
+    }
+
+    public getPreviousNode(): Node | null {
+        if (!this.parent) {
+            return null;
+        } else {
+            const previousSibling = this.getPreviousSibling();
+
+            if (!previousSibling) {
+                return this.getParent();
+            } else if (previousSibling.hasChildren()) {
+                return previousSibling.getLastChild();
+            } else {
+                return previousSibling;
             }
         }
     }
@@ -581,19 +613,18 @@ export class Node implements INode {
             return null;
         } else {
             const previousSibling = this.getPreviousSibling();
-            if (previousSibling) {
-                if (
-                    !previousSibling.hasChildren() ||
-                    !previousSibling.is_open
-                ) {
-                    // Previous sibling
-                    return previousSibling;
-                } else {
-                    // Last child of previous sibling
-                    return previousSibling.getLastChild();
-                }
-            } else {
+
+            if (!previousSibling) {
                 return this.getParent();
+            } else if (
+                !previousSibling.hasChildren() ||
+                !previousSibling.is_open
+            ) {
+                // Previous sibling
+                return previousSibling;
+            } else {
+                // Last child of previous sibling
+                return previousSibling.getLastChild();
             }
         }
     }
