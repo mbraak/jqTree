@@ -16,7 +16,7 @@
     "scripts": {
         "ci": "pnpm lint && pnpm tsc && pnpm test",
         "jest": "jest --coverage --no-cache --verbose --config ./config/jest.config.js",
-        "jest-watch": "jest --watch",
+        "jest-watch": "jest --watch --config ./config/jest.config.js",
         "lint": "eslint src/ --ext .ts,.tsx",
         "production": "./config/production",
         "devserver": "SERVE=true rollup --config config/rollup.config.js --watch",
