@@ -833,7 +833,23 @@ var jqtree = (function (exports) {
       key: "getNextNode",
       value: function getNextNode() {
         var includeChildren = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-        if (includeChildren && this.hasChildren() && this.is_open) {
+        if (includeChildren && this.hasChildren()) {
+          return this.children[0];
+        } else if (!this.parent) {
+          return null;
+        } else {
+          var nextSibling = this.getNextSibling();
+          if (nextSibling) {
+            return nextSibling;
+          } else {
+            return this.parent.getNextNode(false);
+          }
+        }
+      }
+    }, {
+      key: "getNextVisibleNode",
+      value: function getNextVisibleNode() {
+        if (this.hasChildren() && this.is_open) {
           // First child
           return this.children[0];
         } else {
@@ -858,16 +874,30 @@ var jqtree = (function (exports) {
           return null;
         } else {
           var previousSibling = this.getPreviousSibling();
-          if (previousSibling) {
-            if (!previousSibling.hasChildren() || !previousSibling.is_open) {
-              // Previous sibling
-              return previousSibling;
-            } else {
-              // Last child of previous sibling
-              return previousSibling.getLastChild();
-            }
-          } else {
+          if (!previousSibling) {
             return this.getParent();
+          } else if (previousSibling.hasChildren()) {
+            return previousSibling.getLastChild();
+          } else {
+            return previousSibling;
+          }
+        }
+      }
+    }, {
+      key: "getPreviousVisibleNode",
+      value: function getPreviousVisibleNode() {
+        if (!this.parent) {
+          return null;
+        } else {
+          var previousSibling = this.getPreviousSibling();
+          if (!previousSibling) {
+            return this.getParent();
+          } else if (!previousSibling.hasChildren() || !previousSibling.is_open) {
+            // Previous sibling
+            return previousSibling;
+          } else {
+            // Last child of previous sibling
+            return previousSibling.getLastChild();
           }
         }
       }
@@ -1909,12 +1939,12 @@ var jqtree = (function (exports) {
     }, {
       key: "moveDown",
       value: function moveDown(selectedNode) {
-        return this.selectNode(selectedNode.getNextNode());
+        return this.selectNode(selectedNode.getNextVisibleNode());
       }
     }, {
       key: "moveUp",
       value: function moveUp(selectedNode) {
-        return this.selectNode(selectedNode.getPreviousNode());
+        return this.selectNode(selectedNode.getPreviousVisibleNode());
       }
     }, {
       key: "moveRight",
@@ -1925,7 +1955,7 @@ var jqtree = (function (exports) {
           // folder node
           if (selectedNode.is_open) {
             // Right moves to the first child of an open node
-            return this.selectNode(selectedNode.getNextNode());
+            return this.selectNode(selectedNode.getNextVisibleNode());
           } else {
             // Right expands a closed node
             this.treeWidget.openNode(selectedNode);
@@ -2666,40 +2696,32 @@ var jqtree = (function (exports) {
         var getParentWithOverflow = function getParentWithOverflow() {
           var cssAttributes = ["overflow", "overflow-y"];
           var hasOverFlow = function hasOverFlow($el) {
-            var _iterator = _createForOfIteratorHelper(cssAttributes),
-              _step;
-            try {
-              for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                var attr = _step.value;
-                var overflowValue = $el.css(attr);
-                if (overflowValue === "auto" || overflowValue === "scroll") {
-                  return true;
-                }
+            for (var _i = 0, _cssAttributes = cssAttributes; _i < _cssAttributes.length; _i++) {
+              var attr = _cssAttributes[_i];
+              var overflowValue = $el.css(attr);
+              if (overflowValue === "auto" || overflowValue === "scroll") {
+                return true;
               }
-            } catch (err) {
-              _iterator.e(err);
-            } finally {
-              _iterator.f();
             }
             return false;
           };
           if (hasOverFlow(_this.treeWidget.$el)) {
             return _this.treeWidget.$el;
           }
-          var _iterator2 = _createForOfIteratorHelper(_this.treeWidget.$el.parents().get()),
-            _step2;
+          var _iterator = _createForOfIteratorHelper(_this.treeWidget.$el.parents().get()),
+            _step;
           try {
-            for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-              var el = _step2.value;
+            for (_iterator.s(); !(_step = _iterator.n()).done;) {
+              var el = _step.value;
               var $el = jQuery(el);
               if (hasOverFlow($el)) {
                 return $el;
               }
             }
           } catch (err) {
-            _iterator2.e(err);
+            _iterator.e(err);
           } finally {
-            _iterator2.f();
+            _iterator.f();
           }
           return null;
         };
