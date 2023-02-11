@@ -46,7 +46,7 @@ jobs:
               run: |
                   pnpm run tsc
             - name: Clean coverage
-              run: pnpm run clean-coverage
+              run: rm -rf .nyc_output && jest --clearCache
             - name: Run jest tests
               run: pnpm run jest
             - name: Playwright install
@@ -60,20 +60,12 @@ jobs:
                 name: screenshots
                 path: src/playwright/playwright.test.ts-snapshots/
             - name: Merge coverage
-              run: |
-                  pnpm run merge-coverage
-                  pnpm run print-coverage
-                  pnpm run write-coverage
+              run: cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
             - name: Coverage artifact
               uses: actions/upload-artifact@v3
               with:
                 name: coverage
                 path: .nyc_output
-            - name: Coveralls
-              uses: coverallsapp/github-action@master
-              with:
-                github-token: ${{ secrets.GITHUB_TOKEN }}
-                path-to-lcov: ./lcov.info
             - name: Codecov
               uses: codecov/codecov-action@v3
               with:
