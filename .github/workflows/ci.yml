@@ -46,7 +46,7 @@ jobs:
               run: |
                   pnpm run tsc
             - name: Clean coverage
-              run: rm -rf .nyc_output && jest --clearCache
+              run: rm -rf .nyc_output && npx jest --clearCache
             - name: Run jest tests
               run: pnpm run jest
             - name: Playwright install
