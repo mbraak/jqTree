@@ -294,13 +294,13 @@ var jqtree = (function (exports) {
 
   var version = "1.7.0";
 
-  var Position;
-  (function (Position) {
+  var Position = /*#__PURE__*/function (Position) {
     Position[Position["Before"] = 1] = "Before";
     Position[Position["After"] = 2] = "After";
     Position[Position["Inside"] = 3] = "Inside";
     Position[Position["None"] = 4] = "None";
-  })(Position || (Position = {}));
+    return Position;
+  }({});
   var positionNames = {
     before: Position.Before,
     after: Position.After,
