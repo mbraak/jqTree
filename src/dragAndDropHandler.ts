@@ -261,6 +261,10 @@ export class DragAndDropHandler {
             const mid = (low + high) >> 1;
             const area = this.hitAreas[mid];
 
+            if (!area) {
+                return null;
+            }
+
             if (y < area.top) {
                 high = mid;
             } else if (y > area.bottom) {
@@ -433,10 +437,18 @@ abstract class VisibleNodeIterator {
             if (mustIterateInside) {
                 const childrenLength = node.children.length;
                 node.children.forEach((_, i) => {
-                    if (i === childrenLength - 1) {
-                        _iterateNode(node.children[i], null);
-                    } else {
-                        _iterateNode(node.children[i], node.children[i + 1]);
+                    const child = node.children[i];
+
+                    if (child) {
+                        if (i === childrenLength - 1) {
+                            _iterateNode(child, null);
+                        } else {
+                            const nextChild = node.children[i + 1];
+
+                            if (nextChild) {
+                                _iterateNode(child, nextChild);
+                            }
+                        }
                     }
                 });
 
@@ -639,12 +651,14 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         while (i < positionCount) {
             const position = positionsInGroup[i];
 
-            hitAreas.push({
-                top: areaTop,
-                bottom: areaTop + areaHeight,
-                node: position.node,
-                position: position.position,
-            });
+            if (position) {
+                hitAreas.push({
+                    top: areaTop,
+                    bottom: areaTop + areaHeight,
+                    node: position.node,
+                    position: position.position,
+                });
+            }
 
             areaTop += areaHeight;
             i += 1;

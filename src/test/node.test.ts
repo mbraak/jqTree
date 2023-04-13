@@ -164,7 +164,7 @@ describe("addChild", () => {
     });
 
     it("sets the parent of the child", () => {
-        expect(given.node.children[0].parent).toEqual(given.node);
+        expect(given.node.children[0]?.parent).toEqual(given.node);
     });
 });
 
@@ -538,14 +538,16 @@ describe("getLastChild", () => {
         context("when its last child is open and has children", () => {
             beforeEach(() => {
                 const child2 = given.node.children[1];
-                child2.append("child2a");
-                child2.append("child2b");
+                child2?.append("child2a");
+                child2?.append("child2b");
             });
 
             context("and the last child is open", () => {
                 beforeEach(() => {
                     const child2 = given.node.children[1];
-                    child2.is_open = true;
+                    if (child2) {
+                        child2.is_open = true;
+                    }
                 });
 
                 it("returns the last child of that child", () => {

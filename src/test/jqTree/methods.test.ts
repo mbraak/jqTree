@@ -984,7 +984,7 @@ describe("refresh", () => {
 
     it("rerenders the tree", () => {
         const tree = given.$tree.tree("getTree");
-        tree.children[0].name = "node1a";
+        (tree.children[0] as INode).name = "node1a";
 
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({ name: "node1" }),
