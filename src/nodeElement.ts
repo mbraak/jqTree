@@ -105,10 +105,13 @@ export class FolderElement extends NodeElement {
         const buttonEl = $button.get(0);
 
         if (buttonEl) {
-            const icon =
-                this.treeWidget.renderer.openedIconElement.cloneNode(true);
+            const openedIconElement =
+                this.treeWidget.renderer.openedIconElement;
 
-            buttonEl.appendChild(icon);
+            if (openedIconElement) {
+                const icon = openedIconElement.cloneNode(true);
+                buttonEl.appendChild(icon);
+            }
         }
 
         const doOpen = (): void => {
@@ -152,10 +155,13 @@ export class FolderElement extends NodeElement {
         const buttonEl = $button.get(0);
 
         if (buttonEl) {
-            const icon =
-                this.treeWidget.renderer.closedIconElement.cloneNode(true);
+            const closedIconElement =
+                this.treeWidget.renderer.closedIconElement;
 
-            buttonEl.appendChild(icon);
+            if (closedIconElement) {
+                const icon = closedIconElement.cloneNode(true);
+                buttonEl.appendChild(icon);
+            }
         }
 
         const doClose = (): void => {
@@ -252,7 +258,7 @@ class GhostDropHint implements DropHint {
     }
 
     public moveInsideOpenFolder(): void {
-        const childElement = this.node.children[0].element;
+        const childElement = this.node.children[0]?.element;
 
         if (childElement) {
             jQuery(childElement).before(this.$ghost);

@@ -5,8 +5,8 @@ import { JqTreeWidget } from "./tree.jquery";
 type IconElement = Text | Element;
 
 export default class ElementsRenderer {
-    public openedIconElement: IconElement;
-    public closedIconElement: IconElement;
+    public openedIconElement?: IconElement;
+    public closedIconElement?: IconElement;
     private treeWidget: JqTreeWidget;
 
     constructor(treeWidget: JqTreeWidget) {
@@ -32,12 +32,14 @@ export default class ElementsRenderer {
         const $element = this.treeWidget.element;
         $element.empty();
 
-        this.createDomElements(
-            $element[0],
-            this.treeWidget.tree.children,
-            true,
-            1
-        );
+        if ($element[0]) {
+            this.createDomElements(
+                $element[0],
+                this.treeWidget.tree.children,
+                true,
+                1
+            );
+        }
     }
 
     public renderFromNode(node: Node): void {
@@ -167,7 +169,9 @@ export default class ElementsRenderer {
         const buttonLink = document.createElement("a");
         buttonLink.className = buttonClasses;
 
-        buttonLink.appendChild(iconElement.cloneNode(true));
+        if (iconElement) {
+            buttonLink.appendChild(iconElement.cloneNode(true));
+        }
 
         buttonLink.setAttribute("role", "presentation");
         buttonLink.setAttribute("aria-hidden", "true");
@@ -311,7 +315,9 @@ export default class ElementsRenderer {
         return classes.join(" ");
     }
 
-    private createButtonElement(value: string | Element): IconElement {
+    private createButtonElement(
+        value: string | Element
+    ): IconElement | undefined {
         if (typeof value === "string") {
             // convert value to html
             const div = document.createElement("div");

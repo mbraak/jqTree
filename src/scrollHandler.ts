@@ -23,7 +23,7 @@ export default class ScrollHandler {
     public scrollToY(top: number): void {
         this.ensureInit();
 
-        if (this.$scrollParent) {
+        if (this.$scrollParent && this.$scrollParent[0]) {
             this.$scrollParent[0].scrollTop = top;
         } else {
             const offset = this.treeWidget.$el.offset();
@@ -121,7 +121,7 @@ export default class ScrollHandler {
         if (
             $scrollParent &&
             $scrollParent.length &&
-            $scrollParent[0].tagName !== "HTML"
+            $scrollParent[0]?.tagName !== "HTML"
         ) {
             this.$scrollParent = $scrollParent;
 
@@ -222,6 +222,10 @@ export default class ScrollHandler {
         }
 
         const scrollParent = $scrollParent[0];
+
+        if (!scrollParent) {
+            return;
+        }
 
         const canScrollRight =
             scrollParent.scrollLeft + scrollParent.clientWidth <

@@ -1,7 +1,7 @@
 /*
 JqTree 1.7.0
 
-Copyright 2022 Marco Braak
+Copyright 2023 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -294,13 +294,13 @@ var jqtree = (function (exports) {
 
   var version = "1.7.0";
 
-  var Position;
-  (function (Position) {
+  var Position = /*#__PURE__*/function (Position) {
     Position[Position["Before"] = 1] = "Before";
     Position[Position["After"] = 2] = "After";
     Position[Position["Inside"] = 3] = "Inside";
     Position[Position["None"] = 4] = "None";
-  })(Position || (Position = {}));
+    return Position;
+  }({});
   var positionNames = {
     before: Position.Before,
     after: Position.After,

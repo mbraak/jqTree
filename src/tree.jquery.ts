@@ -777,7 +777,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     // Set initial state, either by restoring the state or auto-opening nodes
     // result: must load nodes on demand?
     private setInitialState(): boolean {
-        const restoreState = (): boolean[] => {
+        const restoreState = (): [boolean, boolean] => {
             // result: is state restored, must load on demand?
             if (!this.options.saveState) {
                 return [false, false];
