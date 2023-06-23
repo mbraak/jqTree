@@ -2119,6 +2119,8 @@ var jqtree = (function (exports) {
           }
           return callFunction(this, functionName, args);
         }
+      } else {
+        return undefined;
       }
     };
   };
