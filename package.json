@@ -67,7 +67,7 @@
         "postcss-import": "^15.1.0",
         "postcss-load-config": "^4.0.1",
         "postcss-nested": "^6.0.1",
-        "prettier": "^2.8.8",
+        "prettier": "^3",
         "rollup": "^3.26.1",
         "rollup-plugin-serve": "^2.0.2",
         "tslib": "^2.6.0",
