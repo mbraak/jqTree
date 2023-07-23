@@ -1,7 +1,6 @@
 import { getBoolString } from "./util";
 import { Node } from "./node";
 import { JqTreeWidget } from "./tree.jquery";
-import { title } from "process";
 
 type IconElement = Text | Element;
 
