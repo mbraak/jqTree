@@ -1,6 +1,7 @@
 import { getBoolString } from "./util";
 import { Node } from "./node";
 import { JqTreeWidget } from "./tree.jquery";
+import { title } from "process";
 
 type IconElement = Text | Element;
 
@@ -141,6 +142,18 @@ export default class ElementsRenderer {
         return li;
     }
 
+    private setTreeItemAriaAttributes(
+        li: HTMLLIElement,
+        node: Node,
+        level: number,
+        isSelected: boolean
+    ) {
+        li.setAttribute("aria-label", node.name);
+        li.setAttribute("aria-level", `${level}`);
+        li.setAttribute("aria-selected", getBoolString(isSelected));
+        li.setAttribute("role", "treeitem");
+    }
+
     private createFolderLi(
         node: Node,
         level: number,
@@ -156,40 +169,31 @@ export default class ElementsRenderer {
         // li
         const li = document.createElement("li");
         li.className = `jqtree_common ${folderClasses}`;
-        li.setAttribute("role", "presentation");
+        this.setTreeItemAriaAttributes(li, node, level, isSelected);
+        li.setAttribute("aria-expanded", getBoolString(node.is_open));
 
         // div
         const div = document.createElement("div");
         div.className = "jqtree-element jqtree_common";
-        div.setAttribute("role", "presentation");
+        div.setAttribute("role", "none");
 
         li.appendChild(div);
 
         // button link
         const buttonLink = document.createElement("a");
         buttonLink.className = buttonClasses;
+        buttonLink.setAttribute("aria-hidden", "true");
 
         if (iconElement) {
             buttonLink.appendChild(iconElement.cloneNode(true));
         }
-
-        buttonLink.setAttribute("role", "presentation");
-        buttonLink.setAttribute("aria-hidden", "true");
 
         if (this.treeWidget.options.buttonLeft) {
             div.appendChild(buttonLink);
         }
 
         // title span
-        div.appendChild(
-            this.createTitleSpan(
-                node.name,
-                level,
-                isSelected,
-                node.is_open,
-                true
-            )
-        );
+        div.appendChild(this.createTitleSpan(node.name, isSelected, true));
 
         if (!this.treeWidget.options.buttonLeft) {
             div.appendChild(buttonLink);
@@ -214,34 +218,24 @@ export default class ElementsRenderer {
         // li
         const li = document.createElement("li");
         li.className = classString;
-        li.setAttribute("role", "presentation");
+        this.setTreeItemAriaAttributes(li, node, level, isSelected);
 
         // div
         const div = document.createElement("div");
         div.className = "jqtree-element jqtree_common";
-        div.setAttribute("role", "presentation");
+        div.setAttribute("role", "none");
 
         li.appendChild(div);
 
         // title span
-        div.appendChild(
-            this.createTitleSpan(
-                node.name,
-                level,
-                isSelected,
-                node.is_open,
-                false
-            )
-        );
+        div.appendChild(this.createTitleSpan(node.name, isSelected, false));
 
         return li;
     }
 
     private createTitleSpan(
         nodeName: string,
-        level: number,
         isSelected: boolean,
-        isOpen: boolean,
         isFolder: boolean
     ): HTMLSpanElement {
         const titleSpan = document.createElement("span");
@@ -257,12 +251,6 @@ export default class ElementsRenderer {
         }`;
 
         titleSpan.className = classes;
-
-        titleSpan.setAttribute("role", "treeitem");
-        titleSpan.setAttribute("aria-level", `${level}`);
-
-        titleSpan.setAttribute("aria-selected", getBoolString(isSelected));
-        titleSpan.setAttribute("aria-expanded", getBoolString(isOpen));
 
         if (isSelected) {
             const tabIndex = this.treeWidget.options.tabIndex;

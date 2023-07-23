@@ -59,12 +59,12 @@ export class NodeElement {
         const $li = this.getLi();
 
         $li.removeClass("jqtree-selected");
-        $li.attr("aria-selected", "false");
+        $li.attr("aria-selected", "true");
 
         const $span = this.getSpan();
         $span.removeAttr("tabindex");
 
-        $span.blur();
+        $span.trigger("blur");
     }
 
     protected getUl(): JQuery<HTMLElement> {
@@ -117,9 +117,7 @@ export class FolderElement extends NodeElement {
         const doOpen = (): void => {
             const $li = this.getLi();
             $li.removeClass("jqtree-closed");
-
-            const $span = this.getSpan();
-            $span.attr("aria-expanded", "true");
+            $li.attr("aria-expanded", "true");
 
             if (onFinished) {
                 onFinished(this.node);
@@ -167,9 +165,7 @@ export class FolderElement extends NodeElement {
         const doClose = (): void => {
             const $li = this.getLi();
             $li.addClass("jqtree-closed");
-
-            const $span = this.getSpan();
-            $span.attr("aria-expanded", "false");
+            $li.attr("aria-expanded", "false");
 
             this.treeWidget._triggerEvent("tree.close", {
                 node: this.node,
