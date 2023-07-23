@@ -21,5 +21,5 @@ it("has an accessible ui", async () => {
     });
     const element = $tree.get()[0] as HTMLElement;
 
-    expect(await axe(element)).toHaveNoViolations();
+    await expect(axe(element)).resolves.toHaveNoViolations();
 });
