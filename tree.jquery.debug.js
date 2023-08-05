@@ -1676,6 +1676,14 @@ var jqtree = (function (exports) {
         return li;
       }
     }, {
+      key: "setTreeItemAriaAttributes",
+      value: function setTreeItemAriaAttributes(element, name, level, isSelected) {
+        element.setAttribute("aria-label", name);
+        element.setAttribute("aria-level", "".concat(level));
+        element.setAttribute("aria-selected", getBoolString(isSelected));
+        element.setAttribute("role", "treeitem");
+      }
+    }, {
       key: "createFolderLi",
       value: function createFolderLi(node, level, isSelected) {
         var buttonClasses = this.getButtonClasses(node);
@@ -1685,12 +1693,12 @@ var jqtree = (function (exports) {
         // li
         var li = document.createElement("li");
         li.className = "jqtree_common ".concat(folderClasses);
-        li.setAttribute("role", "presentation");
+        li.setAttribute("role", "none");
 
         // div
         var div = document.createElement("div");
         div.className = "jqtree-element jqtree_common";
-        div.setAttribute("role", "presentation");
+        div.setAttribute("role", "none");
         li.appendChild(div);
 
         // button link
@@ -1699,14 +1707,14 @@ var jqtree = (function (exports) {
         if (iconElement) {
           buttonLink.appendChild(iconElement.cloneNode(true));
         }
-        buttonLink.setAttribute("role", "presentation");
-        buttonLink.setAttribute("aria-hidden", "true");
         if (this.treeWidget.options.buttonLeft) {
           div.appendChild(buttonLink);
         }
 
         // title span
-        div.appendChild(this.createTitleSpan(node.name, level, isSelected, node.is_open, true));
+        var titleSpan = this.createTitleSpan(node.name, isSelected, true, level);
+        titleSpan.setAttribute("aria-expanded", getBoolString(node.is_open));
+        div.appendChild(titleSpan);
         if (!this.treeWidget.options.buttonLeft) {
           div.appendChild(buttonLink);
         }
@@ -1724,21 +1732,22 @@ var jqtree = (function (exports) {
         // li
         var li = document.createElement("li");
         li.className = classString;
-        li.setAttribute("role", "presentation");
+        li.setAttribute("role", "none");
 
         // div
         var div = document.createElement("div");
         div.className = "jqtree-element jqtree_common";
-        div.setAttribute("role", "presentation");
+        div.setAttribute("role", "none");
         li.appendChild(div);
 
         // title span
-        div.appendChild(this.createTitleSpan(node.name, level, isSelected, node.is_open, false));
+        var titleSpan = this.createTitleSpan(node.name, isSelected, false, level);
+        div.appendChild(titleSpan);
         return li;
       }
     }, {
       key: "createTitleSpan",
-      value: function createTitleSpan(nodeName, level, isSelected, isOpen, isFolder) {
+      value: function createTitleSpan(nodeName, isSelected, isFolder, level) {
         var titleSpan = document.createElement("span");
         var classes = "jqtree-title jqtree_common";
         if (isFolder) {
@@ -1746,16 +1755,13 @@ var jqtree = (function (exports) {
         }
         classes += " jqtree-title-button-".concat(this.treeWidget.options.buttonLeft ? "left" : "right");
         titleSpan.className = classes;
-        titleSpan.setAttribute("role", "treeitem");
-        titleSpan.setAttribute("aria-level", "".concat(level));
-        titleSpan.setAttribute("aria-selected", getBoolString(isSelected));
-        titleSpan.setAttribute("aria-expanded", getBoolString(isOpen));
         if (isSelected) {
           var tabIndex = this.treeWidget.options.tabIndex;
           if (tabIndex !== undefined) {
             titleSpan.setAttribute("tabindex", "".concat(tabIndex));
           }
         }
+        this.setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
         if (this.treeWidget.options.autoEscape) {
           titleSpan.textContent = nodeName;
         } else {
@@ -3040,9 +3046,9 @@ var jqtree = (function (exports) {
         var _this$treeWidget$opti;
         var $li = this.getLi();
         $li.addClass("jqtree-selected");
-        $li.attr("aria-selected", "true");
         var $span = this.getSpan();
         $span.attr("tabindex", (_this$treeWidget$opti = this.treeWidget.options.tabIndex) !== null && _this$treeWidget$opti !== void 0 ? _this$treeWidget$opti : null);
+        $span.attr("aria-selected", "true");
         if (mustSetFocus) {
           $span.trigger("focus");
         }
@@ -3052,10 +3058,10 @@ var jqtree = (function (exports) {
       value: function deselect() {
         var $li = this.getLi();
         $li.removeClass("jqtree-selected");
-        $li.attr("aria-selected", "false");
         var $span = this.getSpan();
         $span.removeAttr("tabindex");
-        $span.blur();
+        $span.attr("aria-selected", "false");
+        $span.trigger("blur");
       }
     }, {
       key: "getUl",
@@ -3111,8 +3117,8 @@ var jqtree = (function (exports) {
         var doOpen = function doOpen() {
           var $li = _this.getLi();
           $li.removeClass("jqtree-closed");
-          var $span = _this.getSpan();
-          $span.attr("aria-expanded", "true");
+          var $titleSpan = _this.getSpan();
+          $titleSpan.attr("aria-expanded", "true");
           if (onFinished) {
             onFinished(_this.node);
           }
@@ -3151,8 +3157,8 @@ var jqtree = (function (exports) {
         var doClose = function doClose() {
           var $li = _this2.getLi();
           $li.addClass("jqtree-closed");
-          var $span = _this2.getSpan();
-          $span.attr("aria-expanded", "false");
+          var $titleSpan = _this2.getSpan();
+          $titleSpan.attr("aria-expanded", "false");
           _this2.treeWidget._triggerEvent("tree.close", {
             node: _this2.node
           });
