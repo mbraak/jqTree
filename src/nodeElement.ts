@@ -34,7 +34,7 @@ export class NodeElement {
         if (this.mustShowBorderDropHint(position)) {
             return new BorderDropHint(
                 this.$element,
-                this.treeWidget._getScrollLeft()
+                this.treeWidget._getScrollLeft(),
             );
         } else {
             return new GhostDropHint(this.node, this.$element, position);
@@ -81,7 +81,7 @@ export class NodeElement {
         return this.$element;
     }
 
-    protected mustShowBorderDropHint(position: number): boolean {
+    protected mustShowBorderDropHint(position: Position): boolean {
         return position === Position.Inside;
     }
 }
@@ -90,7 +90,7 @@ export class FolderElement extends NodeElement {
     public open(
         onFinished: OnFinishOpenNode | null,
         slide = true,
-        animationSpeed: JQuery.Duration | string = "fast"
+        animationSpeed: JQuery.Duration = "fast",
     ): void {
         if (this.node.is_open) {
             return;
@@ -140,7 +140,7 @@ export class FolderElement extends NodeElement {
 
     public close(
         slide = true,
-        animationSpeed: JQuery.Duration | string = "fast"
+        animationSpeed: JQuery.Duration | undefined = "fast",
     ): void {
         if (!this.node.is_open) {
             return;
@@ -184,7 +184,7 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    protected mustShowBorderDropHint(position: number): boolean {
+    protected mustShowBorderDropHint(position: Position): boolean {
         return !this.node.is_open && position === Position.Inside;
     }
 
@@ -223,13 +223,13 @@ class GhostDropHint implements DropHint {
     private node: Node;
     private $ghost: JQuery;
 
-    constructor(node: Node, $element: JQuery<Element>, position: number) {
+    constructor(node: Node, $element: JQuery<Element>, position: Position) {
         this.$element = $element;
 
         this.node = node;
         this.$ghost = jQuery(
             `<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span>
-            <span class="jqtree_common jqtree-line"></span></li>`
+            <span class="jqtree_common jqtree-line"></span></li>`,
         );
 
         if (position === Position.After) {

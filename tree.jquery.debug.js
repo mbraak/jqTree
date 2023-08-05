@@ -980,7 +980,7 @@ var jqtree = (function (exports) {
       key: "getNodeClass",
       value: function getNodeClass() {
         var _this$tree4;
-        return this.nodeClass || (this === null || this === void 0 ? void 0 : (_this$tree4 = this.tree) === null || _this$tree4 === void 0 ? void 0 : _this$tree4.nodeClass) || Node;
+        return this.nodeClass || (this === null || this === void 0 || (_this$tree4 = this.tree) === null || _this$tree4 === void 0 ? void 0 : _this$tree4.nodeClass) || Node;
       }
     }, {
       key: "createNode",
@@ -2125,6 +2125,8 @@ var jqtree = (function (exports) {
           }
           return callFunction(this, functionName, args);
         }
+      } else {
+        return undefined;
       }
     };
   };
