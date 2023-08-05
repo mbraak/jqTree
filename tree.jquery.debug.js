@@ -1677,11 +1677,11 @@ var jqtree = (function (exports) {
       }
     }, {
       key: "setTreeItemAriaAttributes",
-      value: function setTreeItemAriaAttributes(li, node, level, isSelected) {
-        li.setAttribute("aria-label", node.name);
-        li.setAttribute("aria-level", "".concat(level));
-        li.setAttribute("aria-selected", getBoolString(isSelected));
-        li.setAttribute("role", "treeitem");
+      value: function setTreeItemAriaAttributes(element, name, level, isSelected) {
+        element.setAttribute("aria-label", name);
+        element.setAttribute("aria-level", "".concat(level));
+        element.setAttribute("aria-selected", getBoolString(isSelected));
+        element.setAttribute("role", "treeitem");
       }
     }, {
       key: "createFolderLi",
@@ -1693,8 +1693,7 @@ var jqtree = (function (exports) {
         // li
         var li = document.createElement("li");
         li.className = "jqtree_common ".concat(folderClasses);
-        this.setTreeItemAriaAttributes(li, node, level, isSelected);
-        li.setAttribute("aria-expanded", getBoolString(node.is_open));
+        li.setAttribute("role", "none");
 
         // div
         var div = document.createElement("div");
@@ -1705,7 +1704,6 @@ var jqtree = (function (exports) {
         // button link
         var buttonLink = document.createElement("a");
         buttonLink.className = buttonClasses;
-        buttonLink.setAttribute("aria-hidden", "true");
         if (iconElement) {
           buttonLink.appendChild(iconElement.cloneNode(true));
         }
@@ -1714,7 +1712,9 @@ var jqtree = (function (exports) {
         }
 
         // title span
-        div.appendChild(this.createTitleSpan(node.name, isSelected, true));
+        var titleSpan = this.createTitleSpan(node.name, isSelected, true, level);
+        titleSpan.setAttribute("aria-expanded", getBoolString(node.is_open));
+        div.appendChild(titleSpan);
         if (!this.treeWidget.options.buttonLeft) {
           div.appendChild(buttonLink);
         }
@@ -1732,7 +1732,7 @@ var jqtree = (function (exports) {
         // li
         var li = document.createElement("li");
         li.className = classString;
-        this.setTreeItemAriaAttributes(li, node, level, isSelected);
+        li.setAttribute("role", "none");
 
         // div
         var div = document.createElement("div");
@@ -1741,12 +1741,13 @@ var jqtree = (function (exports) {
         li.appendChild(div);
 
         // title span
-        div.appendChild(this.createTitleSpan(node.name, isSelected, false));
+        var titleSpan = this.createTitleSpan(node.name, isSelected, false, level);
+        div.appendChild(titleSpan);
         return li;
       }
     }, {
       key: "createTitleSpan",
-      value: function createTitleSpan(nodeName, isSelected, isFolder) {
+      value: function createTitleSpan(nodeName, isSelected, isFolder, level) {
         var titleSpan = document.createElement("span");
         var classes = "jqtree-title jqtree_common";
         if (isFolder) {
@@ -1760,6 +1761,7 @@ var jqtree = (function (exports) {
             titleSpan.setAttribute("tabindex", "".concat(tabIndex));
           }
         }
+        this.setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
         if (this.treeWidget.options.autoEscape) {
           titleSpan.textContent = nodeName;
         } else {
@@ -3042,9 +3044,9 @@ var jqtree = (function (exports) {
         var _this$treeWidget$opti;
         var $li = this.getLi();
         $li.addClass("jqtree-selected");
-        $li.attr("aria-selected", "true");
         var $span = this.getSpan();
         $span.attr("tabindex", (_this$treeWidget$opti = this.treeWidget.options.tabIndex) !== null && _this$treeWidget$opti !== void 0 ? _this$treeWidget$opti : null);
+        $span.attr("aria-selected", "true");
         if (mustSetFocus) {
           $span.trigger("focus");
         }
@@ -3054,9 +3056,9 @@ var jqtree = (function (exports) {
       value: function deselect() {
         var $li = this.getLi();
         $li.removeClass("jqtree-selected");
-        $li.attr("aria-selected", "true");
         var $span = this.getSpan();
         $span.removeAttr("tabindex");
+        $span.attr("aria-selected", "false");
         $span.trigger("blur");
       }
     }, {
@@ -3113,7 +3115,8 @@ var jqtree = (function (exports) {
         var doOpen = function doOpen() {
           var $li = _this.getLi();
           $li.removeClass("jqtree-closed");
-          $li.attr("aria-expanded", "true");
+          var $titleSpan = _this.getSpan();
+          $titleSpan.attr("aria-expanded", "true");
           if (onFinished) {
             onFinished(_this.node);
           }
@@ -3152,7 +3155,8 @@ var jqtree = (function (exports) {
         var doClose = function doClose() {
           var $li = _this2.getLi();
           $li.addClass("jqtree-closed");
-          $li.attr("aria-expanded", "false");
+          var $titleSpan = _this2.getSpan();
+          $titleSpan.attr("aria-expanded", "false");
           _this2.treeWidget._triggerEvent("tree.close", {
             node: _this2.node
           });
