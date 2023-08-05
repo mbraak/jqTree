@@ -1,11 +1,10 @@
 import fs from "fs";
-import path from "path";
 import jsonfile from "jsonfile";
 import template from "lodash.template";
 import { babel } from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
 import serve from "rollup-plugin-serve";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 
 const getBanner = () => {
     const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");
@@ -32,7 +31,7 @@ const babelConfigFile = includeCoverage
 
 const babelPlugin = babel({
     babelHelpers: "bundled",
-    configFile: path.resolve(__dirname, babelConfigFile),
+    configFile: `./config/${babelConfigFile}`,
     extensions: [".ts"],
 });
 
@@ -49,11 +48,7 @@ if (!debugBuild) {
 
 if (devServer) {
     const servePlugin = serve({
-        contentBase: [
-            path.join(__dirname, "../devserver"),
-            path.join(__dirname, "../docs/static"),
-            path.join(__dirname, ".."),
-        ],
+        contentBase: ["./devserver", "./docs/static", "./"],
         port: 8080,
     });
     plugins.push(servePlugin);

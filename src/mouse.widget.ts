@@ -219,6 +219,10 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
         const touch = e.changedTouches[0];
 
+        if (!touch) {
+            return;
+        }
+
         this.handleMouseDown(getPositionInfoFromTouch(touch, e));
     };
 
@@ -233,6 +237,10 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
         const touch = e.changedTouches[0];
 
+        if (!touch) {
+            return;
+        }
+
         this.handleMouseMove(e, getPositionInfoFromTouch(touch, e));
     };
 
@@ -246,6 +254,10 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         }
 
         const touch = e.changedTouches[0];
+
+        if (!touch) {
+            return;
+        }
 
         this.handleMouseUp(getPositionInfoFromTouch(touch, e));
     };

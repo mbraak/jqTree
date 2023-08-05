@@ -3,7 +3,7 @@ title: getPreviousNode
 name: node-functions-getpreviousnode
 ---
 
-Get the previous node in the tree. Does the same as using the *up* key.
+Return the previous node in the tree.
 
 Returns a node or null.
 

@@ -3,6 +3,19 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issue #724: improve accessibility
+
+#### 1.7.0 (december 23 2022)
+
+Small breaking change: this release changes the definition of getPreviousNode and getNextNode.
+
+-   Issue #704: dispatch the tree.load_data after initializing the tree
+-   Issue #706: change the functions for getting the next and previous nodes.
+    -   Rename getPreviousNode to getPreviousVisibleNode and getNextNode to getNextVisibleNode.
+    -   Add new getPreviousNode and getNextNode functions that ignores if a node is visible.
+
 #### 1.6.3 (august 7 2022)
 
 -   Issue # 692: openFolderDelay is false disables opening folders during drag and drop

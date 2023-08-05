@@ -94,6 +94,8 @@ const register = (widgetClass: unknown, widgetName: string): void => {
             } else {
                 return callFunction(this, functionName, args);
             }
+        } else {
+            return undefined;
         }
     };
 };
