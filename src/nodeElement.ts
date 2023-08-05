@@ -45,10 +45,10 @@ export class NodeElement {
         const $li = this.getLi();
 
         $li.addClass("jqtree-selected");
-        $li.attr("aria-selected", "true");
 
         const $span = this.getSpan();
         $span.attr("tabindex", this.treeWidget.options.tabIndex ?? null);
+        $span.attr("aria-selected", "true");
 
         if (mustSetFocus) {
             $span.trigger("focus");
@@ -59,10 +59,10 @@ export class NodeElement {
         const $li = this.getLi();
 
         $li.removeClass("jqtree-selected");
-        $li.attr("aria-selected", "true");
 
         const $span = this.getSpan();
         $span.removeAttr("tabindex");
+        $span.attr("aria-selected", "false");
 
         $span.trigger("blur");
     }
@@ -117,7 +117,9 @@ export class FolderElement extends NodeElement {
         const doOpen = (): void => {
             const $li = this.getLi();
             $li.removeClass("jqtree-closed");
-            $li.attr("aria-expanded", "true");
+
+            const $titleSpan = this.getSpan();
+            $titleSpan.attr("aria-expanded", "true");
 
             if (onFinished) {
                 onFinished(this.node);
@@ -165,7 +167,9 @@ export class FolderElement extends NodeElement {
         const doClose = (): void => {
             const $li = this.getLi();
             $li.addClass("jqtree-closed");
-            $li.attr("aria-expanded", "false");
+
+            const $titleSpan = this.getSpan();
+            $titleSpan.attr("aria-expanded", "false");
 
             this.treeWidget._triggerEvent("tree.close", {
                 node: this.node,

@@ -142,15 +142,15 @@ export default class ElementsRenderer {
     }
 
     private setTreeItemAriaAttributes(
-        li: HTMLLIElement,
-        node: Node,
+        element: HTMLElement,
+        name: string,
         level: number,
         isSelected: boolean
     ) {
-        li.setAttribute("aria-label", node.name);
-        li.setAttribute("aria-level", `${level}`);
-        li.setAttribute("aria-selected", getBoolString(isSelected));
-        li.setAttribute("role", "treeitem");
+        element.setAttribute("aria-label", name);
+        element.setAttribute("aria-level", `${level}`);
+        element.setAttribute("aria-selected", getBoolString(isSelected));
+        element.setAttribute("role", "treeitem");
     }
 
     private createFolderLi(
@@ -168,8 +168,7 @@ export default class ElementsRenderer {
         // li
         const li = document.createElement("li");
         li.className = `jqtree_common ${folderClasses}`;
-        this.setTreeItemAriaAttributes(li, node, level, isSelected);
-        li.setAttribute("aria-expanded", getBoolString(node.is_open));
+        li.setAttribute("role", "none");
 
         // div
         const div = document.createElement("div");
@@ -181,7 +180,6 @@ export default class ElementsRenderer {
         // button link
         const buttonLink = document.createElement("a");
         buttonLink.className = buttonClasses;
-        buttonLink.setAttribute("aria-hidden", "true");
 
         if (iconElement) {
             buttonLink.appendChild(iconElement.cloneNode(true));
@@ -192,7 +190,14 @@ export default class ElementsRenderer {
         }
 
         // title span
-        div.appendChild(this.createTitleSpan(node.name, isSelected, true));
+        const titleSpan = this.createTitleSpan(
+            node.name,
+            isSelected,
+            true,
+            level
+        );
+        titleSpan.setAttribute("aria-expanded", getBoolString(node.is_open));
+        div.appendChild(titleSpan);
 
         if (!this.treeWidget.options.buttonLeft) {
             div.appendChild(buttonLink);
@@ -217,7 +222,7 @@ export default class ElementsRenderer {
         // li
         const li = document.createElement("li");
         li.className = classString;
-        this.setTreeItemAriaAttributes(li, node, level, isSelected);
+        li.setAttribute("role", "none");
 
         // div
         const div = document.createElement("div");
@@ -227,7 +232,13 @@ export default class ElementsRenderer {
         li.appendChild(div);
 
         // title span
-        div.appendChild(this.createTitleSpan(node.name, isSelected, false));
+        const titleSpan = this.createTitleSpan(
+            node.name,
+            isSelected,
+            false,
+            level
+        );
+        div.appendChild(titleSpan);
 
         return li;
     }
@@ -235,7 +246,8 @@ export default class ElementsRenderer {
     private createTitleSpan(
         nodeName: string,
         isSelected: boolean,
-        isFolder: boolean
+        isFolder: boolean,
+        level: number
     ): HTMLSpanElement {
         const titleSpan = document.createElement("span");
 
@@ -258,6 +270,8 @@ export default class ElementsRenderer {
                 titleSpan.setAttribute("tabindex", `${tabIndex}`);
             }
         }
+
+        this.setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
 
         if (this.treeWidget.options.autoEscape) {
             titleSpan.textContent = nodeName;
