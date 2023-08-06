@@ -6,7 +6,7 @@ export type OnFinishOpenNode = (node: Node) => void;
 
 export class NodeElement {
     public node: Node;
-    public $element: JQuery<HTMLElement>;
+    public element: HTMLElement;
     protected treeWidget: JqTreeWidget;
 
     constructor(node: Node, treeWidget: JqTreeWidget) {
@@ -26,25 +26,23 @@ export class NodeElement {
         }
 
         if (node.element) {
-            this.$element = jQuery(node.element);
+            this.element = node.element;
         }
     }
 
     public addDropHint(position: number): DropHint {
         if (this.mustShowBorderDropHint(position)) {
             return new BorderDropHint(
-                this.$element,
+                jQuery(this.element),
                 this.treeWidget._getScrollLeft(),
             );
         } else {
-            return new GhostDropHint(this.node, this.$element, position);
+            return new GhostDropHint(this.node, jQuery(this.element), position);
         }
     }
 
     public select(mustSetFocus: boolean): void {
-        const li = this.getLi();
-
-        li.classList.add("jqtree-selected");
+        this.element.classList.add("jqtree-selected");
 
         const titleSpan = this.getTitleSpan();
         const tabIndex = this.treeWidget.options.tabIndex;
@@ -62,9 +60,7 @@ export class NodeElement {
     }
 
     public deselect(): void {
-        const li = this.getLi();
-
-        li.classList.remove("jqtree-selected");
+        this.element.classList.remove("jqtree-selected");
 
         const titleSpan = this.getTitleSpan();
         titleSpan.removeAttribute("tabindex");
@@ -74,19 +70,13 @@ export class NodeElement {
     }
 
     protected getUl(): HTMLUListElement {
-        return this.node.element.querySelector(
-            ":scope > ul",
-        ) as HTMLUListElement;
+        return this.element.querySelector(":scope > ul") as HTMLUListElement;
     }
 
     protected getTitleSpan(): HTMLSpanElement {
-        return this.node.element.querySelector(
+        return this.element.querySelector(
             ":scope > .jqtree-element > span.jqtree-title",
         ) as HTMLSpanElement;
-    }
-
-    protected getLi(): HTMLLIElement {
-        return this.node.element as HTMLLIElement;
     }
 
     protected mustShowBorderDropHint(position: Position): boolean {
@@ -118,8 +108,7 @@ export class FolderElement extends NodeElement {
         }
 
         const doOpen = (): void => {
-            const li = this.getLi();
-            li.classList.remove("jqtree-closed");
+            this.element.classList.remove("jqtree-closed");
 
             const titleSpan = this.getTitleSpan();
             titleSpan.setAttribute("aria-expanded", "true");
@@ -163,8 +152,7 @@ export class FolderElement extends NodeElement {
         }
 
         const doClose = (): void => {
-            const li = this.getLi();
-            li.classList.add("jqtree-closed");
+            this.element.classList.add("jqtree-closed");
 
             const titleSpan = this.getTitleSpan();
             titleSpan.setAttribute("aria-expanded", "false");
@@ -187,7 +175,7 @@ export class FolderElement extends NodeElement {
     }
 
     private getButton(): HTMLLinkElement {
-        return this.node.element.querySelector(
+        return this.element.querySelector(
             ":scope > .jqtree-element > a.jqtree-toggler",
         ) as HTMLLinkElement;
     }
