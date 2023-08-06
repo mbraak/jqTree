@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### 1.7.1 (august 6 2023)
+
+-   Issue #724: improve accessibility
+
 #### 1.7.0 (december 23 2022)
 
 Small breaking change: this release changes the definition of getPreviousNode and getNextNode.

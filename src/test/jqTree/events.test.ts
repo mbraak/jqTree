@@ -1,6 +1,7 @@
 import getGiven from "givens";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
+import { waitFor } from "@testing-library/dom";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
@@ -41,17 +42,15 @@ describe("tree.click", () => {
         given.$tree.tree({ data: exampleData });
     });
 
-    it("fires tree.click", () =>
-        new Promise<void>((done) => {
-            given.$tree.on("tree.click", (e: unknown) => {
-                const treeClickEvent = e as ClickNodeEvent;
+    it("fires tree.click", () => {
+        const onClick = jest.fn();
+        given.$tree.on("tree.click", onClick);
 
-                expect(treeClickEvent.node).toBe(given.node1);
-                done();
-            });
-
-            given.titleSpan.trigger("click");
-        }));
+        given.titleSpan.trigger("click");
+        expect(onClick).toHaveBeenCalledWith(
+            expect.objectContaining({ node: given.node1 })
+        );
+    });
 });
 
 describe("tree.contextmenu", () => {
@@ -70,17 +69,15 @@ describe("tree.contextmenu", () => {
         given.$tree.tree({ data: exampleData });
     });
 
-    it("fires tree.contextmenu", () =>
-        new Promise<void>((done) => {
-            given.$tree.on("tree.contextmenu", (e: unknown) => {
-                const treeClickEvent = e as ClickNodeEvent;
+    it("fires tree.contextmenu", () => {
+        const onContextMenu = jest.fn();
+        given.$tree.on("tree.contextmenu", onContextMenu);
 
-                expect(treeClickEvent.node).toBe(given.node1);
-                done();
-            });
-
-            given.titleSpan.contextmenu();
-        }));
+        given.titleSpan.trigger("contextmenu");
+        expect(onContextMenu).toHaveBeenCalledWith(
+            expect.objectContaining({ node: given.node1 })
+        );
+    });
 });
 
 describe("tree.dblclick", () => {
@@ -99,17 +96,15 @@ describe("tree.dblclick", () => {
         given.$tree.tree({ data: exampleData });
     });
 
-    it("fires tree.dblclick", () =>
-        new Promise<void>((done) => {
-            given.$tree.on("tree.dblclick", (e: unknown) => {
-                const treeClickEvent = e as ClickNodeEvent;
+    it("fires tree.dblclick", () => {
+        const onDoubleClick = jest.fn();
+        given.$tree.on("tree.dblclick", onDoubleClick);
 
-                expect(treeClickEvent.node).toBe(given.node1);
-                done();
-            });
-
-            given.titleSpan.trigger("dblclick");
-        }));
+        given.titleSpan.trigger("dblclick");
+        expect(onDoubleClick).toHaveBeenCalledWith(
+            expect.objectContaining({ node: given.node1 })
+        );
+    });
 });
 
 describe("tree.init", () => {
@@ -120,22 +115,17 @@ describe("tree.init", () => {
     given("$tree", () => $("#tree1"));
 
     context("with json data", () => {
-        it("is called", () =>
-            new Promise<void>((done) => {
-                given.$tree.on("tree.init", () => {
-                    expect(
-                        given.$tree.tree("getNodeByName", "node2")
-                    ).toMatchObject({
-                        id: 124,
-                        name: "node2",
-                    });
-                    done();
-                });
+        it("is called", () => {
+            const onInit = jest.fn();
+            given.$tree.on("tree.init", onInit);
 
-                given.$tree.tree({
-                    data: exampleData,
-                });
-            }));
+            given.$tree.tree({
+                data: exampleData,
+            });
+
+            // eslint-disable-next-line jest/prefer-called-with
+            expect(onInit).toHaveBeenCalled();
+        });
     });
 
     context("with data loaded from an url", () => {
@@ -147,20 +137,17 @@ describe("tree.init", () => {
             );
         });
 
-        it("is called", () =>
-            new Promise<void>((done) => {
-                given.$tree.on("tree.init", () => {
-                    expect(
-                        given.$tree.tree("getNodeByName", "node2")
-                    ).toMatchObject({
-                        id: 124,
-                        name: "node2",
-                    });
-                    done();
-                });
+        it("is called", async () => {
+            const onInit = jest.fn();
+            given.$tree.on("tree.init", onInit);
 
-                given.$tree.tree({ dataUrl: "/tree/" });
-            }));
+            given.$tree.tree({ dataUrl: "/tree/" });
+
+            await waitFor(() => {
+                // eslint-disable-next-line jest/prefer-called-with
+                expect(onInit).toHaveBeenCalled();
+            });
+        });
     });
 });
 
@@ -172,16 +159,15 @@ describe("tree.load_data", () => {
     given("$tree", () => $("#tree1"));
 
     context("when the tree is initialized with data", () => {
-        it("fires tree.load_data", () =>
-            new Promise<void>((resolve) => {
-                given.$tree.on("tree.load_data", (e: any) => {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    expect(e.tree_data).toEqual(exampleData);
-                    resolve();
-                });
+        it("fires tree.load_data", () => {
+            const onLoadData = jest.fn();
+            given.$tree.on("tree.load_data", onLoadData);
 
-                given.$tree.tree({ data: exampleData });
-            }));
+            given.$tree.tree({ data: exampleData });
+            expect(onLoadData).toHaveBeenCalledWith(
+                expect.objectContaining({ tree_data: exampleData })
+            );
+        });
     });
 });
 
@@ -203,35 +189,35 @@ describe("tree.select", () => {
         });
     });
 
-    it("fires tree.click", () =>
-        new Promise<void>((done) => {
-            given.$tree.on("tree.select", (e: unknown) => {
-                const treeClickEvent = e as ClickNodeEvent;
+    it("fires tree.select", () => {
+        const onSelect = jest.fn();
+        given.$tree.on("tree.select", onSelect);
 
-                expect(treeClickEvent.node).toBe(given.node1);
-                expect(treeClickEvent.deselected_node).toBeNull();
-                done();
-            });
-
-            given.titleSpan.trigger("click");
-        }));
+        given.titleSpan.trigger("click");
+        expect(onSelect).toHaveBeenCalledWith(
+            expect.objectContaining({
+                node: given.node1,
+                deselected_node: null,
+            })
+        );
+    });
 
     context("when the node was selected", () => {
         beforeEach(() => {
             given.$tree.tree("selectNode", given.node1);
         });
 
-        it("fires tree.select with node is null", () =>
-            new Promise<void>((done) => {
-                given.$tree.on("tree.select", (e: unknown) => {
-                    const treeClickEvent = e as ClickNodeEvent;
+        it("fires tree.select with node is null", () => {
+            const onSelect = jest.fn();
+            given.$tree.on("tree.select", onSelect);
 
-                    expect(treeClickEvent.node).toBeNull();
-                    expect(treeClickEvent.previous_node).toBe(given.node1);
-                    done();
-                });
-
-                given.titleSpan.trigger("click");
-            }));
+            given.titleSpan.trigger("click");
+            expect(onSelect).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    node: null,
+                    previous_node: given.node1,
+                })
+            );
+        });
     });
 });

@@ -10,13 +10,13 @@
     "copy_static": "cp ../tree.jquery.js . && cp ../jqtree.css ."
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.7",
-    "autoprefixer": "^10.4.12",
-    "postcss": "^8.4.18",
-    "postcss-cli": "^10",
-    "postcss-import": "^15",
+    "@tailwindcss/typography": "^0.5.9",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.27",
+    "postcss-cli": "^10.1.0",
+    "postcss-import": "^15.1.0",
     "postcss-load-config": "^4.0.1",
-    "postcss-nested": "^6",
-    "tailwindcss": "^3.1.8"
+    "postcss-nested": "^6.0.1",
+    "tailwindcss": "^3.3.3"
   }
 }

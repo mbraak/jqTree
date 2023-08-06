@@ -518,7 +518,7 @@ export class Node implements INode {
         } else {
             const previousIndex = this.parent.getChildIndex(this) - 1;
             if (previousIndex >= 0) {
-                return this.parent.children[previousIndex];
+                return this.parent.children[previousIndex] || null;
             } else {
                 return null;
             }
@@ -531,7 +531,7 @@ export class Node implements INode {
         } else {
             const nextIndex = this.parent.getChildIndex(this) + 1;
             if (nextIndex < this.parent.children.length) {
-                return this.parent.children[nextIndex];
+                return this.parent.children[nextIndex] || null;
             } else {
                 return null;
             }
@@ -558,7 +558,7 @@ export class Node implements INode {
 
     public getNextNode(includeChildren = true): Node | null {
         if (includeChildren && this.hasChildren()) {
-            return this.children[0];
+            return this.children[0] || null;
         } else if (!this.parent) {
             return null;
         } else {
@@ -575,7 +575,7 @@ export class Node implements INode {
     public getNextVisibleNode(): Node | null {
         if (this.hasChildren() && this.is_open) {
             // First child
-            return this.children[0];
+            return this.children[0] || null;
         } else {
             if (!this.parent) {
                 return null;
@@ -646,10 +646,15 @@ export class Node implements INode {
             return null;
         } else {
             const lastChild = this.children[this.children.length - 1];
+
+            if (!lastChild) {
+                return null;
+            }
+
             if (!(lastChild.hasChildren() && lastChild.is_open)) {
                 return lastChild;
             } else {
-                return lastChild.getLastChild();
+                return lastChild?.getLastChild();
             }
         }
     }

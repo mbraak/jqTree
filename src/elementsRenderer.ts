@@ -5,8 +5,8 @@ import { JqTreeWidget } from "./tree.jquery";
 type IconElement = Text | Element;
 
 export default class ElementsRenderer {
-    public openedIconElement: IconElement;
-    public closedIconElement: IconElement;
+    public openedIconElement?: IconElement;
+    public closedIconElement?: IconElement;
     private treeWidget: JqTreeWidget;
 
     constructor(treeWidget: JqTreeWidget) {
@@ -32,12 +32,14 @@ export default class ElementsRenderer {
         const $element = this.treeWidget.element;
         $element.empty();
 
-        this.createDomElements(
-            $element[0],
-            this.treeWidget.tree.children,
-            true,
-            1
-        );
+        if ($element[0]) {
+            this.createDomElements(
+                $element[0],
+                this.treeWidget.tree.children,
+                true,
+                1
+            );
+        }
     }
 
     public renderFromNode(node: Node): void {
@@ -139,6 +141,18 @@ export default class ElementsRenderer {
         return li;
     }
 
+    private setTreeItemAriaAttributes(
+        element: HTMLElement,
+        name: string,
+        level: number,
+        isSelected: boolean
+    ) {
+        element.setAttribute("aria-label", name);
+        element.setAttribute("aria-level", `${level}`);
+        element.setAttribute("aria-selected", getBoolString(isSelected));
+        element.setAttribute("role", "treeitem");
+    }
+
     private createFolderLi(
         node: Node,
         level: number,
@@ -154,12 +168,12 @@ export default class ElementsRenderer {
         // li
         const li = document.createElement("li");
         li.className = `jqtree_common ${folderClasses}`;
-        li.setAttribute("role", "presentation");
+        li.setAttribute("role", "none");
 
         // div
         const div = document.createElement("div");
         div.className = "jqtree-element jqtree_common";
-        div.setAttribute("role", "presentation");
+        div.setAttribute("role", "none");
 
         li.appendChild(div);
 
@@ -167,25 +181,23 @@ export default class ElementsRenderer {
         const buttonLink = document.createElement("a");
         buttonLink.className = buttonClasses;
 
-        buttonLink.appendChild(iconElement.cloneNode(true));
-
-        buttonLink.setAttribute("role", "presentation");
-        buttonLink.setAttribute("aria-hidden", "true");
+        if (iconElement) {
+            buttonLink.appendChild(iconElement.cloneNode(true));
+        }
 
         if (this.treeWidget.options.buttonLeft) {
             div.appendChild(buttonLink);
         }
 
         // title span
-        div.appendChild(
-            this.createTitleSpan(
-                node.name,
-                level,
-                isSelected,
-                node.is_open,
-                true
-            )
+        const titleSpan = this.createTitleSpan(
+            node.name,
+            isSelected,
+            true,
+            level
         );
+        titleSpan.setAttribute("aria-expanded", getBoolString(node.is_open));
+        div.appendChild(titleSpan);
 
         if (!this.treeWidget.options.buttonLeft) {
             div.appendChild(buttonLink);
@@ -210,35 +222,32 @@ export default class ElementsRenderer {
         // li
         const li = document.createElement("li");
         li.className = classString;
-        li.setAttribute("role", "presentation");
+        li.setAttribute("role", "none");
 
         // div
         const div = document.createElement("div");
         div.className = "jqtree-element jqtree_common";
-        div.setAttribute("role", "presentation");
+        div.setAttribute("role", "none");
 
         li.appendChild(div);
 
         // title span
-        div.appendChild(
-            this.createTitleSpan(
-                node.name,
-                level,
-                isSelected,
-                node.is_open,
-                false
-            )
+        const titleSpan = this.createTitleSpan(
+            node.name,
+            isSelected,
+            false,
+            level
         );
+        div.appendChild(titleSpan);
 
         return li;
     }
 
     private createTitleSpan(
         nodeName: string,
-        level: number,
         isSelected: boolean,
-        isOpen: boolean,
-        isFolder: boolean
+        isFolder: boolean,
+        level: number
     ): HTMLSpanElement {
         const titleSpan = document.createElement("span");
 
@@ -254,12 +263,6 @@ export default class ElementsRenderer {
 
         titleSpan.className = classes;
 
-        titleSpan.setAttribute("role", "treeitem");
-        titleSpan.setAttribute("aria-level", `${level}`);
-
-        titleSpan.setAttribute("aria-selected", getBoolString(isSelected));
-        titleSpan.setAttribute("aria-expanded", getBoolString(isOpen));
-
         if (isSelected) {
             const tabIndex = this.treeWidget.options.tabIndex;
 
@@ -267,6 +270,8 @@ export default class ElementsRenderer {
                 titleSpan.setAttribute("tabindex", `${tabIndex}`);
             }
         }
+
+        this.setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
 
         if (this.treeWidget.options.autoEscape) {
             titleSpan.textContent = nodeName;
@@ -311,7 +316,9 @@ export default class ElementsRenderer {
         return classes.join(" ");
     }
 
-    private createButtonElement(value: string | Element): IconElement {
+    private createButtonElement(
+        value: string | Element
+    ): IconElement | undefined {
         if (typeof value === "string") {
             // convert value to html
             const div = document.createElement("div");

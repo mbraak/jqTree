@@ -24,7 +24,7 @@ describe("getPositionName", () => {
 
     context("with an unknown position", () => {
         it("returns an empty string", () => {
-            expect(getPositionName(10)).toBe("");
+            expect(getPositionName(10 as Position)).toBe("");
         });
     });
 });

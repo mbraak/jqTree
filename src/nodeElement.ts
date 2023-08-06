@@ -34,7 +34,7 @@ export class NodeElement {
         if (this.mustShowBorderDropHint(position)) {
             return new BorderDropHint(
                 this.$element,
-                this.treeWidget._getScrollLeft()
+                this.treeWidget._getScrollLeft(),
             );
         } else {
             return new GhostDropHint(this.node, this.$element, position);
@@ -45,10 +45,10 @@ export class NodeElement {
         const $li = this.getLi();
 
         $li.addClass("jqtree-selected");
-        $li.attr("aria-selected", "true");
 
         const $span = this.getSpan();
         $span.attr("tabindex", this.treeWidget.options.tabIndex ?? null);
+        $span.attr("aria-selected", "true");
 
         if (mustSetFocus) {
             $span.trigger("focus");
@@ -59,12 +59,12 @@ export class NodeElement {
         const $li = this.getLi();
 
         $li.removeClass("jqtree-selected");
-        $li.attr("aria-selected", "false");
 
         const $span = this.getSpan();
         $span.removeAttr("tabindex");
+        $span.attr("aria-selected", "false");
 
-        $span.blur();
+        $span.trigger("blur");
     }
 
     protected getUl(): JQuery<HTMLElement> {
@@ -81,7 +81,7 @@ export class NodeElement {
         return this.$element;
     }
 
-    protected mustShowBorderDropHint(position: number): boolean {
+    protected mustShowBorderDropHint(position: Position): boolean {
         return position === Position.Inside;
     }
 }
@@ -90,7 +90,7 @@ export class FolderElement extends NodeElement {
     public open(
         onFinished: OnFinishOpenNode | null,
         slide = true,
-        animationSpeed: JQuery.Duration | string = "fast"
+        animationSpeed: JQuery.Duration = "fast",
     ): void {
         if (this.node.is_open) {
             return;
@@ -105,18 +105,21 @@ export class FolderElement extends NodeElement {
         const buttonEl = $button.get(0);
 
         if (buttonEl) {
-            const icon =
-                this.treeWidget.renderer.openedIconElement.cloneNode(true);
+            const openedIconElement =
+                this.treeWidget.renderer.openedIconElement;
 
-            buttonEl.appendChild(icon);
+            if (openedIconElement) {
+                const icon = openedIconElement.cloneNode(true);
+                buttonEl.appendChild(icon);
+            }
         }
 
         const doOpen = (): void => {
             const $li = this.getLi();
             $li.removeClass("jqtree-closed");
 
-            const $span = this.getSpan();
-            $span.attr("aria-expanded", "true");
+            const $titleSpan = this.getSpan();
+            $titleSpan.attr("aria-expanded", "true");
 
             if (onFinished) {
                 onFinished(this.node);
@@ -137,7 +140,7 @@ export class FolderElement extends NodeElement {
 
     public close(
         slide = true,
-        animationSpeed: JQuery.Duration | string = "fast"
+        animationSpeed: JQuery.Duration | undefined = "fast",
     ): void {
         if (!this.node.is_open) {
             return;
@@ -152,18 +155,21 @@ export class FolderElement extends NodeElement {
         const buttonEl = $button.get(0);
 
         if (buttonEl) {
-            const icon =
-                this.treeWidget.renderer.closedIconElement.cloneNode(true);
+            const closedIconElement =
+                this.treeWidget.renderer.closedIconElement;
 
-            buttonEl.appendChild(icon);
+            if (closedIconElement) {
+                const icon = closedIconElement.cloneNode(true);
+                buttonEl.appendChild(icon);
+            }
         }
 
         const doClose = (): void => {
             const $li = this.getLi();
             $li.addClass("jqtree-closed");
 
-            const $span = this.getSpan();
-            $span.attr("aria-expanded", "false");
+            const $titleSpan = this.getSpan();
+            $titleSpan.attr("aria-expanded", "false");
 
             this.treeWidget._triggerEvent("tree.close", {
                 node: this.node,
@@ -178,7 +184,7 @@ export class FolderElement extends NodeElement {
         }
     }
 
-    protected mustShowBorderDropHint(position: number): boolean {
+    protected mustShowBorderDropHint(position: Position): boolean {
         return !this.node.is_open && position === Position.Inside;
     }
 
@@ -217,13 +223,13 @@ class GhostDropHint implements DropHint {
     private node: Node;
     private $ghost: JQuery;
 
-    constructor(node: Node, $element: JQuery<Element>, position: number) {
+    constructor(node: Node, $element: JQuery<Element>, position: Position) {
         this.$element = $element;
 
         this.node = node;
         this.$ghost = jQuery(
             `<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span>
-            <span class="jqtree_common jqtree-line"></span></li>`
+            <span class="jqtree_common jqtree-line"></span></li>`,
         );
 
         if (position === Position.After) {
@@ -252,7 +258,7 @@ class GhostDropHint implements DropHint {
     }
 
     public moveInsideOpenFolder(): void {
-        const childElement = this.node.children[0].element;
+        const childElement = this.node.children[0]?.element;
 
         if (childElement) {
             jQuery(childElement).before(this.$ghost);
