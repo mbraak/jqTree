@@ -106,20 +106,15 @@ export class FolderElement extends NodeElement {
 
         this.node.is_open = true;
 
-        const $button = this.getButton();
-        $button.removeClass("jqtree-closed");
-        $button.html("");
+        const button = this.getButton();
+        button.classList.remove("jqtree-closed");
+        button.innerHTML = "";
 
-        const buttonEl = $button.get(0);
+        const openedIconElement = this.treeWidget.renderer.openedIconElement;
 
-        if (buttonEl) {
-            const openedIconElement =
-                this.treeWidget.renderer.openedIconElement;
-
-            if (openedIconElement) {
-                const icon = openedIconElement.cloneNode(true);
-                buttonEl.appendChild(icon);
-            }
+        if (openedIconElement) {
+            const icon = openedIconElement.cloneNode(true);
+            button.appendChild(icon);
         }
 
         const doOpen = (): void => {
@@ -156,20 +151,15 @@ export class FolderElement extends NodeElement {
 
         this.node.is_open = false;
 
-        const $button = this.getButton();
-        $button.addClass("jqtree-closed");
-        $button.html("");
+        const button = this.getButton();
+        button.classList.add("jqtree-closed");
+        button.innerHTML = "";
 
-        const buttonEl = $button.get(0);
+        const closedIconElement = this.treeWidget.renderer.closedIconElement;
 
-        if (buttonEl) {
-            const closedIconElement =
-                this.treeWidget.renderer.closedIconElement;
-
-            if (closedIconElement) {
-                const icon = closedIconElement.cloneNode(true);
-                buttonEl.appendChild(icon);
-            }
+        if (closedIconElement) {
+            const icon = closedIconElement.cloneNode(true);
+            button.appendChild(icon);
         }
 
         const doClose = (): void => {
@@ -196,10 +186,10 @@ export class FolderElement extends NodeElement {
         return !this.node.is_open && position === Position.Inside;
     }
 
-    private getButton(): JQuery {
-        return this.$element
-            .children(".jqtree-element")
-            .find("a.jqtree-toggler");
+    private getButton(): HTMLLinkElement {
+        return this.node.element.querySelector(
+            ":scope > .jqtree-element > a.jqtree-toggler",
+        ) as HTMLLinkElement;
     }
 }
 
