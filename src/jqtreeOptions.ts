@@ -47,6 +47,6 @@ export interface JQTreeOptions {
     showEmptyFolder: boolean;
     slide: boolean;
     startDndDelay: number;
-    tabIndex: number;
+    tabIndex: number | undefined;
     useContextMenu: boolean;
 }
