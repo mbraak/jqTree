@@ -42,9 +42,9 @@ export class NodeElement {
     }
 
     public select(mustSetFocus: boolean): void {
-        const $li = this.getLi();
+        const li = this.getLi();
 
-        $li.addClass("jqtree-selected");
+        li.classList.add("jqtree-selected");
 
         const titleSpan = this.getTitleSpan();
         const tabIndex = this.treeWidget.options.tabIndex;
@@ -62,9 +62,9 @@ export class NodeElement {
     }
 
     public deselect(): void {
-        const $li = this.getLi();
+        const li = this.getLi();
 
-        $li.removeClass("jqtree-selected");
+        li.classList.remove("jqtree-selected");
 
         const titleSpan = this.getTitleSpan();
         titleSpan.removeAttribute("tabindex");
@@ -83,8 +83,8 @@ export class NodeElement {
         ) as HTMLSpanElement;
     }
 
-    protected getLi(): JQuery<HTMLElement> {
-        return this.$element;
+    protected getLi(): HTMLLIElement {
+        return this.node.element as HTMLLIElement;
     }
 
     protected mustShowBorderDropHint(position: Position): boolean {
@@ -121,8 +121,8 @@ export class FolderElement extends NodeElement {
         }
 
         const doOpen = (): void => {
-            const $li = this.getLi();
-            $li.removeClass("jqtree-closed");
+            const li = this.getLi();
+            li.classList.remove("jqtree-closed");
 
             const titleSpan = this.getTitleSpan();
             titleSpan.setAttribute("aria-expanded", "true");
@@ -171,8 +171,8 @@ export class FolderElement extends NodeElement {
         }
 
         const doClose = (): void => {
-            const $li = this.getLi();
-            $li.addClass("jqtree-closed");
+            const li = this.getLi();
+            li.classList.add("jqtree-closed");
 
             const titleSpan = this.getTitleSpan();
             titleSpan.setAttribute("aria-expanded", "false");
