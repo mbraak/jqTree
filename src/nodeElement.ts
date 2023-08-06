@@ -46,12 +46,18 @@ export class NodeElement {
 
         $li.addClass("jqtree-selected");
 
-        const $span = this.getSpan();
-        $span.attr("tabindex", this.treeWidget.options.tabIndex ?? null);
-        $span.attr("aria-selected", "true");
+        const titleSpan = this.getTitleSpan();
+        const tabIndex = this.treeWidget.options.tabIndex;
+
+        // Check for null or undefined
+        if (tabIndex != null) {
+            titleSpan.setAttribute("tabindex", tabIndex.toString());
+        }
+
+        titleSpan.setAttribute("aria-selected", "true");
 
         if (mustSetFocus) {
-            $span.trigger("focus");
+            titleSpan.focus();
         }
     }
 
@@ -60,21 +66,21 @@ export class NodeElement {
 
         $li.removeClass("jqtree-selected");
 
-        const $span = this.getSpan();
-        $span.removeAttr("tabindex");
-        $span.attr("aria-selected", "false");
+        const titleSpan = this.getTitleSpan();
+        titleSpan.removeAttribute("tabindex");
+        titleSpan.setAttribute("aria-selected", "false");
 
-        $span.trigger("blur");
+        titleSpan.blur();
     }
 
     protected getUl(): JQuery<HTMLElement> {
         return this.$element.children("ul:first");
     }
 
-    protected getSpan(): JQuery<HTMLElement> {
-        return this.$element
-            .children(".jqtree-element")
-            .find("span.jqtree-title");
+    protected getTitleSpan(): HTMLSpanElement {
+        return this.node.element.querySelector(
+            ":scope > .jqtree-element > span.jqtree-title",
+        ) as HTMLSpanElement;
     }
 
     protected getLi(): JQuery<HTMLElement> {
@@ -118,8 +124,8 @@ export class FolderElement extends NodeElement {
             const $li = this.getLi();
             $li.removeClass("jqtree-closed");
 
-            const $titleSpan = this.getSpan();
-            $titleSpan.attr("aria-expanded", "true");
+            const titleSpan = this.getTitleSpan();
+            titleSpan.setAttribute("aria-expanded", "true");
 
             if (onFinished) {
                 onFinished(this.node);
@@ -168,8 +174,8 @@ export class FolderElement extends NodeElement {
             const $li = this.getLi();
             $li.addClass("jqtree-closed");
 
-            const $titleSpan = this.getSpan();
-            $titleSpan.attr("aria-expanded", "false");
+            const titleSpan = this.getTitleSpan();
+            titleSpan.setAttribute("aria-expanded", "false");
 
             this.treeWidget._triggerEvent("tree.close", {
                 node: this.node,
