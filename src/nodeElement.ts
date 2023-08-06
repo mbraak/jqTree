@@ -73,8 +73,10 @@ export class NodeElement {
         titleSpan.blur();
     }
 
-    protected getUl(): JQuery<HTMLElement> {
-        return this.$element.children("ul:first");
+    protected getUl(): HTMLUListElement {
+        return this.node.element.querySelector(
+            ":scope > ul",
+        ) as HTMLUListElement;
     }
 
     protected getTitleSpan(): HTMLSpanElement {
@@ -137,9 +139,9 @@ export class FolderElement extends NodeElement {
         };
 
         if (slide) {
-            this.getUl().slideDown(animationSpeed, doOpen);
+            jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
         } else {
-            this.getUl().show();
+            jQuery(this.getUl()).show();
             doOpen();
         }
     }
@@ -183,9 +185,9 @@ export class FolderElement extends NodeElement {
         };
 
         if (slide) {
-            this.getUl().slideUp(animationSpeed, doClose);
+            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
         } else {
-            this.getUl().hide();
+            jQuery(this.getUl()).hide();
             doClose();
         }
     }
