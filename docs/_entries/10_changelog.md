@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.7.1 (august 6 2023)
 
 -   Issue #724: improve accessibility
 
