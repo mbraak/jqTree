@@ -164,6 +164,27 @@ describe("autoOpen", () => {
     });
 });
 
+describe("closedIcon", () => {
+    it("renders a string", () => {
+        const $tree = $("#tree1");
+        $tree.tree({
+            closedIcon: "closed",
+            data: exampleData,
+        });
+
+        const $button = $tree.find("a.jqtree-toggler:first");
+        expect($button.text()).toEqual("closed");
+    });
+
+    it("renders an html element", () => {
+        const $tree = $("#tree1");
+        $tree.tree({
+            closedIcon: ,
+            data: exampleData,
+        });
+    });
+});
+
 describe("dataUrl", () => {
     const exampleStructure = [
         expect.objectContaining({ name: "node1" }),
@@ -201,7 +222,7 @@ describe("dataUrl", () => {
                 const data = nodeName ? [nodeName] : exampleData;
 
                 return response(ctx.status(200), ctx.json(data));
-            })
+            }),
         );
     });
 
@@ -323,7 +344,7 @@ describe("onGetStateFromStorage and onSetStateFromStorage", () => {
             JSON.stringify({
                 open_nodes: [123],
                 selected_node: [123],
-            })
+            }),
         );
 
         it("restores the state", () => {
@@ -351,8 +372,11 @@ describe("onLoadFailed", () => {
         beforeEach(() => {
             server.use(
                 rest.get("/tree/", (_request, response, ctx) =>
-                    response(ctx.status(500), ctx.body("Internal server error"))
-                )
+                    response(
+                        ctx.status(500),
+                        ctx.body("Internal server error"),
+                    ),
+                ),
             );
         });
 
@@ -366,7 +390,7 @@ describe("onLoadFailed", () => {
 
             await waitFor(() => {
                 expect(onLoadFailed).toHaveBeenCalledWith(
-                    expect.objectContaining({ status: 500 })
+                    expect.objectContaining({ status: 500 }),
                 );
             });
         });
@@ -432,7 +456,7 @@ describe("saveState", () => {
 
             it("saves the state to local storage", () => {
                 expect(localStorage.getItem("tree")).toBe(
-                    '{"open_nodes":[123],"selected_node":[123]}'
+                    '{"open_nodes":[123],"selected_node":[123]}',
                 );
             });
         });
@@ -442,7 +466,7 @@ describe("saveState", () => {
 
             it("uses the string as a key", () => {
                 expect(localStorage.getItem("my-state")).toBe(
-                    '{"open_nodes":[123],"selected_node":[123]}'
+                    '{"open_nodes":[123],"selected_node":[123]}',
                 );
             });
         });
@@ -462,7 +486,7 @@ describe("saveState", () => {
         beforeEach(() => {
             localStorage.setItem(
                 "tree",
-                '{"open_nodes":[123],"selected_node":[123]}'
+                '{"open_nodes":[123],"selected_node":[123]}',
             );
 
             given.$tree.tree({

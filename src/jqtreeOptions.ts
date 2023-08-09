@@ -21,7 +21,7 @@ export interface JQTreeOptions {
     autoEscape: boolean;
     autoOpen: boolean | number;
     buttonLeft: boolean;
-    closedIcon: string | Element | undefined;
+    closedIcon?: string | Element | JQuery<HTMLElement>;
     data: NodeData[] | undefined;
     dataFilter: DataFilter | undefined;
     dataUrl: DataUrl | undefined;
@@ -39,7 +39,7 @@ export interface JQTreeOptions {
     onLoadFailed: ((response: JQuery.jqXHR) => void) | undefined;
     onLoading: HandleLoadingMethod | undefined;
     onSetStateFromStorage: ((data: string) => void) | undefined;
-    openedIcon: string | Element;
+    openedIcon?: string | Element | JQuery<HTMLElement>;
     openFolderDelay: number | false;
     rtl: boolean | undefined;
     selectable: boolean;
