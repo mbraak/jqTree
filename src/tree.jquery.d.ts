@@ -44,7 +44,7 @@ interface IJQTreeOptions {
     autoEscape?: boolean;
     autoOpen?: boolean | number | string;
     buttonLeft?: boolean;
-    closedIcon?: string | Element;
+    closedIcon?: string | HTMLElement | JQuery<HTMLElement>;
     data?: NodeData[];
     dataFilter?: (data: NodeData[]) => NodeData[];
     dataUrl?: DataUrl;
@@ -61,7 +61,7 @@ interface IJQTreeOptions {
     onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;
-    openedIcon?: string | Element;
+    openedIcon?: string | HTMLElement | JQuery<HTMLElement>;
     openFolderDelay?: number | false;
     rtl?: boolean;
     selectable?: boolean;
@@ -79,17 +79,17 @@ interface IJQTreePlugin {
     (
         behavior: "addNodeAfter",
         newNodeInfo: NodeData,
-        existingNode: INode
+        existingNode: INode,
     ): INode | null;
     (
         behavior: "addNodeBefore",
         newNodeInfo: NodeData,
-        existingNode: INode
+        existingNode: INode,
     ): INode | null;
     (
         behavior: "addParentNode",
         newNodeInfo: NodeData,
-        existingNode: INode
+        existingNode: INode,
     ): INode | null;
     (behavior: "addToSelection", node: INode, mustSetFocus?: boolean): JQuery;
     (behavior: "appendNode", newNodeInfo: NodeData, parentNode?: INode): INode;
@@ -97,7 +97,7 @@ interface IJQTreePlugin {
     (behavior: "destroy"): void;
     (
         behavior: "getNodeByCallback",
-        callback: (node: INode) => boolean
+        callback: (node: INode) => boolean,
     ): INode | null;
     (behavior: "getNodeByHtmlElement", element: Element | JQuery): INode | null;
     (behavior: "getNodeById", id: NodeId): INode | null;
@@ -116,14 +116,14 @@ interface IJQTreePlugin {
         behavior: "loadDataFromUrl",
         param1?: string | null | INode,
         param2?: INode | null | (() => void),
-        param3?: () => void
+        param3?: () => void,
     ): JQuery;
     (behavior: "moveDown"): JQuery;
     (
         behavior: "moveNode",
         node: INode,
         targetNode: INode,
-        position: string
+        position: string,
     ): JQuery;
     (behavior: "moveUp"): JQuery;
     (behavior: "openNode", node: INode): JQuery;
@@ -131,13 +131,13 @@ interface IJQTreePlugin {
     (
         behavior: "openNode",
         node: INode,
-        onFinished: (node: INode) => void
+        onFinished: (node: INode) => void,
     ): JQuery;
     (
         behavior: "openNode",
         node: INode,
         slide: boolean,
-        onFinished?: (node: INode) => void
+        onFinished?: (node: INode) => void,
     ): JQuery;
     (behavior: "prependNode", newNodeInfo: NodeData, parentNode?: INode): INode;
     (behavior: "refresh"): JQuery;

@@ -2,21 +2,21 @@ import { getBoolString } from "./util";
 import { Node } from "./node";
 import { JqTreeWidget } from "./tree.jquery";
 
-type IconElement = Text | Element;
+type IconElement = string | HTMLElement | JQuery<HTMLElement>;
 
 export default class ElementsRenderer {
-    public openedIconElement?: IconElement;
-    public closedIconElement?: IconElement;
+    public openedIconElement?: HTMLElement | Text;
+    public closedIconElement?: HTMLElement | Text;
     private treeWidget: JqTreeWidget;
 
     constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
 
         this.openedIconElement = this.createButtonElement(
-            treeWidget.options.openedIcon || "+"
+            treeWidget.options.openedIcon || "+",
         );
         this.closedIconElement = this.createButtonElement(
-            treeWidget.options.closedIcon || "-"
+            treeWidget.options.closedIcon || "-",
         );
     }
 
@@ -37,7 +37,7 @@ export default class ElementsRenderer {
                 $element[0],
                 this.treeWidget.tree.children,
                 true,
-                1
+                1,
             );
         }
     }
@@ -62,7 +62,7 @@ export default class ElementsRenderer {
                 li,
                 node.children,
                 false,
-                node.getLevel() + 1
+                node.getLevel() + 1,
             );
         }
     }
@@ -71,7 +71,7 @@ export default class ElementsRenderer {
         element: Element,
         children: Node[],
         isRootNode: boolean,
-        level: number
+        level: number,
     ): void {
         const ul = this.createUl(isRootNode);
         element.appendChild(ul);
@@ -123,7 +123,7 @@ export default class ElementsRenderer {
 
     private createLi(node: Node, level: number): HTMLLIElement {
         const isSelected = Boolean(
-            this.treeWidget.selectNodeHandler.isNodeSelected(node)
+            this.treeWidget.selectNodeHandler.isNodeSelected(node),
         );
 
         const mustShowFolder =
@@ -145,7 +145,7 @@ export default class ElementsRenderer {
         element: HTMLElement,
         name: string,
         level: number,
-        isSelected: boolean
+        isSelected: boolean,
     ) {
         element.setAttribute("aria-label", name);
         element.setAttribute("aria-level", `${level}`);
@@ -156,7 +156,7 @@ export default class ElementsRenderer {
     private createFolderLi(
         node: Node,
         level: number,
-        isSelected: boolean
+        isSelected: boolean,
     ): HTMLLIElement {
         const buttonClasses = this.getButtonClasses(node);
         const folderClasses = this.getFolderClasses(node, isSelected);
@@ -194,7 +194,7 @@ export default class ElementsRenderer {
             node.name,
             isSelected,
             true,
-            level
+            level,
         );
         titleSpan.setAttribute("aria-expanded", getBoolString(node.is_open));
         div.appendChild(titleSpan);
@@ -209,7 +209,7 @@ export default class ElementsRenderer {
     private createNodeLi(
         node: Node,
         level: number,
-        isSelected: boolean
+        isSelected: boolean,
     ): HTMLLIElement {
         const liClasses = ["jqtree_common"];
 
@@ -236,7 +236,7 @@ export default class ElementsRenderer {
             node.name,
             isSelected,
             false,
-            level
+            level,
         );
         div.appendChild(titleSpan);
 
@@ -247,7 +247,7 @@ export default class ElementsRenderer {
         nodeName: string,
         isSelected: boolean,
         isFolder: boolean,
-        level: number
+        level: number,
     ): HTMLSpanElement {
         const titleSpan = document.createElement("span");
 
@@ -317,8 +317,8 @@ export default class ElementsRenderer {
     }
 
     private createButtonElement(
-        value: string | Element
-    ): IconElement | undefined {
+        value: IconElement,
+    ): HTMLElement | Text | undefined {
         if (typeof value === "string") {
             // convert value to html
             const div = document.createElement("div");
