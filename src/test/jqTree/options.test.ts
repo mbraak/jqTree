@@ -197,6 +197,21 @@ describe("closedIcon", () => {
         const $span = $tree.find("a.jqtree-toggler:first span.abc");
         expect($span.text()).toBe("test");
     });
+
+    it("renders a html element", () => {
+        const closedIcon = document.createElement("span");
+        closedIcon.className = "abc";
+        closedIcon.textContent = "test";
+
+        const $tree = $("#tree1");
+        $tree.tree({
+            closedIcon,
+            data: exampleData,
+        });
+
+        const $span = $tree.find("a.jqtree-toggler:first span.abc");
+        expect($span.text()).toBe("test");
+    });
 });
 
 describe("dataUrl", () => {
