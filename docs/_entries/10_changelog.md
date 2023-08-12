@@ -5,7 +5,7 @@ name: changelog
 
 #### Development
 
--   Improve types of closedIcon and openedIcon.
+-   Issue #732: improve types of closedIcon and openedIcon
 
 #### 1.7.1 (august 6 2023)
 
