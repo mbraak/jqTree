@@ -1045,7 +1045,7 @@ var jqtree = (function (exports) {
         this.dragElement = new DragElement(node.name, positionInfo.pageX - left, positionInfo.pageY - top, this.treeWidget.element, (_this$treeWidget$opti = this.treeWidget.options.autoEscape) !== null && _this$treeWidget$opti !== void 0 ? _this$treeWidget$opti : true);
         this.isDragging = true;
         this.positionInfo = positionInfo;
-        this.currentItem.$element.addClass("jqtree-moving");
+        this.currentItem.element.classList.add("jqtree-moving");
         return true;
       }
     }, {
@@ -1094,7 +1094,7 @@ var jqtree = (function (exports) {
         this.removeHitAreas();
         var currentItem = this.currentItem;
         if (this.currentItem) {
-          this.currentItem.$element.removeClass("jqtree-moving");
+          this.currentItem.element.classList.remove("jqtree-moving");
           this.currentItem = null;
         }
         this.isDragging = false;
@@ -1114,7 +1114,7 @@ var jqtree = (function (exports) {
           this.generateHitAreas();
           this.currentItem = this.treeWidget._getNodeElementForNode(this.currentItem.node);
           if (this.isDragging) {
-            this.currentItem.$element.addClass("jqtree-moving");
+            this.currentItem.element.classList.add("jqtree-moving");
           }
         }
       }
@@ -1806,6 +1806,10 @@ var jqtree = (function (exports) {
           var div = document.createElement("div");
           div.innerHTML = value;
           return document.createTextNode(div.innerHTML);
+        } else if (value == null) {
+          return undefined;
+        } else if (value.nodeType) {
+          return value;
         } else {
           return jQuery(value)[0];
         }
@@ -3012,7 +3016,7 @@ var jqtree = (function (exports) {
     function NodeElement(node, treeWidget) {
       _classCallCheck(this, NodeElement);
       _defineProperty(this, "node", void 0);
-      _defineProperty(this, "$element", void 0);
+      _defineProperty(this, "element", void 0);
       _defineProperty(this, "treeWidget", void 0);
       this.init(node, treeWidget);
     }
@@ -3028,55 +3032,52 @@ var jqtree = (function (exports) {
           }
         }
         if (node.element) {
-          this.$element = jQuery(node.element);
+          this.element = node.element;
         }
       }
     }, {
       key: "addDropHint",
       value: function addDropHint(position) {
         if (this.mustShowBorderDropHint(position)) {
-          return new BorderDropHint(this.$element, this.treeWidget._getScrollLeft());
+          return new BorderDropHint(jQuery(this.element), this.treeWidget._getScrollLeft());
         } else {
-          return new GhostDropHint(this.node, this.$element, position);
+          return new GhostDropHint(this.node, jQuery(this.element), position);
         }
       }
     }, {
       key: "select",
       value: function select(mustSetFocus) {
-        var _this$treeWidget$opti;
-        var $li = this.getLi();
-        $li.addClass("jqtree-selected");
-        var $span = this.getSpan();
-        $span.attr("tabindex", (_this$treeWidget$opti = this.treeWidget.options.tabIndex) !== null && _this$treeWidget$opti !== void 0 ? _this$treeWidget$opti : null);
-        $span.attr("aria-selected", "true");
+        this.element.classList.add("jqtree-selected");
+        var titleSpan = this.getTitleSpan();
+        var tabIndex = this.treeWidget.options.tabIndex;
+
+        // Check for null or undefined
+        if (tabIndex != null) {
+          titleSpan.setAttribute("tabindex", tabIndex.toString());
+        }
+        titleSpan.setAttribute("aria-selected", "true");
         if (mustSetFocus) {
-          $span.trigger("focus");
+          titleSpan.focus();
         }
       }
     }, {
       key: "deselect",
       value: function deselect() {
-        var $li = this.getLi();
-        $li.removeClass("jqtree-selected");
-        var $span = this.getSpan();
-        $span.removeAttr("tabindex");
-        $span.attr("aria-selected", "false");
-        $span.trigger("blur");
+        this.element.classList.remove("jqtree-selected");
+        var titleSpan = this.getTitleSpan();
+        titleSpan.removeAttribute("tabindex");
+        titleSpan.setAttribute("aria-selected", "false");
+        titleSpan.blur();
       }
     }, {
       key: "getUl",
       value: function getUl() {
-        return this.$element.children("ul:first");
+        return this.element.querySelector(":scope > ul");
       }
     }, {
-      key: "getSpan",
-      value: function getSpan() {
-        return this.$element.children(".jqtree-element").find("span.jqtree-title");
-      }
-    }, {
-      key: "getLi",
-      value: function getLi() {
-        return this.$element;
+      key: "getTitleSpan",
+      value: function getTitleSpan() {
+        return this.element.querySelector(":scope > .jqtree-element > span.jqtree-title");
       }
     }, {
       key: "mustShowBorderDropHint",
@@ -3103,22 +3104,18 @@ var jqtree = (function (exports) {
           return;
         }
         this.node.is_open = true;
-        var $button = this.getButton();
-        $button.removeClass("jqtree-closed");
-        $button.html("");
-        var buttonEl = $button.get(0);
-        if (buttonEl) {
-          var openedIconElement = this.treeWidget.renderer.openedIconElement;
-          if (openedIconElement) {
-            var icon = openedIconElement.cloneNode(true);
-            buttonEl.appendChild(icon);
-          }
+        var button = this.getButton();
+        button.classList.remove("jqtree-closed");
+        button.innerHTML = "";
+        var openedIconElement = this.treeWidget.renderer.openedIconElement;
+        if (openedIconElement) {
+          var icon = openedIconElement.cloneNode(true);
+          button.appendChild(icon);
         }
         var doOpen = function doOpen() {
-          var $li = _this.getLi();
-          $li.removeClass("jqtree-closed");
-          var $titleSpan = _this.getSpan();
-          $titleSpan.attr("aria-expanded", "true");
+          _this.element.classList.remove("jqtree-closed");
+          var titleSpan = _this.getTitleSpan();
+          titleSpan.setAttribute("aria-expanded", "true");
           if (onFinished) {
             onFinished(_this.node);
           }
@@ -3127,9 +3124,9 @@ var jqtree = (function (exports) {
           });
         };
         if (slide) {
-          this.getUl().slideDown(animationSpeed, doOpen);
+          jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
         } else {
-          this.getUl().show();
+          jQuery(this.getUl()).show();
           doOpen();
         }
       }
@@ -3143,30 +3140,26 @@ var jqtree = (function (exports) {
           return;
         }
         this.node.is_open = false;
-        var $button = this.getButton();
-        $button.addClass("jqtree-closed");
-        $button.html("");
-        var buttonEl = $button.get(0);
-        if (buttonEl) {
-          var closedIconElement = this.treeWidget.renderer.closedIconElement;
-          if (closedIconElement) {
-            var icon = closedIconElement.cloneNode(true);
-            buttonEl.appendChild(icon);
-          }
+        var button = this.getButton();
+        button.classList.add("jqtree-closed");
+        button.innerHTML = "";
+        var closedIconElement = this.treeWidget.renderer.closedIconElement;
+        if (closedIconElement) {
+          var icon = closedIconElement.cloneNode(true);
+          button.appendChild(icon);
         }
         var doClose = function doClose() {
-          var $li = _this2.getLi();
-          $li.addClass("jqtree-closed");
-          var $titleSpan = _this2.getSpan();
-          $titleSpan.attr("aria-expanded", "false");
+          _this2.element.classList.add("jqtree-closed");
+          var titleSpan = _this2.getTitleSpan();
+          titleSpan.setAttribute("aria-expanded", "false");
           _this2.treeWidget._triggerEvent("tree.close", {
             node: _this2.node
           });
         };
         if (slide) {
-          this.getUl().slideUp(animationSpeed, doClose);
+          jQuery(this.getUl()).slideUp(animationSpeed, doClose);
         } else {
-          this.getUl().hide();
+          jQuery(this.getUl()).hide();
           doClose();
         }
       }
@@ -3178,7 +3171,7 @@ var jqtree = (function (exports) {
     }, {
       key: "getButton",
       value: function getButton() {
-        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
+        return this.element.querySelector(":scope > .jqtree-element > a.jqtree-toggler");
       }
     }]);
     return FolderElement;
