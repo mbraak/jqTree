@@ -173,15 +173,44 @@ describe("closedIcon", () => {
         });
 
         const $button = $tree.find("a.jqtree-toggler:first");
-        expect($button.text()).toEqual("closed");
+        expect($button.text()).toBe("closed");
     });
 
-    it("renders an html element", () => {
+    it("escapes html", () => {
         const $tree = $("#tree1");
         $tree.tree({
-            closedIcon: ,
+            closedIcon: "<span>test</span>",
             data: exampleData,
         });
+
+        const $button = $tree.find("a.jqtree-toggler:first");
+        expect($button.text()).toBe("<span>test</span>");
+    });
+
+    it("renders a jquery element", () => {
+        const $tree = $("#tree1");
+        $tree.tree({
+            closedIcon: $("<span class='abc'>test</span>"),
+            data: exampleData,
+        });
+
+        const $span = $tree.find("a.jqtree-toggler:first span.abc");
+        expect($span.text()).toBe("test");
+    });
+
+    it("renders a html element", () => {
+        const closedIcon = document.createElement("span");
+        closedIcon.className = "abc";
+        closedIcon.textContent = "test";
+
+        const $tree = $("#tree1");
+        $tree.tree({
+            closedIcon,
+            data: exampleData,
+        });
+
+        const $span = $tree.find("a.jqtree-toggler:first span.abc");
+        expect($span.text()).toBe("test");
     });
 });
 

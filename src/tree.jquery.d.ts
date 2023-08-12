@@ -61,7 +61,7 @@ interface IJQTreeOptions {
     onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;
-    openedIcon?: string | Element | JQuery<HTMLElement>;
+    openedIcon?: string | HTMLElement | JQuery<HTMLElement>;
     openFolderDelay?: number | false;
     rtl?: boolean;
     selectable?: boolean;

@@ -2,11 +2,11 @@ import { getBoolString } from "./util";
 import { Node } from "./node";
 import { JqTreeWidget } from "./tree.jquery";
 
-type IconElement = Text | HTMLElement;
+type IconElement = string | HTMLElement | JQuery<HTMLElement>;
 
 export default class ElementsRenderer {
-    public openedIconElement?: IconElement;
-    public closedIconElement?: IconElement;
+    public openedIconElement?: HTMLElement | Text;
+    public closedIconElement?: HTMLElement | Text;
     private treeWidget: JqTreeWidget;
 
     constructor(treeWidget: JqTreeWidget) {
@@ -317,8 +317,8 @@ export default class ElementsRenderer {
     }
 
     private createButtonElement(
-        value: string | HTMLElement | JQuery<HTMLElement> | undefined,
-    ): IconElement | undefined {
+        value: IconElement,
+    ): HTMLElement | Text | undefined {
         if (typeof value === "string") {
             // convert value to html
             const div = document.createElement("div");
@@ -330,8 +330,7 @@ export default class ElementsRenderer {
         } else if ((value as HTMLElement).nodeType) {
             return value as HTMLElement;
         } else {
-            // todo: jquery element
-            return undefined;
+            return jQuery(value)[0];
         }
     }
 }
