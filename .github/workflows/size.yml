@@ -21,3 +21,4 @@ jobs:
               with:
                   build-script: "production"
                   pattern: "./lib/**/*.js"
+                  exclude: "{./lib/**/*.d.js,./lib/playwright/**,./lib/test/**}"
