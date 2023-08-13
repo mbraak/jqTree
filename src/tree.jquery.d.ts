@@ -49,7 +49,7 @@ interface IJQTreeOptions {
     autoEscape?: boolean;
     autoOpen?: boolean | number | string;
     buttonLeft?: boolean;
-    closedIcon?: string | Element;
+    closedIcon?: string | HTMLElement | JQuery<HTMLElement>;
     data?: NodeData[];
     dataFilter?: (data: NodeData[]) => NodeData[];
     dataUrl?: DataUrl;
@@ -66,7 +66,7 @@ interface IJQTreeOptions {
     onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;
-    openedIcon?: string | Element;
+    openedIcon?: string | HTMLElement | JQuery<HTMLElement>;
     openFolderDelay?: number | false;
     rtl?: boolean;
     selectable?: boolean;

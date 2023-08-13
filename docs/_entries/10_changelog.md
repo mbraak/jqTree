@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development
+
+-   Issue #732: improve types of closedIcon and openedIcon
+
 #### 1.7.1 (august 6 2023)
 
 -   Issue #724: improve accessibility
