@@ -53,12 +53,12 @@ context("when a node has load_on_demand in the data", () => {
                 if (parentId === "1") {
                     return response(
                         ctx.status(200),
-                        ctx.json([{ id: 2, name: "loaded-on-demand" }])
+                        ctx.json([{ id: 2, name: "loaded-on-demand" }]),
                     );
                 } else {
                     return response(ctx.status(400));
                 }
-            })
+            }),
         );
     });
 
@@ -87,7 +87,7 @@ context("when a node has load_on_demand in the data", () => {
 
     context("when the node is opened", () => {
         given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "parent-node")
+            given.$tree.tree("getNodeByNameMustExist", "parent-node"),
         );
 
         it("loads the subtree", async () => {
@@ -136,8 +136,9 @@ context("when a node has load_on_demand in the data", () => {
 
         context("when the node is selected and doesn't have the focus", () => {
             beforeEach(() => {
-                given.$tree.tree("selectNode", given.node);
-                (document.activeElement as HTMLElement).blur();
+                given.$tree.tree("selectNode", given.node, {
+                    mustSetFocus: false,
+                });
             });
 
             it("keeps the node selected and not focused", async () => {
