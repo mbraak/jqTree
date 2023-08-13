@@ -1,25 +1,27 @@
 import { DropHint } from "..//types";
 
 class BorderDropHint implements DropHint {
-    private $hint: JQuery<Element>;
+    private $hint?: JQuery<Element>;
 
-    constructor($element: JQuery<Element>, scrollLeft: number) {
-        const $div = $element.children(".jqtree-element");
+    constructor(element: HTMLElement, scrollLeft: number) {
+        const div = element.querySelector(":scope > .jqtree-element");
 
-        const elWidth = $element.width() || 0;
-        const width = Math.max(elWidth + scrollLeft - 4, 0);
+        if (!div) {
+            this.$hint = undefined;
+            return;
+        }
 
-        const elHeight = $div.outerHeight() || 0;
-        const height = Math.max(elHeight - 4, 0);
+        const width = Math.max(element.offsetWidth + scrollLeft - 4, 0);
+        const height = Math.max(element.clientHeight - 4, 0);
 
         this.$hint = jQuery('<span class="jqtree-border"></span>');
-        $div.append(this.$hint);
+        jQuery(div).append(this.$hint);
 
         this.$hint.css({ width, height });
     }
 
     public remove(): void {
-        this.$hint.remove();
+        this.$hint?.remove();
     }
 }
 

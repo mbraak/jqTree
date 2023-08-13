@@ -33,7 +33,7 @@ class NodeElement {
     public addDropHint(position: number): DropHint {
         if (this.mustShowBorderDropHint(position)) {
             return new BorderDropHint(
-                jQuery(this.element),
+                this.element,
                 this.treeWidget._getScrollLeft(),
             );
         } else {
