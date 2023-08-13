@@ -3012,6 +3012,89 @@ var jqtree = (function (exports) {
     return SelectNodeHandler;
   }();
 
+  var BorderDropHint = /*#__PURE__*/function () {
+    function BorderDropHint(element, scrollLeft) {
+      _classCallCheck(this, BorderDropHint);
+      _defineProperty(this, "hint", void 0);
+      var div = element.querySelector(":scope > .jqtree-element");
+      if (!div) {
+        this.hint = undefined;
+        return;
+      }
+      var width = Math.max(element.offsetWidth + scrollLeft - 4, 0);
+      var height = Math.max(element.clientHeight - 4, 0);
+      var hint = document.createElement("span");
+      hint.className = "jqtree-border";
+      hint.style.width = "".concat(width, "px");
+      hint.style.height = "".concat(height, "px");
+      this.hint = hint;
+      div.append(this.hint);
+    }
+    _createClass(BorderDropHint, [{
+      key: "remove",
+      value: function remove() {
+        var _this$hint;
+        (_this$hint = this.hint) === null || _this$hint === void 0 ? void 0 : _this$hint.remove();
+      }
+    }]);
+    return BorderDropHint;
+  }();
+
+  var GhostDropHint = /*#__PURE__*/function () {
+    function GhostDropHint(node, $element, position) {
+      _classCallCheck(this, GhostDropHint);
+      _defineProperty(this, "$element", void 0);
+      _defineProperty(this, "node", void 0);
+      _defineProperty(this, "$ghost", void 0);
+      this.$element = $element;
+      this.node = node;
+      this.$ghost = jQuery("<li class=\"jqtree_common jqtree-ghost\"><span class=\"jqtree_common jqtree-circle\"></span>\n          <span class=\"jqtree_common jqtree-line\"></span></li>");
+      if (position === Position.After) {
+        this.moveAfter();
+      } else if (position === Position.Before) {
+        this.moveBefore();
+      } else if (position === Position.Inside) {
+        if (node.isFolder() && node.is_open) {
+          this.moveInsideOpenFolder();
+        } else {
+          this.moveInside();
+        }
+      }
+    }
+    _createClass(GhostDropHint, [{
+      key: "remove",
+      value: function remove() {
+        this.$ghost.remove();
+      }
+    }, {
+      key: "moveAfter",
+      value: function moveAfter() {
+        this.$element.after(this.$ghost);
+      }
+    }, {
+      key: "moveBefore",
+      value: function moveBefore() {
+        this.$element.before(this.$ghost);
+      }
+    }, {
+      key: "moveInsideOpenFolder",
+      value: function moveInsideOpenFolder() {
+        var _this$node$children$;
+        var childElement = (_this$node$children$ = this.node.children[0]) === null || _this$node$children$ === void 0 ? void 0 : _this$node$children$.element;
+        if (childElement) {
+          jQuery(childElement).before(this.$ghost);
+        }
+      }
+    }, {
+      key: "moveInside",
+      value: function moveInside() {
+        this.$element.after(this.$ghost);
+        this.$ghost.addClass("jqtree-inside");
+      }
+    }]);
+    return GhostDropHint;
+  }();
+
   var NodeElement = /*#__PURE__*/function () {
     function NodeElement(node, treeWidget) {
       _classCallCheck(this, NodeElement);
@@ -3039,7 +3122,7 @@ var jqtree = (function (exports) {
       key: "addDropHint",
       value: function addDropHint(position) {
         if (this.mustShowBorderDropHint(position)) {
-          return new BorderDropHint(jQuery(this.element), this.treeWidget._getScrollLeft());
+          return new BorderDropHint(this.element, this.treeWidget._getScrollLeft());
         } else {
           return new GhostDropHint(this.node, jQuery(this.element), position);
         }
@@ -3087,6 +3170,7 @@ var jqtree = (function (exports) {
     }]);
     return NodeElement;
   }();
+
   var FolderElement = /*#__PURE__*/function (_NodeElement) {
     _inherits(FolderElement, _NodeElement);
     var _super = _createSuper(FolderElement);
@@ -3176,84 +3260,6 @@ var jqtree = (function (exports) {
     }]);
     return FolderElement;
   }(NodeElement);
-  var BorderDropHint = /*#__PURE__*/function () {
-    function BorderDropHint($element, scrollLeft) {
-      _classCallCheck(this, BorderDropHint);
-      _defineProperty(this, "$hint", void 0);
-      var $div = $element.children(".jqtree-element");
-      var elWidth = $element.width() || 0;
-      var width = Math.max(elWidth + scrollLeft - 4, 0);
-      var elHeight = $div.outerHeight() || 0;
-      var height = Math.max(elHeight - 4, 0);
-      this.$hint = jQuery('<span class="jqtree-border"></span>');
-      $div.append(this.$hint);
-      this.$hint.css({
-        width: width,
-        height: height
-      });
-    }
-    _createClass(BorderDropHint, [{
-      key: "remove",
-      value: function remove() {
-        this.$hint.remove();
-      }
-    }]);
-    return BorderDropHint;
-  }();
-  var GhostDropHint = /*#__PURE__*/function () {
-    function GhostDropHint(node, $element, position) {
-      _classCallCheck(this, GhostDropHint);
-      _defineProperty(this, "$element", void 0);
-      _defineProperty(this, "node", void 0);
-      _defineProperty(this, "$ghost", void 0);
-      this.$element = $element;
-      this.node = node;
-      this.$ghost = jQuery("<li class=\"jqtree_common jqtree-ghost\"><span class=\"jqtree_common jqtree-circle\"></span>\n            <span class=\"jqtree_common jqtree-line\"></span></li>");
-      if (position === Position.After) {
-        this.moveAfter();
-      } else if (position === Position.Before) {
-        this.moveBefore();
-      } else if (position === Position.Inside) {
-        if (node.isFolder() && node.is_open) {
-          this.moveInsideOpenFolder();
-        } else {
-          this.moveInside();
-        }
-      }
-    }
-    _createClass(GhostDropHint, [{
-      key: "remove",
-      value: function remove() {
-        this.$ghost.remove();
-      }
-    }, {
-      key: "moveAfter",
-      value: function moveAfter() {
-        this.$element.after(this.$ghost);
-      }
-    }, {
-      key: "moveBefore",
-      value: function moveBefore() {
-        this.$element.before(this.$ghost);
-      }
-    }, {
-      key: "moveInsideOpenFolder",
-      value: function moveInsideOpenFolder() {
-        var _this$node$children$;
-        var childElement = (_this$node$children$ = this.node.children[0]) === null || _this$node$children$ === void 0 ? void 0 : _this$node$children$.element;
-        if (childElement) {
-          jQuery(childElement).before(this.$ghost);
-        }
-      }
-    }, {
-      key: "moveInside",
-      value: function moveInside() {
-        this.$element.after(this.$ghost);
-        this.$ghost.addClass("jqtree-inside");
-      }
-    }]);
-    return GhostDropHint;
-  }();
 
   var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
   var PARAM_IS_EMPTY = "Parameter is empty: ";
