@@ -992,6 +992,261 @@ var jqtree = (function (exports) {
     return Node;
   }();
 
+  var DragElement = /*#__PURE__*/function () {
+    function DragElement(nodeName, offsetX, offsetY, $tree, autoEscape) {
+      _classCallCheck(this, DragElement);
+      _defineProperty(this, "offsetX", void 0);
+      _defineProperty(this, "offsetY", void 0);
+      _defineProperty(this, "$element", void 0);
+      this.offsetX = offsetX;
+      this.offsetY = offsetY;
+      this.$element = jQuery("<span>").addClass("jqtree-title jqtree-dragging");
+      if (autoEscape) {
+        this.$element.text(nodeName);
+      } else {
+        this.$element.html(nodeName);
+      }
+      this.$element.css("position", "absolute");
+      $tree.append(this.$element);
+    }
+    _createClass(DragElement, [{
+      key: "move",
+      value: function move(pageX, pageY) {
+        this.$element.offset({
+          left: pageX - this.offsetX,
+          top: pageY - this.offsetY
+        });
+      }
+    }, {
+      key: "remove",
+      value: function remove() {
+        this.$element.remove();
+      }
+    }]);
+    return DragElement;
+  }();
+
+  var VisibleNodeIterator = /*#__PURE__*/function () {
+    function VisibleNodeIterator(tree) {
+      _classCallCheck(this, VisibleNodeIterator);
+      _defineProperty(this, "tree", void 0);
+      this.tree = tree;
+    }
+    _createClass(VisibleNodeIterator, [{
+      key: "iterate",
+      value: function iterate() {
+        var _this = this;
+        var isFirstNode = true;
+        var _iterateNode = function _iterateNode(node, nextNode) {
+          var mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
+          var $element = null;
+          if (node.element) {
+            $element = jQuery(node.element);
+            if (!$element.is(":visible")) {
+              return;
+            }
+            if (isFirstNode) {
+              _this.handleFirstNode(node);
+              isFirstNode = false;
+            }
+            if (!node.hasChildren()) {
+              _this.handleNode(node, nextNode, $element);
+            } else if (node.is_open) {
+              if (!_this.handleOpenFolder(node, $element)) {
+                mustIterateInside = false;
+              }
+            } else {
+              _this.handleClosedFolder(node, nextNode, $element);
+            }
+          }
+          if (mustIterateInside) {
+            var childrenLength = node.children.length;
+            node.children.forEach(function (_, i) {
+              var child = node.children[i];
+              if (child) {
+                if (i === childrenLength - 1) {
+                  _iterateNode(child, null);
+                } else {
+                  var nextChild = node.children[i + 1];
+                  if (nextChild) {
+                    _iterateNode(child, nextChild);
+                  }
+                }
+              }
+            });
+            if (node.is_open && $element) {
+              _this.handleAfterOpenFolder(node, nextNode);
+            }
+          }
+        };
+        _iterateNode(this.tree, null);
+      }
+    }]);
+    return VisibleNodeIterator;
+  }();
+
+  var HitAreasGenerator = /*#__PURE__*/function (_VisibleNodeIterator) {
+    _inherits(HitAreasGenerator, _VisibleNodeIterator);
+    var _super = _createSuper(HitAreasGenerator);
+    function HitAreasGenerator(tree, currentNode, treeBottom) {
+      var _this;
+      _classCallCheck(this, HitAreasGenerator);
+      _this = _super.call(this, tree);
+      _defineProperty(_assertThisInitialized(_this), "currentNode", void 0);
+      _defineProperty(_assertThisInitialized(_this), "treeBottom", void 0);
+      _defineProperty(_assertThisInitialized(_this), "positions", void 0);
+      _defineProperty(_assertThisInitialized(_this), "lastTop", void 0);
+      _this.currentNode = currentNode;
+      _this.treeBottom = treeBottom;
+      return _this;
+    }
+    _createClass(HitAreasGenerator, [{
+      key: "generate",
+      value: function generate() {
+        this.positions = [];
+        this.lastTop = 0;
+        this.iterate();
+        return this.generateHitAreas(this.positions);
+      }
+    }, {
+      key: "generateHitAreas",
+      value: function generateHitAreas(positions) {
+        var previousTop = -1;
+        var group = [];
+        var hitAreas = [];
+        var _iterator = _createForOfIteratorHelper(positions),
+          _step;
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var position = _step.value;
+            if (position.top !== previousTop && group.length) {
+              if (group.length) {
+                this.generateHitAreasForGroup(hitAreas, group, previousTop, position.top);
+              }
+              previousTop = position.top;
+              group = [];
+            }
+            group.push(position);
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+        this.generateHitAreasForGroup(hitAreas, group, previousTop, this.treeBottom);
+        return hitAreas;
+      }
+    }, {
+      key: "handleOpenFolder",
+      value: function handleOpenFolder(node, $element) {
+        if (node === this.currentNode) {
+          // Cannot move inside current item
+          // Stop iterating
+          return false;
+        }
+
+        // Cannot move before current item
+        if (node.children[0] !== this.currentNode) {
+          this.addPosition(node, Position.Inside, this.getTop($element));
+        }
+
+        // Continue iterating
+        return true;
+      }
+    }, {
+      key: "handleClosedFolder",
+      value: function handleClosedFolder(node, nextNode, $element) {
+        var top = this.getTop($element);
+        if (node === this.currentNode) {
+          // Cannot move after current item
+          this.addPosition(node, Position.None, top);
+        } else {
+          this.addPosition(node, Position.Inside, top);
+
+          // Cannot move before current item
+          if (nextNode !== this.currentNode) {
+            this.addPosition(node, Position.After, top);
+          }
+        }
+      }
+    }, {
+      key: "handleFirstNode",
+      value: function handleFirstNode(node) {
+        if (node !== this.currentNode) {
+          this.addPosition(node, Position.Before, this.getTop(jQuery(node.element)));
+        }
+      }
+    }, {
+      key: "handleAfterOpenFolder",
+      value: function handleAfterOpenFolder(node, nextNode) {
+        if (node === this.currentNode || nextNode === this.currentNode) {
+          // Cannot move before or after current item
+          this.addPosition(node, Position.None, this.lastTop);
+        } else {
+          this.addPosition(node, Position.After, this.lastTop);
+        }
+      }
+    }, {
+      key: "handleNode",
+      value: function handleNode(node, nextNode, $element) {
+        var top = this.getTop($element);
+        if (node === this.currentNode) {
+          // Cannot move inside current item
+          this.addPosition(node, Position.None, top);
+        } else {
+          this.addPosition(node, Position.Inside, top);
+        }
+        if (nextNode === this.currentNode || node === this.currentNode) {
+          // Cannot move before or after current item
+          this.addPosition(node, Position.None, top);
+        } else {
+          this.addPosition(node, Position.After, top);
+        }
+      }
+    }, {
+      key: "getTop",
+      value: function getTop($element) {
+        var offset = $element.offset();
+        return offset ? offset.top : 0;
+      }
+    }, {
+      key: "addPosition",
+      value: function addPosition(node, position, top) {
+        var area = {
+          top: top,
+          bottom: 0,
+          node: node,
+          position: position
+        };
+        this.positions.push(area);
+        this.lastTop = top;
+      }
+    }, {
+      key: "generateHitAreasForGroup",
+      value: function generateHitAreasForGroup(hitAreas, positionsInGroup, top, bottom) {
+        // limit positions in group
+        var positionCount = Math.min(positionsInGroup.length, 4);
+        var areaHeight = Math.round((bottom - top) / positionCount);
+        var areaTop = top;
+        var i = 0;
+        while (i < positionCount) {
+          var position = positionsInGroup[i];
+          if (position) {
+            hitAreas.push({
+              top: areaTop,
+              bottom: areaTop + areaHeight,
+              node: position.node,
+              position: position.position
+            });
+          }
+          areaTop += areaHeight;
+          i += 1;
+        }
+      }
+    }]);
+    return HitAreasGenerator;
+  }(VisibleNodeIterator);
+
   var DragAndDropHandler = /*#__PURE__*/function () {
     function DragAndDropHandler(treeWidget) {
       _classCallCheck(this, DragAndDropHandler);
@@ -1299,258 +1554,6 @@ var jqtree = (function (exports) {
       }
     }]);
     return DragAndDropHandler;
-  }();
-  var VisibleNodeIterator = /*#__PURE__*/function () {
-    function VisibleNodeIterator(tree) {
-      _classCallCheck(this, VisibleNodeIterator);
-      _defineProperty(this, "tree", void 0);
-      this.tree = tree;
-    }
-    _createClass(VisibleNodeIterator, [{
-      key: "iterate",
-      value: function iterate() {
-        var _this3 = this;
-        var isFirstNode = true;
-        var _iterateNode = function _iterateNode(node, nextNode) {
-          var mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
-          var $element = null;
-          if (node.element) {
-            $element = jQuery(node.element);
-            if (!$element.is(":visible")) {
-              return;
-            }
-            if (isFirstNode) {
-              _this3.handleFirstNode(node);
-              isFirstNode = false;
-            }
-            if (!node.hasChildren()) {
-              _this3.handleNode(node, nextNode, $element);
-            } else if (node.is_open) {
-              if (!_this3.handleOpenFolder(node, $element)) {
-                mustIterateInside = false;
-              }
-            } else {
-              _this3.handleClosedFolder(node, nextNode, $element);
-            }
-          }
-          if (mustIterateInside) {
-            var childrenLength = node.children.length;
-            node.children.forEach(function (_, i) {
-              var child = node.children[i];
-              if (child) {
-                if (i === childrenLength - 1) {
-                  _iterateNode(child, null);
-                } else {
-                  var nextChild = node.children[i + 1];
-                  if (nextChild) {
-                    _iterateNode(child, nextChild);
-                  }
-                }
-              }
-            });
-            if (node.is_open && $element) {
-              _this3.handleAfterOpenFolder(node, nextNode);
-            }
-          }
-        };
-        _iterateNode(this.tree, null);
-      }
-    }]);
-    return VisibleNodeIterator;
-  }();
-  var HitAreasGenerator = /*#__PURE__*/function (_VisibleNodeIterator) {
-    _inherits(HitAreasGenerator, _VisibleNodeIterator);
-    var _super = _createSuper(HitAreasGenerator);
-    function HitAreasGenerator(tree, currentNode, treeBottom) {
-      var _this4;
-      _classCallCheck(this, HitAreasGenerator);
-      _this4 = _super.call(this, tree);
-      _defineProperty(_assertThisInitialized(_this4), "currentNode", void 0);
-      _defineProperty(_assertThisInitialized(_this4), "treeBottom", void 0);
-      _defineProperty(_assertThisInitialized(_this4), "positions", void 0);
-      _defineProperty(_assertThisInitialized(_this4), "lastTop", void 0);
-      _this4.currentNode = currentNode;
-      _this4.treeBottom = treeBottom;
-      return _this4;
-    }
-    _createClass(HitAreasGenerator, [{
-      key: "generate",
-      value: function generate() {
-        this.positions = [];
-        this.lastTop = 0;
-        this.iterate();
-        return this.generateHitAreas(this.positions);
-      }
-    }, {
-      key: "generateHitAreas",
-      value: function generateHitAreas(positions) {
-        var previousTop = -1;
-        var group = [];
-        var hitAreas = [];
-        var _iterator = _createForOfIteratorHelper(positions),
-          _step;
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var position = _step.value;
-            if (position.top !== previousTop && group.length) {
-              if (group.length) {
-                this.generateHitAreasForGroup(hitAreas, group, previousTop, position.top);
-              }
-              previousTop = position.top;
-              group = [];
-            }
-            group.push(position);
-          }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
-        }
-        this.generateHitAreasForGroup(hitAreas, group, previousTop, this.treeBottom);
-        return hitAreas;
-      }
-    }, {
-      key: "handleOpenFolder",
-      value: function handleOpenFolder(node, $element) {
-        if (node === this.currentNode) {
-          // Cannot move inside current item
-          // Stop iterating
-          return false;
-        }
-
-        // Cannot move before current item
-        if (node.children[0] !== this.currentNode) {
-          this.addPosition(node, Position.Inside, this.getTop($element));
-        }
-
-        // Continue iterating
-        return true;
-      }
-    }, {
-      key: "handleClosedFolder",
-      value: function handleClosedFolder(node, nextNode, $element) {
-        var top = this.getTop($element);
-        if (node === this.currentNode) {
-          // Cannot move after current item
-          this.addPosition(node, Position.None, top);
-        } else {
-          this.addPosition(node, Position.Inside, top);
-
-          // Cannot move before current item
-          if (nextNode !== this.currentNode) {
-            this.addPosition(node, Position.After, top);
-          }
-        }
-      }
-    }, {
-      key: "handleFirstNode",
-      value: function handleFirstNode(node) {
-        if (node !== this.currentNode) {
-          this.addPosition(node, Position.Before, this.getTop(jQuery(node.element)));
-        }
-      }
-    }, {
-      key: "handleAfterOpenFolder",
-      value: function handleAfterOpenFolder(node, nextNode) {
-        if (node === this.currentNode || nextNode === this.currentNode) {
-          // Cannot move before or after current item
-          this.addPosition(node, Position.None, this.lastTop);
-        } else {
-          this.addPosition(node, Position.After, this.lastTop);
-        }
-      }
-    }, {
-      key: "handleNode",
-      value: function handleNode(node, nextNode, $element) {
-        var top = this.getTop($element);
-        if (node === this.currentNode) {
-          // Cannot move inside current item
-          this.addPosition(node, Position.None, top);
-        } else {
-          this.addPosition(node, Position.Inside, top);
-        }
-        if (nextNode === this.currentNode || node === this.currentNode) {
-          // Cannot move before or after current item
-          this.addPosition(node, Position.None, top);
-        } else {
-          this.addPosition(node, Position.After, top);
-        }
-      }
-    }, {
-      key: "getTop",
-      value: function getTop($element) {
-        var offset = $element.offset();
-        return offset ? offset.top : 0;
-      }
-    }, {
-      key: "addPosition",
-      value: function addPosition(node, position, top) {
-        var area = {
-          top: top,
-          bottom: 0,
-          node: node,
-          position: position
-        };
-        this.positions.push(area);
-        this.lastTop = top;
-      }
-    }, {
-      key: "generateHitAreasForGroup",
-      value: function generateHitAreasForGroup(hitAreas, positionsInGroup, top, bottom) {
-        // limit positions in group
-        var positionCount = Math.min(positionsInGroup.length, 4);
-        var areaHeight = Math.round((bottom - top) / positionCount);
-        var areaTop = top;
-        var i = 0;
-        while (i < positionCount) {
-          var position = positionsInGroup[i];
-          if (position) {
-            hitAreas.push({
-              top: areaTop,
-              bottom: areaTop + areaHeight,
-              node: position.node,
-              position: position.position
-            });
-          }
-          areaTop += areaHeight;
-          i += 1;
-        }
-      }
-    }]);
-    return HitAreasGenerator;
-  }(VisibleNodeIterator);
-  var DragElement = /*#__PURE__*/function () {
-    function DragElement(nodeName, offsetX, offsetY, $tree, autoEscape) {
-      _classCallCheck(this, DragElement);
-      _defineProperty(this, "offsetX", void 0);
-      _defineProperty(this, "offsetY", void 0);
-      _defineProperty(this, "$element", void 0);
-      this.offsetX = offsetX;
-      this.offsetY = offsetY;
-      this.$element = jQuery("<span>").addClass("jqtree-title jqtree-dragging");
-      if (autoEscape) {
-        this.$element.text(nodeName);
-      } else {
-        this.$element.html(nodeName);
-      }
-      this.$element.css("position", "absolute");
-      $tree.append(this.$element);
-    }
-    _createClass(DragElement, [{
-      key: "move",
-      value: function move(pageX, pageY) {
-        this.$element.offset({
-          left: pageX - this.offsetX,
-          top: pageY - this.offsetY
-        });
-      }
-    }, {
-      key: "remove",
-      value: function remove() {
-        this.$element.remove();
-      }
-    }]);
-    return DragElement;
   }();
 
   var isInt = function isInt(n) {
@@ -3041,14 +3044,14 @@ var jqtree = (function (exports) {
   }();
 
   var GhostDropHint = /*#__PURE__*/function () {
-    function GhostDropHint(node, $element, position) {
+    function GhostDropHint(node, element, position) {
       _classCallCheck(this, GhostDropHint);
-      _defineProperty(this, "$element", void 0);
+      _defineProperty(this, "element", void 0);
       _defineProperty(this, "node", void 0);
-      _defineProperty(this, "$ghost", void 0);
-      this.$element = $element;
+      _defineProperty(this, "ghost", void 0);
+      this.element = element;
       this.node = node;
-      this.$ghost = jQuery("<li class=\"jqtree_common jqtree-ghost\"><span class=\"jqtree_common jqtree-circle\"></span>\n          <span class=\"jqtree_common jqtree-line\"></span></li>");
+      this.ghost = this.createGhostElement();
       if (position === Position.After) {
         this.moveAfter();
       } else if (position === Position.Before) {
@@ -3064,17 +3067,17 @@ var jqtree = (function (exports) {
     _createClass(GhostDropHint, [{
       key: "remove",
       value: function remove() {
-        this.$ghost.remove();
+        this.ghost.remove();
       }
     }, {
       key: "moveAfter",
       value: function moveAfter() {
-        this.$element.after(this.$ghost);
+        this.element.after(this.ghost);
       }
     }, {
       key: "moveBefore",
       value: function moveBefore() {
-        this.$element.before(this.$ghost);
+        this.element.before(this.ghost);
       }
     }, {
       key: "moveInsideOpenFolder",
@@ -3082,14 +3085,27 @@ var jqtree = (function (exports) {
         var _this$node$children$;
         var childElement = (_this$node$children$ = this.node.children[0]) === null || _this$node$children$ === void 0 ? void 0 : _this$node$children$.element;
         if (childElement) {
-          jQuery(childElement).before(this.$ghost);
+          childElement.before(this.ghost);
         }
       }
     }, {
       key: "moveInside",
       value: function moveInside() {
-        this.$element.after(this.$ghost);
-        this.$ghost.addClass("jqtree-inside");
+        this.element.after(this.ghost);
+        this.ghost.classList.add("jqtree-inside");
+      }
+    }, {
+      key: "createGhostElement",
+      value: function createGhostElement() {
+        var ghost = document.createElement("li");
+        ghost.className = "jqtree_common jqtree-ghost";
+        var circleSpan = document.createElement("span");
+        circleSpan.className = "jqtree_common jqtree-circle";
+        ghost.append(circleSpan);
+        var lineSpan = document.createElement("span");
+        lineSpan.className = "jqtree_common jqtree-line";
+        ghost.append(lineSpan);
+        return ghost;
       }
     }]);
     return GhostDropHint;
@@ -3124,7 +3140,7 @@ var jqtree = (function (exports) {
         if (this.mustShowBorderDropHint(position)) {
           return new BorderDropHint(this.element, this.treeWidget._getScrollLeft());
         } else {
-          return new GhostDropHint(this.node, jQuery(this.element), position);
+          return new GhostDropHint(this.node, this.element, position);
         }
       }
     }, {
