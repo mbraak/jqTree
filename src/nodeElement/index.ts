@@ -37,7 +37,7 @@ class NodeElement {
                 this.treeWidget._getScrollLeft(),
             );
         } else {
-            return new GhostDropHint(this.node, jQuery(this.element), position);
+            return new GhostDropHint(this.node, this.element, position);
         }
     }
 

@@ -2,18 +2,14 @@ import { Position, Node } from "../node";
 import { DropHint } from "../types";
 
 class GhostDropHint implements DropHint {
-    private $element: JQuery<Element>;
+    private element: HTMLElement;
     private node: Node;
-    private $ghost: JQuery;
+    private ghost: HTMLElement;
 
-    constructor(node: Node, $element: JQuery<Element>, position: Position) {
-        this.$element = $element;
-
+    constructor(node: Node, element: HTMLElement, position: Position) {
+        this.element = element;
         this.node = node;
-        this.$ghost = jQuery(
-            `<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span>
-          <span class="jqtree_common jqtree-line"></span></li>`,
-        );
+        this.ghost = this.createGhostElement();
 
         if (position === Position.After) {
             this.moveAfter();
@@ -29,28 +25,43 @@ class GhostDropHint implements DropHint {
     }
 
     public remove(): void {
-        this.$ghost.remove();
+        this.ghost.remove();
     }
 
-    public moveAfter(): void {
-        this.$element.after(this.$ghost);
+    private moveAfter(): void {
+        this.element.after(this.ghost);
     }
 
-    public moveBefore(): void {
-        this.$element.before(this.$ghost);
+    private moveBefore(): void {
+        this.element.before(this.ghost);
     }
 
-    public moveInsideOpenFolder(): void {
+    private moveInsideOpenFolder(): void {
         const childElement = this.node.children[0]?.element;
 
         if (childElement) {
-            jQuery(childElement).before(this.$ghost);
+            childElement.before(this.ghost);
         }
     }
 
-    public moveInside(): void {
-        this.$element.after(this.$ghost);
-        this.$ghost.addClass("jqtree-inside");
+    private moveInside(): void {
+        this.element.after(this.ghost);
+        this.ghost.classList.add("jqtree-inside");
+    }
+
+    private createGhostElement() {
+        const ghost = document.createElement("li");
+        ghost.className = "jqtree_common jqtree-ghost";
+
+        const circleSpan = document.createElement("span");
+        circleSpan.className = "jqtree_common jqtree-circle";
+        ghost.append(circleSpan);
+
+        const lineSpan = document.createElement("span");
+        lineSpan.className = "jqtree_common jqtree-line";
+        ghost.append(lineSpan);
+
+        return ghost;
     }
 }
 
