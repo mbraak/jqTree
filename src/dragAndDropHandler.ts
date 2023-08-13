@@ -1,6 +1,6 @@
 import { getPositionName, Node, Position } from "./node";
 import { DropHint, HitArea, PositionInfo } from "./types";
-import { NodeElement } from "./nodeElement";
+import NodeElement from "./nodeElement";
 import { JqTreeWidget } from "./tree.jquery";
 
 interface Dimensions {
