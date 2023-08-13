@@ -159,7 +159,7 @@ describe("addChild", () => {
         expect(given.node.children).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({ id: 100, name: "child1" }),
-            ])
+            ]),
         );
     });
 
@@ -330,7 +330,7 @@ describe("constructor", () => {
     const given = getGiven<Vars>();
 
     given("node", () =>
-        given.params === undefined ? new Node() : new Node(given.params)
+        given.params === undefined ? new Node() : new Node(given.params),
     );
 
     context("without parameters", () => {
@@ -349,7 +349,7 @@ describe("constructor", () => {
                 children: [],
                 parent: null,
             });
-            expect(given.node).not.toHaveProperty("id");
+            expect(given.node.id).toBeUndefined();
         });
     });
 
@@ -719,8 +719,8 @@ describe("getNodeByCallback", () => {
         it("returns the node", () => {
             expect(
                 given.tree.getNodeByCallback((node) =>
-                    node.name.startsWith("chi")
-                )
+                    node.name.startsWith("chi"),
+                ),
             ).toMatchObject({
                 name: "child1",
             });
@@ -776,7 +776,7 @@ describe("getNodeByNameMustExist", () => {
     context("when the node doesn't exist", () => {
         it("throws an exception", () => {
             expect(() =>
-                given.tree.getNodeByNameMustExist("non-existing")
+                given.tree.getNodeByNameMustExist("non-existing"),
             ).toThrow("Node with name non-existing not found");
         });
     });
@@ -1125,7 +1125,7 @@ describe("moveNode", () => {
     context("when moving after a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child2, given.node2, Position.After)
+                given.tree.moveNode(given.child2, given.node2, Position.After),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1147,8 +1147,8 @@ describe("moveNode", () => {
                     given.tree.moveNode(
                         given.child2,
                         given.tree,
-                        Position.After
-                    )
+                        Position.After,
+                    ),
                 ).toBe(false);
             });
         });
@@ -1157,7 +1157,7 @@ describe("moveNode", () => {
     context("when moving inside a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child1, given.node2, Position.Inside)
+                given.tree.moveNode(given.child1, given.node2, Position.Inside),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1182,7 +1182,11 @@ describe("moveNode", () => {
     context("when moving before a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child2, given.child1, Position.Before)
+                given.tree.moveNode(
+                    given.child2,
+                    given.child1,
+                    Position.Before,
+                ),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1206,8 +1210,8 @@ describe("moveNode", () => {
                     given.tree.moveNode(
                         given.child2,
                         given.tree,
-                        Position.Before
-                    )
+                        Position.Before,
+                    ),
                 ).toBe(false);
             });
         });
@@ -1216,7 +1220,7 @@ describe("moveNode", () => {
     context("when the moved node is a parent of the target node", () => {
         it("doesn't move the node", () => {
             expect(
-                given.tree.moveNode(given.node1, given.child1, Position.Before)
+                given.tree.moveNode(given.node1, given.child1, Position.Before),
             ).toBe(false);
 
             expect(given.tree).toMatchObject({
@@ -1237,7 +1241,7 @@ describe("moveNode", () => {
     context("with position None", () => {
         it("returns false", () => {
             expect(
-                given.tree.moveNode(given.child2, given.node2, Position.None)
+                given.tree.moveNode(given.child2, given.node2, Position.None),
             ).toBe(false);
         });
     });
