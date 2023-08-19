@@ -80,7 +80,7 @@ export class DragAndDropHandler {
             positionInfo.pageX - left,
             positionInfo.pageY - top,
             this.treeWidget.element,
-            this.treeWidget.options.autoEscape ?? true
+            this.treeWidget.options.autoEscape ?? true,
         );
 
         this.isDragging = true;
@@ -104,7 +104,7 @@ export class DragAndDropHandler {
 
         const area = this.findHoveredArea(
             positionInfo.pageX,
-            positionInfo.pageY
+            positionInfo.pageY,
         );
 
         if (area && this.canMoveToArea(area)) {
@@ -134,7 +134,7 @@ export class DragAndDropHandler {
             if (this.treeWidget.options.onDragMove) {
                 this.treeWidget.options.onDragMove(
                     this.currentItem.node,
-                    positionInfo.originalEvent
+                    positionInfo.originalEvent,
                 );
             }
         }
@@ -163,7 +163,7 @@ export class DragAndDropHandler {
             if (this.treeWidget.options.onDragStop) {
                 this.treeWidget.options.onDragStop(
                     currentItem.node,
-                    positionInfo.originalEvent
+                    positionInfo.originalEvent,
                 );
             }
         }
@@ -178,7 +178,7 @@ export class DragAndDropHandler {
             this.generateHitAreas();
 
             this.currentItem = this.treeWidget._getNodeElementForNode(
-                this.currentItem.node
+                this.currentItem.node,
             );
 
             if (this.isDragging) {
@@ -194,7 +194,7 @@ export class DragAndDropHandler {
             const hitAreasGenerator = new HitAreasGenerator(
                 this.treeWidget.tree,
                 this.currentItem.node,
-                this.getTreeDimensions().bottom
+                this.getTreeDimensions().bottom,
             );
             this.hitAreas = hitAreasGenerator.generate();
         }
@@ -218,7 +218,7 @@ export class DragAndDropHandler {
         return this.treeWidget.options.onCanMoveTo(
             this.currentItem.node,
             area.node,
-            positionName
+            positionName,
         );
     }
 
@@ -297,7 +297,7 @@ export class DragAndDropHandler {
 
         // add new drop hint
         const nodeElement = this.treeWidget._getNodeElementForNode(
-            this.hoveredArea.node
+            this.hoveredArea.node,
         );
         this.previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
     }
@@ -310,7 +310,7 @@ export class DragAndDropHandler {
                 () => {
                     this.refresh();
                     this.updateDropHint();
-                }
+                },
             );
         };
 
@@ -321,7 +321,7 @@ export class DragAndDropHandler {
         if (openFolderDelay !== false) {
             this.openFolderTimer = window.setTimeout(
                 openFolder,
-                openFolderDelay
+                openFolderDelay,
             );
         }
     }
@@ -464,7 +464,7 @@ abstract class VisibleNodeIterator {
     protected abstract handleNode(
         node: Node,
         nextNode: Node | null,
-        $element: JQuery
+        $element: JQuery,
     ): void;
 
     /*
@@ -478,12 +478,12 @@ abstract class VisibleNodeIterator {
     protected abstract handleClosedFolder(
         node: Node,
         nextNode: Node | null,
-        $element: JQuery
+        $element: JQuery,
     ): void;
 
     protected abstract handleAfterOpenFolder(
         node: Node,
-        nextNode: Node | null
+        nextNode: Node | null,
     ): void;
 
     protected abstract handleFirstNode(node: Node): void;
@@ -512,20 +512,18 @@ export class HitAreasGenerator extends VisibleNodeIterator {
     }
 
     protected generateHitAreas(positions: HitArea[]): HitArea[] {
-        let previousTop = -1;
+        let previousTop = positions[0]?.top ?? 0;
         let group = [];
         const hitAreas: HitArea[] = [];
 
         for (const position of positions) {
             if (position.top !== previousTop && group.length) {
-                if (group.length) {
-                    this.generateHitAreasForGroup(
-                        hitAreas,
-                        group,
-                        previousTop,
-                        position.top
-                    );
-                }
+                this.generateHitAreasForGroup(
+                    hitAreas,
+                    group,
+                    previousTop,
+                    position.top,
+                );
 
                 previousTop = position.top;
                 group = [];
@@ -538,7 +536,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             hitAreas,
             group,
             previousTop,
-            this.treeBottom
+            this.treeBottom,
         );
 
         return hitAreas;
@@ -563,7 +561,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
     protected handleClosedFolder(
         node: Node,
         nextNode: Node,
-        $element: JQuery
+        $element: JQuery,
     ): void {
         const top = this.getTop($element);
 
@@ -585,7 +583,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
             this.addPosition(
                 node,
                 Position.Before,
-                this.getTop(jQuery(node.element))
+                this.getTop(jQuery(node.element)),
             );
         }
     }
@@ -639,7 +637,7 @@ export class HitAreasGenerator extends VisibleNodeIterator {
         hitAreas: HitArea[],
         positionsInGroup: HitArea[],
         top: number,
-        bottom: number
+        bottom: number,
     ): void {
         // limit positions in group
         const positionCount = Math.min(positionsInGroup.length, 4);
@@ -676,13 +674,13 @@ class DragElement {
         offsetX: number,
         offsetY: number,
         $tree: JQuery,
-        autoEscape: boolean
+        autoEscape: boolean,
     ) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
 
         this.$element = jQuery("<span>").addClass(
-            "jqtree-title jqtree-dragging"
+            "jqtree-title jqtree-dragging",
         );
 
         if (autoEscape) {

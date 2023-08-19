@@ -205,7 +205,7 @@ export default class ScrollHandler {
     }
 
     private handleHorizontalScrollingWithParent(
-        positionInfo: PositionInfo
+        positionInfo: PositionInfo,
     ): void {
         if (
             positionInfo.pageX === undefined ||
@@ -240,7 +240,7 @@ export default class ScrollHandler {
         if (isNearRightEdge && canScrollRight) {
             scrollParent.scrollLeft = Math.min(
                 scrollParent.scrollLeft + 20,
-                scrollParent.scrollWidth
+                scrollParent.scrollWidth,
             );
         } else if (isNearLeftEdge && canScrollLeft) {
             scrollParent.scrollLeft = Math.max(scrollParent.scrollLeft - 20, 0);
@@ -248,7 +248,7 @@ export default class ScrollHandler {
     }
 
     private handleHorizontalScrollingWithDocument(
-        positionInfo: PositionInfo
+        positionInfo: PositionInfo,
     ): void {
         if (
             positionInfo.pageX === undefined ||
