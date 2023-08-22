@@ -1,22 +1,25 @@
 import { JqTreeWidget } from "./tree.jquery";
-import { HitArea, PositionInfo } from "./types";
+import { PositionInfo } from "./types";
+
+type ScrollDirection = "bottom" | "top";
 
 export default class ScrollHandler {
     private treeWidget: JqTreeWidget;
-    private previousTop: number;
+    private scrollParentBottom: number;
     private isInitialized: boolean;
     private $scrollParent: JQuery | null;
     private scrollParentTop: number;
+    private scrollDirection?: ScrollDirection;
+    private scrollTimeout?: number;
 
     constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
-        this.previousTop = -1;
         this.isInitialized = false;
     }
 
-    public checkScrolling(): void {
+    public checkScrolling(positionInfo: PositionInfo): void {
         this.ensureInit();
-        this.checkVerticalScrolling();
+        this.checkVerticalScrolling(positionInfo);
         this.checkHorizontalScrolling();
     }
 
@@ -109,6 +112,7 @@ export default class ScrollHandler {
 
         const setDocumentAsScrollParent = (): void => {
             this.scrollParentTop = 0;
+            this.scrollParentBottom = 0; // todo
             this.$scrollParent = null;
         };
 
@@ -125,8 +129,11 @@ export default class ScrollHandler {
         ) {
             this.$scrollParent = $scrollParent;
 
-            const offset = this.$scrollParent.offset();
-            this.scrollParentTop = offset ? offset.top : 0;
+            const offsetTop = this.$scrollParent.offset()?.top || 0;
+            const height = this.$scrollParent.innerHeight() || 0;
+
+            this.scrollParentTop = offsetTop;
+            this.scrollParentBottom = offsetTop + height;
         } else {
             setDocumentAsScrollParent();
         }
@@ -140,52 +147,37 @@ export default class ScrollHandler {
         }
     }
 
-    private handleVerticalScrollingWithScrollParent(area: HitArea): void {
+    private checkVerticalScrolling(positionInfo: PositionInfo): void {
+        if (positionInfo.pageY == null) {
+            return;
+        }
+
         const scrollParent = this.$scrollParent && this.$scrollParent[0];
 
         if (!scrollParent) {
             return;
         }
 
-        const distanceBottom =
-            this.scrollParentTop + scrollParent.offsetHeight - area.bottom;
+        let newScrollDirection: ScrollDirection | undefined;
 
-        if (distanceBottom < 20) {
-            scrollParent.scrollTop += 20;
-            this.treeWidget.refreshHitAreas();
-            this.previousTop = -1;
-        } else if (area.top - this.scrollParentTop < 20) {
-            scrollParent.scrollTop -= 20;
-            this.treeWidget.refreshHitAreas();
-            this.previousTop = -1;
+        if (positionInfo.pageY < this.scrollParentTop) {
+            newScrollDirection = "top";
+        } else if (positionInfo.pageY > this.scrollParentBottom) {
+            newScrollDirection = "bottom";
         }
-    }
 
-    private handleVerticalScrollingWithDocument(area: HitArea): void {
-        const scrollTop = jQuery(document).scrollTop() || 0;
-        const distanceTop = area.top - scrollTop;
+        if (this.scrollDirection !== newScrollDirection) {
+            this.scrollDirection = newScrollDirection;
 
-        if (distanceTop < 20) {
-            jQuery(document).scrollTop(scrollTop - 20);
-        } else {
-            const windowHeight = jQuery(window).height() || 0;
-
-            if (windowHeight - (area.bottom - scrollTop) < 20) {
-                jQuery(document).scrollTop(scrollTop + 20);
+            if (this.scrollTimeout != null) {
+                window.clearTimeout(this.scrollTimeout);
             }
-        }
-    }
 
-    private checkVerticalScrolling(): void {
-        const hoveredArea = this.treeWidget.dndHandler.hoveredArea;
-
-        if (hoveredArea && hoveredArea.top !== this.previousTop) {
-            this.previousTop = hoveredArea.top;
-
-            if (this.$scrollParent) {
-                this.handleVerticalScrollingWithScrollParent(hoveredArea);
-            } else {
-                this.handleVerticalScrollingWithDocument(hoveredArea);
+            if (newScrollDirection) {
+                this.scrollTimeout = window.setTimeout(
+                    this.scrollVertically.bind(this),
+                    40,
+                );
             }
         }
     }
@@ -272,5 +264,25 @@ export default class ScrollHandler {
         } else if (isNearLeftEdge && canScrollLeft) {
             $document.scrollLeft(Math.max(scrollLeft - 20, 0));
         }
+    }
+
+    private scrollVertically() {
+        const scrollParent = this.$scrollParent && this.$scrollParent[0];
+
+        if (!scrollParent || !this.scrollDirection) {
+            return;
+        }
+
+        const distance = this.scrollDirection === "top" ? -20 : 20;
+
+        scrollParent.scrollBy({
+            left: 0,
+            top: distance,
+            behavior: "instant",
+        });
+
+        this.treeWidget.refreshHitAreas();
+
+        setTimeout(this.scrollVertically.bind(this), 40);
     }
 }
