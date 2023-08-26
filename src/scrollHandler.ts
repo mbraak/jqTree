@@ -79,37 +79,6 @@ export default class ScrollHandler {
     }
 
     private initScrollParent(): void {
-        const getParentWithOverflow = (): JQuery | null => {
-            const cssAttributes = ["overflow", "overflow-y"];
-
-            const hasOverFlow = ($el: JQuery): boolean => {
-                for (const attr of cssAttributes) {
-                    const overflowValue = $el.css(attr);
-                    if (
-                        overflowValue === "auto" ||
-                        overflowValue === "scroll"
-                    ) {
-                        return true;
-                    }
-                }
-
-                return false;
-            };
-
-            if (hasOverFlow(this.treeWidget.$el)) {
-                return this.treeWidget.$el;
-            }
-
-            for (const el of this.treeWidget.$el.parents().get()) {
-                const $el = jQuery(el);
-                if (hasOverFlow($el)) {
-                    return $el;
-                }
-            }
-
-            return null;
-        };
-
         const setDocumentAsScrollParent = (): void => {
             this.scrollParentTop = 0;
             this.scrollParentBottom = 0; // todo
