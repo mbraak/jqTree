@@ -455,12 +455,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const nodeOffset = jQuery(node.element).offset();
-        const nodeTop = nodeOffset ? nodeOffset.top : 0;
-
-        const treeOffset = this.$el.offset();
-        const treeTop = treeOffset ? treeOffset.top : 0;
-
+        const nodeTop = jQuery(node.element).offset()?.top ?? 0;
+        const treeTop = this.$el.offset()?.top ?? 0;
         const top = nodeTop - treeTop;
 
         this.scrollHandler.scrollToY(top);

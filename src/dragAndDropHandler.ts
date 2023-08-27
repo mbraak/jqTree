@@ -15,7 +15,6 @@ export class DragAndDropHandler {
     public isDragging: boolean;
     public currentItem: NodeElement | null;
     public hoveredArea: HitArea | null;
-    public positionInfo: PositionInfo | null;
 
     private treeWidget: JqTreeWidget;
     private dragElement: DragElement | null;
@@ -29,7 +28,6 @@ export class DragAndDropHandler {
         this.hitAreas = [];
         this.isDragging = false;
         this.currentItem = null;
-        this.positionInfo = null;
     }
 
     public mouseCapture(positionInfo: PositionInfo): boolean | null {
@@ -84,7 +82,6 @@ export class DragAndDropHandler {
         );
 
         this.isDragging = true;
-        this.positionInfo = positionInfo;
         this.currentItem.$element.addClass("jqtree-moving");
         return true;
     }
@@ -100,7 +97,6 @@ export class DragAndDropHandler {
         }
 
         this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
-        this.positionInfo = positionInfo;
 
         const area = this.findHoveredArea(
             positionInfo.pageX,
@@ -157,7 +153,6 @@ export class DragAndDropHandler {
         }
 
         this.isDragging = false;
-        this.positionInfo = null;
 
         if (!this.hoveredArea && currentItem) {
             if (this.treeWidget.options.onDragStop) {

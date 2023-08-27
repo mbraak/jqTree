@@ -1,119 +1,32 @@
 import { JqTreeWidget } from "./tree.jquery";
 import { PositionInfo } from "./types";
-
-type ScrollDirection = "bottom" | "top";
+import { ScrollParent } from "./scrollHandler/types";
+import createScrollParent from "./scrollHandler/scrollParent";
 
 export default class ScrollHandler {
     private treeWidget: JqTreeWidget;
-    private scrollParentBottom: number;
-    private isInitialized: boolean;
-    private $scrollParent: JQuery | null;
-    private scrollParentTop: number;
-    private scrollDirection?: ScrollDirection;
-    private scrollTimeout?: number;
+    private scrollParent?: ScrollParent;
 
     constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
-        this.isInitialized = false;
+        this.scrollParent = undefined;
     }
 
     public checkScrolling(positionInfo: PositionInfo): void {
-        this.ensureInit();
         this.checkVerticalScrolling(positionInfo);
-        this.checkHorizontalScrolling();
+        this.checkHorizontalScrolling(positionInfo);
     }
 
     public scrollToY(top: number): void {
-        this.ensureInit();
-
-        if (this.$scrollParent && this.$scrollParent[0]) {
-            this.$scrollParent[0].scrollTop = top;
-        } else {
-            const offset = this.treeWidget.$el.offset();
-            const treeTop = offset ? offset.top : 0;
-
-            jQuery(document).scrollTop(top + treeTop);
-        }
+        this.getScrollParent().scrollToY(top);
     }
 
-    public isScrolledIntoView($element: JQuery): boolean {
-        this.ensureInit();
-
-        let elementBottom: number;
-        let viewBottom: number;
-        let elementTop: number;
-        let viewTop: number;
-
-        const elHeight = $element.height() || 0;
-
-        if (this.$scrollParent) {
-            viewTop = 0;
-            viewBottom = this.$scrollParent.height() || 0;
-
-            const offset = $element.offset();
-            const originalTop = offset ? offset.top : 0;
-
-            elementTop = originalTop - this.scrollParentTop;
-            elementBottom = elementTop + elHeight;
-        } else {
-            viewTop = jQuery(window).scrollTop() || 0;
-
-            const windowHeight = jQuery(window).height() || 0;
-            viewBottom = viewTop + windowHeight;
-
-            const offset = $element.offset();
-
-            elementTop = offset ? offset.top : 0;
-            elementBottom = elementTop + elHeight;
-        }
-
-        return elementBottom <= viewBottom && elementTop >= viewTop;
+    public isScrolledIntoView($element: JQuery<HTMLElement>): boolean {
+        return this.getScrollParent().isScrolledIntoView($element);
     }
 
     public getScrollLeft(): number {
-        if (!this.$scrollParent) {
-            return 0;
-        } else {
-            return this.$scrollParent.scrollLeft() || 0;
-        }
-    }
-
-    private initScrollParent(): void {
-        const setDocumentAsScrollParent = (): void => {
-            this.scrollParentTop = 0;
-            this.scrollParentBottom = 0; // todo
-            this.$scrollParent = null;
-        };
-
-        if (this.treeWidget.$el.css("position") === "fixed") {
-            setDocumentAsScrollParent();
-        }
-
-        const $scrollParent = getParentWithOverflow();
-
-        if (
-            $scrollParent &&
-            $scrollParent.length &&
-            $scrollParent[0]?.tagName !== "HTML"
-        ) {
-            this.$scrollParent = $scrollParent;
-
-            const offsetTop = this.$scrollParent.offset()?.top || 0;
-            const height = this.$scrollParent.innerHeight() || 0;
-
-            this.scrollParentTop = offsetTop;
-            this.scrollParentBottom = offsetTop + height;
-        } else {
-            setDocumentAsScrollParent();
-        }
-
-        this.isInitialized = true;
-    }
-
-    private ensureInit(): void {
-        if (!this.isInitialized) {
-            this.initScrollParent();
-        }
+        return this.getScrollParent().getScrollLeft();
     }
 
     private checkVerticalScrolling(positionInfo: PositionInfo): void {
@@ -121,48 +34,15 @@ export default class ScrollHandler {
             return;
         }
 
-        const scrollParent = this.$scrollParent && this.$scrollParent[0];
-
-        if (!scrollParent) {
-            return;
-        }
-
-        let newScrollDirection: ScrollDirection | undefined;
-
-        if (positionInfo.pageY < this.scrollParentTop) {
-            newScrollDirection = "top";
-        } else if (positionInfo.pageY > this.scrollParentBottom) {
-            newScrollDirection = "bottom";
-        }
-
-        if (this.scrollDirection !== newScrollDirection) {
-            this.scrollDirection = newScrollDirection;
-
-            if (this.scrollTimeout != null) {
-                window.clearTimeout(this.scrollTimeout);
-            }
-
-            if (newScrollDirection) {
-                this.scrollTimeout = window.setTimeout(
-                    this.scrollVertically.bind(this),
-                    40,
-                );
-            }
-        }
+        this.getScrollParent().checkVerticalScrolling(positionInfo.pageY);
     }
 
-    private checkHorizontalScrolling(): void {
-        const positionInfo = this.treeWidget.dndHandler.positionInfo;
-
-        if (!positionInfo) {
+    private checkHorizontalScrolling(positionInfo: PositionInfo): void {
+        if (positionInfo.pageX == null) {
             return;
         }
 
-        if (this.$scrollParent) {
-            this.handleHorizontalScrollingWithParent(positionInfo);
-        } else {
-            this.handleHorizontalScrollingWithDocument(positionInfo);
-        }
+        this.getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
     }
 
     private handleHorizontalScrollingWithParent(
@@ -235,23 +115,14 @@ export default class ScrollHandler {
         }
     }
 
-    private scrollVertically() {
-        const scrollParent = this.$scrollParent && this.$scrollParent[0];
-
-        if (!scrollParent || !this.scrollDirection) {
-            return;
+    private getScrollParent(): ScrollParent {
+        if (!this.scrollParent) {
+            this.scrollParent = createScrollParent(
+                this.treeWidget.$el,
+                this.treeWidget.refreshHitAreas.bind(this.treeWidget),
+            );
         }
 
-        const distance = this.scrollDirection === "top" ? -20 : 20;
-
-        scrollParent.scrollBy({
-            left: 0,
-            top: distance,
-            behavior: "instant",
-        });
-
-        this.treeWidget.refreshHitAreas();
-
-        setTimeout(this.scrollVertically.bind(this), 40);
+        return this.scrollParent;
     }
 }

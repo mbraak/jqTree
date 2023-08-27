@@ -1,7 +1,8 @@
-import type { ScrollParent} from './types'
-import ContainerScrollParent from './containerScrollParent'
+import type { ScrollParent } from "./types";
+import ContainerScrollParent from "./containerScrollParent";
+import DocumentScrollParent from "./documentScrollParent";
 
-const hasOverFlow = ($element: JQuery<HTMLElement): boolean => {
+const hasOverFlow = ($element: JQuery<HTMLElement>): boolean => {
     for (const attr of ["overflow", "overflow-y"]) {
         const overflowValue = $element.css(attr);
         if (overflowValue === "auto" || overflowValue === "scroll") {
@@ -29,14 +30,17 @@ const getParentWithOverflow = (
     return null;
 };
 
-const createScrollParent = ($treeElement: JQuery<HTMLElement>): ScrollParent => {
-  const $parentElement = getParentWithOverflow($treeElement);
+const createScrollParent = (
+    $treeElement: JQuery<HTMLElement>,
+    refreshHitAreas: () => void,
+): ScrollParent => {
+    const $parentElement = getParentWithOverflow($treeElement);
 
-  if (
-    $parentElement?.length &&
-    $parentElement[0]?.tagName !== "HTML"
-) {
-  return new ContainerScrollParent($parentElement);
+    if ($parentElement?.length && $parentElement[0]?.tagName !== "HTML") {
+        return new ContainerScrollParent($parentElement, refreshHitAreas);
+    } else {
+        return new DocumentScrollParent($treeElement);
+    }
 };
 
 export default createScrollParent;
