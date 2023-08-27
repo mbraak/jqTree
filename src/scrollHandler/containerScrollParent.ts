@@ -1,4 +1,11 @@
 import type { ScrollDirection, ScrollParent } from "./types";
+import DocumentScrollParent from "./documentScrollParent";
+
+interface Params {
+    $container: JQuery<HTMLElement>;
+    refreshHitAreas: () => void;
+    $treeElement: JQuery<HTMLElement>;
+}
 
 export default class ContainerScrollParent implements ScrollParent {
     private $container: JQuery<HTMLElement>;
@@ -7,8 +14,9 @@ export default class ContainerScrollParent implements ScrollParent {
     private scrollParentTop: number;
     private scrollDirection?: ScrollDirection;
     private scrollTimeout?: number;
+    private documentScrollParent: DocumentScrollParent;
 
-    constructor($container: JQuery<HTMLElement>, refreshHitAreas: () => void) {
+    constructor({ $container, refreshHitAreas, $treeElement }: Params) {
         this.$container = $container;
         this.refreshHitAreas = refreshHitAreas;
 
@@ -17,6 +25,11 @@ export default class ContainerScrollParent implements ScrollParent {
 
         this.scrollParentTop = offsetTop;
         this.scrollParentBottom = offsetTop + height;
+
+        this.documentScrollParent = new DocumentScrollParent(
+            $treeElement,
+            refreshHitAreas,
+        );
     }
 
     public checkHorizontalScrolling(pageX: number): void {
@@ -39,6 +52,12 @@ export default class ContainerScrollParent implements ScrollParent {
                     40,
                 );
             }
+        }
+
+        if (newScrollDirection) {
+            this.documentScrollParent.resetScrolling();
+        } else {
+            this.documentScrollParent.checkVerticalScrolling(pageY);
         }
     }
 

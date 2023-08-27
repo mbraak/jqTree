@@ -34,12 +34,16 @@ const createScrollParent = (
     $treeElement: JQuery<HTMLElement>,
     refreshHitAreas: () => void,
 ): ScrollParent => {
-    const $parentElement = getParentWithOverflow($treeElement);
+    const $container = getParentWithOverflow($treeElement);
 
-    if ($parentElement?.length && $parentElement[0]?.tagName !== "HTML") {
-        return new ContainerScrollParent($parentElement, refreshHitAreas);
+    if ($container?.length && $container[0]?.tagName !== "HTML") {
+        return new ContainerScrollParent({
+            $container,
+            refreshHitAreas,
+            $treeElement,
+        });
     } else {
-        return new DocumentScrollParent($treeElement);
+        return new DocumentScrollParent($treeElement, refreshHitAreas);
     }
 };
 
