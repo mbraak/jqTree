@@ -45,49 +45,6 @@ export default class ScrollHandler {
         this.getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
     }
 
-    private handleHorizontalScrollingWithParent(
-        positionInfo: PositionInfo,
-    ): void {
-        if (
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
-            return;
-        }
-
-        const $scrollParent = this.$scrollParent;
-        const scrollParentOffset = $scrollParent && $scrollParent.offset();
-
-        if (!($scrollParent && scrollParentOffset)) {
-            return;
-        }
-
-        const scrollParent = $scrollParent[0];
-
-        if (!scrollParent) {
-            return;
-        }
-
-        const canScrollRight =
-            scrollParent.scrollLeft + scrollParent.clientWidth <
-            scrollParent.scrollWidth;
-        const canScrollLeft = scrollParent.scrollLeft > 0;
-
-        const rightEdge = scrollParentOffset.left + scrollParent.clientWidth;
-        const leftEdge = scrollParentOffset.left;
-        const isNearRightEdge = positionInfo.pageX > rightEdge - 20;
-        const isNearLeftEdge = positionInfo.pageX < leftEdge + 20;
-
-        if (isNearRightEdge && canScrollRight) {
-            scrollParent.scrollLeft = Math.min(
-                scrollParent.scrollLeft + 20,
-                scrollParent.scrollWidth,
-            );
-        } else if (isNearLeftEdge && canScrollLeft) {
-            scrollParent.scrollLeft = Math.max(scrollParent.scrollLeft - 20, 0);
-        }
-    }
-
     private handleHorizontalScrollingWithDocument(
         positionInfo: PositionInfo,
     ): void {

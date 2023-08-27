@@ -1,4 +1,6 @@
-import type { ScrollDirection, ScrollParent } from "./types";
+import type { ScrollParent } from "./types";
+
+type ScrollDirection = "bottom" | "top";
 
 export default class DocumentScrollParent implements ScrollParent {
     private $element: JQuery<HTMLElement>;
@@ -23,6 +25,7 @@ export default class DocumentScrollParent implements ScrollParent {
 
             if (this.scrollTimeout != null) {
                 window.clearTimeout(this.scrollTimeout);
+                this.scrollTimeout = undefined;
             }
 
             if (newScrollDirection) {

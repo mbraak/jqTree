@@ -1,5 +1,3 @@
-export type ScrollDirection = "bottom" | "top";
-
 export interface ScrollParent {
     checkHorizontalScrolling(pageX: number): void;
     checkVerticalScrolling(pageY: number): void;
