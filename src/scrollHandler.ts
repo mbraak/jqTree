@@ -45,33 +45,6 @@ export default class ScrollHandler {
         this.getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
     }
 
-    private handleHorizontalScrollingWithDocument(
-        positionInfo: PositionInfo,
-    ): void {
-        if (
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
-            return;
-        }
-
-        const $document = jQuery(document);
-
-        const scrollLeft = $document.scrollLeft() || 0;
-        const windowWidth = jQuery(window).width() || 0;
-
-        const canScrollLeft = scrollLeft > 0;
-
-        const isNearRightEdge = positionInfo.pageX > windowWidth - 20;
-        const isNearLeftEdge = positionInfo.pageX - scrollLeft < 20;
-
-        if (isNearRightEdge) {
-            $document.scrollLeft(scrollLeft + 20);
-        } else if (isNearLeftEdge && canScrollLeft) {
-            $document.scrollLeft(Math.max(scrollLeft - 20, 0));
-        }
-    }
-
     private getScrollParent(): ScrollParent {
         if (!this.scrollParent) {
             this.scrollParent = createScrollParent(

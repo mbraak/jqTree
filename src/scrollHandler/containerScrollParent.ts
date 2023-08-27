@@ -40,6 +40,10 @@ export default class ContainerScrollParent implements ScrollParent {
     public checkHorizontalScrolling(pageX: number): void {
         const newHorizontalScrollDirection =
             this.getNewHorizontalScrollDirection(pageX);
+        console.log(
+            "container newHorizontalScrollDirection",
+            newHorizontalScrollDirection,
+        );
 
         if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
             this.horizontalScrollDirection = newHorizontalScrollDirection;
@@ -61,30 +65,6 @@ export default class ContainerScrollParent implements ScrollParent {
         } else {
             this.documentScrollParent.checkHorizontalScrolling(pageX);
         }
-    }
-
-    private getNewHorizontalScrollDirection(
-        pageX: number,
-    ): HorizontalScrollDirection | undefined {
-        const scrollParentOffset = this.$container.offset();
-        if (!scrollParentOffset) {
-            return undefined;
-        }
-
-        const container = this.$container.get(0) as HTMLElement;
-
-        const rightEdge = scrollParentOffset.left + container.clientWidth;
-        const leftEdge = scrollParentOffset.left;
-        const isNearRightEdge = pageX > rightEdge - 20;
-        const isNearLeftEdge = pageX < leftEdge + 20;
-
-        if (isNearRightEdge) {
-            return "right";
-        } else if (isNearLeftEdge) {
-            return "left";
-        }
-
-        return undefined;
     }
 
     public checkVerticalScrolling(pageY: number) {
@@ -131,6 +111,30 @@ export default class ContainerScrollParent implements ScrollParent {
     public scrollToY(top: number): void {
         const container = this.$container.get(0) as HTMLElement;
         container.scrollTop = top;
+    }
+
+    private getNewHorizontalScrollDirection(
+        pageX: number,
+    ): HorizontalScrollDirection | undefined {
+        const scrollParentOffset = this.$container.offset();
+        if (!scrollParentOffset) {
+            return undefined;
+        }
+
+        const container = this.$container.get(0) as HTMLElement;
+
+        const rightEdge = scrollParentOffset.left + container.clientWidth;
+        const leftEdge = scrollParentOffset.left;
+        const isNearRightEdge = pageX > rightEdge - 20;
+        const isNearLeftEdge = pageX < leftEdge + 20;
+
+        if (isNearRightEdge) {
+            return "right";
+        } else if (isNearLeftEdge) {
+            return "left";
+        }
+
+        return undefined;
     }
 
     private getNewVerticalScrollDirection(

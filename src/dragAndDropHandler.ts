@@ -83,6 +83,7 @@ export class DragAndDropHandler {
 
         this.isDragging = true;
         this.currentItem.$element.addClass("jqtree-moving");
+
         return true;
     }
 
