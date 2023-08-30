@@ -40,10 +40,6 @@ export default class ContainerScrollParent implements ScrollParent {
     public checkHorizontalScrolling(pageX: number): void {
         const newHorizontalScrollDirection =
             this.getNewHorizontalScrollDirection(pageX);
-        console.log(
-            "container newHorizontalScrollDirection",
-            newHorizontalScrollDirection,
-        );
 
         if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
             this.horizontalScrollDirection = newHorizontalScrollDirection;
