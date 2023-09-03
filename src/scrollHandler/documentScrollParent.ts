@@ -10,6 +10,8 @@ export default class DocumentScrollParent implements ScrollParent {
     private refreshHitAreas: () => void;
     private verticalScrollDirection?: VerticalScrollDirection;
     private verticalScrollTimeout?: number;
+    private documentScrollHeight?: number;
+    private documentScrollWidth?: number;
 
     constructor($element: JQuery<HTMLElement>, refreshHitAreas: () => void) {
         this.$element = $element;
@@ -81,8 +83,11 @@ export default class DocumentScrollParent implements ScrollParent {
         jQuery(document).scrollTop(top + treeTop);
     }
 
-    public resetScrolling() {
+    public stopScrolling() {
+        this.horizontalScrollDirection = undefined;
         this.verticalScrollDirection = undefined;
+        this.documentScrollHeight = undefined;
+        this.documentScrollWidth = undefined;
     }
 
     private getNewHorizontalScrollDirection(
@@ -96,7 +101,7 @@ export default class DocumentScrollParent implements ScrollParent {
         const isNearRightEdge = pageX > windowWidth - 20;
         const isNearLeftEdge = pageX - scrollLeft < 20;
 
-        if (isNearRightEdge) {
+        if (isNearRightEdge && this.canScrollRight()) {
             return "right";
         }
 
@@ -105,6 +110,42 @@ export default class DocumentScrollParent implements ScrollParent {
         }
 
         return undefined;
+    }
+
+    private canScrollRight() {
+        const documentElement = document.documentElement;
+
+        return (
+            documentElement.scrollLeft + documentElement.clientWidth <
+            this.getDocumentScrollWidth()
+        );
+    }
+
+    private canScrollDown() {
+        const documentElement = document.documentElement;
+
+        return (
+            documentElement.scrollTop + documentElement.clientHeight <
+            this.getDocumentScrollHeight()
+        );
+    }
+
+    private getDocumentScrollHeight() {
+        // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
+        if (this.documentScrollHeight == null) {
+            this.documentScrollHeight = document.documentElement.scrollHeight;
+        }
+
+        return this.documentScrollHeight;
+    }
+
+    private getDocumentScrollWidth() {
+        // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
+        if (this.documentScrollWidth == null) {
+            this.documentScrollWidth = document.documentElement.scrollWidth;
+        }
+
+        return this.documentScrollWidth;
     }
 
     private getNewVerticalScrollDirection(
@@ -119,7 +160,7 @@ export default class DocumentScrollParent implements ScrollParent {
 
         const windowHeight = jQuery(window).height() || 0;
 
-        if (windowHeight - (pageY - scrollTop) < 20) {
+        if (windowHeight - (pageY - scrollTop) < 20 && this.canScrollDown()) {
             return "bottom";
         }
 

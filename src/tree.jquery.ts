@@ -665,6 +665,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     protected mouseStop(positionInfo: PositionInfo): boolean {
         if (this.options.dragAndDrop) {
+            this.scrollHandler.stopScrolling();
             return this.dndHandler.mouseStop(positionInfo);
         } else {
             return false;

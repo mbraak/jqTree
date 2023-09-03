@@ -17,6 +17,10 @@ export default class ScrollHandler {
         this.checkHorizontalScrolling(positionInfo);
     }
 
+    public stopScrolling() {
+        this.getScrollParent().stopScrolling();
+    }
+
     public scrollToY(top: number): void {
         this.getScrollParent().scrollToY(top);
     }

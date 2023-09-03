@@ -57,7 +57,7 @@ export default class ContainerScrollParent implements ScrollParent {
         }
 
         if (newHorizontalScrollDirection) {
-            this.documentScrollParent.resetScrolling();
+            this.documentScrollParent.stopScrolling();
         } else {
             this.documentScrollParent.checkHorizontalScrolling(pageX);
         }
@@ -84,7 +84,7 @@ export default class ContainerScrollParent implements ScrollParent {
         }
 
         if (newVerticalScrollDirection) {
-            this.documentScrollParent.resetScrolling();
+            this.documentScrollParent.stopScrolling();
         } else {
             this.documentScrollParent.checkVerticalScrolling(pageY);
         }
@@ -107,6 +107,12 @@ export default class ContainerScrollParent implements ScrollParent {
     public scrollToY(top: number): void {
         const container = this.$container.get(0) as HTMLElement;
         container.scrollTop = top;
+    }
+
+    public stopScrolling() {
+        this.horizontalScrollDirection = undefined;
+        this.verticalScrollDirection = undefined;
+        this.documentScrollParent.stopScrolling();
     }
 
     private getNewHorizontalScrollDirection(

@@ -4,4 +4,5 @@ export interface ScrollParent {
     getScrollLeft(): number;
     isScrolledIntoView($element: JQuery<HTMLElement>): boolean;
     scrollToY(top: number): void;
+    stopScrolling(): void;
 }
