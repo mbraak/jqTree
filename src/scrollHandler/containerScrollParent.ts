@@ -16,20 +16,14 @@ export default class ContainerScrollParent implements ScrollParent {
     private horizontalScrollDirection?: HorizontalScrollDirection;
     private horizontalScrollTimeout?: number;
     private refreshHitAreas: () => void;
-    private scrollParentBottom: number;
-    private scrollParentTop: number;
+    private scrollParentBottom?: number;
+    private scrollParentTop?: number;
     private verticalScrollTimeout?: number;
     private verticalScrollDirection?: VerticalScrollDirection;
 
     constructor({ $container, refreshHitAreas, $treeElement }: Params) {
         this.$container = $container;
         this.refreshHitAreas = refreshHitAreas;
-
-        const offsetTop = $container.offset()?.top || 0;
-        const height = $container.innerHeight() || 0;
-
-        this.scrollParentTop = offsetTop;
-        this.scrollParentBottom = offsetTop + height;
 
         this.documentScrollParent = new DocumentScrollParent(
             $treeElement,
@@ -98,7 +92,7 @@ export default class ContainerScrollParent implements ScrollParent {
         const elementHeight = $element.height() || 0;
         const viewBottom = this.$container.height() || 0;
         const originalTop = $element.offset()?.top ?? 0;
-        const elementTop = originalTop - this.scrollParentTop;
+        const elementTop = originalTop - this.getScrollParentTop();
         const elementBottom = elementTop + elementHeight;
 
         return elementBottom <= viewBottom && elementTop >= 0;
@@ -112,6 +106,8 @@ export default class ContainerScrollParent implements ScrollParent {
     public stopScrolling() {
         this.horizontalScrollDirection = undefined;
         this.verticalScrollDirection = undefined;
+        this.scrollParentTop = undefined;
+        this.scrollParentBottom = undefined;
         this.documentScrollParent.stopScrolling();
     }
 
@@ -142,11 +138,11 @@ export default class ContainerScrollParent implements ScrollParent {
     private getNewVerticalScrollDirection(
         pageY: number,
     ): VerticalScrollDirection | undefined {
-        if (pageY < this.scrollParentTop) {
+        if (pageY < this.getScrollParentTop()) {
             return "top";
         }
 
-        if (pageY > this.scrollParentBottom) {
+        if (pageY > this.getScrollParentBottom()) {
             return "bottom";
         }
 
@@ -189,5 +185,23 @@ export default class ContainerScrollParent implements ScrollParent {
         this.refreshHitAreas();
 
         setTimeout(this.scrollVertically.bind(this), 40);
+    }
+
+    private getScrollParentTop() {
+        if (this.scrollParentTop == null) {
+            this.scrollParentTop = this.$container.offset()?.top || 0;
+        }
+
+        return this.scrollParentTop;
+    }
+
+    private getScrollParentBottom() {
+        if (this.scrollParentBottom == null) {
+            this.scrollParentBottom =
+                this.getScrollParentTop() +
+                (this.$container.innerHeight() ?? 0);
+        }
+
+        return this.scrollParentBottom;
     }
 }
