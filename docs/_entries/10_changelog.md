@@ -6,6 +6,7 @@ name: changelog
 #### Development
 
 -   Issue #732: improve types of closedIcon and openedIcon
+-   Issue #736: use the bundle in the package.json
 
 #### 1.7.1 (august 6 2023)
 
