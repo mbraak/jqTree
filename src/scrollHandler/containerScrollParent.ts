@@ -101,7 +101,7 @@ export default class ContainerScrollParent implements ScrollParent {
         const elementTop = originalTop - this.scrollParentTop;
         const elementBottom = elementTop + elementHeight;
 
-        return elementBottom <= viewBottom && elementTop >= 0; // todo
+        return elementBottom <= viewBottom && elementTop >= 0;
     }
 
     public scrollToY(top: number): void {
