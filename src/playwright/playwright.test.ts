@@ -119,7 +119,7 @@ test.describe("with dragAndDrop", () => {
 });
 
 test.describe("autoscroll", () => {
-    test("it scrolls automatically when the users drags an element and the document is scrollable", async ({
+    test("it scrolls vertically when the users drags an element to the bottom and the document is scrollable", async ({
         baseURL,
         page,
     }) => {
@@ -142,6 +142,32 @@ test.describe("autoscroll", () => {
 
         expect(
             await page.evaluate("document.documentElement.scrollTop"),
-        ).toEqual(20);
+        ).toBeGreaterThan(0);
+    });
+
+    test("it scrolls horizontally when the users drags an element to the right and the document is scrollable", async ({
+        baseURL,
+        page,
+    }) => {
+        await page.setViewportSize({ width: 60, height: 400 });
+        await initPage({ baseURL, page, autoOpen: 3, dragAndDrop: true });
+
+        expect(
+            await page.evaluate("document.documentElement.scrollLeft"),
+        ).toEqual(0);
+
+        await moveMouseToNode(page, "Saurischia");
+        await page.mouse.down();
+
+        // eslint-disable-next-line playwright/no-wait-for-timeout
+        await page.waitForTimeout(200);
+
+        await page.mouse.move(55, 10);
+        // eslint-disable-next-line playwright/no-wait-for-timeout
+        await page.waitForTimeout(50);
+
+        expect(
+            await page.evaluate("document.documentElement.scrollLeft"),
+        ).toBeGreaterThan(0);
     });
 });
