@@ -60,7 +60,7 @@ export default class DocumentScrollParent implements ScrollParent {
     }
 
     public getScrollLeft(): number {
-        return 0;
+        return document.documentElement.scrollLeft;
     }
 
     public isScrolledIntoView($element: JQuery<HTMLElement>): boolean {
