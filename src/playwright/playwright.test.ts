@@ -3,17 +3,29 @@ import {
     dragAndDrop,
     findNodeElement,
     getTreeStructure,
+    moveMouseToNode,
     selectNode,
 } from "./testUtils";
 import { initCoverage, saveCoverage } from "./coverage";
 
 interface InitPageParameters {
+    autoOpen?: number;
     baseURL?: string;
-    dragAndDrop: boolean;
+    dragAndDrop?: boolean;
     page: Page;
 }
 
-const initPage = async ({ baseURL, dragAndDrop, page }: InitPageParameters) => {
+const defaultParams: Partial<InitPageParameters> = {
+    autoOpen: 0,
+    dragAndDrop: false,
+};
+
+const initPage = async (inputParams: InitPageParameters) => {
+    const { autoOpen, baseURL, dragAndDrop, page } = {
+        ...defaultParams,
+        ...inputParams,
+    };
+
     if (!baseURL) {
         throw new Error("Missing baseURL");
     }
@@ -27,7 +39,7 @@ const initPage = async ({ baseURL, dragAndDrop, page }: InitPageParameters) => {
         const $tree = jQuery("#tree1");
 
         $tree.tree({
-            animationSpeed: 0,
+            animationSpeed: ${autoOpen},
             autoOpen: 0,
             data: ExampleData.exampleData,
             dragAndDrop: ${dragAndDrop},
@@ -108,5 +120,33 @@ test.describe("with dragAndDrop", () => {
 
         const screenshot = await page.screenshot();
         expect(screenshot).toMatchSnapshot();
+    });
+});
+
+test.describe("autoscroll", () => {
+    test("it scrolls automatically when the users drags an element and the document is scrollable", async ({
+        baseURL,
+        page,
+    }) => {
+        page.setViewportSize({ width: 200, height: 100 });
+        await initPage({ baseURL, page, autoOpen: 3, dragAndDrop: true });
+
+        expect(
+            await page.evaluate("document.documentElement.scrollTop"),
+        ).toEqual(0);
+
+        await moveMouseToNode(page, "Saurischia");
+        await page.mouse.down();
+
+        // eslint-disable-next-line playwright/no-wait-for-timeout
+        await page.waitForTimeout(200);
+
+        await page.mouse.move(20, 190);
+        // eslint-disable-next-line playwright/no-wait-for-timeout
+        await page.waitForTimeout(50);
+
+        expect(
+            await page.evaluate("document.documentElement.scrollTop"),
+        ).toEqual(20);
     });
 });

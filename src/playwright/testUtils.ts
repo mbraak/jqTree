@@ -1,5 +1,12 @@
 import { Page, ElementHandle } from "@playwright/test";
 
+interface BoundingBox {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 const locateTitle = (page: Page, title: string) =>
     page.locator(".jqtree-title", {
         hasText: title,
@@ -35,7 +42,9 @@ export const selectNode = async (nodeElement: ElementHandle) => {
     await titleHandle.click();
 };
 
-const getRect = async (elementHandle: ElementHandle<HTMLElement>) => {
+const getRect = async (
+    elementHandle: ElementHandle<HTMLElement>,
+): Promise<BoundingBox> => {
     const boundingBox = await elementHandle.boundingBox();
 
     if (!boundingBox) {
@@ -88,7 +97,7 @@ export const getTreeStructure = async (page: Page) => {
     return JSON.parse(structure) as JQTreeMatchers.TreeStructure;
 };
 
-const getNodeRect = async (page: Page, title: string) => {
+const getNodeRect = async (page: Page, title: string): Promise<BoundingBox> => {
     const titleElement = await locateTitle(page, title).elementHandle();
 
     if (!titleElement) {
@@ -99,24 +108,23 @@ const getNodeRect = async (page: Page, title: string) => {
     return rect;
 };
 
+export const moveMouseToNode = async (page: Page, title: string) => {
+    const rect = await getNodeRect(page, title);
+
+    await page.mouse.move(rect.x + 10, rect.y + rect.height / 2);
+};
+
 export const dragAndDrop = async (
     page: Page,
-    from: string,
-    to: string
+    fromTitle: string,
+    toTitle: string,
 ): Promise<void> => {
-    const fromRect = await getNodeRect(page, from);
-    const toRect = await getNodeRect(page, to);
-
-    await page.mouse.move(
-        fromRect.x + fromRect.width / 2,
-        fromRect.y + fromRect.height / 2
-    );
+    await moveMouseToNode(page, fromTitle);
     await page.mouse.down();
+
     // eslint-disable-next-line playwright/no-wait-for-timeout
     await page.waitForTimeout(200);
-    await page.mouse.move(
-        toRect.x + toRect.width / 2,
-        toRect.y + toRect.height / 2
-    );
+
+    await moveMouseToNode(page, toTitle);
     await page.mouse.up();
 };
