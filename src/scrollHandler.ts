@@ -1,7 +1,7 @@
 import { JqTreeWidget } from "./tree.jquery";
 import { PositionInfo } from "./types";
 import { ScrollParent } from "./scrollHandler/types";
-import createScrollParent from "./scrollHandler/scrollParent";
+import createScrollParent from "./scrollHandler/createScrollParent";
 
 export default class ScrollHandler {
     private treeWidget: JqTreeWidget;
