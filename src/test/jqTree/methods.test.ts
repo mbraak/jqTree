@@ -146,7 +146,7 @@ describe("addToSelection", () => {
 
     it("selects the nodes", () => {
         expect(given.$tree.tree("getSelectedNodes")).toEqual(
-            expect.arrayContaining([given.child1, given.child2])
+            expect.arrayContaining([given.child1, given.child2]),
         );
     });
 
@@ -207,7 +207,7 @@ describe("appendNode", () => {
 
     context("when appending to a parent node", () => {
         given("parent", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1")
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
         );
 
         it("appends the node to parent node", () => {
@@ -244,7 +244,7 @@ describe("appendNode", () => {
 
         it("sets the properties of the object", () => {
             expect(given.$tree.tree("getNodeById", 99)).toMatchObject(
-                given.nodeData
+                given.nodeData,
             );
         });
     });
@@ -302,7 +302,7 @@ describe("getNodeByHtmlElement", () => {
 
     const given = getGiven<Vars>();
     given("htmlElement", () =>
-        screen.getByText("node1", { selector: ".jqtree-title" })
+        screen.getByText("node1", { selector: ".jqtree-title" }),
     );
     given("$tree", () => $("#tree1"));
 
@@ -312,7 +312,7 @@ describe("getNodeByHtmlElement", () => {
 
     it("returns the node", () => {
         expect(
-            given.$tree.tree("getNodeByHtmlElement", given.htmlElement)
+            given.$tree.tree("getNodeByHtmlElement", given.htmlElement),
         ).toEqual(expect.objectContaining({ name: "node1" }));
     });
 });
@@ -394,7 +394,7 @@ describe("getNodesByProperty", () => {
 
     it("gets nodes by property", () => {
         expect(
-            given.$tree.tree("getNodesByProperty", "intProperty", 1)
+            given.$tree.tree("getNodesByProperty", "intProperty", 1),
         ).toEqual([given.node1]);
     });
 });
@@ -417,7 +417,7 @@ describe("getSelectedNode", () => {
 
     context("when nodes have ids", () => {
         given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1")
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
         );
         given("treeData", () => exampleData);
 
@@ -440,7 +440,7 @@ describe("getSelectedNode", () => {
 
     context("when nodes don't have ids", () => {
         given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "without-id1")
+            given.$tree.tree("getNodeByNameMustExist", "without-id1"),
         );
         given("treeData", () => ["without-id1", "without-id2"]);
 
@@ -494,7 +494,7 @@ describe("getSelectedNodes", () => {
 
         it("returns the selected nodes", () => {
             expect(given.$tree.tree("getSelectedNodes")).toEqual(
-                expect.arrayContaining([given.child1, given.child2])
+                expect.arrayContaining([given.child1, given.child2]),
             );
         });
     });
@@ -659,7 +659,7 @@ describe("loadData", () => {
             given.$tree.tree(
                 "loadData",
                 exampleData,
-                given.$tree.tree("getNodeByNameMustExist", "initial1")
+                given.$tree.tree("getNodeByNameMustExist", "initial1"),
             );
         });
 
@@ -688,7 +688,7 @@ describe("loadData", () => {
         beforeEach(() => {
             given.$tree.tree(
                 "selectNode",
-                given.$tree.tree("getNodeByNameMustExist", "child1")
+                given.$tree.tree("getNodeByNameMustExist", "child1"),
             );
         });
 
@@ -696,7 +696,7 @@ describe("loadData", () => {
             given.$tree.tree(
                 "loadData",
                 ["new-child1"],
-                given.$tree.tree("getNodeByNameMustExist", "node1")
+                given.$tree.tree("getNodeByNameMustExist", "node1"),
             );
 
             expect(given.$tree.tree("getSelectedNode")).toBeFalse();
@@ -712,7 +712,7 @@ describe("loadData", () => {
                 given.$tree.tree(
                     "loadData",
                     ["new-child1"],
-                    given.$tree.tree("getNodeByNameMustExist", "node1")
+                    given.$tree.tree("getNodeByNameMustExist", "node1"),
                 );
 
                 expect(given.$tree.tree("getSelectedNode")).toBeFalse();
@@ -723,7 +723,7 @@ describe("loadData", () => {
                     given.$tree.tree(
                         "loadData",
                         ["new-child1"],
-                        given.$tree.tree("getNodeByNameMustExist", "node2")
+                        given.$tree.tree("getNodeByNameMustExist", "node2"),
                     );
 
                     expect(given.$tree.tree("getSelectedNode")).toMatchObject({
@@ -750,8 +750,8 @@ describe("loadDataFromUrl", () => {
     beforeEach(() => {
         server.use(
             rest.get("/tree/", (_request, response, ctx) =>
-                response(ctx.status(200), ctx.json(given.serverData))
-            )
+                response(ctx.status(200), ctx.json(given.serverData)),
+            ),
         );
 
         given.$tree.tree({ data: given.initialData });
@@ -775,7 +775,7 @@ describe("loadDataFromUrl", () => {
             it("loads a subtree", async () => {
                 const parentNode = given.$tree.tree(
                     "getNodeByNameMustExist",
-                    "initial1"
+                    "initial1",
                 );
                 given.$tree.tree("loadDataFromUrl", "/tree/", parentNode);
                 await screen.findByText("new1");
@@ -949,7 +949,7 @@ describe("prependNode", () => {
 
     context("with a parent node", () => {
         given("parent", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1")
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
         );
 
         it("prepends the node to the parent", () => {
@@ -984,7 +984,7 @@ describe("refresh", () => {
 
     it("rerenders the tree", () => {
         const tree = given.$tree.tree("getTree");
-        (tree.children[0] as INode).name = "node1a";
+        (tree.children[0] as INode).name = "node1a"; // eslint-disable-line testing-library/no-node-access
 
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({ name: "node1" }),
@@ -1013,8 +1013,8 @@ describe("reload", () => {
     beforeEach(async () => {
         server.use(
             rest.get("/tree2/", (_request, response, ctx) =>
-                response(ctx.status(200), ctx.json(exampleData))
-            )
+                response(ctx.status(200), ctx.json(exampleData)),
+            ),
         );
 
         given.$tree.tree({ dataUrl: "/tree2/" });
@@ -1070,7 +1070,7 @@ describe("removeNode", () => {
 
     context("with a child node", () => {
         given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "child1")
+            given.$tree.tree("getNodeByNameMustExist", "child1"),
         );
 
         it("removes the node", () => {
@@ -1103,7 +1103,7 @@ describe("removeNode", () => {
 
     context("with a parent node and its children", () => {
         given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1")
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
         );
 
         it("removes the node", () => {
@@ -1121,7 +1121,7 @@ describe("removeNode", () => {
             beforeEach(() => {
                 const child1 = given.$tree.tree(
                     "getNodeByNameMustExist",
-                    "child1"
+                    "child1",
                 );
                 given.$tree.tree("selectNode", child1);
             });
@@ -1139,7 +1139,7 @@ describe("removeNode", () => {
 
         it("raises an exception", () => {
             expect(() => given.$tree.tree("removeNode", given.node)).toThrow(
-                "Node has no parent"
+                "Node has no parent",
             );
         });
     });
@@ -1382,7 +1382,7 @@ describe("updateNode", () => {
                 expect.objectContaining({ name: "node2" }),
             ]);
             expect(given.$tree.tree("getNodeById", 999)).toMatchObject(
-                given.nodeData
+                given.nodeData,
             );
         });
     });
@@ -1406,7 +1406,7 @@ describe("updateNode", () => {
         context("when adding a child to a child node", () => {
             given("nodeData", () => ({ children: ["new-child"] }));
             given("node", () =>
-                given.$tree.tree("getNodeByNameMustExist", "child1")
+                given.$tree.tree("getNodeByNameMustExist", "child1"),
             );
 
             it("adds the child node", () => {

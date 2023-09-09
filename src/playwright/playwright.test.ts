@@ -15,17 +15,12 @@ interface InitPageParameters {
     page: Page;
 }
 
-const defaultParams: Partial<InitPageParameters> = {
-    autoOpen: 0,
-    dragAndDrop: false,
-};
-
-const initPage = async (inputParams: InitPageParameters) => {
-    const { autoOpen, baseURL, dragAndDrop, page } = {
-        ...defaultParams,
-        ...inputParams,
-    };
-
+const initPage = async ({
+    autoOpen,
+    baseURL,
+    dragAndDrop,
+    page,
+}: InitPageParameters) => {
     if (!baseURL) {
         throw new Error("Missing baseURL");
     }
@@ -39,10 +34,10 @@ const initPage = async (inputParams: InitPageParameters) => {
         const $tree = jQuery("#tree1");
 
         $tree.tree({
-            animationSpeed: ${autoOpen},
-            autoOpen: 0,
+            animationSpeed: 0,
+            autoOpen: ${autoOpen || 0},
             data: ExampleData.exampleData,
-            dragAndDrop: ${dragAndDrop},
+            dragAndDrop: ${dragAndDrop || false},
             startDndDelay: 100,
         });
     `);
@@ -128,7 +123,7 @@ test.describe("autoscroll", () => {
         baseURL,
         page,
     }) => {
-        page.setViewportSize({ width: 200, height: 100 });
+        await page.setViewportSize({ width: 200, height: 100 });
         await initPage({ baseURL, page, autoOpen: 3, dragAndDrop: true });
 
         expect(
