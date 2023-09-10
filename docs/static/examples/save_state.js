@@ -6,8 +6,6 @@ $.mockjax({
     responseTime: 0
 });
 
-$(function() {
-    $("#tree1").tree({
-        saveState: true
-    });
+$("#tree1").tree({
+    saveState: true
 });
