@@ -2649,6 +2649,154 @@ var jqtree = (function (exports) {
     return SaveStateHandler;
   }();
 
+  var ContainerScrollParent = /*#__PURE__*/function () {
+    function ContainerScrollParent(_ref) {
+      var $container = _ref.$container,
+        refreshHitAreas = _ref.refreshHitAreas;
+      _classCallCheck(this, ContainerScrollParent);
+      _defineProperty(this, "$container", void 0);
+      _defineProperty(this, "horizontalScrollDirection", void 0);
+      _defineProperty(this, "horizontalScrollTimeout", void 0);
+      _defineProperty(this, "refreshHitAreas", void 0);
+      _defineProperty(this, "scrollParentBottom", void 0);
+      _defineProperty(this, "scrollParentTop", void 0);
+      _defineProperty(this, "verticalScrollTimeout", void 0);
+      _defineProperty(this, "verticalScrollDirection", void 0);
+      this.$container = $container;
+      this.refreshHitAreas = refreshHitAreas;
+    }
+    _createClass(ContainerScrollParent, [{
+      key: "checkHorizontalScrolling",
+      value: function checkHorizontalScrolling(pageX) {
+        var newHorizontalScrollDirection = this.getNewHorizontalScrollDirection(pageX);
+        if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
+          this.horizontalScrollDirection = newHorizontalScrollDirection;
+          if (this.horizontalScrollTimeout != null) {
+            window.clearTimeout(this.verticalScrollTimeout);
+          }
+          if (newHorizontalScrollDirection) {
+            this.horizontalScrollTimeout = window.setTimeout(this.scrollHorizontally.bind(this), 40);
+          }
+        }
+      }
+    }, {
+      key: "checkVerticalScrolling",
+      value: function checkVerticalScrolling(pageY) {
+        var newVerticalScrollDirection = this.getNewVerticalScrollDirection(pageY);
+        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
+          this.verticalScrollDirection = newVerticalScrollDirection;
+          if (this.verticalScrollTimeout != null) {
+            window.clearTimeout(this.verticalScrollTimeout);
+            this.verticalScrollTimeout = undefined;
+          }
+          if (newVerticalScrollDirection) {
+            this.verticalScrollTimeout = window.setTimeout(this.scrollVertically.bind(this), 40);
+          }
+        }
+      }
+    }, {
+      key: "getScrollLeft",
+      value: function getScrollLeft() {
+        return this.$container.scrollLeft() || 0;
+      }
+    }, {
+      key: "scrollToY",
+      value: function scrollToY(top) {
+        var container = this.$container.get(0);
+        container.scrollTop = top;
+      }
+    }, {
+      key: "stopScrolling",
+      value: function stopScrolling() {
+        this.horizontalScrollDirection = undefined;
+        this.verticalScrollDirection = undefined;
+        this.scrollParentTop = undefined;
+        this.scrollParentBottom = undefined;
+      }
+    }, {
+      key: "getNewHorizontalScrollDirection",
+      value: function getNewHorizontalScrollDirection(pageX) {
+        var scrollParentOffset = this.$container.offset();
+        if (!scrollParentOffset) {
+          return undefined;
+        }
+        var container = this.$container.get(0);
+        var rightEdge = scrollParentOffset.left + container.clientWidth;
+        var leftEdge = scrollParentOffset.left;
+        var isNearRightEdge = pageX > rightEdge - 20;
+        var isNearLeftEdge = pageX < leftEdge + 20;
+        if (isNearRightEdge) {
+          return "right";
+        } else if (isNearLeftEdge) {
+          return "left";
+        }
+        return undefined;
+      }
+    }, {
+      key: "getNewVerticalScrollDirection",
+      value: function getNewVerticalScrollDirection(pageY) {
+        if (pageY < this.getScrollParentTop()) {
+          return "top";
+        }
+        if (pageY > this.getScrollParentBottom()) {
+          return "bottom";
+        }
+        return undefined;
+      }
+    }, {
+      key: "scrollHorizontally",
+      value: function scrollHorizontally() {
+        if (!this.horizontalScrollDirection) {
+          return;
+        }
+        var distance = this.horizontalScrollDirection === "left" ? -20 : 20;
+        var container = this.$container.get(0);
+        container.scrollBy({
+          left: distance,
+          top: 0,
+          behavior: "instant"
+        });
+        this.refreshHitAreas();
+        setTimeout(this.scrollHorizontally.bind(this), 40);
+      }
+    }, {
+      key: "scrollVertically",
+      value: function scrollVertically() {
+        if (!this.verticalScrollDirection) {
+          return;
+        }
+        var distance = this.verticalScrollDirection === "top" ? -20 : 20;
+        var container = this.$container.get(0);
+        container.scrollBy({
+          left: 0,
+          top: distance,
+          behavior: "instant"
+        });
+        this.refreshHitAreas();
+        setTimeout(this.scrollVertically.bind(this), 40);
+      }
+    }, {
+      key: "getScrollParentTop",
+      value: function getScrollParentTop() {
+        if (this.scrollParentTop == null) {
+          var _this$$container$offs;
+          this.scrollParentTop = ((_this$$container$offs = this.$container.offset()) === null || _this$$container$offs === void 0 ? void 0 : _this$$container$offs.top) || 0;
+        }
+        return this.scrollParentTop;
+      }
+    }, {
+      key: "getScrollParentBottom",
+      value: function getScrollParentBottom() {
+        if (this.scrollParentBottom == null) {
+          var _this$$container$inne;
+          this.scrollParentBottom = this.getScrollParentTop() + ((_this$$container$inne = this.$container.innerHeight()) !== null && _this$$container$inne !== void 0 ? _this$$container$inne : 0);
+        }
+        return this.scrollParentBottom;
+      }
+    }]);
+    return ContainerScrollParent;
+  }();
+
   var DocumentScrollParent = /*#__PURE__*/function () {
     function DocumentScrollParent($element, refreshHitAreas) {
       _classCallCheck(this, DocumentScrollParent);
@@ -2695,20 +2843,7 @@ var jqtree = (function (exports) {
     }, {
       key: "getScrollLeft",
       value: function getScrollLeft() {
-        return 0;
-      }
-    }, {
-      key: "isScrolledIntoView",
-      value: function isScrolledIntoView($element) {
-        var _$element$offset$top, _$element$offset;
-        var $window = jQuery(window);
-        var elementHeight = $element.height() || 0;
-        var viewTop = $window.scrollTop() || 0;
-        var windowHeight = $window.height() || 0;
-        var viewBottom = viewTop + windowHeight;
-        var elementTop = (_$element$offset$top = (_$element$offset = $element.offset()) === null || _$element$offset === void 0 ? void 0 : _$element$offset.top) !== null && _$element$offset$top !== void 0 ? _$element$offset$top : 0;
-        var elementBottom = elementTop + elementHeight;
-        return elementBottom <= viewBottom && elementTop >= 0;
+        return document.documentElement.scrollLeft;
       }
     }, {
       key: "scrollToY",
@@ -2819,179 +2954,6 @@ var jqtree = (function (exports) {
     return DocumentScrollParent;
   }();
 
-  var ContainerScrollParent = /*#__PURE__*/function () {
-    function ContainerScrollParent(_ref) {
-      var $container = _ref.$container,
-        refreshHitAreas = _ref.refreshHitAreas,
-        $treeElement = _ref.$treeElement;
-      _classCallCheck(this, ContainerScrollParent);
-      _defineProperty(this, "$container", void 0);
-      _defineProperty(this, "documentScrollParent", void 0);
-      _defineProperty(this, "horizontalScrollDirection", void 0);
-      _defineProperty(this, "horizontalScrollTimeout", void 0);
-      _defineProperty(this, "refreshHitAreas", void 0);
-      _defineProperty(this, "scrollParentBottom", void 0);
-      _defineProperty(this, "scrollParentTop", void 0);
-      _defineProperty(this, "verticalScrollTimeout", void 0);
-      _defineProperty(this, "verticalScrollDirection", void 0);
-      this.$container = $container;
-      this.refreshHitAreas = refreshHitAreas;
-      this.documentScrollParent = new DocumentScrollParent($treeElement, refreshHitAreas);
-    }
-    _createClass(ContainerScrollParent, [{
-      key: "checkHorizontalScrolling",
-      value: function checkHorizontalScrolling(pageX) {
-        var newHorizontalScrollDirection = this.getNewHorizontalScrollDirection(pageX);
-        if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
-          this.horizontalScrollDirection = newHorizontalScrollDirection;
-          if (this.horizontalScrollTimeout != null) {
-            window.clearTimeout(this.verticalScrollTimeout);
-          }
-          if (newHorizontalScrollDirection) {
-            this.horizontalScrollTimeout = window.setTimeout(this.scrollHorizontally.bind(this), 40);
-          }
-        }
-        if (newHorizontalScrollDirection) {
-          this.documentScrollParent.stopScrolling();
-        } else {
-          this.documentScrollParent.checkHorizontalScrolling(pageX);
-        }
-      }
-    }, {
-      key: "checkVerticalScrolling",
-      value: function checkVerticalScrolling(pageY) {
-        var newVerticalScrollDirection = this.getNewVerticalScrollDirection(pageY);
-        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
-          this.verticalScrollDirection = newVerticalScrollDirection;
-          if (this.verticalScrollTimeout != null) {
-            window.clearTimeout(this.verticalScrollTimeout);
-            this.verticalScrollTimeout = undefined;
-          }
-          if (newVerticalScrollDirection) {
-            this.verticalScrollTimeout = window.setTimeout(this.scrollVertically.bind(this), 40);
-          }
-        }
-        if (newVerticalScrollDirection) {
-          this.documentScrollParent.stopScrolling();
-        } else {
-          this.documentScrollParent.checkVerticalScrolling(pageY);
-        }
-      }
-    }, {
-      key: "getScrollLeft",
-      value: function getScrollLeft() {
-        return this.$container.scrollLeft() || 0;
-      }
-    }, {
-      key: "isScrolledIntoView",
-      value: function isScrolledIntoView($element) {
-        var _$element$offset$top, _$element$offset;
-        var elementHeight = $element.height() || 0;
-        var viewBottom = this.$container.height() || 0;
-        var originalTop = (_$element$offset$top = (_$element$offset = $element.offset()) === null || _$element$offset === void 0 ? void 0 : _$element$offset.top) !== null && _$element$offset$top !== void 0 ? _$element$offset$top : 0;
-        var elementTop = originalTop - this.getScrollParentTop();
-        var elementBottom = elementTop + elementHeight;
-        return elementBottom <= viewBottom && elementTop >= 0;
-      }
-    }, {
-      key: "scrollToY",
-      value: function scrollToY(top) {
-        var container = this.$container.get(0);
-        container.scrollTop = top;
-      }
-    }, {
-      key: "stopScrolling",
-      value: function stopScrolling() {
-        this.horizontalScrollDirection = undefined;
-        this.verticalScrollDirection = undefined;
-        this.scrollParentTop = undefined;
-        this.scrollParentBottom = undefined;
-        this.documentScrollParent.stopScrolling();
-      }
-    }, {
-      key: "getNewHorizontalScrollDirection",
-      value: function getNewHorizontalScrollDirection(pageX) {
-        var scrollParentOffset = this.$container.offset();
-        if (!scrollParentOffset) {
-          return undefined;
-        }
-        var container = this.$container.get(0);
-        var rightEdge = scrollParentOffset.left + container.clientWidth;
-        var leftEdge = scrollParentOffset.left;
-        var isNearRightEdge = pageX > rightEdge - 20;
-        var isNearLeftEdge = pageX < leftEdge + 20;
-        if (isNearRightEdge) {
-          return "right";
-        } else if (isNearLeftEdge) {
-          return "left";
-        }
-        return undefined;
-      }
-    }, {
-      key: "getNewVerticalScrollDirection",
-      value: function getNewVerticalScrollDirection(pageY) {
-        if (pageY < this.getScrollParentTop()) {
-          return "top";
-        }
-        if (pageY > this.getScrollParentBottom()) {
-          return "bottom";
-        }
-        return undefined;
-      }
-    }, {
-      key: "scrollHorizontally",
-      value: function scrollHorizontally() {
-        if (!this.horizontalScrollDirection) {
-          return;
-        }
-        var distance = this.horizontalScrollDirection === "left" ? -20 : 20;
-        var container = this.$container.get(0);
-        container.scrollBy({
-          left: distance,
-          top: 0,
-          behavior: "instant"
-        });
-        this.refreshHitAreas();
-        setTimeout(this.scrollHorizontally.bind(this), 40);
-      }
-    }, {
-      key: "scrollVertically",
-      value: function scrollVertically() {
-        if (!this.verticalScrollDirection) {
-          return;
-        }
-        var distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        var container = this.$container.get(0);
-        container.scrollBy({
-          left: 0,
-          top: distance,
-          behavior: "instant"
-        });
-        this.refreshHitAreas();
-        setTimeout(this.scrollVertically.bind(this), 40);
-      }
-    }, {
-      key: "getScrollParentTop",
-      value: function getScrollParentTop() {
-        if (this.scrollParentTop == null) {
-          var _this$$container$offs;
-          this.scrollParentTop = ((_this$$container$offs = this.$container.offset()) === null || _this$$container$offs === void 0 ? void 0 : _this$$container$offs.top) || 0;
-        }
-        return this.scrollParentTop;
-      }
-    }, {
-      key: "getScrollParentBottom",
-      value: function getScrollParentBottom() {
-        if (this.scrollParentBottom == null) {
-          var _this$$container$inne;
-          this.scrollParentBottom = this.getScrollParentTop() + ((_this$$container$inne = this.$container.innerHeight()) !== null && _this$$container$inne !== void 0 ? _this$$container$inne : 0);
-        }
-        return this.scrollParentBottom;
-      }
-    }]);
-    return ContainerScrollParent;
-  }();
-
   var hasOverFlow = function hasOverFlow($element) {
     for (var _i = 0, _arr = ["overflow", "overflow-y"]; _i < _arr.length; _i++) {
       var attr = _arr[_i];
@@ -3060,11 +3022,6 @@ var jqtree = (function (exports) {
       key: "scrollToY",
       value: function scrollToY(top) {
         this.getScrollParent().scrollToY(top);
-      }
-    }, {
-      key: "isScrolledIntoView",
-      value: function isScrolledIntoView($element) {
-        return this.getScrollParent().isScrolledIntoView($element);
       }
     }, {
       key: "getScrollLeft",
