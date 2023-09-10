@@ -25,10 +25,6 @@ export default class ScrollHandler {
         this.getScrollParent().scrollToY(top);
     }
 
-    public isScrolledIntoView($element: JQuery<HTMLElement>): boolean {
-        return this.getScrollParent().isScrolledIntoView($element);
-    }
-
     public getScrollLeft(): number {
         return this.getScrollParent().getScrollLeft();
     }

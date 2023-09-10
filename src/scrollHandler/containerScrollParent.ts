@@ -69,16 +69,6 @@ export default class ContainerScrollParent implements ScrollParent {
         return this.$container.scrollLeft() || 0;
     }
 
-    public isScrolledIntoView($element: JQuery<HTMLElement>): boolean {
-        const elementHeight = $element.height() || 0;
-        const viewBottom = this.$container.height() || 0;
-        const originalTop = $element.offset()?.top ?? 0;
-        const elementTop = originalTop - this.getScrollParentTop();
-        const elementBottom = elementTop + elementHeight;
-
-        return elementBottom <= viewBottom && elementTop >= 0;
-    }
-
     public scrollToY(top: number): void {
         const container = this.$container.get(0) as HTMLElement;
         container.scrollTop = top;
