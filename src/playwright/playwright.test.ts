@@ -1,4 +1,4 @@
-import { test, expect, Page, ElementHandle } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import {
     dragAndDrop,
     findNodeElement,
@@ -128,7 +128,9 @@ test.describe("autoscroll when the window is scrollable", () => {
         await initTree(page, { autoOpen: 3, dragAndDrop: true });
 
         expect(
-            await page.evaluate("document.documentElement.scrollTop"),
+            await page
+                .getByRole("document")
+                .evaluate((element) => element.scrollTop),
         ).toEqual(0);
 
         await moveMouseToNode(page, "Saurischia");
@@ -142,7 +144,9 @@ test.describe("autoscroll when the window is scrollable", () => {
         await page.waitForTimeout(50);
 
         expect(
-            await page.evaluate("document.documentElement.scrollTop"),
+            await page
+                .getByRole("document")
+                .evaluate((element) => element.scrollTop),
         ).toBeGreaterThan(0);
     });
 
@@ -155,7 +159,9 @@ test.describe("autoscroll when the window is scrollable", () => {
         await initTree(page, { autoOpen: 3, dragAndDrop: true });
 
         expect(
-            await page.evaluate("document.documentElement.scrollLeft"),
+            await page
+                .getByRole("document")
+                .evaluate((element) => element.scrollLeft),
         ).toEqual(0);
 
         await moveMouseToNode(page, "Saurischia");
@@ -169,7 +175,9 @@ test.describe("autoscroll when the window is scrollable", () => {
         await page.waitForTimeout(50);
 
         expect(
-            await page.evaluate("document.documentElement.scrollLeft"),
+            await page
+                .getByRole("document")
+                .evaluate((element) => element.scrollLeft),
         ).toBeGreaterThan(0);
     });
 });
@@ -199,7 +207,9 @@ test.describe("autoscroll when the container is scrollable", () => {
         await initTree(page, { autoOpen: 3, dragAndDrop: true });
 
         expect(
-            await page.$eval("#container", (element) => element.scrollTop),
+            await page
+                .locator("#container")
+                .evaluate((element) => element.scrollTop),
         ).toEqual(0);
 
         await moveMouseToNode(page, "Saurischia");
@@ -213,7 +223,9 @@ test.describe("autoscroll when the container is scrollable", () => {
         await page.waitForTimeout(50);
 
         expect(
-            await page.$eval("#container", (element) => element.scrollTop),
+            await page
+                .locator("#container")
+                .evaluate((element) => element.scrollTop),
         ).toBeGreaterThan(0);
     });
 });
