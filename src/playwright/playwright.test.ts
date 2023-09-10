@@ -180,6 +180,30 @@ test.describe("autoscroll when the window is scrollable", () => {
                 .evaluate((element) => element.scrollLeft),
         ).toBeGreaterThan(0);
     });
+
+    test("scrollToNode scrolls to a node", async ({ baseURL, page }) => {
+        await page.setViewportSize({ width: 200, height: 100 });
+        await initPage(page, baseURL);
+        await initTree(page, { autoOpen: 3, dragAndDrop: true });
+
+        expect(
+            await page
+                .getByRole("document")
+                .evaluate((element) => element.scrollTop),
+        ).toEqual(0);
+
+        await page.evaluate(`
+            const $tree = jQuery("#tree1");
+            const node = $tree.tree("getNodeByName", "Sauropodomorphs");
+            $tree.tree("scrollToNode",node);
+        `);
+
+        expect(
+            await page
+                .getByRole("document")
+                .evaluate((element) => element.scrollTop),
+        ).toBeGreaterThan(0);
+    });
 });
 
 test.describe("autoscroll when the container is scrollable", () => {
@@ -255,6 +279,26 @@ test.describe("autoscroll when the container is scrollable", () => {
             await page
                 .locator("#container")
                 .evaluate((element) => element.scrollLeft),
+        ).toBeGreaterThan(0);
+    });
+
+    test("scrollToNode scrolls to a node", async ({ page }) => {
+        expect(
+            await page
+                .locator("#container")
+                .evaluate((element) => element.scrollTop),
+        ).toEqual(0);
+
+        await page.evaluate(`
+            const $tree = jQuery("#tree1");
+            const node = $tree.tree("getNodeByName", "Sauropodomorphs");
+            $tree.tree("scrollToNode",node);
+        `);
+
+        expect(
+            await page
+                .locator("#container")
+                .evaluate((element) => element.scrollTop),
         ).toBeGreaterThan(0);
     });
 });
