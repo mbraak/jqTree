@@ -183,14 +183,12 @@ test.describe("autoscroll when the window is scrollable", () => {
 });
 
 test.describe("autoscroll when the container is scrollable", () => {
-    test("it scrolls vertically when the users drags an element to the bottom", async ({
-        baseURL,
-        page,
-    }) => {
+    test.beforeEach(async ({ page, baseURL }) => {
         await initPage(page, baseURL);
 
         // Add a container and make it the parent of the tree element
         await page.evaluate(`
+            document.body.style.marginLeft = "40px";
             document.body.style.marginTop = "40px";
 
             const treeElement = document.querySelector("#tree1");
@@ -198,6 +196,7 @@ test.describe("autoscroll when the container is scrollable", () => {
             const container = document.createElement("div");
             container.id = "container";
             container.style.height = "200px";
+            container.style.width = "60px";
             container.style.overflowY = "scroll";
 
             document.body.replaceChild(container, treeElement);
@@ -205,7 +204,11 @@ test.describe("autoscroll when the container is scrollable", () => {
         `);
 
         await initTree(page, { autoOpen: 3, dragAndDrop: true });
+    });
 
+    test("it scrolls vertically when the users drags an element to the bottom", async ({
+        page,
+    }) => {
         expect(
             await page
                 .locator("#container")
@@ -226,6 +229,32 @@ test.describe("autoscroll when the container is scrollable", () => {
             await page
                 .locator("#container")
                 .evaluate((element) => element.scrollTop),
+        ).toBeGreaterThan(0);
+    });
+
+    test("it scrolls horizontally when the users drags an element to the right", async ({
+        page,
+    }) => {
+        expect(
+            await page
+                .locator("#container")
+                .evaluate((element) => element.scrollLeft),
+        ).toEqual(0);
+
+        await moveMouseToNode(page, "Saurischia");
+        await page.mouse.down();
+
+        // eslint-disable-next-line playwright/no-wait-for-timeout
+        await page.waitForTimeout(200);
+
+        await page.mouse.move(100, 50);
+        // eslint-disable-next-line playwright/no-wait-for-timeout
+        await page.waitForTimeout(50);
+
+        expect(
+            await page
+                .locator("#container")
+                .evaluate((element) => element.scrollLeft),
         ).toBeGreaterThan(0);
     });
 });
