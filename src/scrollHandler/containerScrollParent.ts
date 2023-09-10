@@ -1,5 +1,4 @@
 import type { ScrollParent } from "./types";
-import DocumentScrollParent from "./documentScrollParent";
 
 type HorizontalScrollDirection = "left" | "right";
 type VerticalScrollDirection = "bottom" | "top";
@@ -12,7 +11,6 @@ interface Params {
 
 export default class ContainerScrollParent implements ScrollParent {
     private $container: JQuery<HTMLElement>;
-    private documentScrollParent: DocumentScrollParent;
     private horizontalScrollDirection?: HorizontalScrollDirection;
     private horizontalScrollTimeout?: number;
     private refreshHitAreas: () => void;
@@ -21,14 +19,9 @@ export default class ContainerScrollParent implements ScrollParent {
     private verticalScrollTimeout?: number;
     private verticalScrollDirection?: VerticalScrollDirection;
 
-    constructor({ $container, refreshHitAreas, $treeElement }: Params) {
+    constructor({ $container, refreshHitAreas }: Params) {
         this.$container = $container;
         this.refreshHitAreas = refreshHitAreas;
-
-        this.documentScrollParent = new DocumentScrollParent(
-            $treeElement,
-            refreshHitAreas,
-        );
     }
 
     public checkHorizontalScrolling(pageX: number): void {
@@ -48,12 +41,6 @@ export default class ContainerScrollParent implements ScrollParent {
                     40,
                 );
             }
-        }
-
-        if (newHorizontalScrollDirection) {
-            this.documentScrollParent.stopScrolling();
-        } else {
-            this.documentScrollParent.checkHorizontalScrolling(pageX);
         }
     }
 
@@ -75,12 +62,6 @@ export default class ContainerScrollParent implements ScrollParent {
                     40,
                 );
             }
-        }
-
-        if (newVerticalScrollDirection) {
-            this.documentScrollParent.stopScrolling();
-        } else {
-            this.documentScrollParent.checkVerticalScrolling(pageY);
         }
     }
 
@@ -108,7 +89,6 @@ export default class ContainerScrollParent implements ScrollParent {
         this.verticalScrollDirection = undefined;
         this.scrollParentTop = undefined;
         this.scrollParentBottom = undefined;
-        this.documentScrollParent.stopScrolling();
     }
 
     private getNewHorizontalScrollDirection(
