@@ -6,17 +6,117 @@ baseurl: "/jqTree"
 url: "http://mbraak.github.io/jqTree/"
 
 collections:
-    entries:
-        output: false
-    examples:
-        output: true
+  entries:
+    output: false
+    order:
+      - general.md
+      - introduction.md
+      - features.md
+      - demo.html
+      - requirements.md
+      - downloads.md
+      - tutorial.md
+      - examples.md
+      - usecases.md
+      - changelog.md
+      - options.md
+      - animationspeed.md
+      - autoescape.md
+      - autoopen.md
+      - buttonleft.md
+      - closedicon.md
+      - data.md
+      - datafilter.md
+      - data-url.md
+      - draganddrop.md
+      - keyboardsupport.md
+      - oncanmove.md
+      - oncanmoveto.md
+      - oncanselectnode.md
+      - oncreateli.md
+      - ondragmove.md
+      - ondragstop.md
+      - onismovehandle.md
+      - onloadfailed.md
+      - onloading.md
+      - openedicon.md
+      - openfolderdelay.md
+      - rtl.md
+      - savestate.md
+      - selectable.md
+      - showemptyfolder.md
+      - slide.md
+      - start_dnd_delay.md
+      - tabindex.md
+      - usecontextmenu.md
+      - functions.md
+      - addparentnode.md
+      - addnodeafter.md
+      - addnodebefore.md
+      - appendnode.md
+      - closenode.md
+      - destroy.md
+      - getnodebycallback.md
+      - getnodebyid.md
+      - getnodebyhtmlelement.md
+      - getselectednode.md
+      - getstate.md
+      - gettree.md
+      - isdragging.md
+      - loaddata.md
+      - loaddatafromurl.md
+      - movedown.md
+      - movenode.md
+      - moveup.md
+      - opennode.md
+      - prependnode.md
+      - refresh.md
+      - reload.md
+      - removenode.md
+      - selectnode.md
+      - scrolltonode.md
+      - setoption.md
+      - setstate.md
+      - toggle.md
+      - tojson.md
+      - updatenode.md
+      - events.md
+      - tree-click.md
+      - tree-close.md
+      - tree-contextmenu.md
+      - tree-dblclick.md
+      - tree-init.md
+      - tree-load-data.md
+      - tree-loading-data.md
+      - tree-move.md
+      - tree-refresh.md
+      - tree-open.md
+      - tree-select.md
+      - multiple-selection.md
+      - add-to-selection.md
+      - get-selected-nodes.md
+      - is-node-selected.md
+      - remove-from-selection.md
+      - node-functions.md
+      - children.md
+      - getdata.md
+      - getlevel.md
+      - getnextnode.md
+      - getnextsibling.md
+      - getnextvisiblenode.md
+      - getpreviousnode.md
+      - getprevioussibling.md
+      - getpreviousvisiblenode.md
+      - parent.md
+  examples:
+    output: true
 
 defaults:
-    - scope:
-        path: ""
-        type: "examples"
-      values:
-        layout: "example"
+  - scope:
+      path: ""
+      type: "examples"
+    values:
+      layout: "example"
 
 jqtree_version: 1.7.2
 
