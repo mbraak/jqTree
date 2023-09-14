@@ -6,10 +6,8 @@ $.mockjax({
     responseTime: 0
 });
 
-$(function() {
-    var $tree = $("#tree1");
-    $tree.tree({
-        dragAndDrop: true,
-        autoOpen: 0
-    });
+var $tree = $("#tree1");
+$tree.tree({
+    dragAndDrop: true,
+    autoOpen: 0
 });

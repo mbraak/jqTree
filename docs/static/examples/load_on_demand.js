@@ -12,10 +12,8 @@ $.mockjax({
     }
 });
 
-$(function() {
-    var $tree = $("#tree1");
+var $tree = $("#tree1");
 
-    $tree.tree({
-        saveState: true
-    });
+$tree.tree({
+    saveState: true
 });
