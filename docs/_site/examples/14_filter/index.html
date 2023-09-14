@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Filter</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="JqTree is a jQuery widget for displaying a tree structure in html" />
+        <link rel="stylesheet" href="/jqTree/static/monokai.css" />
+        <link rel="stylesheet" href="/jqTree/static/bower_components/fontawesome/css/all.min.css" />
+        <link rel="stylesheet" href="/jqTree/static/documentation.css" />
+        <link rel="stylesheet" href="/jqTree/jqtree.css" />
+        <link rel="stylesheet" href="/jqTree/static/example.css" />
+    </head>
+    <body>
+        <div class="mx-auto max-w-8xl mt-4 prose px-8">
+  <p class="flex justify-between">
+    <a href="../13_drag_outside/">&laquo; Example 13</a>
+</p>
+
+<h1>Example 14 - filter</h1>
+
+<div class="pb-6">
+    <input id="search-term" class="shadow-sm border px-4 py-1 focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md mr-4" autofocus></input>
+    <button id="search" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Search</button>
+</div>
+<div id="tree1" class="not-prose"></div>
+
+<h3>javascript</h3>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">const</span> <span class="nx">$tree</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#tree1</span><span class="dl">"</span><span class="p">);</span>
+
+<span class="kd">let</span> <span class="nx">foundMatch</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+<span class="nx">$tree</span><span class="p">.</span><span class="nf">tree</span><span class="p">({</span>
+    <span class="na">autoOpen</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="na">data</span><span class="p">:</span> <span class="nx">ExampleData</span><span class="p">.</span><span class="nx">exampleData</span><span class="p">,</span>
+    <span class="na">useContextMenu</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="na">onCreateLi</span><span class="p">:</span> <span class="p">(</span><span class="nx">node</span><span class="p">,</span> <span class="nx">$el</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if </span><span class="p">(</span><span class="nx">foundMatch</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">node</span><span class="p">.</span><span class="nx">openForMatch</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">node</span><span class="p">.</span><span class="nx">parent</span><span class="p">.</span><span class="nx">matches</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">$el</span><span class="p">.</span><span class="nf">addClass</span><span class="p">(</span><span class="dl">"</span><span class="s2">hidden-node</span><span class="dl">"</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">if </span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">matches</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">$el</span><span class="p">.</span><span class="nf">addClass</span><span class="p">(</span><span class="dl">"</span><span class="s2">highlight-node</span><span class="dl">"</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+<span class="p">});</span>
+
+<span class="nf">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#search</span><span class="dl">"</span><span class="p">).</span><span class="nf">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">click</span><span class="dl">"</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">searchTerm</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#search-term</span><span class="dl">"</span><span class="p">).</span><span class="nf">val</span><span class="p">().</span><span class="nf">toLowerCase</span><span class="p">();</span>
+    <span class="kd">const</span> <span class="nx">tree</span> <span class="o">=</span> <span class="nx">$tree</span><span class="p">.</span><span class="nf">tree</span><span class="p">(</span><span class="dl">"</span><span class="s2">getTree</span><span class="dl">"</span><span class="p">);</span>
+
+    <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">searchTerm</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">foundMatch</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+        <span class="nx">tree</span><span class="p">.</span><span class="nf">iterate</span><span class="p">((</span><span class="nx">node</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="nx">node</span><span class="p">[</span><span class="dl">'</span><span class="s1">openForMatch</span><span class="dl">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="nx">node</span><span class="p">[</span><span class="dl">"</span><span class="s2">matches</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">});</span>
+
+        <span class="nx">$tree</span><span class="p">.</span><span class="nf">tree</span><span class="p">(</span><span class="dl">"</span><span class="s2">refresh</span><span class="dl">"</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">foundMatch</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+    <span class="nx">tree</span><span class="p">.</span><span class="nf">iterate</span><span class="p">((</span><span class="nx">node</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">matches</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nf">toLowerCase</span><span class="p">().</span><span class="nf">includes</span><span class="p">(</span><span class="nx">searchTerm</span><span class="p">);</span>
+        <span class="nx">node</span><span class="p">[</span><span class="dl">"</span><span class="s2">openForMatch</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="nx">matches</span><span class="p">;</span>
+        <span class="nx">node</span><span class="p">[</span><span class="dl">"</span><span class="s2">matches</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="nx">matches</span><span class="p">;</span>
+
+        <span class="k">if </span><span class="p">(</span><span class="nx">matches</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">foundMatch</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+            <span class="k">if </span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nf">isFolder</span><span class="p">())</span> <span class="p">{</span>
+                <span class="nx">node</span><span class="p">.</span><span class="nx">is_open</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="kd">let</span> <span class="nx">parent</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">parent</span><span class="p">;</span>
+            <span class="k">while </span><span class="p">(</span><span class="nx">parent</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">parent</span><span class="p">[</span><span class="dl">"</span><span class="s2">openForMatch</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+                <span class="nx">parent</span><span class="p">.</span><span class="nx">is_open</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+                <span class="nx">parent</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">parent</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="nx">$tree</span><span class="p">.</span><span class="nf">tree</span><span class="p">(</span><span class="dl">"</span><span class="s2">refresh</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">});</span></code></pre></figure>
+
+<h3>html</h3>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div</span><span class="err">"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">"search-term"</span> <span class="na">autofocus</span><span class="nt">&gt;&lt;/input&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">"search"</span><span class="nt">&gt;</span>Search<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"tree1"</span><span class="nt">&gt;&lt;/div&gt;</span></code></pre></figure>
+
+<h3>css</h3>
+
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nc">.hidden-node</span> <span class="p">{</span>
+    <span class="nl">display</span><span class="p">:</span> <span class="nb">none</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.highlight-node</span> <span class="o">&gt;</span> <span class="nc">.jqtree-element</span> <span class="o">&gt;</span> <span class="nc">.jqtree-title</span> <span class="p">{</span>
+    <span class="nl">font-weight</span><span class="p">:</span> <span class="nb">bold</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nf">#search-term</span> <span class="p">{</span>
+    <span class="nl">margin-bottom</span><span class="p">:</span> <span class="m">16px</span><span class="p">;</span>
+    <span class="nl">margin-right</span><span class="p">:</span> <span class="m">8px</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+</div>
+
+    </body>
+
+    <script src="/jqTree/static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/jqTree/tree.jquery.js"></script>
+    <script src="/jqTree/static/bower_components/jquery-mockjax/dist/jquery.mockjax.js"></script>
+    <script src="/jqTree/static/example_data.js"></script>
+
+    
+        <script src="/jqTree/static/examples/filter.js"></script>
+    
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "jqtree_documentation",
+  "private": true,
+  "scripts": {
+    "jekyll-build": "bundle exec jekyll build",
+    "jekyll-serve": "bundle exec jekyll serve",
+    "build_docs_css": "pnpm tailwind && pnpm build_example_css && pnpm copy_static",
+    "tailwind": "tailwindcss -i documentation.css -o static/documentation.css",
+    "build_example_css": "postcss -o static/example.css static/example.postcss",
+    "copy_static": "cp ../tree.jquery.js . && cp ../jqtree.css ."
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9",
+    "autoprefixer": "^10.4.15",
+    "postcss": "^8.4.28",
+    "postcss-cli": "^10.1.0",
+    "postcss-import": "^15.1.0",
+    "postcss-load-config": "^4.0.1",
+    "postcss-nested": "^6.0.1",
+    "tailwindcss": "^3.3.3"
+  }
+}
