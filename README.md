@@ -12,7 +12,7 @@ JqTree is a tree widget. Read more in the [documentation](https://mbraak.github.
 
 -   Create a tree from JSON data
 -   Drag and drop
--   Works on ie11+, firefox, chrome and safari
+-   Works on all modern browsers
 -   Written in Typescript
 
 The project is hosted on [github](https://github.com/mbraak/jqTree), has a [test suite](http://mbraak.github.io/jqTree/test/test.html).

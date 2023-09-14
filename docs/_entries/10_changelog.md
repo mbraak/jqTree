@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+#### 1.7.2 (september 14 2023)
+
+-   Issue #732: improve types of closedIcon and openedIcon
+-   Issue #736: use the bundle in the package.json
+
 #### 1.7.1 (august 6 2023)
 
 -   Issue #724: improve accessibility
