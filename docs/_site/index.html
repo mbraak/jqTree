@@ -357,6 +357,12 @@
                 
                     
                         <li>
+                            <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#multiple-selection-is-node-selected">isNodeSelected</a>
+                        </li>
+                    
+                
+                    
+                        <li>
                             <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#functions-loaddata">loadData</a>
                         </li>
                     
@@ -553,13 +559,7 @@
                 
                     
                         <li>
-                            <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#multiple-selection-get-selected-nodes">getSelectedNodes</a>
-                        </li>
-                    
-                
-                    
-                        <li>
-                            <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#multiple-selection-is-node-selected">isNodeSelected</a>
+                            <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#multiple-get-selected-nodes">getSelectedNodes</a>
                         </li>
                     
                 
@@ -631,6 +631,12 @@
                     
                         <li>
                             <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#node-functions-parent">parent</a>
+                        </li>
+                    
+                
+                    
+                        <li>
+                            <a class="block border-l pl-4 border-transparent hover:border-slate-400 text-slate-700 hover:text-slate-900" href="#multiple-selection-get-selected-nodes">getSelectedNodes</a>
                         </li>
                     
                 
@@ -2444,6 +2450,20 @@ event</li>
                 
             
                 
+                    <h4 class="text-xl mb-4 font-bold text-slate-900 tracking-tight" id="multiple-selection-is-node-selected">isNodeSelected</h4>
+                
+                
+                    <div class="mb-16 text-slate-700 doc-entry prose">
+                        <p>Return if this node is selected.</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#tree1</span><span class="dl">'</span><span class="p">).</span><span class="nf">tree</span><span class="p">(</span><span class="dl">'</span><span class="s1">getNodeById</span><span class="dl">'</span><span class="p">,</span> <span class="mi">123</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">isSelected</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#tree1</span><span class="dl">'</span><span class="p">).</span><span class="nf">tree</span><span class="p">(</span><span class="dl">'</span><span class="s1">isNodeSelected</span><span class="dl">'</span><span class="p">,</span> <span class="nx">node</span><span class="p">);</span></code></pre></figure>
+
+
+                    </div>
+                
+            
+                
                     <h4 class="text-xl mb-4 font-bold text-slate-900 tracking-tight" id="functions-loaddata">loadData</h4>
                 
                 
@@ -3257,27 +3277,13 @@ Parameter <strong>onFinished (optional)</strong>: callback when the node is open
                 
             
                 
-                    <h4 class="text-xl mb-4 font-bold text-slate-900 tracking-tight" id="multiple-selection-get-selected-nodes">getSelectedNodes</h4>
+                    <h4 class="text-xl mb-4 font-bold text-slate-900 tracking-tight" id="multiple-get-selected-nodes">getSelectedNodes</h4>
                 
                 
                     <div class="mb-16 text-slate-700 doc-entry prose">
-                        <p>Return a list of selected nodes.</p>
+                        <p>Get the selected nodes. Return an array of nodes</p>
 
-<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">nodes</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#tree1</span><span class="dl">'</span><span class="p">).</span><span class="nf">tree</span><span class="p">(</span><span class="dl">'</span><span class="s1">getSelectedNodes</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
-
-
-                    </div>
-                
-            
-                
-                    <h4 class="text-xl mb-4 font-bold text-slate-900 tracking-tight" id="multiple-selection-is-node-selected">isNodeSelected</h4>
-                
-                
-                    <div class="mb-16 text-slate-700 doc-entry prose">
-                        <p>Return if this node is selected.</p>
-
-<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#tree1</span><span class="dl">'</span><span class="p">).</span><span class="nf">tree</span><span class="p">(</span><span class="dl">'</span><span class="s1">getNodeById</span><span class="dl">'</span><span class="p">,</span> <span class="mi">123</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">isSelected</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#tree1</span><span class="dl">'</span><span class="p">).</span><span class="nf">tree</span><span class="p">(</span><span class="dl">'</span><span class="s1">isNodeSelected</span><span class="dl">'</span><span class="p">,</span> <span class="nx">node</span><span class="p">);</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nx">$tree</span><span class="p">.</span><span class="nf">tree</span><span class="p">(</span><span class="dl">'</span><span class="s1">getSelectedNodes</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
 
 
                     </div>
@@ -3452,6 +3458,19 @@ Parameter <strong>onFinished (optional)</strong>: callback when the node is open
                         <p>You can access the parent of a node using the <strong>parent</strong> property.</p>
 
 <figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">parentNode</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">parent</span><span class="p">;</span></code></pre></figure>
+
+
+                    </div>
+                
+            
+                
+                    <h4 class="text-xl mb-4 font-bold text-slate-900 tracking-tight" id="multiple-selection-get-selected-nodes">getSelectedNodes</h4>
+                
+                
+                    <div class="mb-16 text-slate-700 doc-entry prose">
+                        <p>Return a list of selected nodes.</p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">nodes</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#tree1</span><span class="dl">'</span><span class="p">).</span><span class="nf">tree</span><span class="p">(</span><span class="dl">'</span><span class="s1">getSelectedNodes</span><span class="dl">'</span><span class="p">);</span></code></pre></figure>
 
 
                     </div>
