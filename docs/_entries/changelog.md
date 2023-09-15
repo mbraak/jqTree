@@ -3,8 +3,6 @@ title: Changelog
 name: changelog
 ---
 
-#### test entry
-
 #### 1.7.2 (september 14 2023)
 
 -   Issue #732: improve types of closedIcon and openedIcon
