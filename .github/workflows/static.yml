@@ -28,6 +28,9 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
+      - name: Install ruby packages
+        working-directory: ./docs
+        run: bundle
       - name: Jekyll Build
         working-directory: ./docs
         run: bundle exec jekyll build
