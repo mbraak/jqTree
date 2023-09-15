@@ -2,7 +2,7 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ["master"]
+    branches: ["jeyll-4", "master"]
 
   workflow_dispatch:
 
@@ -23,7 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@4
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+      - name: Jekyll Build
+        working-directory: ./docs
+        run: bundle exec jekyll build
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
