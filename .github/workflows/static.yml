@@ -2,7 +2,7 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ["jeyll-4", "master"]
+    branches: ["jekyll-4", "master"]
 
   workflow_dispatch:
 
