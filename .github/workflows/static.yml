@@ -28,9 +28,21 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install pnpm
+        run: npm install -g pnpm
       - name: Install ruby packages
         working-directory: ./docs
         run: bundle
+      - name: Install javascript packages
+        working-directory: ./docs
+        run: pnpm install
+      - name: Build docs css
+        working-directory: ./docs
+        run: pnpm run build_docs_css
       - name: Jekyll Build
         working-directory: ./docs
         run: bundle exec jekyll build
