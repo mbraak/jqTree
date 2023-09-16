@@ -1,6 +1,6 @@
 {
     "name": "jqtree",
-    "version": "1.7.2",
+    "version": "1.7.3",
     "description": "Tree widget for jQuery",
     "keywords": [
         "jquery-plugin",
@@ -8,6 +8,7 @@
     ],
     "license": "Apache-2.0",
     "browser": "./tree.jquery.js",
+    "main": "./tree.jquery.js",
     "types": "./src/tree.jquery.d.ts",
     "repository": {
         "type": "git",
@@ -27,8 +28,8 @@
         "playwright": "pnpm build-with-coverage && playwright test --config config/playwright.config.js",
         "test": "pnpm jest && pnpm playwright"
     },
-    "dependencies": {
-        "jquery": "^3.7.1"
+    "peerDependencies": {
+        "jquery": "^3"
     },
     "devDependencies": {
         "@babel/cli": "^7.22.15",
