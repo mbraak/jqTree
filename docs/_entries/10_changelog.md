@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+### development version
+
+-   Issue #746: set jQuery as a peer dependency
+-   Issue #747: fix eslint import error
+
 #### 1.7.2 (september 14 2023)
 
 -   Issue #732: improve types of closedIcon and openedIcon
