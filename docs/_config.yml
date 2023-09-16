@@ -9,17 +9,17 @@ collections:
   entries:
     output: false
     order:
-      - general.md
-      - introduction.md
-      - features.md
-      - demo.html
-      - requirements.md
-      - downloads.md
-      - tutorial.md
-      - examples.md
-      - usecases.md
-      - changelog.md
-      - options.md
+      - general/index.md
+      - general/introduction.md
+      - general/features.md
+      - general/demo.html
+      - general/requirements.md
+      - general/downloads.md
+      - general/tutorial.md
+      - general/xamples.md
+      - general/usecases.md
+      - general/changelog.md
+      - options/index.md
       - options/animationspeed.md
       - options/autoescape.md
       - options/autoopen.md
@@ -49,7 +49,7 @@ collections:
       - options/start_dnd_delay.md
       - options/tabindex.md
       - options/usecontextmenu.md
-      - functions.md
+      - functions/index.md
       - functions/addparentnode.md
       - functions/addnodeafter.md
       - functions/addnodebefore.md
@@ -81,7 +81,7 @@ collections:
       - functions/toggle.md
       - functions/tojson.md
       - functions/updatenode.md
-      - events.md
+      - events/index.md
       - events/tree-click.md
       - events/tree-close.md
       - events/tree-contextmenu.md
@@ -93,11 +93,11 @@ collections:
       - events/tree-refresh.md
       - events/tree-open.md
       - events/tree-select.md
-      - multiple-selection.md
+      - multiple_selection/index.md
       - multiple_selection/add-to-selection.md
       - multiple_selection/get-selected-nodes.md
       - multiple_selection/remove-from-selection.md
-      - node-functions.md
+      - node/index.md
       - node/children.md
       - node/getdata.md
       - node/getlevel.md
