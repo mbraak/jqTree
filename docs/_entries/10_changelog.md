@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-### development version
+#### 1.7.3 (september 16 2023)
 
 -   Issue #746: set jQuery as a peer dependency
 -   Issue #747: fix eslint import error
