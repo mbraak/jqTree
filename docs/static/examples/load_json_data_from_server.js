@@ -6,6 +6,4 @@ $.mockjax({
     responseTime: 0
 });
 
-$(function() {
-    $("#tree1").tree();
-});
+$("#tree1").tree();

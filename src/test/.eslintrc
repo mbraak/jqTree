@@ -11,6 +11,7 @@
     "jest/prefer-expect-assertions": "off",
     "jest/prefer-strict-equal": "off",
     "jest/require-hook": "off",
-    "jest/require-top-level-describe": "off"
+    "jest/require-top-level-describe": "off",
+    "testing-library/no-node-access": "off"
   }
 }
