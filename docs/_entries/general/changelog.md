@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### development
+
+-   Issue #675: support toggler on the right with multiline
+
 #### 1.7.3 (september 16 2023)
 
 -   Issue #746: set jQuery as a peer dependency
