@@ -35,8 +35,8 @@ devDependencies:
     specifier: ^0.4.3
     version: 0.4.3(rollup@3.29.2)
   '@testing-library/dom':
-    specifier: ^9.3.1
-    version: 9.3.1
+    specifier: ^9.3.3
+    version: 9.3.3
   '@types/debug':
     specifier: ^4.1.8
     version: 4.1.8
@@ -1859,8 +1859,8 @@ packages:
       '@sinonjs/commons': 3.0.0
     dev: true
 
-  /@testing-library/dom@9.3.1:
-    resolution: {integrity: sha512-0DGPd9AR3+iDTjGoMpxIkAsUihHZ3Ai6CneU6bRRrffXMgzCdlNk43jTrD2/5LT6CBb3MWTP8v510JzYtahD2w==}
+  /@testing-library/dom@9.3.3:
+    resolution: {integrity: sha512-fB0R+fa3AUqbLHWyxXa2kGVtf1Fe1ZZFr0Zp6AIbIAzXb2mKbEXl+PCQNUOaq5lbTab5tfctfXRNsWXxa2f7Aw==}
     engines: {node: '>=14'}
     dependencies:
       '@babel/code-frame': 7.22.13
