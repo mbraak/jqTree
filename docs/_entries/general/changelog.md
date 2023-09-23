@@ -3,7 +3,16 @@ title: Changelog
 name: changelog
 ---
 
-#### Development
+#### development
+
+-   Issue #675: support toggler on the right with multiline
+
+#### 1.7.3 (september 16 2023)
+
+-   Issue #746: set jQuery as a peer dependency
+-   Issue #747: fix eslint import error
+
+#### 1.7.2 (september 14 2023)
 
 -   Issue #732: improve types of closedIcon and openedIcon
 -   Issue #736: use the bundle in the package.json

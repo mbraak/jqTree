@@ -6,19 +6,119 @@ baseurl: "/jqTree"
 url: "http://mbraak.github.io/jqTree/"
 
 collections:
-    entries:
-        output: false
-    examples:
-        output: true
+  entries:
+    output: false
+    order:
+      - general/index.md
+      - general/introduction.md
+      - general/features.md
+      - general/demo.html
+      - general/requirements.md
+      - general/downloads.md
+      - general/tutorial.md
+      - general/examples.md
+      - general/usecases.md
+      - general/changelog.md
+      - options/index.md
+      - options/animationspeed.md
+      - options/autoescape.md
+      - options/autoopen.md
+      - options/buttonleft.md
+      - options/closedicon.md
+      - options/data.md
+      - options/datafilter.md
+      - options/data-url.md
+      - options/draganddrop.md
+      - options/keyboardsupport.md
+      - options/oncanmove.md
+      - options/oncanmoveto.md
+      - options/oncanselectnode.md
+      - options/oncreateli.md
+      - options/ondragmove.md
+      - options/ondragstop.md
+      - options/onismovehandle.md
+      - options/onloadfailed.md
+      - options/onloading.md
+      - options/openedicon.md
+      - options/openfolderdelay.md
+      - options/rtl.md
+      - options/savestate.md
+      - options/selectable.md
+      - options/showemptyfolder.md
+      - options/slide.md
+      - options/start_dnd_delay.md
+      - options/tabindex.md
+      - options/usecontextmenu.md
+      - functions/index.md
+      - functions/addparentnode.md
+      - functions/addnodeafter.md
+      - functions/addnodebefore.md
+      - functions/appendnode.md
+      - functions/closenode.md
+      - functions/destroy.md
+      - functions/getnodebycallback.md
+      - functions/getnodebyid.md
+      - functions/getnodebyhtmlelement.md
+      - functions/getselectednode.md
+      - functions/getstate.md
+      - functions/gettree.md
+      - functions/isdragging.md
+      - functions/is-node-selected.md
+      - functions/loaddata.md
+      - functions/loaddatafromurl.md
+      - functions/movedown.md
+      - functions/movenode.md
+      - functions/moveup.md
+      - functions/opennode.md
+      - functions/prependnode.md
+      - functions/refresh.md
+      - functions/reload.md
+      - functions/removenode.md
+      - functions/selectnode.md
+      - functions/scrolltonode.md
+      - functions/setoption.md
+      - functions/setstate.md
+      - functions/toggle.md
+      - functions/tojson.md
+      - functions/updatenode.md
+      - events/index.md
+      - events/tree-click.md
+      - events/tree-close.md
+      - events/tree-contextmenu.md
+      - events/tree-dblclick.md
+      - events/tree-init.md
+      - events/tree-load-data.md
+      - events/tree-loading-data.md
+      - events/tree-move.md
+      - events/tree-refresh.md
+      - events/tree-open.md
+      - events/tree-select.md
+      - multiple_selection/index.md
+      - multiple_selection/add-to-selection.md
+      - multiple_selection/get-selected-nodes.md
+      - multiple_selection/remove-from-selection.md
+      - node/index.md
+      - node/children.md
+      - node/getdata.md
+      - node/getlevel.md
+      - node/getnextnode.md
+      - node/getnextsibling.md
+      - node/getnextvisiblenode.md
+      - node/getpreviousnode.md
+      - node/getprevioussibling.md
+      - node/getpreviousvisiblenode.md
+      - node/parent.md
+  examples:
+    output: true
 
 defaults:
-    - scope:
-        path: ""
-        type: "examples"
-      values:
-        layout: "example"
+  - scope:
+      path: ""
+      type: "examples"
+    values:
+      layout: "example"
 
-jqtree_version: 1.7.1
+jqtree_version: 1.7.3
 
 # Build settings
 markdown: kramdown

@@ -1,5 +1,5 @@
 /*
-JqTree 1.7.1
+JqTree 1.7.3
 
 Copyright 2023 Marco Braak
 
@@ -292,7 +292,7 @@ var jqtree = (function (exports) {
     return typeof key === "symbol" ? key : String(key);
   }
 
-  var version = "1.7.1";
+  var version = "1.7.3";
 
   var Position = /*#__PURE__*/function (Position) {
     Position[Position["Before"] = 1] = "Before";
