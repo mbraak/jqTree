@@ -57,6 +57,10 @@ ul.jqtree-tree {
         display: flex;
     }
 
+    ul.jqtree-tree .jqtree-element:has(.jqtree-title-button-right) {
+            display: block;
+        }
+
     ul.jqtree-tree .jqtree-title {
         color: #1c4257;
         vertical-align: middle;
