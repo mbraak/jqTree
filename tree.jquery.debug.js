@@ -1,5 +1,5 @@
 /*
-JqTree 1.7.1
+JqTree 1.7.4
 
 Copyright 2023 Marco Braak
 
@@ -20,7 +20,7 @@ limitations under the License.
 var jqtree = (function (exports) {
     'use strict';
 
-    const version = "1.7.1";
+    const version = "1.7.4";
 
     let Position = /*#__PURE__*/function (Position) {
       Position[Position["Before"] = 1] = "Before";
@@ -917,6 +917,16 @@ var jqtree = (function (exports) {
       handleOpenFolder(node, $element) {
         if (node === this.currentNode) {
           // Cannot move inside current item
+
+          // Dnd over the current element is not possible: add a position with type None for the top and the bottom.
+          const top = this.getTop($element);
+          const height = $element.height() || 0;
+          this.addPosition(node, Position.None, top);
+          if (height > 5) {
+            // Subtract 5 pixels to allow more space for the next element.
+            this.addPosition(node, Position.None, top + height - 5);
+          }
+
           // Stop iterating
           return false;
         }
@@ -993,7 +1003,7 @@ var jqtree = (function (exports) {
         let i = 0;
         while (i < positionCount) {
           const position = positionsInGroup[i];
-          if (position) {
+          if (position && position.position !== Position.None) {
             hitAreas.push({
               top: areaTop,
               bottom: areaTop + areaHeight,

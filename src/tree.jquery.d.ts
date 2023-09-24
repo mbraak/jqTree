@@ -34,6 +34,11 @@ interface ClickNodeEvent {
     previous_node?: INode;
 }
 
+interface SelectNodeOptions {
+    mustToggle?: boolean;
+    mustSetFocus?: boolean;
+}
+
 interface SavedState {
     open_nodes: NodeId[];
     selected_node: NodeId[];
@@ -145,7 +150,11 @@ interface IJQTreePlugin {
     (behavior: "removeFromSelection", node: INode): JQuery;
     (behavior: "removeNode", node: INode): JQuery;
     (behavior: "scrollToNode", node: INode): JQuery;
-    (behavior: "selectNode", node: INode | null): JQuery;
+    (
+        behavior: "selectNode",
+        node: INode | null,
+        optionsParam?: SelectNodeOptions,
+    ): JQuery;
     (behavior: "setOption", option: string, value: unknown): JQuery;
     (behavior: "setState", options: Record<string, unknown>): JQuery;
     (behavior: "toggle", node: INode, slideParam?: boolean): JQuery;

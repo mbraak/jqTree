@@ -6,9 +6,7 @@ $.mockjax({
     responseTime: 0
 });
 
-$(function() {
-    $("#tree1").tree({
-        closedIcon: $('<i class="fas fa-arrow-circle-right"></i>'),
-        openedIcon: $('<i class="fas fa-arrow-circle-down"></i>')
-    });
+$("#tree1").tree({
+    closedIcon: $('<i class="fas fa-arrow-circle-right"></i>'),
+    openedIcon: $('<i class="fas fa-arrow-circle-down"></i>')
 });
