@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### development
+#### 1.7.4 (september 24 2023)
 
 -   Issue #675: support toggler on the right with multiline (thanks to Odungern)
 -   Issue #751: fix inconsistent/incorrect drag & drop node highlighting (thanks to Tom De Ford)
