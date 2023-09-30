@@ -1026,6 +1026,19 @@ var jqtree = (function (exports) {
     return DragElement;
   }();
 
+  var isInt = function isInt(n) {
+    return typeof n === "number" && n % 1 === 0;
+  };
+  var isFunction = function isFunction(v) {
+    return typeof v === "function";
+  };
+  var getBoolString = function getBoolString(value) {
+    return value ? "true" : "false";
+  };
+  var getOffsetTop = function getOffsetTop(element) {
+    return element.getBoundingClientRect().y + window.scrollY;
+  };
+
   var VisibleNodeIterator = /*#__PURE__*/function () {
     function VisibleNodeIterator(tree) {
       _classCallCheck(this, VisibleNodeIterator);
@@ -1038,25 +1051,25 @@ var jqtree = (function (exports) {
         var _this = this;
         var isFirstNode = true;
         var _iterateNode = function _iterateNode(node, nextNode) {
+          var _node$element;
           var mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
-          var $element = null;
-          if (node.element) {
-            $element = jQuery(node.element);
-            if (!$element.is(":visible")) {
-              return;
-            }
+          var element = null;
+
+          // Is the element visible?
+          if ((_node$element = node.element) !== null && _node$element !== void 0 && _node$element.offsetParent) {
+            element = node.element;
             if (isFirstNode) {
               _this.handleFirstNode(node);
               isFirstNode = false;
             }
             if (!node.hasChildren()) {
-              _this.handleNode(node, nextNode, $element);
+              _this.handleNode(node, nextNode, node.element);
             } else if (node.is_open) {
-              if (!_this.handleOpenFolder(node, $element)) {
+              if (!_this.handleOpenFolder(node, node.element)) {
                 mustIterateInside = false;
               }
             } else {
-              _this.handleClosedFolder(node, nextNode, $element);
+              _this.handleClosedFolder(node, nextNode, element);
             }
           }
           if (mustIterateInside) {
@@ -1074,7 +1087,7 @@ var jqtree = (function (exports) {
                 }
               }
             });
-            if (node.is_open && $element) {
+            if (node.is_open && element) {
               _this.handleAfterOpenFolder(node, nextNode);
             }
           }
@@ -1137,7 +1150,7 @@ var jqtree = (function (exports) {
       }
     }, {
       key: "handleOpenFolder",
-      value: function handleOpenFolder(node, $element) {
+      value: function handleOpenFolder(node, element) {
         if (node === this.currentNode) {
           // Cannot move inside current item
           // Stop iterating
@@ -1146,7 +1159,7 @@ var jqtree = (function (exports) {
 
         // Cannot move before current item
         if (node.children[0] !== this.currentNode) {
-          this.addPosition(node, Position.Inside, this.getTop($element));
+          this.addPosition(node, Position.Inside, getOffsetTop(element));
         }
 
         // Continue iterating
@@ -1154,8 +1167,8 @@ var jqtree = (function (exports) {
       }
     }, {
       key: "handleClosedFolder",
-      value: function handleClosedFolder(node, nextNode, $element) {
-        var top = this.getTop($element);
+      value: function handleClosedFolder(node, nextNode, element) {
+        var top = getOffsetTop(element);
         if (node === this.currentNode) {
           // Cannot move after current item
           this.addPosition(node, Position.None, top);
@@ -1172,7 +1185,7 @@ var jqtree = (function (exports) {
       key: "handleFirstNode",
       value: function handleFirstNode(node) {
         if (node !== this.currentNode) {
-          this.addPosition(node, Position.Before, this.getTop(jQuery(node.element)));
+          this.addPosition(node, Position.Before, getOffsetTop(node.element));
         }
       }
     }, {
@@ -1187,8 +1200,8 @@ var jqtree = (function (exports) {
       }
     }, {
       key: "handleNode",
-      value: function handleNode(node, nextNode, $element) {
-        var top = this.getTop($element);
+      value: function handleNode(node, nextNode, element) {
+        var top = getOffsetTop(element);
         if (node === this.currentNode) {
           // Cannot move inside current item
           this.addPosition(node, Position.None, top);
@@ -1201,12 +1214,6 @@ var jqtree = (function (exports) {
         } else {
           this.addPosition(node, Position.After, top);
         }
-      }
-    }, {
-      key: "getTop",
-      value: function getTop($element) {
-        var offset = $element.offset();
-        return offset ? offset.top : 0;
       }
     }, {
       key: "addPosition",
@@ -1549,16 +1556,6 @@ var jqtree = (function (exports) {
     }]);
     return DragAndDropHandler;
   }();
-
-  var isInt = function isInt(n) {
-    return typeof n === "number" && n % 1 === 0;
-  };
-  var isFunction = function isFunction(v) {
-    return typeof v === "function";
-  };
-  var getBoolString = function getBoolString(value) {
-    return value ? "true" : "false";
-  };
 
   var ElementsRenderer = /*#__PURE__*/function () {
     function ElementsRenderer(treeWidget) {
