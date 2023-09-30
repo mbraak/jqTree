@@ -1,5 +1,6 @@
 import { HitArea } from "../types";
 import { Node, Position } from "../node";
+import { getOffsetTop } from "../util";
 import VisibleNodeIterator from "./visibleNodeIterator";
 
 class HitAreasGenerator extends VisibleNodeIterator {
@@ -55,7 +56,7 @@ class HitAreasGenerator extends VisibleNodeIterator {
         return hitAreas;
     }
 
-    protected handleOpenFolder(node: Node, $element: JQuery): boolean {
+    protected handleOpenFolder(node: Node, element: HTMLElement): boolean {
         if (node === this.currentNode) {
             // Cannot move inside current item
             // Stop iterating
@@ -64,7 +65,7 @@ class HitAreasGenerator extends VisibleNodeIterator {
 
         // Cannot move before current item
         if (node.children[0] !== this.currentNode) {
-            this.addPosition(node, Position.Inside, this.getTop($element));
+            this.addPosition(node, Position.Inside, getOffsetTop(element));
         }
 
         // Continue iterating
@@ -74,9 +75,9 @@ class HitAreasGenerator extends VisibleNodeIterator {
     protected handleClosedFolder(
         node: Node,
         nextNode: Node,
-        $element: JQuery,
+        element: HTMLElement,
     ): void {
-        const top = this.getTop($element);
+        const top = getOffsetTop(element);
 
         if (node === this.currentNode) {
             // Cannot move after current item
@@ -93,11 +94,7 @@ class HitAreasGenerator extends VisibleNodeIterator {
 
     protected handleFirstNode(node: Node): void {
         if (node !== this.currentNode) {
-            this.addPosition(
-                node,
-                Position.Before,
-                this.getTop(jQuery(node.element)),
-            );
+            this.addPosition(node, Position.Before, getOffsetTop(node.element));
         }
     }
 
@@ -110,8 +107,12 @@ class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    protected handleNode(node: Node, nextNode: Node, $element: JQuery): void {
-        const top = this.getTop($element);
+    protected handleNode(
+        node: Node,
+        nextNode: Node,
+        element: HTMLElement,
+    ): void {
+        const top = getOffsetTop(element);
 
         if (node === this.currentNode) {
             // Cannot move inside current item
@@ -126,12 +127,6 @@ class HitAreasGenerator extends VisibleNodeIterator {
         } else {
             this.addPosition(node, Position.After, top);
         }
-    }
-
-    private getTop($element: JQuery<HTMLElement>): number {
-        const offset = $element.offset();
-
-        return offset ? offset.top : 0;
     }
 
     private addPosition(node: Node, position: number, top: number): void {

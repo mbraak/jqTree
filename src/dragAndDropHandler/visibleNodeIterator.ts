@@ -14,14 +14,11 @@ abstract class VisibleNodeIterator {
             let mustIterateInside =
                 (node.is_open || !node.element) && node.hasChildren();
 
-            let $element: JQuery<HTMLElement> | null = null;
+            let element: HTMLElement | null = null;
 
-            if (node.element) {
-                $element = jQuery(node.element);
-
-                if (!$element.is(":visible")) {
-                    return;
-                }
+            // Is the element visible?
+            if (node.element?.offsetParent) {
+                element = node.element;
 
                 if (isFirstNode) {
                     this.handleFirstNode(node);
@@ -29,13 +26,13 @@ abstract class VisibleNodeIterator {
                 }
 
                 if (!node.hasChildren()) {
-                    this.handleNode(node, nextNode, $element);
+                    this.handleNode(node, nextNode, node.element);
                 } else if (node.is_open) {
-                    if (!this.handleOpenFolder(node, $element)) {
+                    if (!this.handleOpenFolder(node, node.element)) {
                         mustIterateInside = false;
                     }
                 } else {
-                    this.handleClosedFolder(node, nextNode, $element);
+                    this.handleClosedFolder(node, nextNode, element);
                 }
             }
 
@@ -57,7 +54,7 @@ abstract class VisibleNodeIterator {
                     }
                 });
 
-                if (node.is_open && $element) {
+                if (node.is_open && element) {
                     this.handleAfterOpenFolder(node, nextNode);
                 }
             }
@@ -69,7 +66,7 @@ abstract class VisibleNodeIterator {
     protected abstract handleNode(
         node: Node,
         nextNode: Node | null,
-        $element: JQuery,
+        element: HTMLElement,
     ): void;
 
     /*
@@ -78,12 +75,15 @@ abstract class VisibleNodeIterator {
         - true: continue iterating
         - false: stop iterating
     */
-    protected abstract handleOpenFolder(node: Node, $element: JQuery): boolean;
+    protected abstract handleOpenFolder(
+        node: Node,
+        element: HTMLElement,
+    ): boolean;
 
     protected abstract handleClosedFolder(
         node: Node,
         nextNode: Node | null,
-        $element: JQuery,
+        element: HTMLElement,
     ): void;
 
     protected abstract handleAfterOpenFolder(
