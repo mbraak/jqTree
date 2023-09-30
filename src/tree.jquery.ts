@@ -101,7 +101,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public selectNode(
         node: Node | null,
-        optionsParam?: SelectNodeOptions
+        optionsParam?: SelectNodeOptions,
     ): JQuery {
         this.doSelectNode(node, optionsParam);
         return this.element;
@@ -137,21 +137,21 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public loadDataFromUrl(
         param1: string | null | Node,
         param2?: Node | null | HandleFinishedLoading,
-        param3?: HandleFinishedLoading
+        param3?: HandleFinishedLoading,
     ): JQuery {
         if (typeof param1 === "string") {
             // first parameter is url
             this.doLoadDataFromUrl(
                 param1,
                 param2 as Node | null,
-                param3 ?? null
+                param3 ?? null,
             );
         } else {
             // first parameter is not url
             this.doLoadDataFromUrl(
                 null,
                 param1,
-                param2 as HandleFinishedLoading | null
+                param2 as HandleFinishedLoading | null,
             );
         }
 
@@ -185,7 +185,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public getNodeByHtmlElement(
-        element: HTMLElement | JQuery<HTMLElement>
+        element: HTMLElement | JQuery<HTMLElement>,
     ): Node | null {
         return this.getNode(jQuery(element));
     }
@@ -197,7 +197,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public openNode(
         node: Node,
         param1?: boolean | OnFinishOpenNode,
-        param2?: OnFinishOpenNode
+        param2?: OnFinishOpenNode,
     ): JQuery {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
@@ -238,7 +238,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         if (node.isFolder() || node.isEmptyFolder) {
             new FolderElement(node, this).close(
                 slide,
-                this.options.animationSpeed
+                this.options.animationSpeed,
             );
 
             this.saveState();
@@ -258,7 +258,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public addNodeAfter(
         newNodeInfo: NodeData,
-        existingNode: Node
+        existingNode: Node,
     ): Node | null {
         const newNode = existingNode.addAfter(newNodeInfo);
 
@@ -271,7 +271,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public addNodeBefore(
         newNodeInfo: NodeData,
-        existingNode: Node
+        existingNode: Node,
     ): Node | null {
         if (!existingNode) {
             throw Error(PARAM_IS_EMPTY + "existingNode");
@@ -288,7 +288,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public addParentNode(
         newNodeInfo: NodeData,
-        existingNode: Node
+        existingNode: Node,
     ): Node | null {
         if (!existingNode) {
             throw Error(PARAM_IS_EMPTY + "existingNode");
@@ -417,7 +417,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.selectNodeHandler.addToSelection(node);
 
         this._getNodeElementForNode(node).select(
-            mustSetFocus === undefined ? true : mustSetFocus
+            mustSetFocus === undefined ? true : mustSetFocus,
         );
 
         this.saveState();
@@ -455,12 +455,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const nodeOffset = jQuery(node.element).offset();
-        const nodeTop = nodeOffset ? nodeOffset.top : 0;
-
-        const treeOffset = this.$el.offset();
-        const treeTop = treeOffset ? treeOffset.top : 0;
-
+        const nodeTop = jQuery(node.element).offset()?.top ?? 0;
+        const treeTop = this.$el.offset()?.top ?? 0;
         const top = nodeTop - treeTop;
 
         this.scrollHandler.scrollToY(top);
@@ -508,7 +504,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public _triggerEvent(
         eventName: string,
-        values?: Record<string, unknown>
+        values?: Record<string, unknown>,
     ): JQuery.Event {
         const event = jQuery.Event(eventName, values);
         this.element.trigger(event);
@@ -518,18 +514,18 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public _openNode(
         node: Node,
         slide = true,
-        onFinished: OnFinishOpenNode | null
+        onFinished: OnFinishOpenNode | null,
     ): void {
         const doOpenNode = (
             _node: Node,
             _slide: boolean,
-            _onFinished: OnFinishOpenNode | null
+            _onFinished: OnFinishOpenNode | null,
         ): void => {
             const folderElement = new FolderElement(_node, this);
             folderElement.open(
                 _onFinished,
                 _slide,
-                this.options.animationSpeed
+                this.options.animationSpeed,
             );
         };
 
@@ -660,7 +656,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         if (this.options.dragAndDrop) {
             const result = this.dndHandler.mouseDrag(positionInfo);
 
-            this.scrollHandler.checkScrolling();
+            this.scrollHandler.checkScrolling(positionInfo);
             return result;
         } else {
             return false;
@@ -669,6 +665,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     protected mouseStop(positionInfo: PositionInfo): boolean {
         if (this.options.dragAndDrop) {
+            this.scrollHandler.stopScrolling();
             return this.dndHandler.mouseStop(positionInfo);
         } else {
             return false;
@@ -755,7 +752,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.tree = new this.options.nodeClass(
             null,
             true,
-            this.options.nodeClass
+            this.options.nodeClass,
         );
 
         this.selectNodeHandler.clear();
@@ -843,7 +840,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 } else {
                     this.saveStateHandler.setInitialStateOnDemand(
                         state,
-                        cbFinished
+                        cbFinished,
                     );
 
                     return true;
@@ -904,7 +901,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private handleClick = (
-        e: JQuery.ClickEvent<HTMLElement, any, HTMLElement, HTMLElement>
+        e: JQuery.ClickEvent<HTMLElement, any, HTMLElement, HTMLElement>,
     ): void => {
         const clickTarget = this.getClickTarget(e.target);
 
@@ -929,7 +926,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     };
 
     private handleDblclick = (
-        e: JQuery.DoubleClickEvent<HTMLElement, any, HTMLElement, HTMLElement>
+        e: JQuery.DoubleClickEvent<HTMLElement, any, HTMLElement, HTMLElement>,
     ): void => {
         const clickTarget = this.getClickTarget(e.target);
 
@@ -981,7 +978,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private handleContextmenu = (
-        e: JQuery.ContextMenuEvent<HTMLElement, any, HTMLElement, HTMLElement>
+        e: JQuery.ContextMenuEvent<HTMLElement, any, HTMLElement, HTMLElement>,
     ) => {
         const $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
         if ($div.length) {
@@ -1054,7 +1051,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     private doSelectNode(
         node: Node | null,
-        optionsParam?: SelectNodeOptions
+        optionsParam?: SelectNodeOptions,
     ): void {
         const saveState = (): void => {
             if (this.options.saveState) {
@@ -1157,7 +1154,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     private doLoadDataFromUrl(
         urlInfoParam: string | JQuery.AjaxSettings | null,
         parentNode: Node | null,
-        onFinished: HandleFinishedLoading | null
+        onFinished: HandleFinishedLoading | null,
     ): void {
         const urlInfo = urlInfoParam || this.getDataUrlInfo(parentNode);
 
@@ -1167,7 +1164,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     private loadFolderOnDemand(
         node: Node,
         slide = true,
-        onFinished: OnFinishOpenNode | null
+        onFinished: OnFinishOpenNode | null,
     ): void {
         node.is_loading = true;
 
