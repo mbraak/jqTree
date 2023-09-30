@@ -3,6 +3,15 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issue #734: fix autoscroll issue (thanks to WriterStat)
+
+#### 1.7.4 (september 24 2023)
+
+-   Issue #675: support toggler on the right with multiline (thanks to Odungern)
+-   Issue #751: fix inconsistent/incorrect drag & drop node highlighting (thanks to Tom De Ford)
+
 #### 1.7.3 (september 16 2023)
 
 -   Issue #746: set jQuery as a peer dependency
@@ -11,7 +20,7 @@ name: changelog
 #### 1.7.2 (september 14 2023)
 
 -   Issue #732: improve types of closedIcon and openedIcon
--   Issue #736: use the bundle in the package.json
+-   Issue #736: use the bundle in the package.json (thanks to TivoSoho)
 
 #### 1.7.1 (august 6 2023)
 

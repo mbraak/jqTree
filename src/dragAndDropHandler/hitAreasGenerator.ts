@@ -25,20 +25,18 @@ class HitAreasGenerator extends VisibleNodeIterator {
     }
 
     protected generateHitAreas(positions: HitArea[]): HitArea[] {
-        let previousTop = -1;
+        let previousTop = positions[0]?.top ?? 0;
         let group = [];
         const hitAreas: HitArea[] = [];
 
         for (const position of positions) {
             if (position.top !== previousTop && group.length) {
-                if (group.length) {
-                    this.generateHitAreasForGroup(
-                        hitAreas,
-                        group,
-                        previousTop,
-                        position.top,
-                    );
-                }
+                this.generateHitAreasForGroup(
+                    hitAreas,
+                    group,
+                    previousTop,
+                    position.top,
+                );
 
                 previousTop = position.top;
                 group = [];
