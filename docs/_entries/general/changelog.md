@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issue #734: fix autoscroll issue (thanks to WriterStat)
+
 #### 1.7.4 (september 24 2023)
 
 -   Issue #675: support toggler on the right with multiline (thanks to Odungern)
