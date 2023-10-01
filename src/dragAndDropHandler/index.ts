@@ -35,7 +35,7 @@ export class DragAndDropHandler {
     public mouseCapture(positionInfo: PositionInfo): boolean | null {
         const $element = jQuery(positionInfo.target);
 
-        if (!this.mustCaptureElement($element)) {
+        if (!this.mustCaptureElement(positionInfo.target)) {
             return null;
         }
 
@@ -198,8 +198,14 @@ export class DragAndDropHandler {
         }
     }
 
-    private mustCaptureElement($element: JQuery<HTMLElement>): boolean {
-        return !$element.is("input,select,textarea");
+    private mustCaptureElement(element: HTMLElement): boolean {
+        const nodeName = element.nodeName;
+
+        return (
+            nodeName !== "INPUT" &&
+            nodeName !== "SELECT" &&
+            nodeName !== "TEXTAREA"
+        );
     }
 
     private canMoveToArea(area: HitArea): boolean {
