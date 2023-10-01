@@ -1926,6 +1926,7 @@ var jqtree = (function (exports) {
       var _this = this;
       _classCallCheck(this, KeyHandler);
       _defineProperty(this, "treeWidget", void 0);
+      _defineProperty(this, "handleKeyDownHandler", null);
       _defineProperty(this, "handleKeyDown", function (e) {
         if (!_this.canHandleKeyboard()) {
           return true;
@@ -1934,15 +1935,14 @@ var jqtree = (function (exports) {
         if (!selectedNode) {
           return true;
         }
-        var key = e.which;
-        switch (key) {
-          case KeyHandler.DOWN:
+        switch (e.key) {
+          case "ArrowDown":
             return _this.moveDown(selectedNode);
-          case KeyHandler.UP:
+          case "ArrowUp":
             return _this.moveUp(selectedNode);
-          case KeyHandler.RIGHT:
+          case "ArrowRight":
             return _this.moveRight(selectedNode);
-          case KeyHandler.LEFT:
+          case "ArrowLeft":
             return _this.moveLeft(selectedNode);
           default:
             return true;
@@ -1950,13 +1950,16 @@ var jqtree = (function (exports) {
       });
       this.treeWidget = treeWidget;
       if (treeWidget.options.keyboardSupport) {
-        jQuery(document).on("keydown.jqtree", this.handleKeyDown);
+        this.handleKeyDownHandler = this.handleKeyDown.bind(this);
+        document.addEventListener("keydown", this.handleKeyDownHandler);
       }
     }
     _createClass(KeyHandler, [{
       key: "deinit",
       value: function deinit() {
-        jQuery(document).off("keydown.jqtree");
+        if (this.handleKeyDownHandler) {
+          document.removeEventListener("keydown", this.handleKeyDownHandler);
+        }
       }
     }, {
       key: "moveDown",
@@ -2015,10 +2018,6 @@ var jqtree = (function (exports) {
     }]);
     return KeyHandler;
   }();
-  _defineProperty(KeyHandler, "LEFT", 37);
-  _defineProperty(KeyHandler, "UP", 38);
-  _defineProperty(KeyHandler, "RIGHT", 39);
-  _defineProperty(KeyHandler, "DOWN", 40);
 
   var _register = function register(widgetClass, widgetName) {
     var getDataKey = function getDataKey() {
@@ -3489,9 +3488,9 @@ var jqtree = (function (exports) {
         }
       });
       _defineProperty(_assertThisInitialized(_this), "handleContextmenu", function (e) {
-        var $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
-        if ($div.length) {
-          var _node3 = _this.getNode($div);
+        var div = e.target.closest("ul.jqtree-tree .jqtree-element");
+        if (div) {
+          var _node3 = _this.getNode(div);
           if (_node3) {
             e.preventDefault();
             e.stopPropagation();
@@ -3608,8 +3607,12 @@ var jqtree = (function (exports) {
       }
     }, {
       key: "getNodeByHtmlElement",
-      value: function getNodeByHtmlElement(element) {
-        return this.getNode(jQuery(element));
+      value: function getNodeByHtmlElement(inputElement) {
+        var element = inputElement instanceof HTMLElement ? inputElement : inputElement[0];
+        if (!element) {
+          return null;
+        }
+        return this.getNode(element);
       }
     }, {
       key: "getNodeByCallback",
@@ -3940,7 +3943,11 @@ var jqtree = (function (exports) {
     }, {
       key: "_getNodeElement",
       value: function _getNodeElement($element) {
-        var node = this.getNode($element);
+        var element = $element[0];
+        if (!element) {
+          return null;
+        }
+        var node = this.getNode(element);
         if (node) {
           return this._getNodeElementForNode(node);
         } else {
@@ -3950,7 +3957,7 @@ var jqtree = (function (exports) {
     }, {
       key: "_containsElement",
       value: function _containsElement(element) {
-        var node = this.getNode(jQuery(element));
+        var node = this.getNode(element);
         return node != null && node.tree === this.tree;
       }
     }, {
@@ -4246,10 +4253,9 @@ var jqtree = (function (exports) {
     }, {
       key: "getClickTarget",
       value: function getClickTarget(element) {
-        var $target = jQuery(element);
-        var $button = $target.closest(".jqtree-toggler");
-        if ($button.length) {
-          var _node4 = this.getNode($button);
+        var button = element.closest(".jqtree-toggler");
+        if (button) {
+          var _node4 = this.getNode(button);
           if (_node4) {
             return {
               type: "button",
@@ -4257,9 +4263,9 @@ var jqtree = (function (exports) {
             };
           }
         } else {
-          var $el = $target.closest(".jqtree-element");
-          if ($el.length) {
-            var _node5 = this.getNode($el);
+          var jqTreeElement = element.closest(".jqtree-element");
+          if (jqTreeElement) {
+            var _node5 = this.getNode(jqTreeElement);
             if (_node5) {
               return {
                 type: "label",
@@ -4272,12 +4278,12 @@ var jqtree = (function (exports) {
       }
     }, {
       key: "getNode",
-      value: function getNode($element) {
-        var $li = $element.closest("li.jqtree_common");
-        if ($li.length === 0) {
-          return null;
+      value: function getNode(element) {
+        var liElement = element.closest("li.jqtree_common");
+        if (liElement) {
+          return jQuery(liElement).data("node");
         } else {
-          return $li.data("node");
+          return null;
         }
       }
     }, {
