@@ -33,20 +33,20 @@ export class DragAndDropHandler {
     }
 
     public mouseCapture(positionInfo: PositionInfo): boolean | null {
-        const $element = jQuery(positionInfo.target);
+        const element = positionInfo.target;
 
-        if (!this.mustCaptureElement(positionInfo.target)) {
+        if (!this.mustCaptureElement(element)) {
             return null;
         }
 
         if (
             this.treeWidget.options.onIsMoveHandle &&
-            !this.treeWidget.options.onIsMoveHandle($element)
+            !this.treeWidget.options.onIsMoveHandle(jQuery(element))
         ) {
             return null;
         }
 
-        let nodeElement = this.treeWidget._getNodeElement($element);
+        let nodeElement = this.treeWidget._getNodeElement(element);
 
         if (nodeElement && this.treeWidget.options.onCanMove) {
             if (!this.treeWidget.options.onCanMove(nodeElement.node)) {

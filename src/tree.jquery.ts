@@ -587,13 +587,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _getNodeElement($element: JQuery<HTMLElement>): NodeElement | null {
-        const element = $element[0];
-
-        if (!element) {
-            return null;
-        }
-
+    public _getNodeElement(element: HTMLElement): NodeElement | null {
         const node = this.getNode(element);
         if (node) {
             return this._getNodeElementForNode(node);
