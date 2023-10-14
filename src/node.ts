@@ -1,6 +1,4 @@
-interface NodeRecordWithChildren extends NodeRecord {
-    children: NodeData[];
-}
+import { isNodeRecordWithChildren } from "./nodeUtils";
 
 export enum Position {
     Before = 1,
@@ -32,13 +30,6 @@ export const getPositionName = (position: Position): string => {
 
 export const getPosition = (name: string): Position | undefined =>
     positionNames[name];
-
-const isNodeRecordWithChildren = (
-    data: NodeData
-): data is NodeRecordWithChildren =>
-    typeof data === "object" &&
-    "children" in data &&
-    data["children"] instanceof Array;
 
 export class Node implements INode {
     public id?: NodeId;
@@ -254,7 +245,7 @@ export class Node implements INode {
     public moveNode(
         movedNode: Node,
         targetNode: Node,
-        position: Position
+        position: Position,
     ): boolean {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
@@ -268,7 +259,7 @@ export class Node implements INode {
                     if (targetNode.parent) {
                         targetNode.parent.addChildAtPosition(
                             movedNode,
-                            targetNode.parent.getChildIndex(targetNode) + 1
+                            targetNode.parent.getChildIndex(targetNode) + 1,
                         );
                         return true;
                     }
@@ -279,7 +270,7 @@ export class Node implements INode {
                     if (targetNode.parent) {
                         targetNode.parent.addChildAtPosition(
                             movedNode,
-                            targetNode.parent.getChildIndex(targetNode)
+                            targetNode.parent.getChildIndex(targetNode),
                         );
                         return true;
                     }
