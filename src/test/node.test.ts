@@ -159,7 +159,7 @@ describe("addChild", () => {
         expect(given.node.children).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({ id: 100, name: "child1" }),
-            ])
+            ]),
         );
     });
 
@@ -330,7 +330,7 @@ describe("constructor", () => {
     const given = getGiven<Vars>();
 
     given("node", () =>
-        given.params === undefined ? new Node() : new Node(given.params)
+        given.params === undefined ? new Node() : new Node(given.params),
     );
 
     context("without parameters", () => {
@@ -719,8 +719,8 @@ describe("getNodeByCallback", () => {
         it("returns the node", () => {
             expect(
                 given.tree.getNodeByCallback((node) =>
-                    node.name.startsWith("chi")
-                )
+                    node.name.startsWith("chi"),
+                ),
             ).toMatchObject({
                 name: "child1",
             });
@@ -776,7 +776,7 @@ describe("getNodeByNameMustExist", () => {
     context("when the node doesn't exist", () => {
         it("throws an exception", () => {
             expect(() =>
-                given.tree.getNodeByNameMustExist("non-existing")
+                given.tree.getNodeByNameMustExist("non-existing"),
             ).toThrow("Node with name non-existing not found");
         });
     });
@@ -1074,16 +1074,10 @@ describe("iterate", () => {
 });
 
 describe("loadFromData", () => {
-    interface Vars {
-        tree: Node;
-    }
-
-    const given = getGiven<Vars>();
-
-    given("tree", () => new Node().loadFromData(exampleData));
-
     it("creates a tree", () => {
-        expect(given.tree.children).toEqual([
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.children).toEqual([
             expect.objectContaining({
                 id: 123,
                 intProperty: 1,
@@ -1102,6 +1096,41 @@ describe("loadFromData", () => {
                 children: [expect.objectContaining({ id: 127, name: "node3" })],
             }),
         ]);
+    });
+
+    it("sets isEmptyFolder to true for a node when it is has an empty children attribute", () => {
+        const data = [
+            {
+                name: "test1",
+                children: [],
+            },
+        ];
+
+        const tree = new Node().loadFromData(data);
+        expect((tree.children[0] as Node).isEmptyFolder).toBe(true);
+    });
+
+    it("sets isEmptyFolder to false for a node when it doesn't have a children attribute", () => {
+        const data = [
+            {
+                name: "test1",
+            },
+        ];
+
+        const tree = new Node().loadFromData(data);
+        expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
+    });
+
+    it("sets isEmptyFolder to false for a node when it has a children attribute that is not empty", () => {
+        const data = [
+            {
+                name: "test1",
+                children: ["child1"],
+            },
+        ];
+
+        const tree = new Node().loadFromData(data);
+        expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
     });
 });
 
@@ -1125,7 +1154,7 @@ describe("moveNode", () => {
     context("when moving after a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child2, given.node2, Position.After)
+                given.tree.moveNode(given.child2, given.node2, Position.After),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1147,8 +1176,8 @@ describe("moveNode", () => {
                     given.tree.moveNode(
                         given.child2,
                         given.tree,
-                        Position.After
-                    )
+                        Position.After,
+                    ),
                 ).toBe(false);
             });
         });
@@ -1157,7 +1186,7 @@ describe("moveNode", () => {
     context("when moving inside a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child1, given.node2, Position.Inside)
+                given.tree.moveNode(given.child1, given.node2, Position.Inside),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1182,7 +1211,11 @@ describe("moveNode", () => {
     context("when moving before a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child2, given.child1, Position.Before)
+                given.tree.moveNode(
+                    given.child2,
+                    given.child1,
+                    Position.Before,
+                ),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1206,8 +1239,8 @@ describe("moveNode", () => {
                     given.tree.moveNode(
                         given.child2,
                         given.tree,
-                        Position.Before
-                    )
+                        Position.Before,
+                    ),
                 ).toBe(false);
             });
         });
@@ -1216,7 +1249,7 @@ describe("moveNode", () => {
     context("when the moved node is a parent of the target node", () => {
         it("doesn't move the node", () => {
             expect(
-                given.tree.moveNode(given.node1, given.child1, Position.Before)
+                given.tree.moveNode(given.node1, given.child1, Position.Before),
             ).toBe(false);
 
             expect(given.tree).toMatchObject({
@@ -1237,7 +1270,7 @@ describe("moveNode", () => {
     context("with position None", () => {
         it("returns false", () => {
             expect(
-                given.tree.moveNode(given.child2, given.node2, Position.None)
+                given.tree.moveNode(given.child2, given.node2, Position.None),
             ).toBe(false);
         });
     });
