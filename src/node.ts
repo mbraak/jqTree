@@ -371,13 +371,7 @@ export class Node implements INode {
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
 
-            if (
-                isNodeRecordWithChildren(nodeInfo) &&
-                nodeInfo.children.length
-            ) {
-                node.loadFromData(nodeInfo.children);
-            }
-
+            node.loadChildrenFromData(nodeInfo);
             return node;
         }
     }
@@ -391,13 +385,7 @@ export class Node implements INode {
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
 
-            if (
-                isNodeRecordWithChildren(nodeInfo) &&
-                nodeInfo.children.length
-            ) {
-                node.loadFromData(nodeInfo.children);
-            }
-
+            node.loadChildrenFromData(nodeInfo);
             return node;
         }
     }
@@ -434,10 +422,7 @@ export class Node implements INode {
         const node = this.createNode(nodeInfo);
         this.addChild(node);
 
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            node.loadFromData(nodeInfo.children);
-        }
-
+        node.loadChildrenFromData(nodeInfo);
         return node;
     }
 
@@ -445,10 +430,7 @@ export class Node implements INode {
         const node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
 
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            node.loadFromData(nodeInfo.children);
-        }
-
+        node.loadChildrenFromData(nodeInfo);
         return node;
     }
 
@@ -692,5 +674,12 @@ export class Node implements INode {
     private createNode(nodeData?: NodeData): Node {
         const nodeClass = this.getNodeClass();
         return new nodeClass(nodeData);
+    }
+
+    // Load children data from nodeInfo if it has children
+    private loadChildrenFromData(nodeInfo: NodeData) {
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+            this.loadFromData(nodeInfo.children);
+        }
     }
 }
