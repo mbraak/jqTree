@@ -351,6 +351,10 @@ describe("constructor", () => {
             });
             expect(given.node).not.toHaveProperty("id");
         });
+
+        it("sets isEmptyFolder to false", () => {
+            expect(given.node.isEmptyFolder).toBe(false);
+        });
     });
 
     context("with an object with a name property", () => {
@@ -408,7 +412,6 @@ describe("constructor", () => {
                 name: "n1",
                 url: "/",
             });
-            // todo: match object?
             expect(given.node).not.toHaveProperty("label");
             expect(given.node.children).toHaveLength(0);
             expect(given.node.parent).toBeNull();
@@ -434,9 +437,23 @@ describe("constructor", () => {
         }));
 
         it("doesn't set the children", () => {
-            // todo: match object?
             expect(given.node.name).toBe("n1");
             expect(given.node.children).toHaveLength(0);
+        });
+
+        it("sets isEmptyFolder to false", () => {
+            expect(given.node.isEmptyFolder).toBe(false);
+        });
+    });
+
+    context("when the data contains an empty children attribute", () => {
+        given("params", () => ({
+            name: "n1",
+            children: [],
+        }));
+
+        it("sets isEmptyFolder to true ", () => {
+            expect(given.node.isEmptyFolder).toBe(true);
         });
     });
 });
@@ -1315,6 +1332,15 @@ describe("prepend", () => {
                 ],
             });
         });
+    });
+
+    it("sets the isEmptyFolder attribute to true when the node data has empty children", () => {
+        given.node.prepend({
+            name: "test1",
+            children: [],
+        });
+
+        expect((given.node.children[0] as Node).isEmptyFolder).toBe(true);
     });
 });
 

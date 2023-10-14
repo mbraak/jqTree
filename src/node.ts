@@ -47,12 +47,20 @@ export class Node implements INode {
 
     [key: string]: unknown;
 
-    constructor(o: NodeData | null = null, isRoot = false, nodeClass = Node) {
+    constructor(
+        nodeData: NodeData | null = null,
+        isRoot = false,
+        nodeClass = Node,
+    ) {
         this.name = "";
-        this.isEmptyFolder = false;
         this.load_on_demand = false;
 
-        this.setData(o);
+        this.isEmptyFolder =
+            nodeData != null &&
+            isNodeRecordWithChildren(nodeData) &&
+            nodeData.children.length === 0;
+
+        this.setData(nodeData);
 
         this.children = [];
         this.parent = null;
@@ -68,10 +76,10 @@ export class Node implements INode {
     Set the data of this node.
 
     setData(string): set the name of the node
-    setdata(object): set attributes of the node
+    setData(object): set attributes of the node
 
     Examples:
-        setdata('node1')
+        setData('node1')
 
         setData({ name: 'node1', id: 1});
 
@@ -124,16 +132,12 @@ export class Node implements INode {
     public loadFromData(data: NodeData[]): Node {
         this.removeChildren();
 
-        for (const o of data) {
-            const node = this.createNode(o);
+        for (const childData of data) {
+            const node = this.createNode(childData);
             this.addChild(node);
 
-            if (isNodeRecordWithChildren(o)) {
-                if (o.children.length === 0) {
-                    node.isEmptyFolder = true;
-                } else {
-                    node.loadFromData(o.children);
-                }
+            if (isNodeRecordWithChildren(childData)) {
+                node.loadFromData(childData.children);
             }
         }
 
