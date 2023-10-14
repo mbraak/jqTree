@@ -452,7 +452,7 @@ describe("constructor", () => {
             children: [],
         }));
 
-        it("sets isEmptyFolder to true ", () => {
+        it("sets isEmptyFolder to true", () => {
             expect(given.node.isEmptyFolder).toBe(true);
         });
     });
