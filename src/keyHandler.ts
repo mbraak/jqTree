@@ -62,14 +62,6 @@ export default class KeyHandler {
         } else {
             this.treeWidget.selectNode(node);
 
-            if (
-                !this.treeWidget.scrollHandler.isScrolledIntoView(
-                    jQuery(node.element).find(".jqtree-element")
-                )
-            ) {
-                this.treeWidget.scrollToNode(node);
-            }
-
             return false;
         }
     }
