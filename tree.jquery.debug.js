@@ -1,5 +1,5 @@
 /*
-JqTree 1.7.4
+JqTree 1.7.5
 
 Copyright 2023 Marco Braak
 
@@ -292,7 +292,7 @@ var jqtree = (function (exports) {
     return typeof key === "symbol" ? key : String(key);
   }
 
-  var version = "1.7.4";
+  var version = "1.7.5";
 
   var isNodeRecordWithChildren = function isNodeRecordWithChildren(data) {
     return _typeof(data) === "object" && "children" in data && data["children"] instanceof Array;
