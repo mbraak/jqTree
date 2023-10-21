@@ -1,6 +1,4 @@
-interface NodeRecordWithChildren extends NodeRecord {
-    children: NodeData[];
-}
+import { isNodeRecordWithChildren } from "./nodeUtils";
 
 export enum Position {
     Before = 1,
@@ -33,13 +31,6 @@ export const getPositionName = (position: Position): string => {
 export const getPosition = (name: string): Position | undefined =>
     positionNames[name];
 
-const isNodeRecordWithChildren = (
-    data: NodeData
-): data is NodeRecordWithChildren =>
-    typeof data === "object" &&
-    "children" in data &&
-    data["children"] instanceof Array;
-
 export class Node implements INode {
     public id?: NodeId;
     public name: string;
@@ -56,12 +47,20 @@ export class Node implements INode {
 
     [key: string]: unknown;
 
-    constructor(o: NodeData | null = null, isRoot = false, nodeClass = Node) {
+    constructor(
+        nodeData: NodeData | null = null,
+        isRoot = false,
+        nodeClass = Node,
+    ) {
         this.name = "";
-        this.isEmptyFolder = false;
         this.load_on_demand = false;
 
-        this.setData(o);
+        this.isEmptyFolder =
+            nodeData != null &&
+            isNodeRecordWithChildren(nodeData) &&
+            nodeData.children.length === 0;
+
+        this.setData(nodeData);
 
         this.children = [];
         this.parent = null;
@@ -77,10 +76,10 @@ export class Node implements INode {
     Set the data of this node.
 
     setData(string): set the name of the node
-    setdata(object): set attributes of the node
+    setData(object): set attributes of the node
 
     Examples:
-        setdata('node1')
+        setData('node1')
 
         setData({ name: 'node1', id: 1});
 
@@ -133,16 +132,12 @@ export class Node implements INode {
     public loadFromData(data: NodeData[]): Node {
         this.removeChildren();
 
-        for (const o of data) {
-            const node = this.createNode(o);
+        for (const childData of data) {
+            const node = this.createNode(childData);
             this.addChild(node);
 
-            if (isNodeRecordWithChildren(o)) {
-                if (o.children.length === 0) {
-                    node.isEmptyFolder = true;
-                } else {
-                    node.loadFromData(o.children);
-                }
+            if (isNodeRecordWithChildren(childData)) {
+                node.loadFromData(childData.children);
             }
         }
 
@@ -254,7 +249,7 @@ export class Node implements INode {
     public moveNode(
         movedNode: Node,
         targetNode: Node,
-        position: Position
+        position: Position,
     ): boolean {
         if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
             // - Node is parent of target node
@@ -268,7 +263,7 @@ export class Node implements INode {
                     if (targetNode.parent) {
                         targetNode.parent.addChildAtPosition(
                             movedNode,
-                            targetNode.parent.getChildIndex(targetNode) + 1
+                            targetNode.parent.getChildIndex(targetNode) + 1,
                         );
                         return true;
                     }
@@ -279,7 +274,7 @@ export class Node implements INode {
                     if (targetNode.parent) {
                         targetNode.parent.addChildAtPosition(
                             movedNode,
-                            targetNode.parent.getChildIndex(targetNode)
+                            targetNode.parent.getChildIndex(targetNode),
                         );
                         return true;
                     }
@@ -380,13 +375,7 @@ export class Node implements INode {
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
 
-            if (
-                isNodeRecordWithChildren(nodeInfo) &&
-                nodeInfo.children.length
-            ) {
-                node.loadFromData(nodeInfo.children);
-            }
-
+            node.loadChildrenFromData(nodeInfo);
             return node;
         }
     }
@@ -400,13 +389,7 @@ export class Node implements INode {
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
 
-            if (
-                isNodeRecordWithChildren(nodeInfo) &&
-                nodeInfo.children.length
-            ) {
-                node.loadFromData(nodeInfo.children);
-            }
-
+            node.loadChildrenFromData(nodeInfo);
             return node;
         }
     }
@@ -443,10 +426,7 @@ export class Node implements INode {
         const node = this.createNode(nodeInfo);
         this.addChild(node);
 
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            node.loadFromData(nodeInfo.children);
-        }
-
+        node.loadChildrenFromData(nodeInfo);
         return node;
     }
 
@@ -454,10 +434,7 @@ export class Node implements INode {
         const node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
 
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            node.loadFromData(nodeInfo.children);
-        }
-
+        node.loadChildrenFromData(nodeInfo);
         return node;
     }
 
@@ -701,5 +678,12 @@ export class Node implements INode {
     private createNode(nodeData?: NodeData): Node {
         const nodeClass = this.getNodeClass();
         return new nodeClass(nodeData);
+    }
+
+    // Load children data from nodeInfo if it has children
+    private loadChildrenFromData(nodeInfo: NodeData) {
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+            this.loadFromData(nodeInfo.children);
+        }
     }
 }
