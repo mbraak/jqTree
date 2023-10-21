@@ -1,5 +1,5 @@
 /*
-JqTree 1.7.4
+JqTree 1.7.5
 
 Copyright 2023 Marco Braak
 
@@ -292,7 +292,11 @@ var jqtree = (function (exports) {
     return typeof key === "symbol" ? key : String(key);
   }
 
-  var version = "1.7.4";
+  var version = "1.7.5";
+
+  var isNodeRecordWithChildren = function isNodeRecordWithChildren(data) {
+    return _typeof(data) === "object" && "children" in data && data["children"] instanceof Array;
+  };
 
   var Position = /*#__PURE__*/function (Position) {
     Position[Position["Before"] = 1] = "Before";
@@ -320,12 +324,9 @@ var jqtree = (function (exports) {
   var getPosition = function getPosition(name) {
     return positionNames[name];
   };
-  var isNodeRecordWithChildren = function isNodeRecordWithChildren(data) {
-    return _typeof(data) === "object" && "children" in data && data["children"] instanceof Array;
-  };
   var Node = /*#__PURE__*/function () {
     function Node() {
-      var o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var nodeData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       var isRoot = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var nodeClass = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Node;
       _classCallCheck(this, Node);
@@ -342,9 +343,9 @@ var jqtree = (function (exports) {
       _defineProperty(this, "is_loading", void 0);
       _defineProperty(this, "isEmptyFolder", void 0);
       this.name = "";
-      this.isEmptyFolder = false;
       this.load_on_demand = false;
-      this.setData(o);
+      this.isEmptyFolder = nodeData != null && isNodeRecordWithChildren(nodeData) && nodeData.children.length === 0;
+      this.setData(nodeData);
       this.children = [];
       this.parent = null;
       if (isRoot) {
@@ -357,9 +358,9 @@ var jqtree = (function (exports) {
     /*
     Set the data of this node.
      setData(string): set the name of the node
-    setdata(object): set attributes of the node
+    setData(object): set attributes of the node
      Examples:
-        setdata('node1')
+        setData('node1')
          setData({ name: 'node1', id: 1});
          setData({ name: 'node2', id: 2, color: 'green'});
      * This is an internal function; it is not in the docs
@@ -414,15 +415,11 @@ var jqtree = (function (exports) {
           _step;
         try {
           for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var o = _step.value;
-            var _node = this.createNode(o);
+            var childData = _step.value;
+            var _node = this.createNode(childData);
             this.addChild(_node);
-            if (isNodeRecordWithChildren(o)) {
-              if (o.children.length === 0) {
-                _node.isEmptyFolder = true;
-              } else {
-                _node.loadFromData(o.children);
-              }
+            if (isNodeRecordWithChildren(childData)) {
+              _node.loadFromData(childData.children);
             }
           }
         } catch (err) {
@@ -651,9 +648,7 @@ var jqtree = (function (exports) {
           var _node2 = this.createNode(nodeInfo);
           var childIndex = this.parent.getChildIndex(this);
           this.parent.addChildAtPosition(_node2, childIndex + 1);
-          if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            _node2.loadFromData(nodeInfo.children);
-          }
+          _node2.loadChildrenFromData(nodeInfo);
           return _node2;
         }
       }
@@ -666,9 +661,7 @@ var jqtree = (function (exports) {
           var _node3 = this.createNode(nodeInfo);
           var childIndex = this.parent.getChildIndex(this);
           this.parent.addChildAtPosition(_node3, childIndex);
-          if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            _node3.loadFromData(nodeInfo.children);
-          }
+          _node3.loadChildrenFromData(nodeInfo);
           return _node3;
         }
       }
@@ -713,9 +706,7 @@ var jqtree = (function (exports) {
       value: function append(nodeInfo) {
         var node = this.createNode(nodeInfo);
         this.addChild(node);
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-          node.loadFromData(nodeInfo.children);
-        }
+        node.loadChildrenFromData(nodeInfo);
         return node;
       }
     }, {
@@ -723,9 +714,7 @@ var jqtree = (function (exports) {
       value: function prepend(nodeInfo) {
         var node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-          node.loadFromData(nodeInfo.children);
-        }
+        node.loadChildrenFromData(nodeInfo);
         return node;
       }
     }, {
@@ -987,6 +976,15 @@ var jqtree = (function (exports) {
       value: function createNode(nodeData) {
         var nodeClass = this.getNodeClass();
         return new nodeClass(nodeData);
+      }
+
+      // Load children data from nodeInfo if it has children
+    }, {
+      key: "loadChildrenFromData",
+      value: function loadChildrenFromData(nodeInfo) {
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+          this.loadFromData(nodeInfo.children);
+        }
       }
     }]);
     return Node;
@@ -1273,14 +1271,14 @@ var jqtree = (function (exports) {
     _createClass(DragAndDropHandler, [{
       key: "mouseCapture",
       value: function mouseCapture(positionInfo) {
-        var $element = jQuery(positionInfo.target);
-        if (!this.mustCaptureElement($element)) {
+        var element = positionInfo.target;
+        if (!this.mustCaptureElement(element)) {
           return null;
         }
-        if (this.treeWidget.options.onIsMoveHandle && !this.treeWidget.options.onIsMoveHandle($element)) {
+        if (this.treeWidget.options.onIsMoveHandle && !this.treeWidget.options.onIsMoveHandle(jQuery(element))) {
           return null;
         }
-        var nodeElement = this.treeWidget._getNodeElement($element);
+        var nodeElement = this.treeWidget._getNodeElement(element);
         if (nodeElement && this.treeWidget.options.onCanMove) {
           if (!this.treeWidget.options.onCanMove(nodeElement.node)) {
             nodeElement = null;
@@ -1386,8 +1384,9 @@ var jqtree = (function (exports) {
       }
     }, {
       key: "mustCaptureElement",
-      value: function mustCaptureElement($element) {
-        return !$element.is("input,select,textarea");
+      value: function mustCaptureElement(element) {
+        var nodeName = element.nodeName;
+        return nodeName !== "INPUT" && nodeName !== "SELECT" && nodeName !== "TEXTAREA";
       }
     }, {
       key: "canMoveToArea",
@@ -3942,11 +3941,7 @@ var jqtree = (function (exports) {
       }
     }, {
       key: "_getNodeElement",
-      value: function _getNodeElement($element) {
-        var element = $element[0];
-        if (!element) {
-          return null;
-        }
+      value: function _getNodeElement(element) {
         var node = this.getNode(element);
         if (node) {
           return this._getNodeElementForNode(node);
