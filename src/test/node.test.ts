@@ -351,6 +351,10 @@ describe("constructor", () => {
             });
             expect(given.node.id).toBeUndefined();
         });
+
+        it("sets isEmptyFolder to false", () => {
+            expect(given.node.isEmptyFolder).toBe(false);
+        });
     });
 
     context("with an object with a name property", () => {
@@ -408,7 +412,6 @@ describe("constructor", () => {
                 name: "n1",
                 url: "/",
             });
-            // todo: match object?
             expect(given.node).not.toHaveProperty("label");
             expect(given.node.children).toHaveLength(0);
             expect(given.node.parent).toBeNull();
@@ -434,9 +437,23 @@ describe("constructor", () => {
         }));
 
         it("doesn't set the children", () => {
-            // todo: match object?
             expect(given.node.name).toBe("n1");
             expect(given.node.children).toHaveLength(0);
+        });
+
+        it("sets isEmptyFolder to false", () => {
+            expect(given.node.isEmptyFolder).toBe(false);
+        });
+    });
+
+    context("when the data contains an empty children attribute", () => {
+        given("params", () => ({
+            name: "n1",
+            children: [],
+        }));
+
+        it("sets isEmptyFolder to true", () => {
+            expect(given.node.isEmptyFolder).toBe(true);
         });
     });
 });
@@ -1074,16 +1091,10 @@ describe("iterate", () => {
 });
 
 describe("loadFromData", () => {
-    interface Vars {
-        tree: Node;
-    }
-
-    const given = getGiven<Vars>();
-
-    given("tree", () => new Node().loadFromData(exampleData));
-
     it("creates a tree", () => {
-        expect(given.tree.children).toEqual([
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.children).toEqual([
             expect.objectContaining({
                 id: 123,
                 intProperty: 1,
@@ -1102,6 +1113,41 @@ describe("loadFromData", () => {
                 children: [expect.objectContaining({ id: 127, name: "node3" })],
             }),
         ]);
+    });
+
+    it("sets isEmptyFolder to true for a node when it is has an empty children attribute", () => {
+        const data = [
+            {
+                name: "test1",
+                children: [],
+            },
+        ];
+
+        const tree = new Node().loadFromData(data);
+        expect((tree.children[0] as Node).isEmptyFolder).toBe(true);
+    });
+
+    it("sets isEmptyFolder to false for a node when it doesn't have a children attribute", () => {
+        const data = [
+            {
+                name: "test1",
+            },
+        ];
+
+        const tree = new Node().loadFromData(data);
+        expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
+    });
+
+    it("sets isEmptyFolder to false for a node when it has a children attribute that is not empty", () => {
+        const data = [
+            {
+                name: "test1",
+                children: ["child1"],
+            },
+        ];
+
+        const tree = new Node().loadFromData(data);
+        expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
     });
 });
 
@@ -1286,6 +1332,15 @@ describe("prepend", () => {
                 ],
             });
         });
+    });
+
+    it("sets the isEmptyFolder attribute to true when the node data has empty children", () => {
+        given.node.prepend({
+            name: "test1",
+            children: [],
+        });
+
+        expect((given.node.children[0] as Node).isEmptyFolder).toBe(true);
     });
 });
 

@@ -1,5 +1,5 @@
 /*
-JqTree 1.7.4
+JqTree 1.7.5
 
 Copyright 2023 Marco Braak
 
@@ -20,7 +20,9 @@ limitations under the License.
 var jqtree = (function (exports) {
     'use strict';
 
-    const version = "1.7.4";
+    const version = "1.7.5";
+
+    const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data["children"] instanceof Array;
 
     let Position = /*#__PURE__*/function (Position) {
       Position[Position["Before"] = 1] = "Before";
@@ -46,16 +48,15 @@ var jqtree = (function (exports) {
       return "";
     };
     const getPosition = name => positionNames[name];
-    const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data["children"] instanceof Array;
     class Node {
       constructor() {
-        let o = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        let nodeData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         let isRoot = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
         let nodeClass = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Node;
         this.name = "";
-        this.isEmptyFolder = false;
         this.load_on_demand = false;
-        this.setData(o);
+        this.isEmptyFolder = nodeData != null && isNodeRecordWithChildren(nodeData) && nodeData.children.length === 0;
+        this.setData(nodeData);
         this.children = [];
         this.parent = null;
         if (isRoot) {
@@ -68,9 +69,9 @@ var jqtree = (function (exports) {
       /*
       Set the data of this node.
        setData(string): set the name of the node
-      setdata(object): set attributes of the node
+      setData(object): set attributes of the node
        Examples:
-          setdata('node1')
+          setData('node1')
            setData({ name: 'node1', id: 1});
            setData({ name: 'node2', id: 2, color: 'green'});
        * This is an internal function; it is not in the docs
@@ -117,15 +118,11 @@ var jqtree = (function (exports) {
       */
       loadFromData(data) {
         this.removeChildren();
-        for (const o of data) {
-          const node = this.createNode(o);
+        for (const childData of data) {
+          const node = this.createNode(childData);
           this.addChild(node);
-          if (isNodeRecordWithChildren(o)) {
-            if (o.children.length === 0) {
-              node.isEmptyFolder = true;
-            } else {
-              node.loadFromData(o.children);
-            }
+          if (isNodeRecordWithChildren(childData)) {
+            node.loadFromData(childData.children);
           }
         }
         return this;
@@ -310,9 +307,7 @@ var jqtree = (function (exports) {
           const node = this.createNode(nodeInfo);
           const childIndex = this.parent.getChildIndex(this);
           this.parent.addChildAtPosition(node, childIndex + 1);
-          if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            node.loadFromData(nodeInfo.children);
-          }
+          node.loadChildrenFromData(nodeInfo);
           return node;
         }
       }
@@ -323,9 +318,7 @@ var jqtree = (function (exports) {
           const node = this.createNode(nodeInfo);
           const childIndex = this.parent.getChildIndex(this);
           this.parent.addChildAtPosition(node, childIndex);
-          if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            node.loadFromData(nodeInfo.children);
-          }
+          node.loadChildrenFromData(nodeInfo);
           return node;
         }
       }
@@ -355,17 +348,13 @@ var jqtree = (function (exports) {
       append(nodeInfo) {
         const node = this.createNode(nodeInfo);
         this.addChild(node);
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-          node.loadFromData(nodeInfo.children);
-        }
+        node.loadChildrenFromData(nodeInfo);
         return node;
       }
       prepend(nodeInfo) {
         const node = this.createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-          node.loadFromData(nodeInfo.children);
-        }
+        node.loadChildrenFromData(nodeInfo);
         return node;
       }
       isParentOf(node) {
@@ -568,6 +557,13 @@ var jqtree = (function (exports) {
       createNode(nodeData) {
         const nodeClass = this.getNodeClass();
         return new nodeClass(nodeData);
+      }
+
+      // Load children data from nodeInfo if it has children
+      loadChildrenFromData(nodeInfo) {
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+          this.loadFromData(nodeInfo.children);
+        }
       }
     }
 
