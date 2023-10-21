@@ -6,6 +6,7 @@ name: changelog
 #### Development version
 
 -   Issue #734: fix autoscroll issue (thanks to WriterStat)
+-   issue #736: fix empty folder for prepend
 
 #### 1.7.4 (september 24 2023)
 
