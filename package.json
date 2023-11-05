@@ -28,6 +28,9 @@
         "playwright": "pnpm build-with-coverage && playwright test --config config/playwright.config.js",
         "test": "pnpm jest && pnpm playwright"
     },
+    "browserslist": [
+        "defaults"
+    ],
     "peerDependencies": {
         "jquery": "^3"
     },
