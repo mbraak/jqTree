@@ -12,7 +12,11 @@ module.exports = {
         "givens/setup.js",
         "jest-extended/all",
     ],
+    setupFiles: ["<rootDir>/config/jest.polyfills.js"],
     testEnvironment: "jsdom",
+    testEnvironmentOptions: {
+        customExportConditions: [""],
+    },
     testRegex: "\\/src\\/test\\/.*\\.test\\.ts",
     transform: {
         "\\.tsx?$": ["babel-jest", { root: __dirname }],

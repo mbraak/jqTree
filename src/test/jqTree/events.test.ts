@@ -1,5 +1,5 @@
 import getGiven from "givens";
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { waitFor } from "@testing-library/dom";
 import "../../tree.jquery";
@@ -48,7 +48,7 @@ describe("tree.click", () => {
 
         given.titleSpan.trigger("click");
         expect(onClick).toHaveBeenCalledWith(
-            expect.objectContaining({ node: given.node1 })
+            expect.objectContaining({ node: given.node1 }),
         );
     });
 });
@@ -75,7 +75,7 @@ describe("tree.contextmenu", () => {
 
         given.titleSpan.trigger("contextmenu");
         expect(onContextMenu).toHaveBeenCalledWith(
-            expect.objectContaining({ node: given.node1 })
+            expect.objectContaining({ node: given.node1 }),
         );
     });
 });
@@ -102,7 +102,7 @@ describe("tree.dblclick", () => {
 
         given.titleSpan.trigger("dblclick");
         expect(onDoubleClick).toHaveBeenCalledWith(
-            expect.objectContaining({ node: given.node1 })
+            expect.objectContaining({ node: given.node1 }),
         );
     });
 });
@@ -129,12 +129,15 @@ describe("tree.init", () => {
     });
 
     context("with data loaded from an url", () => {
+        const server = setupServer(
+            http.get("/tree", () => HttpResponse.json(exampleData)),
+        );
         beforeEach(() => {
-            server.use(
-                rest.get("/tree/", (_request, response, ctx) =>
-                    response(ctx.status(200), ctx.json(exampleData))
-                )
-            );
+            server.listen();
+        });
+
+        afterAll(() => {
+            server.close();
         });
 
         it("is called", async () => {
@@ -165,7 +168,7 @@ describe("tree.load_data", () => {
 
             given.$tree.tree({ data: exampleData });
             expect(onLoadData).toHaveBeenCalledWith(
-                expect.objectContaining({ tree_data: exampleData })
+                expect.objectContaining({ tree_data: exampleData }),
             );
         });
     });
@@ -198,7 +201,7 @@ describe("tree.select", () => {
             expect.objectContaining({
                 node: given.node1,
                 deselected_node: null,
-            })
+            }),
         );
     });
 
@@ -216,7 +219,7 @@ describe("tree.select", () => {
                 expect.objectContaining({
                     node: null,
                     previous_node: given.node1,
-                })
+                }),
             );
         });
     });
