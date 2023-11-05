@@ -1,15 +1,21 @@
-import { JqTreeWidget } from "./tree.jquery";
 import { PositionInfo } from "./types";
 import { ScrollParent } from "./scrollHandler/types";
 import createScrollParent from "./scrollHandler/createScrollParent";
 
-export default class ScrollHandler {
-    private treeWidget: JqTreeWidget;
-    private scrollParent?: ScrollParent;
+interface ScrollHandlerParams {
+    refreshHitAreas: () => void;
+    $treeElement: JQuery<HTMLElement>;
+}
 
-    constructor(treeWidget: JqTreeWidget) {
-        this.treeWidget = treeWidget;
+export default class ScrollHandler {
+    private refreshHitAreas: () => void;
+    private scrollParent?: ScrollParent;
+    private $treeElement: JQuery<HTMLElement>;
+
+    constructor({ refreshHitAreas, $treeElement }: ScrollHandlerParams) {
+        this.refreshHitAreas = refreshHitAreas;
         this.scrollParent = undefined;
+        this.$treeElement = $treeElement;
     }
 
     public checkScrolling(positionInfo: PositionInfo): void {
@@ -48,8 +54,8 @@ export default class ScrollHandler {
     private getScrollParent(): ScrollParent {
         if (!this.scrollParent) {
             this.scrollParent = createScrollParent(
-                this.treeWidget.$el,
-                this.treeWidget.refreshHitAreas.bind(this.treeWidget),
+                this.$treeElement,
+                this.refreshHitAreas,
             );
         }
 

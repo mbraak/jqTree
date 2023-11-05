@@ -623,7 +623,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.saveStateHandler = new SaveStateHandler(this);
         this.selectNodeHandler = new SelectNodeHandler(this);
         this.dndHandler = new DragAndDropHandler(this);
-        this.scrollHandler = new ScrollHandler(this);
+        this.scrollHandler = new ScrollHandler({
+            refreshHitAreas: this.refreshHitAreas.bind(this),
+            $treeElement: this.$el,
+        });
         this.keyHandler = new KeyHandler(this);
 
         this.initData();
