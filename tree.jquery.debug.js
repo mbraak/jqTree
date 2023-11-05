@@ -567,6 +567,209 @@ var jqtree = (function (exports) {
       }
     }
 
+    class DragElement {
+      constructor(nodeName, offsetX, offsetY, $tree, autoEscape) {
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.$element = jQuery("<span>").addClass("jqtree-title jqtree-dragging");
+        if (autoEscape) {
+          this.$element.text(nodeName);
+        } else {
+          this.$element.html(nodeName);
+        }
+        this.$element.css("position", "absolute");
+        $tree.append(this.$element);
+      }
+      move(pageX, pageY) {
+        this.$element.offset({
+          left: pageX - this.offsetX,
+          top: pageY - this.offsetY
+        });
+      }
+      remove() {
+        this.$element.remove();
+      }
+    }
+
+    const isInt = n => typeof n === "number" && n % 1 === 0;
+    const isFunction = v => typeof v === "function";
+    const getBoolString = value => value ? "true" : "false";
+    const getOffsetTop = element => element.getBoundingClientRect().y + window.scrollY;
+
+    class VisibleNodeIterator {
+      constructor(tree) {
+        this.tree = tree;
+      }
+      iterate() {
+        let isFirstNode = true;
+        const _iterateNode = (node, nextNode) => {
+          let mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
+          let element = null;
+
+          // Is the element visible?
+          if (node.element?.offsetParent) {
+            element = node.element;
+            if (isFirstNode) {
+              this.handleFirstNode(node);
+              isFirstNode = false;
+            }
+            if (!node.hasChildren()) {
+              this.handleNode(node, nextNode, node.element);
+            } else if (node.is_open) {
+              if (!this.handleOpenFolder(node, node.element)) {
+                mustIterateInside = false;
+              }
+            } else {
+              this.handleClosedFolder(node, nextNode, element);
+            }
+          }
+          if (mustIterateInside) {
+            const childrenLength = node.children.length;
+            node.children.forEach((_, i) => {
+              const child = node.children[i];
+              if (child) {
+                if (i === childrenLength - 1) {
+                  _iterateNode(child, null);
+                } else {
+                  const nextChild = node.children[i + 1];
+                  if (nextChild) {
+                    _iterateNode(child, nextChild);
+                  }
+                }
+              }
+            });
+            if (node.is_open && element) {
+              this.handleAfterOpenFolder(node, nextNode);
+            }
+          }
+        };
+        _iterateNode(this.tree, null);
+      }
+
+      /*
+      override
+      return
+          - true: continue iterating
+          - false: stop iterating
+      */
+    }
+
+    class HitAreasGenerator extends VisibleNodeIterator {
+      constructor(tree, currentNode, treeBottom) {
+        super(tree);
+        this.currentNode = currentNode;
+        this.treeBottom = treeBottom;
+      }
+      generate() {
+        this.positions = [];
+        this.lastTop = 0;
+        this.iterate();
+        return this.generateHitAreas(this.positions);
+      }
+      generateHitAreas(positions) {
+        let previousTop = positions[0]?.top ?? 0;
+        let group = [];
+        const hitAreas = [];
+        for (const position of positions) {
+          if (position.top !== previousTop && group.length) {
+            this.generateHitAreasForGroup(hitAreas, group, previousTop, position.top);
+            previousTop = position.top;
+            group = [];
+          }
+          group.push(position);
+        }
+        this.generateHitAreasForGroup(hitAreas, group, previousTop, this.treeBottom);
+        return hitAreas;
+      }
+      handleOpenFolder(node, element) {
+        if (node === this.currentNode) {
+          // Cannot move inside current item
+          // Stop iterating
+          return false;
+        }
+
+        // Cannot move before current item
+        if (node.children[0] !== this.currentNode) {
+          this.addPosition(node, Position.Inside, getOffsetTop(element));
+        }
+
+        // Continue iterating
+        return true;
+      }
+      handleClosedFolder(node, nextNode, element) {
+        const top = getOffsetTop(element);
+        if (node === this.currentNode) {
+          // Cannot move after current item
+          this.addPosition(node, Position.None, top);
+        } else {
+          this.addPosition(node, Position.Inside, top);
+
+          // Cannot move before current item
+          if (nextNode !== this.currentNode) {
+            this.addPosition(node, Position.After, top);
+          }
+        }
+      }
+      handleFirstNode(node) {
+        if (node !== this.currentNode) {
+          this.addPosition(node, Position.Before, getOffsetTop(node.element));
+        }
+      }
+      handleAfterOpenFolder(node, nextNode) {
+        if (node === this.currentNode || nextNode === this.currentNode) {
+          // Cannot move before or after current item
+          this.addPosition(node, Position.None, this.lastTop);
+        } else {
+          this.addPosition(node, Position.After, this.lastTop);
+        }
+      }
+      handleNode(node, nextNode, element) {
+        const top = getOffsetTop(element);
+        if (node === this.currentNode) {
+          // Cannot move inside current item
+          this.addPosition(node, Position.None, top);
+        } else {
+          this.addPosition(node, Position.Inside, top);
+        }
+        if (nextNode === this.currentNode || node === this.currentNode) {
+          // Cannot move before or after current item
+          this.addPosition(node, Position.None, top);
+        } else {
+          this.addPosition(node, Position.After, top);
+        }
+      }
+      addPosition(node, position, top) {
+        const area = {
+          top,
+          bottom: 0,
+          node,
+          position
+        };
+        this.positions.push(area);
+        this.lastTop = top;
+      }
+      generateHitAreasForGroup(hitAreas, positionsInGroup, top, bottom) {
+        // limit positions in group
+        const positionCount = Math.min(positionsInGroup.length, 4);
+        const areaHeight = Math.round((bottom - top) / positionCount);
+        let areaTop = top;
+        let i = 0;
+        while (i < positionCount) {
+          const position = positionsInGroup[i];
+          if (position) {
+            hitAreas.push({
+              top: areaTop,
+              bottom: areaTop + areaHeight,
+              node: position.node,
+              position: position.position
+            });
+          }
+          areaTop += areaHeight;
+          i += 1;
+        }
+      }
+    }
+
     class DragAndDropHandler {
       constructor(treeWidget) {
         this.treeWidget = treeWidget;
@@ -576,14 +779,14 @@ var jqtree = (function (exports) {
         this.currentItem = null;
       }
       mouseCapture(positionInfo) {
-        const $element = jQuery(positionInfo.target);
-        if (!this.mustCaptureElement($element)) {
+        const element = positionInfo.target;
+        if (!this.mustCaptureElement(element)) {
           return null;
         }
-        if (this.treeWidget.options.onIsMoveHandle && !this.treeWidget.options.onIsMoveHandle($element)) {
+        if (this.treeWidget.options.onIsMoveHandle && !this.treeWidget.options.onIsMoveHandle(jQuery(element))) {
           return null;
         }
-        let nodeElement = this.treeWidget._getNodeElement($element);
+        let nodeElement = this.treeWidget._getNodeElement(element);
         if (nodeElement && this.treeWidget.options.onCanMove) {
           if (!this.treeWidget.options.onCanMove(nodeElement.node)) {
             nodeElement = null;
@@ -603,7 +806,7 @@ var jqtree = (function (exports) {
         const node = this.currentItem.node;
         this.dragElement = new DragElement(node.name, positionInfo.pageX - left, positionInfo.pageY - top, this.treeWidget.element, this.treeWidget.options.autoEscape ?? true);
         this.isDragging = true;
-        this.currentItem.$element.addClass("jqtree-moving");
+        this.currentItem.element.classList.add("jqtree-moving");
         return true;
       }
       mouseDrag(positionInfo) {
@@ -647,7 +850,7 @@ var jqtree = (function (exports) {
         this.removeHitAreas();
         const currentItem = this.currentItem;
         if (this.currentItem) {
-          this.currentItem.$element.removeClass("jqtree-moving");
+          this.currentItem.element.classList.remove("jqtree-moving");
           this.currentItem = null;
         }
         this.isDragging = false;
@@ -664,7 +867,7 @@ var jqtree = (function (exports) {
           this.generateHitAreas();
           this.currentItem = this.treeWidget._getNodeElementForNode(this.currentItem.node);
           if (this.isDragging) {
-            this.currentItem.$element.addClass("jqtree-moving");
+            this.currentItem.element.classList.add("jqtree-moving");
           }
         }
       }
@@ -676,8 +879,9 @@ var jqtree = (function (exports) {
           this.hitAreas = hitAreasGenerator.generate();
         }
       }
-      mustCaptureElement($element) {
-        return !$element.is("input,select,textarea");
+      mustCaptureElement(element) {
+        const nodeName = element.nodeName;
+        return nodeName !== "INPUT" && nodeName !== "SELECT" && nodeName !== "TEXTAREA";
       }
       canMoveToArea(area) {
         if (!this.treeWidget.options.onCanMoveTo) {
@@ -818,221 +1022,6 @@ var jqtree = (function (exports) {
         }
       }
     }
-    class VisibleNodeIterator {
-      constructor(tree) {
-        this.tree = tree;
-      }
-      iterate() {
-        let isFirstNode = true;
-        const _iterateNode = (node, nextNode) => {
-          let mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
-          let $element = null;
-          if (node.element) {
-            $element = jQuery(node.element);
-            if (!$element.is(":visible")) {
-              return;
-            }
-            if (isFirstNode) {
-              this.handleFirstNode(node);
-              isFirstNode = false;
-            }
-            if (!node.hasChildren()) {
-              this.handleNode(node, nextNode, $element);
-            } else if (node.is_open) {
-              if (!this.handleOpenFolder(node, $element)) {
-                mustIterateInside = false;
-              }
-            } else {
-              this.handleClosedFolder(node, nextNode, $element);
-            }
-          }
-          if (mustIterateInside) {
-            const childrenLength = node.children.length;
-            node.children.forEach((_, i) => {
-              const child = node.children[i];
-              if (child) {
-                if (i === childrenLength - 1) {
-                  _iterateNode(child, null);
-                } else {
-                  const nextChild = node.children[i + 1];
-                  if (nextChild) {
-                    _iterateNode(child, nextChild);
-                  }
-                }
-              }
-            });
-            if (node.is_open && $element) {
-              this.handleAfterOpenFolder(node, nextNode);
-            }
-          }
-        };
-        _iterateNode(this.tree, null);
-      }
-
-      /*
-      override
-      return
-          - true: continue iterating
-          - false: stop iterating
-      */
-    }
-
-    class HitAreasGenerator extends VisibleNodeIterator {
-      constructor(tree, currentNode, treeBottom) {
-        super(tree);
-        this.currentNode = currentNode;
-        this.treeBottom = treeBottom;
-      }
-      generate() {
-        this.positions = [];
-        this.lastTop = 0;
-        this.iterate();
-        return this.generateHitAreas(this.positions);
-      }
-      generateHitAreas(positions) {
-        let previousTop = positions[0]?.top ?? 0;
-        let group = [];
-        const hitAreas = [];
-        for (const position of positions) {
-          if (position.top !== previousTop && group.length) {
-            this.generateHitAreasForGroup(hitAreas, group, previousTop, position.top);
-            previousTop = position.top;
-            group = [];
-          }
-          group.push(position);
-        }
-        this.generateHitAreasForGroup(hitAreas, group, previousTop, this.treeBottom);
-        return hitAreas;
-      }
-      handleOpenFolder(node, $element) {
-        if (node === this.currentNode) {
-          // Cannot move inside current item
-
-          // Dnd over the current element is not possible: add a position with type None for the top and the bottom.
-          const top = this.getTop($element);
-          const height = $element.height() || 0;
-          this.addPosition(node, Position.None, top);
-          if (height > 5) {
-            // Subtract 5 pixels to allow more space for the next element.
-            this.addPosition(node, Position.None, top + height - 5);
-          }
-
-          // Stop iterating
-          return false;
-        }
-
-        // Cannot move before current item
-        if (node.children[0] !== this.currentNode) {
-          this.addPosition(node, Position.Inside, this.getTop($element));
-        }
-
-        // Continue iterating
-        return true;
-      }
-      handleClosedFolder(node, nextNode, $element) {
-        const top = this.getTop($element);
-        if (node === this.currentNode) {
-          // Cannot move after current item
-          this.addPosition(node, Position.None, top);
-        } else {
-          this.addPosition(node, Position.Inside, top);
-
-          // Cannot move before current item
-          if (nextNode !== this.currentNode) {
-            this.addPosition(node, Position.After, top);
-          }
-        }
-      }
-      handleFirstNode(node) {
-        if (node !== this.currentNode) {
-          this.addPosition(node, Position.Before, this.getTop(jQuery(node.element)));
-        }
-      }
-      handleAfterOpenFolder(node, nextNode) {
-        if (node === this.currentNode || nextNode === this.currentNode) {
-          // Cannot move before or after current item
-          this.addPosition(node, Position.None, this.lastTop);
-        } else {
-          this.addPosition(node, Position.After, this.lastTop);
-        }
-      }
-      handleNode(node, nextNode, $element) {
-        const top = this.getTop($element);
-        if (node === this.currentNode) {
-          // Cannot move inside current item
-          this.addPosition(node, Position.None, top);
-        } else {
-          this.addPosition(node, Position.Inside, top);
-        }
-        if (nextNode === this.currentNode || node === this.currentNode) {
-          // Cannot move before or after current item
-          this.addPosition(node, Position.None, top);
-        } else {
-          this.addPosition(node, Position.After, top);
-        }
-      }
-      getTop($element) {
-        const offset = $element.offset();
-        return offset ? offset.top : 0;
-      }
-      addPosition(node, position, top) {
-        const area = {
-          top,
-          bottom: 0,
-          node,
-          position
-        };
-        this.positions.push(area);
-        this.lastTop = top;
-      }
-      generateHitAreasForGroup(hitAreas, positionsInGroup, top, bottom) {
-        // limit positions in group
-        const positionCount = Math.min(positionsInGroup.length, 4);
-        const areaHeight = Math.round((bottom - top) / positionCount);
-        let areaTop = top;
-        let i = 0;
-        while (i < positionCount) {
-          const position = positionsInGroup[i];
-          if (position && position.position !== Position.None) {
-            hitAreas.push({
-              top: areaTop,
-              bottom: areaTop + areaHeight,
-              node: position.node,
-              position: position.position
-            });
-          }
-          areaTop += areaHeight;
-          i += 1;
-        }
-      }
-    }
-    class DragElement {
-      constructor(nodeName, offsetX, offsetY, $tree, autoEscape) {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.$element = jQuery("<span>").addClass("jqtree-title jqtree-dragging");
-        if (autoEscape) {
-          this.$element.text(nodeName);
-        } else {
-          this.$element.html(nodeName);
-        }
-        this.$element.css("position", "absolute");
-        $tree.append(this.$element);
-      }
-      move(pageX, pageY) {
-        this.$element.offset({
-          left: pageX - this.offsetX,
-          top: pageY - this.offsetY
-        });
-      }
-      remove() {
-        this.$element.remove();
-      }
-    }
-
-    const isInt = n => typeof n === "number" && n % 1 === 0;
-    const isFunction = v => typeof v === "function";
-    const getBoolString = value => value ? "true" : "false";
 
     class ElementsRenderer {
       constructor(treeWidget) {
@@ -1236,6 +1225,10 @@ var jqtree = (function (exports) {
           const div = document.createElement("div");
           div.innerHTML = value;
           return document.createTextNode(div.innerHTML);
+        } else if (value == null) {
+          return undefined;
+        } else if (value.nodeType) {
+          return value;
         } else {
           return jQuery(value)[0];
         }
@@ -1335,18 +1328,18 @@ var jqtree = (function (exports) {
     }
 
     class KeyHandler {
-      static LEFT = 37;
-      static UP = 38;
-      static RIGHT = 39;
-      static DOWN = 40;
+      handleKeyDownHandler = null;
       constructor(treeWidget) {
         this.treeWidget = treeWidget;
         if (treeWidget.options.keyboardSupport) {
-          jQuery(document).on("keydown.jqtree", this.handleKeyDown);
+          this.handleKeyDownHandler = this.handleKeyDown.bind(this);
+          document.addEventListener("keydown", this.handleKeyDownHandler);
         }
       }
       deinit() {
-        jQuery(document).off("keydown.jqtree");
+        if (this.handleKeyDownHandler) {
+          document.removeEventListener("keydown", this.handleKeyDownHandler);
+        }
       }
       moveDown(selectedNode) {
         return this.selectNode(selectedNode.getNextVisibleNode());
@@ -1395,15 +1388,14 @@ var jqtree = (function (exports) {
         if (!selectedNode) {
           return true;
         }
-        const key = e.which;
-        switch (key) {
-          case KeyHandler.DOWN:
+        switch (e.key) {
+          case "ArrowDown":
             return this.moveDown(selectedNode);
-          case KeyHandler.UP:
+          case "ArrowUp":
             return this.moveUp(selectedNode);
-          case KeyHandler.RIGHT:
+          case "ArrowRight":
             return this.moveRight(selectedNode);
-          case KeyHandler.LEFT:
+          case "ArrowLeft":
             return this.moveLeft(selectedNode);
           default:
             return true;
@@ -2310,6 +2302,76 @@ var jqtree = (function (exports) {
       }
     }
 
+    class BorderDropHint {
+      constructor(element, scrollLeft) {
+        const div = element.querySelector(":scope > .jqtree-element");
+        if (!div) {
+          this.hint = undefined;
+          return;
+        }
+        const width = Math.max(element.offsetWidth + scrollLeft - 4, 0);
+        const height = Math.max(element.clientHeight - 4, 0);
+        const hint = document.createElement("span");
+        hint.className = "jqtree-border";
+        hint.style.width = `${width}px`;
+        hint.style.height = `${height}px`;
+        this.hint = hint;
+        div.append(this.hint);
+      }
+      remove() {
+        this.hint?.remove();
+      }
+    }
+
+    class GhostDropHint {
+      constructor(node, element, position) {
+        this.element = element;
+        this.node = node;
+        this.ghost = this.createGhostElement();
+        if (position === Position.After) {
+          this.moveAfter();
+        } else if (position === Position.Before) {
+          this.moveBefore();
+        } else if (position === Position.Inside) {
+          if (node.isFolder() && node.is_open) {
+            this.moveInsideOpenFolder();
+          } else {
+            this.moveInside();
+          }
+        }
+      }
+      remove() {
+        this.ghost.remove();
+      }
+      moveAfter() {
+        this.element.after(this.ghost);
+      }
+      moveBefore() {
+        this.element.before(this.ghost);
+      }
+      moveInsideOpenFolder() {
+        const childElement = this.node.children[0]?.element;
+        if (childElement) {
+          childElement.before(this.ghost);
+        }
+      }
+      moveInside() {
+        this.element.after(this.ghost);
+        this.ghost.classList.add("jqtree-inside");
+      }
+      createGhostElement() {
+        const ghost = document.createElement("li");
+        ghost.className = "jqtree_common jqtree-ghost";
+        const circleSpan = document.createElement("span");
+        circleSpan.className = "jqtree_common jqtree-circle";
+        ghost.append(circleSpan);
+        const lineSpan = document.createElement("span");
+        lineSpan.className = "jqtree_common jqtree-line";
+        ghost.append(lineSpan);
+        return ghost;
+      }
+    }
+
     class NodeElement {
       constructor(node, treeWidget) {
         this.init(node, treeWidget);
@@ -2324,47 +2386,48 @@ var jqtree = (function (exports) {
           }
         }
         if (node.element) {
-          this.$element = jQuery(node.element);
+          this.element = node.element;
         }
       }
       addDropHint(position) {
         if (this.mustShowBorderDropHint(position)) {
-          return new BorderDropHint(this.$element, this.treeWidget._getScrollLeft());
+          return new BorderDropHint(this.element, this.treeWidget._getScrollLeft());
         } else {
-          return new GhostDropHint(this.node, this.$element, position);
+          return new GhostDropHint(this.node, this.element, position);
         }
       }
       select(mustSetFocus) {
-        const $li = this.getLi();
-        $li.addClass("jqtree-selected");
-        const $span = this.getSpan();
-        $span.attr("tabindex", this.treeWidget.options.tabIndex ?? null);
-        $span.attr("aria-selected", "true");
+        this.element.classList.add("jqtree-selected");
+        const titleSpan = this.getTitleSpan();
+        const tabIndex = this.treeWidget.options.tabIndex;
+
+        // Check for null or undefined
+        if (tabIndex != null) {
+          titleSpan.setAttribute("tabindex", tabIndex.toString());
+        }
+        titleSpan.setAttribute("aria-selected", "true");
         if (mustSetFocus) {
-          $span.trigger("focus");
+          titleSpan.focus();
         }
       }
       deselect() {
-        const $li = this.getLi();
-        $li.removeClass("jqtree-selected");
-        const $span = this.getSpan();
-        $span.removeAttr("tabindex");
-        $span.attr("aria-selected", "false");
-        $span.trigger("blur");
+        this.element.classList.remove("jqtree-selected");
+        const titleSpan = this.getTitleSpan();
+        titleSpan.removeAttribute("tabindex");
+        titleSpan.setAttribute("aria-selected", "false");
+        titleSpan.blur();
       }
       getUl() {
-        return this.$element.children("ul:first");
+        return this.element.querySelector(":scope > ul");
       }
-      getSpan() {
-        return this.$element.children(".jqtree-element").find("span.jqtree-title");
-      }
-      getLi() {
-        return this.$element;
+      getTitleSpan() {
+        return this.element.querySelector(":scope > .jqtree-element > span.jqtree-title");
       }
       mustShowBorderDropHint(position) {
         return position === Position.Inside;
       }
     }
+
     class FolderElement extends NodeElement {
       open(onFinished) {
         let slide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -2373,22 +2436,18 @@ var jqtree = (function (exports) {
           return;
         }
         this.node.is_open = true;
-        const $button = this.getButton();
-        $button.removeClass("jqtree-closed");
-        $button.html("");
-        const buttonEl = $button.get(0);
-        if (buttonEl) {
-          const openedIconElement = this.treeWidget.renderer.openedIconElement;
-          if (openedIconElement) {
-            const icon = openedIconElement.cloneNode(true);
-            buttonEl.appendChild(icon);
-          }
+        const button = this.getButton();
+        button.classList.remove("jqtree-closed");
+        button.innerHTML = "";
+        const openedIconElement = this.treeWidget.renderer.openedIconElement;
+        if (openedIconElement) {
+          const icon = openedIconElement.cloneNode(true);
+          button.appendChild(icon);
         }
         const doOpen = () => {
-          const $li = this.getLi();
-          $li.removeClass("jqtree-closed");
-          const $titleSpan = this.getSpan();
-          $titleSpan.attr("aria-expanded", "true");
+          this.element.classList.remove("jqtree-closed");
+          const titleSpan = this.getTitleSpan();
+          titleSpan.setAttribute("aria-expanded", "true");
           if (onFinished) {
             onFinished(this.node);
           }
@@ -2397,9 +2456,9 @@ var jqtree = (function (exports) {
           });
         };
         if (slide) {
-          this.getUl().slideDown(animationSpeed, doOpen);
+          jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
         } else {
-          this.getUl().show();
+          jQuery(this.getUl()).show();
           doOpen();
         }
       }
@@ -2410,30 +2469,26 @@ var jqtree = (function (exports) {
           return;
         }
         this.node.is_open = false;
-        const $button = this.getButton();
-        $button.addClass("jqtree-closed");
-        $button.html("");
-        const buttonEl = $button.get(0);
-        if (buttonEl) {
-          const closedIconElement = this.treeWidget.renderer.closedIconElement;
-          if (closedIconElement) {
-            const icon = closedIconElement.cloneNode(true);
-            buttonEl.appendChild(icon);
-          }
+        const button = this.getButton();
+        button.classList.add("jqtree-closed");
+        button.innerHTML = "";
+        const closedIconElement = this.treeWidget.renderer.closedIconElement;
+        if (closedIconElement) {
+          const icon = closedIconElement.cloneNode(true);
+          button.appendChild(icon);
         }
         const doClose = () => {
-          const $li = this.getLi();
-          $li.addClass("jqtree-closed");
-          const $titleSpan = this.getSpan();
-          $titleSpan.attr("aria-expanded", "false");
+          this.element.classList.add("jqtree-closed");
+          const titleSpan = this.getTitleSpan();
+          titleSpan.setAttribute("aria-expanded", "false");
           this.treeWidget._triggerEvent("tree.close", {
             node: this.node
           });
         };
         if (slide) {
-          this.getUl().slideUp(animationSpeed, doClose);
+          jQuery(this.getUl()).slideUp(animationSpeed, doClose);
         } else {
-          this.getUl().hide();
+          jQuery(this.getUl()).hide();
           doClose();
         }
       }
@@ -2441,63 +2496,7 @@ var jqtree = (function (exports) {
         return !this.node.is_open && position === Position.Inside;
       }
       getButton() {
-        return this.$element.children(".jqtree-element").find("a.jqtree-toggler");
-      }
-    }
-    class BorderDropHint {
-      constructor($element, scrollLeft) {
-        const $div = $element.children(".jqtree-element");
-        const elWidth = $element.width() || 0;
-        const width = Math.max(elWidth + scrollLeft - 4, 0);
-        const elHeight = $div.outerHeight() || 0;
-        const height = Math.max(elHeight - 4, 0);
-        this.$hint = jQuery('<span class="jqtree-border"></span>');
-        $div.append(this.$hint);
-        this.$hint.css({
-          width,
-          height
-        });
-      }
-      remove() {
-        this.$hint.remove();
-      }
-    }
-    class GhostDropHint {
-      constructor(node, $element, position) {
-        this.$element = $element;
-        this.node = node;
-        this.$ghost = jQuery(`<li class="jqtree_common jqtree-ghost"><span class="jqtree_common jqtree-circle"></span>
-            <span class="jqtree_common jqtree-line"></span></li>`);
-        if (position === Position.After) {
-          this.moveAfter();
-        } else if (position === Position.Before) {
-          this.moveBefore();
-        } else if (position === Position.Inside) {
-          if (node.isFolder() && node.is_open) {
-            this.moveInsideOpenFolder();
-          } else {
-            this.moveInside();
-          }
-        }
-      }
-      remove() {
-        this.$ghost.remove();
-      }
-      moveAfter() {
-        this.$element.after(this.$ghost);
-      }
-      moveBefore() {
-        this.$element.before(this.$ghost);
-      }
-      moveInsideOpenFolder() {
-        const childElement = this.node.children[0]?.element;
-        if (childElement) {
-          jQuery(childElement).before(this.$ghost);
-        }
-      }
-      moveInside() {
-        this.$element.after(this.$ghost);
-        this.$ghost.addClass("jqtree-inside");
+        return this.element.querySelector(":scope > .jqtree-element > a.jqtree-toggler");
       }
     }
 
@@ -2624,8 +2623,12 @@ var jqtree = (function (exports) {
       getNodesByProperty(key, value) {
         return this.tree.getNodesByProperty(key, value);
       }
-      getNodeByHtmlElement(element) {
-        return this.getNode(jQuery(element));
+      getNodeByHtmlElement(inputElement) {
+        const element = inputElement instanceof HTMLElement ? inputElement : inputElement[0];
+        if (!element) {
+          return null;
+        }
+        return this.getNode(element);
       }
       getNodeByCallback(callback) {
         return this.tree.getNodeByCallback(callback);
@@ -2886,8 +2889,8 @@ var jqtree = (function (exports) {
           return new NodeElement(node, this);
         }
       }
-      _getNodeElement($element) {
-        const node = this.getNode($element);
+      _getNodeElement(element) {
+        const node = this.getNode(element);
         if (node) {
           return this._getNodeElementForNode(node);
         } else {
@@ -2895,7 +2898,7 @@ var jqtree = (function (exports) {
         }
       }
       _containsElement(element) {
-        const node = this.getNode(jQuery(element));
+        const node = this.getNode(element);
         return node != null && node.tree === this.tree;
       }
       _getScrollLeft() {
@@ -3179,10 +3182,9 @@ var jqtree = (function (exports) {
         }
       };
       getClickTarget(element) {
-        const $target = jQuery(element);
-        const $button = $target.closest(".jqtree-toggler");
-        if ($button.length) {
-          const node = this.getNode($button);
+        const button = element.closest(".jqtree-toggler");
+        if (button) {
+          const node = this.getNode(button);
           if (node) {
             return {
               type: "button",
@@ -3190,9 +3192,9 @@ var jqtree = (function (exports) {
             };
           }
         } else {
-          const $el = $target.closest(".jqtree-element");
-          if ($el.length) {
-            const node = this.getNode($el);
+          const jqTreeElement = element.closest(".jqtree-element");
+          if (jqTreeElement) {
+            const node = this.getNode(jqTreeElement);
             if (node) {
               return {
                 type: "label",
@@ -3203,18 +3205,18 @@ var jqtree = (function (exports) {
         }
         return null;
       }
-      getNode($element) {
-        const $li = $element.closest("li.jqtree_common");
-        if ($li.length === 0) {
-          return null;
+      getNode(element) {
+        const liElement = element.closest("li.jqtree_common");
+        if (liElement) {
+          return jQuery(liElement).data("node");
         } else {
-          return $li.data("node");
+          return null;
         }
       }
       handleContextmenu = e => {
-        const $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
-        if ($div.length) {
-          const node = this.getNode($div);
+        const div = e.target.closest("ul.jqtree-tree .jqtree-element");
+        if (div) {
+          const node = this.getNode(div);
           if (node) {
             e.preventDefault();
             e.stopPropagation();

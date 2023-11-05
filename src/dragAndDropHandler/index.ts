@@ -1,7 +1,9 @@
-import { getPositionName, Node, Position } from "./node";
-import { DropHint, HitArea, PositionInfo } from "./types";
-import { NodeElement } from "./nodeElement";
-import { JqTreeWidget } from "./tree.jquery";
+import { getPositionName, Node, Position } from "../node";
+import { DropHint, HitArea, PositionInfo } from "../types";
+import NodeElement from "../nodeElement";
+import { JqTreeWidget } from "../tree.jquery";
+import DragElement from "./dragElement";
+import HitAreasGenerator from "./hitAreasGenerator";
 
 interface Dimensions {
     left: number;
@@ -31,20 +33,20 @@ export class DragAndDropHandler {
     }
 
     public mouseCapture(positionInfo: PositionInfo): boolean | null {
-        const $element = jQuery(positionInfo.target);
+        const element = positionInfo.target;
 
-        if (!this.mustCaptureElement($element)) {
+        if (!this.mustCaptureElement(element)) {
             return null;
         }
 
         if (
             this.treeWidget.options.onIsMoveHandle &&
-            !this.treeWidget.options.onIsMoveHandle($element)
+            !this.treeWidget.options.onIsMoveHandle(jQuery(element))
         ) {
             return null;
         }
 
-        let nodeElement = this.treeWidget._getNodeElement($element);
+        let nodeElement = this.treeWidget._getNodeElement(element);
 
         if (nodeElement && this.treeWidget.options.onCanMove) {
             if (!this.treeWidget.options.onCanMove(nodeElement.node)) {
@@ -82,7 +84,7 @@ export class DragAndDropHandler {
         );
 
         this.isDragging = true;
-        this.currentItem.$element.addClass("jqtree-moving");
+        this.currentItem.element.classList.add("jqtree-moving");
 
         return true;
     }
@@ -149,7 +151,7 @@ export class DragAndDropHandler {
         const currentItem = this.currentItem;
 
         if (this.currentItem) {
-            this.currentItem.$element.removeClass("jqtree-moving");
+            this.currentItem.element.classList.remove("jqtree-moving");
             this.currentItem = null;
         }
 
@@ -178,7 +180,7 @@ export class DragAndDropHandler {
             );
 
             if (this.isDragging) {
-                this.currentItem.$element.addClass("jqtree-moving");
+                this.currentItem.element.classList.add("jqtree-moving");
             }
         }
     }
@@ -196,8 +198,14 @@ export class DragAndDropHandler {
         }
     }
 
-    private mustCaptureElement($element: JQuery<HTMLElement>): boolean {
-        return !$element.is("input,select,textarea");
+    private mustCaptureElement(element: HTMLElement): boolean {
+        const nodeName = element.nodeName;
+
+        return (
+            nodeName !== "INPUT" &&
+            nodeName !== "SELECT" &&
+            nodeName !== "TEXTAREA"
+        );
     }
 
     private canMoveToArea(area: HitArea): boolean {
@@ -388,326 +396,5 @@ export class DragAndDropHandler {
                 bottom: offset.top + height + 16,
             };
         }
-    }
-}
-
-abstract class VisibleNodeIterator {
-    private tree: Node;
-
-    constructor(tree: Node) {
-        this.tree = tree;
-    }
-
-    protected iterate(): void {
-        let isFirstNode = true;
-
-        const _iterateNode = (node: Node, nextNode: Node | null): void => {
-            let mustIterateInside =
-                (node.is_open || !node.element) && node.hasChildren();
-
-            let $element: JQuery<HTMLElement> | null = null;
-
-            if (node.element) {
-                $element = jQuery(node.element);
-
-                if (!$element.is(":visible")) {
-                    return;
-                }
-
-                if (isFirstNode) {
-                    this.handleFirstNode(node);
-                    isFirstNode = false;
-                }
-
-                if (!node.hasChildren()) {
-                    this.handleNode(node, nextNode, $element);
-                } else if (node.is_open) {
-                    if (!this.handleOpenFolder(node, $element)) {
-                        mustIterateInside = false;
-                    }
-                } else {
-                    this.handleClosedFolder(node, nextNode, $element);
-                }
-            }
-
-            if (mustIterateInside) {
-                const childrenLength = node.children.length;
-                node.children.forEach((_, i) => {
-                    const child = node.children[i];
-
-                    if (child) {
-                        if (i === childrenLength - 1) {
-                            _iterateNode(child, null);
-                        } else {
-                            const nextChild = node.children[i + 1];
-
-                            if (nextChild) {
-                                _iterateNode(child, nextChild);
-                            }
-                        }
-                    }
-                });
-
-                if (node.is_open && $element) {
-                    this.handleAfterOpenFolder(node, nextNode);
-                }
-            }
-        };
-
-        _iterateNode(this.tree, null);
-    }
-
-    protected abstract handleNode(
-        node: Node,
-        nextNode: Node | null,
-        $element: JQuery,
-    ): void;
-
-    /*
-    override
-    return
-        - true: continue iterating
-        - false: stop iterating
-    */
-    protected abstract handleOpenFolder(node: Node, $element: JQuery): boolean;
-
-    protected abstract handleClosedFolder(
-        node: Node,
-        nextNode: Node | null,
-        $element: JQuery,
-    ): void;
-
-    protected abstract handleAfterOpenFolder(
-        node: Node,
-        nextNode: Node | null,
-    ): void;
-
-    protected abstract handleFirstNode(node: Node): void;
-}
-
-export class HitAreasGenerator extends VisibleNodeIterator {
-    private currentNode: Node;
-    private treeBottom: number;
-    private positions: HitArea[];
-    private lastTop: number;
-
-    constructor(tree: Node, currentNode: Node, treeBottom: number) {
-        super(tree);
-
-        this.currentNode = currentNode;
-        this.treeBottom = treeBottom;
-    }
-
-    public generate(): HitArea[] {
-        this.positions = [];
-        this.lastTop = 0;
-
-        this.iterate();
-
-        return this.generateHitAreas(this.positions);
-    }
-
-    protected generateHitAreas(positions: HitArea[]): HitArea[] {
-        let previousTop = positions[0]?.top ?? 0;
-        let group = [];
-        const hitAreas: HitArea[] = [];
-
-        for (const position of positions) {
-            if (position.top !== previousTop && group.length) {
-                this.generateHitAreasForGroup(
-                    hitAreas,
-                    group,
-                    previousTop,
-                    position.top,
-                );
-
-                previousTop = position.top;
-                group = [];
-            }
-
-            group.push(position);
-        }
-
-        this.generateHitAreasForGroup(
-            hitAreas,
-            group,
-            previousTop,
-            this.treeBottom,
-        );
-
-        return hitAreas;
-    }
-
-    protected handleOpenFolder(node: Node, $element: JQuery): boolean {
-        if (node === this.currentNode) {
-            // Cannot move inside current item
-
-            // Dnd over the current element is not possible: add a position with type None for the top and the bottom.
-            const top = this.getTop($element);
-            const height = $element.height() || 0;
-            this.addPosition(node, Position.None, top);
-
-            if (height > 5) {
-                // Subtract 5 pixels to allow more space for the next element.
-                this.addPosition(node, Position.None, top + height - 5);
-            }
-
-            // Stop iterating
-            return false;
-        }
-
-        // Cannot move before current item
-        if (node.children[0] !== this.currentNode) {
-            this.addPosition(node, Position.Inside, this.getTop($element));
-        }
-
-        // Continue iterating
-        return true;
-    }
-
-    protected handleClosedFolder(
-        node: Node,
-        nextNode: Node,
-        $element: JQuery,
-    ): void {
-        const top = this.getTop($element);
-
-        if (node === this.currentNode) {
-            // Cannot move after current item
-            this.addPosition(node, Position.None, top);
-        } else {
-            this.addPosition(node, Position.Inside, top);
-
-            // Cannot move before current item
-            if (nextNode !== this.currentNode) {
-                this.addPosition(node, Position.After, top);
-            }
-        }
-    }
-
-    protected handleFirstNode(node: Node): void {
-        if (node !== this.currentNode) {
-            this.addPosition(
-                node,
-                Position.Before,
-                this.getTop(jQuery(node.element)),
-            );
-        }
-    }
-
-    protected handleAfterOpenFolder(node: Node, nextNode: Node): void {
-        if (node === this.currentNode || nextNode === this.currentNode) {
-            // Cannot move before or after current item
-            this.addPosition(node, Position.None, this.lastTop);
-        } else {
-            this.addPosition(node, Position.After, this.lastTop);
-        }
-    }
-
-    protected handleNode(node: Node, nextNode: Node, $element: JQuery): void {
-        const top = this.getTop($element);
-
-        if (node === this.currentNode) {
-            // Cannot move inside current item
-            this.addPosition(node, Position.None, top);
-        } else {
-            this.addPosition(node, Position.Inside, top);
-        }
-
-        if (nextNode === this.currentNode || node === this.currentNode) {
-            // Cannot move before or after current item
-            this.addPosition(node, Position.None, top);
-        } else {
-            this.addPosition(node, Position.After, top);
-        }
-    }
-
-    private getTop($element: JQuery<HTMLElement>): number {
-        const offset = $element.offset();
-
-        return offset ? offset.top : 0;
-    }
-
-    private addPosition(node: Node, position: number, top: number): void {
-        const area = {
-            top,
-            bottom: 0,
-            node,
-            position,
-        };
-
-        this.positions.push(area);
-        this.lastTop = top;
-    }
-
-    private generateHitAreasForGroup(
-        hitAreas: HitArea[],
-        positionsInGroup: HitArea[],
-        top: number,
-        bottom: number,
-    ): void {
-        // limit positions in group
-        const positionCount = Math.min(positionsInGroup.length, 4);
-
-        const areaHeight = Math.round((bottom - top) / positionCount);
-        let areaTop = top;
-
-        let i = 0;
-        while (i < positionCount) {
-            const position = positionsInGroup[i];
-
-            if (position && position.position !== Position.None) {
-                hitAreas.push({
-                    top: areaTop,
-                    bottom: areaTop + areaHeight,
-                    node: position.node,
-                    position: position.position,
-                });
-            }
-
-            areaTop += areaHeight;
-            i += 1;
-        }
-    }
-}
-
-class DragElement {
-    private offsetX: number;
-    private offsetY: number;
-    private $element: JQuery;
-
-    constructor(
-        nodeName: string,
-        offsetX: number,
-        offsetY: number,
-        $tree: JQuery,
-        autoEscape: boolean,
-    ) {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-
-        this.$element = jQuery("<span>").addClass(
-            "jqtree-title jqtree-dragging",
-        );
-
-        if (autoEscape) {
-            this.$element.text(nodeName);
-        } else {
-            this.$element.html(nodeName);
-        }
-
-        this.$element.css("position", "absolute");
-        $tree.append(this.$element);
-    }
-
-    public move(pageX: number, pageY: number): void {
-        this.$element.offset({
-            left: pageX - this.offsetX,
-            top: pageY - this.offsetY,
-        });
-    }
-
-    public remove(): void {
-        this.$element.remove();
     }
 }

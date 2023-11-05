@@ -5,3 +5,6 @@ export const isFunction = (v: unknown): boolean => typeof v === "function";
 
 export const getBoolString = (value: unknown): string =>
     value ? "true" : "false";
+
+export const getOffsetTop = (element: HTMLElement) =>
+    element.getBoundingClientRect().y + window.scrollY;

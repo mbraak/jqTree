@@ -11,7 +11,9 @@ import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
 import { Node, getPosition } from "./node";
 import { isFunction } from "./util";
-import { FolderElement, NodeElement, OnFinishOpenNode } from "./nodeElement";
+import NodeElement from "./nodeElement";
+import FolderElement, { OnFinishOpenNode } from "./nodeElement/folderElement";
+
 import { JQTreeOptions } from "./jqtreeOptions";
 
 interface ClickTarget {
@@ -185,9 +187,18 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public getNodeByHtmlElement(
-        element: HTMLElement | JQuery<HTMLElement>,
+        inputElement: HTMLElement | JQuery<HTMLElement>,
     ): Node | null {
-        return this.getNode(jQuery(element));
+        const element =
+            inputElement instanceof HTMLElement
+                ? inputElement
+                : inputElement[0];
+
+        if (!element) {
+            return null;
+        }
+
+        return this.getNode(element);
     }
 
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
@@ -576,8 +587,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _getNodeElement($element: JQuery<HTMLElement>): NodeElement | null {
-        const node = this.getNode($element);
+    public _getNodeElement(element: HTMLElement): NodeElement | null {
+        const node = this.getNode(element);
         if (node) {
             return this._getNodeElementForNode(node);
         } else {
@@ -586,7 +597,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public _containsElement(element: HTMLElement): boolean {
-        const node = this.getNode(jQuery(element));
+        const node = this.getNode(element);
 
         return node != null && node.tree === this.tree;
     }
@@ -938,13 +949,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     };
 
-    private getClickTarget(element: EventTarget): ClickTarget | null {
-        const $target = jQuery(element);
+    private getClickTarget(element: HTMLElement): ClickTarget | null {
+        const button = element.closest(".jqtree-toggler");
 
-        const $button = $target.closest(".jqtree-toggler");
-
-        if ($button.length) {
-            const node = this.getNode($button as JQuery<HTMLElement>);
+        if (button) {
+            const node = this.getNode(button as HTMLElement);
 
             if (node) {
                 return {
@@ -953,9 +962,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 };
             }
         } else {
-            const $el = $target.closest(".jqtree-element");
-            if ($el.length) {
-                const node = this.getNode($el as JQuery<HTMLElement>);
+            const jqTreeElement = element.closest(".jqtree-element");
+
+            if (jqTreeElement) {
+                const node = this.getNode(jqTreeElement as HTMLElement);
                 if (node) {
                     return {
                         type: "label",
@@ -968,21 +978,23 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return null;
     }
 
-    private getNode($element: JQuery<HTMLElement>): null | Node {
-        const $li = $element.closest("li.jqtree_common");
-        if ($li.length === 0) {
-            return null;
+    private getNode(element: HTMLElement): null | Node {
+        const liElement = element.closest("li.jqtree_common");
+
+        if (liElement) {
+            return jQuery(liElement).data("node") as Node;
         } else {
-            return $li.data("node") as Node;
+            return null;
         }
     }
 
     private handleContextmenu = (
         e: JQuery.ContextMenuEvent<HTMLElement, any, HTMLElement, HTMLElement>,
     ) => {
-        const $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
-        if ($div.length) {
-            const node = this.getNode($div);
+        const div = e.target.closest("ul.jqtree-tree .jqtree-element");
+
+        if (div) {
+            const node = this.getNode(div as HTMLElement);
             if (node) {
                 e.preventDefault();
                 e.stopPropagation();
