@@ -16,6 +16,8 @@ jobs:
               run: npm install -g pnpm
             - name: Install packages
               run: pnpm install
+            - name: Build lib files
+              run: pnpm run production
             - name: Check compressed size
               uses: preactjs/compressed-size-action@v2
               with:
