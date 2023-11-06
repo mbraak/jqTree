@@ -634,7 +634,16 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             refreshHitAreas: this.refreshHitAreas.bind(this),
             $treeElement: this.$el,
         });
-        this.keyHandler = new KeyHandler(this);
+        this.keyHandler = new KeyHandler({
+            closeNode: this.closeNode.bind(this),
+            getSelectedNode: this.getSelectedNode.bind(this),
+            isFocusOnTree: this.selectNodeHandler.isFocusOnTree.bind(
+                this.selectNodeHandler,
+            ),
+            keyboardSupport: this.options.keyboardSupport,
+            openNode: this.openNode.bind(this),
+            selectNode: this.selectNode.bind(this),
+        });
 
         this.initData();
 
