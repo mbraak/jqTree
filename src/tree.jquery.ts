@@ -627,8 +627,26 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             $treeElement: this.element,
             triggerEvent: this._triggerEvent.bind(this),
         });
-        this.saveStateHandler = new SaveStateHandler(this);
         this.selectNodeHandler = new SelectNodeHandler(this);
+        this.saveStateHandler = new SaveStateHandler({
+            addToSelection: this.selectNodeHandler.addToSelection.bind(
+                this.selectNodeHandler,
+            ),
+            getNodeById: this.getNodeById.bind(this),
+            getSelectedNodes: this.selectNodeHandler.getSelectedNodes.bind(
+                this.selectNodeHandler,
+            ),
+            getTree: () => this.tree,
+            onGetStateFromStorage: this.options.onGetStateFromStorage,
+            onSetStateFromStorage: this.options.onSetStateFromStorage,
+            openNode: this._openNode.bind(this),
+            refreshElements: this._refreshElements.bind(this),
+            removeFromSelection:
+                this.selectNodeHandler.removeFromSelection.bind(
+                    this.selectNodeHandler,
+                ),
+            saveState: this.options.saveState,
+        });
         this.dndHandler = new DragAndDropHandler(this);
         this.scrollHandler = new ScrollHandler({
             refreshHitAreas: this.refreshHitAreas.bind(this),
