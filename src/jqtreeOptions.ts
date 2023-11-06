@@ -6,11 +6,11 @@ type CanMoveNodeTo = (
     positionName: string,
 ) => boolean;
 type CreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
-type DataFilter = (data: unknown) => NodeData[];
+export type DataFilter = (data: unknown) => NodeData[];
 type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
 type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
 type DragMethod = (node: Node, event: Event | Touch) => void;
-type HandleLoadingMethod = (
+export type HandleLoadingMethod = (
     isLoading: boolean,
     node: Node | null,
     $el: JQuery,

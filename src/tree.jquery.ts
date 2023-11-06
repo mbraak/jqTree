@@ -619,7 +619,14 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
 
         this.renderer = new ElementsRenderer(this);
-        this.dataLoader = new DataLoader(this);
+        this.dataLoader = new DataLoader({
+            dataFilter: this.options.dataFilter,
+            loadData: this.loadData.bind(this),
+            onLoadFailed: this.options.onLoadFailed,
+            onLoading: this.options.onLoading,
+            $treeElement: this.element,
+            triggerEvent: this._triggerEvent.bind(this),
+        });
         this.saveStateHandler = new SaveStateHandler(this);
         this.selectNodeHandler = new SelectNodeHandler(this);
         this.dndHandler = new DragAndDropHandler(this);
