@@ -565,7 +565,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
      from_node: redraw this subtree
     */
     public _refreshElements(fromNode: Node | null): void {
-        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
+        const mustSetFocus = this.isFocusOnTree();
         const mustSelect = fromNode
             ? this.isSelectedNodeInSubtree(fromNode)
             : false;
@@ -596,12 +596,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _containsElement(element: HTMLElement): boolean {
-        const node = this.getNode(element);
-
-        return node != null && node.tree === this.tree;
-    }
-
     public _getScrollLeft(): number {
         return this.scrollHandler.getScrollLeft();
     }
@@ -627,7 +621,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             $treeElement: this.element,
             triggerEvent: this._triggerEvent.bind(this),
         });
-        this.selectNodeHandler = new SelectNodeHandler(this);
+        this.selectNodeHandler = new SelectNodeHandler({
+            getNodeById: this.getNodeById.bind(this),
+        });
         this.saveStateHandler = new SaveStateHandler({
             addToSelection: this.selectNodeHandler.addToSelection.bind(
                 this.selectNodeHandler,
@@ -655,9 +651,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.keyHandler = new KeyHandler({
             closeNode: this.closeNode.bind(this),
             getSelectedNode: this.getSelectedNode.bind(this),
-            isFocusOnTree: this.selectNodeHandler.isFocusOnTree.bind(
-                this.selectNodeHandler,
-            ),
+            isFocusOnTree: this.isFocusOnTree.bind(this),
             keyboardSupport: this.options.keyboardSupport,
             openNode: this.openNode.bind(this),
             selectNode: this.selectNode.bind(this),
@@ -1220,6 +1214,22 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.doLoadDataFromUrl(null, node, () => {
             this._openNode(node, slide, onFinished);
         });
+    }
+
+    private containsElement(element: HTMLElement): boolean {
+        const node = this.getNode(element);
+
+        return node != null && node.tree === this.tree;
+    }
+
+    private isFocusOnTree(): boolean {
+        const activeElement = document.activeElement;
+
+        return Boolean(
+            activeElement &&
+                activeElement.tagName === "SPAN" &&
+                this.containsElement(activeElement as HTMLElement),
+        );
     }
 }
 

@@ -1,13 +1,18 @@
 import { Node } from "./node";
-import { JqTreeWidget } from "./tree.jquery";
+
+type GetNodeById = (nodeId: NodeId) => Node | null;
+
+interface SelectNodeHandlerParameters {
+    getNodeById: GetNodeById;
+}
 
 export default class SelectNodeHandler {
-    private treeWidget: JqTreeWidget;
+    private getNodeById: GetNodeById;
     private selectedNodes: Set<NodeId>;
     private selectedSingleNode: Node | null;
 
-    constructor(treeWidget: JqTreeWidget) {
-        this.treeWidget = treeWidget;
+    constructor({ getNodeById }: SelectNodeHandlerParameters) {
+        this.getNodeById = getNodeById;
         this.selectedNodes = new Set<NodeId>();
         this.clear();
     }
@@ -29,7 +34,7 @@ export default class SelectNodeHandler {
             const selectedNodes: Node[] = [];
 
             this.selectedNodes.forEach((id) => {
-                const node = this.treeWidget.getNodeById(id);
+                const node = this.getNodeById(id);
                 if (node) {
                     selectedNodes.push(node);
                 }
@@ -53,7 +58,7 @@ export default class SelectNodeHandler {
                 if (
                     Object.prototype.hasOwnProperty.call(this.selectedNodes, id)
                 ) {
-                    const node = this.treeWidget.getNodeById(id);
+                    const node = this.getNodeById(id);
                     if (node && parent.isParentOf(node)) {
                         selectedNodes.push(node);
                     }
@@ -107,15 +112,5 @@ export default class SelectNodeHandler {
         } else {
             this.selectedSingleNode = node;
         }
-    }
-
-    public isFocusOnTree(): boolean {
-        const activeElement = document.activeElement;
-
-        return Boolean(
-            activeElement &&
-                activeElement.tagName === "SPAN" &&
-                this.treeWidget._containsElement(activeElement as HTMLElement)
-        );
     }
 }
