@@ -612,7 +612,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             this.options.closedIcon = this.getDefaultClosedIcon();
         }
 
-        this.renderer = new ElementsRenderer(this);
+        const getTree = () => this.tree;
+
         this.dataLoader = new DataLoader({
             dataFilter: this.options.dataFilter,
             loadData: this.loadData.bind(this),
@@ -632,7 +633,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             getSelectedNodes: this.selectNodeHandler.getSelectedNodes.bind(
                 this.selectNodeHandler,
             ),
-            getTree: () => this.tree,
+            getTree: getTree.bind(this),
             onGetStateFromStorage: this.options.onGetStateFromStorage,
             onSetStateFromStorage: this.options.onSetStateFromStorage,
             openNode: this._openNode.bind(this),
@@ -655,6 +656,22 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             keyboardSupport: this.options.keyboardSupport,
             openNode: this.openNode.bind(this),
             selectNode: this.selectNode.bind(this),
+        });
+        this.renderer = new ElementsRenderer({
+            autoEscape: this.options.autoEscape,
+            buttonLeft: this.options.buttonLeft,
+            closedIcon: this.options.closedIcon,
+            dragAndDrop: this.options.dragAndDrop,
+            $element: this.element,
+            getTree: getTree.bind(this),
+            isNodeSelected: this.selectNodeHandler.isNodeSelected.bind(
+                this.selectNodeHandler,
+            ),
+            onCreateLi: this.options.onCreateLi,
+            openedIcon: this.options.openedIcon,
+            rtl: this.options.rtl,
+            showEmptyFolder: this.options.showEmptyFolder,
+            tabIndex: this.options.tabIndex,
         });
 
         this.initData();

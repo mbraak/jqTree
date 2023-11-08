@@ -5,7 +5,7 @@ type CanMoveNodeTo = (
     targetNode: Node,
     positionName: string,
 ) => boolean;
-type CreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
+export type CreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 export type DataFilter = (data: unknown) => NodeData[];
 type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
 type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
