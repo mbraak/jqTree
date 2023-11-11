@@ -1,6 +1,6 @@
 import { Node } from "./node";
 
-type CanMoveNodeTo = (
+export type CanMoveNodeTo = (
     node: Node,
     targetNode: Node,
     positionName: string,
@@ -9,7 +9,7 @@ export type CreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 export type DataFilter = (data: unknown) => NodeData[];
 type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
 type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
-type DragMethod = (node: Node, event: Event | Touch) => void;
+export type DragMethod = (node: Node, event: Event | Touch) => void;
 export type HandleLoadingMethod = (
     isLoading: boolean,
     node: Node | null,
@@ -22,31 +22,31 @@ export interface JQTreeOptions {
     autoOpen: boolean | number;
     buttonLeft: boolean;
     closedIcon?: string | HTMLElement | JQuery<HTMLElement>;
-    data: NodeData[] | undefined;
-    dataFilter: DataFilter | undefined;
-    dataUrl: DataUrl | undefined;
+    data?: NodeData[];
+    dataFilter?: DataFilter;
+    dataUrl?: DataUrl;
     dragAndDrop: boolean;
     keyboardSupport: boolean;
     nodeClass: typeof Node;
-    onCanMove: ((node: Node) => boolean) | undefined;
-    onCanMoveTo: CanMoveNodeTo | undefined;
-    onCanSelectNode: ((node: Node) => boolean) | undefined;
-    onCreateLi: CreateLi | undefined;
-    onDragMove: DragMethod | undefined;
-    onDragStop: DragMethod | undefined;
-    onGetStateFromStorage: (() => string) | undefined;
-    onIsMoveHandle: ((el: JQuery) => boolean) | undefined;
-    onLoadFailed: ((response: JQuery.jqXHR) => void) | undefined;
-    onLoading: HandleLoadingMethod | undefined;
-    onSetStateFromStorage: ((data: string) => void) | undefined;
+    onCanMove?: (node: Node) => boolean;
+    onCanMoveTo?: CanMoveNodeTo;
+    onCanSelectNode?: (node: Node) => boolean;
+    onCreateLi?: CreateLi;
+    onDragMove?: DragMethod;
+    onDragStop?: DragMethod;
+    onGetStateFromStorage?: () => string;
+    onIsMoveHandle?: (el: JQuery) => boolean;
+    onLoadFailed?: (response: JQuery.jqXHR) => void;
+    onLoading?: HandleLoadingMethod;
+    onSetStateFromStorage?: (data: string) => void;
     openedIcon?: string | HTMLElement | JQuery<HTMLElement>;
     openFolderDelay: number | false;
-    rtl: boolean | undefined;
+    rtl?: boolean;
     selectable: boolean;
     saveState: boolean | string;
     showEmptyFolder: boolean;
     slide: boolean;
     startDndDelay: number;
-    tabIndex: number | undefined;
+    tabIndex?: number;
     useContextMenu: boolean;
 }

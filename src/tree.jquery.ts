@@ -1197,20 +1197,29 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             dataFilter,
             dragAndDrop,
             keyboardSupport,
+            onCanMove,
             onCreateLi,
+            onDragMove,
+            onDragStop,
             onGetStateFromStorage,
+            onIsMoveHandle,
             onLoadFailed,
             onLoading,
             onSetStateFromStorage,
             openedIcon,
+            openFolderDelay,
             rtl,
             saveState,
             showEmptyFolder,
+            slide,
             tabIndex,
         } = this.options;
 
         const closeNode = this.closeNode.bind(this);
+        const getNodeElement = this._getNodeElement.bind(this);
+        const getNodeElementForNode = this._getNodeElementForNode.bind(this);
         const getNodeById = this.getNodeById.bind(this);
+        const getScrollLeft = this._getScrollLeft.bind(this);
         const getSelectedNode = this.getSelectedNode.bind(this);
         const getTree = this.getTree.bind(this);
         const isFocusOnTree = this.isFocusOnTree.bind(this);
@@ -1257,7 +1266,23 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             saveState,
         });
 
-        const dndHandler = new DragAndDropHandler(this); // todo
+        const dndHandler = new DragAndDropHandler({
+            autoEscape,
+            getNodeElement,
+            getNodeElementForNode,
+            getScrollLeft,
+            getTree,
+            onCanMove,
+            onDragMove,
+            onDragStop,
+            onIsMoveHandle,
+            openFolderDelay,
+            openNode,
+            refreshElements,
+            slide,
+            $treeElement,
+            triggerEvent,
+        });
 
         const scrollHandler = new ScrollHandler({
             refreshHitAreas,
