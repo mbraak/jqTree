@@ -1,8 +1,13 @@
 import { Node } from "./node";
+import { OnFinishOpenNode } from "./nodeElement/folderElement";
 
 type KeyboardEventHandler = (event: KeyboardEvent) => boolean;
 
-type OpenNode = (node: Node) => void;
+type OpenNode = (
+    node: Node,
+    slide?: boolean,
+    onFinished?: OnFinishOpenNode,
+) => void;
 type CloseNode = (node: Node) => void;
 type SelectNode = (node: Node) => void;
 type GetSelectedNode = () => Node | false;

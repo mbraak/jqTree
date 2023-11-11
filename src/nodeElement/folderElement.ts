@@ -5,7 +5,7 @@ export type OnFinishOpenNode = (node: Node) => void;
 
 class FolderElement extends NodeElement {
     public open(
-        onFinished: OnFinishOpenNode | null,
+        onFinished: OnFinishOpenNode | undefined,
         slide = true,
         animationSpeed: JQuery.Duration = "fast",
     ): void {

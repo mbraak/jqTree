@@ -16,7 +16,7 @@ type OnSetStateFromStorage = ((data: string) => void) | undefined;
 type OpenNode = (
     node: Node,
     slide: boolean,
-    onFinished: OnFinishOpenNode | null,
+    onFinished?: OnFinishOpenNode,
 ) => void;
 type RefreshElements = (fromNode: Node | null) => void;
 type RemoveFromSelection = (node: Node) => void;
@@ -258,7 +258,7 @@ export default class SaveStateHandler {
                         if (node.load_on_demand) {
                             loadAndOpenNode(node);
                         } else {
-                            this.openNode(node, false, null);
+                            this.openNode(node, false);
                         }
                     }
                 }

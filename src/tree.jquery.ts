@@ -214,12 +214,12 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const parseParams = (): [boolean, OnFinishOpenNode | null] => {
+        const parseParams = (): [boolean, OnFinishOpenNode | undefined] => {
             let onFinished: OnFinishOpenNode | null;
             let slide: boolean | null;
 
             if (isFunction(param1)) {
-                onFinished = param1 as OnFinishOpenNode | null;
+                onFinished = param1 as OnFinishOpenNode;
                 slide = null;
             } else {
                 slide = param1 as boolean;
@@ -525,12 +525,12 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public _openNode(
         node: Node,
         slide = true,
-        onFinished: OnFinishOpenNode | null,
+        onFinished?: OnFinishOpenNode,
     ): void {
         const doOpenNode = (
             _node: Node,
             _slide: boolean,
-            _onFinished: OnFinishOpenNode | null,
+            _onFinished?: OnFinishOpenNode,
         ): void => {
             const folderElement = new FolderElement(_node, this);
             folderElement.open(
@@ -549,7 +549,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 while (parent) {
                     // nb: do not open root element
                     if (parent.parent) {
-                        doOpenNode(parent, false, null);
+                        doOpenNode(parent, false);
                     }
                     parent = parent.parent;
                 }
@@ -612,67 +612,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             this.options.closedIcon = this.getDefaultClosedIcon();
         }
 
-        const getTree = () => this.tree;
-
-        this.dataLoader = new DataLoader({
-            dataFilter: this.options.dataFilter,
-            loadData: this.loadData.bind(this),
-            onLoadFailed: this.options.onLoadFailed,
-            onLoading: this.options.onLoading,
-            $treeElement: this.element,
-            triggerEvent: this._triggerEvent.bind(this),
-        });
-        this.selectNodeHandler = new SelectNodeHandler({
-            getNodeById: this.getNodeById.bind(this),
-        });
-        this.saveStateHandler = new SaveStateHandler({
-            addToSelection: this.selectNodeHandler.addToSelection.bind(
-                this.selectNodeHandler,
-            ),
-            getNodeById: this.getNodeById.bind(this),
-            getSelectedNodes: this.selectNodeHandler.getSelectedNodes.bind(
-                this.selectNodeHandler,
-            ),
-            getTree: getTree.bind(this),
-            onGetStateFromStorage: this.options.onGetStateFromStorage,
-            onSetStateFromStorage: this.options.onSetStateFromStorage,
-            openNode: this._openNode.bind(this),
-            refreshElements: this._refreshElements.bind(this),
-            removeFromSelection:
-                this.selectNodeHandler.removeFromSelection.bind(
-                    this.selectNodeHandler,
-                ),
-            saveState: this.options.saveState,
-        });
-        this.dndHandler = new DragAndDropHandler(this);
-        this.scrollHandler = new ScrollHandler({
-            refreshHitAreas: this.refreshHitAreas.bind(this),
-            $treeElement: this.$el,
-        });
-        this.keyHandler = new KeyHandler({
-            closeNode: this.closeNode.bind(this),
-            getSelectedNode: this.getSelectedNode.bind(this),
-            isFocusOnTree: this.isFocusOnTree.bind(this),
-            keyboardSupport: this.options.keyboardSupport,
-            openNode: this.openNode.bind(this),
-            selectNode: this.selectNode.bind(this),
-        });
-        this.renderer = new ElementsRenderer({
-            autoEscape: this.options.autoEscape,
-            buttonLeft: this.options.buttonLeft,
-            closedIcon: this.options.closedIcon,
-            dragAndDrop: this.options.dragAndDrop,
-            $element: this.element,
-            getTree: getTree.bind(this),
-            isNodeSelected: this.selectNodeHandler.isNodeSelected.bind(
-                this.selectNodeHandler,
-            ),
-            onCreateLi: this.options.onCreateLi,
-            openedIcon: this.options.openedIcon,
-            rtl: this.options.rtl,
-            showEmptyFolder: this.options.showEmptyFolder,
-            tabIndex: this.options.tabIndex,
-        });
+        this.connectHandlers();
 
         this.initData();
 
@@ -928,7 +868,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
                         return false;
                     } else {
-                        this._openNode(node, false, null);
+                        this._openNode(node, false);
 
                         return level !== maxLevel;
                     }
@@ -1224,7 +1164,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     private loadFolderOnDemand(
         node: Node,
         slide = true,
-        onFinished: OnFinishOpenNode | null,
+        onFinished?: OnFinishOpenNode,
     ): void {
         node.is_loading = true;
 
@@ -1247,6 +1187,114 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 activeElement.tagName === "SPAN" &&
                 this.containsElement(activeElement as HTMLElement),
         );
+    }
+
+    private connectHandlers() {
+        const {
+            autoEscape,
+            buttonLeft,
+            closedIcon,
+            dataFilter,
+            dragAndDrop,
+            keyboardSupport,
+            onCreateLi,
+            onGetStateFromStorage,
+            onLoadFailed,
+            onLoading,
+            onSetStateFromStorage,
+            openedIcon,
+            rtl,
+            saveState,
+            showEmptyFolder,
+            tabIndex,
+        } = this.options;
+
+        const closeNode = this.closeNode.bind(this);
+        const getNodeById = this.getNodeById.bind(this);
+        const getSelectedNode = this.getSelectedNode.bind(this);
+        const getTree = this.getTree.bind(this);
+        const isFocusOnTree = this.isFocusOnTree.bind(this);
+        const loadData = this.loadData.bind(this);
+        const openNode = this._openNode.bind(this);
+        const refreshElements = this._refreshElements.bind(this);
+        const refreshHitAreas = this.refreshHitAreas.bind(this);
+        const selectNode = this.selectNode.bind(this);
+        const $treeElement = this.element;
+        const triggerEvent = this._triggerEvent.bind(this);
+
+        const selectNodeHandler = new SelectNodeHandler({
+            getNodeById,
+        });
+
+        const addToSelection =
+            selectNodeHandler.addToSelection.bind(selectNodeHandler);
+        const getSelectedNodes =
+            selectNodeHandler.getSelectedNodes.bind(selectNodeHandler);
+        const isNodeSelected =
+            selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
+        const removeFromSelection =
+            selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
+
+        const dataLoader = new DataLoader({
+            dataFilter,
+            loadData,
+            onLoadFailed,
+            onLoading,
+            $treeElement,
+            triggerEvent,
+        });
+
+        const saveStateHandler = new SaveStateHandler({
+            addToSelection,
+            getNodeById,
+            getSelectedNodes,
+            getTree,
+            onGetStateFromStorage,
+            onSetStateFromStorage,
+            openNode,
+            refreshElements,
+            removeFromSelection,
+            saveState,
+        });
+
+        const dndHandler = new DragAndDropHandler(this); // todo
+
+        const scrollHandler = new ScrollHandler({
+            refreshHitAreas,
+            $treeElement,
+        });
+
+        const keyHandler = new KeyHandler({
+            closeNode,
+            getSelectedNode,
+            isFocusOnTree,
+            keyboardSupport,
+            openNode,
+            selectNode,
+        });
+
+        const renderer = new ElementsRenderer({
+            autoEscape,
+            buttonLeft,
+            closedIcon,
+            dragAndDrop,
+            $element: $treeElement,
+            getTree,
+            isNodeSelected,
+            onCreateLi,
+            openedIcon,
+            rtl,
+            showEmptyFolder,
+            tabIndex,
+        });
+
+        this.dataLoader = dataLoader;
+        this.dndHandler = dndHandler;
+        this.keyHandler = keyHandler;
+        this.renderer = renderer;
+        this.saveStateHandler = saveStateHandler;
+        this.scrollHandler = scrollHandler;
+        this.selectNodeHandler = selectNodeHandler;
     }
 }
 
