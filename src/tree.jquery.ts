@@ -247,7 +247,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         const slide = slideParam ?? this.options.slide;
 
         if (node.isFolder() || node.isEmptyFolder) {
-            new FolderElement(node, this).close(
+            this.createFolderElement(node).close(
                 slide,
                 this.options.animationSpeed,
             );
@@ -532,7 +532,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             _slide: boolean,
             _onFinished?: OnFinishOpenNode,
         ): void => {
-            const folderElement = new FolderElement(_node, this);
+            const folderElement = this.createFolderElement(_node);
             folderElement.open(
                 _onFinished,
                 _slide,
@@ -581,9 +581,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public _getNodeElementForNode(node: Node): NodeElement {
         if (node.isFolder()) {
-            return new FolderElement(node, this);
+            return this.createFolderElement(node);
         } else {
-            return new NodeElement(node, this);
+            return this.createNodeElement(node);
         }
     }
 
@@ -1320,6 +1320,38 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.saveStateHandler = saveStateHandler;
         this.scrollHandler = scrollHandler;
         this.selectNodeHandler = selectNodeHandler;
+    }
+
+    private createFolderElement(node: Node) {
+        const closedIconElement = this.renderer.closedIconElement;
+        const getScrollLeft = this._getScrollLeft.bind(this);
+        const openedIconElement = this.renderer.openedIconElement;
+        const tabIndex = this.options.tabIndex;
+        const $treeElement = this.element;
+        const triggerEvent = this._triggerEvent.bind(this);
+
+        return new FolderElement({
+            closedIconElement,
+            getScrollLeft,
+            node,
+            openedIconElement,
+            tabIndex,
+            $treeElement,
+            triggerEvent,
+        });
+    }
+
+    private createNodeElement(node: Node) {
+        const getScrollLeft = this._getScrollLeft.bind(this);
+        const tabIndex = this.options.tabIndex;
+        const $treeElement = this.element;
+
+        return new NodeElement({
+            getScrollLeft,
+            node,
+            tabIndex,
+            $treeElement,
+        });
     }
 }
 

@@ -1,9 +1,45 @@
 import { Position, Node } from "../node";
-import NodeElement from "./index";
+import NodeElement, { NodeElementParams } from "./index";
 
 export type OnFinishOpenNode = (node: Node) => void;
 
+type TriggerEvent = (
+    eventName: string,
+    values?: Record<string, unknown>,
+) => JQuery.Event;
+
+interface FolderElementParams extends NodeElementParams {
+    closedIconElement?: HTMLElement | Text;
+    openedIconElement?: HTMLElement | Text;
+    triggerEvent: TriggerEvent;
+}
+
 class FolderElement extends NodeElement {
+    private closedIconElement?: HTMLElement | Text;
+    private openedIconElement?: HTMLElement | Text;
+    private triggerEvent: TriggerEvent;
+
+    constructor({
+        closedIconElement,
+        getScrollLeft,
+        node,
+        openedIconElement,
+        tabIndex,
+        $treeElement,
+        triggerEvent,
+    }: FolderElementParams) {
+        super({
+            getScrollLeft,
+            node,
+            tabIndex,
+            $treeElement,
+        });
+
+        this.closedIconElement = closedIconElement;
+        this.openedIconElement = openedIconElement;
+        this.triggerEvent = triggerEvent;
+    }
+
     public open(
         onFinished: OnFinishOpenNode | undefined,
         slide = true,
@@ -19,7 +55,7 @@ class FolderElement extends NodeElement {
         button.classList.remove("jqtree-closed");
         button.innerHTML = "";
 
-        const openedIconElement = this.treeWidget.renderer.openedIconElement;
+        const openedIconElement = this.openedIconElement;
 
         if (openedIconElement) {
             const icon = openedIconElement.cloneNode(true);
@@ -36,7 +72,7 @@ class FolderElement extends NodeElement {
                 onFinished(this.node);
             }
 
-            this.treeWidget._triggerEvent("tree.open", {
+            this.triggerEvent("tree.open", {
                 node: this.node,
             });
         };
@@ -63,7 +99,7 @@ class FolderElement extends NodeElement {
         button.classList.add("jqtree-closed");
         button.innerHTML = "";
 
-        const closedIconElement = this.treeWidget.renderer.closedIconElement;
+        const closedIconElement = this.closedIconElement;
 
         if (closedIconElement) {
             const icon = closedIconElement.cloneNode(true);
@@ -76,7 +112,7 @@ class FolderElement extends NodeElement {
             const titleSpan = this.getTitleSpan();
             titleSpan.setAttribute("aria-expanded", "false");
 
-            this.treeWidget._triggerEvent("tree.close", {
+            this.triggerEvent("tree.close", {
                 node: this.node,
             });
         };
