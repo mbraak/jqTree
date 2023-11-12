@@ -1,6 +1,7 @@
 import { isInt } from "./util";
 import { Node } from "./node";
 import { OnFinishOpenNode } from "./nodeElement/folderElement";
+import { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
 
 export interface SavedState {
     open_nodes: NodeId[];
@@ -11,8 +12,6 @@ type AddToSelection = (node: Node) => void;
 type GetNodeById = (nodeId: NodeId) => Node | null;
 type GetSelectedNodes = () => Node[];
 type GetTree = () => Node | null;
-type OnGetStateFromStorage = (() => string) | undefined;
-type OnSetStateFromStorage = ((data: string) => void) | undefined;
 type OpenNode = (
     node: Node,
     slide: boolean,

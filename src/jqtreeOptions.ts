@@ -1,16 +1,34 @@
 import { Node } from "./node";
 
-export type CanMoveNodeTo = (
+export type OnCanMove = ((node: Node) => boolean) | undefined;
+
+type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
+
+export type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
+
+export type DragMethod = (node: Node, event: Event | Touch) => void;
+
+export type OnCanMoveTo = (
     node: Node,
     targetNode: Node,
     positionName: string,
 ) => boolean;
-export type CreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
+
+export type OnGetStateFromStorage = (() => string) | undefined;
+
+export type OnIsMoveHandle = (el: JQuery) => boolean;
+
+export type OnLoadFailed = (response: JQuery.jqXHR) => void;
+
+export type OnSetStateFromStorage = ((data: string) => void) | undefined;
+
 export type DataFilter = (data: unknown) => NodeData[];
-type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
-type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
-export type DragMethod = (node: Node, event: Event | Touch) => void;
-export type HandleLoadingMethod = (
+
+export type IconElement = string | HTMLElement | JQuery<HTMLElement>;
+
+export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
+
+export type OnLoading = (
     isLoading: boolean,
     node: Node | null,
     $el: JQuery,
@@ -21,25 +39,25 @@ export interface JQTreeOptions {
     autoEscape: boolean;
     autoOpen: boolean | number;
     buttonLeft: boolean;
-    closedIcon?: string | HTMLElement | JQuery<HTMLElement>;
+    closedIcon?: IconElement;
     data?: NodeData[];
     dataFilter?: DataFilter;
     dataUrl?: DataUrl;
     dragAndDrop: boolean;
     keyboardSupport: boolean;
     nodeClass: typeof Node;
-    onCanMove?: (node: Node) => boolean;
-    onCanMoveTo?: CanMoveNodeTo;
+    onCanMove?: OnCanMove;
+    onCanMoveTo?: OnCanMoveTo;
     onCanSelectNode?: (node: Node) => boolean;
-    onCreateLi?: CreateLi;
+    onCreateLi?: OnCreateLi;
     onDragMove?: DragMethod;
     onDragStop?: DragMethod;
-    onGetStateFromStorage?: () => string;
-    onIsMoveHandle?: (el: JQuery) => boolean;
-    onLoadFailed?: (response: JQuery.jqXHR) => void;
-    onLoading?: HandleLoadingMethod;
-    onSetStateFromStorage?: (data: string) => void;
-    openedIcon?: string | HTMLElement | JQuery<HTMLElement>;
+    onGetStateFromStorage?: OnGetStateFromStorage;
+    onIsMoveHandle?: OnIsMoveHandle;
+    onLoadFailed?: OnLoadFailed;
+    onLoading?: OnLoading;
+    onSetStateFromStorage?: OnSetStateFromStorage;
+    openedIcon?: IconElement;
     openFolderDelay: number | false;
     rtl?: boolean;
     selectable: boolean;

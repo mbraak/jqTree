@@ -4,6 +4,7 @@ import { DropHint } from "../types";
 import BorderDropHint from "./borderDropHint";
 import GhostDropHint from "./ghostDropHint";
 
+// todo: replace treeWidget parameter
 class NodeElement {
     public node: Node;
     public element: HTMLElement;

@@ -3,7 +3,12 @@ import { DropHint, HitArea, PositionInfo } from "../types";
 import NodeElement from "../nodeElement";
 import DragElement from "./dragElement";
 import HitAreasGenerator from "./hitAreasGenerator";
-import { CanMoveNodeTo, DragMethod } from "../jqtreeOptions";
+import {
+    OnCanMove,
+    OnCanMoveTo,
+    OnIsMoveHandle,
+    DragMethod,
+} from "../jqtreeOptions";
 import { OnFinishOpenNode } from "../nodeElement/folderElement";
 
 interface Dimensions {
@@ -13,13 +18,10 @@ interface Dimensions {
     bottom: number;
 }
 
-// todo: move types to 1 place
-type OnCanMove = ((node: Node) => boolean) | undefined;
 type GetNodeElement = (element: HTMLElement) => NodeElement | null;
 type GetNodeElementForNode = (node: Node) => NodeElement;
 type GetScrollLeft = () => number;
 type GetTree = () => Node | null;
-type OnIsMoveHandle = (el: JQuery) => boolean;
 type OpenNode = (
     node: Node,
     slide: boolean,
@@ -38,7 +40,7 @@ interface DragAndDropHandlerParams {
     getScrollLeft: GetScrollLeft;
     getTree: GetTree;
     onCanMove?: OnCanMove;
-    onCanMoveTo?: CanMoveNodeTo;
+    onCanMoveTo?: OnCanMoveTo;
     onDragMove?: DragMethod;
     onDragStop?: DragMethod;
     onIsMoveHandle?: OnIsMoveHandle;
@@ -63,7 +65,7 @@ export class DragAndDropHandler {
     private getScrollLeft: GetScrollLeft;
     private getTree: GetTree;
     private onCanMove?: OnCanMove;
-    private onCanMoveTo?: CanMoveNodeTo;
+    private onCanMoveTo?: OnCanMoveTo;
     private onDragMove?: DragMethod;
     private onDragStop?: DragMethod;
     private onIsMoveHandle?: OnIsMoveHandle;

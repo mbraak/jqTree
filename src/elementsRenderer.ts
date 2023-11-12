@@ -1,9 +1,8 @@
 import { getBoolString } from "./util";
 import { Node } from "./node";
-import { CreateLi } from "./jqtreeOptions";
+import { IconElement, OnCreateLi } from "./jqtreeOptions";
 
 type GetTree = () => Node | null;
-type IconElement = string | HTMLElement | JQuery<HTMLElement>;
 type IsNodeSelected = (node: Node) => boolean;
 
 interface ElementsRendererParams {
@@ -14,7 +13,7 @@ interface ElementsRendererParams {
     $element: JQuery<HTMLElement>;
     getTree: GetTree;
     isNodeSelected: IsNodeSelected;
-    onCreateLi?: CreateLi;
+    onCreateLi?: OnCreateLi;
     openedIcon?: IconElement;
     rtl?: boolean;
     showEmptyFolder: boolean;
@@ -30,7 +29,7 @@ export default class ElementsRenderer {
     private $element: JQuery<HTMLElement>;
     private getTree: GetTree;
     private isNodeSelected: IsNodeSelected;
-    private onCreateLi?: CreateLi;
+    private onCreateLi?: OnCreateLi;
     private rtl?: boolean;
     private showEmptyFolder: boolean;
     private tabIndex?: number;

@@ -1,10 +1,9 @@
 import { Node } from "./node";
-import { DataFilter, HandleLoadingMethod } from "./jqtreeOptions";
+import { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
 
 export type HandleFinishedLoading = () => void;
 
 type LoadData = (data: NodeData[], parentNode: Node | null) => void;
-type OnLoadFailed = (response: JQuery.jqXHR) => void;
 type TriggerEvent = (
     eventName: string,
     values?: Record<string, unknown>,
@@ -14,7 +13,7 @@ interface DataLoaderParams {
     dataFilter?: DataFilter;
     loadData: LoadData;
     onLoadFailed?: OnLoadFailed;
-    onLoading?: HandleLoadingMethod;
+    onLoading?: OnLoading;
     $treeElement: JQuery<HTMLElement>;
     triggerEvent: TriggerEvent;
 }
@@ -23,7 +22,7 @@ export default class DataLoader {
     private dataFilter?: DataFilter;
     private loadData: LoadData;
     private onLoadFailed?: OnLoadFailed;
-    private onLoading?: HandleLoadingMethod;
+    private onLoading?: OnLoading;
     private $treeElement: JQuery<HTMLElement>;
     private triggerEvent: TriggerEvent;
 
