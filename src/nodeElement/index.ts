@@ -1,6 +1,6 @@
 import { Position, Node } from "../node";
 import { JqTreeWidget } from "../tree.jquery";
-import { DropHint } from "../types";
+import { DropHint } from "../dragAndDropHandler/types";
 import BorderDropHint from "./borderDropHint";
 import GhostDropHint from "./ghostDropHint";
 

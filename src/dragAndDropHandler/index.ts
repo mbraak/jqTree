@@ -1,5 +1,6 @@
 import { getPositionName, Node, Position } from "../node";
-import { DropHint, HitArea, PositionInfo } from "../types";
+import { DropHint, HitArea } from "./types";
+import { PositionInfo } from "../mouseWidgetTypes";
 import NodeElement from "../nodeElement";
 import DragElement from "./dragElement";
 import HitAreasGenerator from "./hitAreasGenerator";
