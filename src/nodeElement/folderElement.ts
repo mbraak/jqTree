@@ -1,12 +1,6 @@
-import { Position, Node } from "../node";
+import { Position } from "../node";
 import NodeElement, { NodeElementParams } from "./index";
-
-export type OnFinishOpenNode = (node: Node) => void;
-
-type TriggerEvent = (
-    eventName: string,
-    values?: Record<string, unknown>,
-) => JQuery.Event;
+import { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 
 interface FolderElementParams extends NodeElementParams {
     closedIconElement?: HTMLElement | Text;

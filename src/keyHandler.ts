@@ -1,17 +1,13 @@
 import { Node } from "./node";
-import { OnFinishOpenNode } from "./nodeElement/folderElement";
+import {
+    CloseNode,
+    GetSelectedNode,
+    IsFocusOnTree,
+    OpenNode,
+    SelectNode,
+} from "./jqtreeMethodTypes";
 
 type KeyboardEventHandler = (event: KeyboardEvent) => boolean;
-
-type OpenNode = (
-    node: Node,
-    slide?: boolean,
-    onFinished?: OnFinishOpenNode,
-) => void;
-type CloseNode = (node: Node) => void;
-type SelectNode = (node: Node) => void;
-type GetSelectedNode = () => Node | false;
-type IsFocusOnTree = () => boolean;
 
 interface KeyHandlerParams {
     closeNode: CloseNode;

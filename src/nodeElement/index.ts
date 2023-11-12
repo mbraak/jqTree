@@ -2,8 +2,7 @@ import { Position, Node } from "../node";
 import { DropHint } from "../dragAndDropHandler/types";
 import BorderDropHint from "./borderDropHint";
 import GhostDropHint from "./ghostDropHint";
-
-type GetScrollLeft = () => number;
+import { GetScrollLeft } from "../jqtreeMethodTypes";
 
 export interface NodeElementParams {
     getScrollLeft: GetScrollLeft;

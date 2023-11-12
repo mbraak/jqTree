@@ -1,6 +1,5 @@
 import { Node } from "./node";
-
-type GetNodeById = (nodeId: NodeId) => Node | null;
+import { GetNodeById } from "./jqtreeMethodTypes";
 
 interface SelectNodeHandlerParameters {
     getNodeById: GetNodeById;

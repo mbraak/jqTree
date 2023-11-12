@@ -1,24 +1,20 @@
 import { isInt } from "./util";
 import { Node } from "./node";
-import { OnFinishOpenNode } from "./nodeElement/folderElement";
 import { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
+import {
+    AddToSelection,
+    GetNodeById,
+    GetSelectedNodes,
+    GetTree,
+    OpenNode,
+    RefreshElements,
+    RemoveFromSelection,
+} from "./jqtreeMethodTypes";
 
 export interface SavedState {
     open_nodes: NodeId[];
     selected_node: NodeId[];
 }
-
-type AddToSelection = (node: Node) => void;
-type GetNodeById = (nodeId: NodeId) => Node | null;
-type GetSelectedNodes = () => Node[];
-type GetTree = () => Node | null;
-type OpenNode = (
-    node: Node,
-    slide: boolean,
-    onFinished?: OnFinishOpenNode,
-) => void;
-type RefreshElements = (fromNode: Node | null) => void;
-type RemoveFromSelection = (node: Node) => void;
 
 interface SaveStateHandlerParams {
     addToSelection: AddToSelection;

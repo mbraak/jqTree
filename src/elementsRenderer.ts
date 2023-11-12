@@ -1,9 +1,7 @@
 import { getBoolString } from "./util";
 import { Node } from "./node";
 import { IconElement, OnCreateLi } from "./jqtreeOptions";
-
-type GetTree = () => Node | null;
-type IsNodeSelected = (node: Node) => boolean;
+import { GetTree, IsNodeSelected } from "./jqtreeMethodTypes";
 
 interface ElementsRendererParams {
     autoEscape: boolean;

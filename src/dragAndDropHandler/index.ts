@@ -10,7 +10,13 @@ import {
     OnIsMoveHandle,
     DragMethod,
 } from "../jqtreeOptions";
-import { OnFinishOpenNode } from "../nodeElement/folderElement";
+import {
+    GetScrollLeft,
+    GetTree,
+    OpenNode,
+    RefreshElements,
+    TriggerEvent,
+} from "../jqtreeMethodTypes";
 
 interface Dimensions {
     left: number;
@@ -21,18 +27,6 @@ interface Dimensions {
 
 type GetNodeElement = (element: HTMLElement) => NodeElement | null;
 type GetNodeElementForNode = (node: Node) => NodeElement;
-type GetScrollLeft = () => number;
-type GetTree = () => Node | null;
-type OpenNode = (
-    node: Node,
-    slide: boolean,
-    onFinished?: OnFinishOpenNode,
-) => void;
-type RefreshElements = (fromNode: Node | null) => void;
-type TriggerEvent = (
-    eventName: string,
-    values?: Record<string, unknown>,
-) => JQuery.Event;
 
 interface DragAndDropHandlerParams {
     autoEscape?: boolean;

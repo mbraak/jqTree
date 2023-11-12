@@ -12,8 +12,8 @@ import SimpleWidget from "./simple.widget";
 import { Node, getPosition } from "./node";
 import { isFunction } from "./util";
 import NodeElement from "./nodeElement";
-import FolderElement, { OnFinishOpenNode } from "./nodeElement/folderElement";
-
+import FolderElement from "./nodeElement/folderElement";
+import { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import { JQTreeOptions } from "./jqtreeOptions";
 
 interface ClickTarget {

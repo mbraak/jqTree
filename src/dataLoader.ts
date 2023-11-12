@@ -1,13 +1,8 @@
 import { Node } from "./node";
 import { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
+import { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
 
 export type HandleFinishedLoading = () => void;
-
-type LoadData = (data: NodeData[], parentNode: Node | null) => void;
-type TriggerEvent = (
-    eventName: string,
-    values?: Record<string, unknown>,
-) => JQuery.Event;
 
 interface DataLoaderParams {
     dataFilter?: DataFilter;
