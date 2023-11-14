@@ -43,7 +43,7 @@ interface DragAndDropHandlerParams {
     openNode: OpenNode;
     refreshElements: RefreshElements;
     slide: boolean;
-    $treeElement: JQuery<HTMLElement>;
+    treeElement: HTMLElement;
     triggerEvent: TriggerEvent;
 }
 
@@ -70,7 +70,7 @@ export class DragAndDropHandler {
     private previousGhost: DropHint | null;
     private refreshElements: RefreshElements;
     private slide: boolean;
-    private $treeElement: JQuery<HTMLElement>;
+    private treeElement: HTMLElement;
     private triggerEvent: TriggerEvent;
 
     constructor({
@@ -87,7 +87,7 @@ export class DragAndDropHandler {
         openNode,
         refreshElements,
         slide,
-        $treeElement,
+        treeElement,
         triggerEvent,
     }: DragAndDropHandlerParams) {
         this.autoEscape = autoEscape;
@@ -103,7 +103,7 @@ export class DragAndDropHandler {
         this.openNode = openNode;
         this.refreshElements = refreshElements;
         this.slide = slide;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
 
         this.hoveredArea = null;
@@ -157,7 +157,7 @@ export class DragAndDropHandler {
             nodeName: node.name,
             offsetX: positionInfo.pageX - left,
             offsetY: positionInfo.pageY - top,
-            treeElement: this.$treeElement.get(0) as HTMLElement,
+            treeElement: this.treeElement,
         });
 
         this.isDragging = true;
@@ -424,7 +424,8 @@ export class DragAndDropHandler {
 
                 if (tree) {
                     tree.moveNode(movedNode, targetNode, position);
-                    this.$treeElement.empty();
+
+                    this.treeElement.textContent = "";
                     this.refreshElements(null);
                 }
             };
@@ -449,22 +450,14 @@ export class DragAndDropHandler {
     private getTreeDimensions(): Dimensions {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
-        const offset = this.$treeElement.offset();
+        const left = this.treeElement.offsetLeft + this.getScrollLeft();
+        const top = this.treeElement.offsetTop;
 
-        if (!offset) {
-            return { left: 0, top: 0, right: 0, bottom: 0 };
-        } else {
-            const el = this.$treeElement;
-            const width = el.width() || 0;
-            const height = el.height() || 0;
-            const left = offset.left + this.getScrollLeft();
-
-            return {
-                left,
-                top: offset.top,
-                right: left + width,
-                bottom: offset.top + height + 16,
-            };
-        }
+        return {
+            left,
+            top,
+            right: left + this.treeElement.clientWidth,
+            bottom: top + this.treeElement.clientHeight + 16,
+        };
     }
 }

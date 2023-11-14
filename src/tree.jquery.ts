@@ -1229,6 +1229,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
         const $treeElement = this.element;
+        const treeElement = this.element.get(0) as HTMLElement;
         const triggerEvent = this._triggerEvent.bind(this);
 
         const selectNodeHandler = new SelectNodeHandler({
@@ -1280,7 +1281,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             openNode,
             refreshElements,
             slide,
-            $treeElement,
+            treeElement,
             triggerEvent,
         });
 
