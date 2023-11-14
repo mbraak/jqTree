@@ -1,29 +1,28 @@
+interface DragElementParams {
+    autoEscape: boolean;
+    nodeName: string;
+    offsetX: number;
+    offsetY: number;
+    $tree: JQuery;
+}
+
 class DragElement {
     private offsetX: number;
     private offsetY: number;
-    private $element: JQuery;
+    private $element: JQuery<HTMLElement>;
 
-    constructor(
-        nodeName: string,
-        offsetX: number,
-        offsetY: number,
-        $tree: JQuery,
-        autoEscape: boolean,
-    ) {
+    constructor({
+        autoEscape,
+        nodeName,
+        offsetX,
+        offsetY,
+        $tree,
+    }: DragElementParams) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
 
-        this.$element = jQuery("<span>").addClass(
-            "jqtree-title jqtree-dragging",
-        );
+        this.$element = this.createElement(nodeName, autoEscape);
 
-        if (autoEscape) {
-            this.$element.text(nodeName);
-        } else {
-            this.$element.html(nodeName);
-        }
-
-        this.$element.css("position", "absolute");
         $tree.append(this.$element);
     }
 
@@ -36,6 +35,22 @@ class DragElement {
 
     public remove(): void {
         this.$element.remove();
+    }
+
+    private createElement(nodeName: string, autoEscape: boolean) {
+        const $element = jQuery("<span>").addClass(
+            "jqtree-title jqtree-dragging",
+        );
+
+        if (autoEscape) {
+            $element.text(nodeName);
+        } else {
+            $element.html(nodeName);
+        }
+
+        $element.css("position", "absolute");
+
+        return $element;
     }
 }
 

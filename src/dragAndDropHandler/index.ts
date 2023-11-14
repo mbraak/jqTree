@@ -152,13 +152,13 @@ export class DragAndDropHandler {
 
         const node = this.currentItem.node;
 
-        this.dragElement = new DragElement(
-            node.name,
-            positionInfo.pageX - left,
-            positionInfo.pageY - top,
-            this.$treeElement,
-            this.autoEscape ?? true,
-        );
+        this.dragElement = new DragElement({
+            autoEscape: this.autoEscape ?? true,
+            nodeName: node.name,
+            offsetX: positionInfo.pageX - left,
+            offsetY: positionInfo.pageY - top,
+            $tree: this.$treeElement,
+        });
 
         this.isDragging = true;
         this.currentItem.element.classList.add("jqtree-moving");
