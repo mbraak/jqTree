@@ -325,6 +325,10 @@ export default class ElementsRenderer {
             div.innerHTML = value;
 
             return document.createTextNode(div.innerHTML);
+        } else if (value == null) {
+            return undefined;
+        } else if ((value as HTMLElement).nodeType) {
+            return value as HTMLElement;
         } else {
             return jQuery(value)[0];
         }

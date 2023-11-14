@@ -28,6 +28,9 @@
         "playwright": "pnpm build-with-coverage && playwright test --config config/playwright.config.js",
         "test": "pnpm jest && pnpm playwright"
     },
+    "browserslist": [
+        "defaults"
+    ],
     "peerDependencies": {
         "jquery": "^3"
     },
@@ -41,6 +44,7 @@
         "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-terser": "^0.4.4",
         "@testing-library/dom": "^9.3.3",
+        "@testing-library/user-event": "^14.5.1",
         "@types/debug": "^4.1.12",
         "@types/jest": "^29.5.8",
         "@types/jest-axe": "^3.5.8",

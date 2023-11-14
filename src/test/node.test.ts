@@ -349,7 +349,7 @@ describe("constructor", () => {
                 children: [],
                 parent: null,
             });
-            expect(given.node).not.toHaveProperty("id");
+            expect(given.node.id).toBeUndefined();
         });
 
         it("sets isEmptyFolder to false", () => {

@@ -1,24 +1,26 @@
 import { Node } from "./node";
 import { JqTreeWidget } from "./tree.jquery";
 
-export default class KeyHandler {
-    private static LEFT = 37;
-    private static UP = 38;
-    private static RIGHT = 39;
-    private static DOWN = 40;
+type KeyboardEventHandler = (event: KeyboardEvent) => boolean;
 
+export default class KeyHandler {
     private treeWidget: JqTreeWidget;
+    private handleKeyDownHandler: KeyboardEventHandler | null = null;
 
     constructor(treeWidget: JqTreeWidget) {
         this.treeWidget = treeWidget;
 
         if (treeWidget.options.keyboardSupport) {
-            jQuery(document).on("keydown.jqtree", this.handleKeyDown);
+            this.handleKeyDownHandler = this.handleKeyDown.bind(this);
+
+            document.addEventListener("keydown", this.handleKeyDownHandler);
         }
     }
 
     public deinit(): void {
-        jQuery(document).off("keydown.jqtree");
+        if (this.handleKeyDownHandler) {
+            document.removeEventListener("keydown", this.handleKeyDownHandler);
+        }
     }
 
     public moveDown(selectedNode: Node): boolean {
@@ -66,7 +68,7 @@ export default class KeyHandler {
         }
     }
 
-    private handleKeyDown = (e: JQuery.Event): boolean => {
+    private handleKeyDown = (e: KeyboardEvent): boolean => {
         if (!this.canHandleKeyboard()) {
             return true;
         }
@@ -76,19 +78,17 @@ export default class KeyHandler {
             return true;
         }
 
-        const key = e.which;
-
-        switch (key) {
-            case KeyHandler.DOWN:
+        switch (e.key) {
+            case "ArrowDown":
                 return this.moveDown(selectedNode);
 
-            case KeyHandler.UP:
+            case "ArrowUp":
                 return this.moveUp(selectedNode);
 
-            case KeyHandler.RIGHT:
+            case "ArrowRight":
                 return this.moveRight(selectedNode);
 
-            case KeyHandler.LEFT:
+            case "ArrowLeft":
                 return this.moveLeft(selectedNode);
 
             default:

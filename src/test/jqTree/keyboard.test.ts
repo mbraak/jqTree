@@ -1,4 +1,5 @@
 import getGiven from "givens";
+import { userEvent } from "@testing-library/user-event";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 
@@ -18,22 +19,16 @@ describe("keyboard support", () => {
     interface Vars {
         autoOpen: boolean;
         initialSelectedNode: INode | null;
-        pressedKey: number;
+        pressedKey: string;
         $tree: JQuery<HTMLElement>;
     }
-
-    const KEY_DOWN = 40;
-    const KEY_LEFT = 37;
-    const KEY_RIGHT = 39;
-    const KEY_UP = 38;
-    const KEY_PAGE_UP = 33;
 
     const given = getGiven<Vars>();
     given("autoOpen", () => false);
     given("initialSelectedNode", () => null);
     given("$tree", () => $("#tree1"));
 
-    beforeEach(() => {
+    beforeEach(async () => {
         given.$tree.tree({
             animationSpeed: 0,
             autoOpen: given.autoOpen,
@@ -44,15 +39,15 @@ describe("keyboard support", () => {
             given.$tree.tree("selectNode", given.initialSelectedNode);
         }
 
-        given.$tree.trigger($.Event("keydown", { which: given.pressedKey }));
+        await userEvent.keyboard(`{${given.pressedKey}}`);
     });
 
     context("with key down", () => {
-        given("pressedKey", () => KEY_DOWN);
+        given("pressedKey", () => "ArrowDown");
 
         context("when a node is selected", () => {
             given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node1")
+                given.$tree.tree("getNodeByNameMustExist", "node1"),
             );
 
             it("selects the next node", () => {
@@ -71,7 +66,7 @@ describe("keyboard support", () => {
 
         context("when the last node is selected", () => {
             given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node2")
+                given.$tree.tree("getNodeByNameMustExist", "node2"),
             );
 
             it("keeps the node selected", () => {
@@ -83,11 +78,11 @@ describe("keyboard support", () => {
     });
 
     context("with key up", () => {
-        given("pressedKey", () => KEY_UP);
+        given("pressedKey", () => "ArrowUp");
 
         context("when a node is selected", () => {
             given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node2")
+                given.$tree.tree("getNodeByNameMustExist", "node2"),
             );
 
             it("selects the next node", () => {
@@ -106,11 +101,11 @@ describe("keyboard support", () => {
     });
 
     context("with key right", () => {
-        given("pressedKey", () => KEY_RIGHT);
+        given("pressedKey", () => "ArrowRight");
 
         context("when a closed folder is selected", () => {
             given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node1")
+                given.$tree.tree("getNodeByNameMustExist", "node1"),
             );
 
             it("opens the folder", () => {
@@ -132,7 +127,7 @@ describe("keyboard support", () => {
         context("when an open folder is selected", () => {
             given("autoOpen", () => true);
             given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node1")
+                given.$tree.tree("getNodeByNameMustExist", "node1"),
             );
 
             it("selects the first child", () => {
@@ -168,7 +163,7 @@ describe("keyboard support", () => {
 
         context("when a child is selected", () => {
             given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "child1")
+                given.$tree.tree("getNodeByNameMustExist", "child1"),
             );
 
             it("does nothing", () => {
@@ -179,11 +174,11 @@ describe("keyboard support", () => {
         });
     });
     context("with key left", () => {
-        given("pressedKey", () => KEY_LEFT);
+        given("pressedKey", () => "ArrowLeft");
 
         context("when a closed folder is selected", () => {
             given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node3")
+                given.$tree.tree("getNodeByNameMustExist", "node3"),
             );
 
             it("selects the previous node", () => {
@@ -210,7 +205,7 @@ describe("keyboard support", () => {
         context("when an open folder is selected", () => {
             given("autoOpen", () => true);
             given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node2")
+                given.$tree.tree("getNodeByNameMustExist", "node2"),
             );
 
             it("closes the folder", () => {
@@ -237,10 +232,10 @@ describe("keyboard support", () => {
     });
 
     context("with page up key", () => {
-        given("pressedKey", () => KEY_PAGE_UP);
+        given("pressedKey", () => "PageUp");
 
         given("initialSelectedNode", () =>
-            given.$tree.tree("getNodeByNameMustExist", "child1")
+            given.$tree.tree("getNodeByNameMustExist", "child1"),
         );
 
         it("does nothing", () => {

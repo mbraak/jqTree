@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issue #735: compile to es6
+
 #### 1.7.5 (october 21 2023)
 
 -   Issue #734: fix autoscroll issue (thanks to WriterStat)
