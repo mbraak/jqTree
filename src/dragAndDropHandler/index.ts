@@ -157,7 +157,7 @@ export class DragAndDropHandler {
             nodeName: node.name,
             offsetX: positionInfo.pageX - left,
             offsetY: positionInfo.pageY - top,
-            $tree: this.$treeElement,
+            treeElement: this.$treeElement.get(0) as HTMLElement,
         });
 
         this.isDragging = true;
