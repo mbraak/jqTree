@@ -130,7 +130,7 @@ describe("tree.init", () => {
 
     context("with data loaded from an url", () => {
         const server = setupServer(
-            http.get("/tree", () => HttpResponse.json(exampleData)),
+            http.get("/tree/", () => HttpResponse.json(exampleData)),
         );
         beforeEach(() => {
             server.listen();
