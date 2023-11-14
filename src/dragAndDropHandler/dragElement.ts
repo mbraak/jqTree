@@ -38,19 +38,18 @@ class DragElement {
     }
 
     private createElement(nodeName: string, autoEscape: boolean) {
-        const $element = jQuery("<span>").addClass(
-            "jqtree-title jqtree-dragging",
-        );
+        const element = document.createElement("span");
+        element.classList.add("jqtree-title", "jqtree-dragging");
 
         if (autoEscape) {
-            $element.text(nodeName);
+            element.textContent = nodeName;
         } else {
-            $element.html(nodeName);
+            element.innerHTML = nodeName;
         }
 
-        $element.css("position", "absolute");
+        element.style.pointerEvents = "absolute";
 
-        return $element;
+        return jQuery(element);
     }
 }
 
