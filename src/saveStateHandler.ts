@@ -1,25 +1,76 @@
 import { isInt } from "./util";
-import { JqTreeWidget } from "./tree.jquery";
 import { Node } from "./node";
+import { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
+import {
+    AddToSelection,
+    GetNodeById,
+    GetSelectedNodes,
+    GetTree,
+    OpenNode,
+    RefreshElements,
+    RemoveFromSelection,
+} from "./jqtreeMethodTypes";
 
 export interface SavedState {
     open_nodes: NodeId[];
     selected_node: NodeId[];
 }
 
+interface SaveStateHandlerParams {
+    addToSelection: AddToSelection;
+    getNodeById: GetNodeById;
+    getSelectedNodes: GetSelectedNodes;
+    getTree: GetTree;
+    onGetStateFromStorage?: OnGetStateFromStorage;
+    onSetStateFromStorage?: OnSetStateFromStorage;
+    openNode: OpenNode;
+    refreshElements: RefreshElements;
+    removeFromSelection: RemoveFromSelection;
+    saveState: boolean | string;
+}
+
 export default class SaveStateHandler {
-    private treeWidget: JqTreeWidget;
+    private addToSelection: AddToSelection;
+    private getNodeById: GetNodeById;
+    private getSelectedNodes: GetSelectedNodes;
+    private getTree: GetTree;
+    private onGetStateFromStorage?: OnGetStateFromStorage;
+    private onSetStateFromStorage?: OnSetStateFromStorage;
+    private openNode: OpenNode;
+    private refreshElements: RefreshElements;
+    private removeFromSelection: RemoveFromSelection;
+    private saveStateOption: boolean | string;
     private _supportsLocalStorage: boolean | null;
 
-    constructor(treeWidget: JqTreeWidget) {
-        this.treeWidget = treeWidget;
+    constructor({
+        addToSelection,
+        getNodeById,
+        getSelectedNodes,
+        getTree,
+        onGetStateFromStorage,
+        onSetStateFromStorage,
+        openNode,
+        refreshElements,
+        removeFromSelection,
+        saveState,
+    }: SaveStateHandlerParams) {
+        this.addToSelection = addToSelection;
+        this.getNodeById = getNodeById;
+        this.getSelectedNodes = getSelectedNodes;
+        this.getTree = getTree;
+        this.onGetStateFromStorage = onGetStateFromStorage;
+        this.onSetStateFromStorage = onSetStateFromStorage;
+        this.openNode = openNode;
+        this.refreshElements = refreshElements;
+        this.removeFromSelection = removeFromSelection;
+        this.saveStateOption = saveState;
     }
 
     public saveState(): void {
         const state = JSON.stringify(this.getState());
 
-        if (this.treeWidget.options.onSetStateFromStorage) {
-            this.treeWidget.options.onSetStateFromStorage(state);
+        if (this.onSetStateFromStorage) {
+            this.onSetStateFromStorage(state);
         } else if (this.supportsLocalStorage()) {
             localStorage.setItem(this.getKeyName(), state);
         }
@@ -39,7 +90,7 @@ export default class SaveStateHandler {
         const getOpenNodeIds = (): NodeId[] => {
             const openNodes: NodeId[] = [];
 
-            this.treeWidget.tree.iterate((node: Node) => {
+            this.getTree()?.iterate((node: Node) => {
                 if (node.is_open && node.id && node.hasChildren()) {
                     openNodes.push(node.id);
                 }
@@ -52,7 +103,7 @@ export default class SaveStateHandler {
         const getSelectedNodeIds = (): NodeId[] => {
             const selectedNodeIds: NodeId[] = [];
 
-            this.treeWidget.getSelectedNodes().forEach((node) => {
+            this.getSelectedNodes().forEach((node) => {
                 if (node.id != null) {
                     selectedNodeIds.push(node.id);
                 }
@@ -94,13 +145,13 @@ export default class SaveStateHandler {
 
     public setInitialStateOnDemand(
         state: SavedState,
-        cbFinished: () => void
+        cbFinished: () => void,
     ): void {
         if (state) {
             this.doSetInitialStateOnDemand(
                 state.open_nodes,
                 state.selected_node,
-                cbFinished
+                cbFinished,
             );
         } else {
             cbFinished();
@@ -130,8 +181,8 @@ export default class SaveStateHandler {
     }
 
     private loadFromStorage(): string | null {
-        if (this.treeWidget.options.onGetStateFromStorage) {
-            return this.treeWidget.options.onGetStateFromStorage();
+        if (this.onGetStateFromStorage) {
+            return this.onGetStateFromStorage();
         } else if (this.supportsLocalStorage()) {
             return localStorage.getItem(this.getKeyName());
         } else {
@@ -143,7 +194,7 @@ export default class SaveStateHandler {
         let mustLoadOnDemand = false;
 
         for (const nodeId of nodeIds) {
-            const node = this.treeWidget.getNodeById(nodeId);
+            const node = this.getNodeById(nodeId);
 
             if (node) {
                 if (!node.load_on_demand) {
@@ -161,12 +212,12 @@ export default class SaveStateHandler {
         let selectCount = 0;
 
         for (const nodeId of nodeIds) {
-            const node = this.treeWidget.getNodeById(nodeId);
+            const node = this.getNodeById(nodeId);
 
             if (node) {
                 selectCount += 1;
 
-                this.treeWidget.selectNodeHandler.addToSelection(node);
+                this.addToSelection(node);
             }
         }
 
@@ -174,19 +225,17 @@ export default class SaveStateHandler {
     }
 
     private resetSelection(): void {
-        const selectNodeHandler = this.treeWidget.selectNodeHandler;
-
-        const selectedNodes = selectNodeHandler.getSelectedNodes();
+        const selectedNodes = this.getSelectedNodes();
 
         selectedNodes.forEach((node) => {
-            selectNodeHandler.removeFromSelection(node);
+            this.removeFromSelection(node);
         });
     }
 
     private doSetInitialStateOnDemand(
         nodeIdsParam: NodeId[],
         selectedNodes: NodeId[],
-        cbFinished: () => void
+        cbFinished: () => void,
     ): void {
         let loadingCount = 0;
         let nodeIds = nodeIdsParam;
@@ -195,7 +244,7 @@ export default class SaveStateHandler {
             const newNodesIds = [];
 
             for (const nodeId of nodeIds) {
-                const node = this.treeWidget.getNodeById(nodeId);
+                const node = this.getNodeById(nodeId);
 
                 if (!node) {
                     newNodesIds.push(nodeId);
@@ -204,7 +253,7 @@ export default class SaveStateHandler {
                         if (node.load_on_demand) {
                             loadAndOpenNode(node);
                         } else {
-                            this.treeWidget._openNode(node, false, null);
+                            this.openNode(node, false);
                         }
                     }
                 }
@@ -213,7 +262,7 @@ export default class SaveStateHandler {
             nodeIds = newNodesIds;
 
             if (this.selectInitialNodes(selectedNodes)) {
-                this.treeWidget._refreshElements(null);
+                this.refreshElements(null);
             }
 
             if (loadingCount === 0) {
@@ -223,7 +272,7 @@ export default class SaveStateHandler {
 
         const loadAndOpenNode = (node: Node): void => {
             loadingCount += 1;
-            this.treeWidget._openNode(node, false, () => {
+            this.openNode(node, false, () => {
                 loadingCount -= 1;
                 openNodes();
             });
@@ -233,8 +282,8 @@ export default class SaveStateHandler {
     }
 
     private getKeyName(): string {
-        if (typeof this.treeWidget.options.saveState === "string") {
-            return this.treeWidget.options.saveState;
+        if (typeof this.saveStateOption === "string") {
+            return this.saveStateOption;
         } else {
             return "tree";
         }

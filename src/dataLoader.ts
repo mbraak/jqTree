@@ -1,19 +1,46 @@
 import { Node } from "./node";
-import { JqTreeWidget } from "./tree.jquery";
+import { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
+import { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
 
 export type HandleFinishedLoading = () => void;
 
-export default class DataLoader {
-    private treeWidget: JqTreeWidget;
+interface DataLoaderParams {
+    dataFilter?: DataFilter;
+    loadData: LoadData;
+    onLoadFailed?: OnLoadFailed;
+    onLoading?: OnLoading;
+    $treeElement: JQuery<HTMLElement>;
+    triggerEvent: TriggerEvent;
+}
 
-    constructor(treeWidget: JqTreeWidget) {
-        this.treeWidget = treeWidget;
+export default class DataLoader {
+    private dataFilter?: DataFilter;
+    private loadData: LoadData;
+    private onLoadFailed?: OnLoadFailed;
+    private onLoading?: OnLoading;
+    private $treeElement: JQuery<HTMLElement>;
+    private triggerEvent: TriggerEvent;
+
+    constructor({
+        dataFilter,
+        loadData,
+        onLoadFailed,
+        onLoading,
+        $treeElement,
+        triggerEvent,
+    }: DataLoaderParams) {
+        this.dataFilter = dataFilter;
+        this.loadData = loadData;
+        this.onLoadFailed = onLoadFailed;
+        this.onLoading = onLoading;
+        this.$treeElement = $treeElement;
+        this.triggerEvent = triggerEvent;
     }
 
     public loadFromUrl(
         urlInfo: string | JQuery.AjaxSettings | null,
         parentNode: Node | null,
-        onFinished: HandleFinishedLoading | null
+        onFinished: HandleFinishedLoading | null,
     ): void {
         if (!urlInfo) {
             return;
@@ -30,7 +57,7 @@ export default class DataLoader {
 
         const handleSuccess = (data: string | NodeData[]): void => {
             stopLoading();
-            this.treeWidget.loadData(this.parseData(data), parentNode);
+            this.loadData(this.parseData(data), parentNode);
 
             if (onFinished && typeof onFinished === "function") {
                 onFinished();
@@ -40,8 +67,8 @@ export default class DataLoader {
         const handleError = (jqXHR: JQuery.jqXHR): void => {
             stopLoading();
 
-            if (this.treeWidget.options.onLoadFailed) {
-                this.treeWidget.options.onLoadFailed(jqXHR);
+            if (this.onLoadFailed) {
+                this.onLoadFailed(jqXHR);
             }
         };
 
@@ -64,20 +91,20 @@ export default class DataLoader {
         if (parentNode) {
             return jQuery(parentNode.element);
         } else {
-            return this.treeWidget.element;
+            return this.$treeElement;
         }
     }
 
     private notifyLoading(
         isLoading: boolean,
         node: Node | null,
-        $el: JQuery
+        $el: JQuery,
     ): void {
-        if (this.treeWidget.options.onLoading) {
-            this.treeWidget.options.onLoading(isLoading, node, $el);
+        if (this.onLoading) {
+            this.onLoading(isLoading, node, $el);
         }
 
-        this.treeWidget._triggerEvent("tree.loading_data", {
+        this.triggerEvent("tree.loading_data", {
             isLoading,
             node,
             $el,
@@ -87,7 +114,7 @@ export default class DataLoader {
     private submitRequest(
         urlInfoInput: string | JQuery.AjaxSettings,
         handleSuccess: JQuery.Ajax.SuccessCallback<any>,
-        handleError: JQuery.Ajax.ErrorCallback<any>
+        handleError: JQuery.Ajax.ErrorCallback<any>,
     ): void {
         const urlInfo =
             typeof urlInfoInput === "string"
@@ -109,8 +136,6 @@ export default class DataLoader {
     }
 
     private parseData(data: string | NodeData[]): NodeData[] {
-        const { dataFilter } = this.treeWidget.options;
-
         const getParsedData = () => {
             if (typeof data === "string") {
                 return JSON.parse(data) as NodeData[];
@@ -121,8 +146,8 @@ export default class DataLoader {
 
         const parsedData = getParsedData();
 
-        if (dataFilter) {
-            return dataFilter(parsedData);
+        if (this.dataFilter) {
+            return this.dataFilter(parsedData);
         } else {
             return parsedData;
         }

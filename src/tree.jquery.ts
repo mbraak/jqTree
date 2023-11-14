@@ -4,14 +4,16 @@ import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
 import KeyHandler from "./keyHandler";
 import MouseWidget from "./mouse.widget";
-import { PositionInfo } from "./types";
+import { PositionInfo } from "./mouseWidgetTypes";
 import SaveStateHandler, { SavedState } from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
 import { Node, getPosition } from "./node";
 import { isFunction } from "./util";
-import { FolderElement, NodeElement, OnFinishOpenNode } from "./nodeElement";
+import NodeElement from "./nodeElement";
+import FolderElement from "./nodeElement/folderElement";
+import { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import { JQTreeOptions } from "./jqtreeOptions";
 
 interface ClickTarget {
@@ -185,9 +187,18 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     public getNodeByHtmlElement(
-        element: HTMLElement | JQuery<HTMLElement>,
+        inputElement: HTMLElement | JQuery<HTMLElement>,
     ): Node | null {
-        return this.getNode(jQuery(element));
+        const element =
+            inputElement instanceof HTMLElement
+                ? inputElement
+                : inputElement[0];
+
+        if (!element) {
+            return null;
+        }
+
+        return this.getNode(element);
     }
 
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
@@ -203,12 +214,12 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const parseParams = (): [boolean, OnFinishOpenNode | null] => {
+        const parseParams = (): [boolean, OnFinishOpenNode | undefined] => {
             let onFinished: OnFinishOpenNode | null;
             let slide: boolean | null;
 
             if (isFunction(param1)) {
-                onFinished = param1 as OnFinishOpenNode | null;
+                onFinished = param1 as OnFinishOpenNode;
                 slide = null;
             } else {
                 slide = param1 as boolean;
@@ -236,7 +247,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         const slide = slideParam ?? this.options.slide;
 
         if (node.isFolder() || node.isEmptyFolder) {
-            new FolderElement(node, this).close(
+            this.createFolderElement(node).close(
                 slide,
                 this.options.animationSpeed,
             );
@@ -514,14 +525,14 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     public _openNode(
         node: Node,
         slide = true,
-        onFinished: OnFinishOpenNode | null,
+        onFinished?: OnFinishOpenNode,
     ): void {
         const doOpenNode = (
             _node: Node,
             _slide: boolean,
-            _onFinished: OnFinishOpenNode | null,
+            _onFinished?: OnFinishOpenNode,
         ): void => {
-            const folderElement = new FolderElement(_node, this);
+            const folderElement = this.createFolderElement(_node);
             folderElement.open(
                 _onFinished,
                 _slide,
@@ -538,7 +549,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 while (parent) {
                     // nb: do not open root element
                     if (parent.parent) {
-                        doOpenNode(parent, false, null);
+                        doOpenNode(parent, false);
                     }
                     parent = parent.parent;
                 }
@@ -554,7 +565,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
      from_node: redraw this subtree
     */
     public _refreshElements(fromNode: Node | null): void {
-        const mustSetFocus = this.selectNodeHandler.isFocusOnTree();
+        const mustSetFocus = this.isFocusOnTree();
         const mustSelect = fromNode
             ? this.isSelectedNodeInSubtree(fromNode)
             : false;
@@ -570,25 +581,19 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     public _getNodeElementForNode(node: Node): NodeElement {
         if (node.isFolder()) {
-            return new FolderElement(node, this);
+            return this.createFolderElement(node);
         } else {
-            return new NodeElement(node, this);
+            return this.createNodeElement(node);
         }
     }
 
-    public _getNodeElement($element: JQuery<HTMLElement>): NodeElement | null {
-        const node = this.getNode($element);
+    public _getNodeElement(element: HTMLElement): NodeElement | null {
+        const node = this.getNode(element);
         if (node) {
             return this._getNodeElementForNode(node);
         } else {
             return null;
         }
-    }
-
-    public _containsElement(element: HTMLElement): boolean {
-        const node = this.getNode(jQuery(element));
-
-        return node != null && node.tree === this.tree;
     }
 
     public _getScrollLeft(): number {
@@ -607,13 +612,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             this.options.closedIcon = this.getDefaultClosedIcon();
         }
 
-        this.renderer = new ElementsRenderer(this);
-        this.dataLoader = new DataLoader(this);
-        this.saveStateHandler = new SaveStateHandler(this);
-        this.selectNodeHandler = new SelectNodeHandler(this);
-        this.dndHandler = new DragAndDropHandler(this);
-        this.scrollHandler = new ScrollHandler(this);
-        this.keyHandler = new KeyHandler(this);
+        this.connectHandlers();
 
         this.initData();
 
@@ -869,7 +868,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
                         return false;
                     } else {
-                        this._openNode(node, false, null);
+                        this._openNode(node, false);
 
                         return level !== maxLevel;
                     }
@@ -938,13 +937,11 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     };
 
-    private getClickTarget(element: EventTarget): ClickTarget | null {
-        const $target = jQuery(element);
+    private getClickTarget(element: HTMLElement): ClickTarget | null {
+        const button = element.closest(".jqtree-toggler");
 
-        const $button = $target.closest(".jqtree-toggler");
-
-        if ($button.length) {
-            const node = this.getNode($button as JQuery<HTMLElement>);
+        if (button) {
+            const node = this.getNode(button as HTMLElement);
 
             if (node) {
                 return {
@@ -953,9 +950,10 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 };
             }
         } else {
-            const $el = $target.closest(".jqtree-element");
-            if ($el.length) {
-                const node = this.getNode($el as JQuery<HTMLElement>);
+            const jqTreeElement = element.closest(".jqtree-element");
+
+            if (jqTreeElement) {
+                const node = this.getNode(jqTreeElement as HTMLElement);
                 if (node) {
                     return {
                         type: "label",
@@ -968,21 +966,23 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         return null;
     }
 
-    private getNode($element: JQuery<HTMLElement>): null | Node {
-        const $li = $element.closest("li.jqtree_common");
-        if ($li.length === 0) {
-            return null;
+    private getNode(element: HTMLElement): null | Node {
+        const liElement = element.closest("li.jqtree_common");
+
+        if (liElement) {
+            return jQuery(liElement).data("node") as Node;
         } else {
-            return $li.data("node") as Node;
+            return null;
         }
     }
 
     private handleContextmenu = (
         e: JQuery.ContextMenuEvent<HTMLElement, any, HTMLElement, HTMLElement>,
     ) => {
-        const $div = jQuery(e.target).closest("ul.jqtree-tree .jqtree-element");
-        if ($div.length) {
-            const node = this.getNode($div);
+        const div = e.target.closest("ul.jqtree-tree .jqtree-element");
+
+        if (div) {
+            const node = this.getNode(div as HTMLElement);
             if (node) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -1164,12 +1164,193 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     private loadFolderOnDemand(
         node: Node,
         slide = true,
-        onFinished: OnFinishOpenNode | null,
+        onFinished?: OnFinishOpenNode,
     ): void {
         node.is_loading = true;
 
         this.doLoadDataFromUrl(null, node, () => {
             this._openNode(node, slide, onFinished);
+        });
+    }
+
+    private containsElement(element: HTMLElement): boolean {
+        const node = this.getNode(element);
+
+        return node != null && node.tree === this.tree;
+    }
+
+    private isFocusOnTree(): boolean {
+        const activeElement = document.activeElement;
+
+        return Boolean(
+            activeElement &&
+                activeElement.tagName === "SPAN" &&
+                this.containsElement(activeElement as HTMLElement),
+        );
+    }
+
+    private connectHandlers() {
+        const {
+            autoEscape,
+            buttonLeft,
+            closedIcon,
+            dataFilter,
+            dragAndDrop,
+            keyboardSupport,
+            onCanMove,
+            onCreateLi,
+            onDragMove,
+            onDragStop,
+            onGetStateFromStorage,
+            onIsMoveHandle,
+            onLoadFailed,
+            onLoading,
+            onSetStateFromStorage,
+            openedIcon,
+            openFolderDelay,
+            rtl,
+            saveState,
+            showEmptyFolder,
+            slide,
+            tabIndex,
+        } = this.options;
+
+        const closeNode = this.closeNode.bind(this);
+        const getNodeElement = this._getNodeElement.bind(this);
+        const getNodeElementForNode = this._getNodeElementForNode.bind(this);
+        const getNodeById = this.getNodeById.bind(this);
+        const getScrollLeft = this._getScrollLeft.bind(this);
+        const getSelectedNode = this.getSelectedNode.bind(this);
+        const getTree = this.getTree.bind(this);
+        const isFocusOnTree = this.isFocusOnTree.bind(this);
+        const loadData = this.loadData.bind(this);
+        const openNode = this._openNode.bind(this);
+        const refreshElements = this._refreshElements.bind(this);
+        const refreshHitAreas = this.refreshHitAreas.bind(this);
+        const selectNode = this.selectNode.bind(this);
+        const $treeElement = this.element;
+        const triggerEvent = this._triggerEvent.bind(this);
+
+        const selectNodeHandler = new SelectNodeHandler({
+            getNodeById,
+        });
+
+        const addToSelection =
+            selectNodeHandler.addToSelection.bind(selectNodeHandler);
+        const getSelectedNodes =
+            selectNodeHandler.getSelectedNodes.bind(selectNodeHandler);
+        const isNodeSelected =
+            selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
+        const removeFromSelection =
+            selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
+
+        const dataLoader = new DataLoader({
+            dataFilter,
+            loadData,
+            onLoadFailed,
+            onLoading,
+            $treeElement,
+            triggerEvent,
+        });
+
+        const saveStateHandler = new SaveStateHandler({
+            addToSelection,
+            getNodeById,
+            getSelectedNodes,
+            getTree,
+            onGetStateFromStorage,
+            onSetStateFromStorage,
+            openNode,
+            refreshElements,
+            removeFromSelection,
+            saveState,
+        });
+
+        const dndHandler = new DragAndDropHandler({
+            autoEscape,
+            getNodeElement,
+            getNodeElementForNode,
+            getScrollLeft,
+            getTree,
+            onCanMove,
+            onDragMove,
+            onDragStop,
+            onIsMoveHandle,
+            openFolderDelay,
+            openNode,
+            refreshElements,
+            slide,
+            $treeElement,
+            triggerEvent,
+        });
+
+        const scrollHandler = new ScrollHandler({
+            refreshHitAreas,
+            $treeElement,
+        });
+
+        const keyHandler = new KeyHandler({
+            closeNode,
+            getSelectedNode,
+            isFocusOnTree,
+            keyboardSupport,
+            openNode,
+            selectNode,
+        });
+
+        const renderer = new ElementsRenderer({
+            autoEscape,
+            buttonLeft,
+            closedIcon,
+            dragAndDrop,
+            $element: $treeElement,
+            getTree,
+            isNodeSelected,
+            onCreateLi,
+            openedIcon,
+            rtl,
+            showEmptyFolder,
+            tabIndex,
+        });
+
+        this.dataLoader = dataLoader;
+        this.dndHandler = dndHandler;
+        this.keyHandler = keyHandler;
+        this.renderer = renderer;
+        this.saveStateHandler = saveStateHandler;
+        this.scrollHandler = scrollHandler;
+        this.selectNodeHandler = selectNodeHandler;
+    }
+
+    private createFolderElement(node: Node) {
+        const closedIconElement = this.renderer.closedIconElement;
+        const getScrollLeft = this._getScrollLeft.bind(this);
+        const openedIconElement = this.renderer.openedIconElement;
+        const tabIndex = this.options.tabIndex;
+        const $treeElement = this.element;
+        const triggerEvent = this._triggerEvent.bind(this);
+
+        return new FolderElement({
+            closedIconElement,
+            getScrollLeft,
+            node,
+            openedIconElement,
+            tabIndex,
+            $treeElement,
+            triggerEvent,
+        });
+    }
+
+    private createNodeElement(node: Node) {
+        const getScrollLeft = this._getScrollLeft.bind(this);
+        const tabIndex = this.options.tabIndex;
+        const $treeElement = this.element;
+
+        return new NodeElement({
+            getScrollLeft,
+            node,
+            tabIndex,
+            $treeElement,
         });
     }
 }
