@@ -110,8 +110,8 @@ devDependencies:
     specifier: ^4.5.0
     version: 4.5.0
   msw:
-    specifier: ^2
-    version: 2.0.3(typescript@5.2.2)
+    specifier: ^2.0.6
+    version: 2.0.6(typescript@5.2.2)
   postcss:
     specifier: ^8.4.31
     version: 8.4.31
@@ -1742,13 +1742,13 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@mswjs/cookies@1.0.0:
-    resolution: {integrity: sha512-TdXoBdI+h/EDTsVLCX/34s4+9U0sWi92qFnIGUEikpMCSKLhBeujovyYVSoORNbYgsBH5ga7/tfxyWcEZAxiYA==}
-    engines: {node: '>=14'}
+  /@mswjs/cookies@1.1.0:
+    resolution: {integrity: sha512-0ZcCVQxifZmhwNBoQIrystCb+2sWBY2Zw8lpfJBPCHGCA/HWqehITeCRVIv4VMy8MPlaHo2w2pTHFV2pFfqKPw==}
+    engines: {node: '>=18'}
     dev: true
 
-  /@mswjs/interceptors@0.25.7:
-    resolution: {integrity: sha512-U7iFYs/qU/5jfz1VDpoYz3xqX9nzhsBXw7q923dv6GiGTy+m2ZLhD33L80R/shHOW/YWjeH6k16GbIHGw+bAng==}
+  /@mswjs/interceptors@0.25.11:
+    resolution: {integrity: sha512-27aonWAjdeoZN4j4j6QvePOSOacQUucFRUESAU8FUXsmmagDjmyOi4/NHizxzY/NHSk/HAyqF/IMhl+9puhqNw==}
     engines: {node: '>=18'}
     dependencies:
       '@open-draft/deferred-promise': 2.2.0
@@ -3642,14 +3642,6 @@ packages:
       mime-types: 2.1.35
     dev: true
 
-  /formdata-node@4.4.1:
-    resolution: {integrity: sha512-0iirZp3uVDjVGt9p49aTaqjk84TrglENEDuqfdlZQ1roC9CWlPk6Avf8EEnZNcAqPonwkG35x4n3ww/1THYAeQ==}
-    engines: {node: '>= 12.20'}
-    dependencies:
-      node-domexception: 1.0.0
-      web-streams-polyfill: 4.0.0-beta.3
-    dev: true
-
   /fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
     dev: true
@@ -5044,8 +5036,8 @@ packages:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
     dev: true
 
-  /msw@2.0.3(typescript@5.2.2):
-    resolution: {integrity: sha512-PFIo99h862DiVazndQmko1vJFNNhog0CYajK6N12ESzeLURYJlUglv9ObzWmRCAN3DRVuq7BUeI+eBgRk7oYaQ==}
+  /msw@2.0.6(typescript@5.2.2):
+    resolution: {integrity: sha512-74nN9ADQxHsVx8YGOq5yeDE4bye1mVMAYXojKl0qWraRunTK8UjAVk3wSmOOvVVIDJsyySyjDZ4oYvRuzuMO2g==}
     engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
@@ -5058,15 +5050,14 @@ packages:
       '@bundled-es-modules/cookie': 2.0.0
       '@bundled-es-modules/js-levenshtein': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
-      '@mswjs/cookies': 1.0.0
-      '@mswjs/interceptors': 0.25.7
+      '@mswjs/cookies': 1.1.0
+      '@mswjs/interceptors': 0.25.11
       '@open-draft/until': 2.1.0
       '@types/cookie': 0.4.1
       '@types/js-levenshtein': 1.1.2
       '@types/statuses': 2.0.3
       chalk: 4.1.2
       chokidar: 3.5.3
-      formdata-node: 4.4.1
       graphql: 16.8.1
       headers-polyfill: 4.0.2
       inquirer: 8.2.6
@@ -5095,11 +5086,6 @@ packages:
 
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
-    dev: true
-
-  /node-domexception@1.0.0:
-    resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
-    engines: {node: '>=10.5.0'}
     dev: true
 
   /node-fetch@2.7.0:
@@ -6306,11 +6292,6 @@ packages:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
     dependencies:
       defaults: 1.0.4
-    dev: true
-
-  /web-streams-polyfill@4.0.0-beta.3:
-    resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
-    engines: {node: '>= 14'}
     dev: true
 
   /webidl-conversions@3.0.1:
