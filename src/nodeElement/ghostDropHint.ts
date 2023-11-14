@@ -1,5 +1,5 @@
 import { Position, Node } from "../node";
-import { DropHint } from "../types";
+import { DropHint } from "../dragAndDropHandler/types";
 
 class GhostDropHint implements DropHint {
     private element: HTMLElement;

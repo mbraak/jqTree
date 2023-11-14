@@ -1,24 +1,41 @@
 import { Position, Node } from "../node";
-import { JqTreeWidget } from "../tree.jquery";
-import { DropHint } from "../types";
+import { DropHint } from "../dragAndDropHandler/types";
 import BorderDropHint from "./borderDropHint";
 import GhostDropHint from "./ghostDropHint";
+import { GetScrollLeft } from "../jqtreeMethodTypes";
+
+export interface NodeElementParams {
+    getScrollLeft: GetScrollLeft;
+    node: Node;
+    tabIndex?: number;
+    $treeElement: JQuery<HTMLElement>;
+}
 
 class NodeElement {
     public node: Node;
     public element: HTMLElement;
-    protected treeWidget: JqTreeWidget;
+    private getScrollLeft: GetScrollLeft;
+    private tabIndex?: number;
+    private $treeElement: JQuery<HTMLElement>;
 
-    constructor(node: Node, treeWidget: JqTreeWidget) {
-        this.init(node, treeWidget);
+    constructor({
+        getScrollLeft,
+        node,
+        tabIndex,
+        $treeElement,
+    }: NodeElementParams) {
+        this.getScrollLeft = getScrollLeft;
+        this.tabIndex = tabIndex;
+        this.$treeElement = $treeElement;
+
+        this.init(node);
     }
 
-    public init(node: Node, treeWidget: JqTreeWidget): void {
+    public init(node: Node): void {
         this.node = node;
-        this.treeWidget = treeWidget;
 
         if (!node.element) {
-            const element = this.treeWidget.element.get(0);
+            const element = this.$treeElement.get(0);
 
             if (element) {
                 node.element = element;
@@ -32,10 +49,7 @@ class NodeElement {
 
     public addDropHint(position: number): DropHint {
         if (this.mustShowBorderDropHint(position)) {
-            return new BorderDropHint(
-                this.element,
-                this.treeWidget._getScrollLeft(),
-            );
+            return new BorderDropHint(this.element, this.getScrollLeft());
         } else {
             return new GhostDropHint(this.node, this.element, position);
         }
@@ -45,7 +59,7 @@ class NodeElement {
         this.element.classList.add("jqtree-selected");
 
         const titleSpan = this.getTitleSpan();
-        const tabIndex = this.treeWidget.options.tabIndex;
+        const tabIndex = this.tabIndex;
 
         // Check for null or undefined
         if (tabIndex != null) {

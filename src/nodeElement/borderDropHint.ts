@@ -1,4 +1,4 @@
-import { DropHint } from "..//types";
+import { DropHint } from "../dragAndDropHandler/types";
 
 class BorderDropHint implements DropHint {
     private hint?: HTMLElement;
