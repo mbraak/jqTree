@@ -1,16 +1,48 @@
 import { Node } from "./node";
-import { JqTreeWidget } from "./tree.jquery";
+import {
+    CloseNode,
+    GetSelectedNode,
+    IsFocusOnTree,
+    OpenNode,
+    SelectNode,
+} from "./jqtreeMethodTypes";
 
 type KeyboardEventHandler = (event: KeyboardEvent) => boolean;
 
+interface KeyHandlerParams {
+    closeNode: CloseNode;
+    getSelectedNode: GetSelectedNode;
+    isFocusOnTree: IsFocusOnTree;
+    keyboardSupport: boolean;
+    openNode: OpenNode;
+    selectNode: SelectNode;
+}
+
 export default class KeyHandler {
-    private treeWidget: JqTreeWidget;
-    private handleKeyDownHandler: KeyboardEventHandler | null = null;
+    private closeNode: CloseNode;
+    private getSelectedNode: GetSelectedNode;
+    private handleKeyDownHandler?: KeyboardEventHandler;
+    private isFocusOnTree: IsFocusOnTree;
+    private keyboardSupport: boolean;
+    private openNode: OpenNode;
+    private originalSelectNode: SelectNode;
 
-    constructor(treeWidget: JqTreeWidget) {
-        this.treeWidget = treeWidget;
+    constructor({
+        closeNode,
+        getSelectedNode,
+        isFocusOnTree,
+        keyboardSupport,
+        openNode,
+        selectNode,
+    }: KeyHandlerParams) {
+        this.closeNode = closeNode;
+        this.getSelectedNode = getSelectedNode;
+        this.isFocusOnTree = isFocusOnTree;
+        this.keyboardSupport = keyboardSupport;
+        this.openNode = openNode;
+        this.originalSelectNode = selectNode;
 
-        if (treeWidget.options.keyboardSupport) {
+        if (keyboardSupport) {
             this.handleKeyDownHandler = this.handleKeyDown.bind(this);
 
             document.addEventListener("keydown", this.handleKeyDownHandler);
@@ -41,7 +73,7 @@ export default class KeyHandler {
                 return this.selectNode(selectedNode.getNextVisibleNode());
             } else {
                 // Right expands a closed node
-                this.treeWidget.openNode(selectedNode);
+                this.openNode(selectedNode);
                 return false;
             }
         }
@@ -50,7 +82,7 @@ export default class KeyHandler {
     public moveLeft(selectedNode: Node): boolean {
         if (selectedNode.isFolder() && selectedNode.is_open) {
             // Left on an open node closes the node
-            this.treeWidget.closeNode(selectedNode);
+            this.closeNode(selectedNode);
             return false;
         } else {
             // Left on a closed or end node moves focus to the node's parent
@@ -62,7 +94,7 @@ export default class KeyHandler {
         if (!node) {
             return true;
         } else {
-            this.treeWidget.selectNode(node);
+            this.originalSelectNode(node);
 
             return false;
         }
@@ -73,7 +105,7 @@ export default class KeyHandler {
             return true;
         }
 
-        const selectedNode = this.treeWidget.getSelectedNode();
+        const selectedNode = this.getSelectedNode();
         if (!selectedNode) {
             return true;
         }
@@ -97,9 +129,6 @@ export default class KeyHandler {
     };
 
     private canHandleKeyboard(): boolean {
-        return (
-            (this.treeWidget.options.keyboardSupport || false) &&
-            this.treeWidget.selectNodeHandler.isFocusOnTree()
-        );
+        return this.keyboardSupport && this.isFocusOnTree();
     }
 }

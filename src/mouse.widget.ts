@@ -2,7 +2,7 @@
 This widget does the same a the mouse widget in jqueryui.
 */
 import SimpleWidget from "./simple.widget";
-import { PositionInfo } from "./types";
+import { PositionInfo } from "./mouseWidgetTypes";
 
 const getPositionInfoFromMouseEvent = (e: MouseEvent): PositionInfo => ({
     pageX: e.pageX,
@@ -13,7 +13,7 @@ const getPositionInfoFromMouseEvent = (e: MouseEvent): PositionInfo => ({
 
 const getPositionInfoFromTouch = (
     touch: Touch,
-    e: TouchEvent
+    e: TouchEvent,
 ): PositionInfo => ({
     pageX: touch.pageX,
     pageY: touch.pageY,
@@ -144,7 +144,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
     private handleMouseMove(
         e: MouseEvent | TouchEvent,
-        positionInfo: PositionInfo
+        positionInfo: PositionInfo,
     ): void {
         if (this.isMouseStarted) {
             this.mouseDrag(positionInfo);
