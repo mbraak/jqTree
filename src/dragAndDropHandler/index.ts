@@ -4,6 +4,7 @@ import { PositionInfo } from "../mouseWidgetTypes";
 import NodeElement from "../nodeElement";
 import DragElement from "./dragElement";
 import HitAreasGenerator from "./hitAreasGenerator";
+import { getElementPosition } from "../util";
 import {
     OnCanMove,
     OnCanMoveTo,
@@ -11,7 +12,6 @@ import {
     DragMethod,
 } from "../jqtreeOptions";
 import {
-    GetScrollLeft,
     GetTree,
     OpenNode,
     RefreshElements,
@@ -32,7 +32,6 @@ interface DragAndDropHandlerParams {
     autoEscape?: boolean;
     getNodeElement: GetNodeElement;
     getNodeElementForNode: GetNodeElementForNode;
-    getScrollLeft: GetScrollLeft;
     getTree: GetTree;
     onCanMove?: OnCanMove;
     onCanMoveTo?: OnCanMoveTo;
@@ -57,7 +56,6 @@ export class DragAndDropHandler {
     private dragElement: DragElement | null;
     private getNodeElement: GetNodeElement;
     private getNodeElementForNode: GetNodeElementForNode;
-    private getScrollLeft: GetScrollLeft;
     private getTree: GetTree;
     private onCanMove?: OnCanMove;
     private onCanMoveTo?: OnCanMoveTo;
@@ -77,7 +75,6 @@ export class DragAndDropHandler {
         autoEscape,
         getNodeElement,
         getNodeElementForNode,
-        getScrollLeft,
         getTree,
         onCanMove,
         onCanMoveTo,
@@ -93,7 +90,6 @@ export class DragAndDropHandler {
         this.autoEscape = autoEscape;
         this.getNodeElement = getNodeElement;
         this.getNodeElementForNode = getNodeElementForNode;
-        this.getScrollLeft = getScrollLeft;
         this.getTree = getTree;
         this.onCanMove = onCanMove;
         this.onCanMoveTo = onCanMoveTo;
@@ -146,9 +142,7 @@ export class DragAndDropHandler {
 
         this.refresh();
 
-        const offset = jQuery(positionInfo.target).offset();
-        const left = offset ? offset.left : 0;
-        const top = offset ? offset.top : 0;
+        const { left, top } = getElementPosition(positionInfo.target);
 
         const node = this.currentItem.node;
 
@@ -450,8 +444,7 @@ export class DragAndDropHandler {
     private getTreeDimensions(): Dimensions {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
-        const left = this.treeElement.offsetLeft + this.getScrollLeft();
-        const top = this.treeElement.offsetTop;
+        const { left, top } = getElementPosition(this.treeElement);
 
         return {
             left,

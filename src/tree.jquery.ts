@@ -1219,7 +1219,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         const getNodeElement = this._getNodeElement.bind(this);
         const getNodeElementForNode = this._getNodeElementForNode.bind(this);
         const getNodeById = this.getNodeById.bind(this);
-        const getScrollLeft = this._getScrollLeft.bind(this);
         const getSelectedNode = this.getSelectedNode.bind(this);
         const getTree = this.getTree.bind(this);
         const isFocusOnTree = this.isFocusOnTree.bind(this);
@@ -1271,7 +1270,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             autoEscape,
             getNodeElement,
             getNodeElementForNode,
-            getScrollLeft,
             getTree,
             onCanMove,
             onDragMove,
