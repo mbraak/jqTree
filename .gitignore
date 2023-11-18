@@ -1,3 +1,15 @@
-node_modules/
+.nyc_output/
+.tool-versions
 .DS_Store
+.vscode/
 **/.DS_Store
+docs/_site/
+docs/jqtree.css
+docs/static/documentation.css
+docs/static/example.css
+docs/tree.jquery.js
+jest-coverage/
+node_modules/
+lib
+todo.txt
+update.txt
