@@ -1,21 +1,27 @@
 import type { ScrollParent } from "./types";
+import { getOffsetTop } from '../util'
 
 type HorizontalScrollDirection = "left" | "right";
 type VerticalScrollDirection = "bottom" | "top";
 
+interface Params {
+    refreshHitAreas: () => void;
+    treeElement: HTMLElement;
+}
+
 export default class DocumentScrollParent implements ScrollParent {
-    private $element: JQuery<HTMLElement>;
     private horizontalScrollDirection?: HorizontalScrollDirection;
     private horizontalScrollTimeout?: number;
     private refreshHitAreas: () => void;
+    private treeElement: HTMLElement;
     private verticalScrollDirection?: VerticalScrollDirection;
     private verticalScrollTimeout?: number;
     private documentScrollHeight?: number;
     private documentScrollWidth?: number;
 
-    constructor($element: JQuery<HTMLElement>, refreshHitAreas: () => void) {
-        this.$element = $element;
+    constructor({ refreshHitAreas, treeElement }: Params) {
         this.refreshHitAreas = refreshHitAreas;
+        this.treeElement = treeElement;
     }
 
     public checkHorizontalScrolling(pageX: number): void {
@@ -64,8 +70,7 @@ export default class DocumentScrollParent implements ScrollParent {
     }
 
     public scrollToY(top: number): void {
-        const offset = this.$element.offset();
-        const treeTop = offset ? offset.top : 0;
+        const treeTop = getOffsetTop(this.treeElement);
 
         jQuery(document).scrollTop(top + treeTop);
     }

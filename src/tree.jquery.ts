@@ -1283,7 +1283,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
         const scrollHandler = new ScrollHandler({
             refreshHitAreas,
-            $treeElement,
+            treeElement,
         });
 
         const keyHandler = new KeyHandler({
