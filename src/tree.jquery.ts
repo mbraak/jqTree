@@ -10,7 +10,7 @@ import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
 import { Node, getPosition } from "./node";
-import { isFunction } from "./util";
+import { getOffsetTop, isFunction } from "./util";
 import NodeElement from "./nodeElement";
 import FolderElement from "./nodeElement/folderElement";
 import { OnFinishOpenNode } from "./jqtreeMethodTypes";
@@ -466,9 +466,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const nodeTop = jQuery(node.element).offset()?.top ?? 0;
-        const treeTop = this.$el.offset()?.top ?? 0;
-        const top = nodeTop - treeTop;
+        const top = getOffsetTop(node.element) - getOffsetTop(this.$el.get(0) as HTMLElement);
 
         this.scrollHandler.scrollToY(top);
 
