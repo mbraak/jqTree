@@ -20,7 +20,6 @@ export const initCoverage = async (context: BrowserContext) => {
                     istanbulCLIOutput,
                     `playwright_coverage_${generateUUID()}.json`
                 );
-                console.log(`Writing coverage to ${filename}`);
                 fs.writeFileSync(filename, coverageJSON);
             }
         }
