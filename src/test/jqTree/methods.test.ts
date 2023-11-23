@@ -1207,6 +1207,15 @@ describe("selectNode", () => {
             expect(given.$tree.tree("getSelectedNode")).toBeFalse();
         });
     });
+
+    it("opens the parent node when it's closed", () => {
+        expect(given.node1.is_open).toBeFalsy();
+
+        const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
+        given.$tree.tree("selectNode", child1);
+
+        expect(given.node1.is_open).toBe(true);
+    });
 });
 
 describe("setOption", () => {
