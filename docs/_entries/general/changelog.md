@@ -6,6 +6,7 @@ name: changelog
 #### Development version
 
 -   Issue #735: compile to es6
+-   Issue #766: open parent nodes in the addToSelection method (thanks to Tmgarcia)
 
 #### 1.7.5 (october 21 2023)
 

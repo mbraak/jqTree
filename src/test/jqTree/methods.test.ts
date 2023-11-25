@@ -134,7 +134,7 @@ describe("addToSelection", () => {
     given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
     given("child2", () => given.$tree.tree("getNodeByNameMustExist", "child2"));
 
-    beforeEach(() => {
+    it("selects the nodes", () => {
         given.$tree.tree({
             autoOpen: true,
             data: exampleData,
@@ -142,15 +142,21 @@ describe("addToSelection", () => {
 
         given.$tree.tree("addToSelection", given.child1);
         given.$tree.tree("addToSelection", given.child2);
-    });
 
-    it("selects the nodes", () => {
         expect(given.$tree.tree("getSelectedNodes")).toEqual(
             expect.arrayContaining([given.child1, given.child2]),
         );
     });
 
     it("renders the nodes correctly", () => {
+        given.$tree.tree({
+            autoOpen: true,
+            data: exampleData,
+        });
+
+        given.$tree.tree("addToSelection", given.child1);
+        given.$tree.tree("addToSelection", given.child2);
+
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
                 name: "node1",
@@ -171,6 +177,20 @@ describe("addToSelection", () => {
                 ],
             }),
         ]);
+    });
+
+    it("opens the parent node when it's closed", () => {
+        given.$tree.tree({
+            autoOpen: false,
+            data: exampleData,
+        });
+
+        const node1 = given.$tree.tree("getNodeByNameMustExist", "node1");
+        expect(node1.is_open).toBeFalsy();
+
+        given.$tree.tree("addToSelection", given.child1);
+
+        expect(node1.is_open).toBe(true);
     });
 });
 
@@ -1206,6 +1226,15 @@ describe("selectNode", () => {
             given.$tree.tree("selectNode", null);
             expect(given.$tree.tree("getSelectedNode")).toBeFalse();
         });
+    });
+
+    it("opens the parent node when it's closed", () => {
+        expect(given.node1.is_open).toBeFalsy();
+
+        const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
+        given.$tree.tree("selectNode", child1);
+
+        expect(given.node1.is_open).toBe(true);
     });
 });
 
