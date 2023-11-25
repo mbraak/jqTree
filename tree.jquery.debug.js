@@ -568,33 +568,50 @@ var jqtree = (function (exports) {
     }
 
     class DragElement {
-      constructor(nodeName, offsetX, offsetY, $tree, autoEscape) {
+      constructor(_ref) {
+        let {
+          autoEscape,
+          nodeName,
+          offsetX,
+          offsetY,
+          treeElement
+        } = _ref;
         this.offsetX = offsetX;
         this.offsetY = offsetY;
-        this.$element = jQuery("<span>").addClass("jqtree-title jqtree-dragging");
-        if (autoEscape) {
-          this.$element.text(nodeName);
-        } else {
-          this.$element.html(nodeName);
-        }
-        this.$element.css("position", "absolute");
-        $tree.append(this.$element);
+        this.element = this.createElement(nodeName, autoEscape);
+        treeElement.appendChild(this.element);
       }
       move(pageX, pageY) {
-        this.$element.offset({
-          left: pageX - this.offsetX,
-          top: pageY - this.offsetY
-        });
+        this.element.style.left = `${pageX - this.offsetX}px`;
+        this.element.style.top = `${pageY - this.offsetY}px`;
       }
       remove() {
-        this.$element.remove();
+        this.element.remove();
+      }
+      createElement(nodeName, autoEscape) {
+        const element = document.createElement("span");
+        element.classList.add("jqtree-title", "jqtree-dragging");
+        if (autoEscape) {
+          element.textContent = nodeName;
+        } else {
+          element.innerHTML = nodeName;
+        }
+        element.style.position = "absolute";
+        return element;
       }
     }
 
     const isInt = n => typeof n === "number" && n % 1 === 0;
     const isFunction = v => typeof v === "function";
     const getBoolString = value => value ? "true" : "false";
-    const getOffsetTop = element => element.getBoundingClientRect().y + window.scrollY;
+    const getOffsetTop = element => getElementPosition(element).top;
+    const getElementPosition = element => {
+      const rect = element.getBoundingClientRect();
+      return {
+        left: rect.x + window.scrollX,
+        top: rect.y + window.scrollY
+      };
+    };
 
     class VisibleNodeIterator {
       constructor(tree) {
@@ -776,7 +793,6 @@ var jqtree = (function (exports) {
           autoEscape,
           getNodeElement,
           getNodeElementForNode,
-          getScrollLeft,
           getTree,
           onCanMove,
           onCanMoveTo,
@@ -786,13 +802,12 @@ var jqtree = (function (exports) {
           openNode,
           refreshElements,
           slide,
-          $treeElement,
+          treeElement,
           triggerEvent
         } = _ref;
         this.autoEscape = autoEscape;
         this.getNodeElement = getNodeElement;
         this.getNodeElementForNode = getNodeElementForNode;
-        this.getScrollLeft = getScrollLeft;
         this.getTree = getTree;
         this.onCanMove = onCanMove;
         this.onCanMoveTo = onCanMoveTo;
@@ -802,7 +817,7 @@ var jqtree = (function (exports) {
         this.openNode = openNode;
         this.refreshElements = refreshElements;
         this.slide = slide;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
         this.hoveredArea = null;
         this.hitAreas = [];
@@ -831,11 +846,18 @@ var jqtree = (function (exports) {
           return false;
         }
         this.refresh();
-        const offset = jQuery(positionInfo.target).offset();
-        const left = offset ? offset.left : 0;
-        const top = offset ? offset.top : 0;
+        const {
+          left,
+          top
+        } = getElementPosition(positionInfo.target);
         const node = this.currentItem.node;
-        this.dragElement = new DragElement(node.name, positionInfo.pageX - left, positionInfo.pageY - top, this.$treeElement, this.autoEscape ?? true);
+        this.dragElement = new DragElement({
+          autoEscape: this.autoEscape ?? true,
+          nodeName: node.name,
+          offsetX: positionInfo.pageX - left,
+          offsetY: positionInfo.pageY - top,
+          treeElement: this.treeElement
+        });
         this.isDragging = true;
         this.currentItem.element.classList.add("jqtree-moving");
         return true;
@@ -1013,7 +1035,7 @@ var jqtree = (function (exports) {
             const tree = this.getTree();
             if (tree) {
               tree.moveNode(movedNode, targetNode, position);
-              this.$treeElement.empty();
+              this.treeElement.textContent = "";
               this.refreshElements(null);
             }
           };
@@ -1035,26 +1057,16 @@ var jqtree = (function (exports) {
       getTreeDimensions() {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
-        const offset = this.$treeElement.offset();
-        if (!offset) {
-          return {
-            left: 0,
-            top: 0,
-            right: 0,
-            bottom: 0
-          };
-        } else {
-          const el = this.$treeElement;
-          const width = el.width() || 0;
-          const height = el.height() || 0;
-          const left = offset.left + this.getScrollLeft();
-          return {
-            left,
-            top: offset.top,
-            right: left + width,
-            bottom: offset.top + height + 16
-          };
-        }
+        const {
+          left,
+          top
+        } = getElementPosition(this.treeElement);
+        return {
+          left,
+          top,
+          right: left + this.treeElement.clientWidth,
+          bottom: top + this.treeElement.clientHeight + 16
+        };
       }
     }
 
@@ -2006,10 +2018,10 @@ var jqtree = (function (exports) {
     class ContainerScrollParent {
       constructor(_ref) {
         let {
-          $container,
+          container,
           refreshHitAreas
         } = _ref;
-        this.$container = $container;
+        this.container = container;
         this.refreshHitAreas = refreshHitAreas;
       }
       checkHorizontalScrolling(pageX) {
@@ -2038,11 +2050,10 @@ var jqtree = (function (exports) {
         }
       }
       getScrollLeft() {
-        return this.$container.scrollLeft() || 0;
+        return this.container.scrollLeft;
       }
       scrollToY(top) {
-        const container = this.$container.get(0);
-        container.scrollTop = top;
+        this.container.scrollTop = top;
       }
       stopScrolling() {
         this.horizontalScrollDirection = undefined;
@@ -2051,12 +2062,8 @@ var jqtree = (function (exports) {
         this.scrollParentBottom = undefined;
       }
       getNewHorizontalScrollDirection(pageX) {
-        const scrollParentOffset = this.$container.offset();
-        if (!scrollParentOffset) {
-          return undefined;
-        }
-        const container = this.$container.get(0);
-        const rightEdge = scrollParentOffset.left + container.clientWidth;
+        const scrollParentOffset = getElementPosition(this.container);
+        const rightEdge = scrollParentOffset.left + this.container.clientWidth;
         const leftEdge = scrollParentOffset.left;
         const isNearRightEdge = pageX > rightEdge - 20;
         const isNearLeftEdge = pageX < leftEdge + 20;
@@ -2081,8 +2088,7 @@ var jqtree = (function (exports) {
           return;
         }
         const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
-        const container = this.$container.get(0);
-        container.scrollBy({
+        this.container.scrollBy({
           left: distance,
           top: 0,
           behavior: "instant"
@@ -2095,8 +2101,7 @@ var jqtree = (function (exports) {
           return;
         }
         const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        const container = this.$container.get(0);
-        container.scrollBy({
+        this.container.scrollBy({
           left: 0,
           top: distance,
           behavior: "instant"
@@ -2106,22 +2111,26 @@ var jqtree = (function (exports) {
       }
       getScrollParentTop() {
         if (this.scrollParentTop == null) {
-          this.scrollParentTop = this.$container.offset()?.top || 0;
+          this.scrollParentTop = getOffsetTop(this.container);
         }
         return this.scrollParentTop;
       }
       getScrollParentBottom() {
         if (this.scrollParentBottom == null) {
-          this.scrollParentBottom = this.getScrollParentTop() + (this.$container.innerHeight() ?? 0);
+          this.scrollParentBottom = this.getScrollParentTop() + this.container.clientHeight;
         }
         return this.scrollParentBottom;
       }
     }
 
     class DocumentScrollParent {
-      constructor($element, refreshHitAreas) {
-        this.$element = $element;
+      constructor(_ref) {
+        let {
+          refreshHitAreas,
+          treeElement
+        } = _ref;
         this.refreshHitAreas = refreshHitAreas;
+        this.treeElement = treeElement;
       }
       checkHorizontalScrolling(pageX) {
         const newHorizontalScrollDirection = this.getNewHorizontalScrollDirection(pageX);
@@ -2152,9 +2161,8 @@ var jqtree = (function (exports) {
         return document.documentElement.scrollLeft;
       }
       scrollToY(top) {
-        const offset = this.$element.offset();
-        const treeTop = offset ? offset.top : 0;
-        jQuery(document).scrollTop(top + treeTop);
+        const treeTop = getOffsetTop(this.treeElement);
+        document.documentElement.scrollTop = top + treeTop;
       }
       stopScrolling() {
         this.horizontalScrollDirection = undefined;
@@ -2163,9 +2171,8 @@ var jqtree = (function (exports) {
         this.documentScrollWidth = undefined;
       }
       getNewHorizontalScrollDirection(pageX) {
-        const $document = jQuery(document);
-        const scrollLeft = $document.scrollLeft() || 0;
-        const windowWidth = jQuery(window).width() || 0;
+        const scrollLeft = document.documentElement.scrollLeft;
+        const windowWidth = window.innerWidth;
         const isNearRightEdge = pageX > windowWidth - 20;
         const isNearLeftEdge = pageX - scrollLeft < 20;
         if (isNearRightEdge && this.canScrollRight()) {
@@ -2204,7 +2211,7 @@ var jqtree = (function (exports) {
         if (distanceTop < 20) {
           return "top";
         }
-        const windowHeight = jQuery(window).height() || 0;
+        const windowHeight = window.innerHeight;
         if (windowHeight - (pageY - scrollTop) < 20 && this.canScrollDown()) {
           return "bottom";
         }
@@ -2238,37 +2245,33 @@ var jqtree = (function (exports) {
       }
     }
 
-    const hasOverFlow = $element => {
-      for (const attr of ["overflow", "overflow-y"]) {
-        const overflowValue = $element.css(attr);
-        if (overflowValue === "auto" || overflowValue === "scroll") {
-          return true;
-        }
+    const isOverflow = overflowValue => overflowValue === 'auto' || overflowValue === 'scroll';
+    const hasOverFlow = element => isOverflow(element.style.overflow) || isOverflow(element.style.overflowY);
+    const getParentWithOverflow = treeElement => {
+      if (hasOverFlow(treeElement)) {
+        return treeElement;
       }
-      return false;
-    };
-    const getParentWithOverflow = $treeElement => {
-      if (hasOverFlow($treeElement)) {
-        return $treeElement;
-      }
-      for (const element of $treeElement.parents().get()) {
-        const $element = jQuery(element);
-        if (hasOverFlow($element)) {
-          return $element;
+      let parent = treeElement.parentElement;
+      while (parent) {
+        if (hasOverFlow(parent)) {
+          return parent;
         }
+        parent = parent.parentElement;
       }
       return null;
     };
-    const createScrollParent = ($treeElement, refreshHitAreas) => {
-      const $container = getParentWithOverflow($treeElement);
-      if ($container?.length && $container[0]?.tagName !== "HTML") {
+    const createScrollParent = (treeElement, refreshHitAreas) => {
+      const container = getParentWithOverflow(treeElement);
+      if (container && container.tagName !== "HTML") {
         return new ContainerScrollParent({
-          $container,
-          refreshHitAreas,
-          $treeElement
+          container,
+          refreshHitAreas
         });
       } else {
-        return new DocumentScrollParent($treeElement, refreshHitAreas);
+        return new DocumentScrollParent({
+          refreshHitAreas,
+          treeElement
+        });
       }
     };
 
@@ -2276,11 +2279,11 @@ var jqtree = (function (exports) {
       constructor(_ref) {
         let {
           refreshHitAreas,
-          $treeElement
+          treeElement
         } = _ref;
         this.refreshHitAreas = refreshHitAreas;
         this.scrollParent = undefined;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
       }
       checkScrolling(positionInfo) {
         this.checkVerticalScrolling(positionInfo);
@@ -2309,7 +2312,7 @@ var jqtree = (function (exports) {
       }
       getScrollParent() {
         if (!this.scrollParent) {
-          this.scrollParent = createScrollParent(this.$treeElement, this.refreshHitAreas);
+          this.scrollParent = createScrollParent(this.treeElement, this.refreshHitAreas);
         }
         return this.scrollParent;
       }
@@ -2937,9 +2940,7 @@ var jqtree = (function (exports) {
         if (!node) {
           throw Error(NODE_PARAM_IS_EMPTY);
         }
-        const nodeTop = jQuery(node.element).offset()?.top ?? 0;
-        const treeTop = this.$el.offset()?.top ?? 0;
-        const top = nodeTop - treeTop;
+        const top = getOffsetTop(node.element) - getOffsetTop(this.$el.get(0));
         this.scrollHandler.scrollToY(top);
         return this.element;
       }
@@ -3521,7 +3522,6 @@ var jqtree = (function (exports) {
         const getNodeElement = this._getNodeElement.bind(this);
         const getNodeElementForNode = this._getNodeElementForNode.bind(this);
         const getNodeById = this.getNodeById.bind(this);
-        const getScrollLeft = this._getScrollLeft.bind(this);
         const getSelectedNode = this.getSelectedNode.bind(this);
         const getTree = this.getTree.bind(this);
         const isFocusOnTree = this.isFocusOnTree.bind(this);
@@ -3531,6 +3531,7 @@ var jqtree = (function (exports) {
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
         const $treeElement = this.element;
+        const treeElement = this.element.get(0);
         const triggerEvent = this._triggerEvent.bind(this);
         const selectNodeHandler = new SelectNodeHandler({
           getNodeById
@@ -3563,7 +3564,6 @@ var jqtree = (function (exports) {
           autoEscape,
           getNodeElement,
           getNodeElementForNode,
-          getScrollLeft,
           getTree,
           onCanMove,
           onDragMove,
@@ -3573,12 +3573,12 @@ var jqtree = (function (exports) {
           openNode,
           refreshElements,
           slide,
-          $treeElement,
+          treeElement,
           triggerEvent
         });
         const scrollHandler = new ScrollHandler({
           refreshHitAreas,
-          $treeElement
+          treeElement
         });
         const keyHandler = new KeyHandler({
           closeNode,
