@@ -1,5 +1,5 @@
 /*
-JqTree 1.7.5
+JqTree 1.8.0
 
 Copyright 2023 Marco Braak
 
@@ -20,7 +20,7 @@ limitations under the License.
 var jqtree = (function (exports) {
     'use strict';
 
-    const version = "1.7.5";
+    const version = "1.8.0";
 
     const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data["children"] instanceof Array;
 

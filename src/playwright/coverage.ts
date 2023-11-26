@@ -13,9 +13,7 @@ export const initCoverage = async (context: BrowserContext) => {
     await context.exposeFunction(
         "collectIstanbulCoverage",
         (coverageJSON: string) => {
-            if (!coverageJSON) {
-                console.log("No coverage");
-            } else {
+            if (coverageJSON) {
                 const filename = path.join(
                     istanbulCLIOutput,
                     `playwright_coverage_${generateUUID()}.json`
