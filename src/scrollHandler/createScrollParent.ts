@@ -2,9 +2,14 @@ import type { ScrollParent } from "./types";
 import ContainerScrollParent from "./containerScrollParent";
 import DocumentScrollParent from "./documentScrollParent";
 
-const isOverflow = (overflowValue: string) => overflowValue === 'auto' || overflowValue === 'scroll';
+const isOverflow = (overflowValue: string) =>
+    overflowValue === "auto" || overflowValue === "scroll";
 
-const hasOverFlow = (element: HTMLElement): boolean => isOverflow(element.style.overflow) || isOverflow(element.style.overflowY);
+const hasOverFlow = (element: HTMLElement): boolean => {
+    const style = getComputedStyle(element);
+
+    return isOverflow(style.overflowX) || isOverflow(style.overflowY);
+};
 
 const getParentWithOverflow = (
     treeElement: HTMLElement,
@@ -16,6 +21,7 @@ const getParentWithOverflow = (
     let parent = treeElement.parentElement;
 
     while (parent) {
+        console.log(parent.style.overflow);
         if (hasOverFlow(parent)) {
             return parent;
         }
