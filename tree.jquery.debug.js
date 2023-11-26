@@ -2910,6 +2910,7 @@ var jqtree = (function (exports) {
           throw Error(NODE_PARAM_IS_EMPTY);
         }
         this.selectNodeHandler.addToSelection(node);
+        this.openParents(node);
         this._getNodeElementForNode(node).select(mustSetFocus === undefined ? true : mustSetFocus);
         this.saveState();
         return this.element;
@@ -3419,12 +3420,6 @@ var jqtree = (function (exports) {
             return this.options.selectable === true;
           }
         };
-        const openParents = () => {
-          const parent = node.parent;
-          if (parent && parent.parent && !parent.is_open) {
-            this.openNode(parent, false);
-          }
-        };
         if (!canSelect()) {
           return;
         }
@@ -3444,7 +3439,7 @@ var jqtree = (function (exports) {
             node,
             deselected_node: deselectedNode
           });
-          openParents();
+          this.openParents(node);
         }
         saveState();
       }
@@ -3642,6 +3637,12 @@ var jqtree = (function (exports) {
           tabIndex,
           $treeElement
         });
+      }
+      openParents(node) {
+        const parent = node.parent;
+        if (parent && parent.parent && !parent.is_open) {
+          this.openNode(parent, false);
+        }
       }
     }
     SimpleWidget.register(JqTreeWidget, "tree");

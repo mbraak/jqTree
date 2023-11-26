@@ -426,6 +426,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
 
         this.selectNodeHandler.addToSelection(node);
+        this.openParents(node);
 
         this._getNodeElementForNode(node).select(
             mustSetFocus === undefined ? true : mustSetFocus,
@@ -1079,14 +1080,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             }
         };
 
-        const openParents = (): void => {
-            const parent = node.parent;
-
-            if (parent && parent.parent && !parent.is_open) {
-                this.openNode(parent, false);
-            }
-        };
-
         if (!canSelect()) {
             return;
         }
@@ -1108,7 +1101,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
                 node,
                 deselected_node: deselectedNode,
             });
-            openParents();
+            this.openParents(node);
         }
 
         saveState();
@@ -1352,6 +1345,14 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             tabIndex,
             $treeElement,
         });
+    }
+
+    private openParents(node: Node) {
+        const parent = node.parent;
+
+        if (parent && parent.parent && !parent.is_open) {
+            this.openNode(parent, false);
+        }
     }
 }
 
