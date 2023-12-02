@@ -1,5 +1,6 @@
 import getGiven from "givens";
-import { Node, Position } from "../node";
+import { Node } from "../node";
+import { Position } from "../position";
 import exampleData from "./support/exampleData";
 import "jest-extended";
 
