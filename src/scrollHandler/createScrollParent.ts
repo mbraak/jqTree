@@ -21,7 +21,6 @@ const getParentWithOverflow = (
     let parent = treeElement.parentElement;
 
     while (parent) {
-        console.log(parent.style.overflow);
         if (hasOverFlow(parent)) {
             return parent;
         }
