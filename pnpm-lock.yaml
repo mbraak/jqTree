@@ -110,8 +110,8 @@ devDependencies:
     specifier: ^4.5.0
     version: 4.5.0
   msw:
-    specifier: ^2.0.8
-    version: 2.0.8(typescript@5.2.2)
+    specifier: ^2.0.9
+    version: 2.0.9(typescript@5.2.2)
   postcss:
     specifier: ^8.4.31
     version: 8.4.31
@@ -143,8 +143,8 @@ devDependencies:
     specifier: ^5.2.2
     version: 5.2.2
   undici:
-    specifier: ^5.27.2
-    version: 5.27.2
+    specifier: ^5.28.2
+    version: 5.28.2
 
 packages:
 
@@ -5036,8 +5036,8 @@ packages:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
     dev: true
 
-  /msw@2.0.8(typescript@5.2.2):
-    resolution: {integrity: sha512-/5nQCotVka62lvubQ3tMfUS3TukyeBwvWyvAthcXvDlXGhkA/85HlEwZyFlJ3ZsPW45Ty+ao0S4oFvuM12R/kA==}
+  /msw@2.0.9(typescript@5.2.2):
+    resolution: {integrity: sha512-rl3kuGS+wuB4EKyL5nJ5WIoteCIzIgySp5b2hmIQ7fuXFfDfn/yD+E0k/3lDNFnC79tM3cuws6XmJEdPr7y+Zg==}
     engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
@@ -6179,8 +6179,8 @@ packages:
     resolution: {integrity: sha512-Ga1jfYwRn7+cP9v8auvEXN1rX3sWqlayd4HP7OKk4mZWylEmu3KzXDUGrQUN6Ol7qo1gPvB2e5gX6udnyEPgdA==}
     dev: true
 
-  /undici@5.27.2:
-    resolution: {integrity: sha512-iS857PdOEy/y3wlM3yRp+6SNQQ6xU0mmZcwRSriqk+et/cwWAtwmIGf6WkoDN2EK/AMdCO/dfXzIwi+rFMrjjQ==}
+  /undici@5.28.2:
+    resolution: {integrity: sha512-wh1pHJHnUeQV5Xa8/kyQhO7WFa8M34l026L5P/+2TYiakvGy5Rdc8jWZVyG7ieht/0WgJLEd3kcU5gKx+6GC8w==}
     engines: {node: '>=14.0'}
     dependencies:
       '@fastify/busboy': 2.0.0
