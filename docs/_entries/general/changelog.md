@@ -3,9 +3,12 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.8.0 (november 26 2023)
 
--   Issue #735: compile to es6
+This release drops support for very old browsers (like IE 11).
+
+-   Issue #735: compile to es6. This decreases the file size to 49K (from 62K). This is the minified (not gzipped) version.
+-   Issue #766: open parent nodes in the addToSelection method (thanks to Tmgarcia)
 
 #### 1.7.5 (october 21 2023)
 

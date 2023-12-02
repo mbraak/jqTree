@@ -17,10 +17,6 @@ const initPage = async (page: Page, baseURL: string | undefined) => {
     await page.waitForLoadState("domcontentloaded");
 
     page.on("console", (msg) => console.log(`console: ${msg.text()}`));
-
-    await page.evaluate(`
-        console.log(window.__coverage__ ? 'Coverage enabled' : 'Coverage not enabled');
-    `);
 };
 
 interface InitTreeOptions {
