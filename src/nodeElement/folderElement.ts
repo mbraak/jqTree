@@ -1,4 +1,4 @@
-import { Position } from "../node";
+import { Position } from "../position";
 import NodeElement, { NodeElementParams } from "./index";
 import { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 

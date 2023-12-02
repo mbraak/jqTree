@@ -1,5 +1,6 @@
 import { HitArea } from "./types";
-import { Node, Position } from "../node";
+import { Node } from "../node";
+import { Position } from "../position";
 import { getOffsetTop } from "../util";
 import VisibleNodeIterator from "./visibleNodeIterator";
 
