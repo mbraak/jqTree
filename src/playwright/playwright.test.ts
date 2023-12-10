@@ -216,8 +216,9 @@ test.describe("autoscroll when the container is scrollable", () => {
             const container = document.createElement("div");
             container.id = "container";
             container.style.height = "200px";
-            container.style.width = "60px";
+            container.style.width = "400px";
             container.style.overflowY = "scroll";
+            container.classList.add('wide-tree');
 
             document.body.replaceChild(container, treeElement);
             container.appendChild(treeElement);
@@ -267,15 +268,26 @@ test.describe("autoscroll when the container is scrollable", () => {
         // eslint-disable-next-line playwright/no-wait-for-timeout
         await page.waitForTimeout(200);
 
-        await page.mouse.move(100, 50);
+        await page.mouse.move(410, 50);
         // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(50);
+        await page.waitForTimeout(100);
 
         expect(
             await page
                 .locator("#container")
                 .evaluate((element) => element.scrollLeft),
         ).toBeGreaterThan(0);
+    });
+
+    test("it moves a nodes after scrolling horizontally", async ({ page }) => {
+        await moveMouseToNode(page, "Coelophysoids");
+        await page.mouse.down();
+
+        // eslint-disable-next-line playwright/no-wait-for-timeout
+        await page.waitForTimeout(200);
+
+        await page.mouse.move(410, 50);
+        // todo: scroll and move
     });
 
     test("scrollToNode scrolls to a node", async ({ page }) => {
