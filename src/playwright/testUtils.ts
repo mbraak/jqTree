@@ -10,7 +10,7 @@ interface BoundingBox {
 export const sleep = async (page: Page, timeout: number) =>
     await page.waitForTimeout(timeout); // eslint-disable-line playwright/no-wait-for-timeout
 
-const locateTitle = (page: Page, title: string) =>
+export const locateTitle = (page: Page, title: string) =>
     page.locator(".jqtree-title", {
         hasText: title,
     });

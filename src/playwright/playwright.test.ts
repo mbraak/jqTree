@@ -199,7 +199,7 @@ test.describe("autoscroll when the window is scrollable", () => {
     });
 });
 
-test.describe("autoscroll when the container is scrollable", () => {
+test.describe("autoscroll when the container is scrollable vertically", () => {
     test.beforeEach(async ({ page, baseURL }) => {
         await initPage(page, baseURL);
 
@@ -213,9 +213,7 @@ test.describe("autoscroll when the container is scrollable", () => {
             const container = document.createElement("div");
             container.id = "container";
             container.style.height = "200px";
-            container.style.width = "400px";
             container.style.overflowY = "scroll";
-            container.classList.add('wide-tree');
 
             document.body.replaceChild(container, treeElement);
             container.appendChild(treeElement);
@@ -245,6 +243,49 @@ test.describe("autoscroll when the container is scrollable", () => {
         ).toBeGreaterThan(0);
     });
 
+    test("scrollToNode scrolls to a node", async ({ page }) => {
+        const container = page.locator("#container");
+
+        expect(
+            await container.evaluate((element) => element.scrollTop),
+        ).toEqual(0);
+
+        await page.evaluate(`
+            const $tree = jQuery("#tree1");
+            const node = $tree.tree("getNodeByName", "Sauropodomorphs");
+            $tree.tree("scrollToNode",node);
+        `);
+
+        expect(
+            await container.evaluate((element) => element.scrollTop),
+        ).toBeGreaterThan(0);
+    });
+});
+
+test.describe("autoscroll when the container is scrollable horizontally", () => {
+    test.beforeEach(async ({ page, baseURL }) => {
+        await initPage(page, baseURL);
+
+        // Add a container and make it the parent of the tree element
+        await page.evaluate(`
+            document.body.style.marginLeft = "40px";
+            document.body.style.marginTop = "40px";
+
+            const treeElement = document.querySelector("#tree1");
+
+            const container = document.createElement("div");
+            container.id = "container";
+            container.style.width = "400px";
+            container.style.overflowX = "scroll";
+            container.classList.add('wide-tree');
+
+            document.body.replaceChild(container, treeElement);
+            container.appendChild(treeElement);
+        `);
+
+        await initTree(page, { autoOpen: 3, dragAndDrop: true });
+    });
+
     test("it scrolls horizontally when the users drags an element to the right", async ({
         page,
     }) => {
@@ -271,33 +312,42 @@ test.describe("autoscroll when the container is scrollable", () => {
         ).toBeGreaterThan(0);
     });
 
-    test("it moves a nodes after scrolling horizontally", async ({ page }) => {
+    test("it moves a node after scrolling horizontally", async ({ page }) => {
         await moveMouseToNode(page, "Coelophysoids");
         await page.mouse.down();
         await sleep(page, 200);
 
-        await page.mouse.move(410, 50);
-        await sleep(page, 50);
-        // todo: scroll and move
-    });
+        const container = page.locator("#container");
+        const containerBox = await boundingBox(container);
 
-    test("scrollToNode scrolls to a node", async ({ page }) => {
-        expect(
-            await page
-                .locator("#container")
-                .evaluate((element) => element.scrollTop),
-        ).toEqual(0);
+        await page.mouse.move(
+            containerBox.x + containerBox.width,
+            containerBox.y + 10,
+        );
 
-        await page.evaluate(`
+        await page.waitForFunction(() => {
+            const container = document.querySelector("#container");
+
+            if (!container) {
+                return false;
+            }
+
+            return (
+                container.scrollLeft >=
+                container.scrollWidth - container.clientWidth
+            );
+        });
+
+        await moveMouseToNode(page, "Tyrannosauroids");
+        await page.mouse.down();
+        await sleep(page, 200);
+
+        const childrenJson = await page.evaluate<string>(`
             const $tree = jQuery("#tree1");
-            const node = $tree.tree("getNodeByName", "Sauropodomorphs");
-            $tree.tree("scrollToNode",node);
+            const node = $tree.tree("getNodeByName", "Tyrannosauroids");
+            const children = node.children.map(child => child.name)
+            JSON.stringify(children);
         `);
-
-        expect(
-            await page
-                .locator("#container")
-                .evaluate((element) => element.scrollTop),
-        ).toBeGreaterThan(0);
+        expect(JSON.parse(childrenJson)).toEqual(["Coelophysoids"]);
     });
 });
