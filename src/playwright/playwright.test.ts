@@ -1,10 +1,12 @@
 import { test, expect, Page } from "@playwright/test";
 import {
+    boundingBox,
     dragAndDrop,
     findNodeElement,
     getTreeStructure,
     moveMouseToNode,
     selectNode,
+    sleep,
 } from "./testUtils";
 import { initCoverage, saveCoverage } from "./coverage";
 
@@ -132,12 +134,10 @@ test.describe("autoscroll when the window is scrollable", () => {
         await moveMouseToNode(page, "Saurischia");
         await page.mouse.down();
 
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(200);
+        await sleep(page, 200);
 
         await page.mouse.move(20, 190);
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(50);
+        await sleep(page, 50);
 
         expect(
             await page
@@ -162,13 +162,10 @@ test.describe("autoscroll when the window is scrollable", () => {
 
         await moveMouseToNode(page, "Saurischia");
         await page.mouse.down();
-
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(200);
+        await sleep(page, 200);
 
         await page.mouse.move(55, 10);
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(50);
+        await sleep(page, 50);
 
         expect(
             await page
@@ -230,63 +227,57 @@ test.describe("autoscroll when the container is scrollable", () => {
     test("it scrolls vertically when the users drags an element to the bottom", async ({
         page,
     }) => {
+        const container = page.locator("#container");
+
         expect(
-            await page
-                .locator("#container")
-                .evaluate((element) => element.scrollTop),
+            await container.evaluate((element) => element.scrollTop),
         ).toEqual(0);
 
         await moveMouseToNode(page, "Saurischia");
         await page.mouse.down();
-
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(200);
+        await sleep(page, 200);
 
         await page.mouse.move(20, 245);
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(50);
+        await sleep(page, 50);
 
         expect(
-            await page
-                .locator("#container")
-                .evaluate((element) => element.scrollTop),
+            await container.evaluate((element) => element.scrollTop),
         ).toBeGreaterThan(0);
     });
 
     test("it scrolls horizontally when the users drags an element to the right", async ({
         page,
     }) => {
+        const container = page.locator("#container");
+
         expect(
-            await page
-                .locator("#container")
-                .evaluate((element) => element.scrollLeft),
+            await container.evaluate((element) => element.scrollLeft),
         ).toEqual(0);
 
         await moveMouseToNode(page, "Saurischia");
         await page.mouse.down();
+        await sleep(page, 200);
 
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(200);
+        const containerBox = await boundingBox(container);
 
-        await page.mouse.move(410, 50);
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(100);
+        await page.mouse.move(
+            containerBox.x + containerBox.width,
+            containerBox.y + 10,
+        );
+        await sleep(page, 100);
 
         expect(
-            await page
-                .locator("#container")
-                .evaluate((element) => element.scrollLeft),
+            await container.evaluate((element) => element.scrollLeft),
         ).toBeGreaterThan(0);
     });
 
     test("it moves a nodes after scrolling horizontally", async ({ page }) => {
         await moveMouseToNode(page, "Coelophysoids");
         await page.mouse.down();
-
-        // eslint-disable-next-line playwright/no-wait-for-timeout
-        await page.waitForTimeout(200);
+        await sleep(page, 200);
 
         await page.mouse.move(410, 50);
+        await sleep(page, 50);
         // todo: scroll and move
     });
 
