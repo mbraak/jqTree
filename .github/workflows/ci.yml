@@ -65,5 +65,4 @@ jobs:
               uses: codecov/codecov-action@v3
               with:
                 directory: .nyc_output
-                token: ${{ secrets.CODECOV_TOKEN }}
                 verbose: true
