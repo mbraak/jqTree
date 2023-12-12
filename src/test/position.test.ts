@@ -1,4 +1,4 @@
-import { getPosition, getPositionName, Position } from "../node";
+import { getPosition, getPositionName, Position } from "../position";
 
 const context = describe;
 
