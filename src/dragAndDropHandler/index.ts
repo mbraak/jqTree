@@ -13,6 +13,7 @@ import {
     DragMethod,
 } from "../jqtreeOptions";
 import {
+    GetScrollLeft,
     GetTree,
     OpenNode,
     RefreshElements,
@@ -33,6 +34,7 @@ interface DragAndDropHandlerParams {
     autoEscape?: boolean;
     getNodeElement: GetNodeElement;
     getNodeElementForNode: GetNodeElementForNode;
+    getScrollLeft: GetScrollLeft;
     getTree: GetTree;
     onCanMove?: OnCanMove;
     onCanMoveTo?: OnCanMoveTo;
@@ -57,6 +59,7 @@ export class DragAndDropHandler {
     private dragElement: DragElement | null;
     private getNodeElement: GetNodeElement;
     private getNodeElementForNode: GetNodeElementForNode;
+    private getScrollLeft: GetScrollLeft;
     private getTree: GetTree;
     private onCanMove?: OnCanMove;
     private onCanMoveTo?: OnCanMoveTo;
@@ -76,6 +79,7 @@ export class DragAndDropHandler {
         autoEscape,
         getNodeElement,
         getNodeElementForNode,
+        getScrollLeft,
         getTree,
         onCanMove,
         onCanMoveTo,
@@ -91,6 +95,7 @@ export class DragAndDropHandler {
         this.autoEscape = autoEscape;
         this.getNodeElement = getNodeElement;
         this.getNodeElementForNode = getNodeElementForNode;
+        this.getScrollLeft = getScrollLeft;
         this.getTree = getTree;
         this.onCanMove = onCanMove;
         this.onCanMoveTo = onCanMoveTo;
@@ -445,7 +450,9 @@ export class DragAndDropHandler {
     private getTreeDimensions(): Dimensions {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
-        const { left, top } = getElementPosition(this.treeElement);
+        const treePosition = getElementPosition(this.treeElement);
+        const left = treePosition.left + this.getScrollLeft();
+        const top = treePosition.top;
 
         return {
             left,

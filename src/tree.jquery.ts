@@ -598,10 +598,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    public _getScrollLeft(): number {
-        return this.scrollHandler.getScrollLeft();
-    }
-
     public init(): void {
         super.init();
 
@@ -1260,10 +1256,18 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             saveState,
         });
 
+        const scrollHandler = new ScrollHandler({
+            refreshHitAreas,
+            treeElement,
+        });
+
+        const getScrollLeft = scrollHandler.getScrollLeft.bind(scrollHandler);
+
         const dndHandler = new DragAndDropHandler({
             autoEscape,
             getNodeElement,
             getNodeElementForNode,
+            getScrollLeft,
             getTree,
             onCanMove,
             onDragMove,
@@ -1275,11 +1279,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             slide,
             treeElement,
             triggerEvent,
-        });
-
-        const scrollHandler = new ScrollHandler({
-            refreshHitAreas,
-            treeElement,
         });
 
         const keyHandler = new KeyHandler({
@@ -1317,7 +1316,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     private createFolderElement(node: Node) {
         const closedIconElement = this.renderer.closedIconElement;
-        const getScrollLeft = this._getScrollLeft.bind(this);
+        const getScrollLeft = this.scrollHandler.getScrollLeft.bind(
+            this.scrollHandler,
+        );
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
         const $treeElement = this.element;
@@ -1335,7 +1336,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private createNodeElement(node: Node) {
-        const getScrollLeft = this._getScrollLeft.bind(this);
+        const getScrollLeft = this.scrollHandler.getScrollLeft.bind(
+            this.scrollHandler,
+        );
         const tabIndex = this.options.tabIndex;
         const $treeElement = this.element;
 
