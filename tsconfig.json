@@ -4,7 +4,7 @@
     "include": ["src/**/*"],
     "compilerOptions": {
         "esModuleInterop": true,
-        "lib": ["es2015", "es2015.iterable", "dom"],
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "module": "ESNext",
         "moduleResolution": "bundler",
         "noEmit": true,
