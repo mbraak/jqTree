@@ -5,7 +5,8 @@
     "compilerOptions": {
         "esModuleInterop": true,
         "lib": ["es2015", "es2015.iterable", "dom"],
-        "moduleResolution": "node",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "noEmit": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
