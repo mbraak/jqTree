@@ -4,8 +4,9 @@
     "include": ["src/**/*"],
     "compilerOptions": {
         "esModuleInterop": true,
-        "lib": ["es2015", "es2015.iterable", "dom"],
-        "moduleResolution": "node",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "noEmit": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
