@@ -9,9 +9,9 @@ import SaveStateHandler, { SavedState } from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
+import { getOffsetTop, isFunction } from "./util";
 import { Node } from "./node";
 import { getPosition } from "./position";
-import { isFunction } from "./util";
 import NodeElement from "./nodeElement";
 import FolderElement from "./nodeElement/folderElement";
 import { OnFinishOpenNode } from "./jqtreeMethodTypes";
@@ -468,9 +468,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const nodeTop = jQuery(node.element).offset()?.top ?? 0;
-        const treeTop = this.$el.offset()?.top ?? 0;
-        const top = nodeTop - treeTop;
+        const top =
+            getOffsetTop(node.element) -
+            getOffsetTop(this.$el.get(0) as HTMLElement);
 
         this.scrollHandler.scrollToY(top);
 
@@ -596,10 +596,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         } else {
             return null;
         }
-    }
-
-    public _getScrollLeft(): number {
-        return this.scrollHandler.getScrollLeft();
     }
 
     public init(): void {
@@ -1213,7 +1209,6 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         const getNodeElement = this._getNodeElement.bind(this);
         const getNodeElementForNode = this._getNodeElementForNode.bind(this);
         const getNodeById = this.getNodeById.bind(this);
-        const getScrollLeft = this._getScrollLeft.bind(this);
         const getSelectedNode = this.getSelectedNode.bind(this);
         const getTree = this.getTree.bind(this);
         const isFocusOnTree = this.isFocusOnTree.bind(this);
@@ -1223,6 +1218,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
         const $treeElement = this.element;
+        const treeElement = this.element.get(0) as HTMLElement;
         const triggerEvent = this._triggerEvent.bind(this);
 
         const selectNodeHandler = new SelectNodeHandler({
@@ -1260,6 +1256,13 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             saveState,
         });
 
+        const scrollHandler = new ScrollHandler({
+            refreshHitAreas,
+            treeElement,
+        });
+
+        const getScrollLeft = scrollHandler.getScrollLeft.bind(scrollHandler);
+
         const dndHandler = new DragAndDropHandler({
             autoEscape,
             getNodeElement,
@@ -1274,13 +1277,8 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             openNode,
             refreshElements,
             slide,
-            $treeElement,
+            treeElement,
             triggerEvent,
-        });
-
-        const scrollHandler = new ScrollHandler({
-            refreshHitAreas,
-            $treeElement,
         });
 
         const keyHandler = new KeyHandler({
@@ -1318,7 +1316,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
 
     private createFolderElement(node: Node) {
         const closedIconElement = this.renderer.closedIconElement;
-        const getScrollLeft = this._getScrollLeft.bind(this);
+        const getScrollLeft = this.scrollHandler.getScrollLeft.bind(
+            this.scrollHandler,
+        );
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
         const $treeElement = this.element;
@@ -1336,7 +1336,9 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
     }
 
     private createNodeElement(node: Node) {
-        const getScrollLeft = this._getScrollLeft.bind(this);
+        const getScrollLeft = this.scrollHandler.getScrollLeft.bind(
+            this.scrollHandler,
+        );
         const tabIndex = this.options.tabIndex;
         const $treeElement = this.element;
 

@@ -4,18 +4,18 @@ import createScrollParent from "./scrollHandler/createScrollParent";
 
 interface ScrollHandlerParams {
     refreshHitAreas: () => void;
-    $treeElement: JQuery<HTMLElement>;
+    treeElement: HTMLElement;
 }
 
 export default class ScrollHandler {
     private refreshHitAreas: () => void;
     private scrollParent?: ScrollParent;
-    private $treeElement: JQuery<HTMLElement>;
+    private treeElement: HTMLElement;
 
-    constructor({ refreshHitAreas, $treeElement }: ScrollHandlerParams) {
+    constructor({ refreshHitAreas, treeElement }: ScrollHandlerParams) {
         this.refreshHitAreas = refreshHitAreas;
         this.scrollParent = undefined;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
     }
 
     public checkScrolling(positionInfo: PositionInfo): void {
@@ -54,7 +54,7 @@ export default class ScrollHandler {
     private getScrollParent(): ScrollParent {
         if (!this.scrollParent) {
             this.scrollParent = createScrollParent(
-                this.$treeElement,
+                this.treeElement,
                 this.refreshHitAreas,
             );
         }
