@@ -1,21 +1,27 @@
 import type { ScrollParent } from "./types";
+import { getOffsetTop } from '../util'
 
 type HorizontalScrollDirection = "left" | "right";
 type VerticalScrollDirection = "bottom" | "top";
 
+interface Params {
+    refreshHitAreas: () => void;
+    treeElement: HTMLElement;
+}
+
 export default class DocumentScrollParent implements ScrollParent {
-    private $element: JQuery<HTMLElement>;
+    private documentScrollHeight?: number;
+    private documentScrollWidth?: number;
     private horizontalScrollDirection?: HorizontalScrollDirection;
     private horizontalScrollTimeout?: number;
     private refreshHitAreas: () => void;
+    private treeElement: HTMLElement;
     private verticalScrollDirection?: VerticalScrollDirection;
     private verticalScrollTimeout?: number;
-    private documentScrollHeight?: number;
-    private documentScrollWidth?: number;
 
-    constructor($element: JQuery<HTMLElement>, refreshHitAreas: () => void) {
-        this.$element = $element;
+    constructor({ refreshHitAreas, treeElement }: Params) {
         this.refreshHitAreas = refreshHitAreas;
+        this.treeElement = treeElement;
     }
 
     public checkHorizontalScrolling(pageX: number): void {
@@ -64,10 +70,9 @@ export default class DocumentScrollParent implements ScrollParent {
     }
 
     public scrollToY(top: number): void {
-        const offset = this.$element.offset();
-        const treeTop = offset ? offset.top : 0;
+        const treeTop = getOffsetTop(this.treeElement);
 
-        jQuery(document).scrollTop(top + treeTop);
+        document.documentElement.scrollTop = top + treeTop;
     }
 
     public stopScrolling() {
@@ -80,10 +85,8 @@ export default class DocumentScrollParent implements ScrollParent {
     private getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined {
-        const $document = jQuery(document);
-
-        const scrollLeft = $document.scrollLeft() || 0;
-        const windowWidth = jQuery(window).width() || 0;
+        const scrollLeft = document.documentElement.scrollLeft;
+        const windowWidth = window.innerWidth;
 
         const isNearRightEdge = pageX > windowWidth - 20;
         const isNearLeftEdge = pageX - scrollLeft < 20;
@@ -145,7 +148,7 @@ export default class DocumentScrollParent implements ScrollParent {
             return "top";
         }
 
-        const windowHeight = jQuery(window).height() || 0;
+        const windowHeight = window.innerHeight;
 
         if (windowHeight - (pageY - scrollTop) < 20 && this.canScrollDown()) {
             return "bottom";

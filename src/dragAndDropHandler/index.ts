@@ -5,6 +5,7 @@ import { PositionInfo } from "../mouseWidgetTypes";
 import NodeElement from "../nodeElement";
 import DragElement from "./dragElement";
 import HitAreasGenerator from "./hitAreasGenerator";
+import { getElementPosition } from "../util";
 import {
     OnCanMove,
     OnCanMoveTo,
@@ -44,7 +45,7 @@ interface DragAndDropHandlerParams {
     openNode: OpenNode;
     refreshElements: RefreshElements;
     slide: boolean;
-    $treeElement: JQuery<HTMLElement>;
+    treeElement: HTMLElement;
     triggerEvent: TriggerEvent;
 }
 
@@ -71,7 +72,7 @@ export class DragAndDropHandler {
     private previousGhost: DropHint | null;
     private refreshElements: RefreshElements;
     private slide: boolean;
-    private $treeElement: JQuery<HTMLElement>;
+    private treeElement: HTMLElement;
     private triggerEvent: TriggerEvent;
 
     constructor({
@@ -88,7 +89,7 @@ export class DragAndDropHandler {
         openNode,
         refreshElements,
         slide,
-        $treeElement,
+        treeElement,
         triggerEvent,
     }: DragAndDropHandlerParams) {
         this.autoEscape = autoEscape;
@@ -104,7 +105,7 @@ export class DragAndDropHandler {
         this.openNode = openNode;
         this.refreshElements = refreshElements;
         this.slide = slide;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
 
         this.hoveredArea = null;
@@ -147,19 +148,17 @@ export class DragAndDropHandler {
 
         this.refresh();
 
-        const offset = jQuery(positionInfo.target).offset();
-        const left = offset ? offset.left : 0;
-        const top = offset ? offset.top : 0;
+        const { left, top } = getElementPosition(positionInfo.target);
 
         const node = this.currentItem.node;
 
-        this.dragElement = new DragElement(
-            node.name,
-            positionInfo.pageX - left,
-            positionInfo.pageY - top,
-            this.$treeElement,
-            this.autoEscape ?? true,
-        );
+        this.dragElement = new DragElement({
+            autoEscape: this.autoEscape ?? true,
+            nodeName: node.name,
+            offsetX: positionInfo.pageX - left,
+            offsetY: positionInfo.pageY - top,
+            treeElement: this.treeElement,
+        });
 
         this.isDragging = true;
         this.currentItem.element.classList.add("jqtree-moving");
@@ -425,7 +424,8 @@ export class DragAndDropHandler {
 
                 if (tree) {
                     tree.moveNode(movedNode, targetNode, position);
-                    this.$treeElement.empty();
+
+                    this.treeElement.textContent = "";
                     this.refreshElements(null);
                 }
             };
@@ -450,22 +450,15 @@ export class DragAndDropHandler {
     private getTreeDimensions(): Dimensions {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
-        const offset = this.$treeElement.offset();
+        const treePosition = getElementPosition(this.treeElement);
+        const left = treePosition.left + this.getScrollLeft();
+        const top = treePosition.top;
 
-        if (!offset) {
-            return { left: 0, top: 0, right: 0, bottom: 0 };
-        } else {
-            const el = this.$treeElement;
-            const width = el.width() || 0;
-            const height = el.height() || 0;
-            const left = offset.left + this.getScrollLeft();
-
-            return {
-                left,
-                top: offset.top,
-                right: left + width,
-                bottom: offset.top + height + 16,
-            };
-        }
+        return {
+            left,
+            top,
+            right: left + this.treeElement.clientWidth,
+            bottom: top + this.treeElement.clientHeight + 16,
+        };
     }
 }

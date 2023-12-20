@@ -1,16 +1,16 @@
 import type { ScrollParent } from "./types";
+import { getElementPosition, getOffsetTop } from '../util'
 
 type HorizontalScrollDirection = "left" | "right";
 type VerticalScrollDirection = "bottom" | "top";
 
 interface Params {
-    $container: JQuery<HTMLElement>;
+    container: HTMLElement;
     refreshHitAreas: () => void;
-    $treeElement: JQuery<HTMLElement>;
 }
 
 export default class ContainerScrollParent implements ScrollParent {
-    private $container: JQuery<HTMLElement>;
+    private container: HTMLElement;
     private horizontalScrollDirection?: HorizontalScrollDirection;
     private horizontalScrollTimeout?: number;
     private refreshHitAreas: () => void;
@@ -19,8 +19,8 @@ export default class ContainerScrollParent implements ScrollParent {
     private verticalScrollTimeout?: number;
     private verticalScrollDirection?: VerticalScrollDirection;
 
-    constructor({ $container, refreshHitAreas }: Params) {
-        this.$container = $container;
+    constructor({ container, refreshHitAreas }: Params) {
+        this.container = container;
         this.refreshHitAreas = refreshHitAreas;
     }
 
@@ -66,12 +66,11 @@ export default class ContainerScrollParent implements ScrollParent {
     }
 
     public getScrollLeft(): number {
-        return this.$container.scrollLeft() || 0;
+        return this.container.scrollLeft;
     }
 
     public scrollToY(top: number): void {
-        const container = this.$container.get(0) as HTMLElement;
-        container.scrollTop = top;
+        this.container.scrollTop = top;
     }
 
     public stopScrolling() {
@@ -84,14 +83,9 @@ export default class ContainerScrollParent implements ScrollParent {
     private getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined {
-        const scrollParentOffset = this.$container.offset();
-        if (!scrollParentOffset) {
-            return undefined;
-        }
+        const scrollParentOffset = getElementPosition(this.container);
 
-        const container = this.$container.get(0) as HTMLElement;
-
-        const rightEdge = scrollParentOffset.left + container.clientWidth;
+        const rightEdge = scrollParentOffset.left + this.container.clientWidth;
         const leftEdge = scrollParentOffset.left;
         const isNearRightEdge = pageX > rightEdge - 20;
         const isNearLeftEdge = pageX < leftEdge + 20;
@@ -125,9 +119,8 @@ export default class ContainerScrollParent implements ScrollParent {
         }
 
         const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
-        const container = this.$container.get(0) as HTMLElement;
 
-        container.scrollBy({
+        this.container.scrollBy({
             left: distance,
             top: 0,
             behavior: "instant",
@@ -144,9 +137,8 @@ export default class ContainerScrollParent implements ScrollParent {
         }
 
         const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        const container = this.$container.get(0) as HTMLElement;
 
-        container.scrollBy({
+        this.container.scrollBy({
             left: 0,
             top: distance,
             behavior: "instant",
@@ -159,7 +151,7 @@ export default class ContainerScrollParent implements ScrollParent {
 
     private getScrollParentTop() {
         if (this.scrollParentTop == null) {
-            this.scrollParentTop = this.$container.offset()?.top || 0;
+            this.scrollParentTop = getOffsetTop(this.container)
         }
 
         return this.scrollParentTop;
@@ -167,9 +159,7 @@ export default class ContainerScrollParent implements ScrollParent {
 
     private getScrollParentBottom() {
         if (this.scrollParentBottom == null) {
-            this.scrollParentBottom =
-                this.getScrollParentTop() +
-                (this.$container.innerHeight() ?? 0);
+            this.scrollParentBottom = this.getScrollParentTop() + this.container.clientHeight;
         }
 
         return this.scrollParentBottom;
