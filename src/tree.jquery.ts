@@ -3,7 +3,7 @@ import { DragAndDropHandler } from "./dragAndDropHandler";
 import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
 import KeyHandler from "./keyHandler";
-import MouseWidget from "./mouse.widget";
+import MouseHandler from "./mouseHandler";
 import { PositionInfo } from "./mouseWidgetTypes";
 import SaveStateHandler, { SavedState } from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
@@ -30,7 +30,7 @@ interface SelectNodeOptions {
 const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";
 
-export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
+export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     protected static defaults: JQTreeOptions = {
         animationSpeed: "fast",
         autoEscape: true,
@@ -70,17 +70,18 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         useContextMenu: true,
     };
 
-    public element: JQuery;
-    public tree: Node;
-    public dndHandler: DragAndDropHandler;
-    public renderer: ElementsRenderer;
-    public dataLoader: DataLoader;
-    public scrollHandler: ScrollHandler;
-    public selectNodeHandler: SelectNodeHandler;
-
+    private element: JQuery;
     private isInitialized: boolean;
-    private saveStateHandler: SaveStateHandler;
+    private tree: Node;
+
+    private dataLoader: DataLoader;
+    private dndHandler: DragAndDropHandler;
     private keyHandler: KeyHandler;
+    private mouseHandler: MouseHandler;
+    private renderer: ElementsRenderer;
+    private saveStateHandler: SaveStateHandler;
+    private scrollHandler: ScrollHandler;
+    private selectNodeHandler: SelectNodeHandler;
 
     public toggle(node: Node, slideParam: null | boolean = null): JQuery {
         if (!node) {
@@ -627,6 +628,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         this.element.off();
 
         this.keyHandler.deinit();
+        this.mouseHandler.deinit();
 
         this.tree = new Node({}, true);
 
@@ -669,7 +671,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
         }
     }
 
-    protected getMouseDelay(): number {
+    private getMouseDelay(): number {
         return this.options.startDndDelay ?? 0;
     }
 
@@ -1233,6 +1235,7 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
         const removeFromSelection =
             selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
+        const getMouseDelay = this.getMouseDelay.bind(this);
 
         const dataLoader = new DataLoader({
             dataFilter,
@@ -1305,9 +1308,24 @@ export class JqTreeWidget extends MouseWidget<JQTreeOptions> {
             tabIndex,
         });
 
+        const onMouseCapture = this.mouseCapture.bind(this);
+        const onMouseDrag = this.mouseDrag.bind(this);
+        const onMouseStart = this.mouseStart.bind(this);
+        const onMouseStop = this.mouseStop.bind(this);
+
+        const mouseHandler = new MouseHandler({
+            element: treeElement,
+            getMouseDelay,
+            onMouseCapture,
+            onMouseDrag,
+            onMouseStart,
+            onMouseStop,
+        });
+
         this.dataLoader = dataLoader;
         this.dndHandler = dndHandler;
         this.keyHandler = keyHandler;
+        this.mouseHandler = mouseHandler;
         this.renderer = renderer;
         this.saveStateHandler = saveStateHandler;
         this.scrollHandler = scrollHandler;
