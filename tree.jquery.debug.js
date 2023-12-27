@@ -273,6 +273,7 @@ var jqtree = (function (exports) {
           autoEscape,
           getNodeElement,
           getNodeElementForNode,
+          getScrollLeft,
           getTree,
           onCanMove,
           onCanMoveTo,
@@ -288,6 +289,7 @@ var jqtree = (function (exports) {
         this.autoEscape = autoEscape;
         this.getNodeElement = getNodeElement;
         this.getNodeElementForNode = getNodeElementForNode;
+        this.getScrollLeft = getScrollLeft;
         this.getTree = getTree;
         this.onCanMove = onCanMove;
         this.onCanMoveTo = onCanMoveTo;
@@ -537,10 +539,9 @@ var jqtree = (function (exports) {
       getTreeDimensions() {
         // Return the dimensions of the tree. Add a margin to the bottom to allow
         // to drag-and-drop after the last element.
-        const {
-          left,
-          top
-        } = getElementPosition(this.treeElement);
+        const treePosition = getElementPosition(this.treeElement);
+        const left = treePosition.left + this.getScrollLeft();
+        const top = treePosition.top;
         return {
           left,
           top,
@@ -978,152 +979,48 @@ var jqtree = (function (exports) {
       }
     }
 
-    const register = (widgetClass, widgetName) => {
-      const getDataKey = () => `simple_widget_${widgetName}`;
-      const getWidgetData = (el, dataKey) => {
-        const widget = jQuery.data(el, dataKey);
-        if (widget && widget instanceof SimpleWidget) {
-          return widget;
-        } else {
-          return null;
-        }
-      };
-      const createWidget = ($el, options) => {
-        const dataKey = getDataKey();
-        for (const el of $el.get()) {
-          const existingWidget = getWidgetData(el, dataKey);
-          if (!existingWidget) {
-            const simpleWidgetClass = widgetClass;
-            const widget = new simpleWidgetClass(el, options);
-            if (!jQuery.data(el, dataKey)) {
-              jQuery.data(el, dataKey, widget);
-            }
-
-            // Call init after setting data, so we can call methods
-            widget.init();
-          }
-        }
-        return $el;
-      };
-      const destroyWidget = $el => {
-        const dataKey = getDataKey();
-        for (const el of $el.get()) {
-          const widget = getWidgetData(el, dataKey);
-          if (widget) {
-            widget.destroy();
-          }
-          jQuery.removeData(el, dataKey);
-        }
-      };
-      const callFunction = ($el, functionName, args) => {
-        let result = null;
-        for (const el of $el.get()) {
-          const widget = jQuery.data(el, getDataKey());
-          if (widget && widget instanceof SimpleWidget) {
-            const simpleWidget = widget;
-            const widgetFunction = simpleWidget[functionName];
-            if (widgetFunction && typeof widgetFunction === "function") {
-              result = widgetFunction.apply(widget, args);
-            }
-          }
-        }
-        return result;
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      jQuery.fn[widgetName] = function (argument1) {
-        if (!argument1) {
-          return createWidget(this, null);
-        } else if (typeof argument1 === "object") {
-          const options = argument1;
-          return createWidget(this, options);
-        } else if (typeof argument1 === "string" && argument1[0] !== "_") {
-          const functionName = argument1;
-          if (functionName === "destroy") {
-            return destroyWidget(this);
-          } else if (functionName === "get_widget_class") {
-            return widgetClass;
-          } else {
-            for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-              args[_key - 1] = arguments[_key];
-            }
-            return callFunction(this, functionName, args);
-          }
-        } else {
-          return undefined;
-        }
-      };
-    };
-    class SimpleWidget {
-      static register(widgetClass, widgetName) {
-        register(widgetClass, widgetName);
-      }
-      static defaults = {};
-      constructor(el, options) {
-        this.$el = jQuery(el);
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const defaults = this.constructor["defaults"];
-        this.options = {
-          ...defaults,
-          ...options
-        };
-      }
-      destroy() {
-        this.deinit();
-      }
-      init() {
-        //
-      }
-      deinit() {
-        //
-      }
-    }
-
-    /*
-    This widget does the same a the mouse widget in jqueryui.
-    */
     const getPositionInfoFromMouseEvent = e => ({
+      originalEvent: e,
       pageX: e.pageX,
       pageY: e.pageY,
-      target: e.target,
-      originalEvent: e
+      target: e.target
     });
     const getPositionInfoFromTouch = (touch, e) => ({
+      originalEvent: e,
       pageX: touch.pageX,
       pageY: touch.pageY,
-      target: touch.target,
-      originalEvent: e
+      target: touch.target
     });
-    class MouseWidget extends SimpleWidget {
-      init() {
-        const element = this.$el.get(0);
-        if (element) {
-          element.addEventListener("mousedown", this.mouseDown, {
-            passive: false
-          });
-          element.addEventListener("touchstart", this.touchStart, {
-            passive: false
-          });
-        }
+    class MouseHandler {
+      constructor(_ref) {
+        let {
+          element,
+          getMouseDelay,
+          onMouseCapture,
+          onMouseDrag,
+          onMouseStart,
+          onMouseStop
+        } = _ref;
+        this.element = element;
+        this.getMouseDelay = getMouseDelay;
+        this.onMouseCapture = onMouseCapture;
+        this.onMouseDrag = onMouseDrag;
+        this.onMouseStart = onMouseStart;
+        this.onMouseStop = onMouseStop;
+        element.addEventListener("mousedown", this.mouseDown, {
+          passive: false
+        });
+        element.addEventListener("touchstart", this.touchStart, {
+          passive: false
+        });
         this.isMouseStarted = false;
         this.mouseDelayTimer = null;
         this.isMouseDelayMet = false;
         this.mouseDownInfo = null;
       }
       deinit() {
-        const el = this.$el.get(0);
-        if (el) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-          el.removeEventListener("mousedown", this.mouseDown, {
-            passive: false
-          });
-
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-          el.removeEventListener("touchstart", this.touchStart, {
-            passive: false
-          });
-        }
+        this.element.removeEventListener("mousedown", this.mouseDown);
+        this.element.removeEventListener("touchstart", this.touchStart);
         this.removeMouseMoveEventListeners();
       }
       mouseDown = e => {
@@ -1142,7 +1039,7 @@ var jqtree = (function (exports) {
           this.handleMouseUp(positionInfo);
         }
         this.mouseDownInfo = positionInfo;
-        if (!this.mouseCapture(positionInfo)) {
+        if (!this.onMouseCapture(positionInfo)) {
           return false;
         }
         this.handleStartMouse();
@@ -1184,7 +1081,7 @@ var jqtree = (function (exports) {
       };
       handleMouseMove(e, positionInfo) {
         if (this.isMouseStarted) {
-          this.mouseDrag(positionInfo);
+          this.onMouseDrag(positionInfo);
           if (e.cancelable) {
             e.preventDefault();
           }
@@ -1194,10 +1091,10 @@ var jqtree = (function (exports) {
           return;
         }
         if (this.mouseDownInfo) {
-          this.isMouseStarted = this.mouseStart(this.mouseDownInfo) !== false;
+          this.isMouseStarted = this.onMouseStart(this.mouseDownInfo) !== false;
         }
         if (this.isMouseStarted) {
-          this.mouseDrag(positionInfo);
+          this.onMouseDrag(positionInfo);
           if (e.cancelable) {
             e.preventDefault();
           }
@@ -1214,26 +1111,14 @@ var jqtree = (function (exports) {
         this.mouseDownInfo = null;
         if (this.isMouseStarted) {
           this.isMouseStarted = false;
-          this.mouseStop(positionInfo);
+          this.onMouseStop(positionInfo);
         }
       }
       removeMouseMoveEventListeners() {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        document.removeEventListener("mousemove", this.mouseMove, {
-          passive: false
-        });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        document.removeEventListener("touchmove", this.touchMove, {
-          passive: false
-        });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        document.removeEventListener("mouseup", this.mouseUp, {
-          passive: false
-        });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        document.removeEventListener("touchend", this.touchEnd, {
-          passive: false
-        });
+        document.removeEventListener("mousemove", this.mouseMove);
+        document.removeEventListener("touchmove", this.touchMove);
+        document.removeEventListener("mouseup", this.mouseUp);
+        document.removeEventListener("touchend", this.touchEnd);
       }
       touchStart = e => {
         if (!e) {
@@ -1889,6 +1774,108 @@ var jqtree = (function (exports) {
         } else {
           this.selectedSingleNode = node;
         }
+      }
+    }
+
+    const register = (widgetClass, widgetName) => {
+      const getDataKey = () => `simple_widget_${widgetName}`;
+      const getWidgetData = (el, dataKey) => {
+        const widget = jQuery.data(el, dataKey);
+        if (widget && widget instanceof SimpleWidget) {
+          return widget;
+        } else {
+          return null;
+        }
+      };
+      const createWidget = ($el, options) => {
+        const dataKey = getDataKey();
+        for (const el of $el.get()) {
+          const existingWidget = getWidgetData(el, dataKey);
+          if (!existingWidget) {
+            const simpleWidgetClass = widgetClass;
+            const widget = new simpleWidgetClass(el, options);
+            if (!jQuery.data(el, dataKey)) {
+              jQuery.data(el, dataKey, widget);
+            }
+
+            // Call init after setting data, so we can call methods
+            widget.init();
+          }
+        }
+        return $el;
+      };
+      const destroyWidget = $el => {
+        const dataKey = getDataKey();
+        for (const el of $el.get()) {
+          const widget = getWidgetData(el, dataKey);
+          if (widget) {
+            widget.destroy();
+          }
+          jQuery.removeData(el, dataKey);
+        }
+      };
+      const callFunction = ($el, functionName, args) => {
+        let result = null;
+        for (const el of $el.get()) {
+          const widget = jQuery.data(el, getDataKey());
+          if (widget && widget instanceof SimpleWidget) {
+            const simpleWidget = widget;
+            const widgetFunction = simpleWidget[functionName];
+            if (widgetFunction && typeof widgetFunction === "function") {
+              result = widgetFunction.apply(widget, args);
+            }
+          }
+        }
+        return result;
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      jQuery.fn[widgetName] = function (argument1) {
+        if (!argument1) {
+          return createWidget(this, null);
+        } else if (typeof argument1 === "object") {
+          const options = argument1;
+          return createWidget(this, options);
+        } else if (typeof argument1 === "string" && argument1[0] !== "_") {
+          const functionName = argument1;
+          if (functionName === "destroy") {
+            return destroyWidget(this);
+          } else if (functionName === "get_widget_class") {
+            return widgetClass;
+          } else {
+            for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+              args[_key - 1] = arguments[_key];
+            }
+            return callFunction(this, functionName, args);
+          }
+        } else {
+          return undefined;
+        }
+      };
+    };
+    class SimpleWidget {
+      static register(widgetClass, widgetName) {
+        register(widgetClass, widgetName);
+      }
+      static defaults = {};
+      constructor(el, options) {
+        this.$el = jQuery(el);
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const defaults = this.constructor["defaults"];
+        this.options = {
+          ...defaults,
+          ...options
+        };
+      }
+      destroy() {
+        this.deinit();
+      }
+      init() {
+        //
+      }
+      deinit() {
+        //
       }
     }
 
@@ -2641,7 +2628,7 @@ var jqtree = (function (exports) {
 
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
-    class JqTreeWidget extends MouseWidget {
+    class JqTreeWidget extends SimpleWidget {
       static defaults = {
         animationSpeed: "fast",
         autoEscape: true,
@@ -3035,9 +3022,6 @@ var jqtree = (function (exports) {
           return null;
         }
       }
-      _getScrollLeft() {
-        return this.scrollHandler.getScrollLeft();
-      }
       init() {
         super.init();
         this.element = this.$el;
@@ -3058,6 +3042,7 @@ var jqtree = (function (exports) {
         this.element.empty();
         this.element.off();
         this.keyHandler.deinit();
+        this.mouseHandler.deinit();
         this.tree = new Node({}, true);
         super.deinit();
       }
@@ -3544,6 +3529,7 @@ var jqtree = (function (exports) {
         const getSelectedNodes = selectNodeHandler.getSelectedNodes.bind(selectNodeHandler);
         const isNodeSelected = selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
         const removeFromSelection = selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
+        const getMouseDelay = this.getMouseDelay.bind(this);
         const dataLoader = new DataLoader({
           dataFilter,
           loadData,
@@ -3564,10 +3550,16 @@ var jqtree = (function (exports) {
           removeFromSelection,
           saveState
         });
+        const scrollHandler = new ScrollHandler({
+          refreshHitAreas,
+          treeElement
+        });
+        const getScrollLeft = scrollHandler.getScrollLeft.bind(scrollHandler);
         const dndHandler = new DragAndDropHandler({
           autoEscape,
           getNodeElement,
           getNodeElementForNode,
+          getScrollLeft,
           getTree,
           onCanMove,
           onDragMove,
@@ -3579,10 +3571,6 @@ var jqtree = (function (exports) {
           slide,
           treeElement,
           triggerEvent
-        });
-        const scrollHandler = new ScrollHandler({
-          refreshHitAreas,
-          treeElement
         });
         const keyHandler = new KeyHandler({
           closeNode,
@@ -3606,9 +3594,22 @@ var jqtree = (function (exports) {
           showEmptyFolder,
           tabIndex
         });
+        const onMouseCapture = this.mouseCapture.bind(this);
+        const onMouseDrag = this.mouseDrag.bind(this);
+        const onMouseStart = this.mouseStart.bind(this);
+        const onMouseStop = this.mouseStop.bind(this);
+        const mouseHandler = new MouseHandler({
+          element: treeElement,
+          getMouseDelay,
+          onMouseCapture,
+          onMouseDrag,
+          onMouseStart,
+          onMouseStop
+        });
         this.dataLoader = dataLoader;
         this.dndHandler = dndHandler;
         this.keyHandler = keyHandler;
+        this.mouseHandler = mouseHandler;
         this.renderer = renderer;
         this.saveStateHandler = saveStateHandler;
         this.scrollHandler = scrollHandler;
@@ -3616,7 +3617,7 @@ var jqtree = (function (exports) {
       }
       createFolderElement(node) {
         const closedIconElement = this.renderer.closedIconElement;
-        const getScrollLeft = this._getScrollLeft.bind(this);
+        const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
         const $treeElement = this.element;
@@ -3632,7 +3633,7 @@ var jqtree = (function (exports) {
         });
       }
       createNodeElement(node) {
-        const getScrollLeft = this._getScrollLeft.bind(this);
+        const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const tabIndex = this.options.tabIndex;
         const $treeElement = this.element;
         return new NodeElement({
