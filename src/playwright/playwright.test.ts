@@ -3,6 +3,8 @@ import {
     boundingBox,
     dragAndDrop,
     findNodeElement,
+    getNodeRect,
+    getSelectedNodeName,
     getTreeStructure,
     moveMouseToNode,
     selectNode,
@@ -72,6 +74,8 @@ test.describe("without dragAndDrop", () => {
         const saurischia = await findNodeElement(page, "Saurischia");
         await selectNode(saurischia);
 
+        expect(await getSelectedNodeName(page)).toBe("Saurischia");
+
         const screenshot = await page.screenshot();
         expect(screenshot).toMatchSnapshot();
     });
@@ -113,6 +117,50 @@ test.describe("with dragAndDrop", () => {
 
         const screenshot = await page.screenshot();
         expect(screenshot).toMatchSnapshot();
+    });
+
+    test("moves a node with touch events", async ({ page }) => {
+        const client = await page.context().newCDPSession(page);
+
+        const box1 = await getNodeRect(page, "Herrerasaurians");
+
+        await client.send("Input.dispatchTouchEvent", {
+            type: "touchStart",
+            touchPoints: [{ x: box1.x + 10, y: box1.y + box1.height / 2 }],
+        });
+
+        await sleep(page, 200);
+
+        const box2 = await getNodeRect(page, "Ornithischians");
+        await client.send("Input.dispatchTouchEvent", {
+            type: "touchEnd",
+            touchPoints: [{ x: box2.x + 10, y: box2.y + box2.height / 2 }],
+        });
+
+        const structure = await getTreeStructure(page);
+
+        expect(structure).toEqual([
+            expect.objectContaining({
+                name: "Saurischia",
+                children: [
+                    expect.objectContaining({ name: "Theropods" }),
+                    expect.objectContaining({ name: "Sauropodomorphs" }),
+                ],
+            }),
+            expect.objectContaining({
+                name: "Ornithischians",
+                children: [
+                    expect.objectContaining({ name: "Herrerasaurians" }),
+                    expect.objectContaining({ name: "Heterodontosaurids" }),
+                    expect.objectContaining({ name: "Thyreophorans" }),
+                    expect.objectContaining({ name: "Ornithopods" }),
+                    expect.objectContaining({
+                        name: "Pachycephalosaurians",
+                    }),
+                    expect.objectContaining({ name: "Ceratopsians" }),
+                ],
+            }),
+        ]);
     });
 });
 

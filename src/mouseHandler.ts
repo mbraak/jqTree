@@ -192,7 +192,7 @@ class MouseHandler {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
@@ -210,7 +210,7 @@ class MouseHandler {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
@@ -228,7 +228,7 @@ class MouseHandler {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
