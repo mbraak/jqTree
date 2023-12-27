@@ -635,7 +635,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         super.deinit();
     }
 
-    protected mouseCapture(positionInfo: PositionInfo): boolean | null {
+    private mouseCapture(positionInfo: PositionInfo): boolean | null {
         if (this.options.dragAndDrop) {
             return this.dndHandler.mouseCapture(positionInfo);
         } else {
@@ -643,7 +643,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    protected mouseStart(positionInfo: PositionInfo): boolean {
+    private mouseStart(positionInfo: PositionInfo): boolean {
         if (this.options.dragAndDrop) {
             return this.dndHandler.mouseStart(positionInfo);
         } else {
@@ -651,7 +651,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    protected mouseDrag(positionInfo: PositionInfo): boolean {
+    private mouseDrag(positionInfo: PositionInfo): boolean {
         if (this.options.dragAndDrop) {
             const result = this.dndHandler.mouseDrag(positionInfo);
 
@@ -662,7 +662,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    protected mouseStop(positionInfo: PositionInfo): boolean {
+    private mouseStop(positionInfo: PositionInfo): boolean {
         if (this.options.dragAndDrop) {
             this.scrollHandler.stopScrolling();
             return this.dndHandler.mouseStop(positionInfo);
