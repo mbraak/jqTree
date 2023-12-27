@@ -671,10 +671,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private getMouseDelay(): number {
-        return this.options.startDndDelay ?? 0;
-    }
-
     private initData(): void {
         if (this.options.data) {
             this.doLoadData(this.options.data, null);
@@ -1235,7 +1231,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
         const removeFromSelection =
             selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
-        const getMouseDelay = this.getMouseDelay.bind(this);
+        const getMouseDelay = () => this.options.startDndDelay ?? 0;
 
         const dataLoader = new DataLoader({
             dataFilter,
