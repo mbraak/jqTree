@@ -1,8 +1,8 @@
 export interface PositionInfo {
+    originalEvent: Event;
     pageX: number | undefined;
     pageY: number | undefined;
     target: HTMLElement;
-    originalEvent: Event;
 }
 
 export const getPositionInfoFromMouseEvent = (e: MouseEvent): PositionInfo => ({
