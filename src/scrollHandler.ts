@@ -36,18 +36,10 @@ export default class ScrollHandler {
     }
 
     private checkVerticalScrolling(positionInfo: PositionInfo): void {
-        if (positionInfo.pageY == null) {
-            return;
-        }
-
         this.getScrollParent().checkVerticalScrolling(positionInfo.pageY);
     }
 
     private checkHorizontalScrolling(positionInfo: PositionInfo): void {
-        if (positionInfo.pageX == null) {
-            return;
-        }
-
         this.getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
     }
 

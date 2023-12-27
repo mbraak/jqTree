@@ -138,11 +138,7 @@ export class DragAndDropHandler {
     }
 
     public mouseStart(positionInfo: PositionInfo): boolean {
-        if (
-            !this.currentItem ||
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
+        if (!this.currentItem) {
             return false;
         }
 
@@ -167,12 +163,7 @@ export class DragAndDropHandler {
     }
 
     public mouseDrag(positionInfo: PositionInfo): boolean {
-        if (
-            !this.currentItem ||
-            !this.dragElement ||
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
+        if (!this.currentItem || !this.dragElement) {
             return false;
         }
 

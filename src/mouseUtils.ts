@@ -1,7 +1,7 @@
 export interface PositionInfo {
     originalEvent: Event;
-    pageX: number | undefined;
-    pageY: number | undefined;
+    pageX: number;
+    pageY: number;
     target: HTMLElement;
 }
 
