@@ -237,7 +237,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         const [slide, onFinished] = parseParams();
 
-        this._openNode(node, slide, onFinished);
+        this.openNodeInternal(node, slide, onFinished);
         return this.element;
     }
 
@@ -516,7 +516,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         return __version__;
     }
 
-    public _openNode(
+    private openNodeInternal(
         node: Node,
         slide = true,
         onFinished?: OnFinishOpenNode,
@@ -849,7 +849,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
             const loadAndOpenNode = (node: Node): void => {
                 loadingCount += 1;
-                this._openNode(node, false, () => {
+                this.openNodeInternal(node, false, () => {
                     loadingCount -= 1;
                     openNodes();
                 });
@@ -864,7 +864,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
                         return false;
                     } else {
-                        this._openNode(node, false);
+                        this.openNodeInternal(node, false);
 
                         return level !== maxLevel;
                     }
@@ -1157,7 +1157,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         node.is_loading = true;
 
         this.doLoadDataFromUrl(null, node, () => {
-            this._openNode(node, slide, onFinished);
+            this.openNodeInternal(node, slide, onFinished);
         });
     }
 
@@ -1211,7 +1211,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const getTree = this.getTree.bind(this);
         const isFocusOnTree = this.isFocusOnTree.bind(this);
         const loadData = this.loadData.bind(this);
-        const openNode = this._openNode.bind(this);
+        const openNode = this.openNodeInternal.bind(this);
         const refreshElements = this.refreshElements.bind(this);
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
