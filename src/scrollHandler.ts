@@ -1,4 +1,4 @@
-import { PositionInfo } from "./mouseWidgetTypes";
+import { PositionInfo } from "./mouseUtils";
 import { ScrollParent } from "./scrollHandler/types";
 import createScrollParent from "./scrollHandler/createScrollParent";
 

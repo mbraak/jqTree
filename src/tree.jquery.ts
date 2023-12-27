@@ -4,7 +4,7 @@ import ElementsRenderer from "./elementsRenderer";
 import DataLoader, { HandleFinishedLoading } from "./dataLoader";
 import KeyHandler from "./keyHandler";
 import MouseHandler from "./mouseHandler";
-import { PositionInfo } from "./mouseWidgetTypes";
+import { PositionInfo } from "./mouseUtils";
 import SaveStateHandler, { SavedState } from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
