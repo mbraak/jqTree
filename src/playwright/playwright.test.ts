@@ -117,7 +117,7 @@ test.describe("with dragAndDrop", () => {
 });
 
 test.describe("autoscroll when the window is scrollable", () => {
-    test("it scrolls vertically when the users drags an element to the bottom ", async ({
+    test("it scrolls vertically when the users drags an element to the bottom", async ({
         baseURL,
         page,
     }) => {
