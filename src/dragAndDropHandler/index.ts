@@ -1,7 +1,7 @@
 import { Node } from "../node";
 import { getPositionName, Position } from "../position";
 import { DropHint, HitArea } from "./types";
-import { PositionInfo } from "../mouseWidgetTypes";
+import { PositionInfo } from "../mouseUtils";
 import NodeElement from "../nodeElement";
 import DragElement from "./dragElement";
 import HitAreasGenerator from "./hitAreasGenerator";
@@ -138,11 +138,7 @@ export class DragAndDropHandler {
     }
 
     public mouseStart(positionInfo: PositionInfo): boolean {
-        if (
-            !this.currentItem ||
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
+        if (!this.currentItem) {
             return false;
         }
 
@@ -167,12 +163,7 @@ export class DragAndDropHandler {
     }
 
     public mouseDrag(positionInfo: PositionInfo): boolean {
-        if (
-            !this.currentItem ||
-            !this.dragElement ||
-            positionInfo.pageX === undefined ||
-            positionInfo.pageY === undefined
-        ) {
+        if (!this.currentItem || !this.dragElement) {
             return false;
         }
 

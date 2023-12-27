@@ -110,7 +110,10 @@ export const getTreeStructure = async (page: Page) => {
     return JSON.parse(structure) as JQTreeMatchers.TreeStructure;
 };
 
-const getNodeRect = async (page: Page, title: string): Promise<BoundingBox> => {
+export const getNodeRect = async (
+    page: Page,
+    title: string,
+): Promise<BoundingBox> => {
     const titleElement = await locateTitle(page, title).elementHandle();
 
     if (!titleElement) {
@@ -139,4 +142,12 @@ export const dragAndDrop = async (
 
     await moveMouseToNode(page, toTitle);
     await page.mouse.up();
+};
+
+export const getSelectedNodeName = async (page: Page) => {
+    return await page.evaluate(`
+            const $tree = jQuery("#tree1");
+            const node = $tree.tree('getSelectedNode');
+            node?.name;
+        `);
 };

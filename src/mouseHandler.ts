@@ -1,21 +1,8 @@
-import { PositionInfo } from "./mouseWidgetTypes";
-
-const getPositionInfoFromMouseEvent = (e: MouseEvent): PositionInfo => ({
-    originalEvent: e,
-    pageX: e.pageX,
-    pageY: e.pageY,
-    target: e.target as HTMLElement,
-});
-
-const getPositionInfoFromTouch = (
-    touch: Touch,
-    e: TouchEvent,
-): PositionInfo => ({
-    originalEvent: e,
-    pageX: touch.pageX,
-    pageY: touch.pageY,
-    target: touch.target as HTMLElement,
-});
+import {
+    getPositionInfoFromMouseEvent,
+    getPositionInfoFromTouch,
+    PositionInfo,
+} from "./mouseUtils";
 
 interface MouseHandlerParams {
     element: HTMLElement;
@@ -205,7 +192,7 @@ class MouseHandler {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
@@ -223,7 +210,7 @@ class MouseHandler {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
@@ -241,7 +228,7 @@ class MouseHandler {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
