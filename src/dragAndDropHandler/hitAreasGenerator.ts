@@ -6,8 +6,6 @@ import iterateVisibleNodes from "./iterateVisibleNodes";
 
 class HitAreasGenerator {
     private currentNode: Node;
-    private lastTop: number;
-    private positions: HitArea[];
     private tree: Node;
     private treeBottom: number;
 
@@ -18,18 +16,103 @@ class HitAreasGenerator {
     }
 
     public generate(): HitArea[] {
-        this.positions = [];
-        this.lastTop = 0;
+        const positions: HitArea[] = [];
+        let lastTop = 0;
+
+        const addPosition = (node: Node, position: number, top: number) => {
+            const area = {
+                top,
+                bottom: 0,
+                node,
+                position,
+            };
+
+            positions.push(area);
+            lastTop = top;
+        };
+
+        const handleAfterOpenFolder = (node: Node, nextNode: Node | null) => {
+            if (node === this.currentNode || nextNode === this.currentNode) {
+                // Cannot move before or after current item
+                addPosition(node, Position.None, lastTop);
+            } else {
+                addPosition(node, Position.After, lastTop);
+            }
+        };
+
+        const handleClosedFolder = (
+            node: Node,
+            nextNode: Node | null,
+            element: HTMLElement,
+        ) => {
+            const top = getOffsetTop(element);
+
+            if (node === this.currentNode) {
+                // Cannot move after current item
+                addPosition(node, Position.None, top);
+            } else {
+                addPosition(node, Position.Inside, top);
+
+                // Cannot move before current item
+                if (nextNode !== this.currentNode) {
+                    addPosition(node, Position.After, top);
+                }
+            }
+        };
+
+        const handleFirstNode = (node: Node) => {
+            if (node !== this.currentNode) {
+                addPosition(node, Position.Before, getOffsetTop(node.element));
+            }
+        };
+
+        const handleNode = (
+            node: Node,
+            nextNode: Node | null,
+            element: HTMLElement,
+        ) => {
+            const top = getOffsetTop(element);
+
+            if (node === this.currentNode) {
+                // Cannot move inside current item
+                addPosition(node, Position.None, top);
+            } else {
+                addPosition(node, Position.Inside, top);
+            }
+
+            if (nextNode === this.currentNode || node === this.currentNode) {
+                // Cannot move before or after current item
+                addPosition(node, Position.None, top);
+            } else {
+                addPosition(node, Position.After, top);
+            }
+        };
+
+        const handleOpenFolder = (node: Node, element: HTMLElement) => {
+            if (node === this.currentNode) {
+                // Cannot move inside current item
+                // Stop iterating
+                return false;
+            }
+
+            // Cannot move before current item
+            if (node.children[0] !== this.currentNode) {
+                addPosition(node, Position.Inside, getOffsetTop(element));
+            }
+
+            // Continue iterating
+            return true;
+        };
 
         iterateVisibleNodes(this.tree, {
-            handleAfterOpenFolder: this.handleAfterOpenFolder.bind(this),
-            handleClosedFolder: this.handleClosedFolder.bind(this),
-            handleFirstNode: this.handleFirstNode.bind(this),
-            handleNode: this.handleNode.bind(this),
-            handleOpenFolder: this.handleOpenFolder.bind(this),
+            handleAfterOpenFolder,
+            handleClosedFolder,
+            handleFirstNode,
+            handleNode,
+            handleOpenFolder,
         });
 
-        return this.generateHitAreas(this.positions);
+        return this.generateHitAreas(positions);
     }
 
     private generateHitAreas(positions: HitArea[]): HitArea[] {
@@ -61,91 +144,6 @@ class HitAreasGenerator {
         );
 
         return hitAreas;
-    }
-
-    private handleOpenFolder(node: Node, element: HTMLElement): boolean {
-        if (node === this.currentNode) {
-            // Cannot move inside current item
-            // Stop iterating
-            return false;
-        }
-
-        // Cannot move before current item
-        if (node.children[0] !== this.currentNode) {
-            this.addPosition(node, Position.Inside, getOffsetTop(element));
-        }
-
-        // Continue iterating
-        return true;
-    }
-
-    private handleClosedFolder(
-        node: Node,
-        nextNode: Node | null,
-        element: HTMLElement,
-    ): void {
-        const top = getOffsetTop(element);
-
-        if (node === this.currentNode) {
-            // Cannot move after current item
-            this.addPosition(node, Position.None, top);
-        } else {
-            this.addPosition(node, Position.Inside, top);
-
-            // Cannot move before current item
-            if (nextNode !== this.currentNode) {
-                this.addPosition(node, Position.After, top);
-            }
-        }
-    }
-
-    private handleFirstNode(node: Node): void {
-        if (node !== this.currentNode) {
-            this.addPosition(node, Position.Before, getOffsetTop(node.element));
-        }
-    }
-
-    private handleAfterOpenFolder(node: Node, nextNode: Node | null): void {
-        if (node === this.currentNode || nextNode === this.currentNode) {
-            // Cannot move before or after current item
-            this.addPosition(node, Position.None, this.lastTop);
-        } else {
-            this.addPosition(node, Position.After, this.lastTop);
-        }
-    }
-
-    private handleNode(
-        node: Node,
-        nextNode: Node | null,
-        element: HTMLElement,
-    ): void {
-        const top = getOffsetTop(element);
-
-        if (node === this.currentNode) {
-            // Cannot move inside current item
-            this.addPosition(node, Position.None, top);
-        } else {
-            this.addPosition(node, Position.Inside, top);
-        }
-
-        if (nextNode === this.currentNode || node === this.currentNode) {
-            // Cannot move before or after current item
-            this.addPosition(node, Position.None, top);
-        } else {
-            this.addPosition(node, Position.After, top);
-        }
-    }
-
-    private addPosition(node: Node, position: number, top: number): void {
-        const area = {
-            top,
-            bottom: 0,
-            node,
-            position,
-        };
-
-        this.positions.push(area);
-        this.lastTop = top;
     }
 
     private generateHitAreasForGroup(
