@@ -2,18 +2,18 @@ import { HitArea } from "./types";
 import { Node } from "../node";
 import { Position } from "../position";
 import { getOffsetTop } from "../util";
-import VisibleNodeIterator from "./visibleNodeIterator";
+import iterateVisibleNodes from "./iterateVisibleNodes";
 
-class HitAreasGenerator extends VisibleNodeIterator {
+class HitAreasGenerator {
     private currentNode: Node;
-    private treeBottom: number;
-    private positions: HitArea[];
     private lastTop: number;
+    private positions: HitArea[];
+    private tree: Node;
+    private treeBottom: number;
 
     constructor(tree: Node, currentNode: Node, treeBottom: number) {
-        super(tree);
-
         this.currentNode = currentNode;
+        this.tree = tree;
         this.treeBottom = treeBottom;
     }
 
@@ -21,12 +21,18 @@ class HitAreasGenerator extends VisibleNodeIterator {
         this.positions = [];
         this.lastTop = 0;
 
-        this.iterate();
+        iterateVisibleNodes(this.tree, {
+            handleAfterOpenFolder: this.handleAfterOpenFolder.bind(this),
+            handleClosedFolder: this.handleClosedFolder.bind(this),
+            handleFirstNode: this.handleFirstNode.bind(this),
+            handleNode: this.handleNode.bind(this),
+            handleOpenFolder: this.handleOpenFolder.bind(this),
+        });
 
         return this.generateHitAreas(this.positions);
     }
 
-    protected generateHitAreas(positions: HitArea[]): HitArea[] {
+    private generateHitAreas(positions: HitArea[]): HitArea[] {
         let previousTop = positions[0]?.top ?? 0;
         let group = [];
         const hitAreas: HitArea[] = [];
@@ -57,7 +63,7 @@ class HitAreasGenerator extends VisibleNodeIterator {
         return hitAreas;
     }
 
-    protected handleOpenFolder(node: Node, element: HTMLElement): boolean {
+    private handleOpenFolder(node: Node, element: HTMLElement): boolean {
         if (node === this.currentNode) {
             // Cannot move inside current item
             // Stop iterating
@@ -73,9 +79,9 @@ class HitAreasGenerator extends VisibleNodeIterator {
         return true;
     }
 
-    protected handleClosedFolder(
+    private handleClosedFolder(
         node: Node,
-        nextNode: Node,
+        nextNode: Node | null,
         element: HTMLElement,
     ): void {
         const top = getOffsetTop(element);
@@ -93,13 +99,13 @@ class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    protected handleFirstNode(node: Node): void {
+    private handleFirstNode(node: Node): void {
         if (node !== this.currentNode) {
             this.addPosition(node, Position.Before, getOffsetTop(node.element));
         }
     }
 
-    protected handleAfterOpenFolder(node: Node, nextNode: Node): void {
+    private handleAfterOpenFolder(node: Node, nextNode: Node | null): void {
         if (node === this.currentNode || nextNode === this.currentNode) {
             // Cannot move before or after current item
             this.addPosition(node, Position.None, this.lastTop);
@@ -108,9 +114,9 @@ class HitAreasGenerator extends VisibleNodeIterator {
         }
     }
 
-    protected handleNode(
+    private handleNode(
         node: Node,
-        nextNode: Node,
+        nextNode: Node | null,
         element: HTMLElement,
     ): void {
         const top = getOffsetTop(element);
