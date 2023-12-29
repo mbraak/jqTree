@@ -1,4 +1,4 @@
-import { Page, ElementHandle } from "@playwright/test";
+import { ElementHandle, Locator, Page } from "@playwright/test";
 
 interface BoundingBox {
     x: number;
@@ -7,7 +7,10 @@ interface BoundingBox {
     height: number;
 }
 
-const locateTitle = (page: Page, title: string) =>
+export const sleep = async (page: Page, timeout: number) =>
+    await page.waitForTimeout(timeout); // eslint-disable-line playwright/no-wait-for-timeout
+
+export const locateTitle = (page: Page, title: string) =>
     page.locator(".jqtree-title", {
         hasText: title,
     });
@@ -40,6 +43,16 @@ export const selectNode = async (nodeElement: ElementHandle) => {
     }
 
     await titleHandle.click();
+};
+
+export const boundingBox = async (locator: Locator) => {
+    const result = await locator.boundingBox();
+
+    if (!result) {
+        throw new Error("Empty boundingBox");
+    }
+
+    return result;
 };
 
 const getRect = async (
@@ -97,7 +110,10 @@ export const getTreeStructure = async (page: Page) => {
     return JSON.parse(structure) as JQTreeMatchers.TreeStructure;
 };
 
-const getNodeRect = async (page: Page, title: string): Promise<BoundingBox> => {
+export const getNodeRect = async (
+    page: Page,
+    title: string,
+): Promise<BoundingBox> => {
     const titleElement = await locateTitle(page, title).elementHandle();
 
     if (!titleElement) {
@@ -122,9 +138,16 @@ export const dragAndDrop = async (
     await moveMouseToNode(page, fromTitle);
     await page.mouse.down();
 
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await page.waitForTimeout(200);
+    await sleep(page, 200);
 
     await moveMouseToNode(page, toTitle);
     await page.mouse.up();
+};
+
+export const getSelectedNodeName = async (page: Page) => {
+    return await page.evaluate(`
+            const $tree = jQuery("#tree1");
+            const node = $tree.tree('getSelectedNode');
+            node?.name;
+        `);
 };

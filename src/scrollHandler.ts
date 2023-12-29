@@ -1,21 +1,21 @@
-import { PositionInfo } from "./mouseWidgetTypes";
+import { PositionInfo } from "./mouseUtils";
 import { ScrollParent } from "./scrollHandler/types";
 import createScrollParent from "./scrollHandler/createScrollParent";
 
 interface ScrollHandlerParams {
     refreshHitAreas: () => void;
-    $treeElement: JQuery<HTMLElement>;
+    treeElement: HTMLElement;
 }
 
 export default class ScrollHandler {
     private refreshHitAreas: () => void;
     private scrollParent?: ScrollParent;
-    private $treeElement: JQuery<HTMLElement>;
+    private treeElement: HTMLElement;
 
-    constructor({ refreshHitAreas, $treeElement }: ScrollHandlerParams) {
+    constructor({ refreshHitAreas, treeElement }: ScrollHandlerParams) {
         this.refreshHitAreas = refreshHitAreas;
         this.scrollParent = undefined;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
     }
 
     public checkScrolling(positionInfo: PositionInfo): void {
@@ -36,25 +36,17 @@ export default class ScrollHandler {
     }
 
     private checkVerticalScrolling(positionInfo: PositionInfo): void {
-        if (positionInfo.pageY == null) {
-            return;
-        }
-
         this.getScrollParent().checkVerticalScrolling(positionInfo.pageY);
     }
 
     private checkHorizontalScrolling(positionInfo: PositionInfo): void {
-        if (positionInfo.pageX == null) {
-            return;
-        }
-
         this.getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
     }
 
     private getScrollParent(): ScrollParent {
         if (!this.scrollParent) {
             this.scrollParent = createScrollParent(
-                this.$treeElement,
+                this.treeElement,
                 this.refreshHitAreas,
             );
         }

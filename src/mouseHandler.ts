@@ -1,43 +1,51 @@
-/*
-This widget does the same a the mouse widget in jqueryui.
-*/
-import SimpleWidget from "./simple.widget";
-import { PositionInfo } from "./mouseWidgetTypes";
+import {
+    getPositionInfoFromMouseEvent,
+    getPositionInfoFromTouch,
+    PositionInfo,
+} from "./mouseUtils";
 
-const getPositionInfoFromMouseEvent = (e: MouseEvent): PositionInfo => ({
-    pageX: e.pageX,
-    pageY: e.pageY,
-    target: e.target as HTMLElement,
-    originalEvent: e,
-});
+interface MouseHandlerParams {
+    element: HTMLElement;
+    getMouseDelay: () => number;
+    onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
+    onMouseDrag: (positionInfo: PositionInfo) => void;
+    onMouseStart: (positionInfo: PositionInfo) => boolean;
+    onMouseStop: (positionInfo: PositionInfo) => void;
+}
 
-const getPositionInfoFromTouch = (
-    touch: Touch,
-    e: TouchEvent,
-): PositionInfo => ({
-    pageX: touch.pageX,
-    pageY: touch.pageY,
-    target: touch.target as HTMLElement,
-    originalEvent: e,
-});
-
-abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
-    protected isMouseStarted: boolean;
-    protected mouseDownInfo: PositionInfo | null;
-    private mouseDelayTimer: number | null;
+class MouseHandler {
+    private element: HTMLElement;
+    private getMouseDelay: () => number;
     private isMouseDelayMet: boolean;
+    private isMouseStarted: boolean;
+    private mouseDelayTimer: number | null;
+    private mouseDownInfo: PositionInfo | null;
+    private onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
+    private onMouseDrag: (positionInfo: PositionInfo) => void;
+    private onMouseStart: (positionInfo: PositionInfo) => boolean;
+    private onMouseStop: (positionInfo: PositionInfo) => void;
 
-    public init(): void {
-        const element = this.$el.get(0);
+    constructor({
+        element,
+        getMouseDelay,
+        onMouseCapture,
+        onMouseDrag,
+        onMouseStart,
+        onMouseStop,
+    }: MouseHandlerParams) {
+        this.element = element;
+        this.getMouseDelay = getMouseDelay;
+        this.onMouseCapture = onMouseCapture;
+        this.onMouseDrag = onMouseDrag;
+        this.onMouseStart = onMouseStart;
+        this.onMouseStop = onMouseStop;
 
-        if (element) {
-            element.addEventListener("mousedown", this.mouseDown, {
-                passive: false,
-            });
-            element.addEventListener("touchstart", this.touchStart, {
-                passive: false,
-            });
-        }
+        element.addEventListener("mousedown", this.mouseDown, {
+            passive: false,
+        });
+        element.addEventListener("touchstart", this.touchStart, {
+            passive: false,
+        });
 
         this.isMouseStarted = false;
         this.mouseDelayTimer = null;
@@ -46,32 +54,10 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     }
 
     public deinit(): void {
-        const el = this.$el.get(0);
-
-        if (el) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            (el as any).removeEventListener("mousedown", this.mouseDown, {
-                passive: false,
-            });
-
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            (el as any).removeEventListener("touchstart", this.touchStart, {
-                passive: false,
-            });
-        }
-
+        this.element.removeEventListener("mousedown", this.mouseDown);
+        this.element.removeEventListener("touchstart", this.touchStart);
         this.removeMouseMoveEventListeners();
     }
-
-    protected abstract mouseCapture(positionInfo: PositionInfo): boolean | null;
-
-    protected abstract mouseStart(positionInfo: PositionInfo): boolean;
-
-    protected abstract mouseDrag(positionInfo: PositionInfo): void;
-
-    protected abstract mouseStop(positionInfo: PositionInfo): void;
-
-    protected abstract getMouseDelay(): number;
 
     private mouseDown = (e: MouseEvent): void => {
         // Left mouse button?
@@ -94,7 +80,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
         this.mouseDownInfo = positionInfo;
 
-        if (!this.mouseCapture(positionInfo)) {
+        if (!this.onMouseCapture(positionInfo)) {
             return false;
         }
 
@@ -147,7 +133,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         positionInfo: PositionInfo,
     ): void {
         if (this.isMouseStarted) {
-            this.mouseDrag(positionInfo);
+            this.onMouseDrag(positionInfo);
 
             if (e.cancelable) {
                 e.preventDefault();
@@ -160,11 +146,12 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
         }
 
         if (this.mouseDownInfo) {
-            this.isMouseStarted = this.mouseStart(this.mouseDownInfo) !== false;
+            this.isMouseStarted =
+                this.onMouseStart(this.mouseDownInfo) !== false;
         }
 
         if (this.isMouseStarted) {
-            this.mouseDrag(positionInfo);
+            this.onMouseDrag(positionInfo);
 
             if (e.cancelable) {
                 e.preventDefault();
@@ -185,27 +172,15 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
 
         if (this.isMouseStarted) {
             this.isMouseStarted = false;
-            this.mouseStop(positionInfo);
+            this.onMouseStop(positionInfo);
         }
     }
 
     private removeMouseMoveEventListeners() {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        (document as any).removeEventListener("mousemove", this.mouseMove, {
-            passive: false,
-        });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        (document as any).removeEventListener("touchmove", this.touchMove, {
-            passive: false,
-        });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        (document as any).removeEventListener("mouseup", this.mouseUp, {
-            passive: false,
-        });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        (document as any).removeEventListener("touchend", this.touchEnd, {
-            passive: false,
-        });
+        document.removeEventListener("mousemove", this.mouseMove);
+        document.removeEventListener("touchmove", this.touchMove);
+        document.removeEventListener("mouseup", this.mouseUp);
+        document.removeEventListener("touchend", this.touchEnd);
     }
 
     private touchStart = (e: TouchEvent): void => {
@@ -217,7 +192,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
@@ -235,7 +210,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
@@ -253,7 +228,7 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
             return;
         }
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         if (!touch) {
             return;
@@ -263,4 +238,4 @@ abstract class MouseWidget<WidgetOptions> extends SimpleWidget<WidgetOptions> {
     };
 }
 
-export default MouseWidget;
+export default MouseHandler;

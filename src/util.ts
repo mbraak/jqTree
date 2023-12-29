@@ -7,4 +7,13 @@ export const getBoolString = (value: unknown): string =>
     value ? "true" : "false";
 
 export const getOffsetTop = (element: HTMLElement) =>
-    element.getBoundingClientRect().y + window.scrollY;
+    getElementPosition(element).top;
+
+export const getElementPosition = (element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+
+    return {
+        left: rect.x + window.scrollX,
+        top: rect.y + window.scrollY,
+    };
+};
