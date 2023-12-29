@@ -1,6 +1,6 @@
 import getGiven from "givens";
 import { screen, waitFor } from "@testing-library/dom";
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
@@ -769,9 +769,7 @@ describe("loadDataFromUrl", () => {
 
     beforeEach(() => {
         server.use(
-            rest.get("/tree/", (_request, response, ctx) =>
-                response(ctx.status(200), ctx.json(given.serverData)),
-            ),
+            http.get("/tree/", () => HttpResponse.json(given.serverData)),
         );
 
         given.$tree.tree({ data: given.initialData });
@@ -1031,11 +1029,7 @@ describe("reload", () => {
     given("$tree", () => $("#tree1"));
 
     beforeEach(async () => {
-        server.use(
-            rest.get("/tree2/", (_request, response, ctx) =>
-                response(ctx.status(200), ctx.json(exampleData)),
-            ),
-        );
+        server.use(http.get("/tree2/", () => HttpResponse.json(exampleData)));
 
         given.$tree.tree({ dataUrl: "/tree2/" });
         await screen.findByText("node1");
