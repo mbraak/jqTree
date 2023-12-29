@@ -110,7 +110,7 @@ devDependencies:
     specifier: ^4.5.0
     version: 4.5.0
   msw:
-    specifier: ^2.0.9
+    specifier: ^2.0.11
     version: 2.0.11(typescript@5.3.3)
   postcss:
     specifier: ^8.4.32

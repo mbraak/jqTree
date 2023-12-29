@@ -68,7 +68,7 @@
         "jest-extended": "^4.0.2",
         "jsonfile": "^6.1.0",
         "lodash.template": "^4.5.0",
-        "msw": "^2.0.9",
+        "msw": "^2.0.11",
         "postcss": "^8.4.32",
         "postcss-cli": "^11.0.0",
         "postcss-import": "^15.1.0",
