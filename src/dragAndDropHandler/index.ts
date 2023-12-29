@@ -4,7 +4,7 @@ import { DropHint, HitArea } from "./types";
 import { PositionInfo } from "../mouseUtils";
 import NodeElement from "../nodeElement";
 import DragElement from "./dragElement";
-import HitAreasGenerator from "./hitAreasGenerator";
+import generateHitAreas from "./generateHitAreas";
 import { getElementPosition } from "../util";
 import {
     OnCanMove,
@@ -256,12 +256,11 @@ export class DragAndDropHandler {
         if (!this.currentItem || !tree) {
             this.hitAreas = [];
         } else {
-            const hitAreasGenerator = new HitAreasGenerator(
+            this.hitAreas = generateHitAreas(
                 tree,
                 this.currentItem.node,
                 this.getTreeDimensions().bottom,
             );
-            this.hitAreas = hitAreasGenerator.generate();
         }
     }
 
