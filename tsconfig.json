@@ -18,6 +18,7 @@
         "rootDir": "src",
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
-        "strict": true
+        "strict": true,
+        "target": "ES2022",
     }
 }

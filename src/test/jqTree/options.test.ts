@@ -1,6 +1,6 @@
 import getGiven from "givens";
 import { screen, waitFor } from "@testing-library/dom";
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
@@ -257,11 +257,11 @@ describe("dataUrl", () => {
 
     beforeEach(() => {
         server.use(
-            rest.get("/tree/", (request, response, ctx) => {
+            http.get("/tree/", ({ request }) => {
                 const nodeName = request.headers.get("node");
                 const data = nodeName ? [nodeName] : exampleData;
 
-                return response(ctx.status(200), ctx.json(data));
+                return HttpResponse.json(data);
             }),
         );
     });
@@ -411,11 +411,12 @@ describe("onLoadFailed", () => {
     context("when the loading fails", () => {
         beforeEach(() => {
             server.use(
-                rest.get("/tree/", (_request, response, ctx) =>
-                    response(
-                        ctx.status(500),
-                        ctx.body("Internal server error"),
-                    ),
+                http.get(
+                    "/tree/",
+                    () =>
+                        new HttpResponse("Internal server error", {
+                            status: 500,
+                        }),
                 ),
             );
         });
