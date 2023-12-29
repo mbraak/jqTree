@@ -2,7 +2,6 @@ import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { waitFor } from "@testing-library/dom";
-import { setGlobalOrigin } from "undici";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
@@ -127,7 +126,6 @@ describe("tree.init", () => {
         );
         beforeEach(() => {
             server.listen();
-            setGlobalOrigin(window.location.href);
         });
 
         afterAll(() => {

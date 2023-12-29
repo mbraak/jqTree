@@ -1,6 +1,6 @@
 import getGiven from "givens";
 import { screen } from "@testing-library/dom";
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import "../../tree.jquery";
 import { togglerLink } from "../support/testUtil";
@@ -47,16 +47,16 @@ context("when a node has load_on_demand in the data", () => {
 
     beforeEach(() => {
         server.use(
-            rest.get("/tree/", (request, response, ctx) => {
-                const parentId = request.url.searchParams.get("node");
+            http.get("/tree/", ({ request }) => {
+                const url = new URL(request.url);
+                const parentId = url.searchParams.get("node");
 
                 if (parentId === "1") {
-                    return response(
-                        ctx.status(200),
-                        ctx.json([{ id: 2, name: "loaded-on-demand" }]),
-                    );
+                    return HttpResponse.json([
+                        { id: 2, name: "loaded-on-demand" },
+                    ]);
                 } else {
-                    return response(ctx.status(400));
+                    return new HttpResponse(null, { status: 400 });
                 }
             }),
         );
