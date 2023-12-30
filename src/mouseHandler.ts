@@ -7,6 +7,7 @@ import {
 interface MouseHandlerParams {
     element: HTMLElement;
     getMouseDelay: () => number;
+    onClick: (e: MouseEvent) => void;
     onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
     onMouseDrag: (positionInfo: PositionInfo) => void;
     onMouseStart: (positionInfo: PositionInfo) => boolean;
@@ -20,6 +21,7 @@ class MouseHandler {
     private isMouseStarted: boolean;
     private mouseDelayTimer: number | null;
     private mouseDownInfo: PositionInfo | null;
+    private onClick: (e: MouseEvent) => void;
     private onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
     private onMouseDrag: (positionInfo: PositionInfo) => void;
     private onMouseStart: (positionInfo: PositionInfo) => boolean;
@@ -28,6 +30,7 @@ class MouseHandler {
     constructor({
         element,
         getMouseDelay,
+        onClick,
         onMouseCapture,
         onMouseDrag,
         onMouseStart,
@@ -35,11 +38,13 @@ class MouseHandler {
     }: MouseHandlerParams) {
         this.element = element;
         this.getMouseDelay = getMouseDelay;
+        this.onClick = onClick;
         this.onMouseCapture = onMouseCapture;
         this.onMouseDrag = onMouseDrag;
         this.onMouseStart = onMouseStart;
         this.onMouseStop = onMouseStop;
 
+        element.addEventListener("click", this.handleClick);
         element.addEventListener("mousedown", this.mouseDown, {
             passive: false,
         });
@@ -54,6 +59,7 @@ class MouseHandler {
     }
 
     public deinit(): void {
+        this.element.removeEventListener("click", this.handleClick);
         this.element.removeEventListener("mousedown", this.mouseDown);
         this.element.removeEventListener("touchstart", this.touchStart);
         this.removeMouseMoveEventListeners();
@@ -235,6 +241,10 @@ class MouseHandler {
         }
 
         this.handleMouseUp(getPositionInfoFromTouch(touch, e));
+    };
+
+    private handleClick = (e: MouseEvent): void => {
+        this.onClick(e);
     };
 }
 

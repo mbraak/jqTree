@@ -606,7 +606,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         this.initData();
 
-        this.element.on("click", this.handleClick);
         this.element.on("dblclick", this.handleDblclick);
 
         if (this.options.useContextMenu) {
@@ -895,10 +894,12 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private handleClick = (
-        e: JQuery.ClickEvent<HTMLElement, any, HTMLElement, HTMLElement>,
-    ): void => {
-        const clickTarget = this.getClickTarget(e.target);
+    private handleClick = (e: MouseEvent): void => {
+        if (!e.target) {
+            return;
+        }
+
+        const clickTarget = this.getClickTarget(e.target as HTMLElement);
 
         if (clickTarget) {
             if (clickTarget.type === "button") {
@@ -1304,6 +1305,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             tabIndex,
         });
 
+        const onClick = this.handleClick.bind(this);
         const onMouseCapture = this.mouseCapture.bind(this);
         const onMouseDrag = this.mouseDrag.bind(this);
         const onMouseStart = this.mouseStart.bind(this);
@@ -1312,6 +1314,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const mouseHandler = new MouseHandler({
             element: treeElement,
             getMouseDelay,
+            onClick,
             onMouseCapture,
             onMouseDrag,
             onMouseStart,
