@@ -17,11 +17,6 @@ import FolderElement from "./nodeElement/folderElement";
 import { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import { JQTreeOptions } from "./jqtreeOptions";
 
-interface ClickTarget {
-    node: Node;
-    type: "button" | "label";
-}
-
 interface SelectNodeOptions {
     mustToggle?: boolean;
     mustSetFocus?: boolean;
@@ -606,8 +601,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         this.initData();
 
-        this.element.on("dblclick", this.handleDblclick);
-
         if (this.options.useContextMenu) {
             this.element.on("contextmenu", this.handleContextmenu);
         }
@@ -892,75 +885,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         } else {
             return 0;
         }
-    }
-
-    private handleClick = (e: MouseEvent): void => {
-        if (!e.target) {
-            return;
-        }
-
-        const clickTarget = this.getClickTarget(e.target as HTMLElement);
-
-        if (clickTarget) {
-            if (clickTarget.type === "button") {
-                this.toggle(clickTarget.node, this.options.slide);
-
-                e.preventDefault();
-                e.stopPropagation();
-            } else if (clickTarget.type === "label") {
-                const node = clickTarget.node;
-                const event = this.triggerEvent("tree.click", {
-                    node,
-                    click_event: e,
-                });
-
-                if (!event.isDefaultPrevented()) {
-                    this.doSelectNode(node);
-                }
-            }
-        }
-    };
-
-    private handleDblclick = (
-        e: JQuery.DoubleClickEvent<HTMLElement, any, HTMLElement, HTMLElement>,
-    ): void => {
-        const clickTarget = this.getClickTarget(e.target);
-
-        if (clickTarget?.type === "label") {
-            this.triggerEvent("tree.dblclick", {
-                node: clickTarget.node,
-                click_event: e,
-            });
-        }
-    };
-
-    private getClickTarget(element: HTMLElement): ClickTarget | null {
-        const button = element.closest(".jqtree-toggler");
-
-        if (button) {
-            const node = this.getNode(button as HTMLElement);
-
-            if (node) {
-                return {
-                    type: "button",
-                    node,
-                };
-            }
-        } else {
-            const jqTreeElement = element.closest(".jqtree-element");
-
-            if (jqTreeElement) {
-                const node = this.getNode(jqTreeElement as HTMLElement);
-                if (node) {
-                    return {
-                        type: "label",
-                        node,
-                    };
-                }
-            }
-        }
-
-        return null;
     }
 
     private getNode(element: HTMLElement): null | Node {
@@ -1305,7 +1229,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             tabIndex,
         });
 
-        const onClick = this.handleClick.bind(this);
+        const getNode = this.getNode.bind(this);
         const onMouseCapture = this.mouseCapture.bind(this);
         const onMouseDrag = this.mouseDrag.bind(this);
         const onMouseStart = this.mouseStart.bind(this);
@@ -1314,11 +1238,14 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const mouseHandler = new MouseHandler({
             element: treeElement,
             getMouseDelay,
-            onClick,
+            getNode,
+            onClickButton: this.toggle.bind(this),
+            onClickTitle: this.doSelectNode.bind(this),
             onMouseCapture,
             onMouseDrag,
             onMouseStart,
             onMouseStop,
+            triggerEvent,
         });
 
         this.dataLoader = dataLoader;

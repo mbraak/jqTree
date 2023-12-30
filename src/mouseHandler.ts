@@ -3,48 +3,70 @@ import {
     getPositionInfoFromTouch,
     PositionInfo,
 } from "./mouseUtils";
+import { Node } from "./node";
+import { TriggerEvent } from "./jqtreeMethodTypes";
+
+interface ClickTarget {
+    node: Node;
+    type: "button" | "label";
+}
+
+type GetNode = (element: HTMLElement) => null | Node;
 
 interface MouseHandlerParams {
     element: HTMLElement;
     getMouseDelay: () => number;
-    onClick: (e: MouseEvent) => void;
+    getNode: GetNode;
+    onClickButton: (node: Node) => void;
+    onClickTitle: (node: Node) => void;
     onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
     onMouseDrag: (positionInfo: PositionInfo) => void;
     onMouseStart: (positionInfo: PositionInfo) => boolean;
     onMouseStop: (positionInfo: PositionInfo) => void;
+    triggerEvent: TriggerEvent;
 }
 
 class MouseHandler {
     private element: HTMLElement;
     private getMouseDelay: () => number;
+    private getNode: GetNode;
     private isMouseDelayMet: boolean;
     private isMouseStarted: boolean;
     private mouseDelayTimer: number | null;
     private mouseDownInfo: PositionInfo | null;
-    private onClick: (e: MouseEvent) => void;
+    private onClickButton: (node: Node) => void;
+    private onClickTitle: (node: Node) => void;
     private onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
     private onMouseDrag: (positionInfo: PositionInfo) => void;
     private onMouseStart: (positionInfo: PositionInfo) => boolean;
     private onMouseStop: (positionInfo: PositionInfo) => void;
+    private triggerEvent: TriggerEvent;
 
     constructor({
         element,
         getMouseDelay,
-        onClick,
+        getNode,
+        onClickButton,
+        onClickTitle,
         onMouseCapture,
         onMouseDrag,
         onMouseStart,
         onMouseStop,
+        triggerEvent,
     }: MouseHandlerParams) {
         this.element = element;
         this.getMouseDelay = getMouseDelay;
-        this.onClick = onClick;
+        this.getNode = getNode;
+        this.onClickButton = onClickButton;
+        this.onClickTitle = onClickTitle;
         this.onMouseCapture = onMouseCapture;
         this.onMouseDrag = onMouseDrag;
         this.onMouseStart = onMouseStart;
         this.onMouseStop = onMouseStop;
+        this.triggerEvent = triggerEvent;
 
         element.addEventListener("click", this.handleClick);
+        element.addEventListener("dblclick", this.handleDblclick);
         element.addEventListener("mousedown", this.mouseDown, {
             passive: false,
         });
@@ -60,6 +82,7 @@ class MouseHandler {
 
     public deinit(): void {
         this.element.removeEventListener("click", this.handleClick);
+        this.element.removeEventListener("dblclick", this.handleDblclick);
         this.element.removeEventListener("mousedown", this.mouseDown);
         this.element.removeEventListener("touchstart", this.touchStart);
         this.removeMouseMoveEventListeners();
@@ -244,8 +267,77 @@ class MouseHandler {
     };
 
     private handleClick = (e: MouseEvent): void => {
-        this.onClick(e);
+        if (!e.target) {
+            return;
+        }
+
+        const clickTarget = this.getClickTarget(e.target as HTMLElement);
+
+        if (!clickTarget) {
+            return;
+        }
+
+        if (clickTarget.type === "button") {
+            this.onClickButton(clickTarget.node);
+
+            e.preventDefault();
+            e.stopPropagation();
+        } else if (clickTarget.type === "label") {
+            const event = this.triggerEvent("tree.click", {
+                node: clickTarget.node,
+                click_event: e,
+            });
+
+            if (!event.isDefaultPrevented()) {
+                this.onClickTitle(clickTarget.node);
+            }
+        }
     };
+
+    private handleDblclick = (e: MouseEvent): void => {
+        if (!e.target) {
+            return;
+        }
+
+        const clickTarget = this.getClickTarget(e.target as HTMLElement);
+
+        if (clickTarget?.type === "label") {
+            this.triggerEvent("tree.dblclick", {
+                node: clickTarget.node,
+                click_event: e,
+            });
+        }
+    };
+
+    private getClickTarget(element: HTMLElement): ClickTarget | null {
+        const button = element.closest(".jqtree-toggler");
+
+        if (button) {
+            const node = this.getNode(button as HTMLElement);
+
+            if (node) {
+                return {
+                    type: "button",
+                    node,
+                };
+            }
+        } else {
+            const jqTreeElement =
+                element.closest<HTMLElement>(".jqtree-element");
+
+            if (jqTreeElement) {
+                const node = this.getNode(jqTreeElement);
+                if (node) {
+                    return {
+                        type: "label",
+                        node,
+                    };
+                }
+            }
+        }
+
+        return null;
+    }
 }
 
 export default MouseHandler;
