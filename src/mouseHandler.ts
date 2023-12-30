@@ -24,6 +24,7 @@ interface MouseHandlerParams {
     onMouseStart: (positionInfo: PositionInfo) => boolean;
     onMouseStop: (positionInfo: PositionInfo) => void;
     triggerEvent: TriggerEvent;
+    useContextMenu: boolean;
 }
 
 class MouseHandler {
@@ -41,6 +42,7 @@ class MouseHandler {
     private onMouseStart: (positionInfo: PositionInfo) => boolean;
     private onMouseStop: (positionInfo: PositionInfo) => void;
     private triggerEvent: TriggerEvent;
+    private useContextMenu: boolean;
 
     constructor({
         element,
@@ -53,6 +55,7 @@ class MouseHandler {
         onMouseStart,
         onMouseStop,
         triggerEvent,
+        useContextMenu,
     }: MouseHandlerParams) {
         this.element = element;
         this.getMouseDelay = getMouseDelay;
@@ -64,6 +67,7 @@ class MouseHandler {
         this.onMouseStart = onMouseStart;
         this.onMouseStop = onMouseStop;
         this.triggerEvent = triggerEvent;
+        this.useContextMenu = useContextMenu;
 
         element.addEventListener("click", this.handleClick);
         element.addEventListener("dblclick", this.handleDblclick);
@@ -74,6 +78,10 @@ class MouseHandler {
             passive: false,
         });
 
+        if (useContextMenu) {
+            element.addEventListener("contextmenu", this.handleContextmenu);
+        }
+
         this.isMouseStarted = false;
         this.mouseDelayTimer = null;
         this.isMouseDelayMet = false;
@@ -83,6 +91,14 @@ class MouseHandler {
     public deinit(): void {
         this.element.removeEventListener("click", this.handleClick);
         this.element.removeEventListener("dblclick", this.handleDblclick);
+
+        if (this.useContextMenu) {
+            this.element.removeEventListener(
+                "contextmenu",
+                this.handleContextmenu,
+            );
+        }
+
         this.element.removeEventListener("mousedown", this.mouseDown);
         this.element.removeEventListener("touchstart", this.touchStart);
         this.removeMouseMoveEventListeners();
@@ -307,6 +323,32 @@ class MouseHandler {
                 click_event: e,
             });
         }
+    };
+
+    private handleContextmenu = (e: MouseEvent) => {
+        if (!e.target) {
+            return;
+        }
+
+        const div = (e.target as HTMLElement).closest(
+            "ul.jqtree-tree .jqtree-element",
+        );
+
+        if (div) {
+            const node = this.getNode(div as HTMLElement);
+            if (node) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                this.triggerEvent("tree.contextmenu", {
+                    node,
+                    click_event: e,
+                });
+                return false;
+            }
+        }
+
+        return null;
     };
 
     private getClickTarget(element: HTMLElement): ClickTarget | null {

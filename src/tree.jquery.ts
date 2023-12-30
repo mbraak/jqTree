@@ -600,10 +600,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.connectHandlers();
 
         this.initData();
-
-        if (this.options.useContextMenu) {
-            this.element.on("contextmenu", this.handleContextmenu);
-        }
     }
 
     public deinit(): void {
@@ -896,28 +892,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return null;
         }
     }
-
-    private handleContextmenu = (
-        e: JQuery.ContextMenuEvent<HTMLElement, any, HTMLElement, HTMLElement>,
-    ) => {
-        const div = e.target.closest("ul.jqtree-tree .jqtree-element");
-
-        if (div) {
-            const node = this.getNode(div as HTMLElement);
-            if (node) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                this.triggerEvent("tree.contextmenu", {
-                    node,
-                    click_event: e,
-                });
-                return false;
-            }
-        }
-
-        return null;
-    };
 
     private saveState(): void {
         if (this.options.saveState) {
@@ -1246,6 +1220,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             onMouseStart,
             onMouseStop,
             triggerEvent,
+            useContextMenu: this.options.useContextMenu,
         });
 
         this.dataLoader = dataLoader;
