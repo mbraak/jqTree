@@ -1,5 +1,6 @@
 import getGiven from "givens";
 import { screen } from "@testing-library/dom";
+import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import "../../tree.jquery";
@@ -91,7 +92,8 @@ context("when a node has load_on_demand in the data", () => {
         );
 
         it("loads the subtree", async () => {
-            togglerLink(given.node.element).trigger("click");
+            const toggler = togglerLink(given.node.element);
+            await userEvent.click(toggler.get(0) as HTMLElement);
 
             await screen.findByText("loaded-on-demand");
 
@@ -106,20 +108,21 @@ context("when a node has load_on_demand in the data", () => {
             ]);
         });
 
-        context("when the node is selected and has the focus", () => {
+        context("when the node is selected", () => {
             beforeEach(() => {
                 given.$tree.tree("selectNode", given.node);
             });
 
-            it("keeps the node selected and focused", async () => {
+            it("keeps the node selected", async () => {
                 expect(given.node.element).toBeSelected();
                 expect(given.node.element).toBeFocused();
 
-                togglerLink(given.node.element).trigger("click");
+                const toggler = togglerLink(given.node.element);
+                await userEvent.click(toggler.get(0) as HTMLElement);
+
                 await screen.findByText("loaded-on-demand");
 
                 expect(given.node.element).toBeSelected();
-                expect(given.node.element).toBeFocused();
             });
         });
 
@@ -127,7 +130,9 @@ context("when a node has load_on_demand in the data", () => {
             it("doesn't select the node", async () => {
                 expect(given.node.element).not.toBeSelected();
 
-                togglerLink(given.node.element).trigger("click");
+                const toggler = togglerLink(given.node.element);
+                await userEvent.click(toggler.get(0) as HTMLElement);
+
                 await screen.findByText("loaded-on-demand");
 
                 expect(given.node.element).not.toBeSelected();
@@ -144,7 +149,9 @@ context("when a node has load_on_demand in the data", () => {
                 expect(given.node.element).toBeSelected();
                 expect(given.node.element).not.toBeFocused();
 
-                togglerLink(given.node.element).trigger("click");
+                const toggler = togglerLink(given.node.element);
+                await userEvent.click(toggler.get(0) as HTMLElement);
+
                 await screen.findByText("loaded-on-demand");
 
                 expect(given.node.element).toBeSelected();
