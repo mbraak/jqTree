@@ -330,12 +330,12 @@ class MouseHandler {
             return;
         }
 
-        const div = (e.target as HTMLElement).closest(
+        const div = (e.target as HTMLElement).closest<HTMLElement>(
             "ul.jqtree-tree .jqtree-element",
         );
 
         if (div) {
-            const node = this.getNode(div as HTMLElement);
+            const node = this.getNode(div);
             if (node) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -352,10 +352,10 @@ class MouseHandler {
     };
 
     private getClickTarget(element: HTMLElement): ClickTarget | null {
-        const button = element.closest(".jqtree-toggler");
+        const button = element.closest<HTMLElement>(".jqtree-toggler");
 
         if (button) {
-            const node = this.getNode(button as HTMLElement);
+            const node = this.getNode(button);
 
             if (node) {
                 return {
