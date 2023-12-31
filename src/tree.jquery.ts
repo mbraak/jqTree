@@ -1137,7 +1137,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             loadData,
             onLoadFailed,
             onLoading,
-            $treeElement,
+            treeElement,
             triggerEvent,
         });
 

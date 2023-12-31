@@ -31,7 +31,7 @@ export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 export type OnLoading = (
     isLoading: boolean,
     node: Node | null,
-    $el: JQuery,
+    element: HTMLElement,
 ) => void;
 
 export interface JQTreeOptions {
