@@ -3,49 +3,84 @@ import {
     getPositionInfoFromTouch,
     PositionInfo,
 } from "./mouseUtils";
+import { Node } from "./node";
+import { TriggerEvent } from "./jqtreeMethodTypes";
+
+interface ClickTarget {
+    node: Node;
+    type: "button" | "label";
+}
+
+type GetNode = (element: HTMLElement) => null | Node;
 
 interface MouseHandlerParams {
     element: HTMLElement;
     getMouseDelay: () => number;
+    getNode: GetNode;
+    onClickButton: (node: Node) => void;
+    onClickTitle: (node: Node) => void;
     onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
     onMouseDrag: (positionInfo: PositionInfo) => void;
     onMouseStart: (positionInfo: PositionInfo) => boolean;
     onMouseStop: (positionInfo: PositionInfo) => void;
+    triggerEvent: TriggerEvent;
+    useContextMenu: boolean;
 }
 
 class MouseHandler {
     private element: HTMLElement;
     private getMouseDelay: () => number;
+    private getNode: GetNode;
     private isMouseDelayMet: boolean;
     private isMouseStarted: boolean;
     private mouseDelayTimer: number | null;
     private mouseDownInfo: PositionInfo | null;
+    private onClickButton: (node: Node) => void;
+    private onClickTitle: (node: Node) => void;
     private onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
     private onMouseDrag: (positionInfo: PositionInfo) => void;
     private onMouseStart: (positionInfo: PositionInfo) => boolean;
     private onMouseStop: (positionInfo: PositionInfo) => void;
+    private triggerEvent: TriggerEvent;
+    private useContextMenu: boolean;
 
     constructor({
         element,
         getMouseDelay,
+        getNode,
+        onClickButton,
+        onClickTitle,
         onMouseCapture,
         onMouseDrag,
         onMouseStart,
         onMouseStop,
+        triggerEvent,
+        useContextMenu,
     }: MouseHandlerParams) {
         this.element = element;
         this.getMouseDelay = getMouseDelay;
+        this.getNode = getNode;
+        this.onClickButton = onClickButton;
+        this.onClickTitle = onClickTitle;
         this.onMouseCapture = onMouseCapture;
         this.onMouseDrag = onMouseDrag;
         this.onMouseStart = onMouseStart;
         this.onMouseStop = onMouseStop;
+        this.triggerEvent = triggerEvent;
+        this.useContextMenu = useContextMenu;
 
+        element.addEventListener("click", this.handleClick);
+        element.addEventListener("dblclick", this.handleDblclick);
         element.addEventListener("mousedown", this.mouseDown, {
             passive: false,
         });
         element.addEventListener("touchstart", this.touchStart, {
             passive: false,
         });
+
+        if (useContextMenu) {
+            element.addEventListener("contextmenu", this.handleContextmenu);
+        }
 
         this.isMouseStarted = false;
         this.mouseDelayTimer = null;
@@ -54,6 +89,16 @@ class MouseHandler {
     }
 
     public deinit(): void {
+        this.element.removeEventListener("click", this.handleClick);
+        this.element.removeEventListener("dblclick", this.handleDblclick);
+
+        if (this.useContextMenu) {
+            this.element.removeEventListener(
+                "contextmenu",
+                this.handleContextmenu,
+            );
+        }
+
         this.element.removeEventListener("mousedown", this.mouseDown);
         this.element.removeEventListener("touchstart", this.touchStart);
         this.removeMouseMoveEventListeners();
@@ -236,6 +281,105 @@ class MouseHandler {
 
         this.handleMouseUp(getPositionInfoFromTouch(touch, e));
     };
+
+    private handleClick = (e: MouseEvent): void => {
+        if (!e.target) {
+            return;
+        }
+
+        const clickTarget = this.getClickTarget(e.target as HTMLElement);
+
+        if (!clickTarget) {
+            return;
+        }
+
+        if (clickTarget.type === "button") {
+            this.onClickButton(clickTarget.node);
+
+            e.preventDefault();
+            e.stopPropagation();
+        } else if (clickTarget.type === "label") {
+            const event = this.triggerEvent("tree.click", {
+                node: clickTarget.node,
+                click_event: e,
+            });
+
+            if (!event.isDefaultPrevented()) {
+                this.onClickTitle(clickTarget.node);
+            }
+        }
+    };
+
+    private handleDblclick = (e: MouseEvent): void => {
+        if (!e.target) {
+            return;
+        }
+
+        const clickTarget = this.getClickTarget(e.target as HTMLElement);
+
+        if (clickTarget?.type === "label") {
+            this.triggerEvent("tree.dblclick", {
+                node: clickTarget.node,
+                click_event: e,
+            });
+        }
+    };
+
+    private handleContextmenu = (e: MouseEvent) => {
+        if (!e.target) {
+            return;
+        }
+
+        const div = (e.target as HTMLElement).closest<HTMLElement>(
+            "ul.jqtree-tree .jqtree-element",
+        );
+
+        if (div) {
+            const node = this.getNode(div);
+            if (node) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                this.triggerEvent("tree.contextmenu", {
+                    node,
+                    click_event: e,
+                });
+                return false;
+            }
+        }
+
+        return null;
+    };
+
+    private getClickTarget(element: HTMLElement): ClickTarget | null {
+        const button = element.closest<HTMLElement>(".jqtree-toggler");
+
+        if (button) {
+            const node = this.getNode(button);
+
+            if (node) {
+                return {
+                    type: "button",
+                    node,
+                };
+            }
+        } else {
+            const jqTreeElement =
+                element.closest<HTMLElement>(".jqtree-element");
+
+            if (jqTreeElement) {
+                const node = this.getNode(jqTreeElement);
+                if (node) {
+                    return {
+                        type: "label",
+                        node,
+                    };
+                }
+            }
+        }
+
+        return null;
+    }
 }
 
 export default MouseHandler;

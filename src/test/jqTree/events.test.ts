@@ -2,6 +2,7 @@ import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { waitFor } from "@testing-library/dom";
+import { userEvent } from "@testing-library/user-event";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
@@ -34,11 +35,11 @@ describe("tree.click", () => {
         given.$tree.tree({ data: exampleData });
     });
 
-    it("fires tree.click", () => {
+    it("fires tree.click", async () => {
         const onClick = jest.fn();
         given.$tree.on("tree.click", onClick);
 
-        given.titleSpan.trigger("click");
+        await userEvent.click(given.titleSpan.get(0) as HTMLElement);
         expect(onClick).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -61,11 +62,14 @@ describe("tree.contextmenu", () => {
         given.$tree.tree({ data: exampleData });
     });
 
-    it("fires tree.contextmenu", () => {
+    it("fires tree.contextmenu", async () => {
         const onContextMenu = jest.fn();
         given.$tree.on("tree.contextmenu", onContextMenu);
 
-        given.titleSpan.trigger("contextmenu");
+        await userEvent.pointer({
+            target: given.titleSpan.get(0) as HTMLElement,
+            keys: "[MouseRight]",
+        });
         expect(onContextMenu).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -88,11 +92,11 @@ describe("tree.dblclick", () => {
         given.$tree.tree({ data: exampleData });
     });
 
-    it("fires tree.dblclick", () => {
+    it("fires tree.dblclick", async () => {
         const onDoubleClick = jest.fn();
         given.$tree.on("tree.dblclick", onDoubleClick);
 
-        given.titleSpan.trigger("dblclick");
+        await userEvent.dblClick(given.titleSpan.get(0) as HTMLElement);
         expect(onDoubleClick).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -184,11 +188,11 @@ describe("tree.select", () => {
         });
     });
 
-    it("fires tree.select", () => {
+    it("fires tree.select", async () => {
         const onSelect = jest.fn();
         given.$tree.on("tree.select", onSelect);
 
-        given.titleSpan.trigger("click");
+        await userEvent.click(given.titleSpan.get(0) as HTMLElement);
         expect(onSelect).toHaveBeenCalledWith(
             expect.objectContaining({
                 node: given.node1,
@@ -202,11 +206,11 @@ describe("tree.select", () => {
             given.$tree.tree("selectNode", given.node1);
         });
 
-        it("fires tree.select with node is null", () => {
+        it("fires tree.select with node is null", async () => {
             const onSelect = jest.fn();
             given.$tree.on("tree.select", onSelect);
 
-            given.titleSpan.trigger("click");
+            await userEvent.click(given.titleSpan.get(0) as HTMLElement);
             expect(onSelect).toHaveBeenCalledWith(
                 expect.objectContaining({
                     node: null,

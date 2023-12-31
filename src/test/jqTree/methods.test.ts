@@ -1,6 +1,7 @@
 import getGiven from "givens";
 import { screen, waitFor } from "@testing-library/dom";
 import { http, HttpResponse } from "msw";
+import { userEvent } from "@testing-library/user-event";
 import { setupServer } from "msw/node";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
@@ -1249,9 +1250,11 @@ describe("setOption", () => {
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
-    it("sets an option", () => {
+    it("sets an option", async () => {
         given.$tree.tree("setOption", "selectable", true);
-        titleSpan(given.node1.element).trigger("click");
+        await userEvent.click(
+            titleSpan(given.node1.element).get(0) as HTMLElement,
+        );
         expect(given.$tree.tree("getSelectedNode")).toMatchObject({
             name: "node1",
         });
