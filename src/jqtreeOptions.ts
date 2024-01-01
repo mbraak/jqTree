@@ -55,7 +55,6 @@ export interface JQTreeOptions {
     onGetStateFromStorage?: OnGetStateFromStorage;
     onIsMoveHandle?: OnIsMoveHandle;
     onLoadFailed?: OnLoadFailed;
-    onLoading?: OnLoading;
     onSetStateFromStorage?: OnSetStateFromStorage;
     openedIcon?: IconElement;
     openFolderDelay: number | false;

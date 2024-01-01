@@ -438,28 +438,6 @@ describe("onLoadFailed", () => {
     });
 });
 
-describe("onLoading", () => {
-    it("calls onLoading when the data is loading from an url", async () => {
-        server.use(http.get("/tree/", () => HttpResponse.json(exampleData)));
-
-        const onLoading = jest.fn();
-
-        const $tree = $("#tree1");
-        $tree.tree({
-            dataUrl: "/tree/",
-            onLoading,
-        });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(true, null, $tree.get(0));
-        });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(false, null, $tree.get(0));
-        });
-    });
-});
-
 describe("rtl", () => {
     interface Vars {
         node1: INode;
