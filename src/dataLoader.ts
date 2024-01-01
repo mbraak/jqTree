@@ -44,11 +44,11 @@ export default class DataLoader {
 
         const element = this.getDomElement(parentNode);
         this.addLoadingClass(element);
-        this.notifyLoading(true, parentNode, element);
+        this.notifyLoading(true, parentNode);
 
         const stopLoading = (): void => {
             this.removeLoadingClass(element);
-            this.notifyLoading(false, parentNode, element);
+            this.notifyLoading(false, parentNode);
         };
 
         const handleSuccess = (data: string | NodeData[]): void => {
@@ -87,15 +87,10 @@ export default class DataLoader {
         }
     }
 
-    private notifyLoading(
-        isLoading: boolean,
-        node: Node | null,
-        element: HTMLElement,
-    ): void {
+    private notifyLoading(isLoading: boolean, node: Node | null): void {
         this.triggerEvent("tree.loading_data", {
             isLoading,
             node,
-            element,
         });
     }
 
