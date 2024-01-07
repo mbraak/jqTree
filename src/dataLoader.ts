@@ -1,5 +1,5 @@
 import { Node } from "./node";
-import { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
+import { DataFilter, OnLoadFailed } from "./jqtreeOptions";
 import { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
 
 export type HandleFinishedLoading = () => void;
@@ -8,8 +8,7 @@ interface DataLoaderParams {
     dataFilter?: DataFilter;
     loadData: LoadData;
     onLoadFailed?: OnLoadFailed;
-    onLoading?: OnLoading;
-    $treeElement: JQuery<HTMLElement>;
+    treeElement: HTMLElement;
     triggerEvent: TriggerEvent;
 }
 
@@ -17,23 +16,20 @@ export default class DataLoader {
     private dataFilter?: DataFilter;
     private loadData: LoadData;
     private onLoadFailed?: OnLoadFailed;
-    private onLoading?: OnLoading;
-    private $treeElement: JQuery<HTMLElement>;
+    private treeElement: HTMLElement;
     private triggerEvent: TriggerEvent;
 
     constructor({
         dataFilter,
         loadData,
         onLoadFailed,
-        onLoading,
-        $treeElement,
+        treeElement,
         triggerEvent,
     }: DataLoaderParams) {
         this.dataFilter = dataFilter;
         this.loadData = loadData;
         this.onLoadFailed = onLoadFailed;
-        this.onLoading = onLoading;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
     }
 
@@ -46,13 +42,13 @@ export default class DataLoader {
             return;
         }
 
-        const $el = this.getDomElement(parentNode);
-        this.addLoadingClass($el);
-        this.notifyLoading(true, parentNode, $el);
+        const element = this.getDomElement(parentNode);
+        this.addLoadingClass(element);
+        this.notifyLoading(true, parentNode);
 
         const stopLoading = (): void => {
-            this.removeLoadingClass($el);
-            this.notifyLoading(false, parentNode, $el);
+            this.removeLoadingClass(element);
+            this.notifyLoading(false, parentNode);
         };
 
         const handleSuccess = (data: string | NodeData[]): void => {
@@ -75,39 +71,26 @@ export default class DataLoader {
         this.submitRequest(urlInfo, handleSuccess, handleError);
     }
 
-    private addLoadingClass($el: JQuery<HTMLElement>): void {
-        if ($el) {
-            $el.addClass("jqtree-loading");
-        }
+    private addLoadingClass(element: HTMLElement): void {
+        element.classList.add("jqtree-loading");
     }
 
-    private removeLoadingClass($el: JQuery<HTMLElement>): void {
-        if ($el) {
-            $el.removeClass("jqtree-loading");
-        }
+    private removeLoadingClass(element: HTMLElement): void {
+        element.classList.remove("jqtree-loading");
     }
 
-    private getDomElement(parentNode: Node | null): JQuery<HTMLElement> {
+    private getDomElement(parentNode: Node | null): HTMLElement {
         if (parentNode) {
-            return jQuery(parentNode.element);
+            return parentNode.element;
         } else {
-            return this.$treeElement;
+            return this.treeElement;
         }
     }
 
-    private notifyLoading(
-        isLoading: boolean,
-        node: Node | null,
-        $el: JQuery,
-    ): void {
-        if (this.onLoading) {
-            this.onLoading(isLoading, node, $el);
-        }
-
+    private notifyLoading(isLoading: boolean, node: Node | null): void {
         this.triggerEvent("tree.loading_data", {
             isLoading,
             node,
-            $el,
         });
     }
 
