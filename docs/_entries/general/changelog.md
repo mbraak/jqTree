@@ -3,6 +3,14 @@ title: Changelog
 name: changelog
 ---
 
+#### development
+
+Small braking change:
+
+-   Issue #779: remove `onLoading` option.
+    -   The option can be replaced by using the `tree.loading_data` event
+    -   Related: remove the `$el` attribute from the `tree.loading_data` event.
+
 #### 1.8.0 (november 26 2023)
 
 This release drops support for very old browsers (like IE 11).
