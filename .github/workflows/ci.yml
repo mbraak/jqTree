@@ -8,25 +8,25 @@ jobs:
 
         steps:
             - name: Check out repository code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup node
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                node-version: "20"
             - name: Install pnpm
               run: npm install -g pnpm
             - name: Get pnpm store directory
               id: pnpm-cache
               run: |
                 echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v3
+            - uses: actions/cache@v4
               name: Setup pnpm cache
               with:
                 path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                 key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
                 restore-keys: |
                   ${{ runner.os }}-pnpm-store-
-            - uses: actions/cache@v3
+            - uses: actions/cache@v4
               name: Setup Playwright browsers cache
               with:
                 path: /home/runner/.cache/ms-playwright/
@@ -55,7 +55,7 @@ jobs:
               run: pnpm run playwright
             - name: Screenshots artifact
               if: always()
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: screenshots
                 path: src/playwright/playwright.test.ts-snapshots/

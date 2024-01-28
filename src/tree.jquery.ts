@@ -17,11 +17,6 @@ import FolderElement from "./nodeElement/folderElement";
 import { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import { JQTreeOptions } from "./jqtreeOptions";
 
-interface ClickTarget {
-    node: Node;
-    type: "button" | "label";
-}
-
 interface SelectNodeOptions {
     mustToggle?: boolean;
     mustSetFocus?: boolean;
@@ -54,7 +49,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         onGetStateFromStorage: undefined,
         onIsMoveHandle: undefined,
         onLoadFailed: undefined,
-        onLoading: undefined,
         onSetStateFromStorage: undefined,
         openedIcon: "&#x25bc;",
         openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
@@ -605,13 +599,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.connectHandlers();
 
         this.initData();
-
-        this.element.on("click", this.handleClick);
-        this.element.on("dblclick", this.handleDblclick);
-
-        if (this.options.useContextMenu) {
-            this.element.on("contextmenu", this.handleContextmenu);
-        }
     }
 
     public deinit(): void {
@@ -895,73 +882,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private handleClick = (
-        e: JQuery.ClickEvent<HTMLElement, any, HTMLElement, HTMLElement>,
-    ): void => {
-        const clickTarget = this.getClickTarget(e.target);
-
-        if (clickTarget) {
-            if (clickTarget.type === "button") {
-                this.toggle(clickTarget.node, this.options.slide);
-
-                e.preventDefault();
-                e.stopPropagation();
-            } else if (clickTarget.type === "label") {
-                const node = clickTarget.node;
-                const event = this.triggerEvent("tree.click", {
-                    node,
-                    click_event: e,
-                });
-
-                if (!event.isDefaultPrevented()) {
-                    this.doSelectNode(node);
-                }
-            }
-        }
-    };
-
-    private handleDblclick = (
-        e: JQuery.DoubleClickEvent<HTMLElement, any, HTMLElement, HTMLElement>,
-    ): void => {
-        const clickTarget = this.getClickTarget(e.target);
-
-        if (clickTarget?.type === "label") {
-            this.triggerEvent("tree.dblclick", {
-                node: clickTarget.node,
-                click_event: e,
-            });
-        }
-    };
-
-    private getClickTarget(element: HTMLElement): ClickTarget | null {
-        const button = element.closest(".jqtree-toggler");
-
-        if (button) {
-            const node = this.getNode(button as HTMLElement);
-
-            if (node) {
-                return {
-                    type: "button",
-                    node,
-                };
-            }
-        } else {
-            const jqTreeElement = element.closest(".jqtree-element");
-
-            if (jqTreeElement) {
-                const node = this.getNode(jqTreeElement as HTMLElement);
-                if (node) {
-                    return {
-                        type: "label",
-                        node,
-                    };
-                }
-            }
-        }
-
-        return null;
-    }
-
     private getNode(element: HTMLElement): null | Node {
         const liElement = element.closest("li.jqtree_common");
 
@@ -971,28 +891,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return null;
         }
     }
-
-    private handleContextmenu = (
-        e: JQuery.ContextMenuEvent<HTMLElement, any, HTMLElement, HTMLElement>,
-    ) => {
-        const div = e.target.closest("ul.jqtree-tree .jqtree-element");
-
-        if (div) {
-            const node = this.getNode(div as HTMLElement);
-            if (node) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                this.triggerEvent("tree.contextmenu", {
-                    node,
-                    click_event: e,
-                });
-                return false;
-            }
-        }
-
-        return null;
-    };
 
     private saveState(): void {
         if (this.options.saveState) {
@@ -1192,7 +1090,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             onGetStateFromStorage,
             onIsMoveHandle,
             onLoadFailed,
-            onLoading,
             onSetStateFromStorage,
             openedIcon,
             openFolderDelay,
@@ -1237,8 +1134,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             dataFilter,
             loadData,
             onLoadFailed,
-            onLoading,
-            $treeElement,
+            treeElement,
             triggerEvent,
         });
 
@@ -1304,6 +1200,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             tabIndex,
         });
 
+        const getNode = this.getNode.bind(this);
         const onMouseCapture = this.mouseCapture.bind(this);
         const onMouseDrag = this.mouseDrag.bind(this);
         const onMouseStart = this.mouseStart.bind(this);
@@ -1312,10 +1209,15 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const mouseHandler = new MouseHandler({
             element: treeElement,
             getMouseDelay,
+            getNode,
+            onClickButton: this.toggle.bind(this),
+            onClickTitle: this.doSelectNode.bind(this),
             onMouseCapture,
             onMouseDrag,
             onMouseStart,
             onMouseStop,
+            triggerEvent,
+            useContextMenu: this.options.useContextMenu,
         });
 
         this.dataLoader = dataLoader;
