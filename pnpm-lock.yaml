@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   jquery:
-    specifier: ^3
-    version: 3.7.1
+    specifier: 4.0.0-beta
+    version: 4.0.0-beta
 
 devDependencies:
   '@babel/cli':
@@ -4769,8 +4769,8 @@ packages:
       - ts-node
     dev: true
 
-  /jquery@3.7.1:
-    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
+  /jquery@4.0.0-beta:
+    resolution: {integrity: sha512-F/LxAJ1KuoIfS5j6T5R57YceLJfXjwBl5hJ9za2itWyCy24YqU5R/DzRf76RrpeHfpJgQyqwnPbUQbjSfoEBcQ==}
     dev: false
 
   /js-levenshtein@1.1.6:
