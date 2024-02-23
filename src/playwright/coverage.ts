@@ -16,11 +16,11 @@ export const initCoverage = async (context: BrowserContext) => {
             if (coverageJSON) {
                 const filename = path.join(
                     istanbulCLIOutput,
-                    `playwright_coverage_${generateUUID()}.json`
+                    `playwright_coverage_${generateUUID()}.json`,
                 );
                 fs.writeFileSync(filename, coverageJSON);
             }
-        }
+        },
     );
 };
 
@@ -31,7 +31,7 @@ export const saveCoverage = async (context: BrowserContext) => {
             const anyWindow = window as any;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             const coverageData = anyWindow.__coverage__;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, playwright/no-unsafe-references
             anyWindow.collectIstanbulCoverage(JSON.stringify(coverageData));
         });
     }
