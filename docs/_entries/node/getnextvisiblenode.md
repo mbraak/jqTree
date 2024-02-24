@@ -1,12 +1,12 @@
 ---
-title: getPreviousNode
-name: node-functions-getpreviousnode
+title: getNextVisibleNode
+name: node-functions-getnextvisivlenode
 ---
 
-Return the previous node in the tree.
+Get the next visible node in the tree. Does the same as using the _down_ key.
 
 Returns a node or null.
 
 {% highlight js %}
-var node = node.getPreviousNode();
+var node = node.getNextVisibleNode();
 {% endhighlight %}
