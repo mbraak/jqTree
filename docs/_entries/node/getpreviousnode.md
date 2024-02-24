@@ -8,5 +8,5 @@ Return the previous node in the tree. This is the previous sibling, if there is 
 -   Returns a node or null.
 
 {% highlight js %}
-var node = node.getPreviousNode();
+const previousNode = node.getPreviousNode();
 {% endhighlight %}

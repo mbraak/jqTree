@@ -11,5 +11,5 @@ This is the previous sibling, if there is one. Or, if there is no previous sibli
 -   A node is visible if all its parents are open.
 
 {% highlight js %}
-var node = node.getNextVisibleNode();
+const nextNode = node.getNextVisibleNode();
 {% endhighlight %}

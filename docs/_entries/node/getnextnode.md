@@ -8,5 +8,5 @@ Get the next node in the tree. This is the next sibling, if there is one. Or, if
 -   Returns a node or null.
 
 {% highlight js %}
-var node = node.getNextNode();
+const nextNode = node.getNextNode();
 {% endhighlight %}
