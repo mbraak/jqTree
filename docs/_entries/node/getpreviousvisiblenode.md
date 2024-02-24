@@ -3,11 +3,12 @@ title: getPreviousVisibleNode
 name: node-functions-getpreviousvisiblenode
 ---
 
--   Get the previous visible node in the tree. Does the same as using the _up_ key.
--   If the previous node is an open parent: return the last child of the node.
--   If the previous node is a closed parent: skip the child nodes of the previous parent, return the previous parent node.
+Get the previous visible node in the tree. Does the same as using the _up_ key.
 
-Returns a node or null.
+This is the previous sibling, if there is one. Or, if there is no previous sibling, a node further up in the tree that is visible.
+
+-   Returns a node or null.
+-   A node is visible if all its parents are open.
 
 {% highlight js %}
 var node = node.getPreviousVisibleNode();
