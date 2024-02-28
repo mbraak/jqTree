@@ -1,6 +1,6 @@
 ---
 title: getNextVisibleNode
-name: node-functions-getnextvisivlenode
+name: node-functions-getnextvisiblenode
 ---
 
 Get the next visible node in the tree. Does the same as using the _down_ key.

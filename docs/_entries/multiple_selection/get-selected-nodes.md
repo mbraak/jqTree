@@ -1,6 +1,6 @@
 ---
 title: getSelectedNodes
-name: multiple-get-selected-nodes
+name: multiple-selection-get-selected-nodes
 ---
 
 Get the selected nodes. Return an array of nodes
