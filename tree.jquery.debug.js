@@ -790,26 +790,26 @@ var jqtree = (function (exports) {
           loadData,
           onLoadFailed,
           onLoading,
-          $treeElement,
+          treeElement,
           triggerEvent
         } = _ref;
         this.dataFilter = dataFilter;
         this.loadData = loadData;
         this.onLoadFailed = onLoadFailed;
         this.onLoading = onLoading;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
       }
       loadFromUrl(urlInfo, parentNode, onFinished) {
         if (!urlInfo) {
           return;
         }
-        const $el = this.getDomElement(parentNode);
-        this.addLoadingClass($el);
-        this.notifyLoading(true, parentNode, $el);
+        const element = this.getDomElement(parentNode);
+        this.addLoadingClass(element);
+        this.notifyLoading(true, parentNode, element);
         const stopLoading = () => {
-          this.removeLoadingClass($el);
-          this.notifyLoading(false, parentNode, $el);
+          this.removeLoadingClass(element);
+          this.notifyLoading(false, parentNode, element);
         };
         const handleSuccess = data => {
           stopLoading();
@@ -826,24 +826,21 @@ var jqtree = (function (exports) {
         };
         this.submitRequest(urlInfo, handleSuccess, handleError);
       }
-      addLoadingClass($el) {
-        if ($el) {
-          $el.addClass("jqtree-loading");
-        }
+      addLoadingClass(element) {
+        element.classList.add("jqtree-loading");
       }
-      removeLoadingClass($el) {
-        if ($el) {
-          $el.removeClass("jqtree-loading");
-        }
+      removeLoadingClass(element) {
+        element.classList.remove("jqtree-loading");
       }
       getDomElement(parentNode) {
         if (parentNode) {
-          return jQuery(parentNode.element);
+          return parentNode.element;
         } else {
-          return this.$treeElement;
+          return this.treeElement;
         }
       }
-      notifyLoading(isLoading, node, $el) {
+      notifyLoading(isLoading, node, element) {
+        const $el = jQuery(element);
         if (this.onLoading) {
           this.onLoading(isLoading, node, $el);
         }
@@ -3548,7 +3545,7 @@ var jqtree = (function (exports) {
           loadData,
           onLoadFailed,
           onLoading,
-          $treeElement,
+          treeElement,
           triggerEvent
         });
         const saveStateHandler = new SaveStateHandler({
