@@ -260,3 +260,31 @@ describe("tree.loading_data", () => {
         });
     });
 });
+
+describe("onLoading", () => {
+    const server = setupServer(
+        http.get("/tree/", () => HttpResponse.json(exampleData)),
+    );
+    beforeEach(() => {
+        server.listen();
+    });
+
+    afterAll(() => {
+        server.close();
+    });
+
+    it("calls onLoading", async () => {
+        const $tree = $("#tree1");
+        const onLoading = jest.fn();
+
+        $tree.tree({ dataUrl: "/tree/", onLoading });
+
+        await waitFor(() => {
+            expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
+        });
+
+        await waitFor(() => {
+            expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
+        });
+    });
+});
