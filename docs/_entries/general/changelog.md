@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.8.1 (march 16 2024)
 
 -   Issue #791: fix onCanMoveTo (thanks to Christophe Caron)
 
