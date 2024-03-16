@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issue #791: fix onCanMoveTo (thanks to Christophe Caron)
+
 #### 1.8.0 (november 26 2023)
 
 This release drops support for very old browsers (like IE 11).
