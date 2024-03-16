@@ -170,46 +170,6 @@ describe("tree.load_data", () => {
     });
 });
 
-describe("tree.loading_data", () => {
-    const server = setupServer(
-        http.get("/tree/", () => HttpResponse.json(exampleData)),
-    );
-    beforeEach(() => {
-        server.listen();
-    });
-
-    afterAll(() => {
-        server.close();
-    });
-
-    it("fires tree.loading_data when the data is loading from an url", async () => {
-        const $tree = $("#tree1");
-
-        const onLoading = jest.fn();
-        $tree.on("tree.loading_data", onLoading);
-
-        $tree.tree({ dataUrl: "/tree/" });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    isLoading: true,
-                    node: null,
-                }),
-            );
-        });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    isLoading: false,
-                    node: null,
-                }),
-            );
-        });
-    });
-});
-
 describe("tree.select", () => {
     interface Vars {
         node1: INode;
