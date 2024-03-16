@@ -789,12 +789,14 @@ var jqtree = (function (exports) {
           dataFilter,
           loadData,
           onLoadFailed,
+          onLoading,
           treeElement,
           triggerEvent
         } = _ref;
         this.dataFilter = dataFilter;
         this.loadData = loadData;
         this.onLoadFailed = onLoadFailed;
+        this.onLoading = onLoading;
         this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
       }
@@ -804,10 +806,10 @@ var jqtree = (function (exports) {
         }
         const element = this.getDomElement(parentNode);
         this.addLoadingClass(element);
-        this.notifyLoading(true, parentNode);
+        this.notifyLoading(true, parentNode, element);
         const stopLoading = () => {
           this.removeLoadingClass(element);
-          this.notifyLoading(false, parentNode);
+          this.notifyLoading(false, parentNode, element);
         };
         const handleSuccess = data => {
           stopLoading();
@@ -837,10 +839,15 @@ var jqtree = (function (exports) {
           return this.treeElement;
         }
       }
-      notifyLoading(isLoading, node) {
+      notifyLoading(isLoading, node, element) {
+        const $el = jQuery(element);
+        if (this.onLoading) {
+          this.onLoading(isLoading, node, $el);
+        }
         this.triggerEvent("tree.loading_data", {
           isLoading,
-          node
+          node,
+          $el
         });
       }
       submitRequest(urlInfoInput, handleSuccess, handleError) {
@@ -2734,6 +2741,7 @@ var jqtree = (function (exports) {
         onGetStateFromStorage: undefined,
         onIsMoveHandle: undefined,
         onLoadFailed: undefined,
+        onLoading: undefined,
         onSetStateFromStorage: undefined,
         openedIcon: "&#x25bc;",
         openFolderDelay: 500,
@@ -3499,6 +3507,7 @@ var jqtree = (function (exports) {
           onGetStateFromStorage,
           onIsMoveHandle,
           onLoadFailed,
+          onLoading,
           onSetStateFromStorage,
           openedIcon,
           openFolderDelay,
@@ -3535,6 +3544,7 @@ var jqtree = (function (exports) {
           dataFilter,
           loadData,
           onLoadFailed,
+          onLoading,
           treeElement,
           triggerEvent
         });
