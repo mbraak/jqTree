@@ -3,13 +3,9 @@ title: Changelog
 name: changelog
 ---
 
-#### development
+#### 1.8.1 (march 16 2024)
 
-Small braking change:
-
--   Issue #779: remove `onLoading` option.
-    -   The option can be replaced by using the `tree.loading_data` event
-    -   Related: remove the `$el` attribute from the `tree.loading_data` event.
+-   Issue #791: fix onCanMoveTo (thanks to Christophe Caron)
 
 #### 1.8.0 (november 26 2023)
 
