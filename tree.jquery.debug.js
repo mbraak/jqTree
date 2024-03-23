@@ -204,6 +204,16 @@ var jqtree = (function (exports) {
       const handleOpenFolder = (node, element) => {
         if (node === currentNode) {
           // Cannot move inside current item
+
+          // Dnd over the current element is not possible: add a position with type None for the top and the bottom.
+          const top = getOffsetTop(element);
+          const height = element.clientHeight;
+          addPosition(node, Position.None, top);
+          if (height > 5) {
+            // Subtract 5 pixels to allow more space for the next element.
+            addPosition(node, Position.None, top + height - 5);
+          }
+
           // Stop iterating
           return false;
         }
@@ -233,7 +243,7 @@ var jqtree = (function (exports) {
       let i = 0;
       while (i < positionCount) {
         const position = positionsInGroup[i];
-        if (position) {
+        if (position && position.position !== Position.None) {
           hitAreas.push({
             top: areaTop,
             bottom: areaTop + areaHeight,
