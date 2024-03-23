@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development
+
+-   Issue #751: fix dnd regression (thanks to Tom De Ford)
+
 #### 1.8.1 (march 16 2024)
 
 -   Issue #791: fix onCanMoveTo (thanks to Christophe Caron)
