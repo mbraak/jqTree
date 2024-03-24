@@ -4,13 +4,13 @@ import { Node } from "../node";
 import { Position } from "../position";
 
 describe("generateHitAreasForGroup", () => {
-    it("doesn't add an hit area with zero hit positions", () => {
+    it("doesn't add a hit area with zero hit positions", () => {
         const hitAreas: HitArea[] = [];
         generateHitAreasForGroup(hitAreas, [], 0, 0);
         expect(hitAreas).toBeEmpty();
     });
 
-    it("adds one hitarea with one hit position", () => {
+    it("adds one hit area with one hit position", () => {
         const node = new Node(null);
         const hitPosition = {
             top: 0,
