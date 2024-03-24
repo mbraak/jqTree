@@ -10,7 +10,7 @@ describe("generateHitAreasForGroup", () => {
         expect(hitAreas).toBeEmpty();
     });
 
-    it("adds one hit area with one hit position", () => {
+    it("adds a hit area with one hit position", () => {
         const node = new Node(null);
         const hitPosition = {
             top: 0,
@@ -31,5 +31,18 @@ describe("generateHitAreasForGroup", () => {
                 }),
             ]),
         );
+    });
+
+    it("doesn't add a hit area when the position is Position.None", () => {
+        const node = new Node(null);
+        const hitPosition = {
+            top: 0,
+            node,
+            position: Position.None,
+        };
+
+        const hitAreas: HitArea[] = [];
+        generateHitAreasForGroup(hitAreas, [hitPosition], 0, 100);
+        expect(hitAreas).toBeEmpty();
     });
 });
