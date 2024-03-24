@@ -19,7 +19,7 @@ describe("generateHitAreasForGroup", () => {
         };
 
         const hitAreas: HitArea[] = [];
-        generateHitAreasForGroup(hitAreas, [hitPosition], 0, 100);
+        generateHitAreasForGroup(hitAreas, [hitPosition], 40, 100);
 
         expect(hitAreas).toEqual(
             expect.arrayContaining([
@@ -27,7 +27,7 @@ describe("generateHitAreasForGroup", () => {
                     bottom: 100,
                     position: Position.Inside,
                     node,
-                    top: 0,
+                    top: 40,
                 }),
             ]),
         );
@@ -44,5 +44,41 @@ describe("generateHitAreasForGroup", () => {
         const hitAreas: HitArea[] = [];
         generateHitAreasForGroup(hitAreas, [hitPosition], 0, 100);
         expect(hitAreas).toBeEmpty();
+    });
+
+    it("adds two hit areas with two hit positions", () => {
+        const node = new Node(null);
+        const hitPositions = [
+            {
+                top: 0,
+                node,
+                position: Position.Before,
+            },
+            {
+                top: 0,
+                node,
+                position: Position.Inside,
+            },
+        ];
+
+        const hitAreas: HitArea[] = [];
+        generateHitAreasForGroup(hitAreas, hitPositions, 40, 100);
+
+        expect(hitAreas).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    bottom: 70,
+                    position: Position.Before,
+                    node,
+                    top: 40,
+                }),
+                expect.objectContaining({
+                    bottom: 100,
+                    position: Position.Inside,
+                    node,
+                    top: 70,
+                }),
+            ]),
+        );
     });
 });
