@@ -7,6 +7,16 @@ import { HitArea } from "../dragAndDropHandler/types";
 import { Node } from "../node";
 import { Position } from "../position";
 
+const mockHtmlElement = (y: number) =>
+    ({
+        clientHeight: 20,
+        getBoundingClientRect: () => ({
+            x: 10,
+            y,
+        }),
+        offsetParent: {},
+    }) as HTMLElement;
+
 describe("generateHitAreasForGroup", () => {
     it("doesn't add a hit area with zero hit positions", () => {
         const hitAreas: HitArea[] = [];
@@ -186,20 +196,8 @@ describe("generatePositions", () => {
         const node1 = tree.children[0] as Node;
         const node2 = tree.children[1] as Node;
 
-        node1.element = {
-            getBoundingClientRect: () => ({
-                x: 10,
-                y: 100,
-            }),
-            offsetParent: {},
-        } as HTMLElement;
-        node2.element = {
-            getBoundingClientRect: () => ({
-                x: 10,
-                y: 120,
-            }),
-            offsetParent: {},
-        } as HTMLElement;
+        node1.element = mockHtmlElement(100);
+        node2.element = mockHtmlElement(120);
 
         expect(generateHitPositions(tree, node1)).toEqual([
             expect.objectContaining({
@@ -235,30 +233,11 @@ describe("generatePositions", () => {
         const node2 = tree.children[1] as Node;
         const child1 = node2.children[0] as Node;
 
-        node1.element = {
-            getBoundingClientRect: () => ({
-                x: 10,
-                y: 100,
-            }),
-            offsetParent: {},
-        } as HTMLElement;
-
-        node2.element = {
-            getBoundingClientRect: () => ({
-                x: 10,
-                y: 120,
-            }),
-            offsetParent: {},
-        } as HTMLElement;
+        node1.element = mockHtmlElement(100);
+        node2.element = mockHtmlElement(120);
         node2.is_open = true;
 
-        child1.element = {
-            getBoundingClientRect: () => ({
-                x: 10,
-                y: 140,
-            }),
-            offsetParent: {},
-        } as HTMLElement;
+        child1.element = mockHtmlElement(140);
 
         expect(generateHitPositions(tree, node1)).toEqual([
             expect.objectContaining({
@@ -290,6 +269,51 @@ describe("generatePositions", () => {
                 node: node2,
                 position: Position.After,
                 top: 140,
+            }),
+        ]);
+    });
+
+    it("generates hit positions when the tree has a node and an open folder node and the folder node is the current node", () => {
+        const tree = new Node().loadFromData([
+            { name: "node1", id: 1 },
+            { name: "node2", id: 2, children: [{ name: "child1", id: 3 }] },
+        ]);
+
+        const node1 = tree.children[0] as Node;
+        const node2 = tree.children[1] as Node;
+        const child1 = node2.children[0] as Node;
+
+        node1.element = mockHtmlElement(100);
+        node2.element = mockHtmlElement(120);
+        node2.is_open = true;
+
+        child1.element = mockHtmlElement(140);
+
+        expect(generateHitPositions(tree, node2)).toEqual([
+            expect.objectContaining({
+                node: node1,
+                position: Position.Before,
+                top: 100,
+            }),
+            expect.objectContaining({
+                node: node1,
+                position: Position.Inside,
+                top: 100,
+            }),
+            expect.objectContaining({
+                node: node1,
+                position: Position.None,
+                top: 100,
+            }),
+            expect.objectContaining({
+                node: node2,
+                position: Position.None,
+                top: 120,
+            }),
+            expect.objectContaining({
+                node: node2,
+                position: Position.None,
+                top: 135,
             }),
         ]);
     });
