@@ -1,4 +1,7 @@
-import { generateHitAreasForGroup } from "../dragAndDropHandler/generateHitAreas";
+import {
+    generateHitAreasForGroup,
+    generateHitAreasFromPositions,
+} from "../dragAndDropHandler/generateHitAreas";
 import { HitArea } from "../dragAndDropHandler/types";
 import { Node } from "../node";
 import { Position } from "../position";
@@ -77,6 +80,32 @@ describe("generateHitAreasForGroup", () => {
                     position: Position.Inside,
                     node,
                     top: 70,
+                }),
+            ]),
+        );
+    });
+});
+
+describe("generateHitAreasFromPositions", () => {
+    it("returns an empty array with no hit positions", () => {
+        expect(generateHitAreasFromPositions([], 100)).toBeEmpty();
+    });
+
+    it("returns a hit area with one hit position", () => {
+        const node = new Node(null);
+        const hitPosition = {
+            top: 100,
+            node,
+            position: Position.Inside,
+        };
+
+        expect(generateHitAreasFromPositions([hitPosition], 140)).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    bottom: 140,
+                    node,
+                    position: Position.Inside,
+                    top: 100,
                 }),
             ]),
         );

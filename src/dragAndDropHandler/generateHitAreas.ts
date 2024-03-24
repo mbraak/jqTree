@@ -146,7 +146,7 @@ export const generateHitAreasForGroup = (
     }
 };
 
-const generateHitAreasFromPositions = (
+export const generateHitAreasFromPositions = (
     hitPositions: HitPosition[],
     treeBottom: number,
 ): HitArea[] => {
