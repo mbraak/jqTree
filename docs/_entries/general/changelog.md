@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development
+#### 1.8.2 (march 24 2024)
 
 -   Issue #751: fix dnd regression (thanks to Tom De Ford)
 
