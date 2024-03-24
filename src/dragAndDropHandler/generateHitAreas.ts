@@ -10,7 +10,10 @@ interface HitPosition {
     position: Position;
 }
 
-const generateHitPositions = (tree: Node, currentNode: Node): HitPosition[] => {
+export const generateHitPositions = (
+    tree: Node,
+    currentNode: Node,
+): HitPosition[] => {
     const hitPositions: HitPosition[] = [];
     let lastTop = 0;
 

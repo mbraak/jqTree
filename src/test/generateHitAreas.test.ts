@@ -1,6 +1,7 @@
 import {
     generateHitAreasForGroup,
     generateHitAreasFromPositions,
+    generateHitPositions,
 } from "../dragAndDropHandler/generateHitAreas";
 import { HitArea } from "../dragAndDropHandler/types";
 import { Node } from "../node";
@@ -173,6 +174,65 @@ describe("generateHitAreasFromPositions", () => {
                     node: node2,
                     position: Position.After,
                     top: 125,
+                }),
+            ]),
+        );
+    });
+});
+
+describe("generatePositions", () => {
+    it("doesn't generate hit positions with an empty tree", () => {
+        const tree = new Node(null);
+
+        expect(generateHitPositions(tree, tree)).toBeEmpty();
+    });
+
+    it("generates hit positions when the tree has two nodes and the first node is the current node", () => {
+        const tree = new Node().loadFromData([
+            { name: "node1", id: 1 },
+            { name: "node2", id: 2 },
+        ]);
+
+        const node1 = tree.children[0] as Node;
+        const node2 = tree.children[1] as Node;
+
+        node1.element = {
+            getBoundingClientRect: () => ({
+                x: 10,
+                y: 100,
+            }),
+            offsetParent: {},
+        } as HTMLElement;
+        node2.element = {
+            getBoundingClientRect: () => ({
+                x: 10,
+                y: 120,
+            }),
+            offsetParent: {},
+        } as HTMLElement;
+
+        const r = generateHitPositions(tree, node1);
+        expect(generateHitPositions(tree, node1)).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    node: node1,
+                    position: Position.None,
+                    top: 100,
+                }),
+                expect.objectContaining({
+                    node: node1,
+                    position: Position.None,
+                    top: 100,
+                }),
+                expect.objectContaining({
+                    node: node2,
+                    position: Position.Inside,
+                    top: 120,
+                }),
+                expect.objectContaining({
+                    node: node2,
+                    position: Position.After,
+                    top: 120,
                 }),
             ]),
         );
