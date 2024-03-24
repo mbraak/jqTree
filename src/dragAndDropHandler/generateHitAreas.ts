@@ -154,7 +154,7 @@ const generateHitAreasFromPositions = (
         return [];
     }
 
-    let previousTop = (hitPositions[0] as HitArea).top;
+    let previousTop = (hitPositions[0] as HitPosition).top;
     let group: HitPosition[] = [];
     const hitAreas: HitArea[] = [];
 
