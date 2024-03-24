@@ -211,7 +211,6 @@ describe("generatePositions", () => {
             offsetParent: {},
         } as HTMLElement;
 
-        const r = generateHitPositions(tree, node1);
         expect(generateHitPositions(tree, node1)).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
