@@ -110,4 +110,71 @@ describe("generateHitAreasFromPositions", () => {
             ]),
         );
     });
+
+    it("returns two hit areas with two hit positions with the same top", () => {
+        const node = new Node(null);
+        const hitPositions = [
+            {
+                top: 100,
+                node,
+                position: Position.Before,
+            },
+            {
+                top: 100,
+                node,
+                position: Position.Inside,
+            },
+        ];
+
+        expect(generateHitAreasFromPositions(hitPositions, 140)).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    bottom: 120,
+                    node,
+                    position: Position.Before,
+                    top: 100,
+                }),
+                expect.objectContaining({
+                    bottom: 140,
+                    node,
+                    position: Position.Inside,
+                    top: 120,
+                }),
+            ]),
+        );
+    });
+
+    it("returns two hit areas with two hit positions with a different top", () => {
+        const node1 = new Node(null);
+        const node2 = new Node(null);
+        const hitPositions = [
+            {
+                top: 100,
+                node: node1,
+                position: Position.Inside,
+            },
+            {
+                top: 125,
+                node: node2,
+                position: Position.After,
+            },
+        ];
+
+        expect(generateHitAreasFromPositions(hitPositions, 140)).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    bottom: 125,
+                    node: node1,
+                    position: Position.Inside,
+                    top: 100,
+                }),
+                expect.objectContaining({
+                    bottom: 140,
+                    node: node2,
+                    position: Position.After,
+                    top: 125,
+                }),
+            ]),
+        );
+    });
 });
