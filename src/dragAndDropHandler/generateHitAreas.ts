@@ -118,7 +118,7 @@ const generateHitPositions = (tree: Node, currentNode: Node): HitPosition[] => {
     return hitPositions;
 };
 
-const generateHitAreasForGroup = (
+export const generateHitAreasForGroup = (
     hitAreas: HitArea[],
     positionsInGroup: HitPosition[],
     top: number,
