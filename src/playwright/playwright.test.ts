@@ -26,13 +26,16 @@ const initPage = async (page: Page, baseURL: string | undefined) => {
 interface InitTreeOptions {
     autoOpen?: number;
     dragAndDrop?: boolean;
+    onCanMove?: boolean;
 }
 
 const initTree = async (
     page: Page,
-    { autoOpen, dragAndDrop }: InitTreeOptions,
+    { autoOpen, dragAndDrop, onCanMove }: InitTreeOptions,
 ) => {
     await page.evaluate(`
+        const onCanMove = (node) => node.name !== "Herrerasaurians";
+
         const $tree = jQuery("#tree1");
 
         $tree.tree({
@@ -40,6 +43,7 @@ const initTree = async (
             autoOpen: ${autoOpen || 0},
             data: ExampleData.exampleData,
             dragAndDrop: ${dragAndDrop || false},
+            onCanMove: ${onCanMove ? "onCanMove" : "null"},
             startDndDelay: 100,
         });
     `);
@@ -82,12 +86,10 @@ test.describe("without dragAndDrop", () => {
 });
 
 test.describe("with dragAndDrop", () => {
-    test.beforeEach(async ({ baseURL, page }) => {
+    test("moves a node", async ({ baseURL, page }) => {
         await initPage(page, baseURL);
         await initTree(page, { dragAndDrop: true });
-    });
 
-    test("moves a node", async ({ page }) => {
         await dragAndDrop(page, "Herrerasaurians", "Ornithischians");
 
         const structure = await getTreeStructure(page);
@@ -119,7 +121,10 @@ test.describe("with dragAndDrop", () => {
         expect(screenshot).toMatchSnapshot();
     });
 
-    test("moves a node with touch events", async ({ page }) => {
+    test("moves a node with touch events", async ({ baseURL, page }) => {
+        await initPage(page, baseURL);
+        await initTree(page, { dragAndDrop: true });
+
         const client = await page.context().newCDPSession(page);
 
         const box1 = await getNodeRect(page, "Herrerasaurians");
@@ -151,6 +156,73 @@ test.describe("with dragAndDrop", () => {
                 name: "Ornithischians",
                 children: [
                     expect.objectContaining({ name: "Herrerasaurians" }),
+                    expect.objectContaining({ name: "Heterodontosaurids" }),
+                    expect.objectContaining({ name: "Thyreophorans" }),
+                    expect.objectContaining({ name: "Ornithopods" }),
+                    expect.objectContaining({
+                        name: "Pachycephalosaurians",
+                    }),
+                    expect.objectContaining({ name: "Ceratopsians" }),
+                ],
+            }),
+        ]);
+    });
+
+    test("onCanMove prevents move from a node", async ({ baseURL, page }) => {
+        await initPage(page, baseURL);
+        await initTree(page, { dragAndDrop: true, onCanMove: true });
+
+        await dragAndDrop(page, "Herrerasaurians", "Ornithischians");
+
+        const structure = await getTreeStructure(page);
+
+        expect(structure).toEqual([
+            expect.objectContaining({
+                name: "Saurischia",
+                children: [
+                    expect.objectContaining({ name: "Herrerasaurians" }),
+                    expect.objectContaining({ name: "Theropods" }),
+                    expect.objectContaining({ name: "Sauropodomorphs" }),
+                ],
+            }),
+            expect.objectContaining({
+                name: "Ornithischians",
+                children: [
+                    expect.objectContaining({ name: "Heterodontosaurids" }),
+                    expect.objectContaining({ name: "Thyreophorans" }),
+                    expect.objectContaining({ name: "Ornithopods" }),
+                    expect.objectContaining({
+                        name: "Pachycephalosaurians",
+                    }),
+                    expect.objectContaining({ name: "Ceratopsians" }),
+                ],
+            }),
+        ]);
+    });
+
+    test("onCanMove doesn't prevent move from another node", async ({
+        baseURL,
+        page,
+    }) => {
+        await initPage(page, baseURL);
+        await initTree(page, { dragAndDrop: true, onCanMove: true });
+
+        await dragAndDrop(page, "Theropods", "Ornithischians");
+
+        const structure = await getTreeStructure(page);
+
+        expect(structure).toEqual([
+            expect.objectContaining({
+                name: "Saurischia",
+                children: [
+                    expect.objectContaining({ name: "Herrerasaurians" }),
+                    expect.objectContaining({ name: "Sauropodomorphs" }),
+                ],
+            }),
+            expect.objectContaining({
+                name: "Ornithischians",
+                children: [
+                    expect.objectContaining({ name: "Theropods" }),
                     expect.objectContaining({ name: "Heterodontosaurids" }),
                     expect.objectContaining({ name: "Thyreophorans" }),
                     expect.objectContaining({ name: "Ornithopods" }),
