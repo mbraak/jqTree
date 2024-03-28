@@ -27,14 +27,17 @@ interface InitTreeOptions {
     autoOpen?: number;
     dragAndDrop?: boolean;
     onCanMove?: boolean;
+    onCanMoveTo?: boolean;
 }
 
 const initTree = async (
     page: Page,
-    { autoOpen, dragAndDrop, onCanMove }: InitTreeOptions,
+    { autoOpen, dragAndDrop, onCanMove, onCanMoveTo }: InitTreeOptions,
 ) => {
     await page.evaluate(`
         const onCanMove = (node) => node.name !== "Herrerasaurians";
+
+        const onCanMoveTo = (node, targetNode) => targetNode.name !== "Ornithischians";
 
         const $tree = jQuery("#tree1");
 
@@ -44,6 +47,7 @@ const initTree = async (
             data: ExampleData.exampleData,
             dragAndDrop: ${dragAndDrop || false},
             onCanMove: ${onCanMove ? "onCanMove" : "null"},
+            onCanMoveTo: ${onCanMoveTo ? "onCanMoveTo" : "null"},
             startDndDelay: 100,
         });
     `);
@@ -224,6 +228,79 @@ test.describe("with dragAndDrop", () => {
                 children: [
                     expect.objectContaining({ name: "Theropods" }),
                     expect.objectContaining({ name: "Heterodontosaurids" }),
+                    expect.objectContaining({ name: "Thyreophorans" }),
+                    expect.objectContaining({ name: "Ornithopods" }),
+                    expect.objectContaining({
+                        name: "Pachycephalosaurians",
+                    }),
+                    expect.objectContaining({ name: "Ceratopsians" }),
+                ],
+            }),
+        ]);
+    });
+
+    test("onCanMoveTo prevents move to a node", async ({ baseURL, page }) => {
+        await initPage(page, baseURL);
+        await initTree(page, { dragAndDrop: true, onCanMoveTo: true });
+
+        await dragAndDrop(page, "Herrerasaurians", "Ornithischians");
+
+        const structure = await getTreeStructure(page);
+
+        expect(structure).toEqual([
+            expect.objectContaining({
+                name: "Saurischia",
+                children: [
+                    expect.objectContaining({ name: "Herrerasaurians" }),
+                    expect.objectContaining({ name: "Theropods" }),
+                    expect.objectContaining({ name: "Sauropodomorphs" }),
+                ],
+            }),
+            expect.objectContaining({
+                name: "Ornithischians",
+                children: [
+                    expect.objectContaining({ name: "Heterodontosaurids" }),
+                    expect.objectContaining({ name: "Thyreophorans" }),
+                    expect.objectContaining({ name: "Ornithopods" }),
+                    expect.objectContaining({
+                        name: "Pachycephalosaurians",
+                    }),
+                    expect.objectContaining({ name: "Ceratopsians" }),
+                ],
+            }),
+        ]);
+    });
+
+    test("onCanMoveTo doesn't prevent move to another node", async ({
+        baseURL,
+        page,
+    }) => {
+        await initPage(page, baseURL);
+        await initTree(page, { dragAndDrop: true, onCanMoveTo: true });
+
+        await dragAndDrop(page, "Herrerasaurians", "Heterodontosaurids");
+
+        const structure = await getTreeStructure(page);
+
+        expect(structure).toEqual([
+            expect.objectContaining({
+                name: "Saurischia",
+                children: [
+                    expect.objectContaining({ name: "Theropods" }),
+                    expect.objectContaining({ name: "Sauropodomorphs" }),
+                ],
+            }),
+            expect.objectContaining({
+                name: "Ornithischians",
+                children: [
+                    expect.objectContaining({
+                        name: "Heterodontosaurids",
+                        children: [
+                            expect.objectContaining({
+                                name: "Herrerasaurians",
+                            }),
+                        ],
+                    }),
                     expect.objectContaining({ name: "Thyreophorans" }),
                     expect.objectContaining({ name: "Ornithopods" }),
                     expect.objectContaining({
