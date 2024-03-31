@@ -5,6 +5,7 @@ import { babel } from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
 import serve from "rollup-plugin-serve";
 import terser from "@rollup/plugin-terser";
+import { codecovRollupPlugin } from "@codecov/rollup-plugin";
 
 const getBanner = () => {
     const headerTemplate = fs.readFileSync("./src/header.txt", "utf8");
@@ -35,6 +36,13 @@ const babelPlugin = babel({
     extensions: [".ts"],
 });
 
+const codecovPlugin = codecovRollupPlugin({
+    enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+    bundleName: "<bundle project name>",
+    uploadToken: process.env.CODECOV_TOKEN,
+}),
+
+
 const plugins = [resolvePlugin, babelPlugin];
 
 if (!debugBuild) {
@@ -44,6 +52,15 @@ if (!debugBuild) {
         },
     });
     plugins.push(terserPlugin);
+}
+
+if (!debugBuild && process.env.CODECOV_TOKEN) {
+    const codecovPlugin = codecovRollupPlugin({
+        enableBundleAnalysis: true,
+        bundleName: "jqtree-bundle",
+        uploadToken: process.env.CODECOV_TOKEN,
+    });
+    plugins.push(codecovPlugin);
 }
 
 if (devServer) {
