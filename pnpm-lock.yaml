@@ -22,6 +22,9 @@ devDependencies:
   '@babel/preset-typescript':
     specifier: ^7.23.3
     version: 7.23.3(@babel/core@7.23.9)
+  '@codecov/rollup-plugin':
+    specifier: 0.0.1-beta.5
+    version: 0.0.1-beta.5(rollup@4.12.0)
   '@playwright/test':
     specifier: ^1.41.2
     version: 1.41.2
@@ -1419,6 +1422,26 @@ packages:
     resolution: {integrity: sha512-yn7BklA5acgcBr+7w064fGV+SGIFySjCKpqjcWgBAIfrAkY+4GQTJJHQMeT3V/sgz23VTEVV8TtOmkvJAhFVfg==}
     dependencies:
       statuses: 2.0.1
+    dev: true
+
+  /@codecov/bundler-plugin-core@0.0.1-beta.5:
+    resolution: {integrity: sha512-eltwv1aRJdwonlTD47jQ2GYdKZfMv3jCviDui32JOu12ZAiI3WdJCtjWF9zxpmnHEZ30pn0WbeZir+sXSFLJHw==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      chalk: 4.1.2
+      semver: 7.6.0
+      unplugin: 1.10.1
+      zod: 3.22.4
+    dev: true
+
+  /@codecov/rollup-plugin@0.0.1-beta.5(rollup@4.12.0):
+    resolution: {integrity: sha512-3x6vmt59Hgfpr8jroB7LYa2XX+kFds8HaWsUTBX08sJ2bCw+BzlW1Mnc+IdxBdMtjo1jkYEceRvfwQ0X2LK4ZQ==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      rollup: 3.x || 4.x
+    dependencies:
+      '@codecov/bundler-plugin-core': 0.0.1-beta.5
+      rollup: 4.12.0
     dev: true
 
   /@eslint-community/eslint-utils@4.4.0(eslint@8.56.0):
@@ -6225,6 +6248,16 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: true
 
+  /unplugin@1.10.1:
+    resolution: {integrity: sha512-d6Mhq8RJeGA8UfKCu54Um4lFA0eSaRa3XxdAJg8tIdxbu1ubW0hBCZUL7yI2uGyYCRndvbK8FLHzqy2XKfeMsg==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      acorn: 8.11.3
+      chokidar: 3.6.0
+      webpack-sources: 3.2.3
+      webpack-virtual-modules: 0.6.1
+    dev: true
+
   /update-browserslist-db@1.0.13(browserslist@4.23.0):
     resolution: {integrity: sha512-xebP81SNcPuNpPP3uzeW1NYXxI3rxyJzF3pD6sH4jE7o/IX+WtSpwnVU+qIsDPyk0d3hmFQ7mjqc6AtV604hbg==}
     hasBin: true
@@ -6278,6 +6311,15 @@ packages:
   /webidl-conversions@7.0.0:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
+    dev: true
+
+  /webpack-sources@3.2.3:
+    resolution: {integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==}
+    engines: {node: '>=10.13.0'}
+    dev: true
+
+  /webpack-virtual-modules@0.6.1:
+    resolution: {integrity: sha512-poXpCylU7ExuvZK8z+On3kX+S8o/2dQ/SVYueKA0D4WEMXROXgY8Ez50/bQEUmvoSMMrWcrJqCHuhAbsiwg7Dg==}
     dev: true
 
   /whatwg-encoding@2.0.0:
@@ -6429,4 +6471,8 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    dev: true
+
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: true
