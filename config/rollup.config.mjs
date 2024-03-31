@@ -49,8 +49,8 @@ if (!debugBuild) {
 
 if (!debugBuild && process.env.CODECOV_TOKEN) {
     const codecovPlugin = codecovRollupPlugin({
-        enableBundleAnalysis: true,
         bundleName: "jqtree-bundle",
+        enableBundleAnalysis: true,
         uploadToken: process.env.CODECOV_TOKEN,
     });
     plugins.push(codecovPlugin);
