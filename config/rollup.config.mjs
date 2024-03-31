@@ -36,13 +36,6 @@ const babelPlugin = babel({
     extensions: [".ts"],
 });
 
-const codecovPlugin = codecovRollupPlugin({
-    enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-    bundleName: "<bundle project name>",
-    uploadToken: process.env.CODECOV_TOKEN,
-}),
-
-
 const plugins = [resolvePlugin, babelPlugin];
 
 if (!debugBuild) {
