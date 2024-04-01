@@ -301,6 +301,20 @@ describe("dataUrl", () => {
             });
         });
     });
+
+    it("loads the data and selects the node based on the state", async () => {
+        localStorage.setItem("tree", '{"selected_node":[124]}');
+
+        given.$tree.tree({
+            dataUrl: { url: "/tree/" },
+            saveState: true,
+        });
+
+        await screen.findByText("node1");
+        expect((given.$tree.tree("getSelectedNode") as INode).name).toEqual(
+            "node2",
+        );
+    });
 });
 
 describe("onCanSelectNode", () => {
