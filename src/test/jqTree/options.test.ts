@@ -225,6 +225,26 @@ describe("closedIcon", () => {
     });
 });
 
+describe("dataFilter", () => {
+    it("changes the loaded data", async () => {
+        server.use(http.get("/tree/", () => HttpResponse.json(exampleData)));
+
+        const dataFilter = jest.fn((data) => [data[1]]);
+
+        const $tree = $("#tree1");
+        $tree.tree({
+            dataFilter,
+            dataUrl: "/tree/",
+        });
+
+        await screen.findByText("node2");
+
+        screen.queryByText;
+        expect(screen.queryByText("node1")).toBeNull();
+        expect(dataFilter).toHaveBeenCalledWith(exampleData);
+    });
+});
+
 describe("dataUrl", () => {
     const exampleStructure = [
         expect.objectContaining({ name: "node1" }),
