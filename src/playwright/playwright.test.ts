@@ -140,18 +140,10 @@ test.describe("with dragAndDrop", () => {
 
         await sleep(page, 200);
 
-        const box2 = await getNodeRect(page, "Sauropodomorphs");
-        await client.send("Input.dispatchTouchEvent", {
-            type: "touchMove",
-            touchPoints: [{ x: box2.x + 10, y: box2.y + box2.height / 2 }],
-        });
-
-        await sleep(page, 200);
-
-        const box3 = await getNodeRect(page, "Ornithischians");
+        const box2 = await getNodeRect(page, "Ornithischians");
         await client.send("Input.dispatchTouchEvent", {
             type: "touchEnd",
-            touchPoints: [{ x: box3.x + 10, y: box3.y + box3.height / 2 }],
+            touchPoints: [{ x: box2.x + 10, y: box2.y + box2.height / 2 }],
         });
 
         const structure = await getTreeStructure(page);
@@ -178,6 +170,33 @@ test.describe("with dragAndDrop", () => {
                 ],
             }),
         ]);
+    });
+
+    test("opens a node when a dragged node is hovered over it with a touch event", async ({
+        baseURL,
+        page,
+    }) => {
+        await initPage(page, baseURL);
+        await initTree(page, { dragAndDrop: true });
+
+        const client = await page.context().newCDPSession(page);
+
+        const box1 = await getNodeRect(page, "Herrerasaurians");
+
+        await client.send("Input.dispatchTouchEvent", {
+            type: "touchStart",
+            touchPoints: [{ x: box1.x + 10, y: box1.y + box1.height / 2 }],
+        });
+
+        await sleep(page, 200);
+
+        const box2 = await getNodeRect(page, "Sauropodomorphs");
+        await client.send("Input.dispatchTouchEvent", {
+            type: "touchMove",
+            touchPoints: [{ x: box2.x + 10, y: box2.y + box2.height / 2 }],
+        });
+
+        // todo: is node opened?
     });
 
     test("onCanMove prevents move from a node", async ({ baseURL, page }) => {
