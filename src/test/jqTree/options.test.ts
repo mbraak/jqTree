@@ -311,7 +311,7 @@ describe("dataUrl", () => {
         });
 
         await screen.findByText("node1");
-        expect((given.$tree.tree("getSelectedNode") as INode).name).toEqual(
+        expect((given.$tree.tree("getSelectedNode") as INode).name).toBe(
             "node2",
         );
     });
