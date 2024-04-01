@@ -301,6 +301,32 @@ describe("dataUrl", () => {
             });
         });
     });
+
+    it("loads the data and selects the node when the state contains a selected node", async () => {
+        localStorage.setItem("tree", '{"selected_node":[124]}');
+
+        given.$tree.tree({
+            dataUrl: { url: "/tree/" },
+            saveState: true,
+        });
+
+        await screen.findByText("node1");
+        expect((given.$tree.tree("getSelectedNode") as INode).name).toBe(
+            "node2",
+        );
+    });
+
+    it("loads the data and doesn't selects a node when the state doesn't contain a selected node", async () => {
+        localStorage.setItem("tree", "{}");
+
+        given.$tree.tree({
+            dataUrl: { url: "/tree/" },
+            saveState: true,
+        });
+
+        await screen.findByText("node1");
+        expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+    });
 });
 
 describe("onCanSelectNode", () => {
