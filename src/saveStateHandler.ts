@@ -194,7 +194,7 @@ export default class SaveStateHandler {
     public getNodeIdToBeSelected(): NodeId | null {
         const state = this.getStateFromStorage();
 
-        if (state && state.selected_node) {
+        if (state?.selected_node) {
             return state.selected_node[0] || null;
         } else {
             return null;
