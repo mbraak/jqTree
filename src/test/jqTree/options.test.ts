@@ -239,7 +239,6 @@ describe("dataFilter", () => {
 
         await screen.findByText("node2");
 
-        screen.queryByText;
         expect(screen.queryByText("node1")).toBeNull();
         expect(dataFilter).toHaveBeenCalledWith(exampleData);
     });
