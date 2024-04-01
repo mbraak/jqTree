@@ -229,7 +229,7 @@ describe("dataFilter", () => {
     it("changes the loaded data", async () => {
         server.use(http.get("/tree/", () => HttpResponse.json(exampleData)));
 
-        const dataFilter = jest.fn((data) => [data[1]]);
+        const dataFilter = jest.fn((data) => [data[1]]); // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
 
         const $tree = $("#tree1");
         $tree.tree({
