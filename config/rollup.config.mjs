@@ -47,7 +47,7 @@ if (!debugBuild) {
     plugins.push(terserPlugin);
 }
 
-if (!debugBuild && process.env.CODECOV_TOKEN) {
+if (!debugBuild && !includeCoverage && process.env.CODECOV_TOKEN) {
     const codecovPlugin = codecovRollupPlugin({
         bundleName: "jqtree-bundle",
         enableBundleAnalysis: true,
