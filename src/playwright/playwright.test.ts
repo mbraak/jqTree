@@ -140,10 +140,18 @@ test.describe("with dragAndDrop", () => {
 
         await sleep(page, 200);
 
-        const box2 = await getNodeRect(page, "Ornithischians");
+        const box2 = await getNodeRect(page, "Sauropodomorphs");
+        await client.send("Input.dispatchTouchEvent", {
+            type: "touchMove",
+            touchPoints: [{ x: box2.x + 10, y: box2.y + box2.height / 2 }],
+        });
+
+        await sleep(page, 200);
+
+        const box3 = await getNodeRect(page, "Ornithischians");
         await client.send("Input.dispatchTouchEvent", {
             type: "touchEnd",
-            touchPoints: [{ x: box2.x + 10, y: box2.y + box2.height / 2 }],
+            touchPoints: [{ x: box3.x + 10, y: box3.y + box3.height / 2 }],
         });
 
         const structure = await getTreeStructure(page);
