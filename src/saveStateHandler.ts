@@ -147,15 +147,48 @@ export default class SaveStateHandler {
         state: SavedState,
         cbFinished: () => void,
     ): void {
-        if (state) {
-            this.doSetInitialStateOnDemand(
-                state.open_nodes,
-                state.selected_node,
-                cbFinished,
-            );
-        } else {
-            cbFinished();
-        }
+        let loadingCount = 0;
+        let nodeIds = state.open_nodes;
+
+        const openNodes = (): void => {
+            const newNodesIds = [];
+
+            for (const nodeId of nodeIds) {
+                const node = this.getNodeById(nodeId);
+
+                if (!node) {
+                    newNodesIds.push(nodeId);
+                } else {
+                    if (!node.is_loading) {
+                        if (node.load_on_demand) {
+                            loadAndOpenNode(node);
+                        } else {
+                            this.openNode(node, false);
+                        }
+                    }
+                }
+            }
+
+            nodeIds = newNodesIds;
+
+            if (this.selectInitialNodes(state.selected_node)) {
+                this.refreshElements(null);
+            }
+
+            if (loadingCount === 0) {
+                cbFinished();
+            }
+        };
+
+        const loadAndOpenNode = (node: Node): void => {
+            loadingCount += 1;
+            this.openNode(node, false, () => {
+                loadingCount -= 1;
+                openNodes();
+            });
+        };
+
+        openNodes();
     }
 
     public getNodeIdToBeSelected(): NodeId | null {
@@ -230,55 +263,6 @@ export default class SaveStateHandler {
         selectedNodes.forEach((node) => {
             this.removeFromSelection(node);
         });
-    }
-
-    private doSetInitialStateOnDemand(
-        nodeIdsParam: NodeId[],
-        selectedNodes: NodeId[],
-        cbFinished: () => void,
-    ): void {
-        let loadingCount = 0;
-        let nodeIds = nodeIdsParam;
-
-        const openNodes = (): void => {
-            const newNodesIds = [];
-
-            for (const nodeId of nodeIds) {
-                const node = this.getNodeById(nodeId);
-
-                if (!node) {
-                    newNodesIds.push(nodeId);
-                } else {
-                    if (!node.is_loading) {
-                        if (node.load_on_demand) {
-                            loadAndOpenNode(node);
-                        } else {
-                            this.openNode(node, false);
-                        }
-                    }
-                }
-            }
-
-            nodeIds = newNodesIds;
-
-            if (this.selectInitialNodes(selectedNodes)) {
-                this.refreshElements(null);
-            }
-
-            if (loadingCount === 0) {
-                cbFinished();
-            }
-        };
-
-        const loadAndOpenNode = (node: Node): void => {
-            loadingCount += 1;
-            this.openNode(node, false, () => {
-                loadingCount -= 1;
-                openNodes();
-            });
-        };
-
-        openNodes();
     }
 
     private getKeyName(): string {
