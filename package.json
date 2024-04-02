@@ -39,6 +39,7 @@
         "@babel/core": "^7.24.3",
         "@babel/preset-env": "^7.24.3",
         "@babel/preset-typescript": "^7.24.1",
+        "@codecov/rollup-plugin": "0.0.1-beta.5",
         "@playwright/test": "^1.42.1",
         "@rollup/plugin-babel": "^6.0.4",
         "@rollup/plugin-node-resolve": "^15.2.3",

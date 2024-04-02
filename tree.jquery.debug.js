@@ -1347,15 +1347,44 @@ var jqtree = (function (exports) {
         }
       }
       setInitialStateOnDemand(state, cbFinished) {
-        if (state) {
-          this.doSetInitialStateOnDemand(state.open_nodes, state.selected_node, cbFinished);
-        } else {
-          cbFinished();
-        }
+        let loadingCount = 0;
+        let nodeIds = state.open_nodes;
+        const openNodes = () => {
+          const newNodesIds = [];
+          for (const nodeId of nodeIds) {
+            const node = this.getNodeById(nodeId);
+            if (!node) {
+              newNodesIds.push(nodeId);
+            } else {
+              if (!node.is_loading) {
+                if (node.load_on_demand) {
+                  loadAndOpenNode(node);
+                } else {
+                  this.openNode(node, false);
+                }
+              }
+            }
+          }
+          nodeIds = newNodesIds;
+          if (this.selectInitialNodes(state.selected_node)) {
+            this.refreshElements(null);
+          }
+          if (loadingCount === 0) {
+            cbFinished();
+          }
+        };
+        const loadAndOpenNode = node => {
+          loadingCount += 1;
+          this.openNode(node, false, () => {
+            loadingCount -= 1;
+            openNodes();
+          });
+        };
+        openNodes();
       }
       getNodeIdToBeSelected() {
         const state = this.getStateFromStorage();
-        if (state && state.selected_node) {
+        if (state?.selected_node) {
           return state.selected_node[0] || null;
         } else {
           return null;
@@ -1410,42 +1439,6 @@ var jqtree = (function (exports) {
         selectedNodes.forEach(node => {
           this.removeFromSelection(node);
         });
-      }
-      doSetInitialStateOnDemand(nodeIdsParam, selectedNodes, cbFinished) {
-        let loadingCount = 0;
-        let nodeIds = nodeIdsParam;
-        const openNodes = () => {
-          const newNodesIds = [];
-          for (const nodeId of nodeIds) {
-            const node = this.getNodeById(nodeId);
-            if (!node) {
-              newNodesIds.push(nodeId);
-            } else {
-              if (!node.is_loading) {
-                if (node.load_on_demand) {
-                  loadAndOpenNode(node);
-                } else {
-                  this.openNode(node, false);
-                }
-              }
-            }
-          }
-          nodeIds = newNodesIds;
-          if (this.selectInitialNodes(selectedNodes)) {
-            this.refreshElements(null);
-          }
-          if (loadingCount === 0) {
-            cbFinished();
-          }
-        };
-        const loadAndOpenNode = node => {
-          loadingCount += 1;
-          this.openNode(node, false, () => {
-            loadingCount -= 1;
-            openNodes();
-          });
-        };
-        openNodes();
       }
       getKeyName() {
         if (typeof this.saveStateOption === "string") {
@@ -2514,40 +2507,14 @@ var jqtree = (function (exports) {
     }
 
     class GhostDropHint {
-      constructor(node, element, position) {
+      constructor(element) {
         this.element = element;
-        this.node = node;
         this.ghost = this.createGhostElement();
-        if (position === Position.After) {
-          this.moveAfter();
-        } else if (position === Position.Before) {
-          this.moveBefore();
-        } else if (position === Position.Inside) {
-          if (node.isFolder() && node.is_open) {
-            this.moveInsideOpenFolder();
-          } else {
-            this.moveInside();
-          }
-        }
+        this.element.after(this.ghost);
+        this.ghost.classList.add("jqtree-inside");
       }
       remove() {
         this.ghost.remove();
-      }
-      moveAfter() {
-        this.element.after(this.ghost);
-      }
-      moveBefore() {
-        this.element.before(this.ghost);
-      }
-      moveInsideOpenFolder() {
-        const childElement = this.node.children[0]?.element;
-        if (childElement) {
-          childElement.before(this.ghost);
-        }
-      }
-      moveInside() {
-        this.element.after(this.ghost);
-        this.ghost.classList.add("jqtree-inside");
       }
       createGhostElement() {
         const ghost = document.createElement("li");
@@ -2591,7 +2558,7 @@ var jqtree = (function (exports) {
         if (this.mustShowBorderDropHint(position)) {
           return new BorderDropHint(this.element, this.getScrollLeft());
         } else {
-          return new GhostDropHint(this.node, this.element, position);
+          return new GhostDropHint(this.element);
         }
       }
       select(mustSetFocus) {

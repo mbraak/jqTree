@@ -225,6 +225,25 @@ describe("closedIcon", () => {
     });
 });
 
+describe("dataFilter", () => {
+    it("changes the loaded data", async () => {
+        server.use(http.get("/tree/", () => HttpResponse.json(exampleData)));
+
+        const dataFilter = jest.fn((data) => [data[1]]); // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+
+        const $tree = $("#tree1");
+        $tree.tree({
+            dataFilter,
+            dataUrl: "/tree/",
+        });
+
+        await screen.findByText("node2");
+
+        expect(screen.queryByText("node1")).toBeNull();
+        expect(dataFilter).toHaveBeenCalledWith(exampleData);
+    });
+});
+
 describe("dataUrl", () => {
     const exampleStructure = [
         expect.objectContaining({ name: "node1" }),
@@ -281,6 +300,32 @@ describe("dataUrl", () => {
                 expect(given.$tree).toHaveTreeStructure(expectedStructure);
             });
         });
+    });
+
+    it("loads the data and selects the node when the state contains a selected node", async () => {
+        localStorage.setItem("tree", '{"selected_node":[124]}');
+
+        given.$tree.tree({
+            dataUrl: { url: "/tree/" },
+            saveState: true,
+        });
+
+        await screen.findByText("node1");
+        expect((given.$tree.tree("getSelectedNode") as INode).name).toBe(
+            "node2",
+        );
+    });
+
+    it("loads the data and doesn't selects a node when the state doesn't contain a selected node", async () => {
+        localStorage.setItem("tree", "{}");
+
+        given.$tree.tree({
+            dataUrl: { url: "/tree/" },
+            saveState: true,
+        });
+
+        await screen.findByText("node1");
+        expect(given.$tree.tree("getSelectedNode")).toBeFalse();
     });
 });
 
