@@ -50,9 +50,9 @@
         "@types/jest": "^29.5.12",
         "@types/jest-axe": "^3.5.9",
         "@types/jquery": "^3.5.29",
-        "@types/node": "^20.12.2",
-        "@typescript-eslint/eslint-plugin": "^7.4.0",
-        "@typescript-eslint/parser": "^7.4.0",
+        "@types/node": "^20.12.3",
+        "@typescript-eslint/eslint-plugin": "^7.5.0",
+        "@typescript-eslint/parser": "^7.5.0",
         "autoprefixer": "^10.4.19",
         "babel-jest": "^29.7.0",
         "babel-plugin-istanbul": "^6.1.1",
@@ -77,10 +77,10 @@
         "postcss-load-config": "^5.0.3",
         "postcss-nested": "^6.0.1",
         "prettier": "^3.2.5",
-        "rollup": "^4.13.2",
+        "rollup": "^4.14.0",
         "rollup-plugin-serve": "^3.0.0",
         "tslib": "^2.6.2",
         "typescript": "^5.4.3",
-        "undici": "^5.28.3"
+        "undici": "^5.28.4"
     }
 }
