@@ -36,11 +36,11 @@
     },
     "devDependencies": {
         "@babel/cli": "^7.24.1",
-        "@babel/core": "^7.24.3",
-        "@babel/preset-env": "^7.24.3",
+        "@babel/core": "^7.24.4",
+        "@babel/preset-env": "^7.24.4",
         "@babel/preset-typescript": "^7.24.1",
         "@codecov/rollup-plugin": "0.0.1-beta.5",
-        "@playwright/test": "^1.42.1",
+        "@playwright/test": "^1.43.0",
         "@rollup/plugin-babel": "^6.0.4",
         "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-terser": "^0.4.4",
@@ -50,7 +50,7 @@
         "@types/jest": "^29.5.12",
         "@types/jest-axe": "^3.5.9",
         "@types/jquery": "^3.5.29",
-        "@types/node": "^20.12.3",
+        "@types/node": "^20.12.4",
         "@typescript-eslint/eslint-plugin": "^7.5.0",
         "@typescript-eslint/parser": "^7.5.0",
         "autoprefixer": "^10.4.19",
@@ -80,7 +80,7 @@
         "rollup": "^4.14.0",
         "rollup-plugin-serve": "^3.0.0",
         "tslib": "^2.6.2",
-        "typescript": "^5.4.3",
+        "typescript": "^5.4.4",
         "undici": "^5.28.4"
     }
 }
