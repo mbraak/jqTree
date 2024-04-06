@@ -71,6 +71,10 @@ export const getTreeStructure = async (page: Page) => {
     const structure = await page.evaluate<string>(`
     ;
     function getTreeNode($li) {
+        if ($li.hasClass("jqtree-ghost") || $li.hasClass("jqtree-border")) {
+            return null;
+        }
+
         const $div = $li.children("div.jqtree-element");
         const $span = $div.children("span.jqtree-title");
         const name = $span.text();
@@ -98,10 +102,9 @@ export const getTreeStructure = async (page: Page) => {
     function getChildren($ul) {
         return $ul
             .children("li.jqtree_common")
-            .map((_, li) => {
-                return getTreeNode(jQuery(li));
-            })
-            .get();
+            .map((_, li) => getTreeNode(jQuery(li)))
+            .get()
+            .filter(node => node);
     }
 
     JSON.stringify(window.getChildren(jQuery("ul.jqtree-tree")));
