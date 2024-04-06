@@ -50,7 +50,7 @@
         "@types/jest": "^29.5.12",
         "@types/jest-axe": "^3.5.9",
         "@types/jquery": "^3.5.29",
-        "@types/node": "^20.12.4",
+        "@types/node": "^20.12.5",
         "@typescript-eslint/eslint-plugin": "^7.5.0",
         "@typescript-eslint/parser": "^7.5.0",
         "autoprefixer": "^10.4.19",
