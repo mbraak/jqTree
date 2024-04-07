@@ -2507,40 +2507,14 @@ var jqtree = (function (exports) {
     }
 
     class GhostDropHint {
-      constructor(node, element, position) {
+      constructor(element) {
         this.element = element;
-        this.node = node;
         this.ghost = this.createGhostElement();
-        if (position === Position.After) {
-          this.moveAfter();
-        } else if (position === Position.Before) {
-          this.moveBefore();
-        } else if (position === Position.Inside) {
-          if (node.isFolder() && node.is_open) {
-            this.moveInsideOpenFolder();
-          } else {
-            this.moveInside();
-          }
-        }
+        this.element.after(this.ghost);
+        this.ghost.classList.add("jqtree-inside");
       }
       remove() {
         this.ghost.remove();
-      }
-      moveAfter() {
-        this.element.after(this.ghost);
-      }
-      moveBefore() {
-        this.element.before(this.ghost);
-      }
-      moveInsideOpenFolder() {
-        const childElement = this.node.children[0]?.element;
-        if (childElement) {
-          childElement.before(this.ghost);
-        }
-      }
-      moveInside() {
-        this.element.after(this.ghost);
-        this.ghost.classList.add("jqtree-inside");
       }
       createGhostElement() {
         const ghost = document.createElement("li");
@@ -2584,7 +2558,7 @@ var jqtree = (function (exports) {
         if (this.mustShowBorderDropHint(position)) {
           return new BorderDropHint(this.element, this.getScrollLeft());
         } else {
-          return new GhostDropHint(this.node, this.element, position);
+          return new GhostDropHint(this.element);
         }
       }
       select(mustSetFocus) {
