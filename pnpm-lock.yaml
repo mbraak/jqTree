@@ -23,8 +23,8 @@ devDependencies:
     specifier: ^7.24.1
     version: 7.24.1(@babel/core@7.24.4)
   '@codecov/rollup-plugin':
-    specifier: 0.0.1-beta.5
-    version: 0.0.1-beta.5(rollup@4.14.1)
+    specifier: 0.0.1-beta.6
+    version: 0.0.1-beta.6(rollup@4.14.1)
   '@playwright/test':
     specifier: ^1.43.0
     version: 1.43.0
@@ -1436,8 +1436,8 @@ packages:
       statuses: 2.0.1
     dev: true
 
-  /@codecov/bundler-plugin-core@0.0.1-beta.5:
-    resolution: {integrity: sha512-eltwv1aRJdwonlTD47jQ2GYdKZfMv3jCviDui32JOu12ZAiI3WdJCtjWF9zxpmnHEZ30pn0WbeZir+sXSFLJHw==}
+  /@codecov/bundler-plugin-core@0.0.1-beta.6:
+    resolution: {integrity: sha512-dGk/s90fZm7D1O00gRtuE2gqM/CW9nglaPzcIT0v10VOV2tj+aHRrdB+yjas+RW8QP8Qf/sMqSmjkufP1iqggw==}
     engines: {node: '>=18.0.0'}
     dependencies:
       chalk: 4.1.2
@@ -1446,13 +1446,13 @@ packages:
       zod: 3.22.4
     dev: true
 
-  /@codecov/rollup-plugin@0.0.1-beta.5(rollup@4.14.1):
-    resolution: {integrity: sha512-3x6vmt59Hgfpr8jroB7LYa2XX+kFds8HaWsUTBX08sJ2bCw+BzlW1Mnc+IdxBdMtjo1jkYEceRvfwQ0X2LK4ZQ==}
+  /@codecov/rollup-plugin@0.0.1-beta.6(rollup@4.14.1):
+    resolution: {integrity: sha512-x3ztYUtUiz1znvpz98MvBprDoPLzK0UP3NOX7Kyz7vPHoBCAQ78kaTrk1WPaHvA4y3AeNxODJNqdIYVGdeB7bQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       rollup: 3.x || 4.x
     dependencies:
-      '@codecov/bundler-plugin-core': 0.0.1-beta.5
+      '@codecov/bundler-plugin-core': 0.0.1-beta.6
       rollup: 4.14.1
     dev: true
 
