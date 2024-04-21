@@ -49,7 +49,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         onGetStateFromStorage: undefined,
         onIsMoveHandle: undefined,
         onLoadFailed: undefined,
-        onLoading: undefined,
         onSetStateFromStorage: undefined,
         openedIcon: "&#x25bc;",
         openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
@@ -1012,11 +1011,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (this.isDragging()) {
             this.dndHandler.refresh();
         }
-
-        this.triggerEvent("tree.load_data", {
-            tree_data: data,
-            parent_node: parentNode,
-        });
     }
 
     private deselectNodes(parentNode: Node): void {
@@ -1090,7 +1084,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             onGetStateFromStorage,
             onIsMoveHandle,
             onLoadFailed,
-            onLoading,
             onSetStateFromStorage,
             openedIcon,
             openFolderDelay,
@@ -1135,7 +1128,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             dataFilter,
             loadData,
             onLoadFailed,
-            onLoading,
             treeElement,
             triggerEvent,
         });
