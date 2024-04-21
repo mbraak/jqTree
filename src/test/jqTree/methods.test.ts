@@ -1295,6 +1295,12 @@ describe("setState", () => {
             }),
         ]);
     });
+
+    it("doesn't set the state when the state parameter is null", () => {
+        given.$tree.tree("setState", null as any); // eslint-disable-line @typescript-eslint/no-unsafe-argument
+
+        expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+    });
 });
 
 describe("toggle", () => {

@@ -1,5 +1,5 @@
 import { Node } from "./node";
-import { DataFilter, OnLoadFailed } from "./jqtreeOptions";
+import { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
 import { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
 
 export type HandleFinishedLoading = () => void;
@@ -8,6 +8,7 @@ interface DataLoaderParams {
     dataFilter?: DataFilter;
     loadData: LoadData;
     onLoadFailed?: OnLoadFailed;
+    onLoading?: OnLoading;
     treeElement: HTMLElement;
     triggerEvent: TriggerEvent;
 }
@@ -16,6 +17,7 @@ export default class DataLoader {
     private dataFilter?: DataFilter;
     private loadData: LoadData;
     private onLoadFailed?: OnLoadFailed;
+    private onLoading?: OnLoading;
     private treeElement: HTMLElement;
     private triggerEvent: TriggerEvent;
 
@@ -23,12 +25,14 @@ export default class DataLoader {
         dataFilter,
         loadData,
         onLoadFailed,
+        onLoading,
         treeElement,
         triggerEvent,
     }: DataLoaderParams) {
         this.dataFilter = dataFilter;
         this.loadData = loadData;
         this.onLoadFailed = onLoadFailed;
+        this.onLoading = onLoading;
         this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
     }
@@ -44,11 +48,11 @@ export default class DataLoader {
 
         const element = this.getDomElement(parentNode);
         this.addLoadingClass(element);
-        this.notifyLoading(true, parentNode);
+        this.notifyLoading(true, parentNode, element);
 
         const stopLoading = (): void => {
             this.removeLoadingClass(element);
-            this.notifyLoading(false, parentNode);
+            this.notifyLoading(false, parentNode, element);
         };
 
         const handleSuccess = (data: string | NodeData[]): void => {
@@ -87,10 +91,21 @@ export default class DataLoader {
         }
     }
 
-    private notifyLoading(isLoading: boolean, node: Node | null): void {
+    private notifyLoading(
+        isLoading: boolean,
+        node: Node | null,
+        element: HTMLElement,
+    ): void {
+        const $el = jQuery(element);
+
+        if (this.onLoading) {
+            this.onLoading(isLoading, node, $el);
+        }
+
         this.triggerEvent("tree.loading_data", {
             isLoading,
             node,
+            $el,
         });
     }
 
