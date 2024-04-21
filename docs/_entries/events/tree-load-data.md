@@ -3,13 +3,20 @@ title: tree.load_data
 name: event-load-data
 ---
 
-Called after data is loaded using ajax.
+Called before data is loaded using ajax.
+
+Attributes:
+
+-   `node`
+    -   null when loading the whole tree
+    -   a node when loading data for a sub tree
+-   `element`: dom element
 
 {% highlight js %}
 $('#tree1').on(
     'tree.load_data',
     function(e) {
-        console.log(e.tree_data);
+        //
     }
 );
 {% endhighlight %}

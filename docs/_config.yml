@@ -38,7 +38,6 @@ collections:
       - options/ondragstop.md
       - options/onismovehandle.md
       - options/onloadfailed.md
-      - options/onloading.md
       - options/openedicon.md
       - options/openfolderdelay.md
       - options/rtl.md
@@ -88,7 +87,6 @@ collections:
       - events/tree-dblclick.md
       - events/tree-init.md
       - events/tree-load-data.md
-      - events/tree-loading-data.md
       - events/tree-move.md
       - events/tree-refresh.md
       - events/tree-open.md
