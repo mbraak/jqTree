@@ -1001,18 +1001,16 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         saveState();
     }
 
-    private doLoadData(data: NodeData[] | null, parentNode: Node | null): void {
-        if (data) {
-            if (parentNode) {
-                this.deselectNodes(parentNode);
-                this.loadSubtree(data, parentNode);
-            } else {
-                this.initTree(data);
-            }
+    private doLoadData(data: NodeData[], parentNode: Node | null): void {
+        if (parentNode) {
+            this.deselectNodes(parentNode);
+            this.loadSubtree(data, parentNode);
+        } else {
+            this.initTree(data);
+        }
 
-            if (this.isDragging()) {
-                this.dndHandler.refresh();
-            }
+        if (this.isDragging()) {
+            this.dndHandler.refresh();
         }
 
         this.triggerEvent("tree.load_data", {
