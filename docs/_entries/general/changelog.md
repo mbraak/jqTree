@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issie #805: fix injection vulnerability because of lodash.template
+
 #### 1.8.2 (march 24 2024)
 
 -   Issue #751: fix dnd regression (thanks to Tom De Ford)
