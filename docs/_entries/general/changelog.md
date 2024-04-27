@@ -5,7 +5,8 @@ name: changelog
 
 #### Development version
 
--   Issie #805: fix injection vulnerability because of lodash.template
+-   Issue #805: fix injection vulnerability because of lodash.template
+-   Issue #808: make the npm package smaller
 
 #### 1.8.2 (march 24 2024)
 
