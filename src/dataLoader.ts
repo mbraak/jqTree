@@ -47,7 +47,6 @@ export default class DataLoader {
 
         this.triggerEvent("tree.load_data", {
             node: parentNode,
-            element,
         });
 
         const stopLoading = (): void => {
