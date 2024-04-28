@@ -234,6 +234,58 @@ describe("tree.load_data", () => {
     });
 });
 
+describe("tree.loaded_data", () => {
+    const server = setupServer(
+        http.get("/tree/", () => HttpResponse.json(exampleData)),
+        http.get("/subtree/", () =>
+            HttpResponse.json([{ name: "node4", id: 130 }]),
+        ),
+    );
+    beforeEach(() => {
+        server.listen();
+    });
+
+    it("fires tree.loaded_data when the data is loaded from an url for the whole tree", async () => {
+        const $tree = $("#tree1");
+        const onLoadedData = jest.fn();
+        $tree.on("tree.loaded_data", onLoadedData);
+
+        $tree.tree({ dataUrl: "/tree/" });
+
+        await waitFor(() => {
+            expect(onLoadedData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    node: null,
+                }),
+            );
+        });
+    });
+
+    it("fires tree.loaded_data when the data is loaded from an url for a subtree", async () => {
+        const $tree = $("#tree1");
+
+        const onLoadedData = jest.fn();
+        $tree.on("tree.loaded_data", onLoadedData);
+
+        $tree.tree({ data: exampleData });
+
+        expect(onLoadedData).not.toHaveBeenCalled();
+
+        const node2 = $tree.tree("getNodeByName", "node2");
+        expect(parent).not.toBeNil();
+
+        $tree.tree("loadDataFromUrl", "/subtree/", node2);
+
+        await waitFor(() => {
+            expect(onLoadedData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    node: node2,
+                }),
+            );
+        });
+    });
+});
+
 describe("tree.select", () => {
     interface Vars {
         node1: INode;

@@ -61,6 +61,10 @@ export default class DataLoader {
             if (onFinished && typeof onFinished === "function") {
                 onFinished();
             }
+
+            this.triggerEvent("tree.loaded_data", {
+                node: parentNode,
+            });
         };
 
         const handleError = (jqXHR: JQuery.jqXHR): void => {
