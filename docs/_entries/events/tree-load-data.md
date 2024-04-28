@@ -10,7 +10,6 @@ Attributes:
 -   `node`
     -   null when loading the whole tree
     -   a node when loading data for a sub tree
--   `element`: dom element
 
 {% highlight js %}
 $('#tree1').on(
