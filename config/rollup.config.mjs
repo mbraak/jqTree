@@ -1,6 +1,6 @@
 import fs from "fs";
 import jsonfile from "jsonfile";
-import template from "lodash.template";
+import template from "lodash/template.js";
 import { babel } from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
 import serve from "rollup-plugin-serve";

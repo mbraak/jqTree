@@ -3,6 +3,11 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issue #805: fix injection vulnerability because of lodash.template
+-   Issue #808: make the npm package smaller
+
 #### 1.8.2 (march 24 2024)
 
 -   Issue #751: fix dnd regression (thanks to Tom De Ford)
