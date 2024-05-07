@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.8.3 (may 7 2024)
 
 -   Issue #805: fix injection vulnerability because of lodash.template
 -   Issue #808: make the npm package smaller
