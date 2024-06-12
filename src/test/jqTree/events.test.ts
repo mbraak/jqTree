@@ -151,20 +151,134 @@ describe("tree.init", () => {
 });
 
 describe("tree.load_data", () => {
-    interface Vars {
-        $tree: JQuery<HTMLElement>;
-    }
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
+    const server = setupServer(
+        http.get("/tree/", () => HttpResponse.json(exampleData)),
+        http.get("/subtree/", () =>
+            HttpResponse.json([{ name: "node4", id: 130 }]),
+        ),
+    );
+    beforeEach(() => {
+        server.listen();
+    });
 
-    context("when the tree is initialized with data", () => {
-        it("fires tree.load_data", () => {
-            const onLoadData = jest.fn();
-            given.$tree.on("tree.load_data", onLoadData);
+    afterAll(() => {
+        server.close();
+    });
 
-            given.$tree.tree({ data: exampleData });
+    it("doesn't fire when the tree is initialized with data", () => {
+        const $tree = $("#tree1");
+        const onLoadData = jest.fn();
+        $tree.on("tree.load_data", onLoadData);
+        $tree.tree({ data: exampleData });
+
+        expect(onLoadData).not.toHaveBeenCalled();
+    });
+
+    it("fires tree.load_data when the data is loaded from an url for the whole tree", async () => {
+        const $tree = $("#tree1");
+        const onLoadData = jest.fn();
+        $tree.on("tree.load_data", onLoadData);
+
+        $tree.tree({ dataUrl: "/tree/" });
+
+        await waitFor(() => {
             expect(onLoadData).toHaveBeenCalledWith(
-                expect.objectContaining({ tree_data: exampleData }),
+                expect.objectContaining({
+                    node: null,
+                }),
+            );
+        });
+    });
+
+    it("fires tree.load_data when the data is loaded from an url for a subtree", async () => {
+        const $tree = $("#tree1");
+
+        const onLoadData = jest.fn();
+        $tree.on("tree.load_data", onLoadData);
+
+        $tree.tree({ data: exampleData });
+
+        expect(onLoadData).not.toHaveBeenCalled();
+
+        const node2 = $tree.tree("getNodeByName", "node2");
+        expect(parent).not.toBeNil();
+
+        $tree.tree("loadDataFromUrl", "/subtree/", node2);
+
+        await waitFor(() => {
+            expect(onLoadData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    node: node2,
+                }),
+            );
+        });
+    });
+
+    it("doesn't fire tree.load_data when the data is loaded using loadData for a subtree", () => {
+        const $tree = $("#tree1");
+
+        const onLoadData = jest.fn();
+        $tree.on("tree.load_data", onLoadData);
+
+        $tree.tree({ data: exampleData });
+
+        const node2 = $tree.tree("getNodeByName", "node2");
+        expect(parent).not.toBeNil();
+
+        const subtree = [{ name: "newnode", id: 200 }];
+        $tree.tree("loadData", subtree, node2 as INode);
+
+        expect(onLoadData).not.toHaveBeenCalled();
+    });
+});
+
+describe("tree.loaded_data", () => {
+    const server = setupServer(
+        http.get("/tree/", () => HttpResponse.json(exampleData)),
+        http.get("/subtree/", () =>
+            HttpResponse.json([{ name: "node4", id: 130 }]),
+        ),
+    );
+    beforeEach(() => {
+        server.listen();
+    });
+
+    it("fires tree.loaded_data when the data is loaded from an url for the whole tree", async () => {
+        const $tree = $("#tree1");
+        const onLoadedData = jest.fn();
+        $tree.on("tree.loaded_data", onLoadedData);
+
+        $tree.tree({ dataUrl: "/tree/" });
+
+        await waitFor(() => {
+            expect(onLoadedData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    node: null,
+                }),
+            );
+        });
+    });
+
+    it("fires tree.loaded_data when the data is loaded from an url for a subtree", async () => {
+        const $tree = $("#tree1");
+
+        const onLoadedData = jest.fn();
+        $tree.on("tree.loaded_data", onLoadedData);
+
+        $tree.tree({ data: exampleData });
+
+        expect(onLoadedData).not.toHaveBeenCalled();
+
+        const node2 = $tree.tree("getNodeByName", "node2");
+        expect(parent).not.toBeNil();
+
+        $tree.tree("loadDataFromUrl", "/subtree/", node2);
+
+        await waitFor(() => {
+            expect(onLoadedData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    node: node2,
+                }),
             );
         });
     });
@@ -217,74 +331,6 @@ describe("tree.select", () => {
                     previous_node: given.node1,
                 }),
             );
-        });
-    });
-});
-
-describe("tree.loading_data", () => {
-    const server = setupServer(
-        http.get("/tree/", () => HttpResponse.json(exampleData)),
-    );
-    beforeEach(() => {
-        server.listen();
-    });
-
-    afterAll(() => {
-        server.close();
-    });
-
-    it("fires tree.loading_data when the data is loading from an url", async () => {
-        const $tree = $("#tree1");
-
-        const onLoading = jest.fn();
-        $tree.on("tree.loading_data", onLoading);
-
-        $tree.tree({ dataUrl: "/tree/" });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    isLoading: true,
-                    node: null,
-                }),
-            );
-        });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    isLoading: false,
-                    node: null,
-                }),
-            );
-        });
-    });
-});
-
-describe("onLoading", () => {
-    const server = setupServer(
-        http.get("/tree/", () => HttpResponse.json(exampleData)),
-    );
-    beforeEach(() => {
-        server.listen();
-    });
-
-    afterAll(() => {
-        server.close();
-    });
-
-    it("calls onLoading", async () => {
-        const $tree = $("#tree1");
-        const onLoading = jest.fn();
-
-        $tree.tree({ dataUrl: "/tree/", onLoading });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
-        });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
         });
     });
 });

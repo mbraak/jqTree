@@ -28,12 +28,6 @@ export type IconElement = string | HTMLElement | JQuery<HTMLElement>;
 
 export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 
-export type OnLoading = (
-    isLoading: boolean,
-    node: Node | null,
-    $el: JQuery,
-) => void;
-
 export interface JQTreeOptions {
     animationSpeed: JQuery.Duration;
     autoEscape: boolean;
@@ -55,7 +49,6 @@ export interface JQTreeOptions {
     onGetStateFromStorage?: OnGetStateFromStorage;
     onIsMoveHandle?: OnIsMoveHandle;
     onLoadFailed?: OnLoadFailed;
-    onLoading?: OnLoading;
     onSetStateFromStorage?: OnSetStateFromStorage;
     openedIcon?: IconElement;
     openFolderDelay: number | false;

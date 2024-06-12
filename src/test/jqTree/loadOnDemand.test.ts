@@ -108,6 +108,25 @@ context("when a node has load_on_demand in the data", () => {
             ]);
         });
 
+        it("fires a tree.load_data event", async () => {
+            const onLoadData = jest.fn();
+            given.$tree.on("tree.load_data", onLoadData);
+
+            const nodeElement = given.node.element;
+
+            const toggler = togglerLink(given.node.element);
+            await userEvent.click(toggler.get(0) as HTMLElement);
+
+            await screen.findByText("loaded-on-demand");
+
+            expect(onLoadData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    element: nodeElement,
+                    node: given.node,
+                }),
+            );
+        });
+
         context("when the node is selected", () => {
             beforeEach(() => {
                 given.$tree.tree("selectNode", given.node);
