@@ -20,7 +20,7 @@ $('#tree1').on(
         }
         else {
             // event.node is null
-            // event a node was deselected
+            // A a node was deselected
             // event.previous_node contains the deselected node
         }
     }
