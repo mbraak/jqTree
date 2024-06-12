@@ -14,14 +14,14 @@ $('#tree1').on(
     'tree.select',
     function(event) {
         if (event.node) {
-            // node was selected
-            var node = event.node;
+            // A node was selected
+            const node = event.node;
             alert(node.name);
         }
         else {
             // event.node is null
-            // a node was deselected
-            // e.previous_node contains the deselected node
+            // A node was deselected
+            // event.previous_node contains the deselected node
         }
     }
 );
