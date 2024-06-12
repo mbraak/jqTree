@@ -15,13 +15,13 @@ $('#tree1').on(
     function(event) {
         if (event.node) {
             // node was selected
-            var node = event.node;
+            const node = event.node;
             alert(node.name);
         }
         else {
             // event.node is null
-            // a node was deselected
-            // e.previous_node contains the deselected node
+            // event a node was deselected
+            // event.previous_node contains the deselected node
         }
     }
 );
