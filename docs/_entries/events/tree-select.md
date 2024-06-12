@@ -14,13 +14,13 @@ $('#tree1').on(
     'tree.select',
     function(event) {
         if (event.node) {
-            // node was selected
+            // A node was selected
             const node = event.node;
             alert(node.name);
         }
         else {
             // event.node is null
-            // A a node was deselected
+            // A node was deselected
             // event.previous_node contains the deselected node
         }
     }
