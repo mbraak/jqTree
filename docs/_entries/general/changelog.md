@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+### Development version
+
+-   Issue #819: update braces package to fix security issue
+
 #### 1.8.3 (may 7 2024)
 
 -   Issue #805: fix injection vulnerability because of lodash.template
