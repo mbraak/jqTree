@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-### Development version
+### 1.8.4 (july 19 2024)
 
 -   Issue #819: update braces package to fix security issue
 
