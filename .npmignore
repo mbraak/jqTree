@@ -1,0 +1,11 @@
+.github
+config
+css
+devserver
+docs
+src/playwright
+src/test
+.editorconfig
+.eslintrc
+.prettier
+tsconfig.json

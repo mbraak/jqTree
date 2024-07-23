@@ -3,13 +3,22 @@ title: Changelog
 name: changelog
 ---
 
-#### development
+### 1.8.4 (july 19 2024)
 
-Small braking change:
+-   Issue #819: update braces package to fix security issue
 
--   Issue #779: remove `onLoading` option.
-    -   The option can be replaced by using the `tree.loading_data` event
-    -   Related: remove the `$el` attribute from the `tree.loading_data` event.
+#### 1.8.3 (may 7 2024)
+
+-   Issue #805: fix injection vulnerability because of lodash.template
+-   Issue #808: make the npm package smaller
+
+#### 1.8.2 (march 24 2024)
+
+-   Issue #751: fix dnd regression (thanks to Tom De Ford)
+
+#### 1.8.1 (march 16 2024)
+
+-   Issue #791: fix onCanMoveTo (thanks to Christophe Caron)
 
 #### 1.8.0 (november 26 2023)
 

@@ -6,9 +6,9 @@
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:import/errors",
-        "plugin:import/warnings",
-        "plugin:import/typescript"
+        "plugin:import/recommended",
+        "plugin:import/typescript",
+        "plugin:deprecation/recommended"
     ],
     "rules": {
         "@typescript-eslint/explicit-function-return-type": "off",
@@ -33,6 +33,17 @@
         ]
     },
     "parserOptions": {
-        "project": "./tsconfig.json",
+        "project": "./tsconfig.json"
+    },
+    "settings": {
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts"]
+        },
+        "import/resolver": {
+            "typescript": {
+                "alwaysTryTypes": true,
+                "project": "./tsconfig.json"
+            }
+        }
     }
 }

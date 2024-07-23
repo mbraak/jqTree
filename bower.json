@@ -1,6 +1,6 @@
 {
     "name": "jqTree",
-    "version": "1.8.0",
+    "version": "1.8.4",
     "main": [
         "jqtree.css",
         "jqtree-circle.png",
