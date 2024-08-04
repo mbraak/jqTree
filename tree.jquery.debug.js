@@ -1458,7 +1458,7 @@ var jqtree = (function (exports) {
               const key = "_storage_test";
               sessionStorage.setItem(key, "value");
               sessionStorage.removeItem(key);
-            } catch (error) {
+            } catch {
               return false;
             }
             return true;
@@ -2200,7 +2200,7 @@ var jqtree = (function (exports) {
       getNodeByNameMustExist(name) {
         const node = this.getNodeByCallback(n => n.name === name);
         if (!node) {
-          throw `Node with name ${name} not found`;
+          throw new Error(`Node with name ${name} not found`);
         }
         return node;
       }
@@ -2688,7 +2688,7 @@ var jqtree = (function (exports) {
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
     class JqTreeWidget extends SimpleWidget {
-      static defaults = {
+      static defaults = (() => ({
         animationSpeed: "fast",
         autoEscape: true,
         autoOpen: false,
@@ -2733,7 +2733,7 @@ var jqtree = (function (exports) {
         // The delay for starting dnd (in milliseconds)
         tabIndex: 0,
         useContextMenu: true
-      };
+      }))();
       toggle(node) {
         let slideParam = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         if (!node) {

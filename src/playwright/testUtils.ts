@@ -61,7 +61,7 @@ const getRect = async (
     const boundingBox = await elementHandle.boundingBox();
 
     if (!boundingBox) {
-        throw "No bounding box";
+        throw new Error("No bounding box");
     }
 
     return boundingBox;
