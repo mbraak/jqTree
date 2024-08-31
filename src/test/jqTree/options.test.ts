@@ -173,6 +173,7 @@ describe("closedIcon", () => {
         });
 
         const $button = $tree.find("a.jqtree-toggler:first");
+
         expect($button.text()).toBe("closed");
     });
 
@@ -184,6 +185,7 @@ describe("closedIcon", () => {
         });
 
         const $button = $tree.find("a.jqtree-toggler:first");
+
         expect($button.text()).toBe("<span>test</span>");
     });
 
@@ -195,6 +197,7 @@ describe("closedIcon", () => {
         });
 
         const $span = $tree.find("a.jqtree-toggler:first span.abc");
+
         expect($span.text()).toBe("test");
     });
 
@@ -210,6 +213,7 @@ describe("closedIcon", () => {
         });
 
         const $span = $tree.find("a.jqtree-toggler:first span.abc");
+
         expect($span.text()).toBe("test");
     });
 
@@ -221,6 +225,7 @@ describe("closedIcon", () => {
         });
 
         const $span = $tree.find("a.jqtree-toggler:first");
+
         expect($span.text()).toBe("►");
     });
 });
@@ -311,6 +316,7 @@ describe("dataUrl", () => {
         });
 
         await screen.findByText("node1");
+
         expect((given.$tree.tree("getSelectedNode") as INode).name).toBe(
             "node2",
         );
@@ -325,6 +331,7 @@ describe("dataUrl", () => {
         });
 
         await screen.findByText("node1");
+
         expect(given.$tree.tree("getSelectedNode")).toBeFalse();
     });
 });
