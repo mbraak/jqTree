@@ -18,7 +18,7 @@
         "ci": "pnpm lint && pnpm tsc && pnpm test",
         "jest": "jest --coverage --no-cache --verbose --config ./config/jest.config.js",
         "jest-watch": "jest --watch --config ./config/jest.config.js",
-        "lint": "eslint src/ --ext .ts,.tsx",
+        "lint": "eslint src",
         "production": "./config/production",
         "devserver": "SERVE=true rollup --config config/rollup.config.mjs --watch",
         "devserver-with-coverage": "COVERAGE=true SERVE=true rollup --config config/rollup.config.mjs",
