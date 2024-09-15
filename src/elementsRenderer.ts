@@ -8,7 +8,7 @@ interface ElementsRendererParams {
     buttonLeft: boolean;
     closedIcon?: IconElement;
     dragAndDrop: boolean;
-    $element: JQuery<HTMLElement>;
+    $element: JQuery;
     getTree: GetTree;
     isNodeSelected: IsNodeSelected;
     onCreateLi?: OnCreateLi;
@@ -24,7 +24,7 @@ export default class ElementsRenderer {
     private autoEscape: boolean;
     private buttonLeft: boolean;
     private dragAndDrop: boolean;
-    private $element: JQuery<HTMLElement>;
+    private $element: JQuery;
     private getTree: GetTree;
     private isNodeSelected: IsNodeSelected;
     private onCreateLi?: OnCreateLi;
@@ -56,12 +56,12 @@ export default class ElementsRenderer {
         this.rtl = rtl;
         this.showEmptyFolder = showEmptyFolder;
         this.tabIndex = tabIndex;
-        this.openedIconElement = this.createButtonElement(openedIcon || "+");
-        this.closedIconElement = this.createButtonElement(closedIcon || "-");
+        this.openedIconElement = this.createButtonElement(openedIcon ?? "+");
+        this.closedIconElement = this.createButtonElement(closedIcon ?? "-");
     }
 
     public render(fromNode: Node | null): void {
-        if (fromNode && fromNode.parent) {
+        if (fromNode?.parent) {
             this.renderFromNode(fromNode);
         } else {
             this.renderFromRoot();
@@ -79,6 +79,10 @@ export default class ElementsRenderer {
     }
 
     public renderFromNode(node: Node): void {
+        if (!node.element) {
+            return;
+        }
+
         // remember current li
         const $previousLi = jQuery(node.element);
 
@@ -93,14 +97,7 @@ export default class ElementsRenderer {
         $previousLi.remove();
 
         // create children
-        if (node.children) {
-            this.createDomElements(
-                li,
-                node.children,
-                false,
-                node.getLevel() + 1,
-            );
-        }
+        this.createDomElements(li, node.children, false, node.getLevel() + 1);
     }
 
     private createDomElements(
@@ -356,8 +353,6 @@ export default class ElementsRenderer {
             div.innerHTML = value;
 
             return document.createTextNode(div.innerHTML);
-        } else if (value == null) {
-            return undefined;
         } else if ((value as HTMLElement).nodeType) {
             return value as HTMLElement;
         } else {

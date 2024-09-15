@@ -10,7 +10,9 @@ const context = describe;
 
 const server = setupServer();
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+    server.listen();
+});
 
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
@@ -25,13 +27,15 @@ afterEach(() => {
     localStorage.clear();
 });
 
-afterAll(() => server.close());
+afterAll(() => {
+    server.close();
+});
 
 context("when a node has load_on_demand in the data", () => {
     interface Vars {
         autoOpen: boolean;
         node: INode;
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
         savedState?: string;
     }
     const given = getGiven<Vars>();
@@ -92,7 +96,7 @@ context("when a node has load_on_demand in the data", () => {
         );
 
         it("loads the subtree", async () => {
-            const toggler = togglerLink(given.node.element);
+            const toggler = togglerLink(given.node.element as HTMLElement);
             await userEvent.click(toggler.get(0) as HTMLElement);
 
             await screen.findByText("loaded-on-demand");
@@ -117,7 +121,7 @@ context("when a node has load_on_demand in the data", () => {
                 expect(given.node.element).toBeSelected();
                 expect(given.node.element).toBeFocused();
 
-                const toggler = togglerLink(given.node.element);
+                const toggler = togglerLink(given.node.element as HTMLElement);
                 await userEvent.click(toggler.get(0) as HTMLElement);
 
                 await screen.findByText("loaded-on-demand");
@@ -130,7 +134,7 @@ context("when a node has load_on_demand in the data", () => {
             it("doesn't select the node", async () => {
                 expect(given.node.element).not.toBeSelected();
 
-                const toggler = togglerLink(given.node.element);
+                const toggler = togglerLink(given.node.element as HTMLElement);
                 await userEvent.click(toggler.get(0) as HTMLElement);
 
                 await screen.findByText("loaded-on-demand");
@@ -142,14 +146,14 @@ context("when a node has load_on_demand in the data", () => {
         context("when the node is selected and doesn't have the focus", () => {
             beforeEach(() => {
                 given.$tree.tree("selectNode", given.node);
-                (document.activeElement as HTMLElement).blur(); // eslint-disable-line testing-library/no-node-access
+                (document.activeElement as HTMLElement).blur();
             });
 
             it("keeps the node selected and not focused", async () => {
                 expect(given.node.element).toBeSelected();
                 expect(given.node.element).not.toBeFocused();
 
-                const toggler = togglerLink(given.node.element);
+                const toggler = togglerLink(given.node.element as HTMLElement);
                 await userEvent.click(toggler.get(0) as HTMLElement);
 
                 await screen.findByText("loaded-on-demand");

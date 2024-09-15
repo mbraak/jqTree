@@ -7,8 +7,9 @@ interface BoundingBox {
     height: number;
 }
 
-export const sleep = async (page: Page, timeout: number) =>
+export const sleep = async (page: Page, timeout: number) => {
     await page.waitForTimeout(timeout); // eslint-disable-line playwright/no-wait-for-timeout
+};
 
 export const locateTitle = (page: Page, title: string) =>
     page.locator(".jqtree-title", {

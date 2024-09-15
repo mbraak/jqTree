@@ -125,22 +125,14 @@ export default class SaveStateHandler {
     result: must load on demand
     */
     public setInitialState(state: SavedState): boolean {
-        if (!state) {
-            return false;
-        } else {
-            let mustLoadOnDemand = false;
+        let mustLoadOnDemand = false;
 
-            if (state.open_nodes) {
-                mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
-            }
+        mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
 
-            if (state.selected_node) {
-                this.resetSelection();
-                this.selectInitialNodes(state.selected_node);
-            }
+        this.resetSelection();
+        this.selectInitialNodes(state.selected_node);
 
-            return mustLoadOnDemand;
-        }
+        return mustLoadOnDemand;
     }
 
     public setInitialStateOnDemand(
@@ -195,7 +187,7 @@ export default class SaveStateHandler {
         const state = this.getStateFromStorage();
 
         if (state?.selected_node) {
-            return state.selected_node[0] || null;
+            return state.selected_node[0] ?? null;
         } else {
             return null;
         }
@@ -205,7 +197,7 @@ export default class SaveStateHandler {
         const state = JSON.parse(jsonData) as Record<string, unknown>;
 
         // Check if selected_node is an int (instead of an array)
-        if (state && state.selected_node && isInt(state.selected_node)) {
+        if (state.selected_node && isInt(state.selected_node)) {
             // Convert to array
             state.selected_node = [state.selected_node];
         }
@@ -275,21 +267,16 @@ export default class SaveStateHandler {
 
     private supportsLocalStorage(): boolean {
         const testSupport = (): boolean => {
-            // Is local storage supported?
-            if (localStorage == null) {
+            // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
+            try {
+                const key = "_storage_test";
+                sessionStorage.setItem(key, "value");
+                sessionStorage.removeItem(key);
+            } catch {
                 return false;
-            } else {
-                // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
-                try {
-                    const key = "_storage_test";
-                    sessionStorage.setItem(key, "value");
-                    sessionStorage.removeItem(key);
-                } catch {
-                    return false;
-                }
-
-                return true;
             }
+
+            return true;
         };
 
         if (this._supportsLocalStorage == null) {

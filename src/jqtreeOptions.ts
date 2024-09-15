@@ -24,7 +24,7 @@ export type OnSetStateFromStorage = ((data: string) => void) | undefined;
 
 export type DataFilter = (data: unknown) => NodeData[];
 
-export type IconElement = string | HTMLElement | JQuery<HTMLElement>;
+export type IconElement = string | HTMLElement | JQuery;
 
 export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 
@@ -64,7 +64,7 @@ export interface JQTreeOptions {
     saveState: boolean | string;
     showEmptyFolder: boolean;
     slide: boolean;
-    startDndDelay: number;
+    startDndDelay?: number;
     tabIndex?: number;
     useContextMenu: boolean;
 }

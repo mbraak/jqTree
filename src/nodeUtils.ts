@@ -7,4 +7,4 @@ export const isNodeRecordWithChildren = (
 ): data is NodeRecordWithChildren =>
     typeof data === "object" &&
     "children" in data &&
-    data["children"] instanceof Array;
+    data.children instanceof Array;

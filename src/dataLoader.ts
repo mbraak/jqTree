@@ -128,7 +128,7 @@ export default class DataLoader {
             ...urlInfo,
         };
 
-        ajaxSettings.method = ajaxSettings.method?.toUpperCase() || "GET";
+        ajaxSettings.method = ajaxSettings.method?.toUpperCase() ?? "GET";
 
         void jQuery.ajax(ajaxSettings);
     }
