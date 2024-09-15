@@ -315,7 +315,7 @@ export class Node implements INode {
         const node = this.getNodeByCallback((n: Node) => n.name === name);
 
         if (!node) {
-            throw `Node with name ${name} not found`;
+            throw new Error(`Node with name ${name} not found`);
         }
 
         return node;

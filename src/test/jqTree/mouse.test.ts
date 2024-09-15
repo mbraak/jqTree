@@ -18,6 +18,7 @@ it("selects a node and sets the focus when it is clicked", async () => {
     $tree.tree({ data: exampleData });
 
     const node = $tree.tree("getNodeByNameMustExist", "node1");
+
     expect(node.element).not.toBeSelected();
     expect(node.element).not.toBeFocused();
 
@@ -45,6 +46,7 @@ it("opens a node when the toggle button is clicked", async () => {
     $tree.tree({ data: exampleData });
 
     const node = $tree.tree("getNodeByNameMustExist", "node1");
+
     expect(node.element).not.toBeOpen();
 
     await userEvent.click(togglerLink(node.element).get(0) as HTMLElement);
@@ -57,6 +59,7 @@ it("doesn't select a node when it is opened", async () => {
     $tree.tree({ data: exampleData });
 
     const node = $tree.tree("getNodeByNameMustExist", "node1");
+
     expect(node.element).not.toBeSelected();
     expect(node.element).not.toBeOpen();
 
@@ -72,6 +75,7 @@ it("keeps it selected when a selected node is opened", async () => {
 
     const node = $tree.tree("getNodeByNameMustExist", "node1");
     $tree.tree("selectNode", node);
+
     expect(node.element).toBeSelected();
     expect(node.element).not.toBeOpen();
 

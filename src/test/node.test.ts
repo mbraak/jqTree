@@ -483,6 +483,7 @@ describe("getChildIndex", () => {
     context("when a child doesn't exist", () => {
         it("returns -1", () => {
             const nonExistingChild = new Node("non-existing");
+
             expect(given.node.getChildIndex(nonExistingChild)).toBe(-1);
         });
     });
@@ -1123,8 +1124,8 @@ describe("loadFromData", () => {
                 children: [],
             },
         ];
-
         const tree = new Node().loadFromData(data);
+
         expect((tree.children[0] as Node).isEmptyFolder).toBe(true);
     });
 
@@ -1134,8 +1135,8 @@ describe("loadFromData", () => {
                 name: "test1",
             },
         ];
-
         const tree = new Node().loadFromData(data);
+
         expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
     });
 
@@ -1146,8 +1147,8 @@ describe("loadFromData", () => {
                 children: ["child1"],
             },
         ];
-
         const tree = new Node().loadFromData(data);
+
         expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
     });
 });

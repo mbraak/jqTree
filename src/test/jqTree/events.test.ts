@@ -40,6 +40,7 @@ describe("tree.click", () => {
         given.$tree.on("tree.click", onClick);
 
         await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
         expect(onClick).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -70,6 +71,7 @@ describe("tree.contextmenu", () => {
             target: given.titleSpan.get(0) as HTMLElement,
             keys: "[MouseRight]",
         });
+
         expect(onContextMenu).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -97,6 +99,7 @@ describe("tree.dblclick", () => {
         given.$tree.on("tree.dblclick", onDoubleClick);
 
         await userEvent.dblClick(given.titleSpan.get(0) as HTMLElement);
+
         expect(onDoubleClick).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -128,6 +131,7 @@ describe("tree.init", () => {
         const server = setupServer(
             http.get("/tree/", () => HttpResponse.json(exampleData)),
         );
+
         beforeEach(() => {
             server.listen();
         });
@@ -163,6 +167,7 @@ describe("tree.load_data", () => {
             given.$tree.on("tree.load_data", onLoadData);
 
             given.$tree.tree({ data: exampleData });
+
             expect(onLoadData).toHaveBeenCalledWith(
                 expect.objectContaining({ tree_data: exampleData }),
             );
@@ -193,6 +198,7 @@ describe("tree.select", () => {
         given.$tree.on("tree.select", onSelect);
 
         await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
         expect(onSelect).toHaveBeenCalledWith(
             expect.objectContaining({
                 node: given.node1,
@@ -211,6 +217,7 @@ describe("tree.select", () => {
             given.$tree.on("tree.select", onSelect);
 
             await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
             expect(onSelect).toHaveBeenCalledWith(
                 expect.objectContaining({
                     node: null,
@@ -225,6 +232,7 @@ describe("tree.loading_data", () => {
     const server = setupServer(
         http.get("/tree/", () => HttpResponse.json(exampleData)),
     );
+
     beforeEach(() => {
         server.listen();
     });
@@ -265,6 +273,7 @@ describe("onLoading", () => {
     const server = setupServer(
         http.get("/tree/", () => HttpResponse.json(exampleData)),
     );
+
     beforeEach(() => {
         server.listen();
     });

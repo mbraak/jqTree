@@ -187,6 +187,7 @@ describe("addToSelection", () => {
         });
 
         const node1 = given.$tree.tree("getNodeByNameMustExist", "node1");
+
         expect(node1.is_open).toBeFalsy();
 
         given.$tree.tree("addToSelection", given.child1);
@@ -843,6 +844,7 @@ describe("moveDown", () => {
 
     it("selects the next node", () => {
         given.$tree.tree("moveDown");
+
         expect(given.$tree.tree("getSelectedNode")).toMatchObject({
             name: "node2",
         });
@@ -897,6 +899,7 @@ describe("moveUp", () => {
 
     it("selects the next node", () => {
         given.$tree.tree("moveUp");
+
         expect(given.$tree.tree("getSelectedNode")).toMatchObject({
             name: "node1",
         });
@@ -1208,6 +1211,7 @@ describe("selectNode", () => {
 
         it("deselects the node", () => {
             given.$tree.tree("selectNode", given.node1);
+
             expect(given.node1.element).not.toBeSelected();
         });
     });
@@ -1219,6 +1223,7 @@ describe("selectNode", () => {
 
         it("deselects the current node", () => {
             given.$tree.tree("selectNode", null);
+
             expect(given.$tree.tree("getSelectedNode")).toBeFalse();
         });
     });
@@ -1240,6 +1245,7 @@ describe("setOption", () => {
     }
 
     const given = getGiven<Vars>();
+
     beforeEach(() => {
         given.$tree.tree({
             animationSpeed: 0,
@@ -1247,6 +1253,7 @@ describe("setOption", () => {
             selectable: false,
         });
     });
+
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
@@ -1255,6 +1262,7 @@ describe("setOption", () => {
         await userEvent.click(
             titleSpan(given.node1.element).get(0) as HTMLElement,
         );
+
         expect(given.$tree.tree("getSelectedNode")).toMatchObject({
             name: "node1",
         });
@@ -1267,6 +1275,7 @@ describe("setState", () => {
     }
 
     const given = getGiven<Vars>();
+
     beforeEach(() => {
         given.$tree.tree({
             autoOpen: false,
@@ -1274,6 +1283,7 @@ describe("setState", () => {
             selectable: true,
         });
     });
+
     given("$tree", () => $("#tree1"));
 
     it("sets the state", () => {

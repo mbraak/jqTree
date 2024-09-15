@@ -284,7 +284,7 @@ export default class SaveStateHandler {
                     const key = "_storage_test";
                     sessionStorage.setItem(key, "value");
                     sessionStorage.removeItem(key);
-                } catch (error) {
+                } catch {
                     return false;
                 }
 

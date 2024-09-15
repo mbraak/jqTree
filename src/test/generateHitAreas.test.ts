@@ -21,6 +21,7 @@ describe("generateHitAreasForGroup", () => {
     it("doesn't add a hit area with zero hit positions", () => {
         const hitAreas: HitArea[] = [];
         generateHitAreasForGroup(hitAreas, [], 0, 0);
+
         expect(hitAreas).toBeEmpty();
     });
 
@@ -55,6 +56,7 @@ describe("generateHitAreasForGroup", () => {
 
         const hitAreas: HitArea[] = [];
         generateHitAreasForGroup(hitAreas, [hitPosition], 0, 100);
+
         expect(hitAreas).toBeEmpty();
     });
 
