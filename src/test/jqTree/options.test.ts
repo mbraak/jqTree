@@ -10,7 +10,9 @@ const context = describe;
 
 const server = setupServer();
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+    server.listen();
+});
 
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
@@ -25,12 +27,14 @@ afterEach(() => {
     localStorage.clear();
 });
 
-afterAll(() => server.close());
+afterAll(() => {
+    server.close();
+});
 
 describe("autoEscape", () => {
     interface Vars {
         autoEscape: boolean;
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -71,7 +75,7 @@ describe("autoEscape", () => {
 describe("autoOpen", () => {
     interface Vars {
         autoOpen: boolean | number | string;
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -291,7 +295,7 @@ describe("dataUrl", () => {
     });
 
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
@@ -339,7 +343,7 @@ describe("dataUrl", () => {
 describe("onCanSelectNode", () => {
     interface Vars {
         node1: INode;
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -362,7 +366,7 @@ describe("onCanSelectNode", () => {
 
 describe("onCreateLi", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -371,7 +375,7 @@ describe("onCreateLi", () => {
     beforeEach(() => {
         given.$tree.tree({
             data: exampleData,
-            onCreateLi: (node: INode, el: JQuery<HTMLElement>) => {
+            onCreateLi: (node: INode, el: JQuery) => {
                 titleSpan(el).text(`_${node.name}_`);
             },
         });
@@ -397,7 +401,7 @@ describe("onGetStateFromStorage and onSetStateFromStorage", () => {
     interface Vars {
         initialState: string;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -454,7 +458,7 @@ describe("onGetStateFromStorage and onSetStateFromStorage", () => {
 
 describe("onLoadFailed", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -493,7 +497,7 @@ describe("onLoadFailed", () => {
 describe("rtl", () => {
     interface Vars {
         node1: INode;
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
@@ -505,7 +509,9 @@ describe("rtl", () => {
         });
 
         it("has a different closed icon", () => {
-            expect(togglerLink(given.node1.element).text()).toBe("◀");
+            expect(togglerLink(given.node1.element as HTMLElement).text()).toBe(
+                "◀",
+            );
         });
     });
 
@@ -516,7 +522,9 @@ describe("rtl", () => {
         });
 
         it("has a different closed icon", () => {
-            expect(togglerLink(given.node1.element).text()).toBe("◀");
+            expect(togglerLink(given.node1.element as HTMLElement).text()).toBe(
+                "◀",
+            );
         });
     });
 });
@@ -525,7 +533,7 @@ describe("saveState", () => {
     interface Vars {
         node1: INode;
         saveState: boolean | string;
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
@@ -611,7 +619,7 @@ describe("showEmptyFolder", () => {
     context("when children attribute is an empty array", () => {
         interface Vars {
             showEmptyFolder: boolean;
-            $tree: JQuery<HTMLElement>;
+            $tree: JQuery;
         }
 
         const given = getGiven<Vars>();

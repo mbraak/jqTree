@@ -12,8 +12,8 @@ import {
 } from "./jqtreeMethodTypes";
 
 export interface SavedState {
-    open_nodes: NodeId[];
-    selected_node: NodeId[];
+    open_nodes?: NodeId[];
+    selected_node?: NodeId[];
 }
 
 interface SaveStateHandlerParams {
@@ -125,22 +125,19 @@ export default class SaveStateHandler {
     result: must load on demand
     */
     public setInitialState(state: SavedState): boolean {
-        if (!state) {
-            return false;
-        } else {
-            let mustLoadOnDemand = false;
+        let mustLoadOnDemand = false;
 
-            if (state.open_nodes) {
-                mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
-            }
-
-            if (state.selected_node) {
-                this.resetSelection();
-                this.selectInitialNodes(state.selected_node);
-            }
-
-            return mustLoadOnDemand;
+        if (state.open_nodes) {
+            mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
         }
+
+        this.resetSelection();
+
+        if (state.selected_node) {
+            this.selectInitialNodes(state.selected_node);
+        }
+
+        return mustLoadOnDemand;
     }
 
     public setInitialStateOnDemand(
@@ -151,6 +148,10 @@ export default class SaveStateHandler {
         let nodeIds = state.open_nodes;
 
         const openNodes = (): void => {
+            if (!nodeIds) {
+                return;
+            }
+
             const newNodesIds = [];
 
             for (const nodeId of nodeIds) {
@@ -171,8 +172,10 @@ export default class SaveStateHandler {
 
             nodeIds = newNodesIds;
 
-            if (this.selectInitialNodes(state.selected_node)) {
-                this.refreshElements(null);
+            if (state.selected_node) {
+                if (this.selectInitialNodes(state.selected_node)) {
+                    this.refreshElements(null);
+                }
             }
 
             if (loadingCount === 0) {
@@ -195,7 +198,7 @@ export default class SaveStateHandler {
         const state = this.getStateFromStorage();
 
         if (state?.selected_node) {
-            return state.selected_node[0] || null;
+            return state.selected_node[0] ?? null;
         } else {
             return null;
         }
@@ -205,7 +208,7 @@ export default class SaveStateHandler {
         const state = JSON.parse(jsonData) as Record<string, unknown>;
 
         // Check if selected_node is an int (instead of an array)
-        if (state && state.selected_node && isInt(state.selected_node)) {
+        if (state.selected_node && isInt(state.selected_node)) {
             // Convert to array
             state.selected_node = [state.selected_node];
         }
@@ -275,21 +278,16 @@ export default class SaveStateHandler {
 
     private supportsLocalStorage(): boolean {
         const testSupport = (): boolean => {
-            // Is local storage supported?
-            if (localStorage == null) {
+            // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
+            try {
+                const key = "_storage_test";
+                sessionStorage.setItem(key, "value");
+                sessionStorage.removeItem(key);
+            } catch {
                 return false;
-            } else {
-                // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
-                try {
-                    const key = "_storage_test";
-                    sessionStorage.setItem(key, "value");
-                    sessionStorage.removeItem(key);
-                } catch {
-                    return false;
-                }
-
-                return true;
             }
+
+            return true;
         };
 
         if (this._supportsLocalStorage == null) {

@@ -14,7 +14,7 @@ interface INode {
     id?: NodeId;
     name: string;
     children: INode[];
-    element: HTMLElement;
+    element?: HTMLElement;
     is_open: boolean;
     parent: INode | null;
 
@@ -49,7 +49,7 @@ interface IJQTreeOptions {
     autoEscape?: boolean;
     autoOpen?: boolean | number | string;
     buttonLeft?: boolean;
-    closedIcon?: string | HTMLElement | JQuery<HTMLElement>;
+    closedIcon?: string | HTMLElement | JQuery;
     data?: NodeData[];
     dataFilter?: (data: NodeData[]) => NodeData[];
     dataUrl?: DataUrl;
@@ -66,7 +66,7 @@ interface IJQTreeOptions {
     onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;
-    openedIcon?: string | HTMLElement | JQuery<HTMLElement>;
+    openedIcon?: string | HTMLElement | JQuery;
     openFolderDelay?: number | false;
     rtl?: boolean;
     selectable?: boolean;
@@ -79,8 +79,7 @@ interface IJQTreeOptions {
 }
 
 interface IJQTreePlugin {
-    (): JQuery;
-    (options: IJQTreeOptions): JQuery;
+    (options?: IJQTreeOptions): JQuery;
     (
         behavior: "addNodeAfter",
         newNodeInfo: NodeData,

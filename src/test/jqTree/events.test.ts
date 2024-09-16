@@ -22,13 +22,13 @@ afterEach(() => {
 describe("tree.click", () => {
     interface Vars {
         node1: INode;
-        titleSpan: JQuery<HTMLElement>;
-        $tree: JQuery<HTMLElement>;
+        titleSpan: JQuery;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element));
+    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
@@ -50,13 +50,13 @@ describe("tree.click", () => {
 describe("tree.contextmenu", () => {
     interface Vars {
         node1: INode;
-        titleSpan: JQuery<HTMLElement>;
-        $tree: JQuery<HTMLElement>;
+        titleSpan: JQuery;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element));
+    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
@@ -81,13 +81,13 @@ describe("tree.contextmenu", () => {
 describe("tree.dblclick", () => {
     interface Vars {
         node1: INode;
-        titleSpan: JQuery<HTMLElement>;
-        $tree: JQuery<HTMLElement>;
+        titleSpan: JQuery;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element));
+    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
@@ -108,7 +108,7 @@ describe("tree.dblclick", () => {
 
 describe("tree.init", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
@@ -122,7 +122,6 @@ describe("tree.init", () => {
                 data: exampleData,
             });
 
-            // eslint-disable-next-line jest/prefer-called-with
             expect(onInit).toHaveBeenCalled();
         });
     });
@@ -147,7 +146,6 @@ describe("tree.init", () => {
             given.$tree.tree({ dataUrl: "/tree/" });
 
             await waitFor(() => {
-                // eslint-disable-next-line jest/prefer-called-with
                 expect(onInit).toHaveBeenCalled();
             });
         });
@@ -156,7 +154,7 @@ describe("tree.init", () => {
 
 describe("tree.load_data", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
@@ -178,13 +176,13 @@ describe("tree.load_data", () => {
 describe("tree.select", () => {
     interface Vars {
         node1: INode;
-        titleSpan: JQuery<HTMLElement>;
-        $tree: JQuery<HTMLElement>;
+        titleSpan: JQuery;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element));
+    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {

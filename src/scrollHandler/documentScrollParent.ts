@@ -1,5 +1,5 @@
 import type { ScrollParent } from "./types";
-import { getOffsetTop } from '../util'
+import { getOffsetTop } from "../util";
 
 type HorizontalScrollDirection = "left" | "right";
 type VerticalScrollDirection = "bottom" | "top";
@@ -141,7 +141,7 @@ export default class DocumentScrollParent implements ScrollParent {
     private getNewVerticalScrollDirection(
         pageY: number,
     ): VerticalScrollDirection | undefined {
-        const scrollTop = jQuery(document).scrollTop() || 0;
+        const scrollTop = jQuery(document).scrollTop() ?? 0;
         const distanceTop = pageY - scrollTop;
 
         if (distanceTop < 20) {

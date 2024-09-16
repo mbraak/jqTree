@@ -13,7 +13,7 @@ export class Node implements INode {
     public nodeClass?: typeof Node;
     public load_on_demand: boolean;
     public is_open: boolean;
-    public element: HTMLElement;
+    public element?: HTMLElement;
     public is_loading: boolean;
     public isEmptyFolder: boolean;
 
@@ -101,7 +101,7 @@ export class Node implements INode {
         }
     ]
     */
-    public loadFromData(data: NodeData[]): Node {
+    public loadFromData(data: NodeData[]): this {
         this.removeChildren();
 
         for (const childData of data) {
@@ -196,13 +196,11 @@ export class Node implements INode {
     */
     public iterate(callback: IterateCallback): void {
         const _iterate = (node: Node, level: number): void => {
-            if (node.children) {
-                for (const child of node.children) {
-                    const result = callback(child, level);
+            for (const child of node.children) {
+                const result = callback(child, level);
 
-                    if (result && child.hasChildren()) {
-                        _iterate(child, level + 1);
-                    }
+                if (result && child.hasChildren()) {
+                    _iterate(child, level + 1);
                 }
             }
         };
@@ -293,7 +291,7 @@ export class Node implements INode {
                 }
 
                 if (node.hasChildren()) {
-                    tmpNode["children"] = getDataFromNodes(node.children);
+                    tmpNode.children = getDataFromNodes(node.children);
                 }
 
                 return tmpNode;
@@ -437,7 +435,7 @@ export class Node implements INode {
     }
 
     public getNodeById(nodeId: NodeId): Node | null {
-        return this.idMapping.get(nodeId) || null;
+        return this.idMapping.get(nodeId) ?? null;
     }
 
     public addNodeToIndex(node: Node): void {
@@ -467,7 +465,7 @@ export class Node implements INode {
         } else {
             const previousIndex = this.parent.getChildIndex(this) - 1;
             if (previousIndex >= 0) {
-                return this.parent.children[previousIndex] || null;
+                return this.parent.children[previousIndex] ?? null;
             } else {
                 return null;
             }
@@ -480,7 +478,7 @@ export class Node implements INode {
         } else {
             const nextIndex = this.parent.getChildIndex(this) + 1;
             if (nextIndex < this.parent.children.length) {
-                return this.parent.children[nextIndex] || null;
+                return this.parent.children[nextIndex] ?? null;
             } else {
                 return null;
             }
@@ -507,7 +505,7 @@ export class Node implements INode {
 
     public getNextNode(includeChildren = true): Node | null {
         if (includeChildren && this.hasChildren()) {
-            return this.children[0] || null;
+            return this.children[0] ?? null;
         } else if (!this.parent) {
             return null;
         } else {
@@ -524,7 +522,7 @@ export class Node implements INode {
     public getNextVisibleNode(): Node | null {
         if (this.hasChildren() && this.is_open) {
             // First child
-            return this.children[0] || null;
+            return this.children[0] ?? null;
         } else {
             if (!this.parent) {
                 return null;
@@ -603,7 +601,7 @@ export class Node implements INode {
             if (!(lastChild.hasChildren() && lastChild.is_open)) {
                 return lastChild;
             } else {
-                return lastChild?.getLastChild();
+                return lastChild.getLastChild();
             }
         }
     }
@@ -644,7 +642,7 @@ export class Node implements INode {
     }
 
     private getNodeClass(): typeof Node {
-        return this.nodeClass || this?.tree?.nodeClass || Node;
+        return this.nodeClass ?? this.tree?.nodeClass ?? Node;
     }
 
     private createNode(nodeData?: NodeData): Node {

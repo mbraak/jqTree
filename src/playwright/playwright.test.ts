@@ -20,7 +20,9 @@ const initPage = async (page: Page, baseURL: string | undefined) => {
     await page.goto(`${baseURL}/test_index.html`);
     await page.waitForLoadState("domcontentloaded");
 
-    page.on("console", (msg) => console.log(`console: ${msg.text()}`));
+    page.on("console", (msg) => {
+        console.log(`console: ${msg.text()}`);
+    });
 };
 
 interface InitTreeOptions {
@@ -43,9 +45,9 @@ const initTree = async (
 
         $tree.tree({
             animationSpeed: 0,
-            autoOpen: ${autoOpen || 0},
+            autoOpen: ${autoOpen ?? 0},
             data: ExampleData.exampleData,
-            dragAndDrop: ${dragAndDrop || false},
+            dragAndDrop: ${dragAndDrop ?? false},
             onCanMove: ${onCanMove ? "onCanMove" : "null"},
             onCanMoveTo: ${onCanMoveTo ? "onCanMoveTo" : "null"},
             startDndDelay: 100,

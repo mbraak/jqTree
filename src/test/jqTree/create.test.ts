@@ -14,7 +14,7 @@ afterEach(() => {
 
 describe("create with data", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();

@@ -9,7 +9,7 @@ export interface NodeElementParams {
     getScrollLeft: GetScrollLeft;
     node: Node;
     tabIndex?: number;
-    $treeElement: JQuery<HTMLElement>;
+    $treeElement: JQuery;
 }
 
 class NodeElement {
@@ -17,7 +17,7 @@ class NodeElement {
     public element: HTMLElement;
     private getScrollLeft: GetScrollLeft;
     private tabIndex?: number;
-    private $treeElement: JQuery<HTMLElement>;
+    private $treeElement: JQuery;
 
     constructor({
         getScrollLeft,

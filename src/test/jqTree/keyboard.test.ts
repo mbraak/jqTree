@@ -20,7 +20,7 @@ describe("keyboard support", () => {
         autoOpen: boolean;
         initialSelectedNode: INode | null;
         pressedKey: string;
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
