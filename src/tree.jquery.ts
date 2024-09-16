@@ -355,7 +355,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
 
         if (!data) {
-            throw Error(PARAM_IS_EMPTY + "data");
+            return this.element;
         }
 
         const idIsChanged =
@@ -487,9 +487,11 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         return this.saveStateHandler.getState();
     }
 
-    public setState(state: SavedState): JQuery {
-        this.saveStateHandler.setInitialState(state);
-        this.refreshElements(null);
+    public setState(state?: SavedState): JQuery {
+        if (state) {
+            this.saveStateHandler.setInitialState(state);
+            this.refreshElements(null);
+        }
 
         return this.element;
     }

@@ -22,7 +22,9 @@ it("selects a node and sets the focus when it is clicked", async () => {
     expect(node.element).not.toBeSelected();
     expect(node.element).not.toBeFocused();
 
-    await userEvent.click(titleSpan(node.element).get(0) as HTMLElement);
+    await userEvent.click(
+        titleSpan(node.element as HTMLElement).get(0) as HTMLElement,
+    );
 
     expect(node.element).toBeSelected();
 });
@@ -36,7 +38,9 @@ it("deselects when a selected node is clicked", async () => {
 
     expect(node.element).toBeSelected();
 
-    await userEvent.click(titleSpan(node.element).get(0) as HTMLElement);
+    await userEvent.click(
+        titleSpan(node.element as HTMLElement).get(0) as HTMLElement,
+    );
 
     expect(node.element).not.toBeSelected();
 });
@@ -49,7 +53,9 @@ it("opens a node when the toggle button is clicked", async () => {
 
     expect(node.element).not.toBeOpen();
 
-    await userEvent.click(togglerLink(node.element).get(0) as HTMLElement);
+    await userEvent.click(
+        togglerLink(node.element as HTMLElement).get(0) as HTMLElement,
+    );
 
     expect(node.element).toBeOpen();
 });
@@ -63,7 +69,9 @@ it("doesn't select a node when it is opened", async () => {
     expect(node.element).not.toBeSelected();
     expect(node.element).not.toBeOpen();
 
-    await userEvent.click(togglerLink(node.element).get(0) as HTMLElement);
+    await userEvent.click(
+        togglerLink(node.element as HTMLElement).get(0) as HTMLElement,
+    );
 
     expect(node.element).not.toBeSelected();
     expect(node.element).toBeOpen();
@@ -79,7 +87,9 @@ it("keeps it selected when a selected node is opened", async () => {
     expect(node.element).toBeSelected();
     expect(node.element).not.toBeOpen();
 
-    await userEvent.click(togglerLink(node.element).get(0) as HTMLElement);
+    await userEvent.click(
+        togglerLink(node.element as HTMLElement).get(0) as HTMLElement,
+    );
 
     expect(node.element).toBeSelected();
     expect(node.element).toBeOpen();

@@ -84,7 +84,7 @@ export default class DataLoader {
     }
 
     private getDomElement(parentNode: Node | null): HTMLElement {
-        if (parentNode) {
+        if (parentNode?.element) {
             return parentNode.element;
         } else {
             return this.treeElement;

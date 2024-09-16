@@ -12,8 +12,8 @@ import {
 } from "./jqtreeMethodTypes";
 
 export interface SavedState {
-    open_nodes: NodeId[];
-    selected_node: NodeId[];
+    open_nodes?: NodeId[];
+    selected_node?: NodeId[];
 }
 
 interface SaveStateHandlerParams {
@@ -127,10 +127,15 @@ export default class SaveStateHandler {
     public setInitialState(state: SavedState): boolean {
         let mustLoadOnDemand = false;
 
-        mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
+        if (state.open_nodes) {
+            mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
+        }
 
         this.resetSelection();
-        this.selectInitialNodes(state.selected_node);
+
+        if (state.selected_node) {
+            this.selectInitialNodes(state.selected_node);
+        }
 
         return mustLoadOnDemand;
     }
@@ -143,6 +148,10 @@ export default class SaveStateHandler {
         let nodeIds = state.open_nodes;
 
         const openNodes = (): void => {
+            if (!nodeIds) {
+                return;
+            }
+
             const newNodesIds = [];
 
             for (const nodeId of nodeIds) {
@@ -163,8 +172,10 @@ export default class SaveStateHandler {
 
             nodeIds = newNodesIds;
 
-            if (this.selectInitialNodes(state.selected_node)) {
-                this.refreshElements(null);
+            if (state.selected_node) {
+                if (this.selectInitialNodes(state.selected_node)) {
+                    this.refreshElements(null);
+                }
             }
 
             if (loadingCount === 0) {
