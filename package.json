@@ -54,8 +54,6 @@
         "babel-jest": "^29.7.0",
         "babel-plugin-istanbul": "^7.0.0",
         "eslint": "^8.57.1",
-        "eslint-import-resolver-typescript": "^3.6.3",
-        "eslint-plugin-import": "^2.30.0",
         "eslint-plugin-jest": "^28.8.3",
         "eslint-plugin-playwright": "^1.6.2",
         "eslint-plugin-testing-library": "^6.3.0",

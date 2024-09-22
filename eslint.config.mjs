@@ -1,6 +1,5 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import importPlugin from "eslint-plugin-import";
 import jestPlugin from "eslint-plugin-jest";
 import playwrightPlugin from "eslint-plugin-playwright";
 import testingLibraryPlugin from "eslint-plugin-testing-library";
@@ -9,8 +8,6 @@ export default [
     eslint.configs.recommended,
     ...tseslint.configs.strictTypeChecked,
     ...tseslint.configs.stylisticTypeChecked,
-    importPlugin.flatConfigs.recommended,
-    importPlugin.flatConfigs.typescript,
     {
         languageOptions: {
             parserOptions: {
@@ -44,17 +41,6 @@ export default [
                 },
             ],
             "@typescript-eslint/unified-signatures": "off",
-        },
-        settings: {
-            "import/parsers": {
-                "@typescript-eslint/parser": [".ts", ".js", ".mjs"],
-            },
-            "import/resolver": {
-                typescript: {
-                    alwaysTryTypes: true,
-                    project: "./tsconfig.json",
-                },
-            },
         },
     },
     {
