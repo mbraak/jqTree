@@ -50,8 +50,6 @@ export default [
             "@typescript-eslint/unified-signatures": "off",
             "deprecation/deprecation": "error",
         },
-    },
-    {
         settings: {
             "import/parsers": {
                 "@typescript-eslint/parser": [".ts", ".js", ".mjs"],
