@@ -63,7 +63,6 @@ interface IJQTreeOptions {
     onDragStop?: (node: INode, event: JQuery.Event | Touch) => void;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: JQuery.jqXHR) => void;
-    onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
     onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: string | HTMLElement | JQuery<HTMLElement>;
