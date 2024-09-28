@@ -1,6 +1,6 @@
 {
     "name": "jqtree",
-    "version": "1.8.4",
+    "version": "1.8.5",
     "description": "Tree widget for jQuery",
     "keywords": [
         "jquery-plugin",
@@ -39,7 +39,6 @@
         "@babel/core": "^7.24.9",
         "@babel/preset-env": "^7.24.8",
         "@babel/preset-typescript": "^7.24.7",
-        "@codecov/rollup-plugin": "0.0.1-beta.10",
         "@playwright/test": "^1.45.2",
         "@rollup/plugin-babel": "^6.0.4",
         "@rollup/plugin-node-resolve": "^15.2.3",

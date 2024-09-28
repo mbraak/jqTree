@@ -1,5 +1,5 @@
 /*
-JqTree 1.8.4
+JqTree 1.8.5
 
 Copyright 2024 Marco Braak
 
@@ -20,7 +20,7 @@ limitations under the License.
 var jqtree = (function (exports) {
     'use strict';
 
-    const version = "1.8.4";
+    const version = "1.8.5";
 
     let Position = /*#__PURE__*/function (Position) {
       Position[Position["Before"] = 1] = "Before";
