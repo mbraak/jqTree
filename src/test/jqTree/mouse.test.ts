@@ -1,5 +1,6 @@
-import "../../tree.jquery";
 import { userEvent } from "@testing-library/user-event";
+
+import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan, togglerLink } from "../support/testUtil";
 

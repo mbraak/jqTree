@@ -4,7 +4,7 @@ const register = (widgetClass: unknown, widgetName: string): void => {
     const getWidgetData = (
         el: HTMLElement,
         dataKey: string,
-    ): SimpleWidget<unknown> | null => {
+    ): null | SimpleWidget<unknown> => {
         const widget = jQuery.data(el, dataKey) as unknown;
 
         if (widget && widget instanceof SimpleWidget) {
@@ -102,17 +102,13 @@ const register = (widgetClass: unknown, widgetName: string): void => {
 };
 
 export default class SimpleWidget<WidgetOptions> {
-    public static register(widgetClass: unknown, widgetName: string): void {
-        register(widgetClass, widgetName);
-    }
-
     [key: string]: unknown;
 
     protected static defaults: unknown = {};
 
-    public options: WidgetOptions;
-
     public $el: JQuery;
+
+    public options: WidgetOptions;
 
     constructor(el: HTMLElement, options: WidgetOptions) {
         this.$el = jQuery(el);
@@ -122,15 +118,19 @@ export default class SimpleWidget<WidgetOptions> {
         this.options = { ...defaults, ...options };
     }
 
+    public static register(widgetClass: unknown, widgetName: string): void {
+        register(widgetClass, widgetName);
+    }
+
+    public deinit(): void {
+        //
+    }
+
     public destroy(): void {
         this.deinit();
     }
 
     public init(): void {
-        //
-    }
-
-    public deinit(): void {
         //
     }
 }

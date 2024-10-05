@@ -1,6 +1,3 @@
-import { isInt } from "./util";
-import { Node } from "./node";
-import { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
 import {
     AddToSelection,
     GetNodeById,
@@ -10,6 +7,9 @@ import {
     RefreshElements,
     RemoveFromSelection,
 } from "./jqtreeMethodTypes";
+import { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
+import { Node } from "./node";
+import { isInt } from "./util";
 
 export interface SavedState {
     open_nodes?: NodeId[];
@@ -30,6 +30,7 @@ interface SaveStateHandlerParams {
 }
 
 export default class SaveStateHandler {
+    private _supportsLocalStorage: boolean | null;
     private addToSelection: AddToSelection;
     private getNodeById: GetNodeById;
     private getSelectedNodes: GetSelectedNodes;
@@ -40,7 +41,6 @@ export default class SaveStateHandler {
     private refreshElements: RefreshElements;
     private removeFromSelection: RemoveFromSelection;
     private saveStateOption: boolean | string;
-    private _supportsLocalStorage: boolean | null;
 
     constructor({
         addToSelection,
@@ -66,21 +66,104 @@ export default class SaveStateHandler {
         this.saveStateOption = saveState;
     }
 
-    public saveState(): void {
-        const state = JSON.stringify(this.getState());
-
-        if (this.onSetStateFromStorage) {
-            this.onSetStateFromStorage(state);
-        } else if (this.supportsLocalStorage()) {
-            localStorage.setItem(this.getKeyName(), state);
+    private getKeyName(): string {
+        if (typeof this.saveStateOption === "string") {
+            return this.saveStateOption;
+        } else {
+            return "tree";
         }
     }
 
-    public getStateFromStorage(): SavedState | null {
-        const jsonData = this.loadFromStorage();
+    private loadFromStorage(): null | string {
+        if (this.onGetStateFromStorage) {
+            return this.onGetStateFromStorage();
+        } else if (this.supportsLocalStorage()) {
+            return localStorage.getItem(this.getKeyName());
+        } else {
+            return null;
+        }
+    }
 
-        if (jsonData) {
-            return this.parseState(jsonData) as unknown as SavedState;
+    private openInitialNodes(nodeIds: NodeId[]): boolean {
+        let mustLoadOnDemand = false;
+
+        for (const nodeId of nodeIds) {
+            const node = this.getNodeById(nodeId);
+
+            if (node) {
+                if (!node.load_on_demand) {
+                    node.is_open = true;
+                } else {
+                    mustLoadOnDemand = true;
+                }
+            }
+        }
+
+        return mustLoadOnDemand;
+    }
+
+    private parseState(jsonData: string): SavedState {
+        const state = JSON.parse(jsonData) as Record<string, unknown>;
+
+        // Check if selected_node is an int (instead of an array)
+        if (state.selected_node && isInt(state.selected_node)) {
+            // Convert to array
+            state.selected_node = [state.selected_node];
+        }
+
+        return state as unknown as SavedState;
+    }
+
+    private resetSelection(): void {
+        const selectedNodes = this.getSelectedNodes();
+
+        selectedNodes.forEach((node) => {
+            this.removeFromSelection(node);
+        });
+    }
+
+    private selectInitialNodes(nodeIds: NodeId[]): boolean {
+        let selectCount = 0;
+
+        for (const nodeId of nodeIds) {
+            const node = this.getNodeById(nodeId);
+
+            if (node) {
+                selectCount += 1;
+
+                this.addToSelection(node);
+            }
+        }
+
+        return selectCount !== 0;
+    }
+
+    private supportsLocalStorage(): boolean {
+        const testSupport = (): boolean => {
+            // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
+            try {
+                const key = "_storage_test";
+                sessionStorage.setItem(key, "value");
+                sessionStorage.removeItem(key);
+            } catch {
+                return false;
+            }
+
+            return true;
+        };
+
+        if (this._supportsLocalStorage == null) {
+            this._supportsLocalStorage = testSupport();
+        }
+
+        return this._supportsLocalStorage;
+    }
+
+    public getNodeIdToBeSelected(): NodeId | null {
+        const state = this.getStateFromStorage();
+
+        if (state?.selected_node) {
+            return state.selected_node[0] ?? null;
         } else {
             return null;
         }
@@ -116,6 +199,26 @@ export default class SaveStateHandler {
             open_nodes: getOpenNodeIds(),
             selected_node: getSelectedNodeIds(),
         };
+    }
+
+    public getStateFromStorage(): null | SavedState {
+        const jsonData = this.loadFromStorage();
+
+        if (jsonData) {
+            return this.parseState(jsonData) as unknown as SavedState;
+        } else {
+            return null;
+        }
+    }
+
+    public saveState(): void {
+        const state = JSON.stringify(this.getState());
+
+        if (this.onSetStateFromStorage) {
+            this.onSetStateFromStorage(state);
+        } else if (this.supportsLocalStorage()) {
+            localStorage.setItem(this.getKeyName(), state);
+        }
     }
 
     /*
@@ -192,108 +295,5 @@ export default class SaveStateHandler {
         };
 
         openNodes();
-    }
-
-    public getNodeIdToBeSelected(): NodeId | null {
-        const state = this.getStateFromStorage();
-
-        if (state?.selected_node) {
-            return state.selected_node[0] ?? null;
-        } else {
-            return null;
-        }
-    }
-
-    private parseState(jsonData: string): SavedState {
-        const state = JSON.parse(jsonData) as Record<string, unknown>;
-
-        // Check if selected_node is an int (instead of an array)
-        if (state.selected_node && isInt(state.selected_node)) {
-            // Convert to array
-            state.selected_node = [state.selected_node];
-        }
-
-        return state as unknown as SavedState;
-    }
-
-    private loadFromStorage(): string | null {
-        if (this.onGetStateFromStorage) {
-            return this.onGetStateFromStorage();
-        } else if (this.supportsLocalStorage()) {
-            return localStorage.getItem(this.getKeyName());
-        } else {
-            return null;
-        }
-    }
-
-    private openInitialNodes(nodeIds: NodeId[]): boolean {
-        let mustLoadOnDemand = false;
-
-        for (const nodeId of nodeIds) {
-            const node = this.getNodeById(nodeId);
-
-            if (node) {
-                if (!node.load_on_demand) {
-                    node.is_open = true;
-                } else {
-                    mustLoadOnDemand = true;
-                }
-            }
-        }
-
-        return mustLoadOnDemand;
-    }
-
-    private selectInitialNodes(nodeIds: NodeId[]): boolean {
-        let selectCount = 0;
-
-        for (const nodeId of nodeIds) {
-            const node = this.getNodeById(nodeId);
-
-            if (node) {
-                selectCount += 1;
-
-                this.addToSelection(node);
-            }
-        }
-
-        return selectCount !== 0;
-    }
-
-    private resetSelection(): void {
-        const selectedNodes = this.getSelectedNodes();
-
-        selectedNodes.forEach((node) => {
-            this.removeFromSelection(node);
-        });
-    }
-
-    private getKeyName(): string {
-        if (typeof this.saveStateOption === "string") {
-            return this.saveStateOption;
-        } else {
-            return "tree";
-        }
-    }
-
-    private supportsLocalStorage(): boolean {
-        const testSupport = (): boolean => {
-            // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
-            try {
-                const key = "_storage_test";
-                sessionStorage.setItem(key, "value");
-                sessionStorage.removeItem(key);
-            } catch {
-                return false;
-            }
-
-            return true;
-        };
-
-        if (this._supportsLocalStorage == null) {
-            this._supportsLocalStorage = testSupport();
-        }
-
-        return this._supportsLocalStorage;
     }
 }

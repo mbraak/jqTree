@@ -1,5 +1,5 @@
-import treeStructure from "./treeStructure";
 import { titleSpan } from "./testUtil";
+import treeStructure from "./treeStructure";
 
 const assertJqTreeFolder = ($el: JQuery) => {
     /* istanbul ignore if */

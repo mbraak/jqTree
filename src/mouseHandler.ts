@@ -1,17 +1,17 @@
+import { TriggerEvent } from "./jqtreeMethodTypes";
 import {
     getPositionInfoFromMouseEvent,
     getPositionInfoFromTouch,
     PositionInfo,
 } from "./mouseUtils";
 import { Node } from "./node";
-import { TriggerEvent } from "./jqtreeMethodTypes";
 
 interface ClickTarget {
     node: Node;
     type: "button" | "label";
 }
 
-type GetNode = (element: HTMLElement) => null | Node;
+type GetNode = (element: HTMLElement) => Node | null;
 
 interface MouseHandlerParams {
     element: HTMLElement;
@@ -31,16 +31,157 @@ class MouseHandler {
     private element: HTMLElement;
     private getMouseDelay: () => number;
     private getNode: GetNode;
+
+    private handleClick = (e: MouseEvent): void => {
+        if (!e.target) {
+            return;
+        }
+
+        const clickTarget = this.getClickTarget(e.target as HTMLElement);
+
+        if (!clickTarget) {
+            return;
+        }
+
+        switch (clickTarget.type) {
+            case "button":
+                this.onClickButton(clickTarget.node);
+
+                e.preventDefault();
+                e.stopPropagation();
+                break;
+
+            case "label": {
+                const event = this.triggerEvent("tree.click", {
+                    click_event: e,
+                    node: clickTarget.node,
+                });
+
+                if (!event.isDefaultPrevented()) {
+                    this.onClickTitle(clickTarget.node);
+                }
+                break;
+            }
+        }
+    };
+
+    private handleContextmenu = (e: MouseEvent) => {
+        if (!e.target) {
+            return;
+        }
+
+        const div = (e.target as HTMLElement).closest<HTMLElement>(
+            "ul.jqtree-tree .jqtree-element",
+        );
+
+        if (div) {
+            const node = this.getNode(div);
+            if (node) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                this.triggerEvent("tree.contextmenu", {
+                    click_event: e,
+                    node,
+                });
+                return false;
+            }
+        }
+
+        return null;
+    };
+
+    private handleDblclick = (e: MouseEvent): void => {
+        if (!e.target) {
+            return;
+        }
+
+        const clickTarget = this.getClickTarget(e.target as HTMLElement);
+
+        if (clickTarget?.type === "label") {
+            this.triggerEvent("tree.dblclick", {
+                click_event: e,
+                node: clickTarget.node,
+            });
+        }
+    };
+
     private isMouseDelayMet: boolean;
     private isMouseStarted: boolean;
-    private mouseDelayTimer: number | null;
-    private mouseDownInfo: PositionInfo | null;
+    private mouseDelayTimer: null | number;
+
+    private mouseDown = (e: MouseEvent): void => {
+        // Left mouse button?
+        if (e.button !== 0) {
+            return;
+        }
+
+        const result = this.handleMouseDown(getPositionInfoFromMouseEvent(e));
+
+        if (result && e.cancelable) {
+            e.preventDefault();
+        }
+    };
+
+    private mouseDownInfo: null | PositionInfo;
+
+    private mouseMove = (e: MouseEvent): void => {
+        this.handleMouseMove(e, getPositionInfoFromMouseEvent(e));
+    };
+
+    private mouseUp = (e: MouseEvent): void => {
+        this.handleMouseUp(getPositionInfoFromMouseEvent(e));
+    };
+
     private onClickButton: (node: Node) => void;
     private onClickTitle: (node: Node) => void;
     private onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
     private onMouseDrag: (positionInfo: PositionInfo) => void;
     private onMouseStart: (positionInfo: PositionInfo) => boolean;
     private onMouseStop: (positionInfo: PositionInfo) => void;
+
+    private touchEnd = (e: TouchEvent): void => {
+        if (e.touches.length > 1) {
+            return;
+        }
+
+        const touch = e.touches[0];
+
+        if (!touch) {
+            return;
+        }
+
+        this.handleMouseUp(getPositionInfoFromTouch(touch, e));
+    };
+
+    private touchMove = (e: TouchEvent): void => {
+        if (e.touches.length > 1) {
+            return;
+        }
+
+        const touch = e.touches[0];
+
+        if (!touch) {
+            return;
+        }
+
+        this.handleMouseMove(e, getPositionInfoFromTouch(touch, e));
+    };
+
+    private touchStart = (e: TouchEvent): void => {
+        if (e.touches.length > 1) {
+            return;
+        }
+
+        const touch = e.touches[0];
+
+        if (!touch) {
+            return;
+        }
+
+        this.handleMouseDown(getPositionInfoFromTouch(touch, e));
+    };
+
     private triggerEvent: TriggerEvent;
     private useContextMenu: boolean;
 
@@ -88,34 +229,35 @@ class MouseHandler {
         this.mouseDownInfo = null;
     }
 
-    public deinit(): void {
-        this.element.removeEventListener("click", this.handleClick);
-        this.element.removeEventListener("dblclick", this.handleDblclick);
+    private getClickTarget(element: HTMLElement): ClickTarget | null {
+        const button = element.closest<HTMLElement>(".jqtree-toggler");
 
-        if (this.useContextMenu) {
-            this.element.removeEventListener(
-                "contextmenu",
-                this.handleContextmenu,
-            );
+        if (button) {
+            const node = this.getNode(button);
+
+            if (node) {
+                return {
+                    node,
+                    type: "button",
+                };
+            }
+        } else {
+            const jqTreeElement =
+                element.closest<HTMLElement>(".jqtree-element");
+
+            if (jqTreeElement) {
+                const node = this.getNode(jqTreeElement);
+                if (node) {
+                    return {
+                        node,
+                        type: "label",
+                    };
+                }
+            }
         }
 
-        this.element.removeEventListener("mousedown", this.mouseDown);
-        this.element.removeEventListener("touchstart", this.touchStart);
-        this.removeMouseMoveEventListeners();
+        return null;
     }
-
-    private mouseDown = (e: MouseEvent): void => {
-        // Left mouse button?
-        if (e.button !== 0) {
-            return;
-        }
-
-        const result = this.handleMouseDown(getPositionInfoFromMouseEvent(e));
-
-        if (result && e.cancelable) {
-            e.preventDefault();
-        }
-    };
 
     private handleMouseDown(positionInfo: PositionInfo): boolean {
         // We may have missed mouseup (out of window)
@@ -133,45 +275,6 @@ class MouseHandler {
 
         return true;
     }
-
-    private handleStartMouse(): void {
-        document.addEventListener("mousemove", this.mouseMove, {
-            passive: false,
-        });
-        document.addEventListener("touchmove", this.touchMove, {
-            passive: false,
-        });
-        document.addEventListener("mouseup", this.mouseUp, { passive: false });
-        document.addEventListener("touchend", this.touchEnd, {
-            passive: false,
-        });
-
-        const mouseDelay = this.getMouseDelay();
-
-        if (mouseDelay) {
-            this.startMouseDelayTimer(mouseDelay);
-        } else {
-            this.isMouseDelayMet = true;
-        }
-    }
-
-    private startMouseDelayTimer(mouseDelay: number): void {
-        if (this.mouseDelayTimer) {
-            clearTimeout(this.mouseDelayTimer);
-        }
-
-        this.mouseDelayTimer = window.setTimeout(() => {
-            if (this.mouseDownInfo) {
-                this.isMouseDelayMet = true;
-            }
-        }, mouseDelay);
-
-        this.isMouseDelayMet = false;
-    }
-
-    private mouseMove = (e: MouseEvent): void => {
-        this.handleMouseMove(e, getPositionInfoFromMouseEvent(e));
-    };
 
     private handleMouseMove(
         e: MouseEvent | TouchEvent,
@@ -205,10 +308,6 @@ class MouseHandler {
         }
     }
 
-    private mouseUp = (e: MouseEvent): void => {
-        this.handleMouseUp(getPositionInfoFromMouseEvent(e));
-    };
-
     private handleMouseUp(positionInfo: PositionInfo): void {
         this.removeMouseMoveEventListeners();
         this.isMouseDelayMet = false;
@@ -220,6 +319,27 @@ class MouseHandler {
         }
     }
 
+    private handleStartMouse(): void {
+        document.addEventListener("mousemove", this.mouseMove, {
+            passive: false,
+        });
+        document.addEventListener("touchmove", this.touchMove, {
+            passive: false,
+        });
+        document.addEventListener("mouseup", this.mouseUp, { passive: false });
+        document.addEventListener("touchend", this.touchEnd, {
+            passive: false,
+        });
+
+        const mouseDelay = this.getMouseDelay();
+
+        if (mouseDelay) {
+            this.startMouseDelayTimer(mouseDelay);
+        } else {
+            this.isMouseDelayMet = true;
+        }
+    }
+
     private removeMouseMoveEventListeners() {
         document.removeEventListener("mousemove", this.mouseMove);
         document.removeEventListener("touchmove", this.touchMove);
@@ -227,150 +347,34 @@ class MouseHandler {
         document.removeEventListener("touchend", this.touchEnd);
     }
 
-    private touchStart = (e: TouchEvent): void => {
-        if (e.touches.length > 1) {
-            return;
+    private startMouseDelayTimer(mouseDelay: number): void {
+        if (this.mouseDelayTimer) {
+            clearTimeout(this.mouseDelayTimer);
         }
 
-        const touch = e.touches[0];
-
-        if (!touch) {
-            return;
-        }
-
-        this.handleMouseDown(getPositionInfoFromTouch(touch, e));
-    };
-
-    private touchMove = (e: TouchEvent): void => {
-        if (e.touches.length > 1) {
-            return;
-        }
-
-        const touch = e.touches[0];
-
-        if (!touch) {
-            return;
-        }
-
-        this.handleMouseMove(e, getPositionInfoFromTouch(touch, e));
-    };
-
-    private touchEnd = (e: TouchEvent): void => {
-        if (e.touches.length > 1) {
-            return;
-        }
-
-        const touch = e.touches[0];
-
-        if (!touch) {
-            return;
-        }
-
-        this.handleMouseUp(getPositionInfoFromTouch(touch, e));
-    };
-
-    private handleClick = (e: MouseEvent): void => {
-        if (!e.target) {
-            return;
-        }
-
-        const clickTarget = this.getClickTarget(e.target as HTMLElement);
-
-        if (!clickTarget) {
-            return;
-        }
-
-        switch (clickTarget.type) {
-            case "button":
-                this.onClickButton(clickTarget.node);
-
-                e.preventDefault();
-                e.stopPropagation();
-                break;
-
-            case "label": {
-                const event = this.triggerEvent("tree.click", {
-                    node: clickTarget.node,
-                    click_event: e,
-                });
-
-                if (!event.isDefaultPrevented()) {
-                    this.onClickTitle(clickTarget.node);
-                }
-                break;
+        this.mouseDelayTimer = window.setTimeout(() => {
+            if (this.mouseDownInfo) {
+                this.isMouseDelayMet = true;
             }
-        }
-    };
+        }, mouseDelay);
 
-    private handleDblclick = (e: MouseEvent): void => {
-        if (!e.target) {
-            return;
-        }
+        this.isMouseDelayMet = false;
+    }
 
-        const clickTarget = this.getClickTarget(e.target as HTMLElement);
+    public deinit(): void {
+        this.element.removeEventListener("click", this.handleClick);
+        this.element.removeEventListener("dblclick", this.handleDblclick);
 
-        if (clickTarget?.type === "label") {
-            this.triggerEvent("tree.dblclick", {
-                node: clickTarget.node,
-                click_event: e,
-            });
-        }
-    };
-
-    private handleContextmenu = (e: MouseEvent) => {
-        if (!e.target) {
-            return;
+        if (this.useContextMenu) {
+            this.element.removeEventListener(
+                "contextmenu",
+                this.handleContextmenu,
+            );
         }
 
-        const div = (e.target as HTMLElement).closest<HTMLElement>(
-            "ul.jqtree-tree .jqtree-element",
-        );
-
-        if (div) {
-            const node = this.getNode(div);
-            if (node) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                this.triggerEvent("tree.contextmenu", {
-                    node,
-                    click_event: e,
-                });
-                return false;
-            }
-        }
-
-        return null;
-    };
-
-    private getClickTarget(element: HTMLElement): ClickTarget | null {
-        const button = element.closest<HTMLElement>(".jqtree-toggler");
-
-        if (button) {
-            const node = this.getNode(button);
-
-            if (node) {
-                return {
-                    type: "button",
-                    node,
-                };
-            }
-        } else {
-            const jqTreeElement =
-                element.closest<HTMLElement>(".jqtree-element");
-
-            if (jqTreeElement) {
-                const node = this.getNode(jqTreeElement);
-                if (node) {
-                    return {
-                        type: "label",
-                        node,
-                    };
-                }
-            }
-        }
-
-        return null;
+        this.element.removeEventListener("mousedown", this.mouseDown);
+        this.element.removeEventListener("touchstart", this.touchStart);
+        this.removeMouseMoveEventListeners();
     }
 }
 

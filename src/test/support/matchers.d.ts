@@ -2,15 +2,15 @@
 
 declare namespace JQTreeMatchers {
     interface TreeChild {
-        nodeType: "child";
         name: string;
+        nodeType: "child";
         selected: boolean;
     }
 
     interface TreeFolder {
-        nodeType: "folder";
         children: TreeNode[];
         name: string;
+        nodeType: "folder";
         open: boolean;
         selected: boolean;
     }

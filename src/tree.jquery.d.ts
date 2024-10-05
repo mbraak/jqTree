@@ -2,41 +2,41 @@ type NodeId = number | string;
 
 interface NodeRecord {
     [key: string]: unknown;
-    id?: NodeId;
     children?: NodeData[];
+    id?: NodeId;
 }
 
-type NodeData = string | NodeRecord;
+type NodeData = NodeRecord | string;
 
 type IterateCallback = (node: INode, level: number) => boolean;
 
 interface INode {
-    id?: NodeId;
-    name: string;
+    [key: string]: unknown;
     children: INode[];
     element?: HTMLElement;
+    id?: NodeId;
     is_open: boolean;
-    parent: INode | null;
-
-    [key: string]: unknown;
-
     iterate(callback: IterateCallback): void;
+
+    name: string;
+
+    parent: INode | null;
 }
 
 type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
-type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
+type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ClickNodeEvent {
-    node: INode;
-    deselected_node?: INode | null;
     click_event: JQuery.ClickEvent;
+    deselected_node?: INode | null;
+    node: INode;
     previous_node?: INode;
 }
 
 interface SelectNodeOptions {
-    mustToggle?: boolean;
     mustSetFocus?: boolean;
+    mustToggle?: boolean;
 }
 
 interface SavedState {
@@ -45,34 +45,34 @@ interface SavedState {
 }
 
 interface IJQTreeOptions {
-    animationSpeed?: string | number;
+    animationSpeed?: number | string;
     autoEscape?: boolean;
     autoOpen?: boolean | number | string;
     buttonLeft?: boolean;
-    closedIcon?: string | HTMLElement | JQuery;
+    closedIcon?: HTMLElement | JQuery | string;
     data?: NodeData[];
     dataFilter?: (data: NodeData[]) => NodeData[];
     dataUrl?: DataUrl;
     dragAndDrop?: boolean;
-    nodeClass?: any;
     keyboardSupport?: boolean;
+    nodeClass?: any;
     onCanMove?: (node: INode) => boolean;
     onCanSelectNode?: (node: INode) => boolean;
     onCreateLi?: (node: INode, el: JQuery, isSelected: boolean) => void;
     onDragMove?: (node: INode, event: JQuery.Event | Touch) => void;
     onDragStop?: (node: INode, event: JQuery.Event | Touch) => void;
+    onGetStateFromStorage?: () => string;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: JQuery.jqXHR) => void;
     onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
-    onGetStateFromStorage?: () => string;
     onSetStateFromStorage?: (data: string) => void;
-    openedIcon?: string | HTMLElement | JQuery;
-    openFolderDelay?: number | false;
+    openedIcon?: HTMLElement | JQuery | string;
+    openFolderDelay?: false | number;
     rtl?: boolean;
-    selectable?: boolean;
     saveState?: boolean | string;
-    slide?: boolean;
+    selectable?: boolean;
     showEmptyFolder?: boolean;
+    slide?: boolean;
     startDndDelay?: number;
     tabIndex?: number;
     useContextMenu?: boolean;
@@ -108,9 +108,9 @@ interface IJQTreePlugin {
     (behavior: "getNodeByName", name: string): INode | null;
     (behavior: "getNodeByNameMustExist", name: string): INode;
     (behavior: "getNodesByProperty", key: string, value: unknown): INode[];
-    (behavior: "getSelectedNode"): INode | false;
+    (behavior: "getSelectedNode"): false | INode;
     (behavior: "getSelectedNodes"): INode[];
-    (behavior: "getState"): SavedState | null;
+    (behavior: "getState"): null | SavedState;
     (behavior: "getStateFromStorage"): INode | null;
     (behavior: "getTree"): INode;
     (behavior: "getVersion"): string;
@@ -118,8 +118,8 @@ interface IJQTreePlugin {
     (behavior: "loadData", data: NodeData[], parentNode?: INode): JQuery;
     (
         behavior: "loadDataFromUrl",
-        param1?: string | null | INode,
-        param2?: INode | null | (() => void),
+        param1?: INode | null | string,
+        param2?: (() => void) | INode | null,
         param3?: () => void,
     ): JQuery;
     (behavior: "moveDown"): JQuery;

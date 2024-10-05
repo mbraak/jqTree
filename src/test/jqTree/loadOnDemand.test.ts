@@ -1,8 +1,9 @@
-import getGiven from "givens";
 import { screen } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
+import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+
 import "../../tree.jquery";
 import { togglerLink } from "../support/testUtil";
 
@@ -33,9 +34,9 @@ afterAll(() => {
 
 context("when a node has load_on_demand in the data", () => {
     interface Vars {
+        $tree: JQuery;
         autoOpen: boolean;
         node: INode;
-        $tree: JQuery;
         savedState?: string;
     }
     const given = getGiven<Vars>();
@@ -45,8 +46,8 @@ context("when a node has load_on_demand in the data", () => {
     const initialData = [
         {
             id: 1,
-            name: "parent-node",
             load_on_demand: true,
+            name: "parent-node",
         },
     ];
 
@@ -103,11 +104,11 @@ context("when a node has load_on_demand in the data", () => {
 
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "parent-node",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "loaded-on-demand" }),
                     ],
+                    name: "parent-node",
+                    open: true,
                 }),
             ]);
         });
@@ -172,11 +173,11 @@ context("when a node has load_on_demand in the data", () => {
 
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "parent-node",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "loaded-on-demand" }),
                     ],
+                    name: "parent-node",
+                    open: true,
                 }),
             ]);
         });
@@ -190,11 +191,11 @@ context("when a node has load_on_demand in the data", () => {
 
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "parent-node",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "loaded-on-demand" }),
                     ],
+                    name: "parent-node",
+                    open: true,
                 }),
             ]);
         });

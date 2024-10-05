@@ -6,8 +6,8 @@ export enum Position {
 }
 
 const positionNames: Record<string, Position> = {
-    before: Position.Before,
     after: Position.After,
+    before: Position.Before,
     inside: Position.Inside,
     none: Position.None,
 };

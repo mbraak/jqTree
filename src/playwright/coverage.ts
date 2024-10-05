@@ -1,7 +1,7 @@
+import { BrowserContext } from "@playwright/test";
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
-import { BrowserContext } from "@playwright/test";
 
 const istanbulCLIOutput = path.join(process.cwd(), ".nyc_output");
 

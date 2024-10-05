@@ -1,4 +1,6 @@
-import { test, expect, Page } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
+
+import { initCoverage, saveCoverage } from "./coverage";
 import {
     boundingBox,
     dragAndDrop,
@@ -10,7 +12,6 @@ import {
     selectNode,
     sleep,
 } from "./testUtils";
-import { initCoverage, saveCoverage } from "./coverage";
 
 const initPage = async (page: Page, baseURL: string | undefined) => {
     if (!baseURL) {
@@ -102,8 +103,6 @@ test.describe("with dragAndDrop", () => {
 
         expect(structure).toEqual([
             expect.objectContaining({
-                name: "Saurischia",
-                open: true,
                 children: [
                     expect.objectContaining({ name: "Theropods", open: false }),
                     expect.objectContaining({
@@ -111,10 +110,10 @@ test.describe("with dragAndDrop", () => {
                         open: false,
                     }),
                 ],
+                name: "Saurischia",
+                open: true,
             }),
             expect.objectContaining({
-                name: "Ornithischians",
-                open: true,
                 children: [
                     expect.objectContaining({ name: "Herrerasaurians" }),
                     expect.objectContaining({ name: "Heterodontosaurids" }),
@@ -131,6 +130,8 @@ test.describe("with dragAndDrop", () => {
                     }),
                     expect.objectContaining({ name: "Ceratopsians" }),
                 ],
+                name: "Ornithischians",
+                open: true,
             }),
         ]);
 
@@ -147,30 +148,29 @@ test.describe("with dragAndDrop", () => {
         const box1 = await getNodeRect(page, "Herrerasaurians");
 
         await client.send("Input.dispatchTouchEvent", {
-            type: "touchStart",
             touchPoints: [{ x: box1.x + 10, y: box1.y + box1.height / 2 }],
+            type: "touchStart",
         });
 
         await sleep(page, 200);
 
         const box2 = await getNodeRect(page, "Ornithischians");
         await client.send("Input.dispatchTouchEvent", {
-            type: "touchEnd",
             touchPoints: [{ x: box2.x + 10, y: box2.y + box2.height / 2 }],
+            type: "touchEnd",
         });
 
         const structure = await getTreeStructure(page);
 
         expect(structure).toEqual([
             expect.objectContaining({
-                name: "Saurischia",
                 children: [
                     expect.objectContaining({ name: "Theropods" }),
                     expect.objectContaining({ name: "Sauropodomorphs" }),
                 ],
+                name: "Saurischia",
             }),
             expect.objectContaining({
-                name: "Ornithischians",
                 children: [
                     expect.objectContaining({ name: "Herrerasaurians" }),
                     expect.objectContaining({ name: "Heterodontosaurids" }),
@@ -181,6 +181,7 @@ test.describe("with dragAndDrop", () => {
                     }),
                     expect.objectContaining({ name: "Ceratopsians" }),
                 ],
+                name: "Ornithischians",
             }),
         ]);
     });
@@ -197,16 +198,16 @@ test.describe("with dragAndDrop", () => {
         const box1 = await getNodeRect(page, "Herrerasaurians");
 
         await client.send("Input.dispatchTouchEvent", {
-            type: "touchStart",
             touchPoints: [{ x: box1.x + 10, y: box1.y + box1.height / 2 }],
+            type: "touchStart",
         });
 
         await sleep(page, 200);
 
         const box2 = await getNodeRect(page, "Thyreophorans");
         await client.send("Input.dispatchTouchEvent", {
-            type: "touchMove",
             touchPoints: [{ x: box2.x + 10, y: box2.y + box2.height / 2 }],
+            type: "touchMove",
         });
 
         await sleep(page, 200);
@@ -215,8 +216,6 @@ test.describe("with dragAndDrop", () => {
 
         expect(structure).toEqual([
             expect.objectContaining({
-                name: "Saurischia",
-                open: true,
                 children: [
                     expect.objectContaining({
                         name: "Herrerasaurians",
@@ -227,10 +226,10 @@ test.describe("with dragAndDrop", () => {
                         open: false,
                     }),
                 ],
+                name: "Saurischia",
+                open: true,
             }),
             expect.objectContaining({
-                name: "Ornithischians",
-                open: true,
                 children: [
                     expect.objectContaining({ name: "Heterodontosaurids" }),
                     expect.objectContaining({
@@ -246,6 +245,8 @@ test.describe("with dragAndDrop", () => {
                     }),
                     expect.objectContaining({ name: "Ceratopsians" }),
                 ],
+                name: "Ornithischians",
+                open: true,
             }),
         ]);
     });
@@ -260,17 +261,15 @@ test.describe("with dragAndDrop", () => {
 
         expect(structure).toEqual([
             expect.objectContaining({
-                name: "Saurischia",
-                open: true,
                 children: [
                     expect.objectContaining({ name: "Herrerasaurians" }),
                     expect.objectContaining({ name: "Theropods" }),
                     expect.objectContaining({ name: "Sauropodomorphs" }),
                 ],
+                name: "Saurischia",
+                open: true,
             }),
             expect.objectContaining({
-                name: "Ornithischians",
-                open: true,
                 children: [
                     expect.objectContaining({
                         name: "Heterodontosaurids",
@@ -288,6 +287,8 @@ test.describe("with dragAndDrop", () => {
                     }),
                     expect.objectContaining({ name: "Ceratopsians" }),
                 ],
+                name: "Ornithischians",
+                open: true,
             }),
         ]);
     });
@@ -305,14 +306,13 @@ test.describe("with dragAndDrop", () => {
 
         expect(structure).toEqual([
             expect.objectContaining({
-                name: "Saurischia",
                 children: [
                     expect.objectContaining({ name: "Herrerasaurians" }),
                     expect.objectContaining({ name: "Sauropodomorphs" }),
                 ],
+                name: "Saurischia",
             }),
             expect.objectContaining({
-                name: "Ornithischians",
                 children: [
                     expect.objectContaining({ name: "Theropods" }),
                     expect.objectContaining({ name: "Heterodontosaurids" }),
@@ -323,6 +323,7 @@ test.describe("with dragAndDrop", () => {
                     }),
                     expect.objectContaining({ name: "Ceratopsians" }),
                 ],
+                name: "Ornithischians",
             }),
         ]);
     });
@@ -337,15 +338,14 @@ test.describe("with dragAndDrop", () => {
 
         expect(structure).toEqual([
             expect.objectContaining({
-                name: "Saurischia",
                 children: [
                     expect.objectContaining({ name: "Herrerasaurians" }),
                     expect.objectContaining({ name: "Theropods" }),
                     expect.objectContaining({ name: "Sauropodomorphs" }),
                 ],
+                name: "Saurischia",
             }),
             expect.objectContaining({
-                name: "Ornithischians",
                 children: [
                     expect.objectContaining({ name: "Heterodontosaurids" }),
                     expect.objectContaining({ name: "Thyreophorans" }),
@@ -355,6 +355,7 @@ test.describe("with dragAndDrop", () => {
                     }),
                     expect.objectContaining({ name: "Ceratopsians" }),
                 ],
+                name: "Ornithischians",
             }),
         ]);
     });
@@ -372,22 +373,21 @@ test.describe("with dragAndDrop", () => {
 
         expect(structure).toEqual([
             expect.objectContaining({
-                name: "Saurischia",
                 children: [
                     expect.objectContaining({ name: "Theropods" }),
                     expect.objectContaining({ name: "Sauropodomorphs" }),
                 ],
+                name: "Saurischia",
             }),
             expect.objectContaining({
-                name: "Ornithischians",
                 children: [
                     expect.objectContaining({
-                        name: "Heterodontosaurids",
                         children: [
                             expect.objectContaining({
                                 name: "Herrerasaurians",
                             }),
                         ],
+                        name: "Heterodontosaurids",
                     }),
                     expect.objectContaining({ name: "Thyreophorans" }),
                     expect.objectContaining({ name: "Ornithopods" }),
@@ -396,6 +396,7 @@ test.describe("with dragAndDrop", () => {
                     }),
                     expect.objectContaining({ name: "Ceratopsians" }),
                 ],
+                name: "Ornithischians",
             }),
         ]);
     });
@@ -406,7 +407,7 @@ test.describe("autoscroll when the window is scrollable", () => {
         baseURL,
         page,
     }) => {
-        await page.setViewportSize({ width: 200, height: 100 });
+        await page.setViewportSize({ height: 100, width: 200 });
         await initPage(page, baseURL);
         await initTree(page, { autoOpen: 3, dragAndDrop: true });
 
@@ -435,7 +436,7 @@ test.describe("autoscroll when the window is scrollable", () => {
         baseURL,
         page,
     }) => {
-        await page.setViewportSize({ width: 60, height: 400 });
+        await page.setViewportSize({ height: 400, width: 60 });
         await initPage(page, baseURL);
         await initTree(page, { autoOpen: 3, dragAndDrop: true });
 
@@ -460,7 +461,7 @@ test.describe("autoscroll when the window is scrollable", () => {
     });
 
     test("scrollToNode scrolls to a node", async ({ baseURL, page }) => {
-        await page.setViewportSize({ width: 200, height: 100 });
+        await page.setViewportSize({ height: 100, width: 200 });
         await initPage(page, baseURL);
         await initTree(page, { autoOpen: 3, dragAndDrop: true });
 
@@ -485,7 +486,7 @@ test.describe("autoscroll when the window is scrollable", () => {
 });
 
 test.describe("autoscroll when the container is scrollable vertically", () => {
-    test.beforeEach(async ({ page, baseURL }) => {
+    test.beforeEach(async ({ baseURL, page }) => {
         await initPage(page, baseURL);
 
         // Add a container and make it the parent of the tree element
@@ -548,7 +549,7 @@ test.describe("autoscroll when the container is scrollable vertically", () => {
 });
 
 test.describe("autoscroll when the container is scrollable horizontally", () => {
-    test.beforeEach(async ({ page, baseURL }) => {
+    test.beforeEach(async ({ baseURL, page }) => {
         await initPage(page, baseURL);
 
         // Add a container and make it the parent of the tree element

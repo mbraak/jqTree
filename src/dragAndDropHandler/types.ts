@@ -6,8 +6,8 @@ export interface DropHint {
 }
 
 export interface HitArea {
-    top: number;
     bottom: number;
     node: Node;
     position: Position;
+    top: number;
 }

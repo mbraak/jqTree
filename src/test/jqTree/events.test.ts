@@ -1,8 +1,9 @@
+import { waitFor } from "@testing-library/dom";
+import { userEvent } from "@testing-library/user-event";
 import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { waitFor } from "@testing-library/dom";
-import { userEvent } from "@testing-library/user-event";
+
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
@@ -21,9 +22,9 @@ afterEach(() => {
 
 describe("tree.click", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
         titleSpan: JQuery;
-        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -49,9 +50,9 @@ describe("tree.click", () => {
 
 describe("tree.contextmenu", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
         titleSpan: JQuery;
-        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -68,8 +69,8 @@ describe("tree.contextmenu", () => {
         given.$tree.on("tree.contextmenu", onContextMenu);
 
         await userEvent.pointer({
-            target: given.titleSpan.get(0) as HTMLElement,
             keys: "[MouseRight]",
+            target: given.titleSpan.get(0) as HTMLElement,
         });
 
         expect(onContextMenu).toHaveBeenCalledWith(
@@ -80,9 +81,9 @@ describe("tree.contextmenu", () => {
 
 describe("tree.dblclick", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
         titleSpan: JQuery;
-        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -175,9 +176,9 @@ describe("tree.load_data", () => {
 
 describe("tree.select", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
         titleSpan: JQuery;
-        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -199,8 +200,8 @@ describe("tree.select", () => {
 
         expect(onSelect).toHaveBeenCalledWith(
             expect.objectContaining({
-                node: given.node1,
                 deselected_node: null,
+                node: given.node1,
             }),
         );
     });

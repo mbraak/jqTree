@@ -1,13 +1,13 @@
-import { HitArea } from "./types";
 import { Node } from "../node";
 import { Position } from "../position";
 import { getOffsetTop } from "../util";
 import iterateVisibleNodes from "./iterateVisibleNodes";
+import { HitArea } from "./types";
 
 interface HitPosition {
-    top: number;
     node: Node;
     position: Position;
+    top: number;
 }
 
 export const generateHitPositions = (
@@ -19,9 +19,9 @@ export const generateHitPositions = (
 
     const addHitPosition = (node: Node, position: number, top: number) => {
         hitPositions.push({
-            top,
             node,
             position,
+            top,
         });
         lastTop = top;
     };
@@ -138,10 +138,10 @@ export const generateHitAreasForGroup = (
 
         if (position.position !== Position.None) {
             hitAreas.push({
-                top: areaTop,
                 bottom: areaTop + areaHeight,
                 node: position.node,
                 position: position.position,
+                top: areaTop,
             });
         }
 
