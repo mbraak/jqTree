@@ -35,10 +35,10 @@
         "jquery": "^3"
     },
     "devDependencies": {
-        "@babel/cli": "^7.25.6",
-        "@babel/core": "^7.25.2",
-        "@babel/preset-env": "^7.25.4",
-        "@babel/preset-typescript": "^7.24.7",
+        "@babel/cli": "^7.25.7",
+        "@babel/core": "^7.25.7",
+        "@babel/preset-env": "^7.25.7",
+        "@babel/preset-typescript": "^7.25.7",
         "@playwright/test": "^1.47.2",
         "@rollup/plugin-babel": "^6.0.4",
         "@rollup/plugin-node-resolve": "^15.3.0",
@@ -56,7 +56,7 @@
         "eslint": "^8.57.1",
         "eslint-import-resolver-typescript": "^3.6.3",
         "eslint-plugin-deprecation": "^3.0.0",
-        "eslint-plugin-import": "^2.30.0",
+        "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-jest": "^28.8.3",
         "eslint-plugin-playwright": "^1.6.2",
         "eslint-plugin-testing-library": "^6.3.0",
@@ -75,11 +75,11 @@
         "postcss-load-config": "^6.0.1",
         "postcss-nested": "^6.2.0",
         "prettier": "^3.3.3",
-        "rollup": "^4.22.5",
+        "rollup": "^4.24.0",
         "rollup-plugin-serve": "^3.0.0",
         "tslib": "^2.7.0",
         "typescript": "^5.6.2",
-        "typescript-eslint": "^8.7.0",
+        "typescript-eslint": "^8.8.0",
         "undici": "^5.28.4"
     }
 }
