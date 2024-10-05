@@ -1,6 +1,6 @@
 {
     "name": "jqtree",
-    "version": "1.8.4",
+    "version": "1.8.5",
     "description": "Tree widget for jQuery",
     "keywords": [
         "jquery-plugin",
@@ -35,21 +35,21 @@
         "jquery": "^3"
     },
     "devDependencies": {
-        "@babel/cli": "^7.25.6",
-        "@babel/core": "^7.25.2",
-        "@babel/preset-env": "^7.25.4",
-        "@babel/preset-typescript": "^7.24.7",
+        "@babel/cli": "^7.25.7",
+        "@babel/core": "^7.25.7",
+        "@babel/preset-env": "^7.25.7",
+        "@babel/preset-typescript": "^7.25.7",
         "@playwright/test": "^1.47.2",
         "@rollup/plugin-babel": "^6.0.4",
-        "@rollup/plugin-node-resolve": "^15.2.3",
+        "@rollup/plugin-node-resolve": "^15.3.0",
         "@rollup/plugin-terser": "^0.4.4",
         "@testing-library/dom": "^10.4.0",
         "@testing-library/user-event": "^14.5.2",
         "@types/debug": "^4.1.12",
         "@types/jest": "^29.5.13",
         "@types/jest-axe": "^3.5.9",
-        "@types/jquery": "^3.5.30",
-        "@types/node": "^22.5.5",
+        "@types/jquery": "^3.5.31",
+        "@types/node": "^22.7.4",
         "autoprefixer": "^10.4.20",
         "babel-jest": "^29.7.0",
         "babel-plugin-istanbul": "^7.0.0",
@@ -72,11 +72,11 @@
         "postcss-load-config": "^6.0.1",
         "postcss-nested": "^6.2.0",
         "prettier": "^3.3.3",
-        "rollup": "^4.22.4",
+        "rollup": "^4.24.0",
         "rollup-plugin-serve": "^3.0.0",
         "tslib": "^2.7.0",
         "typescript": "^5.6.2",
-        "typescript-eslint": "^8.6.0",
+        "typescript-eslint": "^8.8.0",
         "undici": "^5.28.4"
     }
 }
