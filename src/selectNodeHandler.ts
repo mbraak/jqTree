@@ -20,7 +20,7 @@ export default class SelectNodeHandler {
         const selectedNodes = this.getSelectedNodes();
 
         if (selectedNodes.length) {
-            return selectedNodes[0] || false;
+            return selectedNodes[0] ?? false;
         } else {
             return false;
         }

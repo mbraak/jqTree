@@ -84,7 +84,7 @@ export default class DataLoader {
     }
 
     private getDomElement(parentNode: Node | null): HTMLElement {
-        if (parentNode) {
+        if (parentNode?.element) {
             return parentNode.element;
         } else {
             return this.treeElement;
@@ -128,7 +128,7 @@ export default class DataLoader {
             ...urlInfo,
         };
 
-        ajaxSettings.method = ajaxSettings.method?.toUpperCase() || "GET";
+        ajaxSettings.method = ajaxSettings.method?.toUpperCase() ?? "GET";
 
         void jQuery.ajax(ajaxSettings);
     }

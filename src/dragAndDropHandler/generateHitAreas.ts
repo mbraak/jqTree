@@ -56,7 +56,7 @@ export const generateHitPositions = (
     };
 
     const handleFirstNode = (node: Node) => {
-        if (node !== currentNode) {
+        if (node !== currentNode && node.element) {
             addHitPosition(node, Position.Before, getOffsetTop(node.element));
         }
     };

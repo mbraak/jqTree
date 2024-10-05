@@ -22,13 +22,13 @@ afterEach(() => {
 describe("tree.click", () => {
     interface Vars {
         node1: INode;
-        titleSpan: JQuery<HTMLElement>;
-        $tree: JQuery<HTMLElement>;
+        titleSpan: JQuery;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element));
+    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
@@ -40,6 +40,7 @@ describe("tree.click", () => {
         given.$tree.on("tree.click", onClick);
 
         await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
         expect(onClick).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -49,13 +50,13 @@ describe("tree.click", () => {
 describe("tree.contextmenu", () => {
     interface Vars {
         node1: INode;
-        titleSpan: JQuery<HTMLElement>;
-        $tree: JQuery<HTMLElement>;
+        titleSpan: JQuery;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element));
+    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
@@ -70,6 +71,7 @@ describe("tree.contextmenu", () => {
             target: given.titleSpan.get(0) as HTMLElement,
             keys: "[MouseRight]",
         });
+
         expect(onContextMenu).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -79,13 +81,13 @@ describe("tree.contextmenu", () => {
 describe("tree.dblclick", () => {
     interface Vars {
         node1: INode;
-        titleSpan: JQuery<HTMLElement>;
-        $tree: JQuery<HTMLElement>;
+        titleSpan: JQuery;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element));
+    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
@@ -97,6 +99,7 @@ describe("tree.dblclick", () => {
         given.$tree.on("tree.dblclick", onDoubleClick);
 
         await userEvent.dblClick(given.titleSpan.get(0) as HTMLElement);
+
         expect(onDoubleClick).toHaveBeenCalledWith(
             expect.objectContaining({ node: given.node1 }),
         );
@@ -105,7 +108,7 @@ describe("tree.dblclick", () => {
 
 describe("tree.init", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
@@ -119,7 +122,6 @@ describe("tree.init", () => {
                 data: exampleData,
             });
 
-            // eslint-disable-next-line jest/prefer-called-with
             expect(onInit).toHaveBeenCalled();
         });
     });
@@ -128,6 +130,7 @@ describe("tree.init", () => {
         const server = setupServer(
             http.get("/tree/", () => HttpResponse.json(exampleData)),
         );
+
         beforeEach(() => {
             server.listen();
         });
@@ -143,7 +146,6 @@ describe("tree.init", () => {
             given.$tree.tree({ dataUrl: "/tree/" });
 
             await waitFor(() => {
-                // eslint-disable-next-line jest/prefer-called-with
                 expect(onInit).toHaveBeenCalled();
             });
         });
@@ -152,7 +154,7 @@ describe("tree.init", () => {
 
 describe("tree.load_data", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
@@ -163,6 +165,7 @@ describe("tree.load_data", () => {
             given.$tree.on("tree.load_data", onLoadData);
 
             given.$tree.tree({ data: exampleData });
+
             expect(onLoadData).toHaveBeenCalledWith(
                 expect.objectContaining({ tree_data: exampleData }),
             );
@@ -173,13 +176,13 @@ describe("tree.load_data", () => {
 describe("tree.select", () => {
     interface Vars {
         node1: INode;
-        titleSpan: JQuery<HTMLElement>;
-        $tree: JQuery<HTMLElement>;
+        titleSpan: JQuery;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element));
+    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
     given("$tree", () => $("#tree1"));
 
     beforeEach(() => {
@@ -193,6 +196,7 @@ describe("tree.select", () => {
         given.$tree.on("tree.select", onSelect);
 
         await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
         expect(onSelect).toHaveBeenCalledWith(
             expect.objectContaining({
                 node: given.node1,
@@ -211,6 +215,7 @@ describe("tree.select", () => {
             given.$tree.on("tree.select", onSelect);
 
             await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
             expect(onSelect).toHaveBeenCalledWith(
                 expect.objectContaining({
                     node: null,
@@ -225,6 +230,7 @@ describe("tree.loading_data", () => {
     const server = setupServer(
         http.get("/tree/", () => HttpResponse.json(exampleData)),
     );
+
     beforeEach(() => {
         server.listen();
     });
@@ -265,6 +271,7 @@ describe("onLoading", () => {
     const server = setupServer(
         http.get("/tree/", () => HttpResponse.json(exampleData)),
     );
+
     beforeEach(() => {
         server.listen();
     });

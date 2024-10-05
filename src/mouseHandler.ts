@@ -191,8 +191,7 @@ class MouseHandler {
         }
 
         if (this.mouseDownInfo) {
-            this.isMouseStarted =
-                this.onMouseStart(this.mouseDownInfo) !== false;
+            this.isMouseStarted = this.onMouseStart(this.mouseDownInfo);
         }
 
         if (this.isMouseStarted) {
@@ -229,10 +228,6 @@ class MouseHandler {
     }
 
     private touchStart = (e: TouchEvent): void => {
-        if (!e) {
-            return;
-        }
-
         if (e.touches.length > 1) {
             return;
         }
@@ -247,10 +242,6 @@ class MouseHandler {
     };
 
     private touchMove = (e: TouchEvent): void => {
-        if (!e) {
-            return;
-        }
-
         if (e.touches.length > 1) {
             return;
         }
@@ -265,10 +256,6 @@ class MouseHandler {
     };
 
     private touchEnd = (e: TouchEvent): void => {
-        if (!e) {
-            return;
-        }
-
         if (e.touches.length > 1) {
             return;
         }
@@ -293,19 +280,24 @@ class MouseHandler {
             return;
         }
 
-        if (clickTarget.type === "button") {
-            this.onClickButton(clickTarget.node);
+        switch (clickTarget.type) {
+            case "button":
+                this.onClickButton(clickTarget.node);
 
-            e.preventDefault();
-            e.stopPropagation();
-        } else if (clickTarget.type === "label") {
-            const event = this.triggerEvent("tree.click", {
-                node: clickTarget.node,
-                click_event: e,
-            });
+                e.preventDefault();
+                e.stopPropagation();
+                break;
 
-            if (!event.isDefaultPrevented()) {
-                this.onClickTitle(clickTarget.node);
+            case "label": {
+                const event = this.triggerEvent("tree.click", {
+                    node: clickTarget.node,
+                    click_event: e,
+                });
+
+                if (!event.isDefaultPrevented()) {
+                    this.onClickTitle(clickTarget.node);
+                }
+                break;
             }
         }
     };
