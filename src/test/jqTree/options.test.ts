@@ -1,7 +1,8 @@
-import getGiven from "givens";
 import { screen, waitFor } from "@testing-library/dom";
+import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan, togglerLink } from "../support/testUtil";
@@ -33,8 +34,8 @@ afterAll(() => {
 
 describe("autoEscape", () => {
     interface Vars {
-        autoEscape: boolean;
         $tree: JQuery;
+        autoEscape: boolean;
     }
 
     const given = getGiven<Vars>();
@@ -74,8 +75,8 @@ describe("autoEscape", () => {
 
 describe("autoOpen", () => {
     interface Vars {
-        autoOpen: boolean | number | string;
         $tree: JQuery;
+        autoOpen: boolean | number | string;
     }
 
     const given = getGiven<Vars>();
@@ -106,11 +107,11 @@ describe("autoOpen", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
-                    name: "node2",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "node3", open: true }),
                     ],
+                    name: "node2",
+                    open: true,
                 }),
             ]);
         });
@@ -123,11 +124,11 @@ describe("autoOpen", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
-                    name: "node2",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "node3", open: false }),
                     ],
+                    name: "node2",
+                    open: true,
                 }),
             ]);
         });
@@ -140,11 +141,11 @@ describe("autoOpen", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
-                    name: "node2",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "node3", open: true }),
                     ],
+                    name: "node2",
+                    open: true,
                 }),
             ]);
         });
@@ -157,11 +158,11 @@ describe("autoOpen", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
-                    name: "node2",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "node3", open: true }),
                     ],
+                    name: "node2",
+                    open: true,
                 }),
             ]);
         });
@@ -261,25 +262,25 @@ describe("dataUrl", () => {
 
     const testCases = [
         {
-            name: "string",
             dataUrl: "/tree/",
             expectedNode: "node1",
             expectedStructure: exampleStructure,
+            name: "string",
         },
         {
-            name: "object with url and headers",
             dataUrl: {
-                url: "/tree/",
                 headers: { node: "test-node" },
+                url: "/tree/",
             },
             expectedNode: "test-node",
             expectedStructure: [expect.objectContaining({ name: "test-node" })],
+            name: "object with url and headers",
         },
         {
-            name: "function",
             dataUrl: () => ({ url: "/tree/" }),
             expectedNode: "node1",
             expectedStructure: exampleStructure,
+            name: "function",
         },
     ];
 
@@ -342,8 +343,8 @@ describe("dataUrl", () => {
 
 describe("onCanSelectNode", () => {
     interface Vars {
-        node1: INode;
         $tree: JQuery;
+        node1: INode;
     }
 
     const given = getGiven<Vars>();
@@ -399,9 +400,9 @@ describe("onGetStateFromStorage and onSetStateFromStorage", () => {
     const getState = (): string => savedState;
 
     interface Vars {
+        $tree: JQuery;
         initialState: string;
         node1: INode;
-        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -496,8 +497,8 @@ describe("onLoadFailed", () => {
 
 describe("rtl", () => {
     interface Vars {
-        node1: INode;
         $tree: JQuery;
+        node1: INode;
     }
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
@@ -531,9 +532,9 @@ describe("rtl", () => {
 
 describe("saveState", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
         saveState: boolean | string;
-        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
@@ -618,8 +619,8 @@ describe("saveState", () => {
 describe("showEmptyFolder", () => {
     context("when children attribute is an empty array", () => {
         interface Vars {
-            showEmptyFolder: boolean;
             $tree: JQuery;
+            showEmptyFolder: boolean;
         }
 
         const given = getGiven<Vars>();
@@ -627,7 +628,7 @@ describe("showEmptyFolder", () => {
 
         beforeEach(() => {
             given.$tree.tree({
-                data: [{ name: "parent1", children: [] }],
+                data: [{ children: [], name: "parent1" }],
                 showEmptyFolder: given.showEmptyFolder,
             });
         });
@@ -647,7 +648,7 @@ describe("showEmptyFolder", () => {
 
             it("creates a folder", () => {
                 expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "parent1", children: [] }),
+                    expect.objectContaining({ children: [], name: "parent1" }),
                 ]);
             });
         });

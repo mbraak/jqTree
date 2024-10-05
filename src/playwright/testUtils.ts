@@ -1,10 +1,10 @@
 import { ElementHandle, Locator, Page } from "@playwright/test";
 
 interface BoundingBox {
+    height: number;
+    width: number;
     x: number;
     y: number;
-    width: number;
-    height: number;
 }
 
 export const sleep = async (page: Page, timeout: number) => {

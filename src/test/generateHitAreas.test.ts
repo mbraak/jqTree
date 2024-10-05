@@ -28,9 +28,9 @@ describe("generateHitAreasForGroup", () => {
     it("adds a hit area with one hit position", () => {
         const node = new Node(null);
         const hitPosition = {
-            top: 0,
             node,
             position: Position.Inside,
+            top: 0,
         };
 
         const hitAreas: HitArea[] = [];
@@ -39,8 +39,8 @@ describe("generateHitAreasForGroup", () => {
         expect(hitAreas).toEqual([
             expect.objectContaining({
                 bottom: 100,
-                position: Position.Inside,
                 node,
+                position: Position.Inside,
                 top: 40,
             }),
         ]);
@@ -49,9 +49,9 @@ describe("generateHitAreasForGroup", () => {
     it("doesn't add a hit area when the position is Position.None", () => {
         const node = new Node(null);
         const hitPosition = {
-            top: 0,
             node,
             position: Position.None,
+            top: 0,
         };
 
         const hitAreas: HitArea[] = [];
@@ -64,14 +64,14 @@ describe("generateHitAreasForGroup", () => {
         const node = new Node(null);
         const hitPositions = [
             {
-                top: 0,
                 node,
                 position: Position.Before,
+                top: 0,
             },
             {
-                top: 0,
                 node,
                 position: Position.Inside,
+                top: 0,
             },
         ];
 
@@ -81,14 +81,14 @@ describe("generateHitAreasForGroup", () => {
         expect(hitAreas).toEqual([
             expect.objectContaining({
                 bottom: 70,
-                position: Position.Before,
                 node,
+                position: Position.Before,
                 top: 40,
             }),
             expect.objectContaining({
                 bottom: 100,
-                position: Position.Inside,
                 node,
+                position: Position.Inside,
                 top: 70,
             }),
         ]);
@@ -103,9 +103,9 @@ describe("generateHitAreasFromPositions", () => {
     it("returns a hit area with one hit position", () => {
         const node = new Node(null);
         const hitPosition = {
-            top: 100,
             node,
             position: Position.Inside,
+            top: 100,
         };
 
         expect(generateHitAreasFromPositions([hitPosition], 140)).toEqual([
@@ -122,14 +122,14 @@ describe("generateHitAreasFromPositions", () => {
         const node = new Node(null);
         const hitPositions = [
             {
-                top: 100,
                 node,
                 position: Position.Before,
+                top: 100,
             },
             {
-                top: 100,
                 node,
                 position: Position.Inside,
+                top: 100,
             },
         ];
 
@@ -154,14 +154,14 @@ describe("generateHitAreasFromPositions", () => {
         const node2 = new Node(null);
         const hitPositions = [
             {
-                top: 100,
                 node: node1,
                 position: Position.Inside,
+                top: 100,
             },
             {
-                top: 125,
                 node: node2,
                 position: Position.After,
+                top: 125,
             },
         ];
 
@@ -191,8 +191,8 @@ describe("generatePositions", () => {
 
     it("generates hit positions when the tree has two nodes and the first node is the current node", () => {
         const tree = new Node().loadFromData([
-            { name: "node1", id: 1 },
-            { name: "node2", id: 2 },
+            { id: 1, name: "node1" },
+            { id: 2, name: "node2" },
         ]);
 
         const node1 = tree.children[0] as Node;
@@ -227,8 +227,8 @@ describe("generatePositions", () => {
 
     it("generates hit positions when the tree has a node and an open folder node and the first node is the current node", () => {
         const tree = new Node().loadFromData([
-            { name: "node1", id: 1 },
-            { name: "node2", id: 2, children: [{ name: "child1", id: 3 }] },
+            { id: 1, name: "node1" },
+            { children: [{ id: 3, name: "child1" }], id: 2, name: "node2" },
         ]);
 
         const node1 = tree.children[0] as Node;
@@ -277,8 +277,8 @@ describe("generatePositions", () => {
 
     it("generates hit positions when the tree has a node and an open folder node and the folder node is the current node", () => {
         const tree = new Node().loadFromData([
-            { name: "node1", id: 1 },
-            { name: "node2", id: 2, children: [{ name: "child1", id: 3 }] },
+            { id: 1, name: "node1" },
+            { children: [{ id: 3, name: "child1" }], id: 2, name: "node2" },
         ]);
 
         const node1 = tree.children[0] as Node;

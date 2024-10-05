@@ -2,6 +2,7 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import";
 import jestPlugin from "eslint-plugin-jest";
+import perfectionistPlugin from "eslint-plugin-perfectionist";
 import playwrightPlugin from "eslint-plugin-playwright";
 import testingLibraryPlugin from "eslint-plugin-testing-library";
 
@@ -11,6 +12,7 @@ export default [
     ...tseslint.configs.stylisticTypeChecked,
     importPlugin.flatConfigs.recommended,
     importPlugin.flatConfigs.typescript,
+    perfectionistPlugin.configs["recommended-natural"],
     {
         languageOptions: {
             parserOptions: {

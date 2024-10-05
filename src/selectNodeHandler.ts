@@ -1,5 +1,5 @@
-import { Node } from "./node";
 import { GetNodeById } from "./jqtreeMethodTypes";
+import { Node } from "./node";
 
 interface SelectNodeHandlerParameters {
     getNodeById: GetNodeById;
@@ -16,7 +16,20 @@ export default class SelectNodeHandler {
         this.clear();
     }
 
-    public getSelectedNode(): Node | false {
+    public addToSelection(node: Node): void {
+        if (node.id != null) {
+            this.selectedNodes.add(node.id);
+        } else {
+            this.selectedSingleNode = node;
+        }
+    }
+
+    public clear(): void {
+        this.selectedNodes.clear();
+        this.selectedSingleNode = null;
+    }
+
+    public getSelectedNode(): false | Node {
         const selectedNodes = this.getSelectedNodes();
 
         if (selectedNodes.length) {
@@ -78,11 +91,6 @@ export default class SelectNodeHandler {
         }
     }
 
-    public clear(): void {
-        this.selectedNodes.clear();
-        this.selectedSingleNode = null;
-    }
-
     public removeFromSelection(node: Node, includeChildren = false): void {
         if (node.id == null) {
             if (
@@ -102,14 +110,6 @@ export default class SelectNodeHandler {
                     return true;
                 });
             }
-        }
-    }
-
-    public addToSelection(node: Node): void {
-        if (node.id != null) {
-            this.selectedNodes.add(node.id);
-        } else {
-            this.selectedSingleNode = node;
         }
     }
 }

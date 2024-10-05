@@ -75,6 +75,9 @@ importers:
       eslint-plugin-jest:
         specifier: ^28.8.3
         version: 28.8.3(@typescript-eslint/eslint-plugin@8.8.0(@typescript-eslint/parser@8.8.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.7.0(@types/node@22.7.4))(typescript@5.6.2)
+      eslint-plugin-perfectionist:
+        specifier: ^3.8.0
+        version: 3.8.0(eslint@8.57.1)(typescript@5.6.2)
       eslint-plugin-playwright:
         specifier: ^1.6.2
         version: 1.6.2(eslint-plugin-jest@28.8.3(@typescript-eslint/eslint-plugin@8.8.0(@typescript-eslint/parser@8.8.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.7.0(@types/node@22.7.4))(typescript@5.6.2))(eslint@8.57.1)
@@ -1790,6 +1793,25 @@ packages:
       jest:
         optional: true
 
+  eslint-plugin-perfectionist@3.8.0:
+    resolution: {integrity: sha512-BYJWbQVOjvIGK9V1xUfn790HuvkePjxti8epOi1H6sdzo0N4RehBmQ8coHPbgA/f12BUG1NIoDtQhI9mUm+o2A==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    peerDependencies:
+      astro-eslint-parser: ^1.0.2
+      eslint: '>=8.0.0'
+      svelte: '>=3.0.0'
+      svelte-eslint-parser: ^0.41.1
+      vue-eslint-parser: '>=9.0.0'
+    peerDependenciesMeta:
+      astro-eslint-parser:
+        optional: true
+      svelte:
+        optional: true
+      svelte-eslint-parser:
+        optional: true
+      vue-eslint-parser:
+        optional: true
+
   eslint-plugin-playwright@1.6.2:
     resolution: {integrity: sha512-mraN4Em3b5jLt01q7qWPyLg0Q5v3KAWfJSlEWwldyUXoa7DSPrBR4k6B6LROLqipsG8ndkwWMdjl1Ffdh15tag==}
     engines: {node: '>=16.6.0'}
@@ -2564,6 +2586,9 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  natural-compare-lite@1.4.0:
+    resolution: {integrity: sha512-Tj+HTDSJJKaZnfiuw+iaF9skdPpTo2GtEly5JHnWV/hfv2Qj/9RKsGISQtLh2ox3l5EAGw487hnBee0sIJ6v2g==}
 
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
@@ -5432,6 +5457,17 @@ snapshots:
       - supports-color
       - typescript
 
+  eslint-plugin-perfectionist@3.8.0(eslint@8.57.1)(typescript@5.6.2):
+    dependencies:
+      '@typescript-eslint/types': 8.8.0
+      '@typescript-eslint/utils': 8.8.0(eslint@8.57.1)(typescript@5.6.2)
+      eslint: 8.57.1
+      minimatch: 9.0.5
+      natural-compare-lite: 1.4.0
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
   eslint-plugin-playwright@1.6.2(eslint-plugin-jest@28.8.3(@typescript-eslint/eslint-plugin@8.8.0(@typescript-eslint/parser@8.8.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.7.0(@types/node@22.7.4))(typescript@5.6.2))(eslint@8.57.1):
     dependencies:
       eslint: 8.57.1
@@ -6445,6 +6481,8 @@ snapshots:
   mute-stream@1.0.0: {}
 
   nanoid@3.3.7: {}
+
+  natural-compare-lite@1.4.0: {}
 
   natural-compare@1.4.0: {}
 

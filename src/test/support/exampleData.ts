@@ -1,22 +1,22 @@
 const exampleData = [
     {
-        name: "node1",
+        children: [
+            { id: 125, intProperty: 2, name: "child1" },
+            { id: 126, name: "child2" },
+        ],
         id: 123, // extra data
         intProperty: 1,
+        name: "node1",
         strProperty: "1",
-        children: [
-            { name: "child1", id: 125, intProperty: 2 },
-            { name: "child2", id: 126 },
-        ],
     },
     {
-        name: "node2",
+        children: [
+            { children: [{ id: 128, name: "child3" }], id: 127, name: "node3" },
+        ],
         id: 124,
         intProperty: 3,
+        name: "node2",
         strProperty: "3",
-        children: [
-            { name: "node3", id: 127, children: [{ name: "child3", id: 128 }] },
-        ],
     },
 ];
 

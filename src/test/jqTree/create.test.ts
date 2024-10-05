@@ -1,4 +1,5 @@
 import getGiven from "givens";
+
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 
@@ -29,25 +30,25 @@ describe("create with data", () => {
     it("creates a tree", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
-                name: "node1",
-                open: false,
-                selected: false,
                 children: [
                     expect.objectContaining({ name: "child1" }),
                     expect.objectContaining({ name: "child2" }),
                 ],
+                name: "node1",
+                open: false,
+                selected: false,
             }),
             expect.objectContaining({
+                children: [
+                    expect.objectContaining({
+                        children: [expect.objectContaining({ name: "child3" })],
+                        name: "node3",
+                        open: false,
+                    }),
+                ],
                 name: "node2",
                 open: false,
                 selected: false,
-                children: [
-                    expect.objectContaining({
-                        name: "node3",
-                        open: false,
-                        children: [expect.objectContaining({ name: "child3" })],
-                    }),
-                ],
             }),
         ]);
     });

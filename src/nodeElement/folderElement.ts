@@ -1,6 +1,6 @@
+import { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 import { Position } from "../position";
 import NodeElement, { NodeElementParams } from "./index";
-import { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 
 interface FolderElementParams extends NodeElementParams {
     closedIconElement?: HTMLElement | Text;
@@ -14,24 +14,74 @@ class FolderElement extends NodeElement {
     private triggerEvent: TriggerEvent;
 
     constructor({
+        $treeElement,
         closedIconElement,
         getScrollLeft,
         node,
         openedIconElement,
         tabIndex,
-        $treeElement,
         triggerEvent,
     }: FolderElementParams) {
         super({
+            $treeElement,
             getScrollLeft,
             node,
             tabIndex,
-            $treeElement,
         });
 
         this.closedIconElement = closedIconElement;
         this.openedIconElement = openedIconElement;
         this.triggerEvent = triggerEvent;
+    }
+
+    protected mustShowBorderDropHint(position: Position): boolean {
+        return !this.node.is_open && position === Position.Inside;
+    }
+
+    private getButton(): HTMLLinkElement {
+        return this.element.querySelector(
+            ":scope > .jqtree-element > a.jqtree-toggler",
+        ) as HTMLLinkElement;
+    }
+
+    public close(
+        slide = true,
+        animationSpeed: JQuery.Duration | undefined = "fast",
+    ): void {
+        if (!this.node.is_open) {
+            return;
+        }
+
+        this.node.is_open = false;
+
+        const button = this.getButton();
+        button.classList.add("jqtree-closed");
+        button.innerHTML = "";
+
+        const closedIconElement = this.closedIconElement;
+
+        if (closedIconElement) {
+            const icon = closedIconElement.cloneNode(true);
+            button.appendChild(icon);
+        }
+
+        const doClose = (): void => {
+            this.element.classList.add("jqtree-closed");
+
+            const titleSpan = this.getTitleSpan();
+            titleSpan.setAttribute("aria-expanded", "false");
+
+            this.triggerEvent("tree.close", {
+                node: this.node,
+            });
+        };
+
+        if (slide) {
+            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
+        } else {
+            jQuery(this.getUl()).hide();
+            doClose();
+        }
     }
 
     public open(
@@ -77,56 +127,6 @@ class FolderElement extends NodeElement {
             jQuery(this.getUl()).show();
             doOpen();
         }
-    }
-
-    public close(
-        slide = true,
-        animationSpeed: JQuery.Duration | undefined = "fast",
-    ): void {
-        if (!this.node.is_open) {
-            return;
-        }
-
-        this.node.is_open = false;
-
-        const button = this.getButton();
-        button.classList.add("jqtree-closed");
-        button.innerHTML = "";
-
-        const closedIconElement = this.closedIconElement;
-
-        if (closedIconElement) {
-            const icon = closedIconElement.cloneNode(true);
-            button.appendChild(icon);
-        }
-
-        const doClose = (): void => {
-            this.element.classList.add("jqtree-closed");
-
-            const titleSpan = this.getTitleSpan();
-            titleSpan.setAttribute("aria-expanded", "false");
-
-            this.triggerEvent("tree.close", {
-                node: this.node,
-            });
-        };
-
-        if (slide) {
-            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
-        } else {
-            jQuery(this.getUl()).hide();
-            doClose();
-        }
-    }
-
-    protected mustShowBorderDropHint(position: Position): boolean {
-        return !this.node.is_open && position === Position.Inside;
-    }
-
-    private getButton(): HTMLLinkElement {
-        return this.element.querySelector(
-            ":scope > .jqtree-element > a.jqtree-toggler",
-        ) as HTMLLinkElement;
     }
 }
 

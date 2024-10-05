@@ -4,7 +4,7 @@ export type OnCanMove = ((node: Node) => boolean) | undefined;
 
 type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
 
-export type DataUrl = string | JQuery.AjaxSettings | DataUrlFunction;
+export type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
 
 export type DragMethod = (node: Node, event: Event | Touch) => void;
 
@@ -24,7 +24,7 @@ export type OnSetStateFromStorage = ((data: string) => void) | undefined;
 
 export type DataFilter = (data: unknown) => NodeData[];
 
-export type IconElement = string | HTMLElement | JQuery;
+export type IconElement = HTMLElement | JQuery | string;
 
 export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 
@@ -58,10 +58,10 @@ export interface JQTreeOptions {
     onLoading?: OnLoading;
     onSetStateFromStorage?: OnSetStateFromStorage;
     openedIcon?: IconElement;
-    openFolderDelay: number | false;
+    openFolderDelay: false | number;
     rtl?: boolean;
-    selectable: boolean;
     saveState: boolean | string;
+    selectable: boolean;
     showEmptyFolder: boolean;
     slide: boolean;
     startDndDelay?: number;

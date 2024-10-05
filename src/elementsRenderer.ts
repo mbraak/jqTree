@@ -1,14 +1,14 @@
-import { getBoolString } from "./util";
-import { Node } from "./node";
-import { IconElement, OnCreateLi } from "./jqtreeOptions";
 import { GetTree, IsNodeSelected } from "./jqtreeMethodTypes";
+import { IconElement, OnCreateLi } from "./jqtreeOptions";
+import { Node } from "./node";
+import { getBoolString } from "./util";
 
 interface ElementsRendererParams {
+    $element: JQuery;
     autoEscape: boolean;
     buttonLeft: boolean;
     closedIcon?: IconElement;
     dragAndDrop: boolean;
-    $element: JQuery;
     getTree: GetTree;
     isNodeSelected: IsNodeSelected;
     onCreateLi?: OnCreateLi;
@@ -19,12 +19,10 @@ interface ElementsRendererParams {
 }
 
 export default class ElementsRenderer {
-    public openedIconElement?: HTMLElement | Text;
-    public closedIconElement?: HTMLElement | Text;
+    private $element: JQuery;
     private autoEscape: boolean;
     private buttonLeft: boolean;
     private dragAndDrop: boolean;
-    private $element: JQuery;
     private getTree: GetTree;
     private isNodeSelected: IsNodeSelected;
     private onCreateLi?: OnCreateLi;
@@ -32,15 +30,18 @@ export default class ElementsRenderer {
     private showEmptyFolder: boolean;
     private tabIndex?: number;
 
+    public closedIconElement?: HTMLElement | Text;
+    public openedIconElement?: HTMLElement | Text;
+
     constructor({
+        $element,
         autoEscape,
         buttonLeft,
         closedIcon,
-        onCreateLi,
         dragAndDrop,
-        $element,
         getTree,
         isNodeSelected,
+        onCreateLi,
         openedIcon,
         rtl,
         showEmptyFolder,
@@ -60,44 +61,25 @@ export default class ElementsRenderer {
         this.closedIconElement = this.createButtonElement(closedIcon ?? "-");
     }
 
-    public render(fromNode: Node | null): void {
-        if (fromNode?.parent) {
-            this.renderFromNode(fromNode);
+    private attachNodeData(node: Node, li: HTMLElement): void {
+        node.element = li;
+        jQuery(li).data("node", node);
+    }
+
+    private createButtonElement(
+        value: IconElement,
+    ): HTMLElement | Text | undefined {
+        if (typeof value === "string") {
+            // convert value to html
+            const div = document.createElement("div");
+            div.innerHTML = value;
+
+            return document.createTextNode(div.innerHTML);
+        } else if ((value as HTMLElement).nodeType) {
+            return value as HTMLElement;
         } else {
-            this.renderFromRoot();
+            return jQuery(value)[0];
         }
-    }
-
-    public renderFromRoot(): void {
-        this.$element.empty();
-
-        const tree = this.getTree();
-
-        if (this.$element[0] && tree) {
-            this.createDomElements(this.$element[0], tree.children, true, 1);
-        }
-    }
-
-    public renderFromNode(node: Node): void {
-        if (!node.element) {
-            return;
-        }
-
-        // remember current li
-        const $previousLi = jQuery(node.element);
-
-        // create element
-        const li = this.createLi(node, node.getLevel());
-        this.attachNodeData(node, li);
-
-        // add element to dom
-        $previousLi.after(li);
-
-        // remove previous li
-        $previousLi.remove();
-
-        // create children
-        this.createDomElements(li, node.children, false, node.getLevel() + 1);
     }
 
     private createDomElements(
@@ -119,68 +101,6 @@ export default class ElementsRenderer {
                 this.createDomElements(li, child.children, false, level + 1);
             }
         }
-    }
-
-    private attachNodeData(node: Node, li: HTMLElement): void {
-        node.element = li;
-        jQuery(li).data("node", node);
-    }
-
-    private createUl(isRootNode: boolean): HTMLUListElement {
-        let classString;
-        let role;
-
-        if (!isRootNode) {
-            classString = "";
-            role = "group";
-        } else {
-            classString = "jqtree-tree";
-            role = "tree";
-
-            if (this.rtl) {
-                classString += " jqtree-rtl";
-            }
-        }
-
-        if (this.dragAndDrop) {
-            classString += " jqtree-dnd";
-        }
-
-        const ul = document.createElement("ul");
-        ul.className = `jqtree_common ${classString}`;
-
-        ul.setAttribute("role", role);
-
-        return ul;
-    }
-
-    private createLi(node: Node, level: number): HTMLLIElement {
-        const isSelected = Boolean(this.isNodeSelected(node));
-
-        const mustShowFolder =
-            node.isFolder() || (node.isEmptyFolder && this.showEmptyFolder);
-
-        const li = mustShowFolder
-            ? this.createFolderLi(node, level, isSelected)
-            : this.createNodeLi(node, level, isSelected);
-
-        if (this.onCreateLi) {
-            this.onCreateLi(node, jQuery(li), isSelected);
-        }
-
-        return li;
-    }
-
-    private setTreeItemAriaAttributes(
-        element: HTMLElement,
-        name: string,
-        level: number,
-        isSelected: boolean,
-    ) {
-        element.setAttribute("aria-label", name);
-        element.setAttribute("aria-level", `${level}`);
-        element.setAttribute("aria-selected", getBoolString(isSelected));
-        element.setAttribute("role", "treeitem");
     }
 
     private createFolderLi(
@@ -231,6 +151,23 @@ export default class ElementsRenderer {
 
         if (!this.buttonLeft) {
             div.appendChild(buttonLink);
+        }
+
+        return li;
+    }
+
+    private createLi(node: Node, level: number): HTMLLIElement {
+        const isSelected = Boolean(this.isNodeSelected(node));
+
+        const mustShowFolder =
+            node.isFolder() || (node.isEmptyFolder && this.showEmptyFolder);
+
+        const li = mustShowFolder
+            ? this.createFolderLi(node, level, isSelected)
+            : this.createNodeLi(node, level, isSelected);
+
+        if (this.onCreateLi) {
+            this.onCreateLi(node, jQuery(li), isSelected);
         }
 
         return li;
@@ -310,6 +247,34 @@ export default class ElementsRenderer {
         return titleSpan;
     }
 
+    private createUl(isRootNode: boolean): HTMLUListElement {
+        let classString;
+        let role;
+
+        if (!isRootNode) {
+            classString = "";
+            role = "group";
+        } else {
+            classString = "jqtree-tree";
+            role = "tree";
+
+            if (this.rtl) {
+                classString += " jqtree-rtl";
+            }
+        }
+
+        if (this.dragAndDrop) {
+            classString += " jqtree-dnd";
+        }
+
+        const ul = document.createElement("ul");
+        ul.className = `jqtree_common ${classString}`;
+
+        ul.setAttribute("role", role);
+
+        return ul;
+    }
+
     private getButtonClasses(node: Node): string {
         const classes = ["jqtree-toggler", "jqtree_common"];
 
@@ -344,19 +309,55 @@ export default class ElementsRenderer {
         return classes.join(" ");
     }
 
-    private createButtonElement(
-        value: IconElement,
-    ): HTMLElement | Text | undefined {
-        if (typeof value === "string") {
-            // convert value to html
-            const div = document.createElement("div");
-            div.innerHTML = value;
+    private setTreeItemAriaAttributes(
+        element: HTMLElement,
+        name: string,
+        level: number,
+        isSelected: boolean,
+    ) {
+        element.setAttribute("aria-label", name);
+        element.setAttribute("aria-level", `${level}`);
+        element.setAttribute("aria-selected", getBoolString(isSelected));
+        element.setAttribute("role", "treeitem");
+    }
 
-            return document.createTextNode(div.innerHTML);
-        } else if ((value as HTMLElement).nodeType) {
-            return value as HTMLElement;
+    public render(fromNode: Node | null): void {
+        if (fromNode?.parent) {
+            this.renderFromNode(fromNode);
         } else {
-            return jQuery(value)[0];
+            this.renderFromRoot();
+        }
+    }
+
+    public renderFromNode(node: Node): void {
+        if (!node.element) {
+            return;
+        }
+
+        // remember current li
+        const $previousLi = jQuery(node.element);
+
+        // create element
+        const li = this.createLi(node, node.getLevel());
+        this.attachNodeData(node, li);
+
+        // add element to dom
+        $previousLi.after(li);
+
+        // remove previous li
+        $previousLi.remove();
+
+        // create children
+        this.createDomElements(li, node.children, false, node.getLevel() + 1);
+    }
+
+    public renderFromRoot(): void {
+        this.$element.empty();
+
+        const tree = this.getTree();
+
+        if (this.$element[0] && tree) {
+            this.createDomElements(this.$element[0], tree.children, true, 1);
         }
     }
 }

@@ -10,16 +10,16 @@ const getTreeNode = ($li: JQuery): JQTreeMatchers.TreeNode => {
         const $ul = $li.children("ul.jqtree_common");
 
         return {
-            nodeType: "folder",
             children: getChildren($ul),
             name,
+            nodeType: "folder",
             open: !$li.hasClass("jqtree-closed"),
             selected,
         };
     } else {
         return {
-            nodeType: "child",
             name,
+            nodeType: "child",
             selected,
         };
     }

@@ -8,7 +8,7 @@ export type GetNodeById = (nodeId: NodeId) => Node | null;
 
 export type GetScrollLeft = () => number;
 
-export type GetSelectedNode = () => Node | false;
+export type GetSelectedNode = () => false | Node;
 
 export type GetSelectedNodes = () => Node[];
 

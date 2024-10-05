@@ -12,10 +12,6 @@ class GhostDropHint implements DropHint {
         this.ghost.classList.add("jqtree-inside");
     }
 
-    public remove(): void {
-        this.ghost.remove();
-    }
-
     private createGhostElement() {
         const ghost = document.createElement("li");
         ghost.className = "jqtree_common jqtree-ghost";
@@ -29,6 +25,10 @@ class GhostDropHint implements DropHint {
         ghost.append(lineSpan);
 
         return ghost;
+    }
+
+    public remove(): void {
+        this.ghost.remove();
     }
 }
 
