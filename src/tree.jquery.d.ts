@@ -26,7 +26,6 @@ interface INode {
 type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
 type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ClickNodeEvent {
     click_event: JQuery.ClickEvent;
     deselected_node?: INode | null;
