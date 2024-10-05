@@ -1,7 +1,6 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import";
-import deprecationPlugin from "eslint-plugin-deprecation";
 import jestPlugin from "eslint-plugin-jest";
 import playwrightPlugin from "eslint-plugin-playwright";
 import testingLibraryPlugin from "eslint-plugin-testing-library";
@@ -18,9 +17,6 @@ export default [
                 projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
-        },
-        plugins: {
-            deprecation: deprecationPlugin,
         },
         rules: {
             "@typescript-eslint/explicit-function-return-type": "off",
@@ -48,18 +44,6 @@ export default [
                 },
             ],
             "@typescript-eslint/unified-signatures": "off",
-            "deprecation/deprecation": "error",
-        },
-        settings: {
-            "import/parsers": {
-                "@typescript-eslint/parser": [".ts", ".js", ".mjs"],
-            },
-            "import/resolver": {
-                typescript: {
-                    alwaysTryTypes: true,
-                    project: "./tsconfig.json",
-                },
-            },
         },
     },
     {
