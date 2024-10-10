@@ -12,8 +12,7 @@ module.exports = {
         "givens/setup.js",
         "jest-extended/all",
     ],
-    setupFiles: ["<rootDir>/config/jest.polyfills.js"],
-    testEnvironment: "jsdom",
+    testEnvironment: "jest-fixed-jsdom",
     testEnvironmentOptions: {
         customExportConditions: [""],
     },
