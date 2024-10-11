@@ -82,17 +82,7 @@ export default class KeyHandler {
         return this.keyboardSupport && this.isFocusOnTree();
     }
 
-    public deinit(): void {
-        if (this.handleKeyDownHandler) {
-            document.removeEventListener("keydown", this.handleKeyDownHandler);
-        }
-    }
-
-    public moveDown(selectedNode: Node): boolean {
-        return this.selectNode(selectedNode.getNextVisibleNode());
-    }
-
-    public moveLeft(selectedNode: Node): boolean {
+    private moveLeft(selectedNode: Node): boolean {
         if (selectedNode.isFolder() && selectedNode.is_open) {
             // Left on an open node closes the node
             this.closeNode(selectedNode);
@@ -103,7 +93,7 @@ export default class KeyHandler {
         }
     }
 
-    public moveRight(selectedNode: Node): boolean {
+    private moveRight(selectedNode: Node): boolean {
         if (!selectedNode.isFolder()) {
             return true;
         } else {
@@ -119,11 +109,7 @@ export default class KeyHandler {
         }
     }
 
-    public moveUp(selectedNode: Node): boolean {
-        return this.selectNode(selectedNode.getPreviousVisibleNode());
-    }
-
-    public selectNode(node: Node | null): boolean {
+    private selectNode(node: Node | null): boolean {
         if (!node) {
             return true;
         } else {
@@ -131,5 +117,19 @@ export default class KeyHandler {
 
             return false;
         }
+    }
+
+    public deinit(): void {
+        if (this.handleKeyDownHandler) {
+            document.removeEventListener("keydown", this.handleKeyDownHandler);
+        }
+    }
+
+    public moveDown(selectedNode: Node): boolean {
+        return this.selectNode(selectedNode.getNextVisibleNode());
+    }
+
+    public moveUp(selectedNode: Node): boolean {
+        return this.selectNode(selectedNode.getPreviousVisibleNode());
     }
 }
