@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+### Development version
+
+-   Issue #840: using the up and down keys scrolls the page
+
 ### 1.8.5 (september 28 2024)
 
 -   Update packages
