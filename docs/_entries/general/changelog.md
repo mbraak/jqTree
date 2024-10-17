@@ -6,6 +6,7 @@ name: changelog
 ### Development version
 
 -   Issue #840: using the up and down keys scrolls the page
+-   Issue #846: attach html element before calling onCreateLi
 
 ### 1.8.5 (september 28 2024)
 
