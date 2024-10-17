@@ -702,7 +702,6 @@ var jqtree = (function (exports) {
         for (const child of children) {
           const li = this.createLi(child, level);
           ul.appendChild(li);
-          this.attachNodeData(child, li);
           if (child.hasChildren()) {
             this.createDomElements(li, child.children, false, level + 1);
           }
@@ -743,10 +742,16 @@ var jqtree = (function (exports) {
         }
         return li;
       }
+
+      /* Create the <li> element
+       * Attach it to node.element.
+       * Call onCreateLi
+       */
       createLi(node, level) {
         const isSelected = Boolean(this.isNodeSelected(node));
         const mustShowFolder = node.isFolder() || node.isEmptyFolder && this.showEmptyFolder;
         const li = mustShowFolder ? this.createFolderLi(node, level, isSelected) : this.createNodeLi(node, level, isSelected);
+        this.attachNodeData(node, li);
         if (this.onCreateLi) {
           this.onCreateLi(node, jQuery(li), isSelected);
         }
@@ -866,7 +871,6 @@ var jqtree = (function (exports) {
 
         // create element
         const li = this.createLi(node, node.getLevel());
-        this.attachNodeData(node, li);
 
         // add element to dom
         $previousLi.after(li);
