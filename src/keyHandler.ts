@@ -36,16 +36,16 @@ export default class KeyHandler {
                     isKeyHandled = this.moveDown(selectedNode);
                     break;
 
-                case "ArrowUp":
-                    isKeyHandled = this.moveUp(selectedNode);
+                case "ArrowLeft":
+                    isKeyHandled = this.moveLeft(selectedNode);
                     break;
 
                 case "ArrowRight":
                     isKeyHandled = this.moveRight(selectedNode);
                     break;
 
-                case "ArrowLeft":
-                    isKeyHandled = this.moveLeft(selectedNode);
+                case "ArrowUp":
+                    isKeyHandled = this.moveUp(selectedNode);
                     break;
             }
         }
