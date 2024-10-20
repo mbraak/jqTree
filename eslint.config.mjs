@@ -5,7 +5,6 @@ import jestPlugin from "eslint-plugin-jest";
 import jestDomPlugin from "eslint-plugin-jest-dom";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
 import playwrightPlugin from "eslint-plugin-playwright";
-import testingLibraryPlugin from "eslint-plugin-testing-library";
 
 export default [
     eslint.configs.recommended,
@@ -58,10 +57,6 @@ export default [
         rules: {
             "jest/no-identical-title": "off",
         },
-    },
-    {
-        files: ["src/test/jqTree/**/*.ts"],
-        ...testingLibraryPlugin.configs["flat/dom"],
     },
     {
         files: ["src/test/jqTree/**/*.ts"],

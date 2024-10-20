@@ -1011,7 +1011,7 @@ describe("refresh", () => {
 
     it("rerenders the tree", () => {
         const tree = given.$tree.tree("getTree");
-        (tree.children[0] as INode).name = "node1a"; // eslint-disable-line testing-library/no-node-access
+        (tree.children[0] as INode).name = "node1a";
 
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({ name: "node1" }),
