@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom";
 import jQuery from "jquery";
 
 import "./jqTreeMatchers";

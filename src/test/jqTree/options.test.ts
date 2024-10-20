@@ -248,8 +248,7 @@ describe("dataFilter", () => {
         });
 
         await screen.findByText("node2");
-
-        expect(screen.queryByText("node1")).toBeNull();
+        expect(screen.queryByText("node1")).not.toBeInTheDocument();
         expect(dataFilter).toHaveBeenCalledWith(exampleData);
     });
 });
