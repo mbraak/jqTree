@@ -1807,11 +1807,21 @@ var jqtree = (function (exports) {
     }
 
     class GhostDropHint {
-      constructor(element) {
+      constructor(node, element, position) {
         this.element = element;
+        this.node = node;
         this.ghost = this.createGhostElement();
-        this.element.after(this.ghost);
-        this.ghost.classList.add("jqtree-inside");
+        if (position === Position.After) {
+          this.moveAfter();
+        } else if (position === Position.Before) {
+          this.moveBefore();
+        } else if (position === Position.Inside) {
+          if (node.isFolder() && node.is_open) {
+            this.moveInsideOpenFolder();
+          } else {
+            this.moveInside();
+          }
+        }
       }
       createGhostElement() {
         const ghost = document.createElement("li");
@@ -1823,6 +1833,22 @@ var jqtree = (function (exports) {
         lineSpan.className = "jqtree_common jqtree-line";
         ghost.append(lineSpan);
         return ghost;
+      }
+      moveAfter() {
+        this.element.after(this.ghost);
+      }
+      moveBefore() {
+        this.element.before(this.ghost);
+      }
+      moveInside() {
+        this.element.after(this.ghost);
+        this.ghost.classList.add("jqtree-inside");
+      }
+      moveInsideOpenFolder() {
+        const childElement = this.node.children[0]?.element;
+        if (childElement) {
+          childElement.before(this.ghost);
+        }
       }
       remove() {
         this.ghost.remove();
@@ -1855,7 +1881,7 @@ var jqtree = (function (exports) {
         if (this.mustShowBorderDropHint(position)) {
           return new BorderDropHint(this.element, this.getScrollLeft());
         } else {
-          return new GhostDropHint(this.element);
+          return new GhostDropHint(this.node, this.element, position);
         }
       }
       deselect() {
