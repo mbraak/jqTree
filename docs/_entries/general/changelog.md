@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+-   Issue #853: fix dnd to first child (thanks to Oskar von Dungern)
+
 #### 1.8.6 (october 26 2024)
 
 -   Issue #840: using the up and down keys scrolls the page
