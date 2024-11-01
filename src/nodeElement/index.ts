@@ -50,7 +50,7 @@ class NodeElement {
         if (this.mustShowBorderDropHint(position)) {
             return new BorderDropHint(this.element, this.getScrollLeft());
         } else {
-            return new GhostDropHint(this.element);
+            return new GhostDropHint(this.node, this.element, position);
         }
     }
 

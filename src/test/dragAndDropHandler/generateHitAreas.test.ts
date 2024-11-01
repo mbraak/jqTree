@@ -2,10 +2,10 @@ import {
     generateHitAreasForGroup,
     generateHitAreasFromPositions,
     generateHitPositions,
-} from "../dragAndDropHandler/generateHitAreas";
-import { HitArea } from "../dragAndDropHandler/types";
-import { Node } from "../node";
-import { Position } from "../position";
+} from "../../dragAndDropHandler/generateHitAreas";
+import { HitArea } from "../../dragAndDropHandler/types";
+import { Node } from "../../node";
+import { Position } from "../../position";
 
 const mockHtmlElement = (y: number) =>
     ({
