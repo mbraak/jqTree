@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.8.7 (november 2 2024)
 
 -   Issue #853: fix dnd to first child (thanks to Oskar von Dungern)
 
