@@ -250,16 +250,16 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         );
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
-        const $treeElement = this.element;
+        const treeElement = this.element.get(0) as HTMLElement;
         const triggerEvent = this.triggerEvent.bind(this);
 
         return new FolderElement({
-            $treeElement,
             closedIconElement,
             getScrollLeft,
             node,
             openedIconElement,
             tabIndex,
+            treeElement,
             triggerEvent,
         });
     }
@@ -269,13 +269,13 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             this.scrollHandler,
         );
         const tabIndex = this.options.tabIndex;
-        const $treeElement = this.element;
+        const treeElement = this.element.get(0) as HTMLElement;
 
         return new NodeElement({
-            $treeElement,
             getScrollLeft,
             node,
             tabIndex,
+            treeElement,
         });
     }
 

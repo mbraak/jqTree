@@ -14,19 +14,19 @@ class FolderElement extends NodeElement {
     private triggerEvent: TriggerEvent;
 
     constructor({
-        $treeElement,
         closedIconElement,
         getScrollLeft,
         node,
         openedIconElement,
         tabIndex,
+        treeElement,
         triggerEvent,
     }: FolderElementParams) {
         super({
-            $treeElement,
             getScrollLeft,
             node,
             tabIndex,
+            treeElement,
         });
 
         this.closedIconElement = closedIconElement;
