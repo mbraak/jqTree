@@ -6,28 +6,28 @@ import BorderDropHint from "./borderDropHint";
 import GhostDropHint from "./ghostDropHint";
 
 export interface NodeElementParams {
-    $treeElement: JQuery;
     getScrollLeft: GetScrollLeft;
     node: Node;
     tabIndex?: number;
+    treeElement: HTMLElement;
 }
 
 class NodeElement {
-    private $treeElement: JQuery;
     private getScrollLeft: GetScrollLeft;
     private tabIndex?: number;
+    private treeElement: HTMLElement;
     public element: HTMLElement;
     public node: Node;
 
     constructor({
-        $treeElement,
         getScrollLeft,
         node,
         tabIndex,
+        treeElement,
     }: NodeElementParams) {
         this.getScrollLeft = getScrollLeft;
         this.tabIndex = tabIndex;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
 
         this.init(node);
     }
@@ -68,16 +68,10 @@ class NodeElement {
         this.node = node;
 
         if (!node.element) {
-            const element = this.$treeElement.get(0);
-
-            if (element) {
-                node.element = element;
-            }
+            node.element = this.treeElement;
         }
 
-        if (node.element) {
-            this.element = node.element;
-        }
+        this.element = node.element;
     }
 
     public select(mustSetFocus: boolean): void {
