@@ -300,6 +300,20 @@ describe("closeNode", () => {
     });
 });
 
+describe("destroy", () => {
+    it("clears the tree element", () => {
+        const $tree = $("#tree1");
+
+        $tree.tree({
+            data: exampleData,
+        });
+
+        $tree.tree("destroy");
+
+        expect($tree.get(0)).toBeEmptyDOMElement();
+    });
+});
+
 describe("getNodeByCallback", () => {
     interface Vars {
         $tree: JQuery;
