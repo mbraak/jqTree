@@ -7,8 +7,6 @@ import {
 } from "./jqtreeMethodTypes";
 import { Node } from "./node";
 
-type KeyboardEventHandler = (event: KeyboardEvent) => boolean;
-
 interface KeyHandlerParams {
     closeNode: CloseNode;
     getSelectedNode: GetSelectedNode;
