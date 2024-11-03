@@ -64,18 +64,14 @@ export default class SelectNodeHandler {
                 return [];
             }
         } else {
-            const selectedNodes = [];
+            const selectedNodes: Node[] = [];
 
-            for (const id in this.selectedNodes) {
-                if (
-                    Object.prototype.hasOwnProperty.call(this.selectedNodes, id)
-                ) {
-                    const node = this.getNodeById(id);
-                    if (node && parent.isParentOf(node)) {
-                        selectedNodes.push(node);
-                    }
+            this.selectedNodes.forEach((id) => {
+                const node = this.getNodeById(id);
+                if (node && parent.isParentOf(node)) {
+                    selectedNodes.push(node);
                 }
-            }
+            });
 
             return selectedNodes;
         }
