@@ -55,7 +55,6 @@ export default class KeyHandler {
         }
     };
 
-    private handleKeyDownHandler?: KeyboardEventHandler;
     private isFocusOnTree: IsFocusOnTree;
     private keyboardSupport: boolean;
     private openNode: OpenNode;
@@ -127,8 +126,8 @@ export default class KeyHandler {
     }
 
     public deinit(): void {
-        if (this.handleKeyDownHandler) {
-            document.removeEventListener("keydown", this.handleKeyDownHandler);
+        if (this.keyboardSupport) {
+            document.removeEventListener("keydown", this.handleKeyDown);
         }
     }
 
