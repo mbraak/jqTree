@@ -1,6 +1,5 @@
 import "@testing-library/jest-dom";
 import jQuery from "jquery";
-import { TransformStream } from "node:stream/web";
 
 import "./jqTreeMatchers";
 
@@ -14,4 +13,3 @@ declare global {
 
 window.$ = jQuery;
 window.jQuery = jQuery;
-window.TransformStream = TransformStream;
