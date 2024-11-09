@@ -902,14 +902,14 @@ var jqtree = (function (exports) {
             case "ArrowDown":
               isKeyHandled = this.moveDown(selectedNode);
               break;
-            case "ArrowUp":
-              isKeyHandled = this.moveUp(selectedNode);
+            case "ArrowLeft":
+              isKeyHandled = this.moveLeft(selectedNode);
               break;
             case "ArrowRight":
               isKeyHandled = this.moveRight(selectedNode);
               break;
-            case "ArrowLeft":
-              isKeyHandled = this.moveLeft(selectedNode);
+            case "ArrowUp":
+              isKeyHandled = this.moveUp(selectedNode);
               break;
           }
         }
@@ -1863,14 +1863,14 @@ var jqtree = (function (exports) {
     class NodeElement {
       constructor(_ref) {
         let {
-          $treeElement,
           getScrollLeft,
           node,
-          tabIndex
+          tabIndex,
+          treeElement
         } = _ref;
         this.getScrollLeft = getScrollLeft;
         this.tabIndex = tabIndex;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
         this.init(node);
       }
       getTitleSpan() {
@@ -1899,14 +1899,9 @@ var jqtree = (function (exports) {
       init(node) {
         this.node = node;
         if (!node.element) {
-          const element = this.$treeElement.get(0);
-          if (element) {
-            node.element = element;
-          }
+          node.element = this.treeElement;
         }
-        if (node.element) {
-          this.element = node.element;
-        }
+        this.element = node.element;
       }
       select(mustSetFocus) {
         this.element.classList.add("jqtree-selected");
@@ -1927,19 +1922,19 @@ var jqtree = (function (exports) {
     class FolderElement extends NodeElement {
       constructor(_ref) {
         let {
-          $treeElement,
           closedIconElement,
           getScrollLeft,
           node,
           openedIconElement,
           tabIndex,
+          treeElement,
           triggerEvent
         } = _ref;
         super({
-          $treeElement,
           getScrollLeft,
           node,
-          tabIndex
+          tabIndex,
+          treeElement
         });
         this.closedIconElement = closedIconElement;
         this.openedIconElement = openedIconElement;
@@ -2919,27 +2914,27 @@ var jqtree = (function (exports) {
         const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
-        const $treeElement = this.element;
+        const treeElement = this.element.get(0);
         const triggerEvent = this.triggerEvent.bind(this);
         return new FolderElement({
-          $treeElement,
           closedIconElement,
           getScrollLeft,
           node,
           openedIconElement,
           tabIndex,
+          treeElement,
           triggerEvent
         });
       }
       createNodeElement(node) {
         const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const tabIndex = this.options.tabIndex;
-        const $treeElement = this.element;
+        const treeElement = this.element.get(0);
         return new NodeElement({
-          $treeElement,
           getScrollLeft,
           node,
-          tabIndex
+          tabIndex,
+          treeElement
         });
       }
       deselectCurrentNode() {
