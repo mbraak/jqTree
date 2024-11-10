@@ -978,8 +978,8 @@ var jqtree = (function (exports) {
         }
       }
       deinit() {
-        if (this.handleKeyDownHandler) {
-          document.removeEventListener("keydown", this.handleKeyDownHandler);
+        if (this.keyboardSupport) {
+          document.removeEventListener("keydown", this.handleKeyDown);
         }
       }
       moveDown(selectedNode) {
@@ -1946,9 +1946,7 @@ var jqtree = (function (exports) {
       getButton() {
         return this.element.querySelector(":scope > .jqtree-element > a.jqtree-toggler");
       }
-      close() {
-        let slide = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-        let animationSpeed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "fast";
+      close(slide, animationSpeed) {
         if (!this.node.is_open) {
           return;
         }
@@ -1976,9 +1974,7 @@ var jqtree = (function (exports) {
           doClose();
         }
       }
-      open(onFinished) {
-        let slide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-        let animationSpeed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "fast";
+      open(onFinished, slide, animationSpeed) {
         if (this.node.is_open) {
           return;
         }
@@ -2046,10 +2042,8 @@ var jqtree = (function (exports) {
       loadFromStorage() {
         if (this.onGetStateFromStorage) {
           return this.onGetStateFromStorage();
-        } else if (this.supportsLocalStorage()) {
-          return localStorage.getItem(this.getKeyName());
         } else {
-          return null;
+          return localStorage.getItem(this.getKeyName());
         }
       }
       openInitialNodes(nodeIds) {
@@ -2092,23 +2086,6 @@ var jqtree = (function (exports) {
           }
         }
         return selectCount !== 0;
-      }
-      supportsLocalStorage() {
-        const testSupport = () => {
-          // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
-          try {
-            const key = "_storage_test";
-            sessionStorage.setItem(key, "value");
-            sessionStorage.removeItem(key);
-          } catch {
-            return false;
-          }
-          return true;
-        };
-        if (this._supportsLocalStorage == null) {
-          this._supportsLocalStorage = testSupport();
-        }
-        return this._supportsLocalStorage;
       }
       getNodeIdToBeSelected() {
         const state = this.getStateFromStorage();
@@ -2155,7 +2132,7 @@ var jqtree = (function (exports) {
         const state = JSON.stringify(this.getState());
         if (this.onSetStateFromStorage) {
           this.onSetStateFromStorage(state);
-        } else if (this.supportsLocalStorage()) {
+        } else {
           localStorage.setItem(this.getKeyName(), state);
         }
       }
@@ -2163,7 +2140,7 @@ var jqtree = (function (exports) {
       /*
       Set initial state
       Don't handle nodes that are loaded on demand
-       result: must load on demand
+       result: must load on demand (boolean)
       */
       setInitialState(state) {
         let mustLoadOnDemand = false;
@@ -2570,14 +2547,12 @@ var jqtree = (function (exports) {
           }
         } else {
           const selectedNodes = [];
-          for (const id in this.selectedNodes) {
-            if (Object.prototype.hasOwnProperty.call(this.selectedNodes, id)) {
-              const node = this.getNodeById(id);
-              if (node && parent.isParentOf(node)) {
-                selectedNodes.push(node);
-              }
+          this.selectedNodes.forEach(id => {
+            const node = this.getNodeById(id);
+            if (node && parent.isParentOf(node)) {
+              selectedNodes.push(node);
             }
-          }
+          });
           return selectedNodes;
         }
       }

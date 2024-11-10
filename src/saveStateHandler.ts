@@ -30,7 +30,6 @@ interface SaveStateHandlerParams {
 }
 
 export default class SaveStateHandler {
-    private _supportsLocalStorage: boolean | null;
     private addToSelection: AddToSelection;
     private getNodeById: GetNodeById;
     private getSelectedNodes: GetSelectedNodes;
@@ -77,10 +76,8 @@ export default class SaveStateHandler {
     private loadFromStorage(): null | string {
         if (this.onGetStateFromStorage) {
             return this.onGetStateFromStorage();
-        } else if (this.supportsLocalStorage()) {
-            return localStorage.getItem(this.getKeyName());
         } else {
-            return null;
+            return localStorage.getItem(this.getKeyName());
         }
     }
 
@@ -136,27 +133,6 @@ export default class SaveStateHandler {
         }
 
         return selectCount !== 0;
-    }
-
-    private supportsLocalStorage(): boolean {
-        const testSupport = (): boolean => {
-            // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
-            try {
-                const key = "_storage_test";
-                sessionStorage.setItem(key, "value");
-                sessionStorage.removeItem(key);
-            } catch {
-                return false;
-            }
-
-            return true;
-        };
-
-        if (this._supportsLocalStorage == null) {
-            this._supportsLocalStorage = testSupport();
-        }
-
-        return this._supportsLocalStorage;
     }
 
     public getNodeIdToBeSelected(): NodeId | null {
@@ -216,7 +192,7 @@ export default class SaveStateHandler {
 
         if (this.onSetStateFromStorage) {
             this.onSetStateFromStorage(state);
-        } else if (this.supportsLocalStorage()) {
+        } else {
             localStorage.setItem(this.getKeyName(), state);
         }
     }
@@ -225,7 +201,7 @@ export default class SaveStateHandler {
     Set initial state
     Don't handle nodes that are loaded on demand
 
-    result: must load on demand
+    result: must load on demand (boolean)
     */
     public setInitialState(state: SavedState): boolean {
         let mustLoadOnDemand = false;
