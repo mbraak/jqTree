@@ -959,6 +959,15 @@ describe("openNode", () => {
             });
         });
     });
+
+    it("handles an empty folder", () => {
+        const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
+        child1.isEmptyFolder = true;
+
+        expect(() => {
+            given.$tree.tree("openNode", child1, false);
+        }).not.toThrow();
+    });
 });
 
 describe("prependNode", () => {
