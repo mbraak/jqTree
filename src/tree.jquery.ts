@@ -626,6 +626,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             _slide: boolean,
             _onFinished?: OnFinishOpenNode,
         ): void => {
+            if (!node.children.length) {
+                return;
+            }
+
             const folderElement = this.createFolderElement(_node);
             folderElement.open(
                 _onFinished,
