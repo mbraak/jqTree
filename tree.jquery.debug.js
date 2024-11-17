@@ -1,5 +1,5 @@
 /*
-JqTree 1.8.7
+JqTree 1.8.8
 
 Copyright 2024 Marco Braak
 
@@ -2688,7 +2688,7 @@ var jqtree = (function (exports) {
       }
     }
 
-    const version = "1.8.7";
+    const version = "1.8.8";
 
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
@@ -3187,6 +3187,9 @@ var jqtree = (function (exports) {
         let slide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
         let onFinished = arguments.length > 2 ? arguments[2] : undefined;
         const doOpenNode = (_node, _slide, _onFinished) => {
+          if (!node.children.length) {
+            return;
+          }
           const folderElement = this.createFolderElement(_node);
           folderElement.open(_onFinished, _slide, this.options.animationSpeed);
         };

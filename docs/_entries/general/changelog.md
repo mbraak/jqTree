@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### 1.8.8 (november 17 2024)
+
+-   Issue #858: load on demand with empty children (thanks to Ivan Kolesov)
+
 #### 1.8.7 (november 2 2024)
 
 -   Issue #853: fix dnd to first child (thanks to Oskar von Dungern)
