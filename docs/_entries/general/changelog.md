@@ -5,6 +5,14 @@ name: changelog
 
 #### Development version
 
+-   Issue #858: load on demand with empty children (thanks to Ivan Kolesov)
+
+#### 1.8.7 (november 2 2024)
+
+-   Issue #853: fix dnd to first child (thanks to Oskar von Dungern)
+
+#### 1.8.6 (october 26 2024)
+
 -   Issue #840: using the up and down keys scrolls the page
 -   Issue #846: attach html element before calling onCreateLi
 

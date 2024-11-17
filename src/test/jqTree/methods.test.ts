@@ -300,6 +300,20 @@ describe("closeNode", () => {
     });
 });
 
+describe("destroy", () => {
+    it("clears the tree element", () => {
+        const $tree = $("#tree1");
+
+        $tree.tree({
+            data: exampleData,
+        });
+
+        $tree.tree("destroy");
+
+        expect($tree.get(0)).toBeEmptyDOMElement();
+    });
+});
+
 describe("getNodeByCallback", () => {
     interface Vars {
         $tree: JQuery;
@@ -944,6 +958,15 @@ describe("openNode", () => {
                 expect(onFinished).toHaveBeenCalledWith(given.node1);
             });
         });
+    });
+
+    it("handles an empty folder", () => {
+        const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
+        child1.isEmptyFolder = true;
+
+        expect(() => {
+            given.$tree.tree("openNode", child1, false);
+        }).not.toThrow();
     });
 });
 

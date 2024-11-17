@@ -1,5 +1,5 @@
 /*
-JqTree 1.8.5
+JqTree 1.8.7
 
 Copyright 2024 Marco Braak
 
@@ -902,14 +902,14 @@ var jqtree = (function (exports) {
             case "ArrowDown":
               isKeyHandled = this.moveDown(selectedNode);
               break;
-            case "ArrowUp":
-              isKeyHandled = this.moveUp(selectedNode);
+            case "ArrowLeft":
+              isKeyHandled = this.moveLeft(selectedNode);
               break;
             case "ArrowRight":
               isKeyHandled = this.moveRight(selectedNode);
               break;
-            case "ArrowLeft":
-              isKeyHandled = this.moveLeft(selectedNode);
+            case "ArrowUp":
+              isKeyHandled = this.moveUp(selectedNode);
               break;
           }
         }
@@ -978,8 +978,8 @@ var jqtree = (function (exports) {
         }
       }
       deinit() {
-        if (this.handleKeyDownHandler) {
-          document.removeEventListener("keydown", this.handleKeyDownHandler);
+        if (this.keyboardSupport) {
+          document.removeEventListener("keydown", this.handleKeyDown);
         }
       }
       moveDown(selectedNode) {
@@ -1807,11 +1807,26 @@ var jqtree = (function (exports) {
     }
 
     class GhostDropHint {
-      constructor(element) {
+      constructor(node, element, position) {
         this.element = element;
+        this.node = node;
         this.ghost = this.createGhostElement();
-        this.element.after(this.ghost);
-        this.ghost.classList.add("jqtree-inside");
+        switch (position) {
+          case Position.After:
+            this.moveAfter();
+            break;
+          case Position.Before:
+            this.moveBefore();
+            break;
+          case Position.Inside:
+            {
+              if (node.isFolder() && node.is_open) {
+                this.moveInsideOpenFolder();
+              } else {
+                this.moveInside();
+              }
+            }
+        }
       }
       createGhostElement() {
         const ghost = document.createElement("li");
@@ -1824,6 +1839,22 @@ var jqtree = (function (exports) {
         ghost.append(lineSpan);
         return ghost;
       }
+      moveAfter() {
+        this.element.after(this.ghost);
+      }
+      moveBefore() {
+        this.element.before(this.ghost);
+      }
+      moveInside() {
+        this.element.after(this.ghost);
+        this.ghost.classList.add("jqtree-inside");
+      }
+      moveInsideOpenFolder() {
+        const childElement = this.node.children[0]?.element;
+        if (childElement) {
+          childElement.before(this.ghost);
+        }
+      }
       remove() {
         this.ghost.remove();
       }
@@ -1832,14 +1863,14 @@ var jqtree = (function (exports) {
     class NodeElement {
       constructor(_ref) {
         let {
-          $treeElement,
           getScrollLeft,
           node,
-          tabIndex
+          tabIndex,
+          treeElement
         } = _ref;
         this.getScrollLeft = getScrollLeft;
         this.tabIndex = tabIndex;
-        this.$treeElement = $treeElement;
+        this.treeElement = treeElement;
         this.init(node);
       }
       getTitleSpan() {
@@ -1855,7 +1886,7 @@ var jqtree = (function (exports) {
         if (this.mustShowBorderDropHint(position)) {
           return new BorderDropHint(this.element, this.getScrollLeft());
         } else {
-          return new GhostDropHint(this.element);
+          return new GhostDropHint(this.node, this.element, position);
         }
       }
       deselect() {
@@ -1868,14 +1899,9 @@ var jqtree = (function (exports) {
       init(node) {
         this.node = node;
         if (!node.element) {
-          const element = this.$treeElement.get(0);
-          if (element) {
-            node.element = element;
-          }
+          node.element = this.treeElement;
         }
-        if (node.element) {
-          this.element = node.element;
-        }
+        this.element = node.element;
       }
       select(mustSetFocus) {
         this.element.classList.add("jqtree-selected");
@@ -1896,19 +1922,19 @@ var jqtree = (function (exports) {
     class FolderElement extends NodeElement {
       constructor(_ref) {
         let {
-          $treeElement,
           closedIconElement,
           getScrollLeft,
           node,
           openedIconElement,
           tabIndex,
+          treeElement,
           triggerEvent
         } = _ref;
         super({
-          $treeElement,
           getScrollLeft,
           node,
-          tabIndex
+          tabIndex,
+          treeElement
         });
         this.closedIconElement = closedIconElement;
         this.openedIconElement = openedIconElement;
@@ -1920,9 +1946,7 @@ var jqtree = (function (exports) {
       getButton() {
         return this.element.querySelector(":scope > .jqtree-element > a.jqtree-toggler");
       }
-      close() {
-        let slide = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-        let animationSpeed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "fast";
+      close(slide, animationSpeed) {
         if (!this.node.is_open) {
           return;
         }
@@ -1950,9 +1974,7 @@ var jqtree = (function (exports) {
           doClose();
         }
       }
-      open(onFinished) {
-        let slide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-        let animationSpeed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "fast";
+      open(onFinished, slide, animationSpeed) {
         if (this.node.is_open) {
           return;
         }
@@ -2020,10 +2042,8 @@ var jqtree = (function (exports) {
       loadFromStorage() {
         if (this.onGetStateFromStorage) {
           return this.onGetStateFromStorage();
-        } else if (this.supportsLocalStorage()) {
-          return localStorage.getItem(this.getKeyName());
         } else {
-          return null;
+          return localStorage.getItem(this.getKeyName());
         }
       }
       openInitialNodes(nodeIds) {
@@ -2066,23 +2086,6 @@ var jqtree = (function (exports) {
           }
         }
         return selectCount !== 0;
-      }
-      supportsLocalStorage() {
-        const testSupport = () => {
-          // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
-          try {
-            const key = "_storage_test";
-            sessionStorage.setItem(key, "value");
-            sessionStorage.removeItem(key);
-          } catch {
-            return false;
-          }
-          return true;
-        };
-        if (this._supportsLocalStorage == null) {
-          this._supportsLocalStorage = testSupport();
-        }
-        return this._supportsLocalStorage;
       }
       getNodeIdToBeSelected() {
         const state = this.getStateFromStorage();
@@ -2129,7 +2132,7 @@ var jqtree = (function (exports) {
         const state = JSON.stringify(this.getState());
         if (this.onSetStateFromStorage) {
           this.onSetStateFromStorage(state);
-        } else if (this.supportsLocalStorage()) {
+        } else {
           localStorage.setItem(this.getKeyName(), state);
         }
       }
@@ -2137,7 +2140,7 @@ var jqtree = (function (exports) {
       /*
       Set initial state
       Don't handle nodes that are loaded on demand
-       result: must load on demand
+       result: must load on demand (boolean)
       */
       setInitialState(state) {
         let mustLoadOnDemand = false;
@@ -2544,14 +2547,12 @@ var jqtree = (function (exports) {
           }
         } else {
           const selectedNodes = [];
-          for (const id in this.selectedNodes) {
-            if (Object.prototype.hasOwnProperty.call(this.selectedNodes, id)) {
-              const node = this.getNodeById(id);
-              if (node && parent.isParentOf(node)) {
-                selectedNodes.push(node);
-              }
+          this.selectedNodes.forEach(id => {
+            const node = this.getNodeById(id);
+            if (node && parent.isParentOf(node)) {
+              selectedNodes.push(node);
             }
-          }
+          });
           return selectedNodes;
         }
       }
@@ -2687,7 +2688,7 @@ var jqtree = (function (exports) {
       }
     }
 
-    const version = "1.8.5";
+    const version = "1.8.7";
 
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
@@ -2888,27 +2889,27 @@ var jqtree = (function (exports) {
         const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
-        const $treeElement = this.element;
+        const treeElement = this.element.get(0);
         const triggerEvent = this.triggerEvent.bind(this);
         return new FolderElement({
-          $treeElement,
           closedIconElement,
           getScrollLeft,
           node,
           openedIconElement,
           tabIndex,
+          treeElement,
           triggerEvent
         });
       }
       createNodeElement(node) {
         const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const tabIndex = this.options.tabIndex;
-        const $treeElement = this.element;
+        const treeElement = this.element.get(0);
         return new NodeElement({
-          $treeElement,
           getScrollLeft,
           node,
-          tabIndex
+          tabIndex,
+          treeElement
         });
       }
       deselectCurrentNode() {

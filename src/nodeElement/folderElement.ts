@@ -14,19 +14,19 @@ class FolderElement extends NodeElement {
     private triggerEvent: TriggerEvent;
 
     constructor({
-        $treeElement,
         closedIconElement,
         getScrollLeft,
         node,
         openedIconElement,
         tabIndex,
+        treeElement,
         triggerEvent,
     }: FolderElementParams) {
         super({
-            $treeElement,
             getScrollLeft,
             node,
             tabIndex,
+            treeElement,
         });
 
         this.closedIconElement = closedIconElement;
@@ -44,10 +44,7 @@ class FolderElement extends NodeElement {
         ) as HTMLLinkElement;
     }
 
-    public close(
-        slide = true,
-        animationSpeed: JQuery.Duration | undefined = "fast",
-    ): void {
+    public close(slide: boolean, animationSpeed: JQuery.Duration): void {
         if (!this.node.is_open) {
             return;
         }
@@ -86,8 +83,8 @@ class FolderElement extends NodeElement {
 
     public open(
         onFinished: OnFinishOpenNode | undefined,
-        slide = true,
-        animationSpeed: JQuery.Duration = "fast",
+        slide: boolean,
+        animationSpeed: JQuery.Duration,
     ): void {
         if (this.node.is_open) {
             return;

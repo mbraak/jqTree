@@ -7,8 +7,6 @@ import {
 } from "./jqtreeMethodTypes";
 import { Node } from "./node";
 
-type KeyboardEventHandler = (event: KeyboardEvent) => boolean;
-
 interface KeyHandlerParams {
     closeNode: CloseNode;
     getSelectedNode: GetSelectedNode;
@@ -36,16 +34,16 @@ export default class KeyHandler {
                     isKeyHandled = this.moveDown(selectedNode);
                     break;
 
-                case "ArrowUp":
-                    isKeyHandled = this.moveUp(selectedNode);
+                case "ArrowLeft":
+                    isKeyHandled = this.moveLeft(selectedNode);
                     break;
 
                 case "ArrowRight":
                     isKeyHandled = this.moveRight(selectedNode);
                     break;
 
-                case "ArrowLeft":
-                    isKeyHandled = this.moveLeft(selectedNode);
+                case "ArrowUp":
+                    isKeyHandled = this.moveUp(selectedNode);
                     break;
             }
         }
@@ -55,7 +53,6 @@ export default class KeyHandler {
         }
     };
 
-    private handleKeyDownHandler?: KeyboardEventHandler;
     private isFocusOnTree: IsFocusOnTree;
     private keyboardSupport: boolean;
     private openNode: OpenNode;
@@ -127,8 +124,8 @@ export default class KeyHandler {
     }
 
     public deinit(): void {
-        if (this.handleKeyDownHandler) {
-            document.removeEventListener("keydown", this.handleKeyDownHandler);
+        if (this.keyboardSupport) {
+            document.removeEventListener("keydown", this.handleKeyDown);
         }
     }
 
