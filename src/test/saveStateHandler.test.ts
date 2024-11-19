@@ -3,12 +3,12 @@ import SaveStateHandler from "../saveStateHandler";
 
 const createSaveStateHandler = ({
     getSelectedNodes = jest.fn(),
+    openNode = jest.fn(),
     removeFromSelection = jest.fn(),
 }) => {
     const addToSelection = jest.fn();
     const getNodeById = jest.fn();
     const getTree = jest.fn();
-    const openNode = jest.fn();
     const refreshElements = jest.fn();
 
     return new SaveStateHandler({
@@ -59,5 +59,16 @@ describe("setInitialState", () => {
         saveStateHandler.setInitialState({});
 
         expect(removeFromSelection).toHaveBeenCalledWith(node);
+    });
+});
+
+describe("setInitialStateOnDemand", () => {
+    it("doesn't open a node when open_nodes in the state is empty", () => {
+        const openNode = jest.fn();
+
+        const saveStateHandler = createSaveStateHandler({ openNode });
+        saveStateHandler.setInitialStateOnDemand({}, jest.fn());
+
+        expect(openNode).not.toHaveBeenCalled();
     });
 });
