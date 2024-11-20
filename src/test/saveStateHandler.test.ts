@@ -2,12 +2,12 @@ import { Node } from "../node";
 import SaveStateHandler from "../saveStateHandler";
 
 const createSaveStateHandler = ({
+    getNodeById = jest.fn(),
     getSelectedNodes = jest.fn(),
     openNode = jest.fn(),
     removeFromSelection = jest.fn(),
 }) => {
     const addToSelection = jest.fn();
-    const getNodeById = jest.fn();
     const getTree = jest.fn();
     const refreshElements = jest.fn();
 
@@ -70,5 +70,28 @@ describe("setInitialStateOnDemand", () => {
         saveStateHandler.setInitialStateOnDemand({}, jest.fn());
 
         expect(openNode).not.toHaveBeenCalled();
+    });
+
+    it("opens a node when it's in open_nodes in the state", () => {
+        const node = new Node({ id: 123 });
+        const openNode = jest.fn();
+        const getNodeById = jest.fn((nodeId) => {
+            if (nodeId === 123) {
+                return node;
+            } else {
+                return null;
+            }
+        });
+
+        const saveStateHandler = createSaveStateHandler({
+            getNodeById,
+            openNode,
+        });
+        saveStateHandler.setInitialStateOnDemand(
+            { open_nodes: [123] },
+            jest.fn(),
+        );
+
+        expect(openNode).toHaveBeenCalledWith(node, false);
     });
 });
