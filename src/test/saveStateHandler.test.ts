@@ -1,3 +1,4 @@
+import { OnFinishOpenNode } from "../jqtreeMethodTypes";
 import { Node } from "../node";
 import SaveStateHandler from "../saveStateHandler";
 
@@ -120,5 +121,58 @@ describe("setInitialStateOnDemand", () => {
 
         expect(addToSelection).toHaveBeenCalledWith(node);
         expect(refreshElements).toHaveBeenCalledWith(null);
+    });
+
+    it("opens nodes recursively", () => {
+        const node1 = new Node({ id: 1, load_on_demand: true });
+        const node2 = new Node({ id: 2 });
+        let calledGetNodeByIdForNode2 = false;
+
+        const getNodeById = jest.fn((nodeId) => {
+            switch (nodeId) {
+                case 1:
+                    return node1;
+                case 2: {
+                    // Return the node the second time.
+                    if (calledGetNodeByIdForNode2) {
+                        return node2;
+                    } else {
+                        calledGetNodeByIdForNode2 = true;
+                        return null;
+                    }
+                }
+                default:
+                    return null;
+            }
+        });
+
+        const openNode = jest.fn(
+            (node: Node, _slide: boolean, onFinished?: OnFinishOpenNode) => {
+                node.load_on_demand = false;
+
+                if (onFinished) {
+                    onFinished(node);
+                }
+            },
+        );
+
+        const saveStateHandler = createSaveStateHandler({
+            getNodeById,
+            openNode,
+        });
+
+        saveStateHandler.setInitialStateOnDemand(
+            { open_nodes: [1, 2] },
+            jest.fn(),
+        );
+
+        expect(openNode).toHaveBeenNthCalledWith(
+            1,
+            node1,
+            false,
+            expect.toBeFunction(),
+        );
+        expect(openNode).toHaveBeenNthCalledWith(2, node1, false);
+        expect(openNode).toHaveBeenNthCalledWith(3, node2, false);
     });
 });
