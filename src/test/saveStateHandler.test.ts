@@ -95,7 +95,7 @@ describe("setInitialStateOnDemand", () => {
         expect(openNode).toHaveBeenCalledWith(node, false);
     });
 
-    it("selects a node and redraws the tree when the node is id in selected_node in the state", () => {
+    it("selects a node and redraws the tree when the node id is in selected_node in the state", () => {
         const node = new Node({ id: 123 });
         const getNodeById = jest.fn((nodeId) => {
             if (nodeId === 123) {
