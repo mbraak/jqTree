@@ -1,6 +1,6 @@
 ---
 title: tabIndex
-name: tabIndex-slide
+name: tab-index
 ---
 
 Set the tabindex of the tree. The default is `0`.
