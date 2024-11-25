@@ -331,23 +331,23 @@ describe("touchEnd", () => {
         const touch = {
             pageX: 0,
             pageY: 0,
-        };
+        } as Touch;
 
         const touchStartEvent = new TouchEvent("touchstart", {
             bubbles: true,
-            touches: [touch as Touch],
+            touches: [touch],
         });
         element.dispatchEvent(touchStartEvent);
 
         const touchMoveEvent = new TouchEvent("touchmove", {
             bubbles: true,
-            touches: [touch as Touch],
+            touches: [touch],
         });
         element.dispatchEvent(touchMoveEvent);
 
         const touchEndEvent = new TouchEvent("touchend", {
             bubbles: true,
-            touches: [],
+            touches: [touch, touch],
         });
         element.dispatchEvent(touchEndEvent);
 
