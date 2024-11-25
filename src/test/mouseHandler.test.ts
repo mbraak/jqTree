@@ -354,3 +354,71 @@ describe("touchEnd", () => {
         expect(onMouseStop).not.toHaveBeenCalled();
     });
 });
+
+describe("touchMove", () => {
+    it("handles a touchmove event without touches", () => {
+        const element = document.createElement("div");
+        document.body.append(element);
+
+        const onMouseCapture = jest.fn(() => true);
+        const onMouseDrag = jest.fn();
+
+        createMouseHandler({
+            element,
+            onMouseCapture,
+            onMouseDrag,
+        });
+
+        const touch = {
+            pageX: 0,
+            pageY: 0,
+        } as Touch;
+
+        const touchStartEvent = new TouchEvent("touchstart", {
+            bubbles: true,
+            touches: [touch],
+        });
+        element.dispatchEvent(touchStartEvent);
+
+        const touchMoveEvent = new TouchEvent("touchmove", {
+            bubbles: true,
+            touches: [],
+        });
+        element.dispatchEvent(touchMoveEvent);
+
+        expect(onMouseDrag).not.toHaveBeenCalled();
+    });
+
+    it("handles a touchmove event with multiple touches", () => {
+        const element = document.createElement("div");
+        document.body.append(element);
+
+        const onMouseCapture = jest.fn(() => true);
+        const onMouseDrag = jest.fn();
+
+        createMouseHandler({
+            element,
+            onMouseCapture,
+            onMouseDrag,
+        });
+
+        const touch = {
+            pageX: 0,
+            pageY: 0,
+        } as Touch;
+
+        const touchStartEvent = new TouchEvent("touchstart", {
+            bubbles: true,
+            touches: [touch],
+        });
+        element.dispatchEvent(touchStartEvent);
+
+        const touchMoveEvent = new TouchEvent("touchmove", {
+            bubbles: true,
+            touches: [touch, touch],
+        });
+        element.dispatchEvent(touchMoveEvent);
+
+        expect(onMouseDrag).not.toHaveBeenCalled();
+    });
+});
