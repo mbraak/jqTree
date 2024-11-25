@@ -5,6 +5,7 @@ interface CreateMouseHandlerParams {
     element: HTMLElement;
     getNode?: jest.Mock;
     onClickButton?: jest.Mock;
+    onMouseCapture?: jest.Mock;
     triggerEvent?: jest.Mock;
 }
 
@@ -12,11 +13,11 @@ const createMouseHandler = ({
     element,
     getNode = jest.fn(),
     onClickButton = jest.fn(),
+    onMouseCapture = jest.fn(),
     triggerEvent = jest.fn(),
 }: CreateMouseHandlerParams) => {
     const getMouseDelay = jest.fn();
     const onClickTitle = jest.fn();
-    const onMouseCapture = jest.fn();
     const onMouseDrag = jest.fn();
     const onMouseStart = jest.fn();
     const onMouseStop = jest.fn();
@@ -192,5 +193,73 @@ describe("handleDblclick", () => {
         element.dispatchEvent(event);
 
         expect(triggerEvent).not.toHaveBeenCalled();
+    });
+});
+
+describe("touchStart", () => {
+    it("handles a touchstart event", () => {
+        const element = document.createElement("div");
+        document.body.append(element);
+
+        const onMouseCapture = jest.fn();
+
+        createMouseHandler({ element, onMouseCapture });
+
+        const touch = {
+            pageX: 0,
+            pageY: 0,
+        };
+
+        const event = new TouchEvent("touchstart", {
+            bubbles: true,
+            touches: [touch as Touch],
+        });
+        element.dispatchEvent(event);
+
+        expect(onMouseCapture).toHaveBeenCalledWith({
+            originalEvent: event,
+            pageX: 0,
+            pageY: 0,
+            target: undefined,
+        });
+    });
+
+    it("handles a touchstart event with multiple touches", () => {
+        const element = document.createElement("div");
+        document.body.append(element);
+
+        const onMouseCapture = jest.fn();
+
+        createMouseHandler({ element, onMouseCapture });
+
+        const touch = {
+            pageX: 0,
+            pageY: 0,
+        } as Touch;
+
+        const event = new TouchEvent("touchstart", {
+            bubbles: true,
+            touches: [touch, touch],
+        });
+        element.dispatchEvent(event);
+
+        expect(onMouseCapture).not.toHaveBeenCalled();
+    });
+
+    it("handles a touchstart event without touches", () => {
+        const element = document.createElement("div");
+        document.body.append(element);
+
+        const onMouseCapture = jest.fn();
+
+        createMouseHandler({ element, onMouseCapture });
+
+        const event = new TouchEvent("touchstart", {
+            bubbles: true,
+            touches: [],
+        });
+        element.dispatchEvent(event);
+
+        expect(onMouseCapture).not.toHaveBeenCalled();
     });
 });
