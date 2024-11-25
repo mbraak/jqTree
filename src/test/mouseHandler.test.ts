@@ -144,3 +144,53 @@ describe("handleContextmenu", () => {
         expect(triggerEvent).not.toHaveBeenCalled();
     });
 });
+
+describe("handleDblclick", () => {
+    it("handles a double click on a label", () => {
+        const element = document.createElement("div");
+
+        const label = document.createElement("div");
+        label.classList.add("jqtree-element");
+        element.appendChild(label);
+
+        document.body.append(element);
+
+        const node = new Node();
+
+        const getNode = jest.fn((element: HTMLElement) => {
+            if (element === label) {
+                return node;
+            } else {
+                return null;
+            }
+        });
+
+        const triggerEvent = jest.fn();
+
+        createMouseHandler({ element, getNode, triggerEvent });
+
+        const event = new MouseEvent("dblclick", { bubbles: true });
+        label.dispatchEvent(event);
+
+        expect(triggerEvent).toHaveBeenCalledWith("tree.dblclick", {
+            click_event: event,
+            node,
+        });
+    });
+
+    it("handles a double click event without a target", () => {
+        const element = document.createElement("div");
+        document.body.appendChild(element);
+
+        const triggerEvent = jest.fn();
+
+        createMouseHandler({ element, triggerEvent });
+
+        const event = new MouseEvent("dblclick", { bubbles: true });
+        jest.spyOn(event, "target", "get").mockReturnValue(null);
+
+        element.dispatchEvent(event);
+
+        expect(triggerEvent).not.toHaveBeenCalled();
+    });
+});
