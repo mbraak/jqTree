@@ -6,6 +6,9 @@ interface CreateMouseHandlerParams {
     getNode?: jest.Mock;
     onClickButton?: jest.Mock;
     onMouseCapture?: jest.Mock;
+    onMouseDrag?: jest.Mock;
+    onMouseStart?: jest.Mock;
+    onMouseStop?: jest.Mock;
     triggerEvent?: jest.Mock;
 }
 
@@ -14,13 +17,13 @@ const createMouseHandler = ({
     getNode = jest.fn(),
     onClickButton = jest.fn(),
     onMouseCapture = jest.fn(),
+    onMouseDrag = jest.fn(),
+    onMouseStart = jest.fn(),
+    onMouseStop = jest.fn(),
     triggerEvent = jest.fn(),
 }: CreateMouseHandlerParams) => {
     const getMouseDelay = jest.fn();
     const onClickTitle = jest.fn();
-    const onMouseDrag = jest.fn();
-    const onMouseStart = jest.fn();
-    const onMouseStop = jest.fn();
 
     return new MouseHandler({
         element,
@@ -261,5 +264,93 @@ describe("touchStart", () => {
         element.dispatchEvent(event);
 
         expect(onMouseCapture).not.toHaveBeenCalled();
+    });
+});
+
+describe("touchEnd", () => {
+    it("handles a touchend event after a touchstart and a touchmove event", () => {
+        const element = document.createElement("div");
+        document.body.append(element);
+
+        const onMouseCapture = jest.fn(() => true);
+        const onMouseStart = jest.fn(() => true);
+        const onMouseStop = jest.fn();
+
+        createMouseHandler({
+            element,
+            onMouseCapture,
+            onMouseStart,
+            onMouseStop,
+        });
+
+        const touch = {
+            pageX: 0,
+            pageY: 0,
+        };
+
+        const touchStartEvent = new TouchEvent("touchstart", {
+            bubbles: true,
+            touches: [touch as Touch],
+        });
+        element.dispatchEvent(touchStartEvent);
+
+        const touchMoveEvent = new TouchEvent("touchmove", {
+            bubbles: true,
+            touches: [touch as Touch],
+        });
+        element.dispatchEvent(touchMoveEvent);
+
+        const touchEndEvent = new TouchEvent("touchend", {
+            bubbles: true,
+            touches: [touch as Touch],
+        });
+        element.dispatchEvent(touchEndEvent);
+
+        expect(onMouseStop).toHaveBeenCalledWith({
+            originalEvent: touchEndEvent,
+            pageX: 0,
+            pageY: 0,
+        });
+    });
+
+    it("handles a touchend with multiple touches", () => {
+        const element = document.createElement("div");
+        document.body.append(element);
+
+        const onMouseCapture = jest.fn(() => true);
+        const onMouseStart = jest.fn(() => true);
+        const onMouseStop = jest.fn();
+
+        createMouseHandler({
+            element,
+            onMouseCapture,
+            onMouseStart,
+            onMouseStop,
+        });
+
+        const touch = {
+            pageX: 0,
+            pageY: 0,
+        };
+
+        const touchStartEvent = new TouchEvent("touchstart", {
+            bubbles: true,
+            touches: [touch as Touch],
+        });
+        element.dispatchEvent(touchStartEvent);
+
+        const touchMoveEvent = new TouchEvent("touchmove", {
+            bubbles: true,
+            touches: [touch as Touch],
+        });
+        element.dispatchEvent(touchMoveEvent);
+
+        const touchEndEvent = new TouchEvent("touchend", {
+            bubbles: true,
+            touches: [],
+        });
+        element.dispatchEvent(touchEndEvent);
+
+        expect(onMouseStop).not.toHaveBeenCalled();
     });
 });
