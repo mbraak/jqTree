@@ -114,18 +114,14 @@ export class DragAndDropHandler {
         this.currentItem = null;
     }
 
-    private canMoveToArea(area: HitArea): boolean {
+    private canMoveToArea(area: HitArea, currentItem: NodeElement): boolean {
         if (!this.onCanMoveTo) {
             return true;
         }
 
-        if (!this.currentItem) {
-            return false;
-        }
-
         const positionName = getPositionName(area.position);
 
-        return this.onCanMoveTo(this.currentItem.node, area.node, positionName);
+        return this.onCanMoveTo(currentItem.node, area.node, positionName);
     }
 
     private clear(): void {
@@ -203,7 +199,7 @@ export class DragAndDropHandler {
             this.currentItem &&
             this.hoveredArea &&
             this.hoveredArea.position !== Position.None &&
-            this.canMoveToArea(this.hoveredArea)
+            this.canMoveToArea(this.hoveredArea, this.currentItem)
         ) {
             const movedNode = this.currentItem.node;
             const targetNode = this.hoveredArea.node;
@@ -351,7 +347,7 @@ export class DragAndDropHandler {
             positionInfo.pageY,
         );
 
-        if (area && this.canMoveToArea(area)) {
+        if (area && this.canMoveToArea(area, this.currentItem)) {
             if (!area.node.isFolder()) {
                 this.stopOpenFolderTimer();
             }
