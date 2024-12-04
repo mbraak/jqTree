@@ -16,6 +16,7 @@ import { Node } from "../node";
 import NodeElement from "../nodeElement";
 import { getPositionName, Position } from "../position";
 import { getElementPosition } from "../util";
+import binarySearch from "./binarySearch";
 import DragElement from "./dragElement";
 import generateHitAreas from "./generateHitAreas";
 import { DropHint, HitArea } from "./types";
@@ -143,26 +144,15 @@ export class DragAndDropHandler {
             return null;
         }
 
-        let low = 0;
-        let high = this.hitAreas.length;
-        while (low < high) {
-            const mid = (low + high) >> 1;
-            const area = this.hitAreas[mid];
-
-            if (!area) {
-                return null;
-            }
-
+        return binarySearch<HitArea>(this.hitAreas, (area) => {
             if (y < area.top) {
-                high = mid;
+                return 1;
             } else if (y > area.bottom) {
-                low = mid + 1;
+                return -1;
             } else {
-                return area;
+                return 0;
             }
-        }
-
-        return null;
+        });
     }
 
     private generateHitAreas(): void {
