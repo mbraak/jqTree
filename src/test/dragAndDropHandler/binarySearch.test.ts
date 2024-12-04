@@ -24,7 +24,7 @@ it("returns null when the value doesn't exist", () => {
 it("handles undefined values in the array", () => {
     const compareFn = (item: number) => item - 6;
     const array = [1, 5, 7, 9];
-    (array as any)[1] = undefined;
+    (array as any)[1] = undefined; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
 
     const result = binarySearch<number>(array, compareFn);
     expect(result).toBeNull();
