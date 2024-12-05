@@ -34,16 +34,6 @@ class FolderElement extends NodeElement {
         this.triggerEvent = triggerEvent;
     }
 
-    protected mustShowBorderDropHint(position: Position): boolean {
-        return !this.node.is_open && position === Position.Inside;
-    }
-
-    private getButton(): HTMLLinkElement {
-        return this.element.querySelector(
-            ":scope > .jqtree-element > a.jqtree-toggler",
-        ) as HTMLLinkElement;
-    }
-
     public close(slide: boolean, animationSpeed: JQuery.Duration): void {
         if (!this.node.is_open) {
             return;
@@ -124,6 +114,16 @@ class FolderElement extends NodeElement {
             jQuery(this.getUl()).show();
             doOpen();
         }
+    }
+
+    protected mustShowBorderDropHint(position: Position): boolean {
+        return !this.node.is_open && position === Position.Inside;
+    }
+
+    private getButton(): HTMLLinkElement {
+        return this.element.querySelector(
+            ":scope > .jqtree-element > a.jqtree-toggler",
+        ) as HTMLLinkElement;
     }
 }
 

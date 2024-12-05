@@ -1,38 +1,12 @@
 import { Node } from "./node";
 
-export type OnCanMove = ((node: Node) => boolean) | undefined;
-
-type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
+export type DataFilter = (data: unknown) => NodeData[];
 
 export type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
 
 export type DragMethod = (node: Node, event: Event | Touch) => void;
 
-export type OnCanMoveTo = (
-    node: Node,
-    targetNode: Node,
-    positionName: string,
-) => boolean;
-
-export type OnGetStateFromStorage = (() => string) | undefined;
-
-export type OnIsMoveHandle = (el: JQuery) => boolean;
-
-export type OnLoadFailed = (response: JQuery.jqXHR) => void;
-
-export type OnSetStateFromStorage = ((data: string) => void) | undefined;
-
-export type DataFilter = (data: unknown) => NodeData[];
-
 export type IconElement = HTMLElement | JQuery | string;
-
-export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
-
-export type OnLoading = (
-    isLoading: boolean,
-    node: Node | null,
-    $el: JQuery,
-) => void;
 
 export interface JQTreeOptions {
     animationSpeed: JQuery.Duration;
@@ -68,3 +42,29 @@ export interface JQTreeOptions {
     tabIndex?: number;
     useContextMenu: boolean;
 }
+
+export type OnCanMove = ((node: Node) => boolean) | undefined;
+
+export type OnCanMoveTo = (
+    node: Node,
+    targetNode: Node,
+    positionName: string,
+) => boolean;
+
+export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
+
+export type OnGetStateFromStorage = (() => string) | undefined;
+
+export type OnIsMoveHandle = (el: JQuery) => boolean;
+
+export type OnLoadFailed = (response: JQuery.jqXHR) => void;
+
+export type OnLoading = (
+    isLoading: boolean,
+    node: Node | null,
+    $el: JQuery,
+) => void;
+
+export type OnSetStateFromStorage = ((data: string) => void) | undefined;
+
+type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;

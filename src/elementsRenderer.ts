@@ -19,6 +19,8 @@ interface ElementsRendererParams {
 }
 
 export default class ElementsRenderer {
+    public closedIconElement?: HTMLElement | Text;
+    public openedIconElement?: HTMLElement | Text;
     private $element: JQuery;
     private autoEscape: boolean;
     private buttonLeft: boolean;
@@ -27,11 +29,9 @@ export default class ElementsRenderer {
     private isNodeSelected: IsNodeSelected;
     private onCreateLi?: OnCreateLi;
     private rtl?: boolean;
+
     private showEmptyFolder: boolean;
     private tabIndex?: number;
-
-    public closedIconElement?: HTMLElement | Text;
-    public openedIconElement?: HTMLElement | Text;
 
     constructor({
         $element,
@@ -59,6 +59,45 @@ export default class ElementsRenderer {
         this.tabIndex = tabIndex;
         this.openedIconElement = this.createButtonElement(openedIcon ?? "+");
         this.closedIconElement = this.createButtonElement(closedIcon ?? "-");
+    }
+
+    public render(fromNode: Node | null): void {
+        if (fromNode?.parent) {
+            this.renderFromNode(fromNode);
+        } else {
+            this.renderFromRoot();
+        }
+    }
+
+    public renderFromNode(node: Node): void {
+        if (!node.element) {
+            return;
+        }
+
+        // remember current li
+        const $previousLi = jQuery(node.element);
+
+        // create element
+        const li = this.createLi(node, node.getLevel());
+
+        // add element to dom
+        $previousLi.after(li);
+
+        // remove previous li
+        $previousLi.remove();
+
+        // create children
+        this.createDomElements(li, node.children, false, node.getLevel() + 1);
+    }
+
+    public renderFromRoot(): void {
+        this.$element.empty();
+
+        const tree = this.getTree();
+
+        if (this.$element[0] && tree) {
+            this.createDomElements(this.$element[0], tree.children, true, 1);
+        }
     }
 
     private attachNodeData(node: Node, li: HTMLElement): void {
@@ -323,44 +362,5 @@ export default class ElementsRenderer {
         element.setAttribute("aria-level", `${level}`);
         element.setAttribute("aria-selected", getBoolString(isSelected));
         element.setAttribute("role", "treeitem");
-    }
-
-    public render(fromNode: Node | null): void {
-        if (fromNode?.parent) {
-            this.renderFromNode(fromNode);
-        } else {
-            this.renderFromRoot();
-        }
-    }
-
-    public renderFromNode(node: Node): void {
-        if (!node.element) {
-            return;
-        }
-
-        // remember current li
-        const $previousLi = jQuery(node.element);
-
-        // create element
-        const li = this.createLi(node, node.getLevel());
-
-        // add element to dom
-        $previousLi.after(li);
-
-        // remove previous li
-        $previousLi.remove();
-
-        // create children
-        this.createDomElements(li, node.children, false, node.getLevel() + 1);
-    }
-
-    public renderFromRoot(): void {
-        this.$element.empty();
-
-        const tree = this.getTree();
-
-        if (this.$element[0] && tree) {
-            this.createDomElements(this.$element[0], tree.children, true, 1);
-        }
     }
 }

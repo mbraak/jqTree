@@ -13,11 +13,11 @@ export interface NodeElementParams {
 }
 
 class NodeElement {
+    public element: HTMLElement;
+    public node: Node;
     private getScrollLeft: GetScrollLeft;
     private tabIndex?: number;
     private treeElement: HTMLElement;
-    public element: HTMLElement;
-    public node: Node;
 
     constructor({
         getScrollLeft,
@@ -30,20 +30,6 @@ class NodeElement {
         this.treeElement = treeElement;
 
         this.init(node);
-    }
-
-    protected getTitleSpan(): HTMLSpanElement {
-        return this.element.querySelector(
-            ":scope > .jqtree-element > span.jqtree-title",
-        ) as HTMLSpanElement;
-    }
-
-    protected getUl(): HTMLUListElement {
-        return this.element.querySelector(":scope > ul") as HTMLUListElement;
-    }
-
-    protected mustShowBorderDropHint(position: Position): boolean {
-        return position === Position.Inside;
     }
 
     public addDropHint(position: number): DropHint {
@@ -90,6 +76,20 @@ class NodeElement {
         if (mustSetFocus) {
             titleSpan.focus();
         }
+    }
+
+    protected getTitleSpan(): HTMLSpanElement {
+        return this.element.querySelector(
+            ":scope > .jqtree-element > span.jqtree-title",
+        ) as HTMLSpanElement;
+    }
+
+    protected getUl(): HTMLUListElement {
+        return this.element.querySelector(":scope > ul") as HTMLUListElement;
+    }
+
+    protected mustShowBorderDropHint(position: Position): boolean {
+        return position === Position.Inside;
     }
 }
 

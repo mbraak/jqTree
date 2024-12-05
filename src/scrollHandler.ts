@@ -18,6 +18,23 @@ export default class ScrollHandler {
         this.treeElement = treeElement;
     }
 
+    public checkScrolling(positionInfo: PositionInfo): void {
+        this.checkVerticalScrolling(positionInfo);
+        this.checkHorizontalScrolling(positionInfo);
+    }
+
+    public getScrollLeft(): number {
+        return this.getScrollParent().getScrollLeft();
+    }
+
+    public scrollToY(top: number): void {
+        this.getScrollParent().scrollToY(top);
+    }
+
+    public stopScrolling() {
+        this.getScrollParent().stopScrolling();
+    }
+
     private checkHorizontalScrolling(positionInfo: PositionInfo): void {
         this.getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
     }
@@ -35,22 +52,5 @@ export default class ScrollHandler {
         }
 
         return this.scrollParent;
-    }
-
-    public checkScrolling(positionInfo: PositionInfo): void {
-        this.checkVerticalScrolling(positionInfo);
-        this.checkHorizontalScrolling(positionInfo);
-    }
-
-    public getScrollLeft(): number {
-        return this.getScrollParent().getScrollLeft();
-    }
-
-    public scrollToY(top: number): void {
-        this.getScrollParent().scrollToY(top);
-    }
-
-    public stopScrolling() {
-        this.getScrollParent().stopScrolling();
     }
 }
