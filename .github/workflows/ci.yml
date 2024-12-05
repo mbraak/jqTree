@@ -65,7 +65,7 @@ jobs:
             - name: Merge coverage
               run: cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
             - name: Codecov
-              uses: codecov/codecov-action@v4
+              uses: codecov/codecov-action@v5
               with:
                 directory: .nyc_output
                 verbose: true
