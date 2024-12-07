@@ -1,9 +1,8 @@
-import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
-
 import { DragAndDropHandler } from "../../dragAndDropHandler";
 import { Node } from "../../node";
 import NodeElement from "../../nodeElement";
 import { Position } from "../../position";
+import { mockLayout } from "../support/testUtil";
 
 describe(".refresh", () => {
     it("generates hit areas if there is a current item", () => {
@@ -16,41 +15,15 @@ describe(".refresh", () => {
         const elementForTree = document.createElement("div");
         document.body.append(elementForTree);
 
-        jest.spyOn(elementForTree, "clientHeight", "get").mockReturnValue(50);
-        jest.spyOn(elementForTree, "clientWidth", "get").mockReturnValue(40);
+        mockLayout(elementForTree, { height: 40, width: 50, x: 0, y: 0 });
 
         const elementForNode1 = document.createElement("div");
         elementForTree.append(elementForNode1);
         const elementForNode2 = document.createElement("div");
         elementForTree.append(elementForNode2);
 
-        jest.spyOn(elementForNode1, "offsetParent", "get").mockReturnValue(
-            elementForTree,
-        );
-        jest.spyOn(elementForNode2, "offsetParent", "get").mockReturnValue(
-            elementForTree,
-        );
-
-        mockElementBoundingClientRect(elementForTree, {
-            height: 40,
-            width: 50,
-            x: 0,
-            y: 0,
-        });
-
-        mockElementBoundingClientRect(elementForNode1, {
-            height: 20,
-            width: 50,
-            x: 0,
-            y: 0,
-        });
-
-        mockElementBoundingClientRect(elementForNode2, {
-            height: 20,
-            width: 50,
-            x: 0,
-            y: 20,
-        });
+        mockLayout(elementForNode1, { height: 20, width: 50, x: 0, y: 0 });
+        mockLayout(elementForNode2, { height: 20, width: 50, x: 0, y: 20 });
 
         const tree = new Node({ isRoot: true });
 
@@ -115,16 +88,16 @@ describe(".refresh", () => {
 
         expect(dragAndDropHandler.hitAreas).toMatchObject([
             expect.objectContaining({
-                bottom: 43,
+                bottom: 38,
                 node: node2,
                 position: Position.Inside,
                 top: 20,
             }),
             expect.objectContaining({
-                bottom: 66,
+                bottom: 56,
                 node: node2,
                 position: Position.After,
-                top: 43,
+                top: 38,
             }),
         ]);
     });

@@ -1,3 +1,12 @@
+import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
+
+interface Rect {
+    height: number;
+    width: number;
+    x: number;
+    y: number;
+}
+
 export const singleChild = ($el: JQuery, selector: string): JQuery => {
     const $result = $el.children(selector);
 
@@ -22,3 +31,13 @@ export const togglerLink = (liNode: HTMLElement | JQuery): JQuery =>
 
 const nodeElement = (liNode: HTMLElement | JQuery): JQuery =>
     singleChild(jQuery(liNode), "div.jqtree-element ");
+
+export const mockLayout = (element: HTMLElement, rect: Rect) => {
+    jest.spyOn(element, "clientHeight", "get").mockReturnValue(rect.height);
+    jest.spyOn(element, "clientWidth", "get").mockReturnValue(rect.width);
+    jest.spyOn(element, "offsetParent", "get").mockReturnValue(
+        element.parentElement,
+    );
+
+    mockElementBoundingClientRect(element, rect);
+};
