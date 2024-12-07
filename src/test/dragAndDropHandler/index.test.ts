@@ -2,7 +2,7 @@ import { DragAndDropHandler } from "../../dragAndDropHandler";
 import { Node } from "../../node";
 import NodeElement from "../../nodeElement";
 import { Position } from "../../position";
-import { mockLayout } from "../support/testUtil";
+import { generateHtmlElementsForTree } from "../support/testUtil";
 
 describe(".refresh", () => {
     it("generates hit areas if there is a current item", () => {
@@ -12,46 +12,35 @@ describe(".refresh", () => {
         const refreshElements = jest.fn();
         const triggerEvent = jest.fn();
 
-        const elementForTree = document.createElement("div");
-        document.body.append(elementForTree);
-
-        mockLayout(elementForTree, { height: 40, width: 50, x: 0, y: 0 });
-
-        const elementForNode1 = document.createElement("div");
-        elementForTree.append(elementForNode1);
-        const elementForNode2 = document.createElement("div");
-        elementForTree.append(elementForNode2);
-
-        mockLayout(elementForNode1, { height: 20, width: 50, x: 0, y: 0 });
-        mockLayout(elementForNode2, { height: 20, width: 50, x: 0, y: 20 });
-
-        const tree = new Node({ isRoot: true });
+        const tree = new Node(null, true);
 
         const node1 = new Node({ name: "node1" });
-        node1.element = elementForNode1;
         tree.addChild(node1);
 
         const node2 = new Node({ name: "node2" });
-        node2.element = elementForNode2;
         tree.addChild(node2);
 
-        const nodeElement1 = new NodeElement({
-            getScrollLeft,
-            node: node1,
-            treeElement: elementForTree,
-        });
-
-        const nodeElement2 = new NodeElement({
-            getScrollLeft,
-            node: node2,
-            treeElement: elementForTree,
-        });
+        const elementForTree = generateHtmlElementsForTree(tree);
 
         const getNodeElement = jest.fn((element) => {
-            if (element == elementForNode1) {
-                return nodeElement1;
-            } else if (element == elementForNode2) {
-                return nodeElement2;
+            let resultNode: Node | null = null;
+
+            tree.iterate((node) => {
+                if (node.element === element) {
+                    resultNode = node;
+                    return false;
+                }
+
+                return true;
+            });
+
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (resultNode) {
+                return new NodeElement({
+                    getScrollLeft,
+                    node: resultNode,
+                    treeElement: elementForTree,
+                });
             } else {
                 return null;
             }
@@ -77,11 +66,11 @@ describe(".refresh", () => {
             originalEvent: new Event("click"),
             pageX: 10,
             pageY: 10,
-            target: elementForNode1,
+            target: node1.element as HTMLElement,
         };
 
         dragAndDropHandler.mouseCapture(positionInfo);
-        expect(dragAndDropHandler.currentItem).toBe(nodeElement1);
+        expect(dragAndDropHandler.currentItem?.node).toBe(node1);
 
         // Call refresh
         dragAndDropHandler.refresh();

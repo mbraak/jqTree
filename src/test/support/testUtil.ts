@@ -1,5 +1,7 @@
 import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
 
+import { Node } from "../../node";
+
 interface Rect {
     height: number;
     width: number;
@@ -40,4 +42,41 @@ export const mockLayout = (element: HTMLElement, rect: Rect) => {
     );
 
     mockElementBoundingClientRect(element, rect);
+};
+
+export const generateHtmlElementsForTree = (tree: Node) => {
+    let y = 0;
+
+    function generateHtmlElementsForNode(
+        node: Node,
+        parentElement: HTMLElement,
+        x: number,
+    ) {
+        const isTree = node.tree === node;
+        const element = document.createElement("div");
+        parentElement.append(element);
+
+        if (!isTree) {
+            mockLayout(element, { height: 20, width: 100 - x, x, y });
+            node.element = element;
+            y += 20;
+        }
+
+        if (node.hasChildren() && (node.is_open || isTree)) {
+            for (const child of node.children) {
+                generateHtmlElementsForNode(
+                    child,
+                    element,
+                    isTree ? x : x + 10,
+                );
+            }
+        }
+
+        return element;
+    }
+
+    const treeElement = generateHtmlElementsForNode(tree, document.body, 0);
+    mockLayout(treeElement, { height: y, width: 100, x: 0, y: 0 });
+
+    return treeElement;
 };
