@@ -155,15 +155,15 @@ export class DragAndDropHandler {
         });
     }
 
-    private generateHitAreas(): void {
+    private generateHitAreas(currentNode: Node): void {
         const tree = this.getTree();
 
-        if (!this.currentItem || !tree) {
+        if (!tree) {
             this.hitAreas = [];
         } else {
             this.hitAreas = generateHitAreas(
                 tree,
-                this.currentItem.node,
+                currentNode,
                 this.getTreeDimensions().bottom,
             );
         }
@@ -426,11 +426,9 @@ export class DragAndDropHandler {
         this.removeHitAreas();
 
         if (this.currentItem) {
-            this.generateHitAreas();
-
-            this.currentItem = this.getNodeElementForNode(
-                this.currentItem.node,
-            );
+            const currentNode = this.currentItem.node;
+            this.generateHitAreas(currentNode);
+            this.currentItem = this.getNodeElementForNode(currentNode);
 
             if (this.isDragging) {
                 this.currentItem.element.classList.add("jqtree-moving");
