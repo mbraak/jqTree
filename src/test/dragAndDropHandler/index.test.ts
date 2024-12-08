@@ -17,7 +17,6 @@ const createDragAndDropHandler = ({
     onIsMoveHandle,
     tree,
 }: CreateDragAndDropHandlerParams) => {
-    const getNodeElementForNode = jest.fn();
     const getScrollLeft = jest.fn();
     const openNode = jest.fn();
     const refreshElements = jest.fn();
@@ -25,13 +24,22 @@ const createDragAndDropHandler = ({
 
     const elementForTree = generateHtmlElementsForTree(tree);
 
+    const getNodeElementForNode = jest.fn(
+        (node: Node) =>
+            new NodeElement({
+                getScrollLeft,
+                node,
+                treeElement: elementForTree,
+            }),
+    );
+
     const getNodeElement = jest.fn((element: HTMLElement) => {
         let resultNode: Node | null = null;
 
         tree.iterate((node) => {
             if (
                 node.element === element ||
-                node.element == element.parentElement
+                node.element === element.parentElement
             ) {
                 resultNode = node;
                 return false;
@@ -52,13 +60,11 @@ const createDragAndDropHandler = ({
         }
     });
 
-    const getTreeImplementation = getTree ?? jest.fn(() => tree);
-
     return new DragAndDropHandler({
         getNodeElement,
         getNodeElementForNode,
         getScrollLeft,
-        getTree: getTreeImplementation,
+        getTree: getTree ?? jest.fn(() => tree),
         onIsMoveHandle,
         openFolderDelay: false,
         openNode,
@@ -211,6 +217,102 @@ describe(".mouseCapture", () => {
         expect(dragAndDropHandler.currentItem).toBeNull();
 
         expect(onIsMoveHandle).toHaveBeenCalled();
+    });
+});
+
+describe(".mouseStart", () => {
+    it("sets dragging to true and returns true", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        // Set current item
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+        expect(dragAndDropHandler.currentItem?.node).toBe(node1);
+        expect(dragAndDropHandler.isDragging).toBeFalse();
+
+        // mouseStart
+        expect(dragAndDropHandler.mouseStart(positionInfo)).toBeTrue();
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+    });
+
+    it("adds the jqtree-moving css class", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+        // Set current item
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        // mouseStart
+        dragAndDropHandler.mouseStart(positionInfo);
+
+        expect(node1.element?.classList).toContain("jqtree-moving");
+    });
+
+    it("creates a drag element", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+        // Set current item
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        // mouseStart
+        dragAndDropHandler.mouseStart(positionInfo);
+
+        expect(document.querySelector(".jqtree-dragging")).toBeInTheDocument();
+    });
+
+    it("sets dragging to false and returns false when there is no current item", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        expect(dragAndDropHandler.mouseStart(positionInfo)).toBeFalse();
+        expect(dragAndDropHandler.isDragging).toBeFalse();
     });
 });
 
