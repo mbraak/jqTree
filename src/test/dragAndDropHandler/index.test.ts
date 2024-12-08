@@ -1,5 +1,6 @@
 import { DragAndDropHandler } from "../../dragAndDropHandler";
 import { GetTree } from "../../jqtreeMethodTypes";
+import { OnIsMoveHandle } from "../../jqtreeOptions";
 import { Node } from "../../node";
 import NodeElement from "../../nodeElement";
 import { Position } from "../../position";
@@ -7,11 +8,13 @@ import { generateHtmlElementsForTree } from "../support/testUtil";
 
 interface CreateDragAndDropHandlerParams {
     getTree?: GetTree;
+    onIsMoveHandle?: OnIsMoveHandle;
     tree: Node;
 }
 
 const createDragAndDropHandler = ({
     getTree,
+    onIsMoveHandle,
     tree,
 }: CreateDragAndDropHandlerParams) => {
     const getNodeElementForNode = jest.fn();
@@ -22,11 +25,14 @@ const createDragAndDropHandler = ({
 
     const elementForTree = generateHtmlElementsForTree(tree);
 
-    const getNodeElement = jest.fn((element) => {
+    const getNodeElement = jest.fn((element: HTMLElement) => {
         let resultNode: Node | null = null;
 
         tree.iterate((node) => {
-            if (node.element === element) {
+            if (
+                node.element === element ||
+                node.element == element.parentElement
+            ) {
                 resultNode = node;
                 return false;
             }
@@ -53,6 +59,7 @@ const createDragAndDropHandler = ({
         getNodeElementForNode,
         getScrollLeft,
         getTree: getTreeImplementation,
+        onIsMoveHandle,
         openFolderDelay: false,
         openNode,
         refreshElements,
@@ -61,6 +68,151 @@ const createDragAndDropHandler = ({
         triggerEvent,
     });
 };
+
+describe(".mouseCapture", () => {
+    it("sets the current item and returns true when a node can be moved", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+        expect(dragAndDropHandler.currentItem).toBeNull();
+
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeTrue();
+        expect(dragAndDropHandler.currentItem?.node).toBe(node1);
+    });
+
+    it("doesn'set the current item and returns false when no node can be moved", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const element = document.createElement("div");
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 200,
+            pageY: 10,
+            target: element,
+        };
+
+        expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeFalse();
+        expect(dragAndDropHandler.currentItem).toBeNull();
+    });
+
+    it("capures the node when an element inside a node element is clicked", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        const element = document.createElement("div");
+        (node2.element as HTMLElement).appendChild(element);
+
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 30,
+            target: element,
+        };
+
+        expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeTrue();
+        expect(dragAndDropHandler.currentItem?.node).toBe(node2);
+    });
+
+    it("doesn't capture the node and returns null when an input element is clicked", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        const element = document.createElement("input");
+        (node2.element as HTMLElement).appendChild(element);
+
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 30,
+            target: element,
+        };
+
+        expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeNull();
+        expect(dragAndDropHandler.currentItem).toBeNull();
+    });
+
+    it("captures the node when onIsMoveHandle returns true", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const onIsMoveHandle = jest.fn(
+            (jQueryElement: JQuery) => jQueryElement.get(0) === node1.element,
+        );
+        const dragAndDropHandler = createDragAndDropHandler({
+            onIsMoveHandle,
+            tree,
+        });
+
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeTrue();
+        expect(dragAndDropHandler.currentItem?.node).toBe(node1);
+
+        expect(onIsMoveHandle).toHaveBeenCalled();
+    });
+
+    it("doesn't capture the node when onIsMoveHandle returns false", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const onIsMoveHandle = jest.fn(() => false);
+        const dragAndDropHandler = createDragAndDropHandler({
+            onIsMoveHandle,
+            tree,
+        });
+
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeNull();
+        expect(dragAndDropHandler.currentItem).toBeNull();
+
+        expect(onIsMoveHandle).toHaveBeenCalled();
+    });
+});
 
 describe(".refresh", () => {
     it("generates hit areas", () => {
