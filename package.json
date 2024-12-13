@@ -58,7 +58,7 @@
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-jest": "^28.9.0",
         "eslint-plugin-jest-dom": "^5.5.0",
-        "eslint-plugin-perfectionist": "^4.2.0",
+        "eslint-plugin-perfectionist": "^4.3.0",
         "eslint-plugin-playwright": "^2.1.0",
         "givens": "^1.3.9",
         "graphql": "^16.9.0",
