@@ -316,6 +316,41 @@ describe(".mouseStart", () => {
     });
 });
 
+describe(".mouseDrag", () => {
+    it("moves the drag element", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+        dragAndDropHandler.mouseStart(positionInfo);
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+
+        // mouse start
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 10,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        });
+
+        const dragElement = document.querySelector(".jqtree-dragging");
+        expect(dragElement).toHaveStyle({ left: "10px", top: "30px" });
+    });
+});
+
 describe(".refresh", () => {
     it("generates hit areas", () => {
         const tree = new Node(null, true);
