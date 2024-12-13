@@ -44,33 +44,6 @@ export class Node implements INode {
         }
     }
 
-    private createNode(nodeData?: NodeData): Node {
-        const nodeClass = this.getNodeClass();
-        return new nodeClass(nodeData);
-    }
-
-    private doRemoveChild(node: Node): void {
-        this.children.splice(this.getChildIndex(node), 1);
-        this.tree?.removeNodeFromIndex(node);
-    }
-
-    private getNodeClass(): typeof Node {
-        return this.nodeClass ?? this.tree?.nodeClass ?? Node;
-    }
-
-    // Load children data from nodeInfo if it has children
-    private loadChildrenFromData(nodeInfo: NodeData) {
-        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
-            this.loadFromData(nodeInfo.children);
-        }
-    }
-
-    private setParent(parent: Node): void {
-        this.parent = parent;
-        this.tree = parent.tree;
-        this.tree?.addNodeToIndex(this);
-    }
-
     public addAfter(nodeInfo: NodeData): Node | null {
         if (!this.parent) {
             return null;
@@ -655,5 +628,32 @@ export class Node implements INode {
                 }
             }
         }
+    }
+
+    private createNode(nodeData?: NodeData): Node {
+        const nodeClass = this.getNodeClass();
+        return new nodeClass(nodeData);
+    }
+
+    private doRemoveChild(node: Node): void {
+        this.children.splice(this.getChildIndex(node), 1);
+        this.tree?.removeNodeFromIndex(node);
+    }
+
+    private getNodeClass(): typeof Node {
+        return this.nodeClass ?? this.tree?.nodeClass ?? Node;
+    }
+
+    // Load children data from nodeInfo if it has children
+    private loadChildrenFromData(nodeInfo: NodeData) {
+        if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+            this.loadFromData(nodeInfo.children);
+        }
+    }
+
+    private setParent(parent: Node): void {
+        this.parent = parent;
+        this.tree = parent.tree;
+        this.tree?.addNodeToIndex(this);
     }
 }

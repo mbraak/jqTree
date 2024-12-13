@@ -3,12 +3,12 @@ import type { ScrollParent } from "./types";
 import { getOffsetTop } from "../util";
 
 type HorizontalScrollDirection = "left" | "right";
-type VerticalScrollDirection = "bottom" | "top";
-
 interface Params {
     refreshHitAreas: () => void;
     treeElement: HTMLElement;
 }
+
+type VerticalScrollDirection = "bottom" | "top";
 
 export default class DocumentScrollParent implements ScrollParent {
     private documentScrollHeight?: number;
@@ -23,6 +23,64 @@ export default class DocumentScrollParent implements ScrollParent {
     constructor({ refreshHitAreas, treeElement }: Params) {
         this.refreshHitAreas = refreshHitAreas;
         this.treeElement = treeElement;
+    }
+
+    public checkHorizontalScrolling(pageX: number): void {
+        const newHorizontalScrollDirection =
+            this.getNewHorizontalScrollDirection(pageX);
+
+        if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
+            this.horizontalScrollDirection = newHorizontalScrollDirection;
+
+            if (this.horizontalScrollTimeout != null) {
+                window.clearTimeout(this.horizontalScrollTimeout);
+            }
+
+            if (newHorizontalScrollDirection) {
+                this.horizontalScrollTimeout = window.setTimeout(
+                    this.scrollHorizontally.bind(this),
+                    40,
+                );
+            }
+        }
+    }
+
+    public checkVerticalScrolling(pageY: number) {
+        const newVerticalScrollDirection =
+            this.getNewVerticalScrollDirection(pageY);
+
+        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
+            this.verticalScrollDirection = newVerticalScrollDirection;
+
+            if (this.verticalScrollTimeout != null) {
+                window.clearTimeout(this.verticalScrollTimeout);
+                this.verticalScrollTimeout = undefined;
+            }
+
+            if (newVerticalScrollDirection) {
+                this.verticalScrollTimeout = window.setTimeout(
+                    this.scrollVertically.bind(this),
+                    40,
+                );
+            }
+        }
+    }
+
+    public getScrollLeft(): number {
+        return document.documentElement.scrollLeft;
+    }
+
+    public scrollToY(top: number): void {
+        const treeTop = getOffsetTop(this.treeElement);
+
+        document.documentElement.scrollTop = top + treeTop;
+    }
+
+    public stopScrolling() {
+        this.horizontalScrollDirection = undefined;
+        this.verticalScrollDirection = undefined;
+        this.documentScrollHeight = undefined;
+        this.documentScrollWidth = undefined;
     }
 
     private canScrollDown() {
@@ -124,63 +182,5 @@ export default class DocumentScrollParent implements ScrollParent {
         this.refreshHitAreas();
 
         setTimeout(this.scrollVertically.bind(this), 40);
-    }
-
-    public checkHorizontalScrolling(pageX: number): void {
-        const newHorizontalScrollDirection =
-            this.getNewHorizontalScrollDirection(pageX);
-
-        if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
-            this.horizontalScrollDirection = newHorizontalScrollDirection;
-
-            if (this.horizontalScrollTimeout != null) {
-                window.clearTimeout(this.horizontalScrollTimeout);
-            }
-
-            if (newHorizontalScrollDirection) {
-                this.horizontalScrollTimeout = window.setTimeout(
-                    this.scrollHorizontally.bind(this),
-                    40,
-                );
-            }
-        }
-    }
-
-    public checkVerticalScrolling(pageY: number) {
-        const newVerticalScrollDirection =
-            this.getNewVerticalScrollDirection(pageY);
-
-        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
-            this.verticalScrollDirection = newVerticalScrollDirection;
-
-            if (this.verticalScrollTimeout != null) {
-                window.clearTimeout(this.verticalScrollTimeout);
-                this.verticalScrollTimeout = undefined;
-            }
-
-            if (newVerticalScrollDirection) {
-                this.verticalScrollTimeout = window.setTimeout(
-                    this.scrollVertically.bind(this),
-                    40,
-                );
-            }
-        }
-    }
-
-    public getScrollLeft(): number {
-        return document.documentElement.scrollLeft;
-    }
-
-    public scrollToY(top: number): void {
-        const treeTop = getOffsetTop(this.treeElement);
-
-        document.documentElement.scrollTop = top + treeTop;
-    }
-
-    public stopScrolling() {
-        this.horizontalScrollDirection = undefined;
-        this.verticalScrollDirection = undefined;
-        this.documentScrollHeight = undefined;
-        this.documentScrollWidth = undefined;
     }
 }

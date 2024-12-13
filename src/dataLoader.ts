@@ -37,6 +37,44 @@ export default class DataLoader {
         this.triggerEvent = triggerEvent;
     }
 
+    public loadFromUrl(
+        urlInfo: JQuery.AjaxSettings | null | string,
+        parentNode: Node | null,
+        onFinished: HandleFinishedLoading | null,
+    ): void {
+        if (!urlInfo) {
+            return;
+        }
+
+        const element = this.getDomElement(parentNode);
+        this.addLoadingClass(element);
+        this.notifyLoading(true, parentNode, element);
+
+        const stopLoading = (): void => {
+            this.removeLoadingClass(element);
+            this.notifyLoading(false, parentNode, element);
+        };
+
+        const handleSuccess = (data: NodeData[] | string): void => {
+            stopLoading();
+            this.loadData(this.parseData(data), parentNode);
+
+            if (onFinished && typeof onFinished === "function") {
+                onFinished();
+            }
+        };
+
+        const handleError = (jqXHR: JQuery.jqXHR): void => {
+            stopLoading();
+
+            if (this.onLoadFailed) {
+                this.onLoadFailed(jqXHR);
+            }
+        };
+
+        this.submitRequest(urlInfo, handleSuccess, handleError);
+    }
+
     private addLoadingClass(element: HTMLElement): void {
         element.classList.add("jqtree-loading");
     }
@@ -111,43 +149,5 @@ export default class DataLoader {
         ajaxSettings.method = ajaxSettings.method?.toUpperCase() ?? "GET";
 
         void jQuery.ajax(ajaxSettings);
-    }
-
-    public loadFromUrl(
-        urlInfo: JQuery.AjaxSettings | null | string,
-        parentNode: Node | null,
-        onFinished: HandleFinishedLoading | null,
-    ): void {
-        if (!urlInfo) {
-            return;
-        }
-
-        const element = this.getDomElement(parentNode);
-        this.addLoadingClass(element);
-        this.notifyLoading(true, parentNode, element);
-
-        const stopLoading = (): void => {
-            this.removeLoadingClass(element);
-            this.notifyLoading(false, parentNode, element);
-        };
-
-        const handleSuccess = (data: NodeData[] | string): void => {
-            stopLoading();
-            this.loadData(this.parseData(data), parentNode);
-
-            if (onFinished && typeof onFinished === "function") {
-                onFinished();
-            }
-        };
-
-        const handleError = (jqXHR: JQuery.jqXHR): void => {
-            stopLoading();
-
-            if (this.onLoadFailed) {
-                this.onLoadFailed(jqXHR);
-            }
-        };
-
-        this.submitRequest(urlInfo, handleSuccess, handleError);
     }
 }
