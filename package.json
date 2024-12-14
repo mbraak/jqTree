@@ -54,7 +54,7 @@
         "autoprefixer": "^10.4.20",
         "babel-jest": "^29.7.0",
         "babel-plugin-istanbul": "^7.0.0",
-        "eslint": "^9.16.0",
+        "eslint": "^9.17.0",
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-jest": "^28.9.0",
         "eslint-plugin-jest-dom": "^5.5.0",
