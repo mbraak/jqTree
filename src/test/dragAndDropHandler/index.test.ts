@@ -341,13 +341,17 @@ describe(".mouseDrag", () => {
         // mouse start
         dragAndDropHandler.mouseDrag({
             originalEvent: new Event("mousemove"),
-            pageX: 10,
+            pageX: 15,
             pageY: 30,
             target: node2.element as HTMLElement,
         });
 
         const dragElement = document.querySelector(".jqtree-dragging");
-        expect(dragElement).toHaveStyle({ left: "10px", top: "30px" });
+        expect(dragElement).toHaveStyle({
+            left: "5px",
+            position: "absolute",
+            top: "20px",
+        });
     });
 });
 
