@@ -75,6 +75,10 @@ const createDragAndDropHandler = ({
     });
 };
 
+beforeEach(() => {
+    document.body.innerHTML = "";
+});
+
 describe(".mouseCapture", () => {
     it("sets the current item and returns true when a node can be moved", () => {
         const tree = new Node(null, true);
@@ -279,6 +283,7 @@ describe(".mouseStart", () => {
         tree.addChild(node2);
 
         const dragAndDropHandler = createDragAndDropHandler({ tree });
+
         // Set current item
         const positionInfo = {
             originalEvent: new Event("click"),
@@ -335,10 +340,11 @@ describe(".mouseDrag", () => {
         };
 
         dragAndDropHandler.mouseCapture(positionInfo);
+
         dragAndDropHandler.mouseStart(positionInfo);
         expect(dragAndDropHandler.isDragging).toBeTrue();
 
-        // mouse start
+        // Move mouse
         dragAndDropHandler.mouseDrag({
             originalEvent: new Event("mousemove"),
             pageX: 15,
@@ -352,6 +358,47 @@ describe(".mouseDrag", () => {
             position: "absolute",
             top: "20px",
         });
+    });
+
+    it("changes the hovered area", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        dragAndDropHandler.mouseStart(positionInfo);
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+        expect(dragAndDropHandler.hoveredArea).toBeNull();
+
+        // Move mouse
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        });
+
+        expect(dragAndDropHandler.hoveredArea).toEqual(
+            expect.objectContaining({
+                bottom: 38,
+                node: node2,
+                position: Position.Inside,
+                top: 20,
+            }),
+        );
     });
 });
 

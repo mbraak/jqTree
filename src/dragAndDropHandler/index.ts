@@ -184,6 +184,7 @@ export class DragAndDropHandler {
         };
     }
 
+    /* Move the dragged node to the selected position in the tree. */
     private moveItem(positionInfo: PositionInfo): void {
         if (
             this.currentItem &&
