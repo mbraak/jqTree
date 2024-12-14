@@ -1,6 +1,6 @@
 import { DragAndDropHandler } from "../../dragAndDropHandler";
 import { GetTree } from "../../jqtreeMethodTypes";
-import { OnIsMoveHandle } from "../../jqtreeOptions";
+import { DragMethod, OnIsMoveHandle } from "../../jqtreeOptions";
 import { Node } from "../../node";
 import NodeElement from "../../nodeElement";
 import { Position } from "../../position";
@@ -8,12 +8,14 @@ import { generateHtmlElementsForTree } from "../support/testUtil";
 
 interface CreateDragAndDropHandlerParams {
     getTree?: GetTree;
+    onDragMove?: DragMethod;
     onIsMoveHandle?: OnIsMoveHandle;
     tree: Node;
 }
 
 const createDragAndDropHandler = ({
     getTree,
+    onDragMove,
     onIsMoveHandle,
     tree,
 }: CreateDragAndDropHandlerParams) => {
@@ -65,6 +67,7 @@ const createDragAndDropHandler = ({
         getNodeElementForNode,
         getScrollLeft,
         getTree: getTree ?? jest.fn(() => tree),
+        onDragMove,
         onIsMoveHandle,
         openFolderDelay: false,
         openNode,
@@ -322,7 +325,7 @@ describe(".mouseStart", () => {
 });
 
 describe(".mouseDrag", () => {
-    it("moves the drag element", () => {
+    it("moves the drag element and returns true", () => {
         const tree = new Node(null, true);
         const node1 = new Node({ name: "node1" });
         tree.addChild(node1);
@@ -345,12 +348,13 @@ describe(".mouseDrag", () => {
         expect(dragAndDropHandler.isDragging).toBeTrue();
 
         // Move mouse
-        dragAndDropHandler.mouseDrag({
+        const dragResult = dragAndDropHandler.mouseDrag({
             originalEvent: new Event("mousemove"),
             pageX: 15,
             pageY: 30,
             target: node2.element as HTMLElement,
         });
+        expect(dragResult).toBeTrue();
 
         const dragElement = document.querySelector(".jqtree-dragging");
         expect(dragElement).toHaveStyle({
@@ -398,6 +402,101 @@ describe(".mouseDrag", () => {
                 position: Position.Inside,
                 top: 20,
             }),
+        );
+    });
+
+    it("returns false when dragging hasn't started", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        const dragResult = dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        });
+        expect(dragResult).toBeFalse();
+    });
+
+    it("sets area to null when no area is found", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({
+            tree,
+        });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 30,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        dragAndDropHandler.mouseStart(positionInfo);
+
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 200,
+            target: document.body,
+        });
+
+        expect(dragAndDropHandler.hoveredArea).toBeNull();
+    });
+
+    it("calls onDragMove when no area is found and onDragMove is defined", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const onDragMove = jest.fn();
+
+        const dragAndDropHandler = createDragAndDropHandler({
+            onDragMove,
+            tree,
+        });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 30,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        dragAndDropHandler.mouseStart(positionInfo);
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+        expect(dragAndDropHandler.hoveredArea).toBeNull();
+
+        const positionInfoForDragging = {
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 200,
+            target: document.body,
+        };
+
+        // Move mouse
+        dragAndDropHandler.mouseDrag(positionInfoForDragging);
+
+        expect(onDragMove).toHaveBeenCalledWith(
+            node1,
+            positionInfoForDragging.originalEvent,
         );
     });
 });
