@@ -5,6 +5,7 @@ import jestPlugin from "eslint-plugin-jest";
 import jestDomPlugin from "eslint-plugin-jest-dom";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
 import playwrightPlugin from "eslint-plugin-playwright";
+import testingLibraryPlugin from "eslint-plugin-testing-library";
 
 export default [
     eslint.configs.recommended,
@@ -59,7 +60,11 @@ export default [
         },
     },
     {
-        files: ["src/test/jqTree/**/*.ts"],
+        files: ["src/test/**/*.ts"],
+        ...testingLibraryPlugin.configs["flat/dom"],
+    },
+    {
+        files: ["src/test/**/*.ts"],
         ...jestDomPlugin.configs["flat/recommended"],
     },
     {

@@ -147,7 +147,7 @@ context("when a node has load_on_demand in the data", () => {
         context("when the node is selected and doesn't have the focus", () => {
             beforeEach(() => {
                 given.$tree.tree("selectNode", given.node);
-                (document.activeElement as HTMLElement).blur();
+                (document.activeElement as HTMLElement).blur(); // eslint-disable-line testing-library/no-node-access
             });
 
             it("keeps the node selected and not focused", async () => {
