@@ -1,12 +1,15 @@
 /// <reference types="jest"/>
 
 declare namespace JQTreeMatchers {
+    export type TreeNode = TreeChild | TreeFolder;
+
+    export type TreeStructure = TreeNode[];
+
     interface TreeChild {
         name: string;
         nodeType: "child";
         selected: boolean;
     }
-
     interface TreeFolder {
         children: TreeNode[];
         name: string;
@@ -14,9 +17,6 @@ declare namespace JQTreeMatchers {
         open: boolean;
         selected: boolean;
     }
-
-    export type TreeNode = TreeChild | TreeFolder;
-    export type TreeStructure = TreeNode[];
 }
 
 declare namespace jest {

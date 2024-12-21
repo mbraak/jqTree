@@ -31,6 +31,10 @@ class GhostDropHint implements DropHint {
         }
     }
 
+    public remove(): void {
+        this.ghost.remove();
+    }
+
     private createGhostElement() {
         const ghost = document.createElement("li");
         ghost.className = "jqtree_common jqtree-ghost";
@@ -65,10 +69,6 @@ class GhostDropHint implements DropHint {
         if (childElement) {
             childElement.before(this.ghost);
         }
-    }
-
-    public remove(): void {
-        this.ghost.remove();
     }
 }
 

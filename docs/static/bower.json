@@ -3,6 +3,6 @@
     "dependencies": {
         "fontawesome": "^6.3.0",
         "jquery": "^3.7.0",
-        "jquery-mockjax": "^2.6.0"
+        "jquery-mockjax": "^2.7.0-beta.0"
     }
 }
