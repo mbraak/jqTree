@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.8.8 (november 17 2024)
 
 -   Issue #858: load on demand with empty children (thanks to Ivan Kolesov)
 

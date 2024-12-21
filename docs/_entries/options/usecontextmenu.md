@@ -1,6 +1,6 @@
 ---
 title: useContextMenu
-name: usecontextmenu
+name: use-context-menu
 ---
 
 Bind the context menu event (true/false).

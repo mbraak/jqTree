@@ -16,6 +16,7 @@ import { Node } from "../node";
 import NodeElement from "../nodeElement";
 import { getPositionName, Position } from "../position";
 import { getElementPosition } from "../util";
+import binarySearch from "./binarySearch";
 import DragElement from "./dragElement";
 import generateHitAreas from "./generateHitAreas";
 import { DropHint, HitArea } from "./types";
@@ -26,9 +27,6 @@ interface Dimensions {
     right: number;
     top: number;
 }
-
-type GetNodeElement = (element: HTMLElement) => NodeElement | null;
-type GetNodeElementForNode = (node: Node) => NodeElement;
 
 interface DragAndDropHandlerParams {
     autoEscape?: boolean;
@@ -48,13 +46,20 @@ interface DragAndDropHandlerParams {
     treeElement: HTMLElement;
     triggerEvent: TriggerEvent;
 }
+type GetNodeElement = (element: HTMLElement) => NodeElement | null;
+
+type GetNodeElementForNode = (node: Node) => NodeElement;
 
 export class DragAndDropHandler {
+    public currentItem: NodeElement | null;
+    public hitAreas: HitArea[];
+    public hoveredArea: HitArea | null;
+    public isDragging: boolean;
+
     private autoEscape?: boolean;
     private dragElement: DragElement | null;
     private getNodeElement: GetNodeElement;
     private getNodeElementForNode: GetNodeElementForNode;
-
     private getScrollLeft: GetScrollLeft;
     private getTree: GetTree;
     private onCanMove?: OnCanMove;
@@ -70,10 +75,6 @@ export class DragAndDropHandler {
     private slide: boolean;
     private treeElement: HTMLElement;
     private triggerEvent: TriggerEvent;
-    public currentItem: NodeElement | null;
-    public hitAreas: HitArea[];
-    public hoveredArea: HitArea | null;
-    public isDragging: boolean;
 
     constructor({
         autoEscape,
@@ -114,18 +115,148 @@ export class DragAndDropHandler {
         this.currentItem = null;
     }
 
-    private canMoveToArea(area: HitArea): boolean {
-        if (!this.onCanMoveTo) {
-            return true;
+    public mouseCapture(positionInfo: PositionInfo): boolean | null {
+        const element = positionInfo.target;
+
+        if (!this.mustCaptureElement(element)) {
+            return null;
         }
 
+        if (this.onIsMoveHandle && !this.onIsMoveHandle(jQuery(element))) {
+            return null;
+        }
+
+        let nodeElement = this.getNodeElement(element);
+
+        if (nodeElement && this.onCanMove) {
+            if (!this.onCanMove(nodeElement.node)) {
+                nodeElement = null;
+            }
+        }
+
+        this.currentItem = nodeElement;
+        return this.currentItem != null;
+    }
+
+    public mouseDrag(positionInfo: PositionInfo): boolean {
+        if (!this.currentItem || !this.dragElement) {
+            return false;
+        }
+
+        this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
+
+        const area = this.findHoveredArea(
+            positionInfo.pageX,
+            positionInfo.pageY,
+        );
+
+        if (area && this.canMoveToArea(area, this.currentItem)) {
+            if (!area.node.isFolder()) {
+                this.stopOpenFolderTimer();
+            }
+
+            if (this.hoveredArea !== area) {
+                this.hoveredArea = area;
+
+                // If this is a closed folder, start timer to open it
+                if (this.mustOpenFolderTimer(area)) {
+                    this.startOpenFolderTimer(area.node);
+                } else {
+                    this.stopOpenFolderTimer();
+                }
+
+                this.updateDropHint();
+            }
+        } else {
+            this.removeDropHint();
+            this.stopOpenFolderTimer();
+            this.hoveredArea = area;
+        }
+
+        if (!area) {
+            if (this.onDragMove) {
+                this.onDragMove(
+                    this.currentItem.node,
+                    positionInfo.originalEvent,
+                );
+            }
+        }
+
+        return true;
+    }
+
+    public mouseStart(positionInfo: PositionInfo): boolean {
         if (!this.currentItem) {
             return false;
         }
 
+        this.refresh();
+
+        const { left, top } = getElementPosition(positionInfo.target);
+
+        const node = this.currentItem.node;
+
+        this.dragElement = new DragElement({
+            autoEscape: this.autoEscape ?? true,
+            nodeName: node.name,
+            offsetX: positionInfo.pageX - left,
+            offsetY: positionInfo.pageY - top,
+            treeElement: this.treeElement,
+        });
+
+        this.isDragging = true;
+        this.currentItem.element.classList.add("jqtree-moving");
+
+        return true;
+    }
+
+    public mouseStop(positionInfo: PositionInfo): boolean {
+        this.moveItem(positionInfo);
+        this.clear();
+        this.removeHover();
+        this.removeDropHint();
+        this.removeHitAreas();
+
+        const currentItem = this.currentItem;
+
+        if (this.currentItem) {
+            this.currentItem.element.classList.remove("jqtree-moving");
+            this.currentItem = null;
+        }
+
+        this.isDragging = false;
+
+        if (!this.hoveredArea && currentItem) {
+            if (this.onDragStop) {
+                this.onDragStop(currentItem.node, positionInfo.originalEvent);
+            }
+        }
+
+        return false;
+    }
+
+    public refresh(): void {
+        this.removeHitAreas();
+
+        if (this.currentItem) {
+            const currentNode = this.currentItem.node;
+            this.generateHitAreas(currentNode);
+            this.currentItem = this.getNodeElementForNode(currentNode);
+
+            if (this.isDragging) {
+                this.currentItem.element.classList.add("jqtree-moving");
+            }
+        }
+    }
+
+    private canMoveToArea(area: HitArea, currentItem: NodeElement): boolean {
+        if (!this.onCanMoveTo) {
+            return true;
+        }
+
         const positionName = getPositionName(area.position);
 
-        return this.onCanMoveTo(this.currentItem.node, area.node, positionName);
+        return this.onCanMoveTo(currentItem.node, area.node, positionName);
     }
 
     private clear(): void {
@@ -147,37 +278,26 @@ export class DragAndDropHandler {
             return null;
         }
 
-        let low = 0;
-        let high = this.hitAreas.length;
-        while (low < high) {
-            const mid = (low + high) >> 1;
-            const area = this.hitAreas[mid];
-
-            if (!area) {
-                return null;
-            }
-
+        return binarySearch<HitArea>(this.hitAreas, (area) => {
             if (y < area.top) {
-                high = mid;
+                return 1;
             } else if (y > area.bottom) {
-                low = mid + 1;
+                return -1;
             } else {
-                return area;
+                return 0;
             }
-        }
-
-        return null;
+        });
     }
 
-    private generateHitAreas(): void {
+    private generateHitAreas(currentNode: Node): void {
         const tree = this.getTree();
 
-        if (!this.currentItem || !tree) {
+        if (!tree) {
             this.hitAreas = [];
         } else {
             this.hitAreas = generateHitAreas(
                 tree,
-                this.currentItem.node,
+                currentNode,
                 this.getTreeDimensions().bottom,
             );
         }
@@ -198,12 +318,13 @@ export class DragAndDropHandler {
         };
     }
 
+    /* Move the dragged node to the selected position in the tree. */
     private moveItem(positionInfo: PositionInfo): void {
         if (
             this.currentItem &&
             this.hoveredArea &&
             this.hoveredArea.position !== Position.None &&
-            this.canMoveToArea(this.hoveredArea)
+            this.canMoveToArea(this.hoveredArea, this.currentItem)
         ) {
             const movedNode = this.currentItem.node;
             const targetNode = this.hoveredArea.node;
@@ -314,141 +435,5 @@ export class DragAndDropHandler {
         // add new drop hint
         const nodeElement = this.getNodeElementForNode(this.hoveredArea.node);
         this.previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
-    }
-
-    public mouseCapture(positionInfo: PositionInfo): boolean | null {
-        const element = positionInfo.target;
-
-        if (!this.mustCaptureElement(element)) {
-            return null;
-        }
-
-        if (this.onIsMoveHandle && !this.onIsMoveHandle(jQuery(element))) {
-            return null;
-        }
-
-        let nodeElement = this.getNodeElement(element);
-
-        if (nodeElement && this.onCanMove) {
-            if (!this.onCanMove(nodeElement.node)) {
-                nodeElement = null;
-            }
-        }
-
-        this.currentItem = nodeElement;
-        return this.currentItem != null;
-    }
-
-    public mouseDrag(positionInfo: PositionInfo): boolean {
-        if (!this.currentItem || !this.dragElement) {
-            return false;
-        }
-
-        this.dragElement.move(positionInfo.pageX, positionInfo.pageY);
-
-        const area = this.findHoveredArea(
-            positionInfo.pageX,
-            positionInfo.pageY,
-        );
-
-        if (area && this.canMoveToArea(area)) {
-            if (!area.node.isFolder()) {
-                this.stopOpenFolderTimer();
-            }
-
-            if (this.hoveredArea !== area) {
-                this.hoveredArea = area;
-
-                // If this is a closed folder, start timer to open it
-                if (this.mustOpenFolderTimer(area)) {
-                    this.startOpenFolderTimer(area.node);
-                } else {
-                    this.stopOpenFolderTimer();
-                }
-
-                this.updateDropHint();
-            }
-        } else {
-            this.removeDropHint();
-            this.stopOpenFolderTimer();
-            this.hoveredArea = area;
-        }
-
-        if (!area) {
-            if (this.onDragMove) {
-                this.onDragMove(
-                    this.currentItem.node,
-                    positionInfo.originalEvent,
-                );
-            }
-        }
-
-        return true;
-    }
-
-    public mouseStart(positionInfo: PositionInfo): boolean {
-        if (!this.currentItem) {
-            return false;
-        }
-
-        this.refresh();
-
-        const { left, top } = getElementPosition(positionInfo.target);
-
-        const node = this.currentItem.node;
-
-        this.dragElement = new DragElement({
-            autoEscape: this.autoEscape ?? true,
-            nodeName: node.name,
-            offsetX: positionInfo.pageX - left,
-            offsetY: positionInfo.pageY - top,
-            treeElement: this.treeElement,
-        });
-
-        this.isDragging = true;
-        this.currentItem.element.classList.add("jqtree-moving");
-
-        return true;
-    }
-
-    public mouseStop(positionInfo: PositionInfo): boolean {
-        this.moveItem(positionInfo);
-        this.clear();
-        this.removeHover();
-        this.removeDropHint();
-        this.removeHitAreas();
-
-        const currentItem = this.currentItem;
-
-        if (this.currentItem) {
-            this.currentItem.element.classList.remove("jqtree-moving");
-            this.currentItem = null;
-        }
-
-        this.isDragging = false;
-
-        if (!this.hoveredArea && currentItem) {
-            if (this.onDragStop) {
-                this.onDragStop(currentItem.node, positionInfo.originalEvent);
-            }
-        }
-
-        return false;
-    }
-
-    public refresh(): void {
-        this.removeHitAreas();
-
-        if (this.currentItem) {
-            this.generateHitAreas();
-
-            this.currentItem = this.getNodeElementForNode(
-                this.currentItem.node,
-            );
-
-            if (this.isDragging) {
-                this.currentItem.element.classList.add("jqtree-moving");
-            }
-        }
     }
 }

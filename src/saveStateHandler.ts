@@ -65,76 +65,6 @@ export default class SaveStateHandler {
         this.saveStateOption = saveState;
     }
 
-    private getKeyName(): string {
-        if (typeof this.saveStateOption === "string") {
-            return this.saveStateOption;
-        } else {
-            return "tree";
-        }
-    }
-
-    private loadFromStorage(): null | string {
-        if (this.onGetStateFromStorage) {
-            return this.onGetStateFromStorage();
-        } else {
-            return localStorage.getItem(this.getKeyName());
-        }
-    }
-
-    private openInitialNodes(nodeIds: NodeId[]): boolean {
-        let mustLoadOnDemand = false;
-
-        for (const nodeId of nodeIds) {
-            const node = this.getNodeById(nodeId);
-
-            if (node) {
-                if (!node.load_on_demand) {
-                    node.is_open = true;
-                } else {
-                    mustLoadOnDemand = true;
-                }
-            }
-        }
-
-        return mustLoadOnDemand;
-    }
-
-    private parseState(jsonData: string): SavedState {
-        const state = JSON.parse(jsonData) as Record<string, unknown>;
-
-        // Check if selected_node is an int (instead of an array)
-        if (state.selected_node && isInt(state.selected_node)) {
-            // Convert to array
-            state.selected_node = [state.selected_node];
-        }
-
-        return state as unknown as SavedState;
-    }
-
-    private resetSelection(): void {
-        const selectedNodes = this.getSelectedNodes();
-
-        selectedNodes.forEach((node) => {
-            this.removeFromSelection(node);
-        });
-    }
-
-    private selectInitialNodes(nodeIds: NodeId[]): boolean {
-        let selectCount = 0;
-
-        for (const nodeId of nodeIds) {
-            const node = this.getNodeById(nodeId);
-
-            if (node) {
-                selectCount += 1;
-
-                this.addToSelection(node);
-            }
-        }
-
-        return selectCount !== 0;
-    }
-
     public getNodeIdToBeSelected(): NodeId | null {
         const state = this.getStateFromStorage();
 
@@ -271,5 +201,75 @@ export default class SaveStateHandler {
         };
 
         openNodes();
+    }
+
+    private getKeyName(): string {
+        if (typeof this.saveStateOption === "string") {
+            return this.saveStateOption;
+        } else {
+            return "tree";
+        }
+    }
+
+    private loadFromStorage(): null | string {
+        if (this.onGetStateFromStorage) {
+            return this.onGetStateFromStorage();
+        } else {
+            return localStorage.getItem(this.getKeyName());
+        }
+    }
+
+    private openInitialNodes(nodeIds: NodeId[]): boolean {
+        let mustLoadOnDemand = false;
+
+        for (const nodeId of nodeIds) {
+            const node = this.getNodeById(nodeId);
+
+            if (node) {
+                if (!node.load_on_demand) {
+                    node.is_open = true;
+                } else {
+                    mustLoadOnDemand = true;
+                }
+            }
+        }
+
+        return mustLoadOnDemand;
+    }
+
+    private parseState(jsonData: string): SavedState {
+        const state = JSON.parse(jsonData) as Record<string, unknown>;
+
+        // Check if selected_node is an int (instead of an array)
+        if (state.selected_node && isInt(state.selected_node)) {
+            // Convert to array
+            state.selected_node = [state.selected_node];
+        }
+
+        return state as unknown as SavedState;
+    }
+
+    private resetSelection(): void {
+        const selectedNodes = this.getSelectedNodes();
+
+        selectedNodes.forEach((node) => {
+            this.removeFromSelection(node);
+        });
+    }
+
+    private selectInitialNodes(nodeIds: NodeId[]): boolean {
+        let selectCount = 0;
+
+        for (const nodeId of nodeIds) {
+            const node = this.getNodeById(nodeId);
+
+            if (node) {
+                selectCount += 1;
+
+                this.addToSelection(node);
+            }
+        }
+
+        return selectCount !== 0;
     }
 }

@@ -26,6 +26,15 @@ class DragElement {
         treeElement.appendChild(this.element);
     }
 
+    public move(pageX: number, pageY: number): void {
+        this.element.style.left = `${pageX - this.offsetX}px`;
+        this.element.style.top = `${pageY - this.offsetY}px`;
+    }
+
+    public remove(): void {
+        this.element.remove();
+    }
+
     private createElement(nodeName: string, autoEscape: boolean) {
         const element = document.createElement("span");
         element.classList.add("jqtree-title", "jqtree-dragging");
@@ -39,15 +48,6 @@ class DragElement {
         element.style.position = "absolute";
 
         return element;
-    }
-
-    public move(pageX: number, pageY: number): void {
-        this.element.style.left = `${pageX - this.offsetX}px`;
-        this.element.style.top = `${pageY - this.offsetY}px`;
-    }
-
-    public remove(): void {
-        this.element.remove();
     }
 }
 

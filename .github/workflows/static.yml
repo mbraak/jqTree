@@ -20,6 +20,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,7 +29,7 @@ jobs:
       - name: Setup ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: '3.3.5'
       - name: Setup node
         uses: actions/setup-node@v4
         with:

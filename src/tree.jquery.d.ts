@@ -1,31 +1,3 @@
-type NodeId = number | string;
-
-interface NodeRecord {
-    [key: string]: unknown;
-    children?: NodeData[];
-    id?: NodeId;
-}
-
-type NodeData = NodeRecord | string;
-
-type IterateCallback = (node: INode, level: number) => boolean;
-
-interface INode {
-    [key: string]: unknown;
-    children: INode[];
-    element?: HTMLElement;
-    id?: NodeId;
-    is_open: boolean;
-    iterate(callback: IterateCallback): void;
-
-    name: string;
-
-    parent: INode | null;
-}
-
-type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
-type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
-
 interface ClickNodeEvent {
     click_event: JQuery.ClickEvent;
     deselected_node?: INode | null;
@@ -33,15 +5,9 @@ interface ClickNodeEvent {
     previous_node?: INode;
 }
 
-interface SelectNodeOptions {
-    mustSetFocus?: boolean;
-    mustToggle?: boolean;
-}
+type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
 
-interface SavedState {
-    open_nodes: NodeId[];
-    selected_node: NodeId[];
-}
+type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
 
 interface IJQTreeOptions {
     animationSpeed?: number | string;
@@ -160,6 +126,40 @@ interface IJQTreePlugin {
     (behavior: "updateNode", node: INode, data: NodeData): JQuery;
 }
 
+interface INode {
+    [key: string]: unknown;
+    children: INode[];
+    element?: HTMLElement;
+    id?: NodeId;
+    is_open: boolean;
+    iterate(callback: IterateCallback): void;
+
+    name: string;
+
+    parent: INode | null;
+}
+type IterateCallback = (node: INode, level: number) => boolean;
+
 interface JQuery {
     tree: IJQTreePlugin;
+}
+
+type NodeData = NodeRecord | string;
+
+type NodeId = number | string;
+
+interface NodeRecord {
+    [key: string]: unknown;
+    children?: NodeData[];
+    id?: NodeId;
+}
+
+interface SavedState {
+    open_nodes: NodeId[];
+    selected_node: NodeId[];
+}
+
+interface SelectNodeOptions {
+    mustSetFocus?: boolean;
+    mustToggle?: boolean;
 }
