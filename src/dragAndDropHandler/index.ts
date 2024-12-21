@@ -16,6 +16,7 @@ import { Node } from "../node";
 import NodeElement from "../nodeElement";
 import { getPositionName, Position } from "../position";
 import { getElementPosition } from "../util";
+import binarySearch from "./binarySearch";
 import DragElement from "./dragElement";
 import generateHitAreas from "./generateHitAreas";
 import { DropHint, HitArea } from "./types";
@@ -114,18 +115,14 @@ export class DragAndDropHandler {
         this.currentItem = null;
     }
 
-    private canMoveToArea(area: HitArea): boolean {
+    private canMoveToArea(area: HitArea, currentItem: NodeElement): boolean {
         if (!this.onCanMoveTo) {
             return true;
         }
 
-        if (!this.currentItem) {
-            return false;
-        }
-
         const positionName = getPositionName(area.position);
 
-        return this.onCanMoveTo(this.currentItem.node, area.node, positionName);
+        return this.onCanMoveTo(currentItem.node, area.node, positionName);
     }
 
     private clear(): void {
@@ -147,37 +144,26 @@ export class DragAndDropHandler {
             return null;
         }
 
-        let low = 0;
-        let high = this.hitAreas.length;
-        while (low < high) {
-            const mid = (low + high) >> 1;
-            const area = this.hitAreas[mid];
-
-            if (!area) {
-                return null;
-            }
-
+        return binarySearch<HitArea>(this.hitAreas, (area) => {
             if (y < area.top) {
-                high = mid;
+                return 1;
             } else if (y > area.bottom) {
-                low = mid + 1;
+                return -1;
             } else {
-                return area;
+                return 0;
             }
-        }
-
-        return null;
+        });
     }
 
-    private generateHitAreas(): void {
+    private generateHitAreas(currentNode: Node): void {
         const tree = this.getTree();
 
-        if (!this.currentItem || !tree) {
+        if (!tree) {
             this.hitAreas = [];
         } else {
             this.hitAreas = generateHitAreas(
                 tree,
-                this.currentItem.node,
+                currentNode,
                 this.getTreeDimensions().bottom,
             );
         }
@@ -198,12 +184,13 @@ export class DragAndDropHandler {
         };
     }
 
+    /* Move the dragged node to the selected position in the tree. */
     private moveItem(positionInfo: PositionInfo): void {
         if (
             this.currentItem &&
             this.hoveredArea &&
             this.hoveredArea.position !== Position.None &&
-            this.canMoveToArea(this.hoveredArea)
+            this.canMoveToArea(this.hoveredArea, this.currentItem)
         ) {
             const movedNode = this.currentItem.node;
             const targetNode = this.hoveredArea.node;
@@ -351,7 +338,7 @@ export class DragAndDropHandler {
             positionInfo.pageY,
         );
 
-        if (area && this.canMoveToArea(area)) {
+        if (area && this.canMoveToArea(area, this.currentItem)) {
             if (!area.node.isFolder()) {
                 this.stopOpenFolderTimer();
             }
@@ -440,11 +427,9 @@ export class DragAndDropHandler {
         this.removeHitAreas();
 
         if (this.currentItem) {
-            this.generateHitAreas();
-
-            this.currentItem = this.getNodeElementForNode(
-                this.currentItem.node,
-            );
+            const currentNode = this.currentItem.node;
+            this.generateHitAreas(currentNode);
+            this.currentItem = this.getNodeElementForNode(currentNode);
 
             if (this.isDragging) {
                 this.currentItem.element.classList.add("jqtree-moving");
