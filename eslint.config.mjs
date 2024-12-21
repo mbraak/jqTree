@@ -60,11 +60,11 @@ export default [
         },
     },
     {
-        files: ["src/test/jqTree/**/*.ts"],
+        files: ["src/test/**/*.ts"],
         ...testingLibraryPlugin.configs["flat/dom"],
     },
     {
-        files: ["src/test/jqTree/**/*.ts"],
+        files: ["src/test/**/*.ts"],
         ...jestDomPlugin.configs["flat/recommended"],
     },
     {
