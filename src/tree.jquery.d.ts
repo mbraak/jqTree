@@ -92,7 +92,7 @@ interface IJQTreePlugin {
         behavior: "moveNode",
         node: INode,
         targetNode: INode,
-        position: string,
+        position: "after" | "before" | "inside",
     ): JQuery;
     (behavior: "moveUp"): JQuery;
     (behavior: "openNode", node: INode): JQuery;

@@ -6,10 +6,9 @@ import { JQTreeOptions } from "./jqtreeOptions";
 import KeyHandler from "./keyHandler";
 import MouseHandler from "./mouseHandler";
 import { PositionInfo } from "./mouseUtils";
-import { Node } from "./node";
+import { Node, Position } from "./node";
 import NodeElement from "./nodeElement";
 import FolderElement from "./nodeElement/folderElement";
-import { getPosition } from "./position";
 import SaveStateHandler, { SavedState } from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
@@ -321,7 +320,11 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         return this.element;
     }
 
-    public moveNode(node?: Node, targetNode?: Node, position?: string): JQuery {
+    public moveNode(
+        node?: Node,
+        targetNode?: Node,
+        position?: Position,
+    ): JQuery {
         if (!node) {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
@@ -334,12 +337,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(PARAM_IS_EMPTY + "position");
         }
 
-        const positionIndex = getPosition(position);
-
-        if (positionIndex !== undefined) {
-            this.tree.moveNode(node, targetNode, positionIndex);
-            this.refreshElements(null);
-        }
+        this.tree.moveNode(node, targetNode, position);
+        this.refreshElements(null);
 
         return this.element;
     }
