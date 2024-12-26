@@ -15,6 +15,7 @@ interface CreateDragAndDropHandlerParams {
     onCanMove?: OnCanMove;
     onCanMoveTo?: OnCanMoveTo;
     onDragMove?: DragMethod;
+    onDragStop?: DragMethod;
     onIsMoveHandle?: OnIsMoveHandle;
     tree: Node;
 }
@@ -24,6 +25,7 @@ const createDragAndDropHandler = ({
     onCanMove,
     onCanMoveTo,
     onDragMove,
+    onDragStop,
     onIsMoveHandle,
     tree,
 }: CreateDragAndDropHandlerParams) => {
@@ -85,6 +87,7 @@ const createDragAndDropHandler = ({
         onCanMove,
         onCanMoveTo,
         onDragMove,
+        onDragStop,
         onIsMoveHandle,
         openFolderDelay: false,
         openNode,
@@ -502,6 +505,54 @@ describe(".mouseStop", () => {
         dragAndDropHandler.mouseStop(dragPositionInfo);
 
         expect(mockMoveNode).toHaveBeenCalledWith(node1, node2, "inside");
+    });
+
+    it("calls onDragStop when there is no hovered area", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const onDragStop = jest.fn();
+
+        const { dragAndDropHandler } = createDragAndDropHandler({
+            onDragStop,
+            tree,
+        });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        dragAndDropHandler.mouseStart(positionInfo);
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+
+        // Move mouse
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        });
+
+        // Stop
+        const originalEvent = new Event("mousemove");
+
+        dragAndDropHandler.mouseStop({
+            originalEvent,
+            pageX: 300,
+            pageY: 300,
+            target: document.body,
+        });
+
+        expect(onDragStop).toHaveBeenCalledWith(node1, originalEvent);
     });
 });
 
