@@ -1,6 +1,6 @@
 import { isNodeRecordWithChildren } from "./nodeUtils";
 
-export type Position = "after" | "before" | "inside" | "none";
+export type Position = "after" | "before" | "inside";
 
 type IterateCallback = (node: Node, level: number) => boolean;
 
@@ -542,9 +542,6 @@ export class Node implements INode {
                     targetNode.addChildAtPosition(movedNode, 0);
                     return true;
                 }
-
-                default:
-                    return false;
             }
         }
     }

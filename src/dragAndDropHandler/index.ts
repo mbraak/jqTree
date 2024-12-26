@@ -319,8 +319,7 @@ export class DragAndDropHandler {
     private moveItem(positionInfo: PositionInfo): void {
         if (
             this.currentItem &&
-            this.hoveredArea &&
-            this.hoveredArea.position !== "none" &&
+            this.hoveredArea?.position &&
             this.canMoveToArea(this.hoveredArea, this.currentItem)
         ) {
             const movedNode = this.currentItem.node;

@@ -1273,14 +1273,6 @@ describe("moveNode", () => {
             });
         });
     });
-
-    context("with position None", () => {
-        it("returns false", () => {
-            expect(given.tree.moveNode(given.child2, given.node2, "none")).toBe(
-                false,
-            );
-        });
-    });
 });
 
 describe("prepend", () => {

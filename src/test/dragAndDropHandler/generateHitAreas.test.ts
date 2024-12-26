@@ -49,7 +49,7 @@ describe("generateHitAreasForGroup", () => {
         const node = new Node(null);
         const hitPosition = {
             node,
-            position: "none" as Position,
+            position: null,
             top: 0,
         };
 
@@ -203,12 +203,12 @@ describe("generatePositions", () => {
         expect(generateHitPositions(tree, node1)).toEqual([
             expect.objectContaining({
                 node: node1,
-                position: "none",
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
                 node: node1,
-                position: "none",
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
@@ -243,12 +243,12 @@ describe("generatePositions", () => {
         expect(generateHitPositions(tree, node1)).toEqual([
             expect.objectContaining({
                 node: node1,
-                position: "none",
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
                 node: node1,
-                position: "none",
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
@@ -303,17 +303,17 @@ describe("generatePositions", () => {
             }),
             expect.objectContaining({
                 node: node1,
-                position: "none",
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
                 node: node2,
-                position: "none",
+                position: null,
                 top: 120,
             }),
             expect.objectContaining({
                 node: node2,
-                position: "none",
+                position: null,
                 top: 135,
             }),
         ]);
