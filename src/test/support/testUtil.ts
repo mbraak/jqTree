@@ -56,6 +56,10 @@ export const generateHtmlElementsForTree = (tree: Node) => {
         const element = document.createElement("div");
         parentElement.append(element);
 
+        const childElement = document.createElement("div");
+        childElement.className = "jqtree-element";
+        element.append(childElement);
+
         if (!isTree) {
             mockLayout(element, { height: 20, width: 100 - x, x, y });
             node.element = element;

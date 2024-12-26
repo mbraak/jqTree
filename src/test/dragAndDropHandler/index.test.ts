@@ -1,6 +1,11 @@
 import { DragAndDropHandler } from "../../dragAndDropHandler";
 import { GetTree } from "../../jqtreeMethodTypes";
-import { DragMethod, OnCanMove, OnIsMoveHandle } from "../../jqtreeOptions";
+import {
+    DragMethod,
+    OnCanMove,
+    OnCanMoveTo,
+    OnIsMoveHandle,
+} from "../../jqtreeOptions";
 import { Node } from "../../node";
 import NodeElement from "../../nodeElement";
 import { Position } from "../../position";
@@ -9,6 +14,7 @@ import { generateHtmlElementsForTree } from "../support/testUtil";
 interface CreateDragAndDropHandlerParams {
     getTree?: GetTree;
     onCanMove?: OnCanMove;
+    onCanMoveTo?: OnCanMoveTo;
     onDragMove?: DragMethod;
     onIsMoveHandle?: OnIsMoveHandle;
     tree: Node;
@@ -17,6 +23,7 @@ interface CreateDragAndDropHandlerParams {
 const createDragAndDropHandler = ({
     getTree,
     onCanMove,
+    onCanMoveTo,
     onDragMove,
     onIsMoveHandle,
     tree,
@@ -70,6 +77,7 @@ const createDragAndDropHandler = ({
         getScrollLeft,
         getTree: getTree ?? jest.fn(() => tree),
         onCanMove,
+        onCanMoveTo,
         onDragMove,
         onIsMoveHandle,
         openFolderDelay: false,
@@ -468,6 +476,42 @@ describe(".mouseDrag", () => {
         );
     });
 
+    it("creates a border drop hint", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const dragAndDropHandler = createDragAndDropHandler({ tree });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        dragAndDropHandler.mouseStart(positionInfo);
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+        expect(dragAndDropHandler.hoveredArea).toBeNull();
+
+        // Move mouse
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        });
+
+        expect(
+            node2.element?.querySelector(".jqtree-border"),
+        ).toBeInTheDocument();
+    });
+
     it("returns false when dragging hasn't started", () => {
         const tree = new Node(null, true);
         const node1 = new Node({ name: "node1" });
@@ -561,6 +605,49 @@ describe(".mouseDrag", () => {
             node1,
             positionInfoForDragging.originalEvent,
         );
+    });
+
+    it("doesn't create a drop hint when onCanMoveTo returns false", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const onCanMoveTo = jest.fn(() => false);
+
+        const dragAndDropHandler = createDragAndDropHandler({
+            onCanMoveTo,
+            tree,
+        });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        dragAndDropHandler.mouseStart(positionInfo);
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+
+        // Move mouse
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        });
+
+        expect(onCanMoveTo).toHaveBeenCalledWith(node1, node2, "inside");
+
+        // Still sets hoveredArea to the new node
+        expect(dragAndDropHandler.hoveredArea?.node).toEqual(node2);
+
+        expect(node2.element?.querySelector(".jqtree-border")).toBeNull();
     });
 });
 
