@@ -53,16 +53,21 @@ export const generateHtmlElementsForTree = (tree: Node) => {
         x: number,
     ) {
         const isTree = node.tree === node;
-        const element = document.createElement("div");
-        parentElement.append(element);
+        const listElement = document.createElement("li");
 
-        const childElement = document.createElement("div");
-        childElement.className = "jqtree-element";
-        element.append(childElement);
+        if (node.hasChildren()) {
+            listElement.className = "jqtree-folder";
+        }
+
+        parentElement.append(listElement);
+
+        const divElement = document.createElement("div");
+        divElement.className = "jqtree-element";
+        listElement.append(divElement);
 
         if (!isTree) {
-            mockLayout(element, { height: 20, width: 100 - x, x, y });
-            node.element = element;
+            mockLayout(listElement, { height: 20, width: 100 - x, x, y });
+            node.element = listElement;
             y += 20;
         }
 
@@ -70,13 +75,13 @@ export const generateHtmlElementsForTree = (tree: Node) => {
             for (const child of node.children) {
                 generateHtmlElementsForNode(
                     child,
-                    element,
+                    listElement,
                     isTree ? x : x + 10,
                 );
             }
         }
 
-        return element;
+        return listElement;
     }
 
     const treeElement = generateHtmlElementsForNode(tree, document.body, 0);
