@@ -2,7 +2,6 @@ import getGiven from "givens";
 import "jest-extended";
 
 import { Node } from "../node";
-import { Position } from "../position";
 import exampleData from "./support/exampleData";
 
 const context = describe;
@@ -1174,7 +1173,7 @@ describe("moveNode", () => {
     context("when moving after a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child2, given.node2, Position.After),
+                given.tree.moveNode(given.child2, given.node2, "after"),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1193,11 +1192,7 @@ describe("moveNode", () => {
         context("when the target is the root node", () => {
             it("returns false", () => {
                 expect(
-                    given.tree.moveNode(
-                        given.child2,
-                        given.tree,
-                        Position.After,
-                    ),
+                    given.tree.moveNode(given.child2, given.tree, "after"),
                 ).toBe(false);
             });
         });
@@ -1206,7 +1201,7 @@ describe("moveNode", () => {
     context("when moving inside a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child1, given.node2, Position.Inside),
+                given.tree.moveNode(given.child1, given.node2, "inside"),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1231,11 +1226,7 @@ describe("moveNode", () => {
     context("when moving before a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(
-                    given.child2,
-                    given.child1,
-                    Position.Before,
-                ),
+                given.tree.moveNode(given.child2, given.child1, "before"),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
@@ -1256,11 +1247,7 @@ describe("moveNode", () => {
         context("when the target is the root node", () => {
             it("returns false", () => {
                 expect(
-                    given.tree.moveNode(
-                        given.child2,
-                        given.tree,
-                        Position.Before,
-                    ),
+                    given.tree.moveNode(given.child2, given.tree, "before"),
                 ).toBe(false);
             });
         });
@@ -1269,7 +1256,7 @@ describe("moveNode", () => {
     context("when the moved node is a parent of the target node", () => {
         it("doesn't move the node", () => {
             expect(
-                given.tree.moveNode(given.node1, given.child1, Position.Before),
+                given.tree.moveNode(given.node1, given.child1, "before"),
             ).toBe(false);
 
             expect(given.tree).toMatchObject({
@@ -1289,9 +1276,9 @@ describe("moveNode", () => {
 
     context("with position None", () => {
         it("returns false", () => {
-            expect(
-                given.tree.moveNode(given.child2, given.node2, Position.None),
-            ).toBe(false);
+            expect(given.tree.moveNode(given.child2, given.node2, "none")).toBe(
+                false,
+            );
         });
     });
 });

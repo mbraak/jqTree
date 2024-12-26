@@ -1,5 +1,5 @@
 import { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
-import { Position } from "../position";
+import { Position } from "../node";
 import NodeElement, { NodeElementParams } from "./index";
 
 interface FolderElementParams extends NodeElementParams {
@@ -117,7 +117,7 @@ class FolderElement extends NodeElement {
     }
 
     protected mustShowBorderDropHint(position: Position): boolean {
-        return !this.node.is_open && position === Position.Inside;
+        return !this.node.is_open && position === "inside";
     }
 
     private getButton(): HTMLLinkElement {

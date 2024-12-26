@@ -14,7 +14,6 @@ import {
 import { PositionInfo } from "../mouseUtils";
 import { Node } from "../node";
 import NodeElement from "../nodeElement";
-import { getPositionName, Position } from "../position";
 import { getElementPosition } from "../util";
 import binarySearch from "./binarySearch";
 import DragElement from "./dragElement";
@@ -254,9 +253,7 @@ export class DragAndDropHandler {
             return true;
         }
 
-        const positionName = getPositionName(area.position);
-
-        return this.onCanMoveTo(currentItem.node, area.node, positionName);
+        return this.onCanMoveTo(currentItem.node, area.node, area.position);
     }
 
     private clear(): void {
@@ -323,7 +320,7 @@ export class DragAndDropHandler {
         if (
             this.currentItem &&
             this.hoveredArea &&
-            this.hoveredArea.position !== Position.None &&
+            this.hoveredArea.position !== "none" &&
             this.canMoveToArea(this.hoveredArea, this.currentItem)
         ) {
             const movedNode = this.currentItem.node;
@@ -331,7 +328,7 @@ export class DragAndDropHandler {
             const position = this.hoveredArea.position;
             const previousParent = movedNode.parent;
 
-            if (position === Position.Inside) {
+            if (position === "inside") {
                 this.hoveredArea.node.is_open = true;
             }
 
@@ -351,7 +348,7 @@ export class DragAndDropHandler {
                     do_move: doMove,
                     moved_node: movedNode,
                     original_event: positionInfo.originalEvent,
-                    position: getPositionName(position),
+                    position,
                     previous_parent: previousParent,
                     target_node: targetNode,
                 },
@@ -376,11 +373,7 @@ export class DragAndDropHandler {
     private mustOpenFolderTimer(area: HitArea): boolean {
         const node = area.node;
 
-        return (
-            node.isFolder() &&
-            !node.is_open &&
-            area.position === Position.Inside
-        );
+        return node.isFolder() && !node.is_open && area.position === "inside";
     }
 
     private removeDropHint(): void {

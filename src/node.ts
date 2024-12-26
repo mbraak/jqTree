@@ -1,5 +1,6 @@
 import { isNodeRecordWithChildren } from "./nodeUtils";
-import { Position } from "./position";
+
+export type Position = "after" | "before" | "inside" | "none";
 
 type IterateCallback = (node: Node, level: number) => boolean;
 
@@ -514,7 +515,7 @@ export class Node implements INode {
             movedNode.parent.doRemoveChild(movedNode);
 
             switch (position) {
-                case Position.After: {
+                case "after": {
                     if (targetNode.parent) {
                         targetNode.parent.addChildAtPosition(
                             movedNode,
@@ -525,7 +526,7 @@ export class Node implements INode {
                     return false;
                 }
 
-                case Position.Before: {
+                case "before": {
                     if (targetNode.parent) {
                         targetNode.parent.addChildAtPosition(
                             movedNode,
@@ -536,7 +537,7 @@ export class Node implements INode {
                     return false;
                 }
 
-                case Position.Inside: {
+                case "inside": {
                     // move inside as first child
                     targetNode.addChildAtPosition(movedNode, 0);
                     return true;
