@@ -8,7 +8,6 @@ import {
 } from "../../jqtreeOptions";
 import { Node } from "../../node";
 import NodeElement from "../../nodeElement";
-import { Position } from "../../position";
 import { generateHtmlElementsForTree } from "../support/testUtil";
 
 interface CreateDragAndDropHandlerParams {
@@ -470,7 +469,7 @@ describe(".mouseDrag", () => {
             expect.objectContaining({
                 bottom: 38,
                 node: node2,
-                position: Position.Inside,
+                position: "inside",
                 top: 20,
             }),
         );
@@ -679,13 +678,13 @@ describe(".refresh", () => {
             expect.objectContaining({
                 bottom: 38,
                 node: node2,
-                position: Position.Inside,
+                position: "inside",
                 top: 20,
             }),
             expect.objectContaining({
                 bottom: 56,
                 node: node2,
-                position: Position.After,
+                position: "after",
                 top: 38,
             }),
         ]);

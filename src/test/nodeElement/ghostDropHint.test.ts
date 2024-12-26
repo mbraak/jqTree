@@ -1,6 +1,5 @@
 import { Node } from "../../node";
 import GhostDropHint from "../../nodeElement/ghostDropHint";
-import { Position } from "../../position";
 
 beforeEach(() => {
     document.body.innerHTML = "";
@@ -11,7 +10,7 @@ it("creates a hint element after the node element when the position is After", (
     document.body.append(nodeElement);
 
     const node = new Node();
-    new GhostDropHint(node, nodeElement, Position.After);
+    new GhostDropHint(node, nodeElement, "after");
 
     expect(nodeElement.nextSibling).toHaveClass("jqtree-ghost");
     expect(nodeElement.previousSibling).toBeNull();
@@ -23,7 +22,7 @@ it("creates a hint element after the node element when the position is Before", 
     document.body.append(nodeElement);
 
     const node = new Node();
-    new GhostDropHint(node, nodeElement, Position.Before);
+    new GhostDropHint(node, nodeElement, "before");
 
     expect(nodeElement.previousSibling).toHaveClass("jqtree-ghost");
     expect(nodeElement.nextSibling).toBeNull();
@@ -42,7 +41,7 @@ it("creates a hint element after the node element when the position is Inside an
     childNode.element = childElement;
     node.addChild(childNode);
 
-    new GhostDropHint(node, nodeElement, Position.Inside);
+    new GhostDropHint(node, nodeElement, "inside");
 
     expect(nodeElement.previousSibling).toBeNull();
     expect(nodeElement.nextSibling).toBeNull();
@@ -57,7 +56,7 @@ it("creates a hint element after the node element when the position is Inside an
     const node = new Node();
     node.addChild(new Node());
 
-    new GhostDropHint(node, nodeElement, Position.Inside);
+    new GhostDropHint(node, nodeElement, "inside");
 
     expect(nodeElement.nextSibling).toHaveClass("jqtree-ghost");
     expect(nodeElement.previousSibling).toBeNull();
