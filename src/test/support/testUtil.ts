@@ -47,27 +47,41 @@ export const mockLayout = (element: HTMLElement, rect: Rect) => {
 export const generateHtmlElementsForTree = (tree: Node) => {
     let y = 0;
 
+    const createNodeElement = (node: Node) => {
+        const isTree = node.tree === node;
+
+        if (isTree) {
+            const element = document.createElement("ul");
+            element.className = "jqtree-tree";
+            return element;
+        } else {
+            const element = document.createElement("li");
+
+            if (node.hasChildren()) {
+                element.className = "jqtree-folder";
+            }
+
+            return element;
+        }
+    };
+
     function generateHtmlElementsForNode(
         node: Node,
         parentElement: HTMLElement,
         x: number,
     ) {
         const isTree = node.tree === node;
-        const listElement = document.createElement("li");
+        const nodeElement = createNodeElement(node);
 
-        if (node.hasChildren()) {
-            listElement.className = "jqtree-folder";
-        }
-
-        parentElement.append(listElement);
-
-        const divElement = document.createElement("div");
-        divElement.className = "jqtree-element";
-        listElement.append(divElement);
+        parentElement.append(nodeElement);
 
         if (!isTree) {
-            mockLayout(listElement, { height: 20, width: 100 - x, x, y });
-            node.element = listElement;
+            const divElement = document.createElement("div");
+            divElement.className = "jqtree-element";
+            nodeElement.append(divElement);
+
+            mockLayout(nodeElement, { height: 20, width: 100 - x, x, y });
+            node.element = nodeElement;
             y += 20;
         }
 
@@ -75,13 +89,13 @@ export const generateHtmlElementsForTree = (tree: Node) => {
             for (const child of node.children) {
                 generateHtmlElementsForNode(
                     child,
-                    listElement,
+                    nodeElement,
                     isTree ? x : x + 10,
                 );
             }
         }
 
-        return listElement;
+        return nodeElement;
     }
 
     const treeElement = generateHtmlElementsForNode(tree, document.body, 0);
