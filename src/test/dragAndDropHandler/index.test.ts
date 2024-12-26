@@ -458,6 +458,51 @@ describe(".mouseStop", () => {
             }),
         );
     });
+
+    it("calls tree.moveNode", () => {
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+
+        const mockMoveNode = jest.spyOn(tree, "moveNode");
+
+        const { dragAndDropHandler } = createDragAndDropHandler({
+            tree,
+        });
+
+        // Capture
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+        expect(dragAndDropHandler.currentItem?.node).toBe(node1);
+
+        // Start
+        expect(dragAndDropHandler.mouseStart(positionInfo)).toBeTrue();
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+
+        // Drag
+        const dragPositionInfo = {
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseDrag(dragPositionInfo);
+        expect(dragAndDropHandler.hoveredArea?.node).toEqual(node2);
+
+        // Stop
+        dragAndDropHandler.mouseStop(dragPositionInfo);
+
+        expect(mockMoveNode).toHaveBeenCalledWith(node1, node2, "inside");
+    });
 });
 
 describe(".mouseDrag", () => {
