@@ -1,5 +1,4 @@
-import { Node } from "../node";
-import { Position } from "../position";
+import { Node, Position } from "../node";
 
 export interface DropHint {
     remove: () => void;

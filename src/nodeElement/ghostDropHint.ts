@@ -1,6 +1,5 @@
 import { DropHint } from "../dragAndDropHandler/types";
-import { Node } from "../node";
-import { Position } from "../position";
+import { Node, Position } from "../node";
 
 class GhostDropHint implements DropHint {
     private element: HTMLElement;
@@ -13,15 +12,15 @@ class GhostDropHint implements DropHint {
         this.ghost = this.createGhostElement();
 
         switch (position) {
-            case Position.After:
+            case "after":
                 this.moveAfter();
                 break;
 
-            case Position.Before:
+            case "before":
                 this.moveBefore();
                 break;
 
-            case Position.Inside: {
+            case "inside": {
                 if (node.isFolder() && node.is_open) {
                     this.moveInsideOpenFolder();
                 } else {

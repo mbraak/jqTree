@@ -1,7 +1,6 @@
 import { DropHint } from "../dragAndDropHandler/types";
 import { GetScrollLeft } from "../jqtreeMethodTypes";
-import { Node } from "../node";
-import { Position } from "../position";
+import { Node, Position } from "../node";
 import BorderDropHint from "./borderDropHint";
 import GhostDropHint from "./ghostDropHint";
 
@@ -32,7 +31,7 @@ class NodeElement {
         this.init(node);
     }
 
-    public addDropHint(position: number): DropHint {
+    public addDropHint(position: Position): DropHint {
         if (this.mustShowBorderDropHint(position)) {
             return new BorderDropHint(this.element, this.getScrollLeft());
         } else {
@@ -89,7 +88,7 @@ class NodeElement {
     }
 
     protected mustShowBorderDropHint(position: Position): boolean {
-        return position === Position.Inside;
+        return position === "inside";
     }
 }
 

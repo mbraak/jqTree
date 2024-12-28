@@ -47,18 +47,35 @@ export const mockLayout = (element: HTMLElement, rect: Rect) => {
 export const generateHtmlElementsForTree = (tree: Node) => {
     let y = 0;
 
+    const createNodeElement = (node: Node) => {
+        const isTree = node.tree === node;
+
+        if (isTree) {
+            const element = document.createElement("ul");
+            element.className = "jqtree-tree";
+            return element;
+        } else {
+            return document.createElement("li");
+        }
+    };
+
     function generateHtmlElementsForNode(
         node: Node,
         parentElement: HTMLElement,
         x: number,
     ) {
         const isTree = node.tree === node;
-        const element = document.createElement("div");
-        parentElement.append(element);
+        const nodeElement = createNodeElement(node);
+
+        parentElement.append(nodeElement);
 
         if (!isTree) {
-            mockLayout(element, { height: 20, width: 100 - x, x, y });
-            node.element = element;
+            const divElement = document.createElement("div");
+            divElement.className = "jqtree-element";
+            nodeElement.append(divElement);
+
+            mockLayout(nodeElement, { height: 20, width: 100 - x, x, y });
+            node.element = nodeElement;
             y += 20;
         }
 
@@ -66,13 +83,13 @@ export const generateHtmlElementsForTree = (tree: Node) => {
             for (const child of node.children) {
                 generateHtmlElementsForNode(
                     child,
-                    element,
+                    nodeElement,
                     isTree ? x : x + 10,
                 );
             }
         }
 
-        return element;
+        return nodeElement;
     }
 
     const treeElement = generateHtmlElementsForNode(tree, document.body, 0);
