@@ -4,14 +4,16 @@
   "scripts": {
     "jekyll-build": "bundle exec jekyll build",
     "jekyll-serve": "bundle exec jekyll serve",
-    "build_docs_css": "pnpm tailwind && pnpm build_example_css && pnpm copy_static",
+    "build_docs_css": "pnpm tailwind && pnpm build_example_css && pnpm copy_jqtree && pnpm copy_vendor_files",
     "tailwind": "tailwindcss -i documentation.css -o static/documentation.css",
     "build_example_css": "postcss -o static/example.css static/example.postcss",
-    "copy_static": "cp ../tree.jquery.js . && cp ../jqtree.css ."
+    "copy_jqtree": "cp ../tree.jquery.js . && cp ../jqtree.css .",
+    "copy_vendor_files": "mkdir static/vendor && cp node_modules/jquery-mockjax/dist/jquery.mockjax.min.js static/vendor"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
     "autoprefixer": "^10.4.20",
+    "jquery-mockjax": "^2.7.0-beta.0",
     "postcss": "^8.4.49",
     "postcss-cli": "^11.0.0",
     "postcss-import": "^16.1.0",
