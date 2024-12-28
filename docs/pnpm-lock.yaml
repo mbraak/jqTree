@@ -14,6 +14,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
+      jquery:
+        specifier: ^3.7.1
+        version: 3.7.1
       jquery-mockjax:
         specifier: ^2.7.0-beta.0
         version: 2.7.0-beta.0
@@ -303,6 +306,9 @@ packages:
 
   jquery-mockjax@2.7.0-beta.0:
     resolution: {integrity: sha512-qn/RJijeLj1GNeMLLAGkZG9sha5muKCoj/e61bRKjXJZ6xKypq5K0hW/qxfQ2xDgyj5KwIRcLEpAomOsLa+qTQ==}
+
+  jquery@3.7.1:
+    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
 
   jsonfile@6.1.0:
     resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}
@@ -914,6 +920,8 @@ snapshots:
   jiti@1.21.6: {}
 
   jquery-mockjax@2.7.0-beta.0: {}
+
+  jquery@3.7.1: {}
 
   jsonfile@6.1.0:
     dependencies:
