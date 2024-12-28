@@ -1,0 +1,3 @@
+mkdir -p static/vendor
+cp node_modules/jquery-mockjax/dist/jquery.mockjax.min.js static/vendor
+cp node_modules/jquery/dist/jquery.min.js static/vendor
