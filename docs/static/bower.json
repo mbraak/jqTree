@@ -1,6 +1,4 @@
 {
     "name": "jqtree-docs",
-    "dependencies": {
-        "fontawesome": "^6.3.0"
-    }
+    "dependencies": {}
 }
