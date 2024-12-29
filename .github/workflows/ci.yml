@@ -54,6 +54,9 @@ jobs:
               run: pnpm run jest
             - name: Playwright install
               run: npx playwright install chromium
+            - name: Copy vendor files
+              run: pnpm install && pnpm run copy_vendor_files
+              working-directory: ./docs
             - name: Run playwright tests
               run: pnpm run playwright
             - name: Screenshots artifact
