@@ -1,7 +1,7 @@
 /*
 JqTree 1.8.8
 
-Copyright 2024 Marco Braak
+Copyright 2025 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -118,31 +118,6 @@ var jqtree = (function (exports) {
         void jQuery.ajax(ajaxSettings);
       }
     }
-
-    let Position = /*#__PURE__*/function (Position) {
-      Position[Position["Before"] = 1] = "Before";
-      Position[Position["After"] = 2] = "After";
-      Position[Position["Inside"] = 3] = "Inside";
-      Position[Position["None"] = 4] = "None";
-      return Position;
-    }({});
-    const positionNames = {
-      after: Position.After,
-      before: Position.Before,
-      inside: Position.Inside,
-      none: Position.None
-    };
-    const getPositionName = position => {
-      for (const name in positionNames) {
-        if (Object.prototype.hasOwnProperty.call(positionNames, name)) {
-          if (positionNames[name] === position) {
-            return name;
-          }
-        }
-      }
-      return "";
-    };
-    const getPosition = name => positionNames[name];
 
     const isInt = n => typeof n === "number" && n % 1 === 0;
     const isFunction = v => typeof v === "function";
@@ -278,43 +253,43 @@ var jqtree = (function (exports) {
       const handleAfterOpenFolder = (node, nextNode) => {
         if (node === currentNode || nextNode === currentNode) {
           // Cannot move before or after current item
-          addHitPosition(node, Position.None, lastTop);
+          addHitPosition(node, null, lastTop);
         } else {
-          addHitPosition(node, Position.After, lastTop);
+          addHitPosition(node, "after", lastTop);
         }
       };
       const handleClosedFolder = (node, nextNode, element) => {
         const top = getOffsetTop(element);
         if (node === currentNode) {
           // Cannot move after current item
-          addHitPosition(node, Position.None, top);
+          addHitPosition(node, null, top);
         } else {
-          addHitPosition(node, Position.Inside, top);
+          addHitPosition(node, "inside", top);
 
           // Cannot move before current item
           if (nextNode !== currentNode) {
-            addHitPosition(node, Position.After, top);
+            addHitPosition(node, "after", top);
           }
         }
       };
       const handleFirstNode = node => {
         if (node !== currentNode && node.element) {
-          addHitPosition(node, Position.Before, getOffsetTop(node.element));
+          addHitPosition(node, "before", getOffsetTop(node.element));
         }
       };
       const handleNode = (node, nextNode, element) => {
         const top = getOffsetTop(element);
         if (node === currentNode) {
           // Cannot move inside current item
-          addHitPosition(node, Position.None, top);
+          addHitPosition(node, null, top);
         } else {
-          addHitPosition(node, Position.Inside, top);
+          addHitPosition(node, "inside", top);
         }
         if (nextNode === currentNode || node === currentNode) {
           // Cannot move before or after current item
-          addHitPosition(node, Position.None, top);
+          addHitPosition(node, null, top);
         } else {
-          addHitPosition(node, Position.After, top);
+          addHitPosition(node, "after", top);
         }
       };
       const handleOpenFolder = (node, element) => {
@@ -324,10 +299,10 @@ var jqtree = (function (exports) {
           // Dnd over the current element is not possible: add a position with type None for the top and the bottom.
           const top = getOffsetTop(element);
           const height = element.clientHeight;
-          addHitPosition(node, Position.None, top);
+          addHitPosition(node, null, top);
           if (height > 5) {
             // Subtract 5 pixels to allow more space for the next element.
-            addHitPosition(node, Position.None, top + height - 5);
+            addHitPosition(node, null, top + height - 5);
           }
 
           // Stop iterating
@@ -336,7 +311,7 @@ var jqtree = (function (exports) {
 
         // Cannot move before current item
         if (node.children[0] !== currentNode) {
-          addHitPosition(node, Position.Inside, getOffsetTop(element));
+          addHitPosition(node, "inside", getOffsetTop(element));
         }
 
         // Continue iterating
@@ -358,7 +333,7 @@ var jqtree = (function (exports) {
       let areaTop = top;
       for (let i = 0; i < positionCount; i++) {
         const position = positionsInGroup[i];
-        if (position.position !== Position.None) {
+        if (position.position) {
           hitAreas.push({
             bottom: areaTop + areaHeight,
             node: position.node,
@@ -533,8 +508,7 @@ var jqtree = (function (exports) {
         if (!this.onCanMoveTo) {
           return true;
         }
-        const positionName = getPositionName(area.position);
-        return this.onCanMoveTo(currentItem.node, area.node, positionName);
+        return this.onCanMoveTo(currentItem.node, area.node, area.position);
       }
       clear() {
         if (this.dragElement) {
@@ -581,12 +555,12 @@ var jqtree = (function (exports) {
 
       /* Move the dragged node to the selected position in the tree. */
       moveItem(positionInfo) {
-        if (this.currentItem && this.hoveredArea && this.hoveredArea.position !== Position.None && this.canMoveToArea(this.hoveredArea, this.currentItem)) {
+        if (this.currentItem && this.hoveredArea?.position && this.canMoveToArea(this.hoveredArea, this.currentItem)) {
           const movedNode = this.currentItem.node;
           const targetNode = this.hoveredArea.node;
           const position = this.hoveredArea.position;
           const previousParent = movedNode.parent;
-          if (position === Position.Inside) {
+          if (position === "inside") {
             this.hoveredArea.node.is_open = true;
           }
           const doMove = () => {
@@ -602,7 +576,7 @@ var jqtree = (function (exports) {
               do_move: doMove,
               moved_node: movedNode,
               original_event: positionInfo.originalEvent,
-              position: getPositionName(position),
+              position,
               previous_parent: previousParent,
               target_node: targetNode
             }
@@ -618,7 +592,7 @@ var jqtree = (function (exports) {
       }
       mustOpenFolderTimer(area) {
         const node = area.node;
-        return node.isFolder() && !node.is_open && area.position === Position.Inside;
+        return node.isFolder() && !node.is_open && area.position === "inside";
       }
       removeDropHint() {
         if (this.previousGhost) {
@@ -1678,7 +1652,7 @@ var jqtree = (function (exports) {
         } else {
           movedNode.parent.doRemoveChild(movedNode);
           switch (position) {
-            case Position.After:
+            case "after":
               {
                 if (targetNode.parent) {
                   targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
@@ -1686,7 +1660,7 @@ var jqtree = (function (exports) {
                 }
                 return false;
               }
-            case Position.Before:
+            case "before":
               {
                 if (targetNode.parent) {
                   targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
@@ -1694,14 +1668,12 @@ var jqtree = (function (exports) {
                 }
                 return false;
               }
-            case Position.Inside:
+            case "inside":
               {
                 // move inside as first child
                 targetNode.addChildAtPosition(movedNode, 0);
                 return true;
               }
-            default:
-              return false;
           }
         }
       }
@@ -1825,13 +1797,13 @@ var jqtree = (function (exports) {
         this.node = node;
         this.ghost = this.createGhostElement();
         switch (position) {
-          case Position.After:
+          case "after":
             this.moveAfter();
             break;
-          case Position.Before:
+          case "before":
             this.moveBefore();
             break;
-          case Position.Inside:
+          case "inside":
             {
               if (node.isFolder() && node.is_open) {
                 this.moveInsideOpenFolder();
@@ -1928,7 +1900,7 @@ var jqtree = (function (exports) {
         return this.element.querySelector(":scope > ul");
       }
       mustShowBorderDropHint(position) {
-        return position === Position.Inside;
+        return position === "inside";
       }
     }
 
@@ -2013,7 +1985,7 @@ var jqtree = (function (exports) {
         }
       }
       mustShowBorderDropHint(position) {
-        return !this.node.is_open && position === Position.Inside;
+        return !this.node.is_open && position === "inside";
       }
       getButton() {
         return this.element.querySelector(":scope > .jqtree-element > a.jqtree-toggler");
@@ -2919,11 +2891,8 @@ var jqtree = (function (exports) {
         if (!position) {
           throw Error(PARAM_IS_EMPTY + "position");
         }
-        const positionIndex = getPosition(position);
-        if (positionIndex !== undefined) {
-          this.tree.moveNode(node, targetNode, positionIndex);
-          this.refreshElements(null);
-        }
+        this.tree.moveNode(node, targetNode, position);
+        this.refreshElements(null);
         return this.element;
       }
       moveUp() {
