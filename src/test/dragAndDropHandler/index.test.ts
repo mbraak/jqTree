@@ -1,5 +1,5 @@
 import { DragAndDropHandler } from "../../dragAndDropHandler";
-import { GetTree } from "../../jqtreeMethodTypes";
+import { GetTree, OpenNode } from "../../jqtreeMethodTypes";
 import {
     DragMethod,
     OnCanMove,
@@ -17,6 +17,8 @@ interface CreateDragAndDropHandlerParams {
     onDragMove?: DragMethod;
     onDragStop?: DragMethod;
     onIsMoveHandle?: OnIsMoveHandle;
+    openFolderDelay?: false | number;
+    openNode?: OpenNode;
     tree: Node;
 }
 
@@ -27,10 +29,11 @@ const createDragAndDropHandler = ({
     onDragMove,
     onDragStop,
     onIsMoveHandle,
+    openFolderDelay,
+    openNode,
     tree,
 }: CreateDragAndDropHandlerParams) => {
     const getScrollLeft = jest.fn();
-    const openNode = jest.fn();
     const refreshElements = jest.fn();
 
     const treeElement = generateHtmlElementsForTree(tree);
@@ -89,8 +92,8 @@ const createDragAndDropHandler = ({
         onDragMove,
         onDragStop,
         onIsMoveHandle,
-        openFolderDelay: false,
-        openNode,
+        openFolderDelay: openFolderDelay ?? false,
+        openNode: openNode ?? jest.fn(),
         refreshElements,
         slide: false,
         treeElement: treeElement,
@@ -102,6 +105,10 @@ const createDragAndDropHandler = ({
 
 beforeEach(() => {
     document.body.innerHTML = "";
+});
+
+afterEach(() => {
+    jest.useRealTimers();
 });
 
 describe(".mouseCapture", () => {
@@ -809,6 +816,52 @@ describe(".mouseDrag", () => {
         expect(dragAndDropHandler.hoveredArea?.node).toEqual(node2);
 
         expect(node2.element?.querySelector(".jqtree-border")).toBeNull();
+    });
+
+    it("opens a closed folder when it is hovered for a certain time", () => {
+        jest.useFakeTimers();
+
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+        node2.addChild(new Node({ name: "child" }));
+
+        const openNode = jest.fn();
+
+        const { dragAndDropHandler } = createDragAndDropHandler({
+            openFolderDelay: 100,
+            openNode,
+            tree,
+        });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        dragAndDropHandler.mouseStart(positionInfo);
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+
+        // Move mouse
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        });
+
+        jest.advanceTimersByTime(10);
+        expect(openNode).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(100);
+        expect(openNode).toHaveBeenCalled();
     });
 });
 
