@@ -86,6 +86,7 @@ export class DragAndDropHandler {
         onDragMove,
         onDragStop,
         onIsMoveHandle,
+        openFolderDelay,
         openNode,
         refreshElements,
         slide,
@@ -102,6 +103,7 @@ export class DragAndDropHandler {
         this.onDragMove = onDragMove;
         this.onDragStop = onDragStop;
         this.onIsMoveHandle = onIsMoveHandle;
+        this.openFolderDelay = openFolderDelay;
         this.openNode = openNode;
         this.refreshElements = refreshElements;
         this.slide = slide;

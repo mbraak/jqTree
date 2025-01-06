@@ -51,7 +51,8 @@ const initTree = async (
             dragAndDrop: ${dragAndDrop ?? false},
             onCanMove: ${onCanMove ? "onCanMove" : "null"},
             onCanMoveTo: ${onCanMoveTo ? "onCanMoveTo" : "null"},
-            startDndDelay: 100,
+            openFolderDelay: 100,
+            startDndDelay: 100
         });
     `);
 };
