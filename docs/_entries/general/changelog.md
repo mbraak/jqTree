@@ -3,9 +3,11 @@ title: Changelog
 name: changelog
 ---
 
-#### 1.8.9 (january 6 2025)
+#### 1.8.10 (january 6 2025)
 
 - Issue #878: fix timeout for opening folder
+
+#### skipped 1.8.9: incorrect build
 
 #### 1.8.8 (november 17 2024)
 

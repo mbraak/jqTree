@@ -118,7 +118,7 @@ defaults:
     values:
       layout: "example"
 
-jqtree_version: 1.8.9
+jqtree_version: 1.8.10
 
 # Build settings
 markdown: kramdown
