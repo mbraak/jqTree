@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development version
+#### 1.8.9 (january 6 2025)
 
 - Issue #878: fix timeout for opening folder
 
