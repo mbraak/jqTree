@@ -55,7 +55,17 @@ export const generateHtmlElementsForTree = (tree: Node) => {
             element.className = "jqtree-tree";
             return element;
         } else {
-            return document.createElement("li");
+            const li = document.createElement("li");
+
+            if (node.isFolder()) {
+                li.className = "jqtree-folder";
+
+                if (!node.is_open) {
+                    li.classList.add("jqtree-closed");
+                }
+            }
+
+            return li;
         }
     };
 

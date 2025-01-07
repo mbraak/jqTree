@@ -1,5 +1,5 @@
 /*
-JqTree 1.8.8
+JqTree 1.8.10
 
 Copyright 2025 Marco Braak
 
@@ -377,6 +377,7 @@ var jqtree = (function (exports) {
           onDragMove,
           onDragStop,
           onIsMoveHandle,
+          openFolderDelay,
           openNode,
           refreshElements,
           slide,
@@ -393,6 +394,7 @@ var jqtree = (function (exports) {
         this.onDragMove = onDragMove;
         this.onDragStop = onDragStop;
         this.onIsMoveHandle = onIsMoveHandle;
+        this.openFolderDelay = openFolderDelay;
         this.openNode = openNode;
         this.refreshElements = refreshElements;
         this.slide = slide;
@@ -2673,7 +2675,7 @@ var jqtree = (function (exports) {
       }
     }
 
-    const version = "1.8.8";
+    const version = "1.8.10";
 
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
