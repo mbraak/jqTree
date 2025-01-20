@@ -849,7 +849,7 @@ describe(".mouseDrag", () => {
         dragAndDropHandler.mouseStart(positionInfo);
         expect(dragAndDropHandler.isDragging).toBeTrue();
 
-        // Move mouse
+        // Move mouse to node2
         dragAndDropHandler.mouseDrag({
             originalEvent: new Event("mousemove"),
             pageX: 15,
@@ -861,7 +861,64 @@ describe(".mouseDrag", () => {
         expect(openNode).not.toHaveBeenCalled();
 
         jest.advanceTimersByTime(100);
-        expect(openNode).toHaveBeenCalled();
+        expect(openNode).toHaveBeenCalledWith(
+            node2,
+            false,
+            expect.toBeFunction(),
+        );
+    });
+
+    it("doesn't open a closed folder when it is hovered over but not long enough", () => {
+        jest.useFakeTimers();
+
+        const tree = new Node(null, true);
+        const node1 = new Node({ name: "node1" });
+        tree.addChild(node1);
+        const node2 = new Node({ name: "node2" });
+        tree.addChild(node2);
+        node2.addChild(new Node({ name: "child" }));
+
+        const openNode = jest.fn();
+
+        const { dragAndDropHandler } = createDragAndDropHandler({
+            openFolderDelay: 100,
+            openNode,
+            tree,
+        });
+
+        // Start dragging
+        const positionInfo = {
+            originalEvent: new Event("click"),
+            pageX: 10,
+            pageY: 10,
+            target: node1.element as HTMLElement,
+        };
+
+        dragAndDropHandler.mouseCapture(positionInfo);
+
+        dragAndDropHandler.mouseStart(positionInfo);
+        expect(dragAndDropHandler.isDragging).toBeTrue();
+
+        // Move mouse to node2
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 15,
+            pageY: 30,
+            target: node2.element as HTMLElement,
+        });
+
+        jest.advanceTimersByTime(10);
+
+        // Move mouse outside of the tree
+        dragAndDropHandler.mouseDrag({
+            originalEvent: new Event("mousemove"),
+            pageX: 150,
+            pageY: 500,
+            target: document.body,
+        });
+
+        jest.advanceTimersByTime(100);
+        expect(openNode).not.toHaveBeenCalled();
     });
 });
 
