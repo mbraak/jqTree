@@ -64,7 +64,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: screenshots
-                path: src/playwright/playwright.test.ts-snapshots/
+                path: test-results/
             - name: Merge coverage
               run: cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
             - name: Codecov
