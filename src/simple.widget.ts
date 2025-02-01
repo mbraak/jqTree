@@ -3,8 +3,8 @@ const register = (widgetClass: unknown, widgetName: string): void => {
 
     const getWidgetData = (
         el: HTMLElement,
-        dataKey: string
-    ): SimpleWidget<unknown> | null => {
+        dataKey: string,
+    ): null | SimpleWidget<unknown> => {
         const widget = jQuery.data(el, dataKey) as unknown;
 
         if (widget && widget instanceof SimpleWidget) {
@@ -53,7 +53,7 @@ const register = (widgetClass: unknown, widgetName: string): void => {
     const callFunction = (
         $el: JQuery,
         functionName: string,
-        args: unknown[]
+        args: unknown[],
     ): unknown => {
         let result = null;
 
@@ -88,7 +88,8 @@ const register = (widgetClass: unknown, widgetName: string): void => {
             const functionName = argument1;
 
             if (functionName === "destroy") {
-                return destroyWidget(this);
+                destroyWidget(this);
+                return undefined;
             } else if (functionName === "get_widget_class") {
                 return widgetClass;
             } else {
@@ -101,24 +102,28 @@ const register = (widgetClass: unknown, widgetName: string): void => {
 };
 
 export default class SimpleWidget<WidgetOptions> {
-    public static register(widgetClass: unknown, widgetName: string): void {
-        register(widgetClass, widgetName);
-    }
-
     [key: string]: unknown;
 
     protected static defaults: unknown = {};
 
-    public options: WidgetOptions;
+    public $el: JQuery;
 
-    public $el: JQuery<HTMLElement>;
+    public options: WidgetOptions;
 
     constructor(el: HTMLElement, options: WidgetOptions) {
         this.$el = jQuery(el);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const defaults = (this.constructor as any)["defaults"] as WidgetOptions;
+        const defaults = (this.constructor as any).defaults as WidgetOptions;
         this.options = { ...defaults, ...options };
+    }
+
+    public static register(widgetClass: unknown, widgetName: string): void {
+        register(widgetClass, widgetName);
+    }
+
+    public deinit(): void {
+        //
     }
 
     public destroy(): void {
@@ -126,10 +131,6 @@ export default class SimpleWidget<WidgetOptions> {
     }
 
     public init(): void {
-        //
-    }
-
-    public deinit(): void {
         //
     }
 }

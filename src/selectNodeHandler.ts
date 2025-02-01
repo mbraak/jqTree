@@ -1,5 +1,5 @@
-import { Node } from "./node";
 import { GetNodeById } from "./jqtreeMethodTypes";
+import { Node } from "./node";
 
 interface SelectNodeHandlerParameters {
     getNodeById: GetNodeById;
@@ -16,11 +16,24 @@ export default class SelectNodeHandler {
         this.clear();
     }
 
-    public getSelectedNode(): Node | false {
+    public addToSelection(node: Node): void {
+        if (node.id != null) {
+            this.selectedNodes.add(node.id);
+        } else {
+            this.selectedSingleNode = node;
+        }
+    }
+
+    public clear(): void {
+        this.selectedNodes.clear();
+        this.selectedSingleNode = null;
+    }
+
+    public getSelectedNode(): false | Node {
         const selectedNodes = this.getSelectedNodes();
 
         if (selectedNodes.length) {
-            return selectedNodes[0] || false;
+            return selectedNodes[0] ?? false;
         } else {
             return false;
         }
@@ -51,18 +64,14 @@ export default class SelectNodeHandler {
                 return [];
             }
         } else {
-            const selectedNodes = [];
+            const selectedNodes: Node[] = [];
 
-            for (const id in this.selectedNodes) {
-                if (
-                    Object.prototype.hasOwnProperty.call(this.selectedNodes, id)
-                ) {
-                    const node = this.getNodeById(id);
-                    if (node && parent.isParentOf(node)) {
-                        selectedNodes.push(node);
-                    }
+            this.selectedNodes.forEach((id) => {
+                const node = this.getNodeById(id);
+                if (node && parent.isParentOf(node)) {
+                    selectedNodes.push(node);
                 }
-            }
+            });
 
             return selectedNodes;
         }
@@ -76,11 +85,6 @@ export default class SelectNodeHandler {
         } else {
             return false;
         }
-    }
-
-    public clear(): void {
-        this.selectedNodes.clear();
-        this.selectedSingleNode = null;
     }
 
     public removeFromSelection(node: Node, includeChildren = false): void {
@@ -102,14 +106,6 @@ export default class SelectNodeHandler {
                     return true;
                 });
             }
-        }
-    }
-
-    public addToSelection(node: Node): void {
-        if (node.id != null) {
-            this.selectedNodes.add(node.id);
-        } else {
-            this.selectedSingleNode = node;
         }
     }
 }

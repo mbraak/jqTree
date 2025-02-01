@@ -1,13 +1,12 @@
-import { HitArea } from "./types";
-import { Node } from "../node";
-import { Position } from "../position";
+import { Node, Position } from "../node";
 import { getOffsetTop } from "../util";
 import iterateVisibleNodes from "./iterateVisibleNodes";
+import { HitArea } from "./types";
 
 interface HitPosition {
-    top: number;
     node: Node;
-    position: Position;
+    position: null | Position;
+    top: number;
 }
 
 export const generateHitPositions = (
@@ -17,11 +16,15 @@ export const generateHitPositions = (
     const hitPositions: HitPosition[] = [];
     let lastTop = 0;
 
-    const addHitPosition = (node: Node, position: number, top: number) => {
+    const addHitPosition = (
+        node: Node,
+        position: null | Position,
+        top: number,
+    ) => {
         hitPositions.push({
-            top,
             node,
             position,
+            top,
         });
         lastTop = top;
     };
@@ -29,9 +32,9 @@ export const generateHitPositions = (
     const handleAfterOpenFolder = (node: Node, nextNode: Node | null) => {
         if (node === currentNode || nextNode === currentNode) {
             // Cannot move before or after current item
-            addHitPosition(node, Position.None, lastTop);
+            addHitPosition(node, null, lastTop);
         } else {
-            addHitPosition(node, Position.After, lastTop);
+            addHitPosition(node, "after", lastTop);
         }
     };
 
@@ -44,20 +47,20 @@ export const generateHitPositions = (
 
         if (node === currentNode) {
             // Cannot move after current item
-            addHitPosition(node, Position.None, top);
+            addHitPosition(node, null, top);
         } else {
-            addHitPosition(node, Position.Inside, top);
+            addHitPosition(node, "inside", top);
 
             // Cannot move before current item
             if (nextNode !== currentNode) {
-                addHitPosition(node, Position.After, top);
+                addHitPosition(node, "after", top);
             }
         }
     };
 
     const handleFirstNode = (node: Node) => {
-        if (node !== currentNode) {
-            addHitPosition(node, Position.Before, getOffsetTop(node.element));
+        if (node !== currentNode && node.element) {
+            addHitPosition(node, "before", getOffsetTop(node.element));
         }
     };
 
@@ -70,16 +73,16 @@ export const generateHitPositions = (
 
         if (node === currentNode) {
             // Cannot move inside current item
-            addHitPosition(node, Position.None, top);
+            addHitPosition(node, null, top);
         } else {
-            addHitPosition(node, Position.Inside, top);
+            addHitPosition(node, "inside", top);
         }
 
         if (nextNode === currentNode || node === currentNode) {
             // Cannot move before or after current item
-            addHitPosition(node, Position.None, top);
+            addHitPosition(node, null, top);
         } else {
-            addHitPosition(node, Position.After, top);
+            addHitPosition(node, "after", top);
         }
     };
 
@@ -90,11 +93,11 @@ export const generateHitPositions = (
             // Dnd over the current element is not possible: add a position with type None for the top and the bottom.
             const top = getOffsetTop(element);
             const height = element.clientHeight;
-            addHitPosition(node, Position.None, top);
+            addHitPosition(node, null, top);
 
             if (height > 5) {
                 // Subtract 5 pixels to allow more space for the next element.
-                addHitPosition(node, Position.None, top + height - 5);
+                addHitPosition(node, null, top + height - 5);
             }
 
             // Stop iterating
@@ -103,7 +106,7 @@ export const generateHitPositions = (
 
         // Cannot move before current item
         if (node.children[0] !== currentNode) {
-            addHitPosition(node, Position.Inside, getOffsetTop(element));
+            addHitPosition(node, "inside", getOffsetTop(element));
         }
 
         // Continue iterating
@@ -136,12 +139,12 @@ export const generateHitAreasForGroup = (
     for (let i = 0; i < positionCount; i++) {
         const position = positionsInGroup[i] as HitPosition;
 
-        if (position.position !== Position.None) {
+        if (position.position) {
             hitAreas.push({
-                top: areaTop,
                 bottom: areaTop + areaHeight,
                 node: position.node,
                 position: position.position,
+                top: areaTop,
             });
         }
 

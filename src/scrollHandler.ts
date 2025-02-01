@@ -1,6 +1,6 @@
 import { PositionInfo } from "./mouseUtils";
-import { ScrollParent } from "./scrollHandler/types";
 import createScrollParent from "./scrollHandler/createScrollParent";
+import { ScrollParent } from "./scrollHandler/types";
 
 interface ScrollHandlerParams {
     refreshHitAreas: () => void;
@@ -23,24 +23,24 @@ export default class ScrollHandler {
         this.checkHorizontalScrolling(positionInfo);
     }
 
-    public stopScrolling() {
-        this.getScrollParent().stopScrolling();
+    public getScrollLeft(): number {
+        return this.getScrollParent().getScrollLeft();
     }
 
     public scrollToY(top: number): void {
         this.getScrollParent().scrollToY(top);
     }
 
-    public getScrollLeft(): number {
-        return this.getScrollParent().getScrollLeft();
-    }
-
-    private checkVerticalScrolling(positionInfo: PositionInfo): void {
-        this.getScrollParent().checkVerticalScrolling(positionInfo.pageY);
+    public stopScrolling() {
+        this.getScrollParent().stopScrolling();
     }
 
     private checkHorizontalScrolling(positionInfo: PositionInfo): void {
         this.getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
+    }
+
+    private checkVerticalScrolling(positionInfo: PositionInfo): void {
+        this.getScrollParent().checkVerticalScrolling(positionInfo.pageY);
     }
 
     private getScrollParent(): ScrollParent {

@@ -1,18 +1,21 @@
-import getGiven from "givens";
 import { screen, waitFor } from "@testing-library/dom";
-import { http, HttpResponse } from "msw";
 import { userEvent } from "@testing-library/user-event";
+import getGiven from "givens";
+import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+
 import "../../tree.jquery";
+import __version__ from "../../version";
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
-import __version__ from "../../version";
 
 const context = describe;
 
 const server = setupServer();
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+    server.listen();
+});
 
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
@@ -27,12 +30,14 @@ afterEach(() => {
     localStorage.clear();
 });
 
-afterAll(() => server.close());
+afterAll(() => {
+    server.close();
+});
 
 describe("addNodeAfter", () => {
     interface Vars {
+        $tree: JQuery;
         node: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -59,8 +64,8 @@ describe("addNodeAfter", () => {
 
 describe("addNodeBefore", () => {
     interface Vars {
+        $tree: JQuery;
         node: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -87,8 +92,8 @@ describe("addNodeBefore", () => {
 
 describe("addParentNode", () => {
     interface Vars {
+        $tree: JQuery;
         child1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -107,16 +112,16 @@ describe("addParentNode", () => {
     it("adds the parent node", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
-                name: "node1",
                 children: [
                     expect.objectContaining({
-                        name: "new-parent-node",
                         children: [
                             expect.objectContaining({ name: "child1" }),
                             expect.objectContaining({ name: "child2" }),
                         ],
+                        name: "new-parent-node",
                     }),
                 ],
+                name: "node1",
             }),
             expect.objectContaining({ name: "node2" }),
         ]);
@@ -125,9 +130,9 @@ describe("addParentNode", () => {
 
 describe("addToSelection", () => {
     interface Vars {
+        $tree: JQuery;
         child1: INode;
         child2: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -160,22 +165,22 @@ describe("addToSelection", () => {
 
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
-                name: "node1",
-                selected: false,
                 children: [
                     expect.objectContaining({ name: "child1", selected: true }),
                     expect.objectContaining({ name: "child2", selected: true }),
                 ],
+                name: "node1",
+                selected: false,
             }),
             expect.objectContaining({
-                name: "node2",
-                selected: false,
                 children: [
                     expect.objectContaining({
                         name: "node3",
                         selected: false,
                     }),
                 ],
+                name: "node2",
+                selected: false,
             }),
         ]);
     });
@@ -187,6 +192,7 @@ describe("addToSelection", () => {
         });
 
         const node1 = given.$tree.tree("getNodeByNameMustExist", "node1");
+
         expect(node1.is_open).toBeFalsy();
 
         given.$tree.tree("addToSelection", given.child1);
@@ -197,9 +203,9 @@ describe("addToSelection", () => {
 
 describe("appendNode", () => {
     interface Vars {
+        $tree: JQuery;
         nodeData: NodeData;
         parent: INode | undefined;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -234,12 +240,12 @@ describe("appendNode", () => {
         it("appends the node to parent node", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "node1",
                     children: [
                         expect.objectContaining({ name: "child1" }),
                         expect.objectContaining({ name: "child2" }),
                         expect.objectContaining({ name: "appended-node" }),
                     ],
+                    name: "node1",
                 }),
                 expect.objectContaining({ name: "node2" }),
             ]);
@@ -273,8 +279,8 @@ describe("appendNode", () => {
 
 describe("closeNode", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -294,9 +300,23 @@ describe("closeNode", () => {
     });
 });
 
+describe("destroy", () => {
+    it("clears the tree element", () => {
+        const $tree = $("#tree1");
+
+        $tree.tree({
+            data: exampleData,
+        });
+
+        $tree.tree("destroy");
+
+        expect($tree.get(0)).toBeEmptyDOMElement();
+    });
+});
+
 describe("getNodeByCallback", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -317,8 +337,8 @@ describe("getNodeByCallback", () => {
 
 describe("getNodeByHtmlElement", () => {
     interface Vars {
+        $tree: JQuery;
         htmlElement: HTMLElement;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -340,8 +360,8 @@ describe("getNodeByHtmlElement", () => {
 
 describe("getNodeById", () => {
     interface Vars {
+        $tree: JQuery;
         data: NodeData[];
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -399,8 +419,8 @@ describe("getNodeById", () => {
 
 describe("getNodesByProperty", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -422,8 +442,8 @@ describe("getNodesByProperty", () => {
 
 describe("getSelectedNode", () => {
     interface Vars {
+        $tree: JQuery;
         node: INode;
-        $tree: JQuery<HTMLElement>;
         treeData: NodeData[];
     }
 
@@ -485,9 +505,9 @@ describe("getSelectedNode", () => {
 
 describe("getSelectedNodes", () => {
     interface Vars {
+        $tree: JQuery;
         child1: INode;
         child2: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -523,8 +543,8 @@ describe("getSelectedNodes", () => {
 
 describe("getState", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -546,8 +566,8 @@ describe("getState", () => {
 
 describe("getStateFromStorage", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -572,7 +592,7 @@ describe("getStateFromStorage", () => {
 
 describe("getTree", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
@@ -593,7 +613,7 @@ describe("getTree", () => {
 
 describe("getVersion", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -610,8 +630,8 @@ describe("getVersion", () => {
 
 describe("isNodeSelected", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -641,8 +661,8 @@ describe("isNodeSelected", () => {
 
 describe("loadData", () => {
     interface Vars {
+        $tree: JQuery;
         initialData: NodeData[];
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -661,15 +681,15 @@ describe("loadData", () => {
         it("replaces the whole tree", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "node1",
                     children: [
                         expect.objectContaining({ name: "child1" }),
                         expect.objectContaining({ name: "child2" }),
                     ],
+                    name: "node1",
                 }),
                 expect.objectContaining({
-                    name: "node2",
                     children: [expect.objectContaining({ name: "node3" })],
+                    name: "node2",
                 }),
             ]);
         });
@@ -687,17 +707,17 @@ describe("loadData", () => {
         it("loads the data under the node", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "initial1",
                     children: [
                         expect.objectContaining({
-                            name: "node1",
                             children: [
                                 expect.objectContaining({ name: "child1" }),
                                 expect.objectContaining({ name: "child2" }),
                             ],
+                            name: "node1",
                         }),
                         expect.objectContaining({ name: "node2" }),
                     ],
+                    name: "initial1",
                 }),
             ]);
         });
@@ -725,7 +745,7 @@ describe("loadData", () => {
 
         context("when the selected node doesn't have an id", () => {
             given("initialData", () => [
-                { name: "node1", children: ["child1", "child2"] },
+                { children: ["child1", "child2"], name: "node1" },
                 "node2",
             ]);
 
@@ -758,9 +778,9 @@ describe("loadData", () => {
 
 describe("loadDataFromUrl", () => {
     interface Vars {
+        $tree: JQuery;
         initialData: NodeData[];
         serverData: NodeData[];
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -801,11 +821,11 @@ describe("loadDataFromUrl", () => {
 
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({
-                        name: "initial1",
                         children: [
                             expect.objectContaining({ name: "new1" }),
                             expect.objectContaining({ name: "new2" }),
                         ],
+                        name: "initial1",
                     }),
                     expect.objectContaining({ name: "initial2" }),
                 ]);
@@ -829,8 +849,8 @@ describe("loadDataFromUrl", () => {
 
 describe("moveDown", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
@@ -843,6 +863,7 @@ describe("moveDown", () => {
 
     it("selects the next node", () => {
         given.$tree.tree("moveDown");
+
         expect(given.$tree.tree("getSelectedNode")).toMatchObject({
             name: "node2",
         });
@@ -851,9 +872,9 @@ describe("moveDown", () => {
 
 describe("moveNode", () => {
     interface Vars {
+        $tree: JQuery;
         child1: INode;
         node2: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -872,8 +893,8 @@ describe("moveNode", () => {
     it("moves node", () => {
         expect(given.$tree).toHaveTreeStructure([
             expect.objectContaining({
-                name: "node1",
                 children: [expect.objectContaining({ name: "child2" })],
+                name: "node1",
             }),
             expect.objectContaining({ name: "node2" }),
             expect.objectContaining({ name: "child1" }),
@@ -883,8 +904,8 @@ describe("moveNode", () => {
 
 describe("moveUp", () => {
     interface Vars {
+        $tree: JQuery;
         node2: INode;
-        $tree: JQuery<HTMLElement>;
     }
     const given = getGiven<Vars>();
     given("node2", () => given.$tree.tree("getNodeByNameMustExist", "node2"));
@@ -897,6 +918,7 @@ describe("moveUp", () => {
 
     it("selects the next node", () => {
         given.$tree.tree("moveUp");
+
         expect(given.$tree.tree("getSelectedNode")).toMatchObject({
             name: "node1",
         });
@@ -905,8 +927,8 @@ describe("moveUp", () => {
 
 describe("openNode", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -937,12 +959,21 @@ describe("openNode", () => {
             });
         });
     });
+
+    it("handles an empty folder", () => {
+        const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
+        child1.isEmptyFolder = true;
+
+        expect(() => {
+            given.$tree.tree("openNode", child1, false);
+        }).not.toThrow();
+    });
 });
 
 describe("prependNode", () => {
     interface Vars {
+        $tree: JQuery;
         parent: INode | undefined;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -974,12 +1005,12 @@ describe("prependNode", () => {
         it("prepends the node to the parent", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "node1",
                     children: [
                         expect.objectContaining({ name: "prepended-node" }),
                         expect.objectContaining({ name: "child1" }),
                         expect.objectContaining({ name: "child2" }),
                     ],
+                    name: "node1",
                 }),
                 expect.objectContaining({ name: "node2" }),
             ]);
@@ -989,7 +1020,7 @@ describe("prependNode", () => {
 
 describe("refresh", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -1021,8 +1052,8 @@ describe("refresh", () => {
 
 describe("reload", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -1058,7 +1089,9 @@ describe("reload", () => {
 
             given.$tree.tree("reload", handleFinished);
 
-            await waitFor(() => expect(handleFinished).toHaveBeenCalledWith());
+            await waitFor(() => {
+                expect(handleFinished).toHaveBeenCalledWith();
+            });
 
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
@@ -1070,8 +1103,8 @@ describe("reload", () => {
 
 describe("removeNode", () => {
     interface Vars {
+        $tree: JQuery;
         node: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -1093,12 +1126,12 @@ describe("removeNode", () => {
 
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "node1",
                     children: [expect.objectContaining({ name: "child2" })],
+                    name: "node1",
                 }),
                 expect.objectContaining({
-                    name: "node2",
                     children: [expect.objectContaining({ name: "node3" })],
+                    name: "node2",
                 }),
             ]);
         });
@@ -1126,8 +1159,8 @@ describe("removeNode", () => {
 
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
-                    name: "node2",
                     children: [expect.objectContaining({ name: "node3" })],
+                    name: "node2",
                 }),
             ]);
         });
@@ -1162,9 +1195,9 @@ describe("removeNode", () => {
 
 describe("selectNode", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
         node2: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -1208,6 +1241,7 @@ describe("selectNode", () => {
 
         it("deselects the node", () => {
             given.$tree.tree("selectNode", given.node1);
+
             expect(given.node1.element).not.toBeSelected();
         });
     });
@@ -1219,6 +1253,7 @@ describe("selectNode", () => {
 
         it("deselects the current node", () => {
             given.$tree.tree("selectNode", null);
+
             expect(given.$tree.tree("getSelectedNode")).toBeFalse();
         });
     });
@@ -1235,11 +1270,12 @@ describe("selectNode", () => {
 
 describe("setOption", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
+
     beforeEach(() => {
         given.$tree.tree({
             animationSpeed: 0,
@@ -1247,14 +1283,16 @@ describe("setOption", () => {
             selectable: false,
         });
     });
+
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
     given("$tree", () => $("#tree1"));
 
     it("sets an option", async () => {
         given.$tree.tree("setOption", "selectable", true);
         await userEvent.click(
-            titleSpan(given.node1.element).get(0) as HTMLElement,
+            titleSpan(given.node1.element as HTMLElement).get(0) as HTMLElement,
         );
+
         expect(given.$tree.tree("getSelectedNode")).toMatchObject({
             name: "node1",
         });
@@ -1263,10 +1301,11 @@ describe("setOption", () => {
 
 describe("setState", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
+
     beforeEach(() => {
         given.$tree.tree({
             autoOpen: false,
@@ -1274,6 +1313,7 @@ describe("setState", () => {
             selectable: true,
         });
     });
+
     given("$tree", () => $("#tree1"));
 
     it("sets the state", () => {
@@ -1305,9 +1345,9 @@ describe("setState", () => {
 
 describe("toggle", () => {
     interface Vars {
+        $tree: JQuery;
         autoOpen: boolean;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -1340,7 +1380,7 @@ describe("toggle", () => {
 
 describe("toJson", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -1359,10 +1399,10 @@ describe("toJson", () => {
 
 describe("updateNode", () => {
     interface Vars {
+        $tree: JQuery;
         isSelected: boolean;
         node: INode;
         nodeData: NodeData;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -1444,18 +1484,18 @@ describe("updateNode", () => {
             it("adds the child node", () => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({
-                        name: "node1",
                         children: [
                             expect.objectContaining({
-                                name: "child1",
                                 children: [
                                     expect.objectContaining({
                                         name: "new-child",
                                     }),
                                 ],
+                                name: "child1",
                             }),
                             expect.objectContaining({ name: "child2" }),
                         ],
+                        name: "node1",
                     }),
                     expect.objectContaining({ name: "node2" }),
                 ]);
@@ -1468,12 +1508,12 @@ describe("updateNode", () => {
             it("removes the children", () => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({
-                        nodeType: "child",
                         name: "node1",
+                        nodeType: "child",
                     }),
                     expect.objectContaining({
-                        nodeType: "folder",
                         name: "node2",
+                        nodeType: "folder",
                     }),
                 ]);
             });

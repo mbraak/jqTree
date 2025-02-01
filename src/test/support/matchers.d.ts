@@ -1,22 +1,22 @@
 /// <reference types="jest"/>
 
 declare namespace JQTreeMatchers {
+    export type TreeNode = TreeChild | TreeFolder;
+
+    export type TreeStructure = TreeNode[];
+
     interface TreeChild {
-        nodeType: "child";
         name: string;
+        nodeType: "child";
         selected: boolean;
     }
-
     interface TreeFolder {
-        nodeType: "folder";
         children: TreeNode[];
         name: string;
+        nodeType: "folder";
         open: boolean;
         selected: boolean;
     }
-
-    export type TreeNode = TreeChild | TreeFolder;
-    export type TreeStructure = TreeNode[];
 }
 
 declare namespace jest {

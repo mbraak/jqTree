@@ -7,9 +7,11 @@ docs/_site/
 docs/jqtree.css
 docs/static/documentation.css
 docs/static/example.css
+docs/static/vendor/
 docs/tree.jquery.js
 jest-coverage/
+lib/
 node_modules/
-lib
+test-results/
 todo.txt
 update.txt

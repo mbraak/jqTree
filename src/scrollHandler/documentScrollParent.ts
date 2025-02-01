@@ -1,13 +1,14 @@
 import type { ScrollParent } from "./types";
-import { getOffsetTop } from '../util'
+
+import { getOffsetTop } from "../util";
 
 type HorizontalScrollDirection = "left" | "right";
-type VerticalScrollDirection = "bottom" | "top";
-
 interface Params {
     refreshHitAreas: () => void;
     treeElement: HTMLElement;
 }
+
+type VerticalScrollDirection = "bottom" | "top";
 
 export default class DocumentScrollParent implements ScrollParent {
     private documentScrollHeight?: number;
@@ -82,24 +83,13 @@ export default class DocumentScrollParent implements ScrollParent {
         this.documentScrollWidth = undefined;
     }
 
-    private getNewHorizontalScrollDirection(
-        pageX: number,
-    ): HorizontalScrollDirection | undefined {
-        const scrollLeft = document.documentElement.scrollLeft;
-        const windowWidth = window.innerWidth;
+    private canScrollDown() {
+        const documentElement = document.documentElement;
 
-        const isNearRightEdge = pageX > windowWidth - 20;
-        const isNearLeftEdge = pageX - scrollLeft < 20;
-
-        if (isNearRightEdge && this.canScrollRight()) {
-            return "right";
-        }
-
-        if (isNearLeftEdge) {
-            return "left";
-        }
-
-        return undefined;
+        return (
+            documentElement.scrollTop + documentElement.clientHeight <
+            this.getDocumentScrollHeight()
+        );
     }
 
     private canScrollRight() {
@@ -108,15 +98,6 @@ export default class DocumentScrollParent implements ScrollParent {
         return (
             documentElement.scrollLeft + documentElement.clientWidth <
             this.getDocumentScrollWidth()
-        );
-    }
-
-    private canScrollDown() {
-        const documentElement = document.documentElement;
-
-        return (
-            documentElement.scrollTop + documentElement.clientHeight <
-            this.getDocumentScrollHeight()
         );
     }
 
@@ -138,10 +119,30 @@ export default class DocumentScrollParent implements ScrollParent {
         return this.documentScrollWidth;
     }
 
+    private getNewHorizontalScrollDirection(
+        pageX: number,
+    ): HorizontalScrollDirection | undefined {
+        const scrollLeft = document.documentElement.scrollLeft;
+        const windowWidth = window.innerWidth;
+
+        const isNearRightEdge = pageX > windowWidth - 20;
+        const isNearLeftEdge = pageX - scrollLeft < 20;
+
+        if (isNearRightEdge && this.canScrollRight()) {
+            return "right";
+        }
+
+        if (isNearLeftEdge) {
+            return "left";
+        }
+
+        return undefined;
+    }
+
     private getNewVerticalScrollDirection(
         pageY: number,
-    ): VerticalScrollDirection | undefined {
-        const scrollTop = jQuery(document).scrollTop() || 0;
+    ): undefined | VerticalScrollDirection {
+        const scrollTop = jQuery(document).scrollTop() ?? 0;
         const distanceTop = pageY - scrollTop;
 
         if (distanceTop < 20) {
@@ -163,7 +164,7 @@ export default class DocumentScrollParent implements ScrollParent {
         }
 
         const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
-        window.scrollBy({ left: distance, top: 0, behavior: "instant" });
+        window.scrollBy({ behavior: "instant", left: distance, top: 0 });
 
         this.refreshHitAreas();
 
@@ -176,7 +177,7 @@ export default class DocumentScrollParent implements ScrollParent {
         }
 
         const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        window.scrollBy({ left: 0, top: distance, behavior: "instant" });
+        window.scrollBy({ behavior: "instant", left: 0, top: distance });
 
         this.refreshHitAreas();
 

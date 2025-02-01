@@ -1,6 +1,6 @@
-import { Position } from "../position";
-import NodeElement, { NodeElementParams } from "./index";
 import { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
+import { Position } from "../node";
+import NodeElement, { NodeElementParams } from "./index";
 
 interface FolderElementParams extends NodeElementParams {
     closedIconElement?: HTMLElement | Text;
@@ -19,14 +19,14 @@ class FolderElement extends NodeElement {
         node,
         openedIconElement,
         tabIndex,
-        $treeElement,
+        treeElement,
         triggerEvent,
     }: FolderElementParams) {
         super({
             getScrollLeft,
             node,
             tabIndex,
-            $treeElement,
+            treeElement,
         });
 
         this.closedIconElement = closedIconElement;
@@ -34,10 +34,47 @@ class FolderElement extends NodeElement {
         this.triggerEvent = triggerEvent;
     }
 
+    public close(slide: boolean, animationSpeed: JQuery.Duration): void {
+        if (!this.node.is_open) {
+            return;
+        }
+
+        this.node.is_open = false;
+
+        const button = this.getButton();
+        button.classList.add("jqtree-closed");
+        button.innerHTML = "";
+
+        const closedIconElement = this.closedIconElement;
+
+        if (closedIconElement) {
+            const icon = closedIconElement.cloneNode(true);
+            button.appendChild(icon);
+        }
+
+        const doClose = (): void => {
+            this.element.classList.add("jqtree-closed");
+
+            const titleSpan = this.getTitleSpan();
+            titleSpan.setAttribute("aria-expanded", "false");
+
+            this.triggerEvent("tree.close", {
+                node: this.node,
+            });
+        };
+
+        if (slide) {
+            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
+        } else {
+            jQuery(this.getUl()).hide();
+            doClose();
+        }
+    }
+
     public open(
         onFinished: OnFinishOpenNode | undefined,
-        slide = true,
-        animationSpeed: JQuery.Duration = "fast",
+        slide: boolean,
+        animationSpeed: JQuery.Duration,
     ): void {
         if (this.node.is_open) {
             return;
@@ -79,48 +116,8 @@ class FolderElement extends NodeElement {
         }
     }
 
-    public close(
-        slide = true,
-        animationSpeed: JQuery.Duration | undefined = "fast",
-    ): void {
-        if (!this.node.is_open) {
-            return;
-        }
-
-        this.node.is_open = false;
-
-        const button = this.getButton();
-        button.classList.add("jqtree-closed");
-        button.innerHTML = "";
-
-        const closedIconElement = this.closedIconElement;
-
-        if (closedIconElement) {
-            const icon = closedIconElement.cloneNode(true);
-            button.appendChild(icon);
-        }
-
-        const doClose = (): void => {
-            this.element.classList.add("jqtree-closed");
-
-            const titleSpan = this.getTitleSpan();
-            titleSpan.setAttribute("aria-expanded", "false");
-
-            this.triggerEvent("tree.close", {
-                node: this.node,
-            });
-        };
-
-        if (slide) {
-            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
-        } else {
-            jQuery(this.getUl()).hide();
-            doClose();
-        }
-    }
-
     protected mustShowBorderDropHint(position: Position): boolean {
-        return !this.node.is_open && position === Position.Inside;
+        return !this.node.is_open && position === "inside";
     }
 
     private getButton(): HTMLLinkElement {

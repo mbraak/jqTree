@@ -1,5 +1,6 @@
-import getGiven from "givens";
 import { userEvent } from "@testing-library/user-event";
+import getGiven from "givens";
+
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 
@@ -17,10 +18,10 @@ afterEach(() => {
 
 describe("keyboard support", () => {
     interface Vars {
+        $tree: JQuery;
         autoOpen: boolean;
         initialSelectedNode: INode | null;
         pressedKey: string;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -133,9 +134,6 @@ describe("keyboard support", () => {
             it("selects the first child", () => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({
-                        name: "node1",
-                        open: true,
-                        selected: false,
                         children: [
                             expect.objectContaining({
                                 name: "child1",
@@ -146,6 +144,9 @@ describe("keyboard support", () => {
                                 selected: false,
                             }),
                         ],
+                        name: "node1",
+                        open: true,
+                        selected: false,
                     }),
                     expect.objectContaining({
                         name: "node2",
@@ -188,8 +189,6 @@ describe("keyboard support", () => {
                         selected: false,
                     }),
                     expect.objectContaining({
-                        name: "node2",
-                        selected: true,
                         children: [
                             expect.objectContaining({
                                 name: "node3",
@@ -197,6 +196,8 @@ describe("keyboard support", () => {
                                 selected: false,
                             }),
                         ],
+                        name: "node2",
+                        selected: true,
                     }),
                 ]);
             });

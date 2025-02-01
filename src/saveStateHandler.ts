@@ -1,6 +1,3 @@
-import { isInt } from "./util";
-import { Node } from "./node";
-import { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
 import {
     AddToSelection,
     GetNodeById,
@@ -10,10 +7,13 @@ import {
     RefreshElements,
     RemoveFromSelection,
 } from "./jqtreeMethodTypes";
+import { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
+import { Node } from "./node";
+import { isInt } from "./util";
 
 export interface SavedState {
-    open_nodes: NodeId[];
-    selected_node: NodeId[];
+    open_nodes?: NodeId[];
+    selected_node?: NodeId[];
 }
 
 interface SaveStateHandlerParams {
@@ -40,7 +40,6 @@ export default class SaveStateHandler {
     private refreshElements: RefreshElements;
     private removeFromSelection: RemoveFromSelection;
     private saveStateOption: boolean | string;
-    private _supportsLocalStorage: boolean | null;
 
     constructor({
         addToSelection,
@@ -66,21 +65,11 @@ export default class SaveStateHandler {
         this.saveStateOption = saveState;
     }
 
-    public saveState(): void {
-        const state = JSON.stringify(this.getState());
+    public getNodeIdToBeSelected(): NodeId | null {
+        const state = this.getStateFromStorage();
 
-        if (this.onSetStateFromStorage) {
-            this.onSetStateFromStorage(state);
-        } else if (this.supportsLocalStorage()) {
-            localStorage.setItem(this.getKeyName(), state);
-        }
-    }
-
-    public getStateFromStorage(): SavedState | null {
-        const jsonData = this.loadFromStorage();
-
-        if (jsonData) {
-            return this.parseState(jsonData) as unknown as SavedState;
+        if (state?.selected_node) {
+            return state.selected_node[0] ?? null;
         } else {
             return null;
         }
@@ -118,29 +107,46 @@ export default class SaveStateHandler {
         };
     }
 
+    public getStateFromStorage(): null | SavedState {
+        const jsonData = this.loadFromStorage();
+
+        if (jsonData) {
+            return this.parseState(jsonData) as unknown as SavedState;
+        } else {
+            return null;
+        }
+    }
+
+    public saveState(): void {
+        const state = JSON.stringify(this.getState());
+
+        if (this.onSetStateFromStorage) {
+            this.onSetStateFromStorage(state);
+        } else {
+            localStorage.setItem(this.getKeyName(), state);
+        }
+    }
+
     /*
     Set initial state
     Don't handle nodes that are loaded on demand
 
-    result: must load on demand
+    result: must load on demand (boolean)
     */
     public setInitialState(state: SavedState): boolean {
-        if (!state) {
-            return false;
-        } else {
-            let mustLoadOnDemand = false;
+        let mustLoadOnDemand = false;
 
-            if (state.open_nodes) {
-                mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
-            }
-
-            if (state.selected_node) {
-                this.resetSelection();
-                this.selectInitialNodes(state.selected_node);
-            }
-
-            return mustLoadOnDemand;
+        if (state.open_nodes) {
+            mustLoadOnDemand = this.openInitialNodes(state.open_nodes);
         }
+
+        this.resetSelection();
+
+        if (state.selected_node) {
+            this.selectInitialNodes(state.selected_node);
+        }
+
+        return mustLoadOnDemand;
     }
 
     public setInitialStateOnDemand(
@@ -151,6 +157,10 @@ export default class SaveStateHandler {
         let nodeIds = state.open_nodes;
 
         const openNodes = (): void => {
+            if (!nodeIds) {
+                return;
+            }
+
             const newNodesIds = [];
 
             for (const nodeId of nodeIds) {
@@ -171,8 +181,10 @@ export default class SaveStateHandler {
 
             nodeIds = newNodesIds;
 
-            if (this.selectInitialNodes(state.selected_node)) {
-                this.refreshElements(null);
+            if (state.selected_node) {
+                if (this.selectInitialNodes(state.selected_node)) {
+                    this.refreshElements(null);
+                }
             }
 
             if (loadingCount === 0) {
@@ -191,35 +203,19 @@ export default class SaveStateHandler {
         openNodes();
     }
 
-    public getNodeIdToBeSelected(): NodeId | null {
-        const state = this.getStateFromStorage();
-
-        if (state?.selected_node) {
-            return state.selected_node[0] || null;
+    private getKeyName(): string {
+        if (typeof this.saveStateOption === "string") {
+            return this.saveStateOption;
         } else {
-            return null;
+            return "tree";
         }
     }
 
-    private parseState(jsonData: string): SavedState {
-        const state = JSON.parse(jsonData) as Record<string, unknown>;
-
-        // Check if selected_node is an int (instead of an array)
-        if (state && state.selected_node && isInt(state.selected_node)) {
-            // Convert to array
-            state.selected_node = [state.selected_node];
-        }
-
-        return state as unknown as SavedState;
-    }
-
-    private loadFromStorage(): string | null {
+    private loadFromStorage(): null | string {
         if (this.onGetStateFromStorage) {
             return this.onGetStateFromStorage();
-        } else if (this.supportsLocalStorage()) {
-            return localStorage.getItem(this.getKeyName());
         } else {
-            return null;
+            return localStorage.getItem(this.getKeyName());
         }
     }
 
@@ -241,6 +237,26 @@ export default class SaveStateHandler {
         return mustLoadOnDemand;
     }
 
+    private parseState(jsonData: string): SavedState {
+        const state = JSON.parse(jsonData) as Record<string, unknown>;
+
+        // Check if selected_node is an int (instead of an array)
+        if (state.selected_node && isInt(state.selected_node)) {
+            // Convert to array
+            state.selected_node = [state.selected_node];
+        }
+
+        return state as unknown as SavedState;
+    }
+
+    private resetSelection(): void {
+        const selectedNodes = this.getSelectedNodes();
+
+        selectedNodes.forEach((node) => {
+            this.removeFromSelection(node);
+        });
+    }
+
     private selectInitialNodes(nodeIds: NodeId[]): boolean {
         let selectCount = 0;
 
@@ -255,47 +271,5 @@ export default class SaveStateHandler {
         }
 
         return selectCount !== 0;
-    }
-
-    private resetSelection(): void {
-        const selectedNodes = this.getSelectedNodes();
-
-        selectedNodes.forEach((node) => {
-            this.removeFromSelection(node);
-        });
-    }
-
-    private getKeyName(): string {
-        if (typeof this.saveStateOption === "string") {
-            return this.saveStateOption;
-        } else {
-            return "tree";
-        }
-    }
-
-    private supportsLocalStorage(): boolean {
-        const testSupport = (): boolean => {
-            // Is local storage supported?
-            if (localStorage == null) {
-                return false;
-            } else {
-                // Check if it's possible to store an item. Safari does not allow this in private browsing mode.
-                try {
-                    const key = "_storage_test";
-                    sessionStorage.setItem(key, "value");
-                    sessionStorage.removeItem(key);
-                } catch (error) {
-                    return false;
-                }
-
-                return true;
-            }
-        };
-
-        if (this._supportsLocalStorage == null) {
-            this._supportsLocalStorage = testSupport();
-        }
-
-        return this._supportsLocalStorage;
     }
 }

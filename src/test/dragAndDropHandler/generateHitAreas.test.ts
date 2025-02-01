@@ -2,10 +2,9 @@ import {
     generateHitAreasForGroup,
     generateHitAreasFromPositions,
     generateHitPositions,
-} from "../dragAndDropHandler/generateHitAreas";
-import { HitArea } from "../dragAndDropHandler/types";
-import { Node } from "../node";
-import { Position } from "../position";
+} from "../../dragAndDropHandler/generateHitAreas";
+import { HitArea } from "../../dragAndDropHandler/types";
+import { Node, Position } from "../../node";
 
 const mockHtmlElement = (y: number) =>
     ({
@@ -21,15 +20,16 @@ describe("generateHitAreasForGroup", () => {
     it("doesn't add a hit area with zero hit positions", () => {
         const hitAreas: HitArea[] = [];
         generateHitAreasForGroup(hitAreas, [], 0, 0);
+
         expect(hitAreas).toBeEmpty();
     });
 
     it("adds a hit area with one hit position", () => {
         const node = new Node(null);
         const hitPosition = {
-            top: 0,
             node,
-            position: Position.Inside,
+            position: "inside" as Position,
+            top: 0,
         };
 
         const hitAreas: HitArea[] = [];
@@ -38,23 +38,24 @@ describe("generateHitAreasForGroup", () => {
         expect(hitAreas).toEqual([
             expect.objectContaining({
                 bottom: 100,
-                position: Position.Inside,
                 node,
+                position: "inside",
                 top: 40,
             }),
         ]);
     });
 
-    it("doesn't add a hit area when the position is Position.None", () => {
+    it("doesn't add a hit area when the position is none", () => {
         const node = new Node(null);
         const hitPosition = {
-            top: 0,
             node,
-            position: Position.None,
+            position: null,
+            top: 0,
         };
 
         const hitAreas: HitArea[] = [];
         generateHitAreasForGroup(hitAreas, [hitPosition], 0, 100);
+
         expect(hitAreas).toBeEmpty();
     });
 
@@ -62,14 +63,14 @@ describe("generateHitAreasForGroup", () => {
         const node = new Node(null);
         const hitPositions = [
             {
-                top: 0,
                 node,
-                position: Position.Before,
+                position: "before" as Position,
+                top: 0,
             },
             {
-                top: 0,
                 node,
-                position: Position.Inside,
+                position: "inside" as Position,
+                top: 0,
             },
         ];
 
@@ -79,14 +80,14 @@ describe("generateHitAreasForGroup", () => {
         expect(hitAreas).toEqual([
             expect.objectContaining({
                 bottom: 70,
-                position: Position.Before,
                 node,
+                position: "before",
                 top: 40,
             }),
             expect.objectContaining({
                 bottom: 100,
-                position: Position.Inside,
                 node,
+                position: "inside",
                 top: 70,
             }),
         ]);
@@ -101,16 +102,16 @@ describe("generateHitAreasFromPositions", () => {
     it("returns a hit area with one hit position", () => {
         const node = new Node(null);
         const hitPosition = {
-            top: 100,
             node,
-            position: Position.Inside,
+            position: "inside" as Position,
+            top: 100,
         };
 
         expect(generateHitAreasFromPositions([hitPosition], 140)).toEqual([
             expect.objectContaining({
                 bottom: 140,
                 node,
-                position: Position.Inside,
+                position: "inside",
                 top: 100,
             }),
         ]);
@@ -120,14 +121,14 @@ describe("generateHitAreasFromPositions", () => {
         const node = new Node(null);
         const hitPositions = [
             {
-                top: 100,
                 node,
-                position: Position.Before,
+                position: "before" as Position,
+                top: 100,
             },
             {
-                top: 100,
                 node,
-                position: Position.Inside,
+                position: "inside" as Position,
+                top: 100,
             },
         ];
 
@@ -135,13 +136,13 @@ describe("generateHitAreasFromPositions", () => {
             expect.objectContaining({
                 bottom: 120,
                 node,
-                position: Position.Before,
+                position: "before",
                 top: 100,
             }),
             expect.objectContaining({
                 bottom: 140,
                 node,
-                position: Position.Inside,
+                position: "inside",
                 top: 120,
             }),
         ]);
@@ -152,14 +153,14 @@ describe("generateHitAreasFromPositions", () => {
         const node2 = new Node(null);
         const hitPositions = [
             {
-                top: 100,
                 node: node1,
-                position: Position.Inside,
+                position: "inside" as Position,
+                top: 100,
             },
             {
-                top: 125,
                 node: node2,
-                position: Position.After,
+                position: "after" as Position,
+                top: 125,
             },
         ];
 
@@ -167,13 +168,13 @@ describe("generateHitAreasFromPositions", () => {
             expect.objectContaining({
                 bottom: 125,
                 node: node1,
-                position: Position.Inside,
+                position: "inside",
                 top: 100,
             }),
             expect.objectContaining({
                 bottom: 140,
                 node: node2,
-                position: Position.After,
+                position: "after",
                 top: 125,
             }),
         ]);
@@ -189,8 +190,8 @@ describe("generatePositions", () => {
 
     it("generates hit positions when the tree has two nodes and the first node is the current node", () => {
         const tree = new Node().loadFromData([
-            { name: "node1", id: 1 },
-            { name: "node2", id: 2 },
+            { id: 1, name: "node1" },
+            { id: 2, name: "node2" },
         ]);
 
         const node1 = tree.children[0] as Node;
@@ -202,22 +203,22 @@ describe("generatePositions", () => {
         expect(generateHitPositions(tree, node1)).toEqual([
             expect.objectContaining({
                 node: node1,
-                position: Position.None,
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
                 node: node1,
-                position: Position.None,
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
                 node: node2,
-                position: Position.Inside,
+                position: "inside",
                 top: 120,
             }),
             expect.objectContaining({
                 node: node2,
-                position: Position.After,
+                position: "after",
                 top: 120,
             }),
         ]);
@@ -225,8 +226,8 @@ describe("generatePositions", () => {
 
     it("generates hit positions when the tree has a node and an open folder node and the first node is the current node", () => {
         const tree = new Node().loadFromData([
-            { name: "node1", id: 1 },
-            { name: "node2", id: 2, children: [{ name: "child1", id: 3 }] },
+            { id: 1, name: "node1" },
+            { children: [{ id: 3, name: "child1" }], id: 2, name: "node2" },
         ]);
 
         const node1 = tree.children[0] as Node;
@@ -242,32 +243,32 @@ describe("generatePositions", () => {
         expect(generateHitPositions(tree, node1)).toEqual([
             expect.objectContaining({
                 node: node1,
-                position: Position.None,
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
                 node: node1,
-                position: Position.None,
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
                 node: node2,
-                position: Position.Inside,
+                position: "inside",
                 top: 120,
             }),
             expect.objectContaining({
                 node: child1,
-                position: Position.Inside,
+                position: "inside",
                 top: 140,
             }),
             expect.objectContaining({
                 node: child1,
-                position: Position.After,
+                position: "after",
                 top: 140,
             }),
             expect.objectContaining({
                 node: node2,
-                position: Position.After,
+                position: "after",
                 top: 140,
             }),
         ]);
@@ -275,8 +276,8 @@ describe("generatePositions", () => {
 
     it("generates hit positions when the tree has a node and an open folder node and the folder node is the current node", () => {
         const tree = new Node().loadFromData([
-            { name: "node1", id: 1 },
-            { name: "node2", id: 2, children: [{ name: "child1", id: 3 }] },
+            { id: 1, name: "node1" },
+            { children: [{ id: 3, name: "child1" }], id: 2, name: "node2" },
         ]);
 
         const node1 = tree.children[0] as Node;
@@ -292,27 +293,27 @@ describe("generatePositions", () => {
         expect(generateHitPositions(tree, node2)).toEqual([
             expect.objectContaining({
                 node: node1,
-                position: Position.Before,
+                position: "before",
                 top: 100,
             }),
             expect.objectContaining({
                 node: node1,
-                position: Position.Inside,
+                position: "inside",
                 top: 100,
             }),
             expect.objectContaining({
                 node: node1,
-                position: Position.None,
+                position: null,
                 top: 100,
             }),
             expect.objectContaining({
                 node: node2,
-                position: Position.None,
+                position: null,
                 top: 120,
             }),
             expect.objectContaining({
                 node: node2,
-                position: Position.None,
+                position: null,
                 top: 135,
             }),
         ]);

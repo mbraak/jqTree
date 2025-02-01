@@ -1,7 +1,8 @@
-import getGiven from "givens";
 import { screen, waitFor } from "@testing-library/dom";
+import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 import { titleSpan, togglerLink } from "../support/testUtil";
@@ -10,7 +11,9 @@ const context = describe;
 
 const server = setupServer();
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+    server.listen();
+});
 
 beforeEach(() => {
     $("body").append('<div id="tree1"></div>');
@@ -25,12 +28,14 @@ afterEach(() => {
     localStorage.clear();
 });
 
-afterAll(() => server.close());
+afterAll(() => {
+    server.close();
+});
 
 describe("autoEscape", () => {
     interface Vars {
+        $tree: JQuery;
         autoEscape: boolean;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -70,8 +75,8 @@ describe("autoEscape", () => {
 
 describe("autoOpen", () => {
     interface Vars {
+        $tree: JQuery;
         autoOpen: boolean | number | string;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -102,11 +107,11 @@ describe("autoOpen", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
-                    name: "node2",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "node3", open: true }),
                     ],
+                    name: "node2",
+                    open: true,
                 }),
             ]);
         });
@@ -119,11 +124,11 @@ describe("autoOpen", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
-                    name: "node2",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "node3", open: false }),
                     ],
+                    name: "node2",
+                    open: true,
                 }),
             ]);
         });
@@ -136,11 +141,11 @@ describe("autoOpen", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
-                    name: "node2",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "node3", open: true }),
                     ],
+                    name: "node2",
+                    open: true,
                 }),
             ]);
         });
@@ -153,11 +158,11 @@ describe("autoOpen", () => {
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
-                    name: "node2",
-                    open: true,
                     children: [
                         expect.objectContaining({ name: "node3", open: true }),
                     ],
+                    name: "node2",
+                    open: true,
                 }),
             ]);
         });
@@ -173,6 +178,7 @@ describe("closedIcon", () => {
         });
 
         const $button = $tree.find("a.jqtree-toggler:first");
+
         expect($button.text()).toBe("closed");
     });
 
@@ -184,6 +190,7 @@ describe("closedIcon", () => {
         });
 
         const $button = $tree.find("a.jqtree-toggler:first");
+
         expect($button.text()).toBe("<span>test</span>");
     });
 
@@ -195,6 +202,7 @@ describe("closedIcon", () => {
         });
 
         const $span = $tree.find("a.jqtree-toggler:first span.abc");
+
         expect($span.text()).toBe("test");
     });
 
@@ -210,6 +218,7 @@ describe("closedIcon", () => {
         });
 
         const $span = $tree.find("a.jqtree-toggler:first span.abc");
+
         expect($span.text()).toBe("test");
     });
 
@@ -221,6 +230,7 @@ describe("closedIcon", () => {
         });
 
         const $span = $tree.find("a.jqtree-toggler:first");
+
         expect($span.text()).toBe("►");
     });
 });
@@ -238,8 +248,7 @@ describe("dataFilter", () => {
         });
 
         await screen.findByText("node2");
-
-        expect(screen.queryByText("node1")).toBeNull();
+        expect(screen.queryByText("node1")).not.toBeInTheDocument();
         expect(dataFilter).toHaveBeenCalledWith(exampleData);
     });
 });
@@ -252,25 +261,25 @@ describe("dataUrl", () => {
 
     const testCases = [
         {
-            name: "string",
             dataUrl: "/tree/",
             expectedNode: "node1",
             expectedStructure: exampleStructure,
+            name: "string",
         },
         {
-            name: "object with url and headers",
             dataUrl: {
-                url: "/tree/",
                 headers: { node: "test-node" },
+                url: "/tree/",
             },
             expectedNode: "test-node",
             expectedStructure: [expect.objectContaining({ name: "test-node" })],
+            name: "object with url and headers",
         },
         {
-            name: "function",
             dataUrl: () => ({ url: "/tree/" }),
             expectedNode: "node1",
             expectedStructure: exampleStructure,
+            name: "function",
         },
     ];
 
@@ -286,7 +295,7 @@ describe("dataUrl", () => {
     });
 
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
     const given = getGiven<Vars>();
     given("$tree", () => $("#tree1"));
@@ -311,6 +320,7 @@ describe("dataUrl", () => {
         });
 
         await screen.findByText("node1");
+
         expect((given.$tree.tree("getSelectedNode") as INode).name).toBe(
             "node2",
         );
@@ -325,14 +335,15 @@ describe("dataUrl", () => {
         });
 
         await screen.findByText("node1");
+
         expect(given.$tree.tree("getSelectedNode")).toBeFalse();
     });
 });
 
 describe("onCanSelectNode", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -355,7 +366,7 @@ describe("onCanSelectNode", () => {
 
 describe("onCreateLi", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -364,7 +375,7 @@ describe("onCreateLi", () => {
     beforeEach(() => {
         given.$tree.tree({
             data: exampleData,
-            onCreateLi: (node: INode, el: JQuery<HTMLElement>) => {
+            onCreateLi: (node: INode, el: JQuery) => {
                 titleSpan(el).text(`_${node.name}_`);
             },
         });
@@ -388,9 +399,9 @@ describe("onGetStateFromStorage and onSetStateFromStorage", () => {
     const getState = (): string => savedState;
 
     interface Vars {
+        $tree: JQuery;
         initialState: string;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
 
     const given = getGiven<Vars>();
@@ -447,7 +458,7 @@ describe("onGetStateFromStorage and onSetStateFromStorage", () => {
 
 describe("onLoadFailed", () => {
     interface Vars {
-        $tree: JQuery<HTMLElement>;
+        $tree: JQuery;
     }
 
     const given = getGiven<Vars>();
@@ -485,8 +496,8 @@ describe("onLoadFailed", () => {
 
 describe("rtl", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
-        $tree: JQuery<HTMLElement>;
     }
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
@@ -498,7 +509,9 @@ describe("rtl", () => {
         });
 
         it("has a different closed icon", () => {
-            expect(togglerLink(given.node1.element).text()).toBe("◀");
+            expect(togglerLink(given.node1.element as HTMLElement).text()).toBe(
+                "◀",
+            );
         });
     });
 
@@ -509,16 +522,18 @@ describe("rtl", () => {
         });
 
         it("has a different closed icon", () => {
-            expect(togglerLink(given.node1.element).text()).toBe("◀");
+            expect(togglerLink(given.node1.element as HTMLElement).text()).toBe(
+                "◀",
+            );
         });
     });
 });
 
 describe("saveState", () => {
     interface Vars {
+        $tree: JQuery;
         node1: INode;
         saveState: boolean | string;
-        $tree: JQuery<HTMLElement>;
     }
     const given = getGiven<Vars>();
     given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
@@ -603,8 +618,8 @@ describe("saveState", () => {
 describe("showEmptyFolder", () => {
     context("when children attribute is an empty array", () => {
         interface Vars {
+            $tree: JQuery;
             showEmptyFolder: boolean;
-            $tree: JQuery<HTMLElement>;
         }
 
         const given = getGiven<Vars>();
@@ -612,7 +627,7 @@ describe("showEmptyFolder", () => {
 
         beforeEach(() => {
             given.$tree.tree({
-                data: [{ name: "parent1", children: [] }],
+                data: [{ children: [], name: "parent1" }],
                 showEmptyFolder: given.showEmptyFolder,
             });
         });
@@ -632,7 +647,7 @@ describe("showEmptyFolder", () => {
 
             it("creates a folder", () => {
                 expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "parent1", children: [] }),
+                    expect.objectContaining({ children: [], name: "parent1" }),
                 ]);
             });
         });

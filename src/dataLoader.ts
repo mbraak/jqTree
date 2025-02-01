@@ -1,6 +1,6 @@
-import { Node } from "./node";
-import { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
 import { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
+import { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
+import { Node } from "./node";
 
 export type HandleFinishedLoading = () => void;
 
@@ -38,7 +38,7 @@ export default class DataLoader {
     }
 
     public loadFromUrl(
-        urlInfo: string | JQuery.AjaxSettings | null,
+        urlInfo: JQuery.AjaxSettings | null | string,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {
@@ -55,7 +55,7 @@ export default class DataLoader {
             this.notifyLoading(false, parentNode, element);
         };
 
-        const handleSuccess = (data: string | NodeData[]): void => {
+        const handleSuccess = (data: NodeData[] | string): void => {
             stopLoading();
             this.loadData(this.parseData(data), parentNode);
 
@@ -79,12 +79,8 @@ export default class DataLoader {
         element.classList.add("jqtree-loading");
     }
 
-    private removeLoadingClass(element: HTMLElement): void {
-        element.classList.remove("jqtree-loading");
-    }
-
     private getDomElement(parentNode: Node | null): HTMLElement {
-        if (parentNode) {
+        if (parentNode?.element) {
             return parentNode.element;
         } else {
             return this.treeElement;
@@ -103,37 +99,13 @@ export default class DataLoader {
         }
 
         this.triggerEvent("tree.loading_data", {
+            $el,
             isLoading,
             node,
-            $el,
         });
     }
 
-    private submitRequest(
-        urlInfoInput: string | JQuery.AjaxSettings,
-        handleSuccess: JQuery.Ajax.SuccessCallback<any>,
-        handleError: JQuery.Ajax.ErrorCallback<any>,
-    ): void {
-        const urlInfo =
-            typeof urlInfoInput === "string"
-                ? { url: urlInfoInput }
-                : urlInfoInput;
-
-        const ajaxSettings: JQuery.AjaxSettings = {
-            method: "GET",
-            cache: false,
-            dataType: "json",
-            success: handleSuccess,
-            error: handleError,
-            ...urlInfo,
-        };
-
-        ajaxSettings.method = ajaxSettings.method?.toUpperCase() || "GET";
-
-        void jQuery.ajax(ajaxSettings);
-    }
-
-    private parseData(data: string | NodeData[]): NodeData[] {
+    private parseData(data: NodeData[] | string): NodeData[] {
         const getParsedData = () => {
             if (typeof data === "string") {
                 return JSON.parse(data) as NodeData[];
@@ -149,5 +121,33 @@ export default class DataLoader {
         } else {
             return parsedData;
         }
+    }
+
+    private removeLoadingClass(element: HTMLElement): void {
+        element.classList.remove("jqtree-loading");
+    }
+
+    private submitRequest(
+        urlInfoInput: JQuery.AjaxSettings | string,
+        handleSuccess: JQuery.Ajax.SuccessCallback<any>,
+        handleError: JQuery.Ajax.ErrorCallback<any>,
+    ): void {
+        const urlInfo =
+            typeof urlInfoInput === "string"
+                ? { url: urlInfoInput }
+                : urlInfoInput;
+
+        const ajaxSettings: JQuery.AjaxSettings = {
+            cache: false,
+            dataType: "json",
+            error: handleError,
+            method: "GET",
+            success: handleSuccess,
+            ...urlInfo,
+        };
+
+        ajaxSettings.method = ajaxSettings.method?.toUpperCase() ?? "GET";
+
+        void jQuery.ajax(ajaxSettings);
     }
 }

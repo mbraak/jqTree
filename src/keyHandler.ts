@@ -1,4 +1,3 @@
-import { Node } from "./node";
 import {
     CloseNode,
     GetSelectedNode,
@@ -6,8 +5,7 @@ import {
     OpenNode,
     SelectNode,
 } from "./jqtreeMethodTypes";
-
-type KeyboardEventHandler = (event: KeyboardEvent) => boolean;
+import { Node } from "./node";
 
 interface KeyHandlerParams {
     closeNode: CloseNode;
@@ -21,12 +19,12 @@ interface KeyHandlerParams {
 export default class KeyHandler {
     private closeNode: CloseNode;
     private getSelectedNode: GetSelectedNode;
-    private handleKeyDownHandler?: KeyboardEventHandler;
+
     private isFocusOnTree: IsFocusOnTree;
+
     private keyboardSupport: boolean;
     private openNode: OpenNode;
     private originalSelectNode: SelectNode;
-
     constructor({
         closeNode,
         getSelectedNode,
@@ -43,15 +41,13 @@ export default class KeyHandler {
         this.originalSelectNode = selectNode;
 
         if (keyboardSupport) {
-            this.handleKeyDownHandler = this.handleKeyDown.bind(this);
-
-            document.addEventListener("keydown", this.handleKeyDownHandler);
+            document.addEventListener("keydown", this.handleKeyDown);
         }
     }
 
     public deinit(): void {
-        if (this.handleKeyDownHandler) {
-            document.removeEventListener("keydown", this.handleKeyDownHandler);
+        if (this.keyboardSupport) {
+            document.removeEventListener("keydown", this.handleKeyDown);
         }
     }
 
@@ -63,9 +59,57 @@ export default class KeyHandler {
         return this.selectNode(selectedNode.getPreviousVisibleNode());
     }
 
-    public moveRight(selectedNode: Node): boolean {
-        if (!selectedNode.isFolder()) {
+    private canHandleKeyboard(): boolean {
+        return this.keyboardSupport && this.isFocusOnTree();
+    }
+
+    private handleKeyDown = (e: KeyboardEvent): void => {
+        if (!this.canHandleKeyboard()) {
+            return;
+        }
+
+        let isKeyHandled = false;
+
+        const selectedNode = this.getSelectedNode();
+        if (selectedNode) {
+            switch (e.key) {
+                case "ArrowDown":
+                    isKeyHandled = this.moveDown(selectedNode);
+                    break;
+
+                case "ArrowLeft":
+                    isKeyHandled = this.moveLeft(selectedNode);
+                    break;
+
+                case "ArrowRight":
+                    isKeyHandled = this.moveRight(selectedNode);
+                    break;
+
+                case "ArrowUp":
+                    isKeyHandled = this.moveUp(selectedNode);
+                    break;
+            }
+        }
+
+        if (isKeyHandled) {
+            e.preventDefault();
+        }
+    };
+
+    private moveLeft(selectedNode: Node): boolean {
+        if (selectedNode.isFolder() && selectedNode.is_open) {
+            // Left on an open node closes the node
+            this.closeNode(selectedNode);
             return true;
+        } else {
+            // Left on a closed or end node moves focus to the node's parent
+            return this.selectNode(selectedNode.getParent());
+        }
+    }
+
+    private moveRight(selectedNode: Node): boolean {
+        if (!selectedNode.isFolder()) {
+            return false;
         } else {
             // folder node
             if (selectedNode.is_open) {
@@ -74,61 +118,22 @@ export default class KeyHandler {
             } else {
                 // Right expands a closed node
                 this.openNode(selectedNode);
-                return false;
+                return true;
             }
         }
     }
 
-    public moveLeft(selectedNode: Node): boolean {
-        if (selectedNode.isFolder() && selectedNode.is_open) {
-            // Left on an open node closes the node
-            this.closeNode(selectedNode);
-            return false;
-        } else {
-            // Left on a closed or end node moves focus to the node's parent
-            return this.selectNode(selectedNode.getParent());
-        }
-    }
-
-    public selectNode(node: Node | null): boolean {
+    /* Select the node.
+     * Don't do anything if the node is null.
+     * Result: a different node was selected.
+     */
+    private selectNode(node: Node | null): boolean {
         if (!node) {
-            return true;
+            return false;
         } else {
             this.originalSelectNode(node);
 
-            return false;
-        }
-    }
-
-    private handleKeyDown = (e: KeyboardEvent): boolean => {
-        if (!this.canHandleKeyboard()) {
             return true;
         }
-
-        const selectedNode = this.getSelectedNode();
-        if (!selectedNode) {
-            return true;
-        }
-
-        switch (e.key) {
-            case "ArrowDown":
-                return this.moveDown(selectedNode);
-
-            case "ArrowUp":
-                return this.moveUp(selectedNode);
-
-            case "ArrowRight":
-                return this.moveRight(selectedNode);
-
-            case "ArrowLeft":
-                return this.moveLeft(selectedNode);
-
-            default:
-                return true;
-        }
-    };
-
-    private canHandleKeyboard(): boolean {
-        return this.keyboardSupport && this.isFocusOnTree();
     }
 }

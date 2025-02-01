@@ -54,6 +54,9 @@ jobs:
               run: pnpm run jest
             - name: Playwright install
               run: npx playwright install chromium
+            - name: Copy vendor files
+              run: pnpm install && pnpm run copy_vendor_files
+              working-directory: ./docs
             - name: Run playwright tests
               run: pnpm run playwright
             - name: Screenshots artifact
@@ -61,11 +64,11 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: screenshots
-                path: src/playwright/playwright.test.ts-snapshots/
+                path: test-results/
             - name: Merge coverage
               run: cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
             - name: Codecov
-              uses: codecov/codecov-action@v4
+              uses: codecov/codecov-action@v5
               with:
                 directory: .nyc_output
                 verbose: true

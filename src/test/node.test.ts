@@ -1,8 +1,8 @@
 import getGiven from "givens";
-import { Node } from "../node";
-import { Position } from "../position";
-import exampleData from "./support/exampleData";
 import "jest-extended";
+
+import { Node } from "../node";
+import exampleData from "./support/exampleData";
 
 const context = describe;
 
@@ -54,19 +54,19 @@ describe("addAfter", () => {
     context("when adding a node with children", () => {
         it("adds the children", () => {
             given.node1.addAfter({
-                name: "new node",
                 children: ["newchild1", "newchild2"],
+                name: "new node",
             });
 
             expect(given.tree).toMatchObject({
                 children: [
                     expect.objectContaining({ name: "node1" }),
                     expect.objectContaining({
-                        name: "new node",
                         children: [
                             expect.objectContaining({ name: "newchild1" }),
                             expect.objectContaining({ name: "newchild2" }),
                         ],
+                        name: "new node",
                     }),
                     expect.objectContaining({ name: "node2" }),
                 ],
@@ -123,19 +123,19 @@ describe("addBefore", () => {
     context("when adding a node with children", () => {
         it("adds the children", () => {
             given.node2.addBefore({
-                name: "new node",
                 children: ["newchild1", "newchild2"],
+                name: "new node",
             });
 
             expect(given.tree).toMatchObject({
                 children: [
                     expect.objectContaining({ name: "node1" }),
                     expect.objectContaining({
-                        name: "new node",
                         children: [
                             expect.objectContaining({ name: "newchild1" }),
                             expect.objectContaining({ name: "newchild2" }),
                         ],
+                        name: "new node",
                     }),
                     expect.objectContaining({ name: "node2" }),
                 ],
@@ -230,8 +230,8 @@ describe("addChildAtPosition", () => {
 
 describe("addParent", () => {
     interface Vars {
-        tree: Node;
         node1: Node;
+        tree: Node;
     }
     const given = getGiven<Vars>();
     given("node1", () => new Node("node1"));
@@ -246,20 +246,20 @@ describe("addParent", () => {
         given.node1.addParent("parent1");
 
         expect(given.tree).toMatchObject({
-            name: "",
             children: [
                 expect.objectContaining({
-                    name: "parent1",
                     children: [
                         expect.objectContaining({
-                            name: "node1",
                             children: [
                                 expect.objectContaining({ name: "child1" }),
                             ],
+                            name: "node1",
                         }),
                     ],
+                    name: "parent1",
                 }),
             ],
+            name: "",
         });
     });
 
@@ -288,11 +288,11 @@ describe("append", () => {
         given.node.append("child2");
 
         expect(given.node).toMatchObject({
-            name: "node1",
             children: [
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
             ],
+            name: "node1",
         });
     });
 
@@ -303,18 +303,18 @@ describe("append", () => {
     context("when adding a node with children", () => {
         it("adds the children", () => {
             given.node.append({
-                name: "new node",
                 children: ["newchild1", "newchild2"],
+                name: "new node",
             });
 
             expect(given.node).toMatchObject({
                 children: [
                     expect.objectContaining({
-                        name: "new node",
                         children: [
                             expect.objectContaining({ name: "newchild1" }),
                             expect.objectContaining({ name: "newchild2" }),
                         ],
+                        name: "new node",
                     }),
                 ],
             });
@@ -346,8 +346,8 @@ describe("constructor", () => {
 
         it("creates a node", () => {
             expect(given.node).toMatchObject({
-                name: "n1",
                 children: [],
+                name: "n1",
                 parent: null,
             });
             expect(given.node.id).toBeUndefined();
@@ -433,8 +433,8 @@ describe("constructor", () => {
 
     context("with an object with children", () => {
         given("params", () => ({
-            name: "n1",
             children: ["c"],
+            name: "n1",
         }));
 
         it("doesn't set the children", () => {
@@ -449,8 +449,8 @@ describe("constructor", () => {
 
     context("when the data contains an empty children attribute", () => {
         given("params", () => ({
-            name: "n1",
             children: [],
+            name: "n1",
         }));
 
         it("sets isEmptyFolder to true", () => {
@@ -483,6 +483,7 @@ describe("getChildIndex", () => {
     context("when a child doesn't exist", () => {
         it("returns -1", () => {
             const nonExistingChild = new Node("non-existing");
+
             expect(given.node.getChildIndex(nonExistingChild)).toBe(-1);
         });
     });
@@ -498,11 +499,11 @@ describe("getData", () => {
     it("returns the tree data", () => {
         expect(given.tree.getData()).toEqual([
             expect.objectContaining({
-                name: "node1",
                 children: [
                     expect.objectContaining({ name: "child1" }),
                     expect.objectContaining({ name: "child2" }),
                 ],
+                name: "node1",
             }),
             expect.objectContaining({ name: "node2" }),
         ]);
@@ -987,23 +988,23 @@ describe("initFromData", () => {
 
     beforeEach(() => {
         given.tree.initFromData({
-            name: "node1",
-            id: 1,
             children: [
-                { name: "child1", id: 2 },
-                { name: "child2", id: 3 },
+                { id: 2, name: "child1" },
+                { id: 3, name: "child2" },
             ],
+            id: 1,
+            name: "node1",
         });
     });
 
     it("loads the data", () => {
         expect(given.tree).toMatchObject({
-            id: 1,
-            name: "node1",
             children: [
                 expect.objectContaining({ id: 2, name: "child1" }),
                 expect.objectContaining({ id: 3, name: "child2" }),
             ],
+            id: 1,
+            name: "node1",
         });
     });
 });
@@ -1097,21 +1098,21 @@ describe("loadFromData", () => {
 
         expect(tree.children).toEqual([
             expect.objectContaining({
-                id: 123,
-                intProperty: 1,
-                name: "node1",
-                strProperty: "1",
                 children: [
                     expect.objectContaining({ id: 125, name: "child1" }),
                     expect.objectContaining({ id: 126, name: "child2" }),
                 ],
+                id: 123,
+                intProperty: 1,
+                name: "node1",
+                strProperty: "1",
             }),
             expect.objectContaining({
+                children: [expect.objectContaining({ id: 127, name: "node3" })],
                 id: 124,
                 intProperty: 3,
                 name: "node2",
                 strProperty: "3",
-                children: [expect.objectContaining({ id: 127, name: "node3" })],
             }),
         ]);
     });
@@ -1119,12 +1120,12 @@ describe("loadFromData", () => {
     it("sets isEmptyFolder to true for a node when it is has an empty children attribute", () => {
         const data = [
             {
-                name: "test1",
                 children: [],
+                name: "test1",
             },
         ];
-
         const tree = new Node().loadFromData(data);
+
         expect((tree.children[0] as Node).isEmptyFolder).toBe(true);
     });
 
@@ -1134,20 +1135,20 @@ describe("loadFromData", () => {
                 name: "test1",
             },
         ];
-
         const tree = new Node().loadFromData(data);
+
         expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
     });
 
     it("sets isEmptyFolder to false for a node when it has a children attribute that is not empty", () => {
         const data = [
             {
-                name: "test1",
                 children: ["child1"],
+                name: "test1",
             },
         ];
-
         const tree = new Node().loadFromData(data);
+
         expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
     });
 });
@@ -1172,30 +1173,26 @@ describe("moveNode", () => {
     context("when moving after a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child2, given.node2, Position.After),
+                given.tree.moveNode(given.child2, given.node2, "after"),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
-                name: "",
                 children: [
                     expect.objectContaining({
-                        name: "node1",
                         children: [expect.objectContaining({ name: "child1" })],
+                        name: "node1",
                     }),
                     expect.objectContaining({ name: "node2" }),
                     expect.objectContaining({ name: "child2" }),
                 ],
+                name: "",
             });
         });
 
         context("when the target is the root node", () => {
             it("returns false", () => {
                 expect(
-                    given.tree.moveNode(
-                        given.child2,
-                        given.tree,
-                        Position.After,
-                    ),
+                    given.tree.moveNode(given.child2, given.tree, "after"),
                 ).toBe(false);
             });
         });
@@ -1204,24 +1201,24 @@ describe("moveNode", () => {
     context("when moving inside a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(given.child1, given.node2, Position.Inside),
+                given.tree.moveNode(given.child1, given.node2, "inside"),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
-                name: "",
                 children: [
                     expect.objectContaining({
-                        name: "node1",
                         children: [expect.objectContaining({ name: "child2" })],
+                        name: "node1",
                     }),
                     expect.objectContaining({
-                        name: "node2",
                         children: [
                             expect.objectContaining({ name: "child1" }),
                             expect.objectContaining({ name: "node3" }),
                         ],
+                        name: "node2",
                     }),
                 ],
+                name: "",
             });
         });
     });
@@ -1229,36 +1226,28 @@ describe("moveNode", () => {
     context("when moving before a node", () => {
         it("moves the node", () => {
             expect(
-                given.tree.moveNode(
-                    given.child2,
-                    given.child1,
-                    Position.Before,
-                ),
+                given.tree.moveNode(given.child2, given.child1, "before"),
             ).toBe(true);
 
             expect(given.tree).toMatchObject({
-                name: "",
                 children: [
                     expect.objectContaining({
-                        name: "node1",
                         children: [
                             expect.objectContaining({ name: "child2" }),
                             expect.objectContaining({ name: "child1" }),
                         ],
+                        name: "node1",
                     }),
                     expect.objectContaining({ name: "node2" }),
                 ],
+                name: "",
             });
         });
 
         context("when the target is the root node", () => {
             it("returns false", () => {
                 expect(
-                    given.tree.moveNode(
-                        given.child2,
-                        given.tree,
-                        Position.Before,
-                    ),
+                    given.tree.moveNode(given.child2, given.tree, "before"),
                 ).toBe(false);
             });
         });
@@ -1267,29 +1256,21 @@ describe("moveNode", () => {
     context("when the moved node is a parent of the target node", () => {
         it("doesn't move the node", () => {
             expect(
-                given.tree.moveNode(given.node1, given.child1, Position.Before),
+                given.tree.moveNode(given.node1, given.child1, "before"),
             ).toBe(false);
 
             expect(given.tree).toMatchObject({
                 children: [
                     expect.objectContaining({
-                        name: "node1",
                         children: [
                             expect.objectContaining({ name: "child1" }),
                             expect.objectContaining({ name: "child2" }),
                         ],
+                        name: "node1",
                     }),
                     expect.objectContaining({ name: "node2" }),
                 ],
             });
-        });
-    });
-
-    context("with position None", () => {
-        it("returns false", () => {
-            expect(
-                given.tree.moveNode(given.child2, given.node2, Position.None),
-            ).toBe(false);
         });
     });
 });
@@ -1306,29 +1287,29 @@ describe("prepend", () => {
         given.node.prepend("child1");
 
         expect(given.node).toMatchObject({
-            name: "node1",
             children: [
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
             ],
+            name: "node1",
         });
     });
 
     context("when prepending a node with children", () => {
         it("adds the children", () => {
             given.node.prepend({
-                name: "new node",
                 children: ["newchild1", "newchild2"],
+                name: "new node",
             });
 
             expect(given.node).toMatchObject({
                 children: [
                     expect.objectContaining({
-                        name: "new node",
                         children: [
                             expect.objectContaining({ name: "newchild1" }),
                             expect.objectContaining({ name: "newchild2" }),
                         ],
+                        name: "new node",
                     }),
                 ],
             });
@@ -1337,8 +1318,8 @@ describe("prepend", () => {
 
     it("sets the isEmptyFolder attribute to true when the node data has empty children", () => {
         given.node.prepend({
-            name: "test1",
             children: [],
+            name: "test1",
         });
 
         expect((given.node.children[0] as Node).isEmptyFolder).toBe(true);
@@ -1362,8 +1343,8 @@ describe("remove", () => {
         expect(given.tree).toMatchObject({
             children: [
                 expect.objectContaining({
-                    name: "node1",
                     children: [expect.objectContaining({ name: "child2" })],
+                    name: "node1",
                 }),
                 expect.objectContaining({ name: "node2" }),
             ],

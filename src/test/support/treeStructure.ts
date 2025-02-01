@@ -1,6 +1,6 @@
 import { singleChild } from "./testUtil";
 
-const getTreeNode = ($li: JQuery<HTMLElement>): JQTreeMatchers.TreeNode => {
+const getTreeNode = ($li: JQuery): JQTreeMatchers.TreeNode => {
     const $div = singleChild($li, "div.jqtree-element");
     const $span = singleChild($div, "span.jqtree-title");
     const name = $span.html();
@@ -10,30 +10,28 @@ const getTreeNode = ($li: JQuery<HTMLElement>): JQTreeMatchers.TreeNode => {
         const $ul = $li.children("ul.jqtree_common");
 
         return {
-            nodeType: "folder",
             children: getChildren($ul),
             name,
+            nodeType: "folder",
             open: !$li.hasClass("jqtree-closed"),
             selected,
         };
     } else {
         return {
-            nodeType: "child",
             name,
+            nodeType: "child",
             selected,
         };
     }
 };
 
-const getChildren = ($ul: JQuery<HTMLElement>): JQTreeMatchers.TreeStructure =>
+const getChildren = ($ul: JQuery): JQTreeMatchers.TreeStructure =>
     $ul
         .children("li.jqtree_common")
         .map<JQTreeMatchers.TreeNode>((_, li) => getTreeNode(jQuery(li)))
         .get();
 
-const treeStructure = (
-    $el: JQuery<HTMLElement>
-): JQTreeMatchers.TreeStructure =>
+const treeStructure = ($el: JQuery): JQTreeMatchers.TreeStructure =>
     getChildren(singleChild($el, "ul.jqtree-tree"));
 
 export default treeStructure;

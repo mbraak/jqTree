@@ -1,5 +1,15 @@
+import "@testing-library/jest-dom";
 import jQuery from "jquery";
+
 import "./jqTreeMatchers";
 
-(window as any).$ = jQuery; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-(window as any).jQuery = jQuery; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+declare global {
+    interface Window {
+        $: JQueryStatic;
+        jQuery: JQueryStatic;
+        TransformStream: any;
+    }
+}
+
+window.$ = jQuery;
+window.jQuery = jQuery;

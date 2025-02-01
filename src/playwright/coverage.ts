@@ -1,7 +1,7 @@
+import { BrowserContext } from "@playwright/test";
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
-import { BrowserContext } from "@playwright/test";
 
 const istanbulCLIOutput = path.join(process.cwd(), ".nyc_output");
 
@@ -31,7 +31,7 @@ export const saveCoverage = async (context: BrowserContext) => {
             const anyWindow = window as any;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             const coverageData = anyWindow.__coverage__;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, playwright/no-unsafe-references
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             anyWindow.collectIstanbulCoverage(JSON.stringify(coverageData));
         });
     }

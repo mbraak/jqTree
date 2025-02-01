@@ -1,17 +1,3 @@
-import { Node } from "../node";
-import { getPositionName, Position } from "../position";
-import { DropHint, HitArea } from "./types";
-import { PositionInfo } from "../mouseUtils";
-import NodeElement from "../nodeElement";
-import DragElement from "./dragElement";
-import generateHitAreas from "./generateHitAreas";
-import { getElementPosition } from "../util";
-import {
-    OnCanMove,
-    OnCanMoveTo,
-    OnIsMoveHandle,
-    DragMethod,
-} from "../jqtreeOptions";
 import {
     GetScrollLeft,
     GetTree,
@@ -19,16 +5,27 @@ import {
     RefreshElements,
     TriggerEvent,
 } from "../jqtreeMethodTypes";
+import {
+    DragMethod,
+    OnCanMove,
+    OnCanMoveTo,
+    OnIsMoveHandle,
+} from "../jqtreeOptions";
+import { PositionInfo } from "../mouseUtils";
+import { Node } from "../node";
+import NodeElement from "../nodeElement";
+import { getElementPosition } from "../util";
+import binarySearch from "./binarySearch";
+import DragElement from "./dragElement";
+import generateHitAreas from "./generateHitAreas";
+import { DropHint, HitArea } from "./types";
 
 interface Dimensions {
-    left: number;
-    top: number;
-    right: number;
     bottom: number;
+    left: number;
+    right: number;
+    top: number;
 }
-
-type GetNodeElement = (element: HTMLElement) => NodeElement | null;
-type GetNodeElementForNode = (node: Node) => NodeElement;
 
 interface DragAndDropHandlerParams {
     autoEscape?: boolean;
@@ -41,19 +38,22 @@ interface DragAndDropHandlerParams {
     onDragMove?: DragMethod;
     onDragStop?: DragMethod;
     onIsMoveHandle?: OnIsMoveHandle;
-    openFolderDelay: number | false;
+    openFolderDelay: false | number;
     openNode: OpenNode;
     refreshElements: RefreshElements;
     slide: boolean;
     treeElement: HTMLElement;
     triggerEvent: TriggerEvent;
 }
+type GetNodeElement = (element: HTMLElement) => NodeElement | null;
+
+type GetNodeElementForNode = (node: Node) => NodeElement;
 
 export class DragAndDropHandler {
-    public hitAreas: HitArea[];
-    public isDragging: boolean;
     public currentItem: NodeElement | null;
+    public hitAreas: HitArea[];
     public hoveredArea: HitArea | null;
+    public isDragging: boolean;
 
     private autoEscape?: boolean;
     private dragElement: DragElement | null;
@@ -66,8 +66,8 @@ export class DragAndDropHandler {
     private onDragMove?: DragMethod;
     private onDragStop?: DragMethod;
     private onIsMoveHandle?: OnIsMoveHandle;
-    private openFolderDelay: number | false;
-    private openFolderTimer: number | null;
+    private openFolderDelay: false | number;
+    private openFolderTimer: null | number;
     private openNode: OpenNode;
     private previousGhost: DropHint | null;
     private refreshElements: RefreshElements;
@@ -86,6 +86,7 @@ export class DragAndDropHandler {
         onDragMove,
         onDragStop,
         onIsMoveHandle,
+        openFolderDelay,
         openNode,
         refreshElements,
         slide,
@@ -102,6 +103,7 @@ export class DragAndDropHandler {
         this.onDragMove = onDragMove;
         this.onDragStop = onDragStop;
         this.onIsMoveHandle = onIsMoveHandle;
+        this.openFolderDelay = openFolderDelay;
         this.openNode = openNode;
         this.refreshElements = refreshElements;
         this.slide = slide;
@@ -137,31 +139,6 @@ export class DragAndDropHandler {
         return this.currentItem != null;
     }
 
-    public mouseStart(positionInfo: PositionInfo): boolean {
-        if (!this.currentItem) {
-            return false;
-        }
-
-        this.refresh();
-
-        const { left, top } = getElementPosition(positionInfo.target);
-
-        const node = this.currentItem.node;
-
-        this.dragElement = new DragElement({
-            autoEscape: this.autoEscape ?? true,
-            nodeName: node.name,
-            offsetX: positionInfo.pageX - left,
-            offsetY: positionInfo.pageY - top,
-            treeElement: this.treeElement,
-        });
-
-        this.isDragging = true;
-        this.currentItem.element.classList.add("jqtree-moving");
-
-        return true;
-    }
-
     public mouseDrag(positionInfo: PositionInfo): boolean {
         if (!this.currentItem || !this.dragElement) {
             return false;
@@ -174,7 +151,7 @@ export class DragAndDropHandler {
             positionInfo.pageY,
         );
 
-        if (area && this.canMoveToArea(area)) {
+        if (area && this.canMoveToArea(area, this.currentItem)) {
             if (!area.node.isFolder()) {
                 this.stopOpenFolderTimer();
             }
@@ -209,6 +186,31 @@ export class DragAndDropHandler {
         return true;
     }
 
+    public mouseStart(positionInfo: PositionInfo): boolean {
+        if (!this.currentItem) {
+            return false;
+        }
+
+        this.refresh();
+
+        const { left, top } = getElementPosition(positionInfo.target);
+
+        const node = this.currentItem.node;
+
+        this.dragElement = new DragElement({
+            autoEscape: this.autoEscape ?? true,
+            nodeName: node.name,
+            offsetX: positionInfo.pageX - left,
+            offsetY: positionInfo.pageY - top,
+            treeElement: this.treeElement,
+        });
+
+        this.isDragging = true;
+        this.currentItem.element.classList.add("jqtree-moving");
+
+        return true;
+    }
+
     public mouseStop(positionInfo: PositionInfo): boolean {
         this.moveItem(positionInfo);
         this.clear();
@@ -238,11 +240,9 @@ export class DragAndDropHandler {
         this.removeHitAreas();
 
         if (this.currentItem) {
-            this.generateHitAreas();
-
-            this.currentItem = this.getNodeElementForNode(
-                this.currentItem.node,
-            );
+            const currentNode = this.currentItem.node;
+            this.generateHitAreas(currentNode);
+            this.currentItem = this.getNodeElementForNode(currentNode);
 
             if (this.isDragging) {
                 this.currentItem.element.classList.add("jqtree-moving");
@@ -250,46 +250,12 @@ export class DragAndDropHandler {
         }
     }
 
-    private generateHitAreas(): void {
-        const tree = this.getTree();
-
-        if (!this.currentItem || !tree) {
-            this.hitAreas = [];
-        } else {
-            this.hitAreas = generateHitAreas(
-                tree,
-                this.currentItem.node,
-                this.getTreeDimensions().bottom,
-            );
-        }
-    }
-
-    private mustCaptureElement(element: HTMLElement): boolean {
-        const nodeName = element.nodeName;
-
-        return (
-            nodeName !== "INPUT" &&
-            nodeName !== "SELECT" &&
-            nodeName !== "TEXTAREA"
-        );
-    }
-
-    private canMoveToArea(area: HitArea): boolean {
+    private canMoveToArea(area: HitArea, currentItem: NodeElement): boolean {
         if (!this.onCanMoveTo) {
             return true;
         }
 
-        if (!this.currentItem) {
-            return false;
-        }
-
-        const positionName = getPositionName(area.position);
-
-        return this.onCanMoveTo(this.currentItem.node, area.node, positionName);
-    }
-
-    private removeHitAreas(): void {
-        this.hitAreas = [];
+        return this.onCanMoveTo(currentItem.node, area.node, area.position);
     }
 
     private clear(): void {
@@ -297,16 +263,6 @@ export class DragAndDropHandler {
             this.dragElement.remove();
             this.dragElement = null;
         }
-    }
-
-    private removeDropHint(): void {
-        if (this.previousGhost) {
-            this.previousGhost.remove();
-        }
-    }
-
-    private removeHover(): void {
-        this.hoveredArea = null;
     }
 
     private findHoveredArea(x: number, y: number): HitArea | null {
@@ -321,49 +277,118 @@ export class DragAndDropHandler {
             return null;
         }
 
-        let low = 0;
-        let high = this.hitAreas.length;
-        while (low < high) {
-            const mid = (low + high) >> 1;
-            const area = this.hitAreas[mid];
+        return binarySearch<HitArea>(this.hitAreas, (area) => {
+            if (y < area.top) {
+                return 1;
+            } else if (y > area.bottom) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+    }
 
-            if (!area) {
-                return null;
+    private generateHitAreas(currentNode: Node): void {
+        const tree = this.getTree();
+
+        if (!tree) {
+            this.hitAreas = [];
+        } else {
+            this.hitAreas = generateHitAreas(
+                tree,
+                currentNode,
+                this.getTreeDimensions().bottom,
+            );
+        }
+    }
+
+    private getTreeDimensions(): Dimensions {
+        // Return the dimensions of the tree. Add a margin to the bottom to allow
+        // to drag-and-drop after the last element.
+        const treePosition = getElementPosition(this.treeElement);
+        const left = treePosition.left + this.getScrollLeft();
+        const top = treePosition.top;
+
+        return {
+            bottom: top + this.treeElement.clientHeight + 16,
+            left,
+            right: left + this.treeElement.clientWidth,
+            top,
+        };
+    }
+
+    /* Move the dragged node to the selected position in the tree. */
+    private moveItem(positionInfo: PositionInfo): void {
+        if (
+            this.currentItem &&
+            this.hoveredArea?.position &&
+            this.canMoveToArea(this.hoveredArea, this.currentItem)
+        ) {
+            const movedNode = this.currentItem.node;
+            const targetNode = this.hoveredArea.node;
+            const position = this.hoveredArea.position;
+            const previousParent = movedNode.parent;
+
+            if (position === "inside") {
+                this.hoveredArea.node.is_open = true;
             }
 
-            if (y < area.top) {
-                high = mid;
-            } else if (y > area.bottom) {
-                low = mid + 1;
-            } else {
-                return area;
+            const doMove = (): void => {
+                const tree = this.getTree();
+
+                if (tree) {
+                    tree.moveNode(movedNode, targetNode, position);
+
+                    this.treeElement.textContent = "";
+                    this.refreshElements(null);
+                }
+            };
+
+            const event = this.triggerEvent("tree.move", {
+                move_info: {
+                    do_move: doMove,
+                    moved_node: movedNode,
+                    original_event: positionInfo.originalEvent,
+                    position,
+                    previous_parent: previousParent,
+                    target_node: targetNode,
+                },
+            });
+
+            if (!event.isDefaultPrevented()) {
+                doMove();
             }
         }
+    }
 
-        return null;
+    private mustCaptureElement(element: HTMLElement): boolean {
+        const nodeName = element.nodeName;
+
+        return (
+            nodeName !== "INPUT" &&
+            nodeName !== "SELECT" &&
+            nodeName !== "TEXTAREA"
+        );
     }
 
     private mustOpenFolderTimer(area: HitArea): boolean {
         const node = area.node;
 
-        return (
-            node.isFolder() &&
-            !node.is_open &&
-            area.position === Position.Inside
-        );
+        return node.isFolder() && !node.is_open && area.position === "inside";
     }
 
-    private updateDropHint(): void {
-        if (!this.hoveredArea) {
-            return;
+    private removeDropHint(): void {
+        if (this.previousGhost) {
+            this.previousGhost.remove();
         }
+    }
 
-        // remove previous drop hint
-        this.removeDropHint();
+    private removeHitAreas(): void {
+        this.hitAreas = [];
+    }
 
-        // add new drop hint
-        const nodeElement = this.getNodeElementForNode(this.hoveredArea.node);
-        this.previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
+    private removeHover(): void {
+        this.hoveredArea = null;
     }
 
     private startOpenFolderTimer(folder: Node): void {
@@ -393,62 +418,16 @@ export class DragAndDropHandler {
         }
     }
 
-    private moveItem(positionInfo: PositionInfo): void {
-        if (
-            this.currentItem &&
-            this.hoveredArea &&
-            this.hoveredArea.position !== Position.None &&
-            this.canMoveToArea(this.hoveredArea)
-        ) {
-            const movedNode = this.currentItem.node;
-            const targetNode = this.hoveredArea.node;
-            const position = this.hoveredArea.position;
-            const previousParent = movedNode.parent;
-
-            if (position === Position.Inside) {
-                this.hoveredArea.node.is_open = true;
-            }
-
-            const doMove = (): void => {
-                const tree = this.getTree();
-
-                if (tree) {
-                    tree.moveNode(movedNode, targetNode, position);
-
-                    this.treeElement.textContent = "";
-                    this.refreshElements(null);
-                }
-            };
-
-            const event = this.triggerEvent("tree.move", {
-                move_info: {
-                    moved_node: movedNode,
-                    target_node: targetNode,
-                    position: getPositionName(position),
-                    previous_parent: previousParent,
-                    do_move: doMove,
-                    original_event: positionInfo.originalEvent,
-                },
-            });
-
-            if (!event.isDefaultPrevented()) {
-                doMove();
-            }
+    private updateDropHint(): void {
+        if (!this.hoveredArea) {
+            return;
         }
-    }
 
-    private getTreeDimensions(): Dimensions {
-        // Return the dimensions of the tree. Add a margin to the bottom to allow
-        // to drag-and-drop after the last element.
-        const treePosition = getElementPosition(this.treeElement);
-        const left = treePosition.left + this.getScrollLeft();
-        const top = treePosition.top;
+        // remove previous drop hint
+        this.removeDropHint();
 
-        return {
-            left,
-            top,
-            right: left + this.treeElement.clientWidth,
-            bottom: top + this.treeElement.clientHeight + 16,
-        };
+        // add new drop hint
+        const nodeElement = this.getNodeElementForNode(this.hoveredArea.node);
+        this.previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
     }
 }

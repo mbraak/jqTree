@@ -7,9 +7,9 @@ interface DragElementParams {
 }
 
 class DragElement {
+    private element: HTMLElement;
     private offsetX: number;
     private offsetY: number;
-    private element: HTMLElement;
 
     constructor({
         autoEscape,
