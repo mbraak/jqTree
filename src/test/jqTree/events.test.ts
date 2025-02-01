@@ -258,7 +258,7 @@ describe("tree.loading_data", () => {
         });
 
         await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(
+            expect(onLoading).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     isLoading: false,
                     node: null,
