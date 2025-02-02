@@ -87,11 +87,9 @@ const register = (widgetClass: unknown, widgetName: string): void => {
         } else if (typeof argument1 === "string" && argument1[0] !== "_") {
             const functionName = argument1;
 
-            if (functionName === "destroy") {
+            if (argument1 === "destroy") {
                 destroyWidget(this);
                 return undefined;
-            } else if (functionName === "get_widget_class") {
-                return widgetClass;
             } else {
                 return callFunction(this, functionName, args);
             }
