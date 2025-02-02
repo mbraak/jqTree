@@ -1535,3 +1535,11 @@ describe("updateNode", () => {
         });
     });
 });
+
+it("returns undefined when calling with a strint that starts with an underscore", () => {
+    const $tree = $("#tree1");
+
+    const tree = $tree.tree as unknown as (name: string) => undefined;
+    const result = tree("_test"); // eslint-disable-line @typescript-eslint/no-confusing-void-expression
+    expect(result).toBeUndefined();
+});
