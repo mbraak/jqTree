@@ -1536,7 +1536,7 @@ describe("updateNode", () => {
     });
 });
 
-it("returns undefined when calling with a strint that starts with an underscore", () => {
+it("returns undefined when calling with a string that starts with an underscore", () => {
     const $tree = $("#tree1");
 
     const tree = $tree.tree as unknown as (name: string) => undefined;
