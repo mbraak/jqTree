@@ -11,9 +11,11 @@ For this to work, you should give each node in the tree data an id field:
 {
     name: 'node1',
     id: 123,
-    childen: [
-        name: 'child1',
-        id: 124
+    children: [
+        {
+            name: 'child1',
+            id: 124
+        }
     ]
 }
 {% endhighlight %}
