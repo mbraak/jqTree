@@ -11,6 +11,8 @@
     "copy_vendor_files": "./copy_vendor_files"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4",
+    "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.16",
     "autoprefixer": "^10.4.20",
     "jquery": "^3.7.1",
