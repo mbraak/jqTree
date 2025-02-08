@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --container-8xl: 90rem;
+}
