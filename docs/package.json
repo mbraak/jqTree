@@ -5,7 +5,7 @@
     "jekyll-build": "bundle exec jekyll build",
     "jekyll-serve": "bundle exec jekyll serve",
     "build_docs_css": "pnpm tailwind && pnpm build_example_css && pnpm copy_jqtree && pnpm copy_vendor_files",
-    "tailwind": "tailwindcss -i documentation.css -o static/documentation.css",
+    "tailwind": "tailwindcss -m -i documentation.css -o static/documentation.css",
     "build_example_css": "postcss -o static/example.css static/example.postcss",
     "copy_jqtree": "cp ../tree.jquery.js . && cp ../jqtree.css .",
     "copy_vendor_files": "./copy_vendor_files"
