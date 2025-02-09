@@ -36,8 +36,8 @@
     },
     "devDependencies": {
         "@babel/cli": "^7.26.4",
-        "@babel/core": "^7.26.7",
-        "@babel/preset-env": "^7.26.7",
+        "@babel/core": "^7.26.8",
+        "@babel/preset-env": "^7.26.8",
         "@babel/preset-typescript": "^7.26.0",
         "@eslint/js": "^9.20.0",
         "@playwright/test": "^1.50.1",
