@@ -11,8 +11,8 @@
     "copy_vendor_files": "./copy_vendor_files"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.0.4",
-    "@tailwindcss/postcss": "^4.0.4",
+    "@tailwindcss/cli": "^4.0.5",
+    "@tailwindcss/postcss": "^4.0.5",
     "@tailwindcss/typography": "^0.5.16",
     "autoprefixer": "^10.4.20",
     "jquery": "^3.7.1",
@@ -22,6 +22,6 @@
     "postcss-import": "^16.1.0",
     "postcss-load-config": "^6.0.1",
     "postcss-nested": "^7.0.2",
-    "tailwindcss": "^4.0.4"
+    "tailwindcss": "^4.0.5"
   }
 }
