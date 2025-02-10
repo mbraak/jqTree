@@ -1,6 +1,6 @@
 import type { ScrollParent } from "./types";
 
-import { getElementPosition, getOffsetTop } from '../util'
+import { getElementPosition, getOffsetTop } from "../util";
 
 type HorizontalScrollDirection = "left" | "right";
 interface Params {
@@ -85,8 +85,9 @@ export default class ContainerScrollParent implements ScrollParent {
         pageX: number,
     ): HorizontalScrollDirection | undefined {
         const scrollParentOffset = getElementPosition(this.container);
+        const containerWidth = this.container.getBoundingClientRect().width;
 
-        const rightEdge = scrollParentOffset.left + this.container.clientWidth;
+        const rightEdge = scrollParentOffset.left + containerWidth;
         const leftEdge = scrollParentOffset.left;
         const isNearRightEdge = pageX > rightEdge - 20;
         const isNearLeftEdge = pageX < leftEdge + 20;
@@ -116,7 +117,10 @@ export default class ContainerScrollParent implements ScrollParent {
 
     private getScrollParentBottom() {
         if (this.scrollParentBottom == null) {
-            this.scrollParentBottom = this.getScrollParentTop() + this.container.clientHeight;
+            const containerHeight =
+                this.container.getBoundingClientRect().bottom;
+            this.scrollParentBottom =
+                this.getScrollParentTop() + containerHeight;
         }
 
         return this.scrollParentBottom;
@@ -124,7 +128,7 @@ export default class ContainerScrollParent implements ScrollParent {
 
     private getScrollParentTop() {
         if (this.scrollParentTop == null) {
-            this.scrollParentTop = getOffsetTop(this.container)
+            this.scrollParentTop = getOffsetTop(this.container);
         }
 
         return this.scrollParentTop;
