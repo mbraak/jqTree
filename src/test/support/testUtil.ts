@@ -34,7 +34,7 @@ export const togglerLink = (liNode: HTMLElement | JQuery): JQuery =>
 const nodeElement = (liNode: HTMLElement | JQuery): JQuery =>
     singleChild(jQuery(liNode), "div.jqtree-element ");
 
-export const mockLayout = (element: HTMLElement, rect: Rect) => {
+const mockLayout = (element: HTMLElement, rect: Rect) => {
     jest.spyOn(element, "clientHeight", "get").mockReturnValue(rect.height);
     jest.spyOn(element, "clientWidth", "get").mockReturnValue(rect.width);
     jest.spyOn(element, "offsetParent", "get").mockReturnValue(
