@@ -118,7 +118,7 @@ export default class ContainerScrollParent implements ScrollParent {
     private getScrollParentBottom() {
         if (this.scrollParentBottom == null) {
             const containerHeight =
-                this.container.getBoundingClientRect().bottom;
+                this.container.getBoundingClientRect().height;
             this.scrollParentBottom =
                 this.getScrollParentTop() + containerHeight;
         }
