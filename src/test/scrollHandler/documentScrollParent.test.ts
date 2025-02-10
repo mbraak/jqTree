@@ -58,3 +58,58 @@ describe("checkHorizontalScrolling", () => {
         expect(scrollBy).toHaveBeenCalledTimes(1);
     });
 });
+
+describe("checkVerticalScrolling", () => {
+    it("scrolls to the top when pageY is near the top edge", () => {
+        jest.useFakeTimers();
+        const scrollBy = jest.fn();
+        window.scrollBy = scrollBy;
+
+        const refreshHitAreas = jest.fn();
+        const treeElement = document.createElement("div");
+
+        const documentScrollParent = new DocumentScrollParent({
+            refreshHitAreas,
+            treeElement,
+        });
+
+        documentScrollParent.checkVerticalScrolling(10);
+
+        expect(scrollBy).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(50);
+        expect(scrollBy).toHaveBeenCalledWith({
+            behavior: "instant",
+            left: 0,
+            top: -20,
+        });
+    });
+
+    it("stops scrolling when pageX is moved from the top edge", () => {
+        jest.useFakeTimers();
+        const scrollBy = jest.fn();
+        window.scrollBy = scrollBy;
+
+        const refreshHitAreas = jest.fn();
+        const treeElement = document.createElement("div");
+
+        const documentScrollParent = new DocumentScrollParent({
+            refreshHitAreas,
+            treeElement,
+        });
+
+        documentScrollParent.checkVerticalScrolling(10);
+
+        expect(scrollBy).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(50);
+        expect(scrollBy).toHaveBeenCalledWith({
+            behavior: "instant",
+            left: 0,
+            top: -20,
+        });
+
+        documentScrollParent.checkVerticalScrolling(100);
+        jest.advanceTimersByTime(50);
+
+        expect(scrollBy).toHaveBeenCalledTimes(1);
+    });
+});
