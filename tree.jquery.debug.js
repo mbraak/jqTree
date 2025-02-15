@@ -2231,7 +2231,8 @@ var jqtree = (function (exports) {
       }
       getNewHorizontalScrollDirection(pageX) {
         const scrollParentOffset = getElementPosition(this.container);
-        const rightEdge = scrollParentOffset.left + this.container.clientWidth;
+        const containerWidth = this.container.getBoundingClientRect().width;
+        const rightEdge = scrollParentOffset.left + containerWidth;
         const leftEdge = scrollParentOffset.left;
         const isNearRightEdge = pageX > rightEdge - 20;
         const isNearLeftEdge = pageX < leftEdge + 20;
@@ -2253,7 +2254,8 @@ var jqtree = (function (exports) {
       }
       getScrollParentBottom() {
         if (this.scrollParentBottom == null) {
-          this.scrollParentBottom = this.getScrollParentTop() + this.container.clientHeight;
+          const containerHeight = this.container.getBoundingClientRect().height;
+          this.scrollParentBottom = this.getScrollParentTop() + containerHeight;
         }
         return this.scrollParentBottom;
       }
@@ -2633,11 +2635,9 @@ var jqtree = (function (exports) {
           return createWidget(this, options);
         } else if (typeof argument1 === "string" && argument1[0] !== "_") {
           const functionName = argument1;
-          if (functionName === "destroy") {
+          if (argument1 === "destroy") {
             destroyWidget(this);
             return undefined;
-          } else if (functionName === "get_widget_class") {
-            return widgetClass;
           } else {
             for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
               args[_key - 1] = arguments[_key];
