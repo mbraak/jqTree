@@ -1,27 +1,27 @@
-import type { ScrollParent } from "./types";
-
 import { getOffsetTop } from "../util";
+import {
+    HorizontalScrollDirection,
+    ScrollParent,
+    VerticalScrollDirection,
+} from "./scrollParent";
 
-type HorizontalScrollDirection = "left" | "right";
 interface Params {
     refreshHitAreas: () => void;
     treeElement: HTMLElement;
 }
 
-type VerticalScrollDirection = "bottom" | "top";
-
-export default class DocumentScrollParent implements ScrollParent {
+export default class DocumentScrollParent extends ScrollParent {
     private documentScrollHeight?: number;
     private documentScrollWidth?: number;
     private horizontalScrollDirection?: HorizontalScrollDirection;
     private horizontalScrollTimeout?: number;
-    private refreshHitAreas: () => void;
     private treeElement: HTMLElement;
     private verticalScrollDirection?: VerticalScrollDirection;
     private verticalScrollTimeout?: number;
 
     constructor({ refreshHitAreas, treeElement }: Params) {
-        this.refreshHitAreas = refreshHitAreas;
+        super({ refreshHitAreas });
+
         this.treeElement = treeElement;
     }
 

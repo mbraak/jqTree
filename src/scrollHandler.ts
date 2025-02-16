@@ -1,6 +1,6 @@
 import { PositionInfo } from "./mouseUtils";
 import createScrollParent from "./scrollHandler/createScrollParent";
-import { ScrollParent } from "./scrollHandler/types";
+import { ScrollParent } from "./scrollHandler/scrollParent";
 
 interface ScrollHandlerParams {
     refreshHitAreas: () => void;

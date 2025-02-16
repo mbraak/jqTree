@@ -1,28 +1,27 @@
-import type { ScrollParent } from "./types";
-
 import { getElementPosition, getOffsetTop } from "../util";
+import {
+    HorizontalScrollDirection,
+    ScrollParent,
+    VerticalScrollDirection,
+} from "./scrollParent";
 
-type HorizontalScrollDirection = "left" | "right";
 interface Params {
     container: HTMLElement;
     refreshHitAreas: () => void;
 }
 
-type VerticalScrollDirection = "bottom" | "top";
-
-export default class ContainerScrollParent implements ScrollParent {
+export default class ContainerScrollParent extends ScrollParent {
     private container: HTMLElement;
     private horizontalScrollDirection?: HorizontalScrollDirection;
     private horizontalScrollTimeout?: number;
-    private refreshHitAreas: () => void;
     private scrollParentBottom?: number;
     private scrollParentTop?: number;
     private verticalScrollDirection?: VerticalScrollDirection;
     private verticalScrollTimeout?: number;
 
     constructor({ container, refreshHitAreas }: Params) {
+        super({ refreshHitAreas });
         this.container = container;
-        this.refreshHitAreas = refreshHitAreas;
     }
 
     public checkHorizontalScrolling(pageX: number): void {
