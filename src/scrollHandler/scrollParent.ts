@@ -36,12 +36,36 @@ export abstract class ScrollParent {
         }
     }
 
-    abstract checkVerticalScrolling(pageY: number): void;
+    public checkVerticalScrolling(pageY: number) {
+        const newVerticalScrollDirection =
+            this.getNewVerticalScrollDirection(pageY);
+
+        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
+            this.verticalScrollDirection = newVerticalScrollDirection;
+
+            if (this.verticalScrollTimeout != null) {
+                window.clearTimeout(this.verticalScrollTimeout);
+                this.verticalScrollTimeout = undefined;
+            }
+
+            if (newVerticalScrollDirection) {
+                this.verticalScrollTimeout = window.setTimeout(
+                    this.scrollVertically.bind(this),
+                    40,
+                );
+            }
+        }
+    }
+
     abstract getScrollLeft(): number;
     abstract scrollToY(top: number): void;
     abstract stopScrolling(): void;
     protected abstract getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined;
+    protected abstract getNewVerticalScrollDirection(
+        pageY: number,
+    ): undefined | VerticalScrollDirection;
     protected abstract scrollHorizontally(): void;
+    protected abstract scrollVertically(): void;
 }

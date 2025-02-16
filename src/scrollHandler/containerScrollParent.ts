@@ -20,27 +20,6 @@ export default class ContainerScrollParent extends ScrollParent {
         this.container = container;
     }
 
-    public checkVerticalScrolling(pageY: number) {
-        const newVerticalScrollDirection =
-            this.getNewVerticalScrollDirection(pageY);
-
-        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
-            this.verticalScrollDirection = newVerticalScrollDirection;
-
-            if (this.verticalScrollTimeout != null) {
-                window.clearTimeout(this.verticalScrollTimeout);
-                this.verticalScrollTimeout = undefined;
-            }
-
-            if (newVerticalScrollDirection) {
-                this.verticalScrollTimeout = window.setTimeout(
-                    this.scrollVertically.bind(this),
-                    40,
-                );
-            }
-        }
-    }
-
     public getScrollLeft(): number {
         return this.container.scrollLeft;
     }
@@ -76,6 +55,20 @@ export default class ContainerScrollParent extends ScrollParent {
         return undefined;
     }
 
+    protected getNewVerticalScrollDirection(
+        pageY: number,
+    ): undefined | VerticalScrollDirection {
+        if (pageY < this.getScrollParentTop()) {
+            return "top";
+        }
+
+        if (pageY > this.getScrollParentBottom()) {
+            return "bottom";
+        }
+
+        return undefined;
+    }
+
     protected scrollHorizontally() {
         if (!this.horizontalScrollDirection) {
             return;
@@ -94,18 +87,22 @@ export default class ContainerScrollParent extends ScrollParent {
         setTimeout(this.scrollHorizontally.bind(this), 40);
     }
 
-    private getNewVerticalScrollDirection(
-        pageY: number,
-    ): undefined | VerticalScrollDirection {
-        if (pageY < this.getScrollParentTop()) {
-            return "top";
+    protected scrollVertically() {
+        if (!this.verticalScrollDirection) {
+            return;
         }
 
-        if (pageY > this.getScrollParentBottom()) {
-            return "bottom";
-        }
+        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
 
-        return undefined;
+        this.container.scrollBy({
+            behavior: "instant",
+            left: 0,
+            top: distance,
+        });
+
+        this.refreshHitAreas();
+
+        setTimeout(this.scrollVertically.bind(this), 40);
     }
 
     private getScrollParentBottom() {
@@ -125,23 +122,5 @@ export default class ContainerScrollParent extends ScrollParent {
         }
 
         return this.scrollParentTop;
-    }
-
-    private scrollVertically() {
-        if (!this.verticalScrollDirection) {
-            return;
-        }
-
-        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-
-        this.container.scrollBy({
-            behavior: "instant",
-            left: 0,
-            top: distance,
-        });
-
-        this.refreshHitAreas();
-
-        setTimeout(this.scrollVertically.bind(this), 40);
     }
 }

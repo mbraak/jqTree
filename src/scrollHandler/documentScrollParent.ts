@@ -21,27 +21,6 @@ export default class DocumentScrollParent extends ScrollParent {
         this.treeElement = treeElement;
     }
 
-    public checkVerticalScrolling(pageY: number) {
-        const newVerticalScrollDirection =
-            this.getNewVerticalScrollDirection(pageY);
-
-        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
-            this.verticalScrollDirection = newVerticalScrollDirection;
-
-            if (this.verticalScrollTimeout != null) {
-                window.clearTimeout(this.verticalScrollTimeout);
-                this.verticalScrollTimeout = undefined;
-            }
-
-            if (newVerticalScrollDirection) {
-                this.verticalScrollTimeout = window.setTimeout(
-                    this.scrollVertically.bind(this),
-                    40,
-                );
-            }
-        }
-    }
-
     public getScrollLeft(): number {
         return document.documentElement.scrollLeft;
     }
@@ -79,6 +58,25 @@ export default class DocumentScrollParent extends ScrollParent {
         return undefined;
     }
 
+    protected getNewVerticalScrollDirection(
+        pageY: number,
+    ): undefined | VerticalScrollDirection {
+        const scrollTop = jQuery(document).scrollTop() ?? 0;
+        const distanceTop = pageY - scrollTop;
+
+        if (distanceTop < 20) {
+            return "top";
+        }
+
+        const windowHeight = window.innerHeight;
+
+        if (windowHeight - (pageY - scrollTop) < 20 && this.canScrollDown()) {
+            return "bottom";
+        }
+
+        return undefined;
+    }
+
     protected scrollHorizontally() {
         if (!this.horizontalScrollDirection) {
             return;
@@ -90,6 +88,19 @@ export default class DocumentScrollParent extends ScrollParent {
         this.refreshHitAreas();
 
         setTimeout(this.scrollHorizontally.bind(this), 40);
+    }
+
+    protected scrollVertically() {
+        if (!this.verticalScrollDirection) {
+            return;
+        }
+
+        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
+        window.scrollBy({ behavior: "instant", left: 0, top: distance });
+
+        this.refreshHitAreas();
+
+        setTimeout(this.scrollVertically.bind(this), 40);
     }
 
     private canScrollDown() {
@@ -126,37 +137,5 @@ export default class DocumentScrollParent extends ScrollParent {
         }
 
         return this.documentScrollWidth;
-    }
-
-    private getNewVerticalScrollDirection(
-        pageY: number,
-    ): undefined | VerticalScrollDirection {
-        const scrollTop = jQuery(document).scrollTop() ?? 0;
-        const distanceTop = pageY - scrollTop;
-
-        if (distanceTop < 20) {
-            return "top";
-        }
-
-        const windowHeight = window.innerHeight;
-
-        if (windowHeight - (pageY - scrollTop) < 20 && this.canScrollDown()) {
-            return "bottom";
-        }
-
-        return undefined;
-    }
-
-    private scrollVertically() {
-        if (!this.verticalScrollDirection) {
-            return;
-        }
-
-        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        window.scrollBy({ behavior: "instant", left: 0, top: distance });
-
-        this.refreshHitAreas();
-
-        setTimeout(this.scrollVertically.bind(this), 40);
     }
 }
