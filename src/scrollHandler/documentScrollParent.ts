@@ -13,36 +13,12 @@ interface Params {
 export default class DocumentScrollParent extends ScrollParent {
     private documentScrollHeight?: number;
     private documentScrollWidth?: number;
-    private horizontalScrollDirection?: HorizontalScrollDirection;
-    private horizontalScrollTimeout?: number;
     private treeElement: HTMLElement;
-    private verticalScrollDirection?: VerticalScrollDirection;
-    private verticalScrollTimeout?: number;
 
     constructor({ refreshHitAreas, treeElement }: Params) {
         super({ refreshHitAreas });
 
         this.treeElement = treeElement;
-    }
-
-    public checkHorizontalScrolling(pageX: number): void {
-        const newHorizontalScrollDirection =
-            this.getNewHorizontalScrollDirection(pageX);
-
-        if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
-            this.horizontalScrollDirection = newHorizontalScrollDirection;
-
-            if (this.horizontalScrollTimeout != null) {
-                window.clearTimeout(this.horizontalScrollTimeout);
-            }
-
-            if (newHorizontalScrollDirection) {
-                this.horizontalScrollTimeout = window.setTimeout(
-                    this.scrollHorizontally.bind(this),
-                    40,
-                );
-            }
-        }
     }
 
     public checkVerticalScrolling(pageY: number) {
@@ -83,6 +59,39 @@ export default class DocumentScrollParent extends ScrollParent {
         this.documentScrollWidth = undefined;
     }
 
+    protected getNewHorizontalScrollDirection(
+        pageX: number,
+    ): HorizontalScrollDirection | undefined {
+        const scrollLeft = document.documentElement.scrollLeft;
+        const windowWidth = window.innerWidth;
+
+        const isNearRightEdge = pageX > windowWidth - 20;
+        const isNearLeftEdge = pageX - scrollLeft < 20;
+
+        if (isNearRightEdge && this.canScrollRight()) {
+            return "right";
+        }
+
+        if (isNearLeftEdge) {
+            return "left";
+        }
+
+        return undefined;
+    }
+
+    protected scrollHorizontally() {
+        if (!this.horizontalScrollDirection) {
+            return;
+        }
+
+        const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
+        window.scrollBy({ behavior: "instant", left: distance, top: 0 });
+
+        this.refreshHitAreas();
+
+        setTimeout(this.scrollHorizontally.bind(this), 40);
+    }
+
     private canScrollDown() {
         const documentElement = document.documentElement;
 
@@ -119,26 +128,6 @@ export default class DocumentScrollParent extends ScrollParent {
         return this.documentScrollWidth;
     }
 
-    private getNewHorizontalScrollDirection(
-        pageX: number,
-    ): HorizontalScrollDirection | undefined {
-        const scrollLeft = document.documentElement.scrollLeft;
-        const windowWidth = window.innerWidth;
-
-        const isNearRightEdge = pageX > windowWidth - 20;
-        const isNearLeftEdge = pageX - scrollLeft < 20;
-
-        if (isNearRightEdge && this.canScrollRight()) {
-            return "right";
-        }
-
-        if (isNearLeftEdge) {
-            return "left";
-        }
-
-        return undefined;
-    }
-
     private getNewVerticalScrollDirection(
         pageY: number,
     ): undefined | VerticalScrollDirection {
@@ -156,19 +145,6 @@ export default class DocumentScrollParent extends ScrollParent {
         }
 
         return undefined;
-    }
-
-    private scrollHorizontally() {
-        if (!this.horizontalScrollDirection) {
-            return;
-        }
-
-        const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
-        window.scrollBy({ behavior: "instant", left: distance, top: 0 });
-
-        this.refreshHitAreas();
-
-        setTimeout(this.scrollHorizontally.bind(this), 40);
     }
 
     private scrollVertically() {
