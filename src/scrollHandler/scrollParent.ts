@@ -1,18 +1,22 @@
 export type HorizontalScrollDirection = "left" | "right";
 export type VerticalScrollDirection = "bottom" | "top";
 
-interface Params {
+interface ConstructorParams {
+    container: HTMLElement;
     refreshHitAreas: () => void;
 }
 
 export abstract class ScrollParent {
+    protected container: HTMLElement;
     protected horizontalScrollDirection?: HorizontalScrollDirection;
     protected horizontalScrollTimeout?: number;
+
     protected refreshHitAreas: () => void;
     protected verticalScrollDirection?: VerticalScrollDirection;
     protected verticalScrollTimeout?: number;
 
-    constructor({ refreshHitAreas }: Params) {
+    constructor({ container, refreshHitAreas }: ConstructorParams) {
+        this.container = container;
         this.refreshHitAreas = refreshHitAreas;
     }
 

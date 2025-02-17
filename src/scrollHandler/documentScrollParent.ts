@@ -16,19 +16,19 @@ export default class DocumentScrollParent extends ScrollParent {
     private treeElement: HTMLElement;
 
     constructor({ refreshHitAreas, treeElement }: Params) {
-        super({ refreshHitAreas });
+        super({ container: document.documentElement, refreshHitAreas });
 
         this.treeElement = treeElement;
     }
 
     public getScrollLeft(): number {
-        return document.documentElement.scrollLeft;
+        return this.container.scrollLeft;
     }
 
     public scrollToY(top: number): void {
         const treeTop = getOffsetTop(this.treeElement);
 
-        document.documentElement.scrollTop = top + treeTop;
+        this.container.scrollTop = top + treeTop;
     }
 
     public stopScrolling() {
@@ -41,7 +41,7 @@ export default class DocumentScrollParent extends ScrollParent {
     protected getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined {
-        const scrollLeft = document.documentElement.scrollLeft;
+        const scrollLeft = this.container.scrollLeft;
         const windowWidth = window.innerWidth;
 
         const isNearRightEdge = pageX > windowWidth - 20;
@@ -104,19 +104,15 @@ export default class DocumentScrollParent extends ScrollParent {
     }
 
     private canScrollDown() {
-        const documentElement = document.documentElement;
-
         return (
-            documentElement.scrollTop + documentElement.clientHeight <
+            this.container.scrollTop + this.container.clientHeight <
             this.getDocumentScrollHeight()
         );
     }
 
     private canScrollRight() {
-        const documentElement = document.documentElement;
-
         return (
-            documentElement.scrollLeft + documentElement.clientWidth <
+            this.container.scrollLeft + this.container.clientWidth <
             this.getDocumentScrollWidth()
         );
     }
@@ -124,7 +120,7 @@ export default class DocumentScrollParent extends ScrollParent {
     private getDocumentScrollHeight() {
         // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
         if (this.documentScrollHeight == null) {
-            this.documentScrollHeight = document.documentElement.scrollHeight;
+            this.documentScrollHeight = this.container.scrollHeight;
         }
 
         return this.documentScrollHeight;
@@ -133,7 +129,7 @@ export default class DocumentScrollParent extends ScrollParent {
     private getDocumentScrollWidth() {
         // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
         if (this.documentScrollWidth == null) {
-            this.documentScrollWidth = document.documentElement.scrollWidth;
+            this.documentScrollWidth = this.container.scrollWidth;
         }
 
         return this.documentScrollWidth;

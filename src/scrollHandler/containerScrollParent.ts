@@ -5,20 +5,9 @@ import {
     VerticalScrollDirection,
 } from "./scrollParent";
 
-interface Params {
-    container: HTMLElement;
-    refreshHitAreas: () => void;
-}
-
 export default class ContainerScrollParent extends ScrollParent {
-    private container: HTMLElement;
     private scrollParentBottom?: number;
     private scrollParentTop?: number;
-
-    constructor({ container, refreshHitAreas }: Params) {
-        super({ refreshHitAreas });
-        this.container = container;
-    }
 
     public getScrollLeft(): number {
         return this.container.scrollLeft;
