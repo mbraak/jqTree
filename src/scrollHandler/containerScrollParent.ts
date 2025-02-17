@@ -29,10 +29,10 @@ export default class ContainerScrollParent extends ScrollParent {
     }
 
     public stopScrolling() {
+        super.stopScrolling();
+
         this.horizontalScrollDirection = undefined;
         this.verticalScrollDirection = undefined;
-        this.scrollParentTop = undefined;
-        this.scrollParentBottom = undefined;
     }
 
     protected getNewHorizontalScrollDirection(

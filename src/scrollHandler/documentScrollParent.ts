@@ -32,8 +32,8 @@ export default class DocumentScrollParent extends ScrollParent {
     }
 
     public stopScrolling() {
-        this.horizontalScrollDirection = undefined;
-        this.verticalScrollDirection = undefined;
+        super.stopScrolling();
+
         this.documentScrollHeight = undefined;
         this.documentScrollWidth = undefined;
     }

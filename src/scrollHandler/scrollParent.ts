@@ -59,7 +59,12 @@ export abstract class ScrollParent {
 
     abstract getScrollLeft(): number;
     abstract scrollToY(top: number): void;
-    abstract stopScrolling(): void;
+
+    public stopScrolling() {
+        this.horizontalScrollDirection = undefined;
+        this.verticalScrollDirection = undefined;
+    }
+
     protected abstract getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined;
