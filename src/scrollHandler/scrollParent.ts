@@ -65,7 +65,9 @@ export abstract class ScrollParent {
         return this.container.scrollLeft;
     }
 
-    abstract scrollToY(top: number): void;
+    public scrollToY(top: number): void {
+        this.container.scrollTop = top;
+    }
 
     public stopScrolling() {
         this.horizontalScrollDirection = undefined;

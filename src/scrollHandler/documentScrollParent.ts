@@ -24,7 +24,7 @@ export default class DocumentScrollParent extends ScrollParent {
     public scrollToY(top: number): void {
         const treeTop = getOffsetTop(this.treeElement);
 
-        this.container.scrollTop = top + treeTop;
+        super.scrollToY(top + treeTop);
     }
 
     public stopScrolling() {
