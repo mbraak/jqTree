@@ -80,6 +80,23 @@ export abstract class ScrollParent {
     protected abstract getNewVerticalScrollDirection(
         pageY: number,
     ): undefined | VerticalScrollDirection;
-    protected abstract scrollHorizontally(): void;
+
+    protected scrollHorizontally() {
+        if (!this.horizontalScrollDirection) {
+            return;
+        }
+
+        const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
+        this.container.scrollBy({
+            behavior: "instant",
+            left: distance,
+            top: 0,
+        });
+
+        this.refreshHitAreas();
+
+        setTimeout(this.scrollHorizontally.bind(this), 40);
+    }
+
     protected abstract scrollVertically(): void;
 }
