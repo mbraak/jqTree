@@ -57,7 +57,7 @@ export default class DocumentScrollParent extends ScrollParent {
     protected getNewVerticalScrollDirection(
         pageY: number,
     ): undefined | VerticalScrollDirection {
-        const scrollTop = jQuery(document).scrollTop() ?? 0;
+        const scrollTop = this.container.scrollTop;
         const distanceTop = pageY - scrollTop;
 
         if (distanceTop < 20) {
