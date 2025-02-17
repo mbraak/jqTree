@@ -73,19 +73,6 @@ export default class DocumentScrollParent extends ScrollParent {
         return undefined;
     }
 
-    protected scrollVertically() {
-        if (!this.verticalScrollDirection) {
-            return;
-        }
-
-        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        window.scrollBy({ behavior: "instant", left: 0, top: distance });
-
-        this.refreshHitAreas();
-
-        setTimeout(this.scrollVertically.bind(this), 40);
-    }
-
     private canScrollDown() {
         return (
             this.container.scrollTop + this.container.clientHeight <

@@ -98,5 +98,20 @@ export abstract class ScrollParent {
         setTimeout(this.scrollHorizontally.bind(this), 40);
     }
 
-    protected abstract scrollVertically(): void;
+    protected scrollVertically() {
+        if (!this.verticalScrollDirection) {
+            return;
+        }
+
+        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
+        this.container.scrollBy({
+            behavior: "instant",
+            left: 0,
+            top: distance,
+        });
+
+        this.refreshHitAreas();
+
+        setTimeout(this.scrollVertically.bind(this), 40);
+    }
 }

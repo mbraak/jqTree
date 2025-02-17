@@ -50,24 +50,6 @@ export default class ContainerScrollParent extends ScrollParent {
         return undefined;
     }
 
-    protected scrollVertically() {
-        if (!this.verticalScrollDirection) {
-            return;
-        }
-
-        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-
-        this.container.scrollBy({
-            behavior: "instant",
-            left: 0,
-            top: distance,
-        });
-
-        this.refreshHitAreas();
-
-        setTimeout(this.scrollVertically.bind(this), 40);
-    }
-
     private getScrollParentBottom() {
         if (this.scrollParentBottom == null) {
             const containerHeight =
