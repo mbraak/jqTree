@@ -9,10 +9,6 @@ export default class ContainerScrollParent extends ScrollParent {
     private scrollParentBottom?: number;
     private scrollParentTop?: number;
 
-    public getScrollLeft(): number {
-        return this.container.scrollLeft;
-    }
-
     public scrollToY(top: number): void {
         this.container.scrollTop = top;
     }

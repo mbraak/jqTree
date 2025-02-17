@@ -61,7 +61,10 @@ export abstract class ScrollParent {
         }
     }
 
-    abstract getScrollLeft(): number;
+    public getScrollLeft(): number {
+        return this.container.scrollLeft;
+    }
+
     abstract scrollToY(top: number): void;
 
     public stopScrolling() {

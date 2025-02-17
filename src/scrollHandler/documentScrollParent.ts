@@ -21,10 +21,6 @@ export default class DocumentScrollParent extends ScrollParent {
         this.treeElement = treeElement;
     }
 
-    public getScrollLeft(): number {
-        return this.container.scrollLeft;
-    }
-
     public scrollToY(top: number): void {
         const treeTop = getOffsetTop(this.treeElement);
 
