@@ -1,128 +1,43 @@
-import type { ScrollParent } from "./types";
-
 import { getOffsetTop } from "../util";
+import {
+    HorizontalScrollDirection,
+    ScrollParent,
+    VerticalScrollDirection,
+} from "./scrollParent";
 
-type HorizontalScrollDirection = "left" | "right";
 interface Params {
     refreshHitAreas: () => void;
     treeElement: HTMLElement;
 }
 
-type VerticalScrollDirection = "bottom" | "top";
-
-export default class DocumentScrollParent implements ScrollParent {
+export default class DocumentScrollParent extends ScrollParent {
     private documentScrollHeight?: number;
     private documentScrollWidth?: number;
-    private horizontalScrollDirection?: HorizontalScrollDirection;
-    private horizontalScrollTimeout?: number;
-    private refreshHitAreas: () => void;
     private treeElement: HTMLElement;
-    private verticalScrollDirection?: VerticalScrollDirection;
-    private verticalScrollTimeout?: number;
 
     constructor({ refreshHitAreas, treeElement }: Params) {
-        this.refreshHitAreas = refreshHitAreas;
+        super({ container: document.documentElement, refreshHitAreas });
+
         this.treeElement = treeElement;
-    }
-
-    public checkHorizontalScrolling(pageX: number): void {
-        const newHorizontalScrollDirection =
-            this.getNewHorizontalScrollDirection(pageX);
-
-        if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
-            this.horizontalScrollDirection = newHorizontalScrollDirection;
-
-            if (this.horizontalScrollTimeout != null) {
-                window.clearTimeout(this.horizontalScrollTimeout);
-            }
-
-            if (newHorizontalScrollDirection) {
-                this.horizontalScrollTimeout = window.setTimeout(
-                    this.scrollHorizontally.bind(this),
-                    40,
-                );
-            }
-        }
-    }
-
-    public checkVerticalScrolling(pageY: number) {
-        const newVerticalScrollDirection =
-            this.getNewVerticalScrollDirection(pageY);
-
-        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
-            this.verticalScrollDirection = newVerticalScrollDirection;
-
-            if (this.verticalScrollTimeout != null) {
-                window.clearTimeout(this.verticalScrollTimeout);
-                this.verticalScrollTimeout = undefined;
-            }
-
-            if (newVerticalScrollDirection) {
-                this.verticalScrollTimeout = window.setTimeout(
-                    this.scrollVertically.bind(this),
-                    40,
-                );
-            }
-        }
-    }
-
-    public getScrollLeft(): number {
-        return document.documentElement.scrollLeft;
     }
 
     public scrollToY(top: number): void {
         const treeTop = getOffsetTop(this.treeElement);
 
-        document.documentElement.scrollTop = top + treeTop;
+        super.scrollToY(top + treeTop);
     }
 
     public stopScrolling() {
-        this.horizontalScrollDirection = undefined;
-        this.verticalScrollDirection = undefined;
+        super.stopScrolling();
+
         this.documentScrollHeight = undefined;
         this.documentScrollWidth = undefined;
     }
 
-    private canScrollDown() {
-        const documentElement = document.documentElement;
-
-        return (
-            documentElement.scrollTop + documentElement.clientHeight <
-            this.getDocumentScrollHeight()
-        );
-    }
-
-    private canScrollRight() {
-        const documentElement = document.documentElement;
-
-        return (
-            documentElement.scrollLeft + documentElement.clientWidth <
-            this.getDocumentScrollWidth()
-        );
-    }
-
-    private getDocumentScrollHeight() {
-        // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
-        if (this.documentScrollHeight == null) {
-            this.documentScrollHeight = document.documentElement.scrollHeight;
-        }
-
-        return this.documentScrollHeight;
-    }
-
-    private getDocumentScrollWidth() {
-        // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
-        if (this.documentScrollWidth == null) {
-            this.documentScrollWidth = document.documentElement.scrollWidth;
-        }
-
-        return this.documentScrollWidth;
-    }
-
-    private getNewHorizontalScrollDirection(
+    protected getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined {
-        const scrollLeft = document.documentElement.scrollLeft;
+        const scrollLeft = this.container.scrollLeft;
         const windowWidth = window.innerWidth;
 
         const isNearRightEdge = pageX > windowWidth - 20;
@@ -139,10 +54,10 @@ export default class DocumentScrollParent implements ScrollParent {
         return undefined;
     }
 
-    private getNewVerticalScrollDirection(
+    protected getNewVerticalScrollDirection(
         pageY: number,
     ): undefined | VerticalScrollDirection {
-        const scrollTop = jQuery(document).scrollTop() ?? 0;
+        const scrollTop = this.container.scrollTop;
         const distanceTop = pageY - scrollTop;
 
         if (distanceTop < 20) {
@@ -158,29 +73,35 @@ export default class DocumentScrollParent implements ScrollParent {
         return undefined;
     }
 
-    private scrollHorizontally() {
-        if (!this.horizontalScrollDirection) {
-            return;
-        }
-
-        const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
-        window.scrollBy({ behavior: "instant", left: distance, top: 0 });
-
-        this.refreshHitAreas();
-
-        setTimeout(this.scrollHorizontally.bind(this), 40);
+    private canScrollDown() {
+        return (
+            this.container.scrollTop + this.container.clientHeight <
+            this.getDocumentScrollHeight()
+        );
     }
 
-    private scrollVertically() {
-        if (!this.verticalScrollDirection) {
-            return;
+    private canScrollRight() {
+        return (
+            this.container.scrollLeft + this.container.clientWidth <
+            this.getDocumentScrollWidth()
+        );
+    }
+
+    private getDocumentScrollHeight() {
+        // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
+        if (this.documentScrollHeight == null) {
+            this.documentScrollHeight = this.container.scrollHeight;
         }
 
-        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        window.scrollBy({ behavior: "instant", left: 0, top: distance });
+        return this.documentScrollHeight;
+    }
 
-        this.refreshHitAreas();
+    private getDocumentScrollWidth() {
+        // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
+        if (this.documentScrollWidth == null) {
+            this.documentScrollWidth = this.container.scrollWidth;
+        }
 
-        setTimeout(this.scrollVertically.bind(this), 40);
+        return this.documentScrollWidth;
     }
 }

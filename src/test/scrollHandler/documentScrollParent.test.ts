@@ -8,7 +8,7 @@ describe("checkHorizontalScrolling", () => {
     it("scrolls to the left when pageX is near the left edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
-        window.scrollBy = scrollBy;
+        document.documentElement.scrollBy = scrollBy;
 
         const refreshHitAreas = jest.fn();
         const treeElement = document.createElement("div");
@@ -32,7 +32,7 @@ describe("checkHorizontalScrolling", () => {
     it("stops scrolling when pageX is moved from the left edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
-        window.scrollBy = scrollBy;
+        document.documentElement.scrollBy = scrollBy;
 
         const refreshHitAreas = jest.fn();
         const treeElement = document.createElement("div");
@@ -63,7 +63,7 @@ describe("checkVerticalScrolling", () => {
     it("scrolls to the top when pageY is near the top edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
-        window.scrollBy = scrollBy;
+        document.documentElement.scrollBy = scrollBy;
 
         const refreshHitAreas = jest.fn();
         const treeElement = document.createElement("div");
@@ -87,7 +87,7 @@ describe("checkVerticalScrolling", () => {
     it("stops scrolling when pageX is moved from the top edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
-        window.scrollBy = scrollBy;
+        document.documentElement.scrollBy = scrollBy;
 
         const refreshHitAreas = jest.fn();
         const treeElement = document.createElement("div");
