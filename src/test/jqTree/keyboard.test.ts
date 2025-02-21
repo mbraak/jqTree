@@ -6,17 +6,17 @@ import exampleData from "../support/exampleData";
 
 const context = describe;
 
-beforeEach(() => {
-    $("body").append('<div id="tree1"></div>');
-});
-
-afterEach(() => {
-    const $tree = $("#tree1");
-    $tree.tree("destroy");
-    $tree.remove();
-});
-
 describe("keyboard support", () => {
+    beforeEach(() => {
+        $("body").append('<div id="tree1"></div>');
+    });
+
+    afterEach(() => {
+        const $tree = $("#tree1");
+        $tree.tree("destroy");
+        $tree.remove();
+    });
+
     interface Vars {
         $tree: JQuery;
         autoOpen: boolean;
