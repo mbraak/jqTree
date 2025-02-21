@@ -71,8 +71,8 @@
         "jsdom-testing-mocks": "^1.13.1",
         "jsonfile": "^6.1.0",
         "lodash": "^4.17.21",
-        "msw": "^2.7.0",
-        "postcss": "^8.5.2",
+        "msw": "^2.7.1",
+        "postcss": "^8.5.3",
         "postcss-cli": "^11.0.0",
         "postcss-import": "^16.1.0",
         "postcss-load-config": "^6.0.1",
@@ -82,7 +82,7 @@
         "rollup-plugin-serve": "^3.0.0",
         "tslib": "^2.8.1",
         "typescript": "^5.7.3",
-        "typescript-eslint": "^8.24.0"
+        "typescript-eslint": "^8.24.1"
     },
     "pnpm": {
         "onlyBuiltDependencies": [
