@@ -1,16 +1,27 @@
-import { OnFinishOpenNode } from "../jqtreeMethodTypes";
+import { jest } from "@jest/globals";
+
+import {
+    AddToSelection,
+    GetNodeById,
+    GetSelectedNodes,
+    GetTree,
+    OnFinishOpenNode,
+    OpenNode,
+    RefreshElements,
+    RemoveFromSelection,
+} from "../jqtreeMethodTypes";
 import { Node } from "../node";
 import SaveStateHandler from "../saveStateHandler";
 
 const createSaveStateHandler = ({
-    addToSelection = jest.fn(),
-    getNodeById = jest.fn(),
-    getSelectedNodes = jest.fn(),
-    openNode = jest.fn(),
-    refreshElements = jest.fn(),
-    removeFromSelection = jest.fn(),
+    addToSelection = jest.fn<AddToSelection>(),
+    getNodeById = jest.fn<GetNodeById>(),
+    getSelectedNodes = jest.fn<GetSelectedNodes>(),
+    openNode = jest.fn<OpenNode>(),
+    refreshElements = jest.fn<RefreshElements>(),
+    removeFromSelection = jest.fn<RemoveFromSelection>(),
 }) => {
-    const getTree = jest.fn();
+    const getTree = jest.fn<GetTree>();
 
     return new SaveStateHandler({
         addToSelection,
@@ -33,6 +44,7 @@ describe("getStateFromStorage", () => {
         localStorage.clear();
 
         const saveStateHandler = createSaveStateHandler({});
+
         expect(saveStateHandler.getStateFromStorage()).toBeNull();
     });
 
@@ -40,7 +52,8 @@ describe("getStateFromStorage", () => {
         localStorage.setItem("tree", JSON.stringify({ selected_node: 123 }));
 
         const saveStateHandler = createSaveStateHandler({});
-        expect(saveStateHandler.getStateFromStorage()).toEqual({
+
+        expect(saveStateHandler.getStateFromStorage()).toStrictEqual({
             selected_node: [123],
         });
     });
@@ -146,8 +159,8 @@ describe("setInitialStateOnDemand", () => {
             }
         });
 
-        const openNode = jest.fn(
-            (node: Node, _slide: boolean, onFinished?: OnFinishOpenNode) => {
+        const openNode = jest.fn<OpenNode>(
+            (node: Node, _slide?: boolean, onFinished?: OnFinishOpenNode) => {
                 node.load_on_demand = false;
 
                 if (onFinished) {

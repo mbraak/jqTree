@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
 
 import { Node } from "../../node";

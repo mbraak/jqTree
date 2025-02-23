@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import getGiven from "givens";
@@ -10,124 +11,233 @@ import { titleSpan } from "../support/testUtil";
 
 const context = describe;
 
-beforeEach(() => {
-    $("body").append('<div id="tree1"></div>');
-});
-
-afterEach(() => {
-    const $tree = $("#tree1");
-    $tree.tree("destroy");
-    $tree.remove();
-});
-
-describe("tree.click", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-        titleSpan: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
-    given("$tree", () => $("#tree1"));
-
+describe("events", () => {
     beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
+        $("body").append('<div id="tree1"></div>');
     });
 
-    it("fires tree.click", async () => {
-        const onClick = jest.fn();
-        given.$tree.on("tree.click", onClick);
+    afterEach(() => {
+        const $tree = $("#tree1");
+        $tree.tree("destroy");
+        $tree.remove();
+    });
 
-        await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+    describe("tree.click", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+            titleSpan: JQuery;
+        }
 
-        expect(onClick).toHaveBeenCalledWith(
-            expect.objectContaining({ node: given.node1 }),
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
         );
-    });
-});
+        given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
+        given("$tree", () => $("#tree1"));
 
-describe("tree.contextmenu", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-        titleSpan: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
-    });
-
-    it("fires tree.contextmenu", async () => {
-        const onContextMenu = jest.fn();
-        given.$tree.on("tree.contextmenu", onContextMenu);
-
-        await userEvent.pointer({
-            keys: "[MouseRight]",
-            target: given.titleSpan.get(0) as HTMLElement,
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
         });
 
-        expect(onContextMenu).toHaveBeenCalledWith(
-            expect.objectContaining({ node: given.node1 }),
+        it("fires tree.click", async () => {
+            const onClick = jest.fn();
+            given.$tree.on("tree.click", onClick);
+
+            await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
+            expect(onClick).toHaveBeenCalledWith(
+                expect.objectContaining({ node: given.node1 }),
+            );
+        });
+    });
+
+    describe("tree.contextmenu", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+            titleSpan: JQuery;
+        }
+
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
         );
+        given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+        });
+
+        it("fires tree.contextmenu", async () => {
+            const onContextMenu = jest.fn();
+            given.$tree.on("tree.contextmenu", onContextMenu);
+
+            await userEvent.pointer({
+                keys: "[MouseRight]",
+                target: given.titleSpan.get(0) as HTMLElement,
+            });
+
+            expect(onContextMenu).toHaveBeenCalledWith(
+                expect.objectContaining({ node: given.node1 }),
+            );
+        });
     });
-});
 
-describe("tree.dblclick", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-        titleSpan: JQuery;
-    }
+    describe("tree.dblclick", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+            titleSpan: JQuery;
+        }
 
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
-    });
-
-    it("fires tree.dblclick", async () => {
-        const onDoubleClick = jest.fn();
-        given.$tree.on("tree.dblclick", onDoubleClick);
-
-        await userEvent.dblClick(given.titleSpan.get(0) as HTMLElement);
-
-        expect(onDoubleClick).toHaveBeenCalledWith(
-            expect.objectContaining({ node: given.node1 }),
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
         );
+        given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+        });
+
+        it("fires tree.dblclick", async () => {
+            const onDoubleClick = jest.fn();
+            given.$tree.on("tree.dblclick", onDoubleClick);
+
+            await userEvent.dblClick(given.titleSpan.get(0) as HTMLElement);
+
+            expect(onDoubleClick).toHaveBeenCalledWith(
+                expect.objectContaining({ node: given.node1 }),
+            );
+        });
     });
-});
 
-describe("tree.init", () => {
-    interface Vars {
-        $tree: JQuery;
-    }
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
+    describe("tree.init", () => {
+        interface Vars {
+            $tree: JQuery;
+        }
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
 
-    context("with json data", () => {
-        it("is called", () => {
-            const onInit = jest.fn();
-            given.$tree.on("tree.init", onInit);
+        context("with json data", () => {
+            it("is called", () => {
+                const onInit = jest.fn();
+                given.$tree.on("tree.init", onInit);
 
+                given.$tree.tree({
+                    data: exampleData,
+                });
+
+                expect(onInit).toHaveBeenCalledWith(expect.anything());
+            });
+        });
+
+        context("with data loaded from an url", () => {
+            const server = setupServer(
+                http.get("/tree/", () => HttpResponse.json(exampleData)),
+            );
+
+            beforeEach(() => {
+                server.listen();
+            });
+
+            afterAll(() => {
+                server.close();
+            });
+
+            it("is called", async () => {
+                const onInit = jest.fn();
+                given.$tree.on("tree.init", onInit);
+
+                given.$tree.tree({ dataUrl: "/tree/" });
+
+                await waitFor(() => {
+                    expect(onInit).toHaveBeenCalledWith(expect.anything());
+                });
+            });
+        });
+    });
+
+    describe("tree.load_data", () => {
+        interface Vars {
+            $tree: JQuery;
+        }
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+
+        context("when the tree is initialized with data", () => {
+            it("fires tree.load_data", () => {
+                const onLoadData = jest.fn();
+                given.$tree.on("tree.load_data", onLoadData);
+
+                given.$tree.tree({ data: exampleData });
+
+                expect(onLoadData).toHaveBeenCalledWith(
+                    expect.objectContaining({ tree_data: exampleData }),
+                );
+            });
+        });
+    });
+
+    describe("tree.select", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+            titleSpan: JQuery;
+        }
+
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
             given.$tree.tree({
                 data: exampleData,
             });
+        });
 
-            expect(onInit).toHaveBeenCalled();
+        it("fires tree.select", async () => {
+            const onSelect = jest.fn();
+            given.$tree.on("tree.select", onSelect);
+
+            await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
+            expect(onSelect).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    deselected_node: null,
+                    node: given.node1,
+                }),
+            );
+        });
+
+        context("when the node was selected", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node1);
+            });
+
+            it("fires tree.select with node is null", async () => {
+                const onSelect = jest.fn();
+                given.$tree.on("tree.select", onSelect);
+
+                await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+
+                expect(onSelect).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        node: null,
+                        previous_node: given.node1,
+                    }),
+                );
+            });
         });
     });
 
-    context("with data loaded from an url", () => {
+    describe("tree.loading_data", () => {
         const server = setupServer(
             http.get("/tree/", () => HttpResponse.json(exampleData)),
         );
@@ -140,159 +250,60 @@ describe("tree.init", () => {
             server.close();
         });
 
-        it("is called", async () => {
-            const onInit = jest.fn();
-            given.$tree.on("tree.init", onInit);
+        it("fires tree.loading_data when the data is loading from an url", async () => {
+            const $tree = $("#tree1");
 
-            given.$tree.tree({ dataUrl: "/tree/" });
+            const onLoading = jest.fn();
+            $tree.on("tree.loading_data", onLoading);
+
+            $tree.tree({ dataUrl: "/tree/" });
 
             await waitFor(() => {
-                expect(onInit).toHaveBeenCalled();
+                expect(onLoading).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        isLoading: true,
+                        node: null,
+                    }),
+                );
+            });
+
+            await waitFor(() => {
+                expect(onLoading).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        isLoading: false,
+                        node: null,
+                    }),
+                );
             });
         });
     });
-});
 
-describe("tree.load_data", () => {
-    interface Vars {
-        $tree: JQuery;
-    }
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    context("when the tree is initialized with data", () => {
-        it("fires tree.load_data", () => {
-            const onLoadData = jest.fn();
-            given.$tree.on("tree.load_data", onLoadData);
-
-            given.$tree.tree({ data: exampleData });
-
-            expect(onLoadData).toHaveBeenCalledWith(
-                expect.objectContaining({ tree_data: exampleData }),
-            );
-        });
-    });
-});
-
-describe("tree.select", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-        titleSpan: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
-    });
-
-    it("fires tree.select", async () => {
-        const onSelect = jest.fn();
-        given.$tree.on("tree.select", onSelect);
-
-        await userEvent.click(given.titleSpan.get(0) as HTMLElement);
-
-        expect(onSelect).toHaveBeenCalledWith(
-            expect.objectContaining({
-                deselected_node: null,
-                node: given.node1,
-            }),
+    describe("onLoading", () => {
+        const server = setupServer(
+            http.get("/tree/", () => HttpResponse.json(exampleData)),
         );
-    });
 
-    context("when the node was selected", () => {
         beforeEach(() => {
-            given.$tree.tree("selectNode", given.node1);
+            server.listen();
         });
 
-        it("fires tree.select with node is null", async () => {
-            const onSelect = jest.fn();
-            given.$tree.on("tree.select", onSelect);
-
-            await userEvent.click(given.titleSpan.get(0) as HTMLElement);
-
-            expect(onSelect).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    node: null,
-                    previous_node: given.node1,
-                }),
-            );
-        });
-    });
-});
-
-describe("tree.loading_data", () => {
-    const server = setupServer(
-        http.get("/tree/", () => HttpResponse.json(exampleData)),
-    );
-
-    beforeEach(() => {
-        server.listen();
-    });
-
-    afterAll(() => {
-        server.close();
-    });
-
-    it("fires tree.loading_data when the data is loading from an url", async () => {
-        const $tree = $("#tree1");
-
-        const onLoading = jest.fn();
-        $tree.on("tree.loading_data", onLoading);
-
-        $tree.tree({ dataUrl: "/tree/" });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    isLoading: true,
-                    node: null,
-                }),
-            );
+        afterAll(() => {
+            server.close();
         });
 
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    isLoading: false,
-                    node: null,
-                }),
-            );
-        });
-    });
-});
+        it("calls onLoading", async () => {
+            const $tree = $("#tree1");
+            const onLoading = jest.fn();
 
-describe("onLoading", () => {
-    const server = setupServer(
-        http.get("/tree/", () => HttpResponse.json(exampleData)),
-    );
+            $tree.tree({ dataUrl: "/tree/", onLoading });
 
-    beforeEach(() => {
-        server.listen();
-    });
+            await waitFor(() => {
+                expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
+            });
 
-    afterAll(() => {
-        server.close();
-    });
-
-    it("calls onLoading", async () => {
-        const $tree = $("#tree1");
-        const onLoading = jest.fn();
-
-        $tree.tree({ dataUrl: "/tree/", onLoading });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
-        });
-
-        await waitFor(() => {
-            expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
+            await waitFor(() => {
+                expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
+            });
         });
     });
 });
