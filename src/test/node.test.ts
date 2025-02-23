@@ -157,7 +157,7 @@ describe("addChild", () => {
     });
 
     it("adds the child", () => {
-        expect(given.node.children).toEqual(
+        expect(given.node.children).toStrictEqual(
             expect.arrayContaining([
                 expect.objectContaining({ id: 100, name: "child1" }),
             ]),
@@ -165,7 +165,7 @@ describe("addChild", () => {
     });
 
     it("sets the parent of the child", () => {
-        expect(given.node.children[0]?.parent).toEqual(given.node);
+        expect(given.node.children[0]?.parent).toStrictEqual(given.node);
     });
 });
 
@@ -189,13 +189,13 @@ describe("addChildAtPosition", () => {
         given("index", () => 0);
 
         it("adds at the start", () => {
-            expect(given.node.children).toEqual([
+            expect(given.node.children).toStrictEqual([
                 expect.objectContaining({ name: "new" }),
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
             ]);
 
-            expect(given.node.children).toEqual([
+            expect(given.node.children).toStrictEqual([
                 expect.objectContaining({ name: "new" }),
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
@@ -207,7 +207,7 @@ describe("addChildAtPosition", () => {
         given("index", () => 1);
 
         it("inserts at index 1", () => {
-            expect(given.node.children).toEqual([
+            expect(given.node.children).toStrictEqual([
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "new" }),
                 expect.objectContaining({ name: "child2" }),
@@ -219,7 +219,7 @@ describe("addChildAtPosition", () => {
         given("index", () => 99);
 
         it("adds add the end", () => {
-            expect(given.node.children).toEqual([
+            expect(given.node.children).toStrictEqual([
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
                 expect.objectContaining({ name: "new" }),
@@ -497,7 +497,7 @@ describe("getData", () => {
     given("tree", () => new Node().loadFromData(exampleData));
 
     it("returns the tree data", () => {
-        expect(given.tree.getData()).toEqual([
+        expect(given.tree.getData()).toStrictEqual([
             expect.objectContaining({
                 children: [
                     expect.objectContaining({ name: "child1" }),
@@ -519,7 +519,7 @@ describe("getData", () => {
 
     context("with includeParent parameter", () => {
         it("returns the tree data including the node itself", () => {
-            expect(given.tree.getData(true)).toEqual([
+            expect(given.tree.getData(true)).toStrictEqual([
                 expect.objectContaining({
                     children: [
                         expect.objectContaining({ name: "node1" }),
@@ -1065,7 +1065,7 @@ describe("iterate", () => {
         given("visitor", () => visitAllNodes);
 
         it("visits all nodes", () => {
-            expect(given.visited).toEqual([
+            expect(given.visited).toStrictEqual([
                 ["node1", 0],
                 ["child1", 1],
                 ["child2", 1],
@@ -1084,7 +1084,7 @@ describe("iterate", () => {
         given("visitor", () => visitNodes);
 
         it("stops the iteration for the current node", () => {
-            expect(given.visited).toEqual([
+            expect(given.visited).toStrictEqual([
                 ["node1", 0],
                 ["node2", 0],
             ]);
@@ -1096,7 +1096,7 @@ describe("loadFromData", () => {
     it("creates a tree", () => {
         const tree = new Node().loadFromData(exampleData);
 
-        expect(tree.children).toEqual([
+        expect(tree.children).toStrictEqual([
             expect.objectContaining({
                 children: [
                     expect.objectContaining({ id: 125, name: "child1" }),
@@ -1370,7 +1370,7 @@ describe("removeChild", () => {
     });
 
     it("removes the child", () => {
-        expect(given.node1.children).toEqual([
+        expect(given.node1.children).toStrictEqual([
             expect.objectContaining({ name: "child2" }),
         ]);
     });

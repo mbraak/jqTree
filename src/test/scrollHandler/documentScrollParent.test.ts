@@ -1,10 +1,12 @@
+import { afterEach, describe, expect, it, jest } from "@jest/globals";
+
 import DocumentScrollParent from "../../scrollHandler/documentScrollParent";
 
-afterEach(() => {
-    jest.useRealTimers();
-});
-
 describe("checkHorizontalScrolling", () => {
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
     it("scrolls to the left when pageX is near the left edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
@@ -21,7 +23,9 @@ describe("checkHorizontalScrolling", () => {
         documentScrollParent.checkHorizontalScrolling(10);
 
         expect(scrollBy).not.toHaveBeenCalled();
+
         jest.advanceTimersByTime(50);
+
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
             left: -20,
@@ -45,7 +49,9 @@ describe("checkHorizontalScrolling", () => {
         documentScrollParent.checkHorizontalScrolling(10);
 
         expect(scrollBy).not.toHaveBeenCalled();
+
         jest.advanceTimersByTime(50);
+
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
             left: -20,
@@ -76,7 +82,9 @@ describe("checkVerticalScrolling", () => {
         documentScrollParent.checkVerticalScrolling(10);
 
         expect(scrollBy).not.toHaveBeenCalled();
+
         jest.advanceTimersByTime(50);
+
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
             left: 0,
@@ -100,7 +108,9 @@ describe("checkVerticalScrolling", () => {
         documentScrollParent.checkVerticalScrolling(10);
 
         expect(scrollBy).not.toHaveBeenCalled();
+
         jest.advanceTimersByTime(50);
+
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
             left: 0,

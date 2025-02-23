@@ -35,7 +35,7 @@ describe("generateHitAreasForGroup", () => {
         const hitAreas: HitArea[] = [];
         generateHitAreasForGroup(hitAreas, [hitPosition], 40, 100);
 
-        expect(hitAreas).toEqual([
+        expect(hitAreas).toStrictEqual([
             expect.objectContaining({
                 bottom: 100,
                 node,
@@ -77,7 +77,7 @@ describe("generateHitAreasForGroup", () => {
         const hitAreas: HitArea[] = [];
         generateHitAreasForGroup(hitAreas, hitPositions, 40, 100);
 
-        expect(hitAreas).toEqual([
+        expect(hitAreas).toStrictEqual([
             expect.objectContaining({
                 bottom: 70,
                 node,
@@ -107,14 +107,16 @@ describe("generateHitAreasFromPositions", () => {
             top: 100,
         };
 
-        expect(generateHitAreasFromPositions([hitPosition], 140)).toEqual([
-            expect.objectContaining({
-                bottom: 140,
-                node,
-                position: "inside",
-                top: 100,
-            }),
-        ]);
+        expect(generateHitAreasFromPositions([hitPosition], 140)).toStrictEqual(
+            [
+                expect.objectContaining({
+                    bottom: 140,
+                    node,
+                    position: "inside",
+                    top: 100,
+                }),
+            ],
+        );
     });
 
     it("returns two hit areas with two hit positions with the same top", () => {
@@ -132,7 +134,7 @@ describe("generateHitAreasFromPositions", () => {
             },
         ];
 
-        expect(generateHitAreasFromPositions(hitPositions, 140)).toEqual([
+        expect(generateHitAreasFromPositions(hitPositions, 140)).toStrictEqual([
             expect.objectContaining({
                 bottom: 120,
                 node,
@@ -164,7 +166,7 @@ describe("generateHitAreasFromPositions", () => {
             },
         ];
 
-        expect(generateHitAreasFromPositions(hitPositions, 140)).toEqual([
+        expect(generateHitAreasFromPositions(hitPositions, 140)).toStrictEqual([
             expect.objectContaining({
                 bottom: 125,
                 node: node1,
@@ -200,7 +202,7 @@ describe("generatePositions", () => {
         node1.element = mockHtmlElement(100);
         node2.element = mockHtmlElement(120);
 
-        expect(generateHitPositions(tree, node1)).toEqual([
+        expect(generateHitPositions(tree, node1)).toStrictEqual([
             expect.objectContaining({
                 node: node1,
                 position: null,
@@ -240,7 +242,7 @@ describe("generatePositions", () => {
 
         child1.element = mockHtmlElement(140);
 
-        expect(generateHitPositions(tree, node1)).toEqual([
+        expect(generateHitPositions(tree, node1)).toStrictEqual([
             expect.objectContaining({
                 node: node1,
                 position: null,
@@ -290,7 +292,7 @@ describe("generatePositions", () => {
 
         child1.element = mockHtmlElement(140);
 
-        expect(generateHitPositions(tree, node2)).toEqual([
+        expect(generateHitPositions(tree, node2)).toStrictEqual([
             expect.objectContaining({
                 node: node1,
                 position: "before",
