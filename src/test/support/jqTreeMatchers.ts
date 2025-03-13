@@ -22,7 +22,7 @@ expect.extend({
         /* istanbul ignore next */
         return {
             message: () => "The is node is not focused",
-            pass: document.activeElement === titleSpan(el)[0],
+            pass: document.activeElement === titleSpan(el),
         };
     },
     toBeOpen(el: HTMLElement) {
@@ -42,11 +42,11 @@ expect.extend({
         };
     },
     toHaveTreeStructure(
-        el: HTMLElement,
+        $el: JQuery,
         expectedStructure: JQTreeMatchers.TreeStructure,
     ) {
-        const $el = jQuery(el);
-        const receivedStructure = treeStructure($el);
+        const el = $el.get(0) as HTMLElement;
+        const receivedStructure = treeStructure(el);
 
         /* istanbul ignore next */
         return {

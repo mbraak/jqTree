@@ -403,7 +403,8 @@ describe("options", () => {
             given.$tree.tree({
                 data: exampleData,
                 onCreateLi: (node: INode, el: JQuery) => {
-                    titleSpan(el).text(`_${node.name}_`);
+                    titleSpan(el.get(0) as HTMLElement).innerHTML =
+                        `_${node.name}_`;
                 },
             });
         });
@@ -541,7 +542,7 @@ describe("options", () => {
 
             it("has a different closed icon", () => {
                 expect(
-                    togglerLink(given.node1.element as HTMLElement).text(),
+                    togglerLink(given.node1.element as HTMLElement).innerHTML,
                 ).toBe("◀");
             });
         });
@@ -554,7 +555,7 @@ describe("options", () => {
 
             it("has a different closed icon", () => {
                 expect(
-                    togglerLink(given.node1.element as HTMLElement).text(),
+                    togglerLink(given.node1.element as HTMLElement).innerHTML,
                 ).toBe("◀");
             });
         });

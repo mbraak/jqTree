@@ -1356,9 +1356,7 @@ describe("methods", () => {
         it("sets an option", async () => {
             given.$tree.tree("setOption", "selectable", true);
             await userEvent.click(
-                titleSpan(given.node1.element as HTMLElement).get(
-                    0,
-                ) as HTMLElement,
+                titleSpan(given.node1.element as HTMLElement),
             );
 
             expect(given.$tree.tree("getSelectedNode")).toMatchObject({

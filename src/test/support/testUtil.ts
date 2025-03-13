@@ -10,30 +10,50 @@ interface Rect {
     y: number;
 }
 
-export const singleChild = ($el: JQuery, selector: string): JQuery => {
-    const $result = $el.children(selector);
+export const getChilden = (
+    el: HTMLElement,
+    nodeName: string,
+    className: string,
+) => {
+    const result: HTMLElement[] = [];
 
-    /* istanbul ignore if */
-    if ($result.length === 0) {
-        throw new Error(`No child found for selector '${selector}'`);
+    for (const child of el.children) {
+        if (
+            child.nodeName === nodeName.toUpperCase() &&
+            child.classList.contains(className)
+        ) {
+            result.push(child as HTMLElement);
+        }
     }
 
-    /* istanbul ignore if */
-    if ($result.length > 1) {
-        throw new Error(`Multiple elements found for selector '${selector}'`);
-    }
-
-    return $result;
+    return result;
 };
 
-export const titleSpan = (liNode: HTMLElement | JQuery): JQuery =>
-    singleChild(nodeElement(liNode), "span.jqtree-title");
+export const singleChild = (
+    el: HTMLElement,
+    nodeName: string,
+    className: string,
+) => {
+    const children = getChilden(el, nodeName, className);
 
-export const togglerLink = (liNode: HTMLElement | JQuery): JQuery =>
-    singleChild(nodeElement(liNode), "a.jqtree-toggler");
+    /* istanbul ignore if */
+    if (children.length !== 1) {
+        throw new Error(
+            `Expected single child, got ${el.children.length} for ${nodeName} ${className}`,
+        );
+    }
 
-const nodeElement = (liNode: HTMLElement | JQuery): JQuery =>
-    singleChild(jQuery(liNode), "div.jqtree-element ");
+    return children[0] as HTMLElement;
+};
+
+export const titleSpan = (liNode: HTMLElement): HTMLElement =>
+    singleChild(nodeElement(liNode), "span", "jqtree-title");
+
+export const togglerLink = (liNode: HTMLElement): HTMLElement =>
+    singleChild(nodeElement(liNode), "a", "jqtree-toggler");
+
+const nodeElement = (liNode: HTMLElement): HTMLElement =>
+    singleChild(liNode, "div", "jqtree-element");
 
 const mockLayout = (element: HTMLElement, rect: Rect) => {
     jest.spyOn(element, "clientHeight", "get").mockReturnValue(rect.height);
