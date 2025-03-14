@@ -11,17 +11,17 @@
     "copy_vendor_files": "./copy_vendor_files"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.0.6",
-    "@tailwindcss/postcss": "^4.0.6",
+    "@tailwindcss/cli": "^4.0.14",
+    "@tailwindcss/postcss": "^4.0.14",
     "@tailwindcss/typography": "^0.5.16",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.21",
     "jquery": "^3.7.1",
     "jquery-mockjax": "2.7.0-beta.0",
-    "postcss": "^8.5.2",
-    "postcss-cli": "^11.0.0",
+    "postcss": "^8.5.3",
+    "postcss-cli": "^11.0.1",
     "postcss-import": "^16.1.0",
     "postcss-load-config": "^6.0.1",
     "postcss-nested": "^7.0.2",
-    "tailwindcss": "^4.0.6"
+    "tailwindcss": "^4.0.14"
   }
 }
