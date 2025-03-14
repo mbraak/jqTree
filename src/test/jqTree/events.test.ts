@@ -26,7 +26,7 @@ describe("events", () => {
         interface Vars {
             $tree: JQuery;
             node1: INode;
-            titleSpan: JQuery;
+            titleSpan: HTMLElement;
         }
 
         const given = getGiven<Vars>();
@@ -44,7 +44,7 @@ describe("events", () => {
             const onClick = jest.fn();
             given.$tree.on("tree.click", onClick);
 
-            await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+            await userEvent.click(given.titleSpan);
 
             expect(onClick).toHaveBeenCalledWith(
                 expect.objectContaining({ node: given.node1 }),
@@ -56,7 +56,7 @@ describe("events", () => {
         interface Vars {
             $tree: JQuery;
             node1: INode;
-            titleSpan: JQuery;
+            titleSpan: HTMLElement;
         }
 
         const given = getGiven<Vars>();
@@ -76,7 +76,7 @@ describe("events", () => {
 
             await userEvent.pointer({
                 keys: "[MouseRight]",
-                target: given.titleSpan.get(0) as HTMLElement,
+                target: given.titleSpan,
             });
 
             expect(onContextMenu).toHaveBeenCalledWith(
@@ -89,7 +89,7 @@ describe("events", () => {
         interface Vars {
             $tree: JQuery;
             node1: INode;
-            titleSpan: JQuery;
+            titleSpan: HTMLElement;
         }
 
         const given = getGiven<Vars>();
@@ -107,7 +107,7 @@ describe("events", () => {
             const onDoubleClick = jest.fn();
             given.$tree.on("tree.dblclick", onDoubleClick);
 
-            await userEvent.dblClick(given.titleSpan.get(0) as HTMLElement);
+            await userEvent.dblClick(given.titleSpan);
 
             expect(onDoubleClick).toHaveBeenCalledWith(
                 expect.objectContaining({ node: given.node1 }),
@@ -186,7 +186,7 @@ describe("events", () => {
         interface Vars {
             $tree: JQuery;
             node1: INode;
-            titleSpan: JQuery;
+            titleSpan: HTMLElement;
         }
 
         const given = getGiven<Vars>();
@@ -206,7 +206,7 @@ describe("events", () => {
             const onSelect = jest.fn();
             given.$tree.on("tree.select", onSelect);
 
-            await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+            await userEvent.click(given.titleSpan);
 
             expect(onSelect).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -225,7 +225,7 @@ describe("events", () => {
                 const onSelect = jest.fn();
                 given.$tree.on("tree.select", onSelect);
 
-                await userEvent.click(given.titleSpan.get(0) as HTMLElement);
+                await userEvent.click(given.titleSpan);
 
                 expect(onSelect).toHaveBeenCalledWith(
                     expect.objectContaining({

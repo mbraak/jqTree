@@ -26,6 +26,6 @@ declare namespace jest {
         toBeFocused(): boolean;
         toBeOpen(): boolean;
         toBeSelected(): boolean;
-        toHaveTreeStructure(treeStructure: any): boolean;
+        toHaveTreeStructure(treeStructure: TreeStructure): boolean;
     }
 }

@@ -24,9 +24,7 @@ describe("mouse", () => {
         expect(node.element).not.toBeSelected();
         expect(node.element).not.toBeFocused();
 
-        await userEvent.click(
-            titleSpan(node.element as HTMLElement).get(0) as HTMLElement,
-        );
+        await userEvent.click(titleSpan(node.element as HTMLElement));
 
         expect(node.element).toBeSelected();
     });
@@ -40,9 +38,7 @@ describe("mouse", () => {
 
         expect(node.element).toBeSelected();
 
-        await userEvent.click(
-            titleSpan(node.element as HTMLElement).get(0) as HTMLElement,
-        );
+        await userEvent.click(titleSpan(node.element as HTMLElement));
 
         expect(node.element).not.toBeSelected();
     });
@@ -55,9 +51,7 @@ describe("mouse", () => {
 
         expect(node.element).not.toBeOpen();
 
-        await userEvent.click(
-            togglerLink(node.element as HTMLElement).get(0) as HTMLElement,
-        );
+        await userEvent.click(togglerLink(node.element as HTMLElement));
 
         expect(node.element).toBeOpen();
     });
@@ -71,9 +65,7 @@ describe("mouse", () => {
         expect(node.element).not.toBeSelected();
         expect(node.element).not.toBeOpen();
 
-        await userEvent.click(
-            togglerLink(node.element as HTMLElement).get(0) as HTMLElement,
-        );
+        await userEvent.click(togglerLink(node.element as HTMLElement));
 
         expect(node.element).not.toBeSelected();
         expect(node.element).toBeOpen();
@@ -89,9 +81,7 @@ describe("mouse", () => {
         expect(node.element).toBeSelected();
         expect(node.element).not.toBeOpen();
 
-        await userEvent.click(
-            togglerLink(node.element as HTMLElement).get(0) as HTMLElement,
-        );
+        await userEvent.click(togglerLink(node.element as HTMLElement));
 
         expect(node.element).toBeSelected();
         expect(node.element).toBeOpen();
