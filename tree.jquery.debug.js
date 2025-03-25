@@ -1876,9 +1876,7 @@ var jqtree = (function (exports) {
       }
       init(node) {
         this.node = node;
-        if (!node.element) {
-          node.element = this.treeElement;
-        }
+        node.element ??= this.treeElement;
         this.element = node.element;
       }
       select(mustSetFocus) {
@@ -2292,9 +2290,7 @@ var jqtree = (function (exports) {
         return this.scrollParentBottom;
       }
       getScrollParentTop() {
-        if (this.scrollParentTop == null) {
-          this.scrollParentTop = getOffsetTop(this.container);
-        }
+        this.scrollParentTop ??= getOffsetTop(this.container);
         return this.scrollParentTop;
       }
     }
@@ -2353,16 +2349,12 @@ var jqtree = (function (exports) {
       }
       getDocumentScrollHeight() {
         // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
-        if (this.documentScrollHeight == null) {
-          this.documentScrollHeight = this.container.scrollHeight;
-        }
+        this.documentScrollHeight ??= this.container.scrollHeight;
         return this.documentScrollHeight;
       }
       getDocumentScrollWidth() {
         // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
-        if (this.documentScrollWidth == null) {
-          this.documentScrollWidth = this.container.scrollWidth;
-        }
+        this.documentScrollWidth ??= this.container.scrollWidth;
         return this.documentScrollWidth;
       }
     }
@@ -2430,9 +2422,7 @@ var jqtree = (function (exports) {
         this.getScrollParent().checkVerticalScrolling(positionInfo.pageY);
       }
       getScrollParent() {
-        if (!this.scrollParent) {
-          this.scrollParent = createScrollParent(this.treeElement, this.refreshHitAreas);
-        }
+        this.scrollParent ??= createScrollParent(this.treeElement, this.refreshHitAreas);
         return this.scrollParent;
       }
     }
@@ -2785,9 +2775,7 @@ var jqtree = (function (exports) {
         this.element = this.$el;
         this.isInitialized = false;
         this.options.rtl = this.getRtlOption();
-        if (this.options.closedIcon == null) {
-          this.options.closedIcon = this.getDefaultClosedIcon();
-        }
+        this.options.closedIcon ??= this.getDefaultClosedIcon();
         this.connectHandlers();
         this.initData();
       }
@@ -2870,9 +2858,7 @@ var jqtree = (function (exports) {
             slide = param1;
             onFinished = param2;
           }
-          if (slide == null) {
-            slide = this.options.slide;
-          }
+          slide ??= this.options.slide;
           return [slide, onFinished];
         };
         const [slide, onFinished] = parseParams();
