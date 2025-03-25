@@ -89,18 +89,14 @@ export default class DocumentScrollParent extends ScrollParent {
 
     private getDocumentScrollHeight() {
         // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
-        if (this.documentScrollHeight == null) {
-            this.documentScrollHeight = this.container.scrollHeight;
-        }
+        this.documentScrollHeight ??= this.container.scrollHeight;
 
         return this.documentScrollHeight;
     }
 
     private getDocumentScrollWidth() {
         // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
-        if (this.documentScrollWidth == null) {
-            this.documentScrollWidth = this.container.scrollWidth;
-        }
+        this.documentScrollWidth ??= this.container.scrollWidth;
 
         return this.documentScrollWidth;
     }

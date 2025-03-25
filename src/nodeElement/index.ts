@@ -52,9 +52,7 @@ class NodeElement {
     public init(node: Node): void {
         this.node = node;
 
-        if (!node.element) {
-            node.element = this.treeElement;
-        }
+        node.element ??= this.treeElement;
 
         this.element = node.element;
     }

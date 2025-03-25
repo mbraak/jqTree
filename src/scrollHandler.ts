@@ -44,12 +44,10 @@ export default class ScrollHandler {
     }
 
     private getScrollParent(): ScrollParent {
-        if (!this.scrollParent) {
-            this.scrollParent = createScrollParent(
-                this.treeElement,
-                this.refreshHitAreas,
-            );
-        }
+        this.scrollParent ??= createScrollParent(
+            this.treeElement,
+            this.refreshHitAreas,
+        );
 
         return this.scrollParent;
     }

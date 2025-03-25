@@ -62,9 +62,7 @@ export default class ContainerScrollParent extends ScrollParent {
     }
 
     private getScrollParentTop() {
-        if (this.scrollParentTop == null) {
-            this.scrollParentTop = getOffsetTop(this.container);
-        }
+        this.scrollParentTop ??= getOffsetTop(this.container);
 
         return this.scrollParentTop;
     }
