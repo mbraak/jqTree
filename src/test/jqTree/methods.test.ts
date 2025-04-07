@@ -83,16 +83,25 @@ describe("methods", () => {
                 autoOpen: true,
                 data: exampleData,
             });
-
-            given.$tree.tree("addNodeBefore", "added-node", given.node);
         });
 
         it("adds the node", () => {
+            given.$tree.tree("addNodeBefore", "added-node", given.node);
+
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "added-node" }),
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
+        });
+
+        it("throws an error without an existingNode parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("addNodeBefore", "added-node");
+            }).toThrow("Parameter is empty: existingNode");
         });
     });
 
@@ -113,11 +122,11 @@ describe("methods", () => {
                 autoOpen: true,
                 data: exampleData,
             });
-
-            given.$tree.tree("addParentNode", "new-parent-node", given.child1);
         });
 
         it("adds the parent node", () => {
+            given.$tree.tree("addParentNode", "new-parent-node", given.child1);
+
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     children: [
@@ -133,6 +142,15 @@ describe("methods", () => {
                 }),
                 expect.objectContaining({ name: "node2" }),
             ]);
+        });
+
+        it("throws an error without an existingNode parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("addParentNode", "new-parent-node");
+            }).toThrow("Parameter is empty: existingNode");
         });
     });
 
@@ -216,6 +234,20 @@ describe("methods", () => {
             given.$tree.tree("addToSelection", given.child1);
 
             expect(node1.is_open).toBe(true);
+        });
+
+        it("throws an error without a node parameter", () => {
+            given.$tree.tree({
+                autoOpen: false,
+                data: exampleData,
+            });
+
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("addToSelection");
+            }).toThrow("Node parameter is empty");
         });
     });
 
@@ -312,11 +344,21 @@ describe("methods", () => {
                 autoOpen: true,
                 data: exampleData,
             });
-            given.$tree.tree("closeNode", given.node1, false);
         });
 
         it("closes the node", () => {
+            given.$tree.tree("closeNode", given.node1, false);
+
             expect(given.node1.element).toBeClosed();
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("closeNode");
+            }).toThrow("Node parameter is empty");
         });
     });
 
@@ -682,24 +724,23 @@ describe("methods", () => {
             given.$tree.tree({ data: exampleData });
         });
 
-        context("when the node is selected", () => {
-            beforeEach(() => {
-                given.$tree.tree("selectNode", given.node1);
-            });
+        it("returns truewhen the node is selected", () => {
+            given.$tree.tree("selectNode", given.node1);
 
-            it("returns true", () => {
-                expect(
-                    given.$tree.tree("isNodeSelected", given.node1),
-                ).toBeTrue();
-            });
+            expect(given.$tree.tree("isNodeSelected", given.node1)).toBeTrue();
         });
 
-        context("when the node is not selected", () => {
-            it("returns false", () => {
-                expect(
-                    given.$tree.tree("isNodeSelected", given.node1),
-                ).toBeFalse();
-            });
+        it("returns false when the node is not selected", () => {
+            expect(given.$tree.tree("isNodeSelected", given.node1)).toBeFalse();
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("isNodeSelected");
+            }).toThrow("Node parameter is empty");
         });
     });
 
@@ -939,10 +980,11 @@ describe("methods", () => {
                 autoOpen: true,
                 data: exampleData,
             });
-            given.$tree.tree("moveNode", given.child1, given.node2, "after");
         });
 
         it("moves node", () => {
+            given.$tree.tree("moveNode", given.child1, given.node2, "after");
+
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     children: [expect.objectContaining({ name: "child2" })],
@@ -951,6 +993,33 @@ describe("methods", () => {
                 expect.objectContaining({ name: "node2" }),
                 expect.objectContaining({ name: "child1" }),
             ]);
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("moveNode");
+            }).toThrow("Node parameter is empty");
+        });
+
+        it("throws an error without a targetNode parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("moveNode", given.child1);
+            }).toThrow("Parameter is empty: targetNode");
+        });
+
+        it("throws an error without a position parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("moveNode", given.child1, given.node2);
+            }).toThrow("Parameter is empty: position");
         });
     });
 
@@ -1004,15 +1073,13 @@ describe("methods", () => {
             expect(given.node1.element).toBeOpen();
         });
 
-        context("with onFinished parameter", () => {
-            it("calls the function", async () => {
-                const onFinished = jest.fn();
+        it("calls the function with onFinished parameter", async () => {
+            const onFinished = jest.fn();
 
-                given.$tree.tree("openNode", given.node1, onFinished);
+            given.$tree.tree("openNode", given.node1, onFinished);
 
-                await waitFor(() => {
-                    expect(onFinished).toHaveBeenCalledWith(given.node1);
-                });
+            await waitFor(() => {
+                expect(onFinished).toHaveBeenCalledWith(given.node1);
             });
         });
 
@@ -1023,6 +1090,15 @@ describe("methods", () => {
             expect(() => {
                 given.$tree.tree("openNode", child1, false);
             }).not.toThrow();
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("openNode");
+            }).toThrow("Node parameter is empty");
         });
     });
 
@@ -1251,6 +1327,15 @@ describe("methods", () => {
                 ).toThrow("Node has no parent");
             });
         });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("removeNode");
+            }).toThrow("Node parameter is empty");
+        });
     });
 
     describe("selectNode", () => {
@@ -1356,9 +1441,7 @@ describe("methods", () => {
         it("sets an option", async () => {
             given.$tree.tree("setOption", "selectable", true);
             await userEvent.click(
-                titleSpan(given.node1.element as HTMLElement).get(
-                    0,
-                ) as HTMLElement,
+                titleSpan(given.node1.element as HTMLElement),
             );
 
             expect(given.$tree.tree("getSelectedNode")).toMatchObject({
@@ -1430,21 +1513,31 @@ describe("methods", () => {
                 autoOpen: given.autoOpen,
                 data: exampleData,
             });
-            given.$tree.tree("toggle", given.node1, false);
         });
 
-        context("when the node is closed", () => {
-            it("opens the node", () => {
-                expect(given.node1.element).toBeOpen();
-            });
+        it("opens the node when the node is closed", () => {
+            given.$tree.tree("toggle", given.node1, false);
+
+            expect(given.node1.element).toBeOpen();
         });
 
         context("when the node is open", () => {
             given("autoOpen", () => true);
 
             it("closes the node", () => {
+                given.$tree.tree("toggle", given.node1, false);
+
                 expect(given.node1.element).toBeClosed();
             });
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("toggle");
+            }).toThrow("Node parameter is empty");
         });
     });
 
@@ -1493,14 +1586,14 @@ describe("methods", () => {
             if (given.isSelected) {
                 given.$tree.tree("selectNode", given.node);
             }
-
-            given.$tree.tree("updateNode", given.node, given.nodeData);
         });
 
         context("with a string", () => {
             given("nodeData", () => "updated-node");
 
             it("updates the name", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({ name: "updated-node" }),
                     expect.objectContaining({ name: "node2" }),
@@ -1512,6 +1605,8 @@ describe("methods", () => {
             given("nodeData", () => ({ name: "updated-node" }));
 
             it("updates the name", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({ name: "updated-node" }),
                     expect.objectContaining({ name: "node2" }),
@@ -1523,6 +1618,8 @@ describe("methods", () => {
             given("nodeData", () => ({ id: 999 }));
 
             it("updates the id", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({ name: "node1" }),
                     expect.objectContaining({ name: "node2" }),
@@ -1537,6 +1634,8 @@ describe("methods", () => {
             given("nodeData", () => ({ color: "green" }));
 
             it("updates the node", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({ name: "node1" }),
                     expect.objectContaining({ name: "node2" }),
@@ -1556,6 +1655,8 @@ describe("methods", () => {
                 );
 
                 it("adds the child node", () => {
+                    given.$tree.tree("updateNode", given.node, given.nodeData);
+
                     expect(given.$tree).toHaveTreeStructure([
                         expect.objectContaining({
                             children: [
@@ -1580,6 +1681,8 @@ describe("methods", () => {
                 given("nodeData", () => ({ children: [] }));
 
                 it("removes the children", () => {
+                    given.$tree.tree("updateNode", given.node, given.nodeData);
+
                     expect(given.$tree).toHaveTreeStructure([
                         expect.objectContaining({
                             name: "node1",
@@ -1598,6 +1701,8 @@ describe("methods", () => {
             given("isSelected", () => true);
 
             it("keeps the node selected", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({ name: "node1" }),
                     expect.objectContaining({ name: "node2" }),
@@ -1605,8 +1710,19 @@ describe("methods", () => {
             });
 
             it("keeps the focus on the node", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
                 expect(given.node.element).toBeFocused();
             });
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("updateNode");
+            }).toThrow("Node parameter is empty");
         });
     });
 

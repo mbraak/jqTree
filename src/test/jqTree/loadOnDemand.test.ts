@@ -98,7 +98,7 @@ describe("load on demand", () => {
 
         it("loads the subtree", async () => {
             const toggler = togglerLink(given.node.element as HTMLElement);
-            await userEvent.click(toggler.get(0) as HTMLElement);
+            await userEvent.click(toggler);
 
             await screen.findByText("loaded-on-demand");
 
@@ -125,7 +125,7 @@ describe("load on demand", () => {
                 expect(given.node.element).toBeFocused();
 
                 const toggler = togglerLink(given.node.element as HTMLElement);
-                await userEvent.click(toggler.get(0) as HTMLElement);
+                await userEvent.click(toggler);
 
                 await screen.findByText("loaded-on-demand");
 
@@ -138,7 +138,7 @@ describe("load on demand", () => {
                 expect(given.node.element).not.toBeSelected();
 
                 const toggler = togglerLink(given.node.element as HTMLElement);
-                await userEvent.click(toggler.get(0) as HTMLElement);
+                await userEvent.click(toggler);
 
                 await screen.findByText("loaded-on-demand");
 
@@ -157,7 +157,7 @@ describe("load on demand", () => {
                 expect(given.node.element).not.toBeFocused();
 
                 const toggler = togglerLink(given.node.element as HTMLElement);
-                await userEvent.click(toggler.get(0) as HTMLElement);
+                await userEvent.click(toggler);
 
                 await screen.findByText("loaded-on-demand");
 

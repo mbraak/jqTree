@@ -183,6 +183,42 @@ describe("options", () => {
         });
     });
 
+    describe("buttonLeft", () => {
+        it("renders the button on the right when buttonLeft is false", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                buttonLeft: false,
+                data: exampleData,
+            });
+
+            const node = $tree.tree("getNodeByName", "node1");
+            const liElement = node?.element as HTMLElement;
+            const spanElement = titleSpan(liElement);
+
+            // eslint-disable-next-line testing-library/no-node-access
+            const nextSibling = spanElement.nextSibling as HTMLElement;
+
+            expect(nextSibling).toHaveClass("jqtree-toggler");
+        });
+
+        it("renders the button on the left when buttonLeft is true", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                buttonLeft: true,
+                data: exampleData,
+            });
+
+            const node = $tree.tree("getNodeByName", "node1");
+            const liElement = node?.element as HTMLElement;
+            const spanElement = titleSpan(liElement);
+
+            // eslint-disable-next-line testing-library/no-node-access
+            const nextSibling = spanElement.previousSibling as HTMLElement;
+
+            expect(nextSibling).toHaveClass("jqtree-toggler");
+        });
+    });
+
     describe("closedIcon", () => {
         it("renders a string", () => {
             const $tree = $("#tree1");
@@ -403,7 +439,8 @@ describe("options", () => {
             given.$tree.tree({
                 data: exampleData,
                 onCreateLi: (node: INode, el: JQuery) => {
-                    titleSpan(el).text(`_${node.name}_`);
+                    titleSpan(el.get(0) as HTMLElement).innerHTML =
+                        `_${node.name}_`;
                 },
             });
         });
@@ -541,7 +578,7 @@ describe("options", () => {
 
             it("has a different closed icon", () => {
                 expect(
-                    togglerLink(given.node1.element as HTMLElement).text(),
+                    togglerLink(given.node1.element as HTMLElement).innerHTML,
                 ).toBe("◀");
             });
         });
@@ -554,7 +591,7 @@ describe("options", () => {
 
             it("has a different closed icon", () => {
                 expect(
-                    togglerLink(given.node1.element as HTMLElement).text(),
+                    togglerLink(given.node1.element as HTMLElement).innerHTML,
                 ).toBe("◀");
             });
         });
