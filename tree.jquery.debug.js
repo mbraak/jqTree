@@ -21,15 +21,14 @@ var jqtree = (function (exports) {
     'use strict';
 
     class DataLoader {
-      constructor(_ref) {
-        let {
-          dataFilter,
-          loadData,
-          onLoadFailed,
-          onLoading,
-          treeElement,
-          triggerEvent
-        } = _ref;
+      constructor({
+        dataFilter,
+        loadData,
+        onLoadFailed,
+        onLoading,
+        treeElement,
+        triggerEvent
+      }) {
         this.dataFilter = dataFilter;
         this.loadData = loadData;
         this.onLoadFailed = onLoadFailed;
@@ -153,14 +152,13 @@ var jqtree = (function (exports) {
     }
 
     class DragElement {
-      constructor(_ref) {
-        let {
-          autoEscape,
-          nodeName,
-          offsetX,
-          offsetY,
-          treeElement
-        } = _ref;
+      constructor({
+        autoEscape,
+        nodeName,
+        offsetX,
+        offsetY,
+        treeElement
+      }) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.element = this.createElement(nodeName, autoEscape);
@@ -186,14 +184,13 @@ var jqtree = (function (exports) {
       }
     }
 
-    const iterateVisibleNodes = (tree, _ref) => {
-      let {
-        handleAfterOpenFolder,
-        handleClosedFolder,
-        handleFirstNode,
-        handleNode,
-        handleOpenFolder
-      } = _ref;
+    const iterateVisibleNodes = (tree, {
+      handleAfterOpenFolder,
+      handleClosedFolder,
+      handleFirstNode,
+      handleNode,
+      handleOpenFolder
+    }) => {
       let isFirstNode = true;
       const iterate = (node, nextNode) => {
         let mustIterateInside = (node.is_open || !node.element) && node.hasChildren();
@@ -365,25 +362,24 @@ var jqtree = (function (exports) {
     const generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFromPositions(generateHitPositions(tree, currentNode), treeBottom);
 
     class DragAndDropHandler {
-      constructor(_ref) {
-        let {
-          autoEscape,
-          getNodeElement,
-          getNodeElementForNode,
-          getScrollLeft,
-          getTree,
-          onCanMove,
-          onCanMoveTo,
-          onDragMove,
-          onDragStop,
-          onIsMoveHandle,
-          openFolderDelay,
-          openNode,
-          refreshElements,
-          slide,
-          treeElement,
-          triggerEvent
-        } = _ref;
+      constructor({
+        autoEscape,
+        getNodeElement,
+        getNodeElementForNode,
+        getScrollLeft,
+        getTree,
+        onCanMove,
+        onCanMoveTo,
+        onDragMove,
+        onDragStop,
+        onIsMoveHandle,
+        openFolderDelay,
+        openNode,
+        refreshElements,
+        slide,
+        treeElement,
+        triggerEvent
+      }) {
         this.autoEscape = autoEscape;
         this.getNodeElement = getNodeElement;
         this.getNodeElementForNode = getNodeElementForNode;
@@ -641,21 +637,20 @@ var jqtree = (function (exports) {
     }
 
     class ElementsRenderer {
-      constructor(_ref) {
-        let {
-          $element,
-          autoEscape,
-          buttonLeft,
-          closedIcon,
-          dragAndDrop,
-          getTree,
-          isNodeSelected,
-          onCreateLi,
-          openedIcon,
-          rtl,
-          showEmptyFolder,
-          tabIndex
-        } = _ref;
+      constructor({
+        $element,
+        autoEscape,
+        buttonLeft,
+        closedIcon,
+        dragAndDrop,
+        getTree,
+        isNodeSelected,
+        onCreateLi,
+        openedIcon,
+        rtl,
+        showEmptyFolder,
+        tabIndex
+      }) {
         this.autoEscape = autoEscape;
         this.buttonLeft = buttonLeft;
         this.dragAndDrop = dragAndDrop;
@@ -880,15 +875,14 @@ var jqtree = (function (exports) {
     }
 
     class KeyHandler {
-      constructor(_ref) {
-        let {
-          closeNode,
-          getSelectedNode,
-          isFocusOnTree,
-          keyboardSupport,
-          openNode,
-          selectNode
-        } = _ref;
+      constructor({
+        closeNode,
+        getSelectedNode,
+        isFocusOnTree,
+        keyboardSupport,
+        openNode,
+        selectNode
+      }) {
         this.closeNode = closeNode;
         this.getSelectedNode = getSelectedNode;
         this.isFocusOnTree = isFocusOnTree;
@@ -993,20 +987,19 @@ var jqtree = (function (exports) {
     });
 
     class MouseHandler {
-      constructor(_ref) {
-        let {
-          element,
-          getMouseDelay,
-          getNode,
-          onClickButton,
-          onClickTitle,
-          onMouseCapture,
-          onMouseDrag,
-          onMouseStart,
-          onMouseStop,
-          triggerEvent,
-          useContextMenu
-        } = _ref;
+      constructor({
+        element,
+        getMouseDelay,
+        getNode,
+        onClickButton,
+        onClickTitle,
+        onMouseCapture,
+        onMouseDrag,
+        onMouseStart,
+        onMouseStop,
+        triggerEvent,
+        useContextMenu
+      }) {
         this.element = element;
         this.getMouseDelay = getMouseDelay;
         this.getNode = getNode;
@@ -1258,10 +1251,7 @@ var jqtree = (function (exports) {
     const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
 
     class Node {
-      constructor() {
-        let nodeData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-        let isRoot = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-        let nodeClass = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Node;
+      constructor(nodeData = null, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.load_on_demand = false;
         this.isEmptyFolder = nodeData != null && isNodeRecordWithChildren(nodeData) && nodeData.children.length === 0;
@@ -1369,8 +1359,7 @@ var jqtree = (function (exports) {
       /*
       Get the tree as data.
       */
-      getData() {
-        let includeParent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      getData(includeParent = false) {
         const getDataFromNodes = nodes => {
           return nodes.map(node => {
             const tmpNode = {};
@@ -1417,8 +1406,7 @@ var jqtree = (function (exports) {
         }
         return level;
       }
-      getNextNode() {
-        let includeChildren = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      getNextNode(includeChildren = true) {
         if (includeChildren && this.hasChildren()) {
           return this.children[0] ?? null;
         } else if (!this.parent) {
@@ -1848,13 +1836,12 @@ var jqtree = (function (exports) {
     }
 
     class NodeElement {
-      constructor(_ref) {
-        let {
-          getScrollLeft,
-          node,
-          tabIndex,
-          treeElement
-        } = _ref;
+      constructor({
+        getScrollLeft,
+        node,
+        tabIndex,
+        treeElement
+      }) {
         this.getScrollLeft = getScrollLeft;
         this.tabIndex = tabIndex;
         this.treeElement = treeElement;
@@ -1905,16 +1892,15 @@ var jqtree = (function (exports) {
     }
 
     class FolderElement extends NodeElement {
-      constructor(_ref) {
-        let {
-          closedIconElement,
-          getScrollLeft,
-          node,
-          openedIconElement,
-          tabIndex,
-          treeElement,
-          triggerEvent
-        } = _ref;
+      constructor({
+        closedIconElement,
+        getScrollLeft,
+        node,
+        openedIconElement,
+        tabIndex,
+        treeElement,
+        triggerEvent
+      }) {
         super({
           getScrollLeft,
           node,
@@ -1993,19 +1979,18 @@ var jqtree = (function (exports) {
     }
 
     class SaveStateHandler {
-      constructor(_ref) {
-        let {
-          addToSelection,
-          getNodeById,
-          getSelectedNodes,
-          getTree,
-          onGetStateFromStorage,
-          onSetStateFromStorage,
-          openNode,
-          refreshElements,
-          removeFromSelection,
-          saveState
-        } = _ref;
+      constructor({
+        addToSelection,
+        getNodeById,
+        getSelectedNodes,
+        getTree,
+        onGetStateFromStorage,
+        onSetStateFromStorage,
+        openNode,
+        refreshElements,
+        removeFromSelection,
+        saveState
+      }) {
         this.addToSelection = addToSelection;
         this.getNodeById = getNodeById;
         this.getSelectedNodes = getSelectedNodes;
@@ -2182,11 +2167,10 @@ var jqtree = (function (exports) {
     }
 
     class ScrollParent {
-      constructor(_ref) {
-        let {
-          container,
-          refreshHitAreas
-        } = _ref;
+      constructor({
+        container,
+        refreshHitAreas
+      }) {
         this.container = container;
         this.refreshHitAreas = refreshHitAreas;
       }
@@ -2296,11 +2280,10 @@ var jqtree = (function (exports) {
     }
 
     class DocumentScrollParent extends ScrollParent {
-      constructor(_ref) {
-        let {
-          refreshHitAreas,
-          treeElement
-        } = _ref;
+      constructor({
+        refreshHitAreas,
+        treeElement
+      }) {
         super({
           container: document.documentElement,
           refreshHitAreas
@@ -2393,11 +2376,10 @@ var jqtree = (function (exports) {
     };
 
     class ScrollHandler {
-      constructor(_ref) {
-        let {
-          refreshHitAreas,
-          treeElement
-        } = _ref;
+      constructor({
+        refreshHitAreas,
+        treeElement
+      }) {
         this.refreshHitAreas = refreshHitAreas;
         this.scrollParent = undefined;
         this.treeElement = treeElement;
@@ -2428,10 +2410,9 @@ var jqtree = (function (exports) {
     }
 
     class SelectNodeHandler {
-      constructor(_ref) {
-        let {
-          getNodeById
-        } = _ref;
+      constructor({
+        getNodeById
+      }) {
         this.getNodeById = getNodeById;
         this.selectedNodes = new Set();
         this.clear();
@@ -2496,8 +2477,7 @@ var jqtree = (function (exports) {
           return false;
         }
       }
-      removeFromSelection(node) {
-        let includeChildren = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      removeFromSelection(node, includeChildren = false) {
         if (node.id == null) {
           if (this.selectedSingleNode && node.element === this.selectedSingleNode.element) {
             this.selectedSingleNode = null;
@@ -2569,7 +2549,7 @@ var jqtree = (function (exports) {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      jQuery.fn[widgetName] = function (argument1) {
+      jQuery.fn[widgetName] = function (argument1, ...args) {
         if (!argument1) {
           return createWidget(this, null);
         } else if (typeof argument1 === "object") {
@@ -2581,9 +2561,6 @@ var jqtree = (function (exports) {
             destroyWidget(this);
             return undefined;
           } else {
-            for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-              args[_key - 1] = arguments[_key];
-            }
             return callFunction(this, functionName, args);
           }
         } else {
@@ -2622,7 +2599,7 @@ var jqtree = (function (exports) {
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
     class JqTreeWidget extends SimpleWidget {
-      static defaults = (() => ({
+      static defaults = {
         animationSpeed: "fast",
         autoEscape: true,
         autoOpen: false,
@@ -2667,7 +2644,7 @@ var jqtree = (function (exports) {
         // The delay for starting dnd (in milliseconds)
         tabIndex: 0,
         useContextMenu: true
-      }))();
+      };
       addNodeAfter(newNodeInfo, existingNode) {
         const newNode = existingNode.addAfter(newNodeInfo);
         if (newNode) {
@@ -2932,8 +2909,7 @@ var jqtree = (function (exports) {
         }
         return this.element;
       }
-      toggle(node) {
-        let slideParam = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      toggle(node, slideParam = null) {
         if (!node) {
           throw Error(NODE_PARAM_IS_EMPTY);
         }
@@ -3371,9 +3347,7 @@ var jqtree = (function (exports) {
           return subtree === selectedNode || subtree.isParentOf(selectedNode);
         }
       }
-      loadFolderOnDemand(node) {
-        let slide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-        let onFinished = arguments.length > 2 ? arguments[2] : undefined;
+      loadFolderOnDemand(node, slide = true, onFinished) {
         node.is_loading = true;
         this.doLoadDataFromUrl(null, node, () => {
           this.openNodeInternal(node, slide, onFinished);
@@ -3416,9 +3390,7 @@ var jqtree = (function (exports) {
           return false;
         }
       }
-      openNodeInternal(node) {
-        let slide = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-        let onFinished = arguments.length > 2 ? arguments[2] : undefined;
+      openNodeInternal(node, slide = true, onFinished) {
         const doOpenNode = (_node, _slide, _onFinished) => {
           if (!node.children.length) {
             return;
