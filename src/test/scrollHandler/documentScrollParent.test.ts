@@ -1,14 +1,16 @@
+import { afterEach, describe, expect, it, jest } from "@jest/globals";
+
 import DocumentScrollParent from "../../scrollHandler/documentScrollParent";
 
-afterEach(() => {
-    jest.useRealTimers();
-});
-
 describe("checkHorizontalScrolling", () => {
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
     it("scrolls to the left when pageX is near the left edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
-        window.scrollBy = scrollBy;
+        document.documentElement.scrollBy = scrollBy;
 
         const refreshHitAreas = jest.fn();
         const treeElement = document.createElement("div");
@@ -21,7 +23,9 @@ describe("checkHorizontalScrolling", () => {
         documentScrollParent.checkHorizontalScrolling(10);
 
         expect(scrollBy).not.toHaveBeenCalled();
+
         jest.advanceTimersByTime(50);
+
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
             left: -20,
@@ -32,7 +36,7 @@ describe("checkHorizontalScrolling", () => {
     it("stops scrolling when pageX is moved from the left edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
-        window.scrollBy = scrollBy;
+        document.documentElement.scrollBy = scrollBy;
 
         const refreshHitAreas = jest.fn();
         const treeElement = document.createElement("div");
@@ -45,7 +49,9 @@ describe("checkHorizontalScrolling", () => {
         documentScrollParent.checkHorizontalScrolling(10);
 
         expect(scrollBy).not.toHaveBeenCalled();
+
         jest.advanceTimersByTime(50);
+
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
             left: -20,
@@ -63,7 +69,7 @@ describe("checkVerticalScrolling", () => {
     it("scrolls to the top when pageY is near the top edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
-        window.scrollBy = scrollBy;
+        document.documentElement.scrollBy = scrollBy;
 
         const refreshHitAreas = jest.fn();
         const treeElement = document.createElement("div");
@@ -76,7 +82,9 @@ describe("checkVerticalScrolling", () => {
         documentScrollParent.checkVerticalScrolling(10);
 
         expect(scrollBy).not.toHaveBeenCalled();
+
         jest.advanceTimersByTime(50);
+
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
             left: 0,
@@ -87,7 +95,7 @@ describe("checkVerticalScrolling", () => {
     it("stops scrolling when pageX is moved from the top edge", () => {
         jest.useFakeTimers();
         const scrollBy = jest.fn();
-        window.scrollBy = scrollBy;
+        document.documentElement.scrollBy = scrollBy;
 
         const refreshHitAreas = jest.fn();
         const treeElement = document.createElement("div");
@@ -100,7 +108,9 @@ describe("checkVerticalScrolling", () => {
         documentScrollParent.checkVerticalScrolling(10);
 
         expect(scrollBy).not.toHaveBeenCalled();
+
         jest.advanceTimersByTime(50);
+
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
             left: 0,

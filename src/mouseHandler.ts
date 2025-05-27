@@ -6,12 +6,14 @@ import {
 } from "./mouseUtils";
 import { Node } from "./node";
 
+export type GetNode = (element: HTMLElement) => Node | null;
+export type MouseCapture = (positionInfo: PositionInfo) => boolean | null;
+export type MouseStart = (positionInfo: PositionInfo) => boolean;
+
 interface ClickTarget {
     node: Node;
     type: "button" | "label";
 }
-
-type GetNode = (element: HTMLElement) => Node | null;
 
 interface MouseHandlerParams {
     element: HTMLElement;
@@ -19,9 +21,9 @@ interface MouseHandlerParams {
     getNode: GetNode;
     onClickButton: (node: Node) => void;
     onClickTitle: (node: Node) => void;
-    onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
+    onMouseCapture: MouseCapture;
     onMouseDrag: (positionInfo: PositionInfo) => void;
-    onMouseStart: (positionInfo: PositionInfo) => boolean;
+    onMouseStart: MouseStart;
     onMouseStop: (positionInfo: PositionInfo) => void;
     triggerEvent: TriggerEvent;
     useContextMenu: boolean;

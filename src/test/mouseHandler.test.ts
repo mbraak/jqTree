@@ -1,15 +1,22 @@
-import MouseHandler from "../mouseHandler";
+import { jest } from "@jest/globals";
+
+import { TriggerEvent } from "../jqtreeMethodTypes";
+import MouseHandler, {
+    GetNode,
+    MouseCapture,
+    MouseStart,
+} from "../mouseHandler";
 import { Node } from "../node";
 
 interface CreateMouseHandlerParams {
     element: HTMLElement;
-    getNode?: jest.Mock;
+    getNode?: jest.Mock<GetNode>;
     onClickButton?: jest.Mock;
-    onMouseCapture?: jest.Mock;
+    onMouseCapture?: jest.Mock<MouseCapture>;
     onMouseDrag?: jest.Mock;
-    onMouseStart?: jest.Mock;
+    onMouseStart?: jest.Mock<MouseStart>;
     onMouseStop?: jest.Mock;
-    triggerEvent?: jest.Mock;
+    triggerEvent?: jest.Mock<TriggerEvent>;
 }
 
 const createMouseHandler = ({
@@ -22,7 +29,7 @@ const createMouseHandler = ({
     onMouseStop = jest.fn(),
     triggerEvent = jest.fn(),
 }: CreateMouseHandlerParams) => {
-    const getMouseDelay = jest.fn();
+    const getMouseDelay = jest.fn<() => number>();
     const onClickTitle = jest.fn();
 
     return new MouseHandler({
@@ -104,7 +111,7 @@ describe("handleContextmenu", () => {
             }
         });
 
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element: nodeElement, getNode, triggerEvent });
 
@@ -122,7 +129,7 @@ describe("handleContextmenu", () => {
         document.body.appendChild(element);
 
         const getNode = jest.fn(() => null);
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element, getNode, triggerEvent });
 
@@ -136,7 +143,7 @@ describe("handleContextmenu", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element, triggerEvent });
 
@@ -169,7 +176,7 @@ describe("handleDblclick", () => {
             }
         });
 
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element, getNode, triggerEvent });
 
@@ -186,7 +193,7 @@ describe("handleDblclick", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element, triggerEvent });
 
@@ -204,7 +211,7 @@ describe("touchStart", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn();
+        const onMouseCapture = jest.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
@@ -231,7 +238,7 @@ describe("touchStart", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn();
+        const onMouseCapture = jest.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
@@ -253,7 +260,7 @@ describe("touchStart", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn();
+        const onMouseCapture = jest.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
