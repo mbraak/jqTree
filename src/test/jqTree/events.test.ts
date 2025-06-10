@@ -268,7 +268,7 @@ describe("events", () => {
             });
 
             await waitFor(() => {
-                expect(onLoading).toHaveBeenCalledWith(
+                expect(onLoading).toHaveBeenLastCalledWith(
                     expect.objectContaining({
                         isLoading: false,
                         node: null,
