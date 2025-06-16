@@ -1389,6 +1389,30 @@ describe("methods", () => {
         });
     });
 
+    describe("scrollToNode", () => {
+        it("throws an error without a node parameter", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            expect(() => {
+                $tree.tree("scrollToNode", undefined as unknown as INode);
+            }).toThrow("Node parameter is empty");
+        });
+
+        it("handles a node without an element", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            const result = $tree.tree("scrollToNode", {} as unknown as INode);
+
+            expect(result).toStrictEqual($tree);
+        });
+    });
+
     describe("selectNode", () => {
         interface Vars {
             $tree: JQuery;
