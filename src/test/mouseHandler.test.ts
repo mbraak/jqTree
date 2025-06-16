@@ -520,4 +520,74 @@ describe("mouseMove", () => {
             }),
         );
     });
+
+    it("calls onMouseStart when mousedown is triggered twice", () => {
+        jest.useFakeTimers();
+
+        const treeElement = document.createElement("ul");
+        treeElement.classList.add("jqtree-tree");
+        document.body.appendChild(treeElement);
+
+        const nodeElement = document.createElement("div");
+        nodeElement.className = "jqtree-element";
+        treeElement.appendChild(nodeElement);
+
+        const node = new Node();
+
+        const getNode = jest.fn((element: HTMLElement) => {
+            if (element === nodeElement) {
+                return node;
+            } else {
+                return null;
+            }
+        });
+
+        const getMouseDelay = jest.fn(() => 1_000);
+        const onMouseCapture = jest.fn(() => true);
+        const onMouseStart = jest.fn(() => true);
+
+        createMouseHandler({
+            element: nodeElement,
+            getMouseDelay,
+            getNode,
+            onMouseCapture,
+            onMouseStart,
+        });
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true }),
+        );
+
+        jest.advanceTimersByTime(600);
+
+        nodeElement.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+        jest.advanceTimersByTime(600);
+
+        expect(onMouseStart).not.toHaveBeenCalled();
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true }),
+        );
+
+        jest.advanceTimersByTime(600);
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousemove", { bubbles: true }),
+        );
+
+        expect(onMouseStart).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(600);
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousemove", { bubbles: true }),
+        );
+
+        expect(onMouseStart).toHaveBeenCalledExactlyOnceWith(
+            expect.objectContaining({
+                target: nodeElement,
+            }),
+        );
+    });
 });
