@@ -202,11 +202,7 @@ export class Node implements INode {
         if (!this.hasChildren()) {
             return null;
         } else {
-            const lastChild = this.children[this.children.length - 1];
-
-            if (!lastChild) {
-                return null;
-            }
+            const lastChild = this.children[this.children.length - 1] as Node;
 
             if (!(lastChild.hasChildren() && lastChild.is_open)) {
                 return lastChild;

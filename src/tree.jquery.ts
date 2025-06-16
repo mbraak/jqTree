@@ -190,7 +190,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const element =
             inputElement instanceof HTMLElement
                 ? inputElement
-                : inputElement[0];
+                : inputElement.get(0);
 
         if (!element) {
             return null;
