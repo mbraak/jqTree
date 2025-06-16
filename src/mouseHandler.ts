@@ -6,6 +6,7 @@ import {
 } from "./mouseUtils";
 import { Node } from "./node";
 
+export type GetMouseDelay = () => number;
 export type GetNode = (element: HTMLElement) => Node | null;
 export type MouseCapture = (positionInfo: PositionInfo) => boolean | null;
 export type MouseStart = (positionInfo: PositionInfo) => boolean;
@@ -31,7 +32,7 @@ interface MouseHandlerParams {
 
 class MouseHandler {
     private element: HTMLElement;
-    private getMouseDelay: () => number;
+    private getMouseDelay: GetMouseDelay;
     private getNode: GetNode;
 
     private isMouseDelayMet: boolean;
@@ -44,11 +45,11 @@ class MouseHandler {
     private onClickButton: (node: Node) => void;
     private onClickTitle: (node: Node) => void;
 
-    private onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
+    private onMouseCapture: MouseCapture;
 
     private onMouseDrag: (positionInfo: PositionInfo) => void;
 
-    private onMouseStart: (positionInfo: PositionInfo) => boolean;
+    private onMouseStart: MouseStart;
 
     private onMouseStop: (positionInfo: PositionInfo) => void;
 
