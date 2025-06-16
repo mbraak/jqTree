@@ -415,10 +415,25 @@ describe("methods", () => {
             given.$tree.tree({ data: exampleData });
         });
 
-        it("returns the node", () => {
+        it("returns the node with an HTMLElement parameter", () => {
             expect(
                 given.$tree.tree("getNodeByHtmlElement", given.htmlElement),
             ).toStrictEqual(expect.objectContaining({ name: "node1" }));
+        });
+
+        it("returns the node with a jQuery element parameter", () => {
+            expect(
+                given.$tree.tree(
+                    "getNodeByHtmlElement",
+                    jQuery(given.htmlElement),
+                ),
+            ).toStrictEqual(expect.objectContaining({ name: "node1" }));
+        });
+
+        it("returns null with an empty jQuery element element parameter", () => {
+            expect(
+                given.$tree.tree("getNodeByHtmlElement", jQuery()),
+            ).toBeNull();
         });
     });
 
@@ -1237,6 +1252,42 @@ describe("methods", () => {
         });
     });
 
+    describe("removeFromSelection", () => {
+        it("deselects a node", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            const child1 = $tree.tree("getNodeByName", "child1") as INode;
+            const child2 = $tree.tree("getNodeByName", "child2") as INode;
+            $tree.tree("addToSelection", child1);
+            $tree.tree("addToSelection", child2);
+
+            expect($tree.tree("isNodeSelected", child1)).toBeTrue();
+            expect($tree.tree("isNodeSelected", child2)).toBeTrue();
+
+            $tree.tree("removeFromSelection", child2);
+
+            expect($tree.tree("isNodeSelected", child1)).toBeTrue();
+            expect($tree.tree("isNodeSelected", child2)).toBeFalse();
+        });
+
+        it("raises an error with an empty parameter", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            expect(() => {
+                $tree.tree(
+                    "removeFromSelection",
+                    undefined as unknown as INode,
+                );
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
     describe("removeNode", () => {
         interface Vars {
             $tree: JQuery;
@@ -1335,6 +1386,30 @@ describe("methods", () => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("removeNode");
             }).toThrow("Node parameter is empty");
+        });
+    });
+
+    describe("scrollToNode", () => {
+        it("throws an error without a node parameter", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            expect(() => {
+                $tree.tree("scrollToNode", undefined as unknown as INode);
+            }).toThrow("Node parameter is empty");
+        });
+
+        it("handles a node without an element", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            const result = $tree.tree("scrollToNode", {} as unknown as INode);
+
+            expect(result).toStrictEqual($tree);
         });
     });
 
