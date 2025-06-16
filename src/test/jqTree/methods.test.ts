@@ -415,10 +415,25 @@ describe("methods", () => {
             given.$tree.tree({ data: exampleData });
         });
 
-        it("returns the node", () => {
+        it("returns the node with an HTMLElement parameter", () => {
             expect(
                 given.$tree.tree("getNodeByHtmlElement", given.htmlElement),
             ).toStrictEqual(expect.objectContaining({ name: "node1" }));
+        });
+
+        it("returns the node with a jQuery element parameter", () => {
+            expect(
+                given.$tree.tree(
+                    "getNodeByHtmlElement",
+                    jQuery(given.htmlElement),
+                ),
+            ).toStrictEqual(expect.objectContaining({ name: "node1" }));
+        });
+
+        it("returns null with an empty jQuery element element parameter", () => {
+            expect(
+                given.$tree.tree("getNodeByHtmlElement", jQuery()),
+            ).toBeNull();
         });
     });
 
