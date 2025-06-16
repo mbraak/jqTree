@@ -1252,6 +1252,42 @@ describe("methods", () => {
         });
     });
 
+    describe("removeFromSelection", () => {
+        it("deselects a node", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            const child1 = $tree.tree("getNodeByName", "child1") as INode;
+            const child2 = $tree.tree("getNodeByName", "child2") as INode;
+            $tree.tree("addToSelection", child1);
+            $tree.tree("addToSelection", child2);
+
+            expect($tree.tree("isNodeSelected", child1)).toBeTrue();
+            expect($tree.tree("isNodeSelected", child2)).toBeTrue();
+
+            $tree.tree("removeFromSelection", child2);
+
+            expect($tree.tree("isNodeSelected", child1)).toBeTrue();
+            expect($tree.tree("isNodeSelected", child2)).toBeFalse();
+        });
+
+        it("raises an error with an empty parameter", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            expect(() => {
+                $tree.tree(
+                    "removeFromSelection",
+                    undefined as unknown as INode,
+                );
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
     describe("removeNode", () => {
         interface Vars {
             $tree: JQuery;
