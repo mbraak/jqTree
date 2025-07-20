@@ -51,7 +51,7 @@
         "@types/debug": "^4.1.12",
         "@types/jest-axe": "^3.5.9",
         "@types/jquery": "^3.5.32",
-        "@types/node": "^24.0.14",
+        "@types/node": "^24.0.15",
         "autoprefixer": "^10.4.21",
         "babel-jest": "^30.0.4",
         "babel-plugin-istanbul": "^7.0.0",
