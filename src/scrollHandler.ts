@@ -1,6 +1,6 @@
 import { PositionInfo } from "./mouseUtils";
 import createScrollParent from "./scrollHandler/createScrollParent";
-import { ScrollParent } from "./scrollHandler/types";
+import { ScrollParent } from "./scrollHandler/scrollParent";
 
 interface ScrollHandlerParams {
     refreshHitAreas: () => void;
@@ -44,12 +44,10 @@ export default class ScrollHandler {
     }
 
     private getScrollParent(): ScrollParent {
-        if (!this.scrollParent) {
-            this.scrollParent = createScrollParent(
-                this.treeElement,
-                this.refreshHitAreas,
-            );
-        }
+        this.scrollParent ??= createScrollParent(
+            this.treeElement,
+            this.refreshHitAreas,
+        );
 
         return this.scrollParent;
     }

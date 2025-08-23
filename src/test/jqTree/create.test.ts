@@ -3,17 +3,17 @@ import getGiven from "givens";
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 
-beforeEach(() => {
-    $("body").append('<div id="tree1"></div>');
-});
-
-afterEach(() => {
-    const $tree = $("#tree1");
-    $tree.tree("destroy");
-    $tree.remove();
-});
-
 describe("create with data", () => {
+    beforeEach(() => {
+        $("body").append('<div id="tree1"></div>');
+    });
+
+    afterEach(() => {
+        const $tree = $("#tree1");
+        $tree.tree("destroy");
+        $tree.remove();
+    });
+
     interface Vars {
         $tree: JQuery;
     }

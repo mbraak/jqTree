@@ -1,19 +1,24 @@
-import { singleChild } from "./testUtil";
+import { getChilden, singleChild } from "./testUtil";
 
-const getTreeNode = ($li: JQuery): JQTreeMatchers.TreeNode => {
-    const $div = singleChild($li, "div.jqtree-element");
-    const $span = singleChild($div, "span.jqtree-title");
-    const name = $span.html();
-    const selected = $li.hasClass("jqtree-selected");
+const getTreeNode = (li: HTMLElement): JQTreeMatchers.TreeNode => {
+    const div = singleChild(li, "div", "jqtree-element");
+    const span = singleChild(div, "span", "jqtree-title");
+    const name = span.innerHTML;
+    const selected = li.classList.contains("jqtree-selected");
 
-    if ($li.hasClass("jqtree-folder")) {
-        const $ul = $li.children("ul.jqtree_common");
+    if (li.classList.contains("jqtree-folder")) {
+        const ulChildren = getChilden(li, "ul", "jqtree_common");
+
+        const children =
+            ulChildren.length === 1
+                ? getChildNodes(ulChildren[0] as HTMLElement)
+                : [];
 
         return {
-            children: getChildren($ul),
+            children,
             name,
             nodeType: "folder",
-            open: !$li.hasClass("jqtree-closed"),
+            open: !li.classList.contains("jqtree-closed"),
             selected,
         };
     } else {
@@ -25,13 +30,11 @@ const getTreeNode = ($li: JQuery): JQTreeMatchers.TreeNode => {
     }
 };
 
-const getChildren = ($ul: JQuery): JQTreeMatchers.TreeStructure =>
-    $ul
-        .children("li.jqtree_common")
-        .map<JQTreeMatchers.TreeNode>((_, li) => getTreeNode(jQuery(li)))
-        .get();
+const getChildNodes = (ul: HTMLElement) =>
+    getChilden(ul, "li", "jqtree_common").map((li) => getTreeNode(li));
 
-const treeStructure = ($el: JQuery): JQTreeMatchers.TreeStructure =>
-    getChildren(singleChild($el, "ul.jqtree-tree"));
+const treeStructure = (el: HTMLElement): JQTreeMatchers.TreeStructure => {
+    return getChildNodes(singleChild(el, "ul", "jqtree-tree"));
+};
 
 export default treeStructure;

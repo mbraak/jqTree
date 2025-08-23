@@ -1,56 +1,52 @@
 import { titleSpan } from "./testUtil";
 import treeStructure from "./treeStructure";
 
-const assertJqTreeFolder = ($el: JQuery) => {
+const assertJqTreeFolder = (el: HTMLElement) => {
     /* istanbul ignore if */
-    if (!$el.hasClass("jqtree-folder")) {
+    if (!el.classList.contains("jqtree-folder")) {
         throw new Error("Node is not a folder");
     }
 };
 
 expect.extend({
-    toBeClosed(el: HTMLElement | JQuery) {
-        const $el = jQuery(el);
-        assertJqTreeFolder($el);
+    toBeClosed(el: HTMLElement) {
+        assertJqTreeFolder(el);
 
         /* istanbul ignore next */
         return {
             message: () => "The node is open",
-            pass: $el.hasClass("jqtree-closed"),
+            pass: el.classList.contains("jqtree-closed"),
         };
     },
-    toBeFocused(el: HTMLElement | JQuery) {
+    toBeFocused(el: HTMLElement) {
         /* istanbul ignore next */
         return {
             message: () => "The is node is not focused",
-            pass: document.activeElement === titleSpan(el)[0],
+            pass: document.activeElement === titleSpan(el),
         };
     },
-    toBeOpen(el: HTMLElement | JQuery) {
-        const $el = jQuery(el);
-        assertJqTreeFolder($el);
+    toBeOpen(el: HTMLElement) {
+        assertJqTreeFolder(el);
 
         /* istanbul ignore next */
         return {
             message: () => "The node is closed",
-            pass: !$el.hasClass("jqtree-closed"),
+            pass: !el.classList.contains("jqtree-closed"),
         };
     },
-    toBeSelected(el: HTMLElement | JQuery) {
-        const $el = jQuery(el);
-
+    toBeSelected(el: HTMLElement) {
         /* istanbul ignore next */
         return {
             message: () => "The node is not selected",
-            pass: $el.hasClass("jqtree-selected"),
+            pass: el.classList.contains("jqtree-selected"),
         };
     },
     toHaveTreeStructure(
-        el: HTMLElement | JQuery,
+        $el: JQuery,
         expectedStructure: JQTreeMatchers.TreeStructure,
     ) {
-        const $el = jQuery(el);
-        const receivedStructure = treeStructure($el);
+        const el = $el.get(0) as HTMLElement;
+        const receivedStructure = treeStructure(el);
 
         /* istanbul ignore next */
         return {

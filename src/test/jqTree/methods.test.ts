@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import getGiven from "givens";
@@ -13,698 +14,119 @@ const context = describe;
 
 const server = setupServer();
 
-beforeAll(() => {
-    server.listen();
-});
-
-beforeEach(() => {
-    $("body").append('<div id="tree1"></div>');
-});
-
-afterEach(() => {
-    server.resetHandlers();
-
-    const $tree = $("#tree1");
-    $tree.tree("destroy");
-    $tree.remove();
-    localStorage.clear();
-});
-
-afterAll(() => {
-    server.close();
-});
-
-describe("addNodeAfter", () => {
-    interface Vars {
-        $tree: JQuery;
-        node: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-    given("node", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
+describe("methods", () => {
+    beforeAll(() => {
+        server.listen();
+    });
 
     beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
-        });
-
-        given.$tree.tree("addNodeAfter", "added-node", given.node);
+        $("body").append('<div id="tree1"></div>');
     });
 
-    it("adds the node", () => {
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({ name: "node1" }),
-            expect.objectContaining({ name: "added-node" }),
-            expect.objectContaining({ name: "node2" }),
-        ]);
-    });
-});
+    afterEach(() => {
+        server.resetHandlers();
 
-describe("addNodeBefore", () => {
-    interface Vars {
-        $tree: JQuery;
-        node: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-    given("node", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
-        });
-
-        given.$tree.tree("addNodeBefore", "added-node", given.node);
-    });
-
-    it("adds the node", () => {
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({ name: "added-node" }),
-            expect.objectContaining({ name: "node1" }),
-            expect.objectContaining({ name: "node2" }),
-        ]);
-    });
-});
-
-describe("addParentNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        child1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-    given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
-        });
-
-        given.$tree.tree("addParentNode", "new-parent-node", given.child1);
-    });
-
-    it("adds the parent node", () => {
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({
-                children: [
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "child1" }),
-                            expect.objectContaining({ name: "child2" }),
-                        ],
-                        name: "new-parent-node",
-                    }),
-                ],
-                name: "node1",
-            }),
-            expect.objectContaining({ name: "node2" }),
-        ]);
-    });
-});
-
-describe("addToSelection", () => {
-    interface Vars {
-        $tree: JQuery;
-        child1: INode;
-        child2: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-    given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
-    given("child2", () => given.$tree.tree("getNodeByNameMustExist", "child2"));
-
-    it("selects the nodes", () => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
-        });
-
-        given.$tree.tree("addToSelection", given.child1);
-        given.$tree.tree("addToSelection", given.child2);
-
-        expect(given.$tree.tree("getSelectedNodes")).toEqual(
-            expect.arrayContaining([given.child1, given.child2]),
-        );
-    });
-
-    it("renders the nodes correctly", () => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
-        });
-
-        given.$tree.tree("addToSelection", given.child1);
-        given.$tree.tree("addToSelection", given.child2);
-
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({
-                children: [
-                    expect.objectContaining({ name: "child1", selected: true }),
-                    expect.objectContaining({ name: "child2", selected: true }),
-                ],
-                name: "node1",
-                selected: false,
-            }),
-            expect.objectContaining({
-                children: [
-                    expect.objectContaining({
-                        name: "node3",
-                        selected: false,
-                    }),
-                ],
-                name: "node2",
-                selected: false,
-            }),
-        ]);
-    });
-
-    it("opens the parent node when it's closed", () => {
-        given.$tree.tree({
-            autoOpen: false,
-            data: exampleData,
-        });
-
-        const node1 = given.$tree.tree("getNodeByNameMustExist", "node1");
-
-        expect(node1.is_open).toBeFalsy();
-
-        given.$tree.tree("addToSelection", given.child1);
-
-        expect(node1.is_open).toBe(true);
-    });
-});
-
-describe("appendNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        nodeData: NodeData;
-        parent: INode | undefined;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-    given("parent", () => undefined);
-    given("nodeData", () => "appended-node");
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
-        });
-
-        given.$tree.tree("appendNode", given.nodeData, given.parent);
-    });
-
-    context("with an empty parent parameter", () => {
-        it("appends the node to the tree", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "node1" }),
-                expect.objectContaining({ name: "node2" }),
-                expect.objectContaining({ name: "appended-node" }),
-            ]);
-        });
-    });
-
-    context("when appending to a parent node", () => {
-        given("parent", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-
-        it("appends the node to parent node", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({ name: "child1" }),
-                        expect.objectContaining({ name: "child2" }),
-                        expect.objectContaining({ name: "appended-node" }),
-                    ],
-                    name: "node1",
-                }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
-        });
-    });
-
-    context("when appending a node using an object", () => {
-        given("nodeData", () => ({
-            color: "green",
-            id: 99,
-            name: "appended-using-object",
-        }));
-
-        it("appends the node to the tree", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    name: "node1",
-                }),
-                expect.objectContaining({ name: "node2" }),
-                expect.objectContaining({ name: "appended-using-object" }),
-            ]);
-        });
-
-        it("sets the properties of the object", () => {
-            expect(given.$tree.tree("getNodeById", 99)).toMatchObject(
-                given.nodeData,
-            );
-        });
-    });
-});
-
-describe("closeNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
-        });
-        given.$tree.tree("closeNode", given.node1, false);
-    });
-
-    it("closes the node", () => {
-        expect(given.node1.element).toBeClosed();
-    });
-});
-
-describe("destroy", () => {
-    it("clears the tree element", () => {
         const $tree = $("#tree1");
-
-        $tree.tree({
-            data: exampleData,
-        });
-
         $tree.tree("destroy");
-
-        expect($tree.get(0)).toBeEmptyDOMElement();
-    });
-});
-
-describe("getNodeByCallback", () => {
-    interface Vars {
-        $tree: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
+        $tree.remove();
+        localStorage.clear();
     });
 
-    it("returns the node", () => {
-        const callback = (node: INode) => node.name.startsWith("chi");
-
-        expect(given.$tree.tree("getNodeByCallback", callback)).toMatchObject({
-            name: "child1",
-        });
-    });
-});
-
-describe("getNodeByHtmlElement", () => {
-    interface Vars {
-        $tree: JQuery;
-        htmlElement: HTMLElement;
-    }
-
-    const given = getGiven<Vars>();
-    given("htmlElement", () =>
-        screen.getByText("node1", { selector: ".jqtree-title" }),
-    );
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
+    afterAll(() => {
+        server.close();
     });
 
-    it("returns the node", () => {
-        expect(
-            given.$tree.tree("getNodeByHtmlElement", given.htmlElement),
-        ).toEqual(expect.objectContaining({ name: "node1" }));
-    });
-});
+    describe("addNodeAfter", () => {
+        interface Vars {
+            $tree: JQuery;
+            node: INode;
+        }
 
-describe("getNodeById", () => {
-    interface Vars {
-        $tree: JQuery;
-        data: NodeData[];
-    }
-
-    const given = getGiven<Vars>();
-    given("data", () => exampleData);
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: given.data,
-        });
-    });
-
-    it("returns the node", () => {
-        expect(given.$tree.tree("getNodeById", 127)).toMatchObject({
-            name: "node3",
-        });
-    });
-
-    context("with a string parameter", () => {
-        it("doesn't return the node", () => {
-            expect(given.$tree.tree("getNodeById", "127")).toBeNull();
-        });
-    });
-
-    context("when the node doesn't exist", () => {
-        it("returns null", () => {
-            expect(given.$tree.tree("getNodeById", 99999)).toBeNull();
-        });
-    });
-
-    context("when the data has string ids", () => {
-        given("data", () => [{ id: "123", name: "node1" }]);
-
-        context("with a string parameter", () => {
-            it("returns the node", () => {
-                expect(given.$tree.tree("getNodeById", "123")).toMatchObject({
-                    name: "node1",
-                });
-            });
-        });
-
-        context("with a number parameter", () => {
-            it("doesn't return the node", () => {
-                expect(given.$tree.tree("getNodeById", 123)).toBeNull();
-            });
-        });
-
-        context("when the node doesn't exist", () => {
-            it("returns null", () => {
-                expect(given.$tree.tree("getNodeById", "abc")).toBeNull();
-            });
-        });
-    });
-});
-
-describe("getNodesByProperty", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
-    });
-
-    it("gets nodes by property", () => {
-        expect(
-            given.$tree.tree("getNodesByProperty", "intProperty", 1),
-        ).toEqual([given.node1]);
-    });
-});
-
-describe("getSelectedNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        node: INode;
-        treeData: NodeData[];
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: given.treeData,
-        });
-    });
-
-    context("when nodes have ids", () => {
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
         given("node", () =>
             given.$tree.tree("getNodeByNameMustExist", "node1"),
         );
-        given("treeData", () => exampleData);
 
-        context("when no node is selected", () => {
-            it("returns false", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBe(false);
-            });
-        });
-
-        context("when a node is selected", () => {
-            beforeEach(() => {
-                given.$tree.tree("selectNode", given.node);
-            });
-
-            it("returns the selected node", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBe(given.node);
-            });
-        });
-    });
-
-    context("when nodes don't have ids", () => {
-        given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "without-id1"),
-        );
-        given("treeData", () => ["without-id1", "without-id2"]);
-
-        context("when no node is selected", () => {
-            it("returns false", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBe(false);
-            });
-        });
-
-        context("when a node is selected", () => {
-            beforeEach(() => {
-                given.$tree.tree("selectNode", given.node);
-            });
-
-            it("returns the selected node", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBe(given.node);
-            });
-        });
-    });
-});
-
-describe("getSelectedNodes", () => {
-    interface Vars {
-        $tree: JQuery;
-        child1: INode;
-        child2: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
-    given("child2", () => given.$tree.tree("getNodeByNameMustExist", "child2"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
-    });
-
-    context("when no node is selected", () => {
-        it("returns an empty array", () => {
-            expect(given.$tree.tree("getSelectedNodes")).toHaveLength(0);
-        });
-    });
-
-    context("when nodes are selected", () => {
         beforeEach(() => {
-            given.$tree.tree("addToSelection", given.child1);
-            given.$tree.tree("addToSelection", given.child2);
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+
+            given.$tree.tree("addNodeAfter", "added-node", given.node);
         });
 
-        it("returns the selected nodes", () => {
-            expect(given.$tree.tree("getSelectedNodes")).toEqual(
-                expect.arrayContaining([given.child1, given.child2]),
-            );
-        });
-    });
-});
-
-describe("getState", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
-        given.$tree.tree("openNode", given.node1, false);
-    });
-
-    it("returns the state", () => {
-        expect(given.$tree.tree("getState")).toEqual({
-            open_nodes: [123],
-            selected_node: [],
-        });
-    });
-});
-
-describe("getStateFromStorage", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-            saveState: true,
-        });
-        given.$tree.tree("openNode", given.node1, false);
-    });
-
-    it("returns the state", () => {
-        expect(given.$tree.tree("getStateFromStorage")).toEqual({
-            open_nodes: [123],
-            selected_node: [],
-        });
-    });
-});
-
-describe("getTree", () => {
-    interface Vars {
-        $tree: JQuery;
-    }
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
-    });
-
-    it("returns the tree", () => {
-        expect(given.$tree.tree("getTree")).toMatchObject({
-            children: [
-                expect.objectContaining({ name: "node1" }),
-                expect.objectContaining({ name: "node2" }),
-            ],
-        });
-    });
-});
-
-describe("getVersion", () => {
-    interface Vars {
-        $tree: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree();
-    });
-
-    it("returns the version", () => {
-        expect(given.$tree.tree("getVersion")).toBe(__version__);
-    });
-});
-
-describe("isNodeSelected", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
-    });
-
-    context("when the node is selected", () => {
-        beforeEach(() => {
-            given.$tree.tree("selectNode", given.node1);
-        });
-
-        it("returns true", () => {
-            expect(given.$tree.tree("isNodeSelected", given.node1)).toBeTrue();
-        });
-    });
-
-    context("when the node is not selected", () => {
-        it("returns false", () => {
-            expect(given.$tree.tree("isNodeSelected", given.node1)).toBeFalse();
-        });
-    });
-});
-
-describe("loadData", () => {
-    interface Vars {
-        $tree: JQuery;
-        initialData: NodeData[];
-    }
-
-    const given = getGiven<Vars>();
-    given("initialData", () => ["initial1"]);
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: given.initialData });
-    });
-
-    context("when the node parameter is empty", () => {
-        beforeEach(() => {
-            given.$tree.tree("loadData", exampleData);
-        });
-
-        it("replaces the whole tree", () => {
+        it("adds the node", () => {
             expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({ name: "child1" }),
-                        expect.objectContaining({ name: "child2" }),
-                    ],
-                    name: "node1",
-                }),
-                expect.objectContaining({
-                    children: [expect.objectContaining({ name: "node3" })],
-                    name: "node2",
-                }),
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "added-node" }),
+                expect.objectContaining({ name: "node2" }),
             ]);
         });
     });
 
-    context("with a node parameter", () => {
+    describe("addNodeBefore", () => {
+        interface Vars {
+            $tree: JQuery;
+            node: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+        given("node", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+
         beforeEach(() => {
-            given.$tree.tree(
-                "loadData",
-                exampleData,
-                given.$tree.tree("getNodeByNameMustExist", "initial1"),
-            );
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
         });
 
-        it("loads the data under the node", () => {
+        it("adds the node", () => {
+            given.$tree.tree("addNodeBefore", "added-node", given.node);
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "added-node" }),
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+
+        it("throws an error without an existingNode parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("addNodeBefore", "added-node");
+            }).toThrow("Parameter is empty: existingNode");
+        });
+    });
+
+    describe("addParentNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            child1: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+        given("child1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "child1"),
+        );
+
+        beforeEach(() => {
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+        });
+
+        it("adds the parent node", () => {
+            given.$tree.tree("addParentNode", "new-parent-node", given.child1);
+
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({
                     children: [
@@ -713,41 +135,703 @@ describe("loadData", () => {
                                 expect.objectContaining({ name: "child1" }),
                                 expect.objectContaining({ name: "child2" }),
                             ],
-                            name: "node1",
+                            name: "new-parent-node",
                         }),
-                        expect.objectContaining({ name: "node2" }),
                     ],
-                    name: "initial1",
+                    name: "node1",
                 }),
+                expect.objectContaining({ name: "node2" }),
             ]);
+        });
+
+        it("throws an error without an existingNode parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("addParentNode", "new-parent-node");
+            }).toThrow("Parameter is empty: existingNode");
         });
     });
 
-    context("with a node parameter which has a selected child", () => {
-        given("initialData", () => exampleData);
+    describe("addToSelection", () => {
+        interface Vars {
+            $tree: JQuery;
+            child1: INode;
+            child2: INode;
+        }
 
-        beforeEach(() => {
-            given.$tree.tree(
-                "selectNode",
-                given.$tree.tree("getNodeByNameMustExist", "child1"),
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+        given("child1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "child1"),
+        );
+        given("child2", () =>
+            given.$tree.tree("getNodeByNameMustExist", "child2"),
+        );
+
+        it("selects the nodes", () => {
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+
+            given.$tree.tree("addToSelection", given.child1);
+            given.$tree.tree("addToSelection", given.child2);
+
+            expect(given.$tree.tree("getSelectedNodes")).toStrictEqual(
+                expect.arrayContaining([given.child1, given.child2]),
             );
         });
 
-        it("deselects the node", () => {
-            given.$tree.tree(
-                "loadData",
-                ["new-child1"],
+        it("renders the nodes correctly", () => {
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+
+            given.$tree.tree("addToSelection", given.child1);
+            given.$tree.tree("addToSelection", given.child2);
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "child1",
+                            selected: true,
+                        }),
+                        expect.objectContaining({
+                            name: "child2",
+                            selected: true,
+                        }),
+                    ],
+                    name: "node1",
+                    selected: false,
+                }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "node3",
+                            selected: false,
+                        }),
+                    ],
+                    name: "node2",
+                    selected: false,
+                }),
+            ]);
+        });
+
+        it("opens the parent node when it's closed", () => {
+            given.$tree.tree({
+                autoOpen: false,
+                data: exampleData,
+            });
+
+            const node1 = given.$tree.tree("getNodeByNameMustExist", "node1");
+
+            expect(node1.is_open).toBeFalsy();
+
+            given.$tree.tree("addToSelection", given.child1);
+
+            expect(node1.is_open).toBe(true);
+        });
+
+        it("throws an error without a node parameter", () => {
+            given.$tree.tree({
+                autoOpen: false,
+                data: exampleData,
+            });
+
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("addToSelection");
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
+    describe("appendNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            nodeData: NodeData;
+            parent: INode | undefined;
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+        given("parent", () => undefined);
+        given("nodeData", () => "appended-node");
+
+        beforeEach(() => {
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+
+            given.$tree.tree("appendNode", given.nodeData, given.parent);
+        });
+
+        context("with an empty parent parameter", () => {
+            it("appends the node to the tree", () => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                    expect.objectContaining({ name: "appended-node" }),
+                ]);
+            });
+        });
+
+        context("when appending to a parent node", () => {
+            given("parent", () =>
                 given.$tree.tree("getNodeByNameMustExist", "node1"),
             );
 
-            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+            it("appends the node to parent node", () => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({ name: "child1" }),
+                            expect.objectContaining({ name: "child2" }),
+                            expect.objectContaining({ name: "appended-node" }),
+                        ],
+                        name: "node1",
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
         });
 
-        context("when the selected node doesn't have an id", () => {
-            given("initialData", () => [
-                { children: ["child1", "child2"], name: "node1" },
-                "node2",
-            ]);
+        context("when appending a node using an object", () => {
+            given("nodeData", () => ({
+                color: "green",
+                id: 99,
+                name: "appended-using-object",
+            }));
+
+            it("appends the node to the tree", () => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        name: "node1",
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                    expect.objectContaining({ name: "appended-using-object" }),
+                ]);
+            });
+
+            it("sets the properties of the object", () => {
+                expect(given.$tree.tree("getNodeById", 99)).toMatchObject(
+                    given.nodeData,
+                );
+            });
+        });
+    });
+
+    describe("closeNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+        });
+
+        it("closes the node", () => {
+            given.$tree.tree("closeNode", given.node1, false);
+
+            expect(given.node1.element).toBeClosed();
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("closeNode");
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
+    describe("destroy", () => {
+        it("clears the tree element", () => {
+            const $tree = $("#tree1");
+
+            $tree.tree({
+                data: exampleData,
+            });
+
+            $tree.tree("destroy");
+
+            expect($tree.get(0)).toBeEmptyDOMElement();
+        });
+    });
+
+    describe("getNodeByCallback", () => {
+        interface Vars {
+            $tree: JQuery;
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+        });
+
+        it("returns the node", () => {
+            const callback = (node: INode) => node.name.startsWith("chi");
+
+            expect(
+                given.$tree.tree("getNodeByCallback", callback),
+            ).toMatchObject({
+                name: "child1",
+            });
+        });
+    });
+
+    describe("getNodeByHtmlElement", () => {
+        interface Vars {
+            $tree: JQuery;
+            htmlElement: HTMLElement;
+        }
+
+        const given = getGiven<Vars>();
+        given("htmlElement", () =>
+            screen.getByText("node1", { selector: ".jqtree-title" }),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+        });
+
+        it("returns the node with an HTMLElement parameter", () => {
+            expect(
+                given.$tree.tree("getNodeByHtmlElement", given.htmlElement),
+            ).toStrictEqual(expect.objectContaining({ name: "node1" }));
+        });
+
+        it("returns the node with a jQuery element parameter", () => {
+            expect(
+                given.$tree.tree(
+                    "getNodeByHtmlElement",
+                    jQuery(given.htmlElement),
+                ),
+            ).toStrictEqual(expect.objectContaining({ name: "node1" }));
+        });
+
+        it("returns null with an empty jQuery element element parameter", () => {
+            expect(
+                given.$tree.tree("getNodeByHtmlElement", jQuery()),
+            ).toBeNull();
+        });
+    });
+
+    describe("getNodeById", () => {
+        interface Vars {
+            $tree: JQuery;
+            data: NodeData[];
+        }
+
+        const given = getGiven<Vars>();
+        given("data", () => exampleData);
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: given.data,
+            });
+        });
+
+        it("returns the node", () => {
+            expect(given.$tree.tree("getNodeById", 127)).toMatchObject({
+                name: "node3",
+            });
+        });
+
+        context("with a string parameter", () => {
+            it("doesn't return the node", () => {
+                expect(given.$tree.tree("getNodeById", "127")).toBeNull();
+            });
+        });
+
+        context("when the node doesn't exist", () => {
+            it("returns null", () => {
+                expect(given.$tree.tree("getNodeById", 99999)).toBeNull();
+            });
+        });
+
+        context("when the data has string ids", () => {
+            given("data", () => [{ id: "123", name: "node1" }]);
+
+            context("with a string parameter", () => {
+                it("returns the node", () => {
+                    expect(
+                        given.$tree.tree("getNodeById", "123"),
+                    ).toMatchObject({
+                        name: "node1",
+                    });
+                });
+            });
+
+            context("with a number parameter", () => {
+                it("doesn't return the node", () => {
+                    expect(given.$tree.tree("getNodeById", 123)).toBeNull();
+                });
+            });
+
+            context("when the node doesn't exist", () => {
+                it("returns null", () => {
+                    expect(given.$tree.tree("getNodeById", "abc")).toBeNull();
+                });
+            });
+        });
+    });
+
+    describe("getNodesByProperty", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
+            });
+        });
+
+        it("gets nodes by property", () => {
+            expect(
+                given.$tree.tree("getNodesByProperty", "intProperty", 1),
+            ).toStrictEqual([given.node1]);
+        });
+    });
+
+    describe("getSelectedNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            node: INode;
+            treeData: NodeData[];
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: given.treeData,
+            });
+        });
+
+        context("when nodes have ids", () => {
+            given("node", () =>
+                given.$tree.tree("getNodeByNameMustExist", "node1"),
+            );
+            given("treeData", () => exampleData);
+
+            context("when no node is selected", () => {
+                it("returns false", () => {
+                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                });
+            });
+
+            context("when a node is selected", () => {
+                beforeEach(() => {
+                    given.$tree.tree("selectNode", given.node);
+                });
+
+                it("returns the selected node", () => {
+                    expect(given.$tree.tree("getSelectedNode")).toBe(
+                        given.node,
+                    );
+                });
+            });
+        });
+
+        context("when nodes don't have ids", () => {
+            given("node", () =>
+                given.$tree.tree("getNodeByNameMustExist", "without-id1"),
+            );
+            given("treeData", () => ["without-id1", "without-id2"]);
+
+            context("when no node is selected", () => {
+                it("returns false", () => {
+                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                });
+            });
+
+            context("when a node is selected", () => {
+                beforeEach(() => {
+                    given.$tree.tree("selectNode", given.node);
+                });
+
+                it("returns the selected node", () => {
+                    expect(given.$tree.tree("getSelectedNode")).toBe(
+                        given.node,
+                    );
+                });
+            });
+        });
+    });
+
+    describe("getSelectedNodes", () => {
+        interface Vars {
+            $tree: JQuery;
+            child1: INode;
+            child2: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("child1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "child1"),
+        );
+        given("child2", () =>
+            given.$tree.tree("getNodeByNameMustExist", "child2"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
+            });
+        });
+
+        context("when no node is selected", () => {
+            it("returns an empty array", () => {
+                expect(given.$tree.tree("getSelectedNodes")).toHaveLength(0);
+            });
+        });
+
+        context("when nodes are selected", () => {
+            beforeEach(() => {
+                given.$tree.tree("addToSelection", given.child1);
+                given.$tree.tree("addToSelection", given.child2);
+            });
+
+            it("returns the selected nodes", () => {
+                expect(given.$tree.tree("getSelectedNodes")).toStrictEqual(
+                    expect.arrayContaining([given.child1, given.child2]),
+                );
+            });
+        });
+    });
+
+    describe("getState", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+            given.$tree.tree("openNode", given.node1, false);
+        });
+
+        it("returns the state", () => {
+            expect(given.$tree.tree("getState")).toStrictEqual({
+                open_nodes: [123],
+                selected_node: [],
+            });
+        });
+    });
+
+    describe("getStateFromStorage", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
+                saveState: true,
+            });
+            given.$tree.tree("openNode", given.node1, false);
+        });
+
+        it("returns the state", () => {
+            expect(given.$tree.tree("getStateFromStorage")).toStrictEqual({
+                open_nodes: [123],
+                selected_node: [],
+            });
+        });
+    });
+
+    describe("getTree", () => {
+        interface Vars {
+            $tree: JQuery;
+        }
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+        });
+
+        it("returns the tree", () => {
+            expect(given.$tree.tree("getTree")).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
+        });
+    });
+
+    describe("getVersion", () => {
+        interface Vars {
+            $tree: JQuery;
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree();
+        });
+
+        it("returns the version", () => {
+            expect(given.$tree.tree("getVersion")).toBe(__version__);
+        });
+    });
+
+    describe("isNodeSelected", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+        });
+
+        it("returns truewhen the node is selected", () => {
+            given.$tree.tree("selectNode", given.node1);
+
+            expect(given.$tree.tree("isNodeSelected", given.node1)).toBeTrue();
+        });
+
+        it("returns false when the node is not selected", () => {
+            expect(given.$tree.tree("isNodeSelected", given.node1)).toBeFalse();
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("isNodeSelected");
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
+    describe("loadData", () => {
+        interface Vars {
+            $tree: JQuery;
+            initialData: NodeData[];
+        }
+
+        const given = getGiven<Vars>();
+        given("initialData", () => ["initial1"]);
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: given.initialData });
+        });
+
+        context("when the node parameter is empty", () => {
+            beforeEach(() => {
+                given.$tree.tree("loadData", exampleData);
+            });
+
+            it("replaces the whole tree", () => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({ name: "child1" }),
+                            expect.objectContaining({ name: "child2" }),
+                        ],
+                        name: "node1",
+                    }),
+                    expect.objectContaining({
+                        children: [expect.objectContaining({ name: "node3" })],
+                        name: "node2",
+                    }),
+                ]);
+            });
+        });
+
+        context("with a node parameter", () => {
+            beforeEach(() => {
+                given.$tree.tree(
+                    "loadData",
+                    exampleData,
+                    given.$tree.tree("getNodeByNameMustExist", "initial1"),
+                );
+            });
+
+            it("loads the data under the node", () => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({
+                                children: [
+                                    expect.objectContaining({ name: "child1" }),
+                                    expect.objectContaining({ name: "child2" }),
+                                ],
+                                name: "node1",
+                            }),
+                            expect.objectContaining({ name: "node2" }),
+                        ],
+                        name: "initial1",
+                    }),
+                ]);
+            });
+        });
+
+        context("with a node parameter which has a selected child", () => {
+            given("initialData", () => exampleData);
+
+            beforeEach(() => {
+                given.$tree.tree(
+                    "selectNode",
+                    given.$tree.tree("getNodeByNameMustExist", "child1"),
+                );
+            });
 
             it("deselects the node", () => {
                 given.$tree.tree(
@@ -759,197 +843,252 @@ describe("loadData", () => {
                 expect(given.$tree.tree("getSelectedNode")).toBeFalse();
             });
 
-            context("when the selected child is under another node", () => {
-                it("doesn't deselect the node", () => {
+            context("when the selected node doesn't have an id", () => {
+                given("initialData", () => [
+                    { children: ["child1", "child2"], name: "node1" },
+                    "node2",
+                ]);
+
+                it("deselects the node", () => {
                     given.$tree.tree(
                         "loadData",
                         ["new-child1"],
-                        given.$tree.tree("getNodeByNameMustExist", "node2"),
+                        given.$tree.tree("getNodeByNameMustExist", "node1"),
                     );
 
-                    expect(given.$tree.tree("getSelectedNode")).toMatchObject({
-                        name: "child1",
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+                });
+
+                context("when the selected child is under another node", () => {
+                    it("doesn't deselect the node", () => {
+                        given.$tree.tree(
+                            "loadData",
+                            ["new-child1"],
+                            given.$tree.tree("getNodeByNameMustExist", "node2"),
+                        );
+
+                        expect(
+                            given.$tree.tree("getSelectedNode"),
+                        ).toMatchObject({
+                            name: "child1",
+                        });
                     });
                 });
             });
         });
     });
-});
 
-describe("loadDataFromUrl", () => {
-    interface Vars {
-        $tree: JQuery;
-        initialData: NodeData[];
-        serverData: NodeData[];
-    }
+    describe("loadDataFromUrl", () => {
+        interface Vars {
+            $tree: JQuery;
+            initialData: NodeData[];
+            serverData: NodeData[];
+        }
 
-    const given = getGiven<Vars>();
-    given("initialData", () => []);
-    given("serverData", () => exampleData);
-    given("$tree", () => $("#tree1"));
+        const given = getGiven<Vars>();
+        given("initialData", () => []);
+        given("serverData", () => exampleData);
+        given("$tree", () => $("#tree1"));
 
-    beforeEach(() => {
-        server.use(
-            http.get("/tree/", () => HttpResponse.json(given.serverData)),
-        );
+        beforeEach(() => {
+            server.use(
+                http.get("/tree/", () => HttpResponse.json(given.serverData)),
+            );
 
-        given.$tree.tree({ data: given.initialData });
-    });
-
-    context("with url parameter", () => {
-        it("loads the tree", async () => {
-            given.$tree.tree("loadDataFromUrl", "/tree/");
-            await screen.findByText("node1");
-
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "node1" }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
+            given.$tree.tree({ data: given.initialData });
         });
 
-        context("with parent node", () => {
-            given("initialData", () => ["initial1", "initial2"]);
-            given("serverData", () => ["new1", "new2"]);
-
-            it("loads a subtree", async () => {
-                const parentNode = given.$tree.tree(
-                    "getNodeByNameMustExist",
-                    "initial1",
-                );
-                given.$tree.tree("loadDataFromUrl", "/tree/", parentNode);
-                await screen.findByText("new1");
+        context("with url parameter", () => {
+            it("loads the tree", async () => {
+                given.$tree.tree("loadDataFromUrl", "/tree/");
+                await screen.findByText("node1");
 
                 expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "new1" }),
-                            expect.objectContaining({ name: "new2" }),
-                        ],
-                        name: "initial1",
-                    }),
-                    expect.objectContaining({ name: "initial2" }),
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
+
+            context("with parent node", () => {
+                given("initialData", () => ["initial1", "initial2"]);
+                given("serverData", () => ["new1", "new2"]);
+
+                it("loads a subtree", async () => {
+                    const parentNode = given.$tree.tree(
+                        "getNodeByNameMustExist",
+                        "initial1",
+                    );
+                    given.$tree.tree("loadDataFromUrl", "/tree/", parentNode);
+                    await screen.findByText("new1");
+
+                    expect(given.$tree).toHaveTreeStructure([
+                        expect.objectContaining({
+                            children: [
+                                expect.objectContaining({ name: "new1" }),
+                                expect.objectContaining({ name: "new2" }),
+                            ],
+                            name: "initial1",
+                        }),
+                        expect.objectContaining({ name: "initial2" }),
+                    ]);
+                });
+            });
+        });
+
+        context("without url parameter", () => {
+            it("loads the data from dataUrl", async () => {
+                given.$tree.tree("setOption", "dataUrl", "/tree/");
+                given.$tree.tree("loadDataFromUrl");
+                await screen.findByText("node1");
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
                 ]);
             });
         });
     });
 
-    context("without url parameter", () => {
-        it("loads the data from dataUrl", async () => {
-            given.$tree.tree("setOption", "dataUrl", "/tree/");
-            given.$tree.tree("loadDataFromUrl");
-            await screen.findByText("node1");
+    describe("moveDown", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+            given.$tree.tree("selectNode", given.node1);
+        });
+
+        it("selects the next node", () => {
+            given.$tree.tree("moveDown");
+
+            expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+                name: "node2",
+            });
+        });
+    });
+
+    describe("moveNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            child1: INode;
+            node2: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("child1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "child1"),
+        );
+        given("node2", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node2"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+        });
+
+        it("moves node", () => {
+            given.$tree.tree("moveNode", given.child1, given.node2, "after");
 
             expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({
+                    children: [expect.objectContaining({ name: "child2" })],
+                    name: "node1",
+                }),
                 expect.objectContaining({ name: "node2" }),
+                expect.objectContaining({ name: "child1" }),
             ]);
         });
-    });
-});
 
-describe("moveDown", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("moveNode");
+            }).toThrow("Node parameter is empty");
+        });
 
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
-        given.$tree.tree("selectNode", given.node1);
-    });
+        it("throws an error without a targetNode parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("moveNode", given.child1);
+            }).toThrow("Parameter is empty: targetNode");
+        });
 
-    it("selects the next node", () => {
-        given.$tree.tree("moveDown");
-
-        expect(given.$tree.tree("getSelectedNode")).toMatchObject({
-            name: "node2",
+        it("throws an error without a position parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("moveNode", given.child1, given.node2);
+            }).toThrow("Parameter is empty: position");
         });
     });
-});
 
-describe("moveNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        child1: INode;
-        node2: INode;
-    }
+    describe("moveUp", () => {
+        interface Vars {
+            $tree: JQuery;
+            node2: INode;
+        }
+        const given = getGiven<Vars>();
+        given("node2", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node2"),
+        );
+        given("$tree", () => $("#tree1"));
 
-    const given = getGiven<Vars>();
-    given("child1", () => given.$tree.tree("getNodeByNameMustExist", "child1"));
-    given("node2", () => given.$tree.tree("getNodeByNameMustExist", "node2"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
+        beforeEach(() => {
+            given.$tree.tree({ data: exampleData });
+            given.$tree.tree("selectNode", given.node2);
         });
-        given.$tree.tree("moveNode", given.child1, given.node2, "after");
-    });
 
-    it("moves node", () => {
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({
-                children: [expect.objectContaining({ name: "child2" })],
+        it("selects the next node", () => {
+            given.$tree.tree("moveUp");
+
+            expect(given.$tree.tree("getSelectedNode")).toMatchObject({
                 name: "node1",
-            }),
-            expect.objectContaining({ name: "node2" }),
-            expect.objectContaining({ name: "child1" }),
-        ]);
-    });
-});
-
-describe("moveUp", () => {
-    interface Vars {
-        $tree: JQuery;
-        node2: INode;
-    }
-    const given = getGiven<Vars>();
-    given("node2", () => given.$tree.tree("getNodeByNameMustExist", "node2"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({ data: exampleData });
-        given.$tree.tree("selectNode", given.node2);
-    });
-
-    it("selects the next node", () => {
-        given.$tree.tree("moveUp");
-
-        expect(given.$tree.tree("getSelectedNode")).toMatchObject({
-            name: "node1",
-        });
-    });
-});
-
-describe("openNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: false,
-            data: exampleData,
+            });
         });
     });
 
-    it("opens the node", () => {
-        given.$tree.tree("openNode", given.node1, false);
+    describe("openNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
 
-        expect(given.node1.element).toBeOpen();
-    });
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
 
-    context("with onFinished parameter", () => {
-        it("calls the function", async () => {
+        beforeEach(() => {
+            given.$tree.tree({
+                autoOpen: false,
+                data: exampleData,
+            });
+        });
+
+        it("opens the node", () => {
+            given.$tree.tree("openNode", given.node1, false);
+
+            expect(given.node1.element).toBeOpen();
+        });
+
+        it("calls the function with onFinished parameter", async () => {
             const onFinished = jest.fn();
 
             given.$tree.tree("openNode", given.node1, onFinished);
@@ -958,541 +1097,64 @@ describe("openNode", () => {
                 expect(onFinished).toHaveBeenCalledWith(given.node1);
             });
         });
-    });
 
-    it("handles an empty folder", () => {
-        const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
-        child1.isEmptyFolder = true;
+        it("handles an empty folder", () => {
+            const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
+            child1.isEmptyFolder = true;
 
-        expect(() => {
-            given.$tree.tree("openNode", child1, false);
-        }).not.toThrow();
-    });
-});
-
-describe("prependNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        parent: INode | undefined;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-    given("parent", () => undefined);
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
+            expect(() => {
+                given.$tree.tree("openNode", child1, false);
+            }).not.toThrow();
         });
-        given.$tree.tree("prependNode", "prepended-node", given.parent);
-    });
 
-    context("with an empty parent parameter", () => {
-        it("prepends the node to the tree", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "prepended-node" }),
-                expect.objectContaining({ name: "node1" }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("openNode");
+            }).toThrow("Node parameter is empty");
         });
     });
 
-    context("with a parent node", () => {
-        given("parent", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-
-        it("prepends the node to the parent", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({ name: "prepended-node" }),
-                        expect.objectContaining({ name: "child1" }),
-                        expect.objectContaining({ name: "child2" }),
-                    ],
-                    name: "node1",
-                }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
-        });
-    });
-});
-
-describe("refresh", () => {
-    interface Vars {
-        $tree: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
-    });
-
-    it("rerenders the tree", () => {
-        const tree = given.$tree.tree("getTree");
-        (tree.children[0] as INode).name = "node1a"; // eslint-disable-line testing-library/no-node-access
-
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({ name: "node1" }),
-            expect.objectContaining({ name: "node2" }),
-        ]);
-
-        given.$tree.tree("refresh");
-
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({ name: "node1a" }),
-            expect.objectContaining({ name: "node2" }),
-        ]);
-    });
-});
-
-describe("reload", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(async () => {
-        server.use(http.get("/tree2/", () => HttpResponse.json(exampleData)));
-
-        given.$tree.tree({ dataUrl: "/tree2/" });
-        await screen.findByText("node1");
-
-        given.$tree.tree("removeNode", given.node1);
-    });
-
-    it("reloads the data from the server", async () => {
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({ name: "node2" }),
-        ]);
-
-        given.$tree.tree("reload");
-        await screen.findByText("node1");
-
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({ name: "node1" }),
-            expect.objectContaining({ name: "node2" }),
-        ]);
-    });
-
-    context("with a onFinished parameter", () => {
-        it("calls onFinished", async () => {
-            const handleFinished = jest.fn();
-
-            given.$tree.tree("reload", handleFinished);
-
-            await waitFor(() => {
-                expect(handleFinished).toHaveBeenCalledWith();
-            });
-
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "node1" }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
-        });
-    });
-});
-
-describe("removeNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        node: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
-    });
-
-    context("with a child node", () => {
-        given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "child1"),
-        );
-
-        it("removes the node", () => {
-            given.$tree.tree("removeNode", given.node);
-
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [expect.objectContaining({ name: "child2" })],
-                    name: "node1",
-                }),
-                expect.objectContaining({
-                    children: [expect.objectContaining({ name: "node3" })],
-                    name: "node2",
-                }),
-            ]);
-        });
-
-        context("when the node is selected", () => {
-            beforeEach(() => {
-                given.$tree.tree("selectNode", given.node);
-            });
-
-            it("removes and deselects the node", () => {
-                given.$tree.tree("removeNode", given.node);
-
-                expect(given.$tree.tree("getSelectedNode")).toBe(false);
-            });
-        });
-    });
-
-    context("with a parent node and its children", () => {
-        given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-
-        it("removes the node", () => {
-            given.$tree.tree("removeNode", given.node);
-
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [expect.objectContaining({ name: "node3" })],
-                    name: "node2",
-                }),
-            ]);
-        });
-
-        context("when a child node is selected", () => {
-            beforeEach(() => {
-                const child1 = given.$tree.tree(
-                    "getNodeByNameMustExist",
-                    "child1",
-                );
-                given.$tree.tree("selectNode", child1);
-            });
-
-            it("removes the node and deselects the child", () => {
-                given.$tree.tree("removeNode", given.node);
-
-                expect(given.$tree.tree("getSelectedNode")).toBe(false);
-            });
-        });
-    });
-
-    context("with a root node", () => {
-        given("node", () => given.$tree.tree("getTree"));
-
-        it("raises an exception", () => {
-            expect(() => given.$tree.tree("removeNode", given.node)).toThrow(
-                "Node has no parent",
-            );
-        });
-    });
-});
-
-describe("selectNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-        node2: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("node2", () => given.$tree.tree("getNodeByNameMustExist", "node2"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-            selectable: true,
-        });
-    });
-
-    context("when another node is selected", () => {
-        beforeEach(() => {
-            given.$tree.tree("selectNode", given.node2);
-            given.$tree.tree("selectNode", given.node1);
-        });
-
-        it("selects the node and deselects the previous node", () => {
-            expect(given.node1.element).toBeSelected();
-            expect(given.node2.element).not.toBeSelected();
-        });
-    });
-
-    context("when the node is not selected", () => {
-        beforeEach(() => {
-            given.$tree.tree("selectNode", given.node1);
-        });
-
-        it("selects the node", () => {
-            expect(given.node1.element).toBeSelected();
-        });
-    });
-
-    context("when the node is selected", () => {
-        beforeEach(() => {
-            given.$tree.tree("selectNode", given.node1);
-        });
-
-        it("deselects the node", () => {
-            given.$tree.tree("selectNode", given.node1);
-
-            expect(given.node1.element).not.toBeSelected();
-        });
-    });
-
-    context("with a null parameter", () => {
-        beforeEach(() => {
-            given.$tree.tree("selectNode", given.node1);
-        });
-
-        it("deselects the current node", () => {
-            given.$tree.tree("selectNode", null);
-
-            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
-        });
-    });
-
-    it("opens the parent node when it's closed", () => {
-        expect(given.node1.is_open).toBeFalsy();
-
-        const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
-        given.$tree.tree("selectNode", child1);
-
-        expect(given.node1.is_open).toBe(true);
-    });
-});
-
-describe("setOption", () => {
-    interface Vars {
-        $tree: JQuery;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-
-    beforeEach(() => {
-        given.$tree.tree({
-            animationSpeed: 0,
-            data: exampleData,
-            selectable: false,
-        });
-    });
-
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    it("sets an option", async () => {
-        given.$tree.tree("setOption", "selectable", true);
-        await userEvent.click(
-            titleSpan(given.node1.element as HTMLElement).get(0) as HTMLElement,
-        );
-
-        expect(given.$tree.tree("getSelectedNode")).toMatchObject({
-            name: "node1",
-        });
-    });
-});
-
-describe("setState", () => {
-    interface Vars {
-        $tree: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: false,
-            data: exampleData,
-            selectable: true,
-        });
-    });
-
-    given("$tree", () => $("#tree1"));
-
-    it("sets the state", () => {
-        given.$tree.tree("setState", {
-            open_nodes: [123],
-            selected_node: [123],
-        });
-
-        expect(given.$tree).toHaveTreeStructure([
-            expect.objectContaining({
-                name: "node1",
-                open: true,
-                selected: true,
-            }),
-            expect.objectContaining({
-                name: "node2",
-                open: false,
-                selected: false,
-            }),
-        ]);
-    });
-
-    it("doesn't set the state when the state parameter is null", () => {
-        given.$tree.tree("setState", null as any); // eslint-disable-line @typescript-eslint/no-unsafe-argument
-
-        expect(given.$tree.tree("getSelectedNode")).toBeFalse();
-    });
-});
-
-describe("toggle", () => {
-    interface Vars {
-        $tree: JQuery;
-        autoOpen: boolean;
-        node1: INode;
-    }
-
-    const given = getGiven<Vars>();
-    given("autoOpen", () => false);
-    given("node1", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: given.autoOpen,
-            data: exampleData,
-        });
-        given.$tree.tree("toggle", given.node1, false);
-    });
-
-    context("when the node is closed", () => {
-        it("opens the node", () => {
-            expect(given.node1.element).toBeOpen();
-        });
-    });
-
-    context("when the node is open", () => {
-        given("autoOpen", () => true);
-
-        it("closes the node", () => {
-            expect(given.node1.element).toBeClosed();
-        });
-    });
-});
-
-describe("toJson", () => {
-    interface Vars {
-        $tree: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
-    });
-
-    it("returns nodes as json", () => {
-        expect(JSON.parse(given.$tree.tree("toJson"))).toEqual(exampleData);
-    });
-});
-
-describe("updateNode", () => {
-    interface Vars {
-        $tree: JQuery;
-        isSelected: boolean;
-        node: INode;
-        nodeData: NodeData;
-    }
-
-    const given = getGiven<Vars>();
-    given("isSelected", () => false);
-    given("node", () => given.$tree.tree("getNodeByNameMustExist", "node1"));
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            autoOpen: true,
-            data: exampleData,
-        });
-
-        if (given.isSelected) {
-            given.$tree.tree("selectNode", given.node);
+    describe("prependNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            parent: INode | undefined;
         }
 
-        given.$tree.tree("updateNode", given.node, given.nodeData);
-    });
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+        given("parent", () => undefined);
 
-    context("with a string", () => {
-        given("nodeData", () => "updated-node");
-
-        it("updates the name", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "updated-node" }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
+            });
+            given.$tree.tree("prependNode", "prepended-node", given.parent);
         });
-    });
 
-    context("with an object containing a name", () => {
-        given("nodeData", () => ({ name: "updated-node" }));
-
-        it("updates the name", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "updated-node" }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
-        });
-    });
-
-    context("with an object containing an id", () => {
-        given("nodeData", () => ({ id: 999 }));
-
-        it("updates the id", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "node1" }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
-            expect(given.$tree.tree("getNodeById", 999)).toMatchObject(
-                given.nodeData,
-            );
-        });
-    });
-
-    context("with an object containing a property", () => {
-        given("nodeData", () => ({ color: "green" }));
-
-        it("updates the node", () => {
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({ name: "node1" }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
-            expect(given.$tree.tree("getNodeById", 123)).toMatchObject({
-                color: "green",
-                name: "node1",
+        context("with an empty parent parameter", () => {
+            it("prepends the node to the tree", () => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "prepended-node" }),
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
             });
         });
-    });
 
-    context("with an object containing children", () => {
-        context("when adding a child to a child node", () => {
-            given("nodeData", () => ({ children: ["new-child"] }));
-            given("node", () =>
-                given.$tree.tree("getNodeByNameMustExist", "child1"),
+        context("with a parent node", () => {
+            given("parent", () =>
+                given.$tree.tree("getNodeByNameMustExist", "node1"),
             );
 
-            it("adds the child node", () => {
+            it("prepends the node to the parent", () => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({
                         children: [
-                            expect.objectContaining({
-                                children: [
-                                    expect.objectContaining({
-                                        name: "new-child",
-                                    }),
-                                ],
-                                name: "child1",
-                            }),
+                            expect.objectContaining({ name: "prepended-node" }),
+                            expect.objectContaining({ name: "child1" }),
                             expect.objectContaining({ name: "child2" }),
                         ],
                         name: "node1",
@@ -1501,37 +1163,650 @@ describe("updateNode", () => {
                 ]);
             });
         });
+    });
 
-        context("when removing the children", () => {
-            given("nodeData", () => ({ children: [] }));
+    describe("refresh", () => {
+        interface Vars {
+            $tree: JQuery;
+        }
 
-            it("removes the children", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        name: "node1",
-                        nodeType: "child",
-                    }),
-                    expect.objectContaining({
-                        name: "node2",
-                        nodeType: "folder",
-                    }),
-                ]);
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
             });
+        });
+
+        it("rerenders the tree", () => {
+            const tree = given.$tree.tree("getTree");
+            (tree.children[0] as INode).name = "node1a"; // eslint-disable-line testing-library/no-node-access
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+
+            given.$tree.tree("refresh");
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1a" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
         });
     });
 
-    context("when the node was selected", () => {
-        given("isSelected", () => true);
+    describe("reload", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
 
-        it("keeps the node selected", () => {
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(async () => {
+            server.use(
+                http.get("/tree2/", () => HttpResponse.json(exampleData)),
+            );
+
+            given.$tree.tree({ dataUrl: "/tree2/" });
+            await screen.findByText("node1");
+
+            given.$tree.tree("removeNode", given.node1);
+        });
+
+        it("reloads the data from the server", async () => {
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node2" }),
+            ]);
+
+            given.$tree.tree("reload");
+            await screen.findByText("node1");
+
             expect(given.$tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
         });
 
-        it("keeps the focus on the node", () => {
-            expect(given.node.element).toBeFocused();
+        context("with a onFinished parameter", () => {
+            it("calls onFinished", async () => {
+                const handleFinished = jest.fn();
+
+                given.$tree.tree("reload", handleFinished);
+
+                await waitFor(() => {
+                    expect(handleFinished).toHaveBeenCalledWith();
+                });
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
         });
+    });
+
+    describe("removeFromSelection", () => {
+        it("deselects a node", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            const child1 = $tree.tree("getNodeByName", "child1") as INode;
+            const child2 = $tree.tree("getNodeByName", "child2") as INode;
+            $tree.tree("addToSelection", child1);
+            $tree.tree("addToSelection", child2);
+
+            expect($tree.tree("isNodeSelected", child1)).toBeTrue();
+            expect($tree.tree("isNodeSelected", child2)).toBeTrue();
+
+            $tree.tree("removeFromSelection", child2);
+
+            expect($tree.tree("isNodeSelected", child1)).toBeTrue();
+            expect($tree.tree("isNodeSelected", child2)).toBeFalse();
+        });
+
+        it("raises an error with an empty parameter", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            expect(() => {
+                $tree.tree(
+                    "removeFromSelection",
+                    undefined as unknown as INode,
+                );
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
+    describe("removeNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            node: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
+            });
+        });
+
+        context("with a child node", () => {
+            given("node", () =>
+                given.$tree.tree("getNodeByNameMustExist", "child1"),
+            );
+
+            it("removes the node", () => {
+                given.$tree.tree("removeNode", given.node);
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [expect.objectContaining({ name: "child2" })],
+                        name: "node1",
+                    }),
+                    expect.objectContaining({
+                        children: [expect.objectContaining({ name: "node3" })],
+                        name: "node2",
+                    }),
+                ]);
+            });
+
+            context("when the node is selected", () => {
+                beforeEach(() => {
+                    given.$tree.tree("selectNode", given.node);
+                });
+
+                it("removes and deselects the node", () => {
+                    given.$tree.tree("removeNode", given.node);
+
+                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                });
+            });
+        });
+
+        context("with a parent node and its children", () => {
+            given("node", () =>
+                given.$tree.tree("getNodeByNameMustExist", "node1"),
+            );
+
+            it("removes the node", () => {
+                given.$tree.tree("removeNode", given.node);
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [expect.objectContaining({ name: "node3" })],
+                        name: "node2",
+                    }),
+                ]);
+            });
+
+            context("when a child node is selected", () => {
+                beforeEach(() => {
+                    const child1 = given.$tree.tree(
+                        "getNodeByNameMustExist",
+                        "child1",
+                    );
+                    given.$tree.tree("selectNode", child1);
+                });
+
+                it("removes the node and deselects the child", () => {
+                    given.$tree.tree("removeNode", given.node);
+
+                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                });
+            });
+        });
+
+        context("with a root node", () => {
+            given("node", () => given.$tree.tree("getTree"));
+
+            it("raises an exception", () => {
+                expect(() =>
+                    given.$tree.tree("removeNode", given.node),
+                ).toThrow("Node has no parent");
+            });
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("removeNode");
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
+    describe("scrollToNode", () => {
+        it("throws an error without a node parameter", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            expect(() => {
+                $tree.tree("scrollToNode", undefined as unknown as INode);
+            }).toThrow("Node parameter is empty");
+        });
+
+        it("handles a node without an element", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+            });
+
+            const result = $tree.tree("scrollToNode", {} as unknown as INode);
+
+            expect(result).toStrictEqual($tree);
+        });
+    });
+
+    describe("selectNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+            node2: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("node2", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node2"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
+                selectable: true,
+            });
+        });
+
+        context("when another node is selected", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node2);
+                given.$tree.tree("selectNode", given.node1);
+            });
+
+            it("selects the node and deselects the previous node", () => {
+                expect(given.node1.element).toBeSelected();
+                expect(given.node2.element).not.toBeSelected();
+            });
+        });
+
+        context("when the node is not selected", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node1);
+            });
+
+            it("selects the node", () => {
+                expect(given.node1.element).toBeSelected();
+            });
+        });
+
+        context("when the node is selected", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node1);
+            });
+
+            it("deselects the node", () => {
+                given.$tree.tree("selectNode", given.node1);
+
+                expect(given.node1.element).not.toBeSelected();
+            });
+        });
+
+        context("with a null parameter", () => {
+            beforeEach(() => {
+                given.$tree.tree("selectNode", given.node1);
+            });
+
+            it("deselects the current node", () => {
+                given.$tree.tree("selectNode", null);
+
+                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+            });
+        });
+
+        it("opens the parent node when it's closed", () => {
+            expect(given.node1.is_open).toBeFalsy();
+
+            const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
+            given.$tree.tree("selectNode", child1);
+
+            expect(given.node1.is_open).toBe(true);
+        });
+    });
+
+    describe("setOption", () => {
+        interface Vars {
+            $tree: JQuery;
+            node1: INode;
+        }
+
+        const given = getGiven<Vars>();
+
+        beforeEach(() => {
+            given.$tree.tree({
+                animationSpeed: 0,
+                data: exampleData,
+                selectable: false,
+            });
+        });
+
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        it("sets an option", async () => {
+            given.$tree.tree("setOption", "selectable", true);
+            await userEvent.click(
+                titleSpan(given.node1.element as HTMLElement),
+            );
+
+            expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+                name: "node1",
+            });
+        });
+    });
+
+    describe("setState", () => {
+        interface Vars {
+            $tree: JQuery;
+        }
+
+        const given = getGiven<Vars>();
+
+        beforeEach(() => {
+            given.$tree.tree({
+                autoOpen: false,
+                data: exampleData,
+                selectable: true,
+            });
+        });
+
+        given("$tree", () => $("#tree1"));
+
+        it("sets the state", () => {
+            given.$tree.tree("setState", {
+                open_nodes: [123],
+                selected_node: [123],
+            });
+
+            expect(given.$tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    open: true,
+                    selected: true,
+                }),
+                expect.objectContaining({
+                    name: "node2",
+                    open: false,
+                    selected: false,
+                }),
+            ]);
+        });
+
+        it("doesn't set the state when the state parameter is null", () => {
+            given.$tree.tree("setState", null as any); // eslint-disable-line @typescript-eslint/no-unsafe-argument
+
+            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+        });
+    });
+
+    describe("toggle", () => {
+        interface Vars {
+            $tree: JQuery;
+            autoOpen: boolean;
+            node1: INode;
+        }
+
+        const given = getGiven<Vars>();
+        given("autoOpen", () => false);
+        given("node1", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                autoOpen: given.autoOpen,
+                data: exampleData,
+            });
+        });
+
+        it("opens the node when the node is closed", () => {
+            given.$tree.tree("toggle", given.node1, false);
+
+            expect(given.node1.element).toBeOpen();
+        });
+
+        context("when the node is open", () => {
+            given("autoOpen", () => true);
+
+            it("closes the node", () => {
+                given.$tree.tree("toggle", given.node1, false);
+
+                expect(given.node1.element).toBeClosed();
+            });
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("toggle");
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
+    describe("toJson", () => {
+        interface Vars {
+            $tree: JQuery;
+        }
+
+        const given = getGiven<Vars>();
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                data: exampleData,
+            });
+        });
+
+        it("returns nodes as json", () => {
+            expect(JSON.parse(given.$tree.tree("toJson"))).toStrictEqual(
+                exampleData,
+            );
+        });
+    });
+
+    describe("updateNode", () => {
+        interface Vars {
+            $tree: JQuery;
+            isSelected: boolean;
+            node: INode;
+            nodeData: NodeData;
+        }
+
+        const given = getGiven<Vars>();
+        given("isSelected", () => false);
+        given("node", () =>
+            given.$tree.tree("getNodeByNameMustExist", "node1"),
+        );
+        given("$tree", () => $("#tree1"));
+
+        beforeEach(() => {
+            given.$tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+
+            if (given.isSelected) {
+                given.$tree.tree("selectNode", given.node);
+            }
+        });
+
+        context("with a string", () => {
+            given("nodeData", () => "updated-node");
+
+            it("updates the name", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "updated-node" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
+        });
+
+        context("with an object containing a name", () => {
+            given("nodeData", () => ({ name: "updated-node" }));
+
+            it("updates the name", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "updated-node" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
+        });
+
+        context("with an object containing an id", () => {
+            given("nodeData", () => ({ id: 999 }));
+
+            it("updates the id", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+                expect(given.$tree.tree("getNodeById", 999)).toMatchObject(
+                    given.nodeData,
+                );
+            });
+        });
+
+        context("with an object containing a property", () => {
+            given("nodeData", () => ({ color: "green" }));
+
+            it("updates the node", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+                expect(given.$tree.tree("getNodeById", 123)).toMatchObject({
+                    color: "green",
+                    name: "node1",
+                });
+            });
+        });
+
+        context("with an object containing children", () => {
+            context("when adding a child to a child node", () => {
+                given("nodeData", () => ({ children: ["new-child"] }));
+                given("node", () =>
+                    given.$tree.tree("getNodeByNameMustExist", "child1"),
+                );
+
+                it("adds the child node", () => {
+                    given.$tree.tree("updateNode", given.node, given.nodeData);
+
+                    expect(given.$tree).toHaveTreeStructure([
+                        expect.objectContaining({
+                            children: [
+                                expect.objectContaining({
+                                    children: [
+                                        expect.objectContaining({
+                                            name: "new-child",
+                                        }),
+                                    ],
+                                    name: "child1",
+                                }),
+                                expect.objectContaining({ name: "child2" }),
+                            ],
+                            name: "node1",
+                        }),
+                        expect.objectContaining({ name: "node2" }),
+                    ]);
+                });
+            });
+
+            context("when removing the children", () => {
+                given("nodeData", () => ({ children: [] }));
+
+                it("removes the children", () => {
+                    given.$tree.tree("updateNode", given.node, given.nodeData);
+
+                    expect(given.$tree).toHaveTreeStructure([
+                        expect.objectContaining({
+                            name: "node1",
+                            nodeType: "child",
+                        }),
+                        expect.objectContaining({
+                            name: "node2",
+                            nodeType: "folder",
+                        }),
+                    ]);
+                });
+            });
+        });
+
+        context("when the node was selected", () => {
+            given("isSelected", () => true);
+
+            it("keeps the node selected", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
+
+            it("keeps the focus on the node", () => {
+                given.$tree.tree("updateNode", given.node, given.nodeData);
+
+                expect(given.node.element).toBeFocused();
+            });
+        });
+
+        it("throws an error without a node parameter", () => {
+            expect(() => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                const $tree = given.$tree as unknown as any;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                $tree.tree("updateNode");
+            }).toThrow("Node parameter is empty");
+        });
+    });
+
+    it("returns undefined when calling with a string that starts with an underscore", () => {
+        const $tree = $("#tree1");
+
+        const tree = $tree.tree as unknown as (name: string) => undefined;
+        const result = tree("_test"); // eslint-disable-line @typescript-eslint/no-confusing-void-expression
+
+        expect(result).toBeUndefined();
     });
 });

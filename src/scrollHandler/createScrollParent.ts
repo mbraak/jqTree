@@ -1,4 +1,4 @@
-import type { ScrollParent } from "./types";
+import type { ScrollParent } from "./scrollParent";
 
 import ContainerScrollParent from "./containerScrollParent";
 import DocumentScrollParent from "./documentScrollParent";

@@ -1,19 +1,29 @@
-import MouseHandler from "../mouseHandler";
+import { jest } from "@jest/globals";
+
+import { TriggerEvent } from "../jqtreeMethodTypes";
+import MouseHandler, {
+    GetMouseDelay,
+    GetNode,
+    MouseCapture,
+    MouseStart,
+} from "../mouseHandler";
 import { Node } from "../node";
 
 interface CreateMouseHandlerParams {
     element: HTMLElement;
-    getNode?: jest.Mock;
+    getMouseDelay?: jest.Mock<GetMouseDelay>;
+    getNode?: jest.Mock<GetNode>;
     onClickButton?: jest.Mock;
-    onMouseCapture?: jest.Mock;
+    onMouseCapture?: jest.Mock<MouseCapture>;
     onMouseDrag?: jest.Mock;
-    onMouseStart?: jest.Mock;
+    onMouseStart?: jest.Mock<MouseStart>;
     onMouseStop?: jest.Mock;
-    triggerEvent?: jest.Mock;
+    triggerEvent?: jest.Mock<TriggerEvent>;
 }
 
 const createMouseHandler = ({
     element,
+    getMouseDelay = jest.fn(() => 0),
     getNode = jest.fn(),
     onClickButton = jest.fn(),
     onMouseCapture = jest.fn(),
@@ -22,7 +32,6 @@ const createMouseHandler = ({
     onMouseStop = jest.fn(),
     triggerEvent = jest.fn(),
 }: CreateMouseHandlerParams) => {
-    const getMouseDelay = jest.fn();
     const onClickTitle = jest.fn();
 
     return new MouseHandler({
@@ -41,6 +50,10 @@ const createMouseHandler = ({
 };
 
 describe("handleClick", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
     it("handles a button click", () => {
         const element = document.createElement("div");
 
@@ -85,6 +98,10 @@ describe("handleClick", () => {
 });
 
 describe("handleContextmenu", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
     it("handles a context menu event on a node", () => {
         const treeElement = document.createElement("ul");
         treeElement.classList.add("jqtree-tree");
@@ -104,7 +121,7 @@ describe("handleContextmenu", () => {
             }
         });
 
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element: nodeElement, getNode, triggerEvent });
 
@@ -122,7 +139,7 @@ describe("handleContextmenu", () => {
         document.body.appendChild(element);
 
         const getNode = jest.fn(() => null);
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element, getNode, triggerEvent });
 
@@ -136,7 +153,7 @@ describe("handleContextmenu", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element, triggerEvent });
 
@@ -150,6 +167,10 @@ describe("handleContextmenu", () => {
 });
 
 describe("handleDblclick", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
     it("handles a double click on a label", () => {
         const element = document.createElement("div");
 
@@ -169,7 +190,7 @@ describe("handleDblclick", () => {
             }
         });
 
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element, getNode, triggerEvent });
 
@@ -186,7 +207,7 @@ describe("handleDblclick", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const triggerEvent = jest.fn();
+        const triggerEvent = jest.fn<TriggerEvent>();
 
         createMouseHandler({ element, triggerEvent });
 
@@ -200,11 +221,15 @@ describe("handleDblclick", () => {
 });
 
 describe("touchStart", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
     it("handles a touchstart event", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn();
+        const onMouseCapture = jest.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
@@ -231,7 +256,7 @@ describe("touchStart", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn();
+        const onMouseCapture = jest.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
@@ -253,7 +278,7 @@ describe("touchStart", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn();
+        const onMouseCapture = jest.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
@@ -268,6 +293,10 @@ describe("touchStart", () => {
 });
 
 describe("touchEnd", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
     it("handles a touchend event after a touchstart and a touchmove event", () => {
         const element = document.createElement("div");
         document.body.append(element);
@@ -356,6 +385,10 @@ describe("touchEnd", () => {
 });
 
 describe("touchMove", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
     it("handles a touchmove event without touches", () => {
         const element = document.createElement("div");
         document.body.append(element);
@@ -420,5 +453,141 @@ describe("touchMove", () => {
         element.dispatchEvent(touchMoveEvent);
 
         expect(onMouseDrag).not.toHaveBeenCalled();
+    });
+});
+
+describe("mouseMove", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("calls onMouseStart when the delay is met and there is a mouse move", () => {
+        jest.useFakeTimers();
+
+        const treeElement = document.createElement("ul");
+        treeElement.classList.add("jqtree-tree");
+        document.body.appendChild(treeElement);
+
+        const nodeElement = document.createElement("div");
+        nodeElement.className = "jqtree-element";
+        treeElement.appendChild(nodeElement);
+
+        const node = new Node();
+
+        const getNode = jest.fn((element: HTMLElement) => {
+            if (element === nodeElement) {
+                return node;
+            } else {
+                return null;
+            }
+        });
+
+        const getMouseDelay = jest.fn(() => 1_000);
+        const onMouseCapture = jest.fn(() => true);
+        const onMouseStart = jest.fn(() => true);
+
+        createMouseHandler({
+            element: nodeElement,
+            getMouseDelay,
+            getNode,
+            onMouseCapture,
+            onMouseStart,
+        });
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true }),
+        );
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousemove", { bubbles: true }),
+        );
+
+        expect(onMouseStart).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(1_500);
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousemove", { bubbles: true }),
+        );
+
+        expect(onMouseStart).toHaveBeenCalledExactlyOnceWith(
+            expect.objectContaining({
+                target: nodeElement,
+            }),
+        );
+    });
+
+    it("calls onMouseStart when mousedown is triggered twice", () => {
+        jest.useFakeTimers();
+
+        const treeElement = document.createElement("ul");
+        treeElement.classList.add("jqtree-tree");
+        document.body.appendChild(treeElement);
+
+        const nodeElement = document.createElement("div");
+        nodeElement.className = "jqtree-element";
+        treeElement.appendChild(nodeElement);
+
+        const node = new Node();
+
+        const getNode = jest.fn((element: HTMLElement) => {
+            if (element === nodeElement) {
+                return node;
+            } else {
+                return null;
+            }
+        });
+
+        const getMouseDelay = jest.fn(() => 1_000);
+        const onMouseCapture = jest.fn(() => true);
+        const onMouseStart = jest.fn(() => true);
+
+        createMouseHandler({
+            element: nodeElement,
+            getMouseDelay,
+            getNode,
+            onMouseCapture,
+            onMouseStart,
+        });
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true }),
+        );
+
+        jest.advanceTimersByTime(600);
+
+        nodeElement.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+        jest.advanceTimersByTime(600);
+
+        expect(onMouseStart).not.toHaveBeenCalled();
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true }),
+        );
+
+        jest.advanceTimersByTime(600);
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousemove", { bubbles: true }),
+        );
+
+        expect(onMouseStart).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(600);
+
+        nodeElement.dispatchEvent(
+            new MouseEvent("mousemove", { bubbles: true }),
+        );
+
+        expect(onMouseStart).toHaveBeenCalledExactlyOnceWith(
+            expect.objectContaining({
+                target: nodeElement,
+            }),
+        );
     });
 });

@@ -24,6 +24,7 @@ export default [
         rules: {
             "@typescript-eslint/explicit-function-return-type": "off",
             "@typescript-eslint/interface-name-prefix": "off",
+            "@typescript-eslint/no-empty-object-type": "off",
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-use-before-define": "off",
             "@typescript-eslint/no-unused-vars": [
@@ -51,12 +52,22 @@ export default [
     },
     {
         files: ["src/test/**/*.ts"],
-        ...jestPlugin.configs["flat/recommended"],
+        ...jestPlugin.configs["flat/all"],
     },
     {
         files: ["src/test/**/*.ts"],
         rules: {
+            "jest/no-conditional-in-test": "off",
+            "jest/no-duplicate-hooks": "off",
+            "jest/no-hooks": "off",
             "jest/no-identical-title": "off",
+            "jest/prefer-expect-assertions": "off",
+            "jest/prefer-importing-jest-globals": [
+                "error",
+                { types: ["jest"] },
+            ],
+            "jest/prefer-lowercase-title": "off",
+            "jest/require-hook": "off",
         },
     },
     {

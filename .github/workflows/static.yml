@@ -4,7 +4,6 @@ on:
   push:
     branches: ["master", "test-docs"]
   workflow_dispatch:
-    branches: ["master", "test-docs"]
 
 permissions:
   contents: read
@@ -29,7 +28,7 @@ jobs:
       - name: Setup ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3.5'
+          ruby-version: '3.3.6'
       - name: Setup node
         uses: actions/setup-node@v4
         with:

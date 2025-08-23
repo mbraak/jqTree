@@ -190,7 +190,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const element =
             inputElement instanceof HTMLElement
                 ? inputElement
-                : inputElement[0];
+                : inputElement.get(0);
 
         if (!element) {
             return null;
@@ -247,9 +247,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         this.options.rtl = this.getRtlOption();
 
-        if (this.options.closedIcon == null) {
-            this.options.closedIcon = this.getDefaultClosedIcon();
-        }
+        this.options.closedIcon ??= this.getDefaultClosedIcon();
 
         this.connectHandlers();
 
@@ -373,9 +371,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
                 onFinished = param2 as OnFinishOpenNode;
             }
 
-            if (slide == null) {
-                slide = this.options.slide;
-            }
+            slide ??= this.options.slide;
 
             return [slide, onFinished];
         };

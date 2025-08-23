@@ -6,12 +6,15 @@ import {
 } from "./mouseUtils";
 import { Node } from "./node";
 
+export type GetMouseDelay = () => number;
+export type GetNode = (element: HTMLElement) => Node | null;
+export type MouseCapture = (positionInfo: PositionInfo) => boolean | null;
+export type MouseStart = (positionInfo: PositionInfo) => boolean;
+
 interface ClickTarget {
     node: Node;
     type: "button" | "label";
 }
-
-type GetNode = (element: HTMLElement) => Node | null;
 
 interface MouseHandlerParams {
     element: HTMLElement;
@@ -19,9 +22,9 @@ interface MouseHandlerParams {
     getNode: GetNode;
     onClickButton: (node: Node) => void;
     onClickTitle: (node: Node) => void;
-    onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
+    onMouseCapture: MouseCapture;
     onMouseDrag: (positionInfo: PositionInfo) => void;
-    onMouseStart: (positionInfo: PositionInfo) => boolean;
+    onMouseStart: MouseStart;
     onMouseStop: (positionInfo: PositionInfo) => void;
     triggerEvent: TriggerEvent;
     useContextMenu: boolean;
@@ -29,7 +32,7 @@ interface MouseHandlerParams {
 
 class MouseHandler {
     private element: HTMLElement;
-    private getMouseDelay: () => number;
+    private getMouseDelay: GetMouseDelay;
     private getNode: GetNode;
 
     private isMouseDelayMet: boolean;
@@ -42,11 +45,11 @@ class MouseHandler {
     private onClickButton: (node: Node) => void;
     private onClickTitle: (node: Node) => void;
 
-    private onMouseCapture: (positionInfo: PositionInfo) => boolean | null;
+    private onMouseCapture: MouseCapture;
 
     private onMouseDrag: (positionInfo: PositionInfo) => void;
 
-    private onMouseStart: (positionInfo: PositionInfo) => boolean;
+    private onMouseStart: MouseStart;
 
     private onMouseStop: (positionInfo: PositionInfo) => void;
 
