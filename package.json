@@ -32,7 +32,7 @@
         "defaults"
     ],
     "peerDependencies": {
-        "jquery": "4.0.0-beta.2"
+        "jquery": "4.0.0-rc.1"
     },
     "devDependencies": {
         "@babel/cli": "^7.27.2",
@@ -50,7 +50,7 @@
         "@testing-library/user-event": "^14.6.1",
         "@types/debug": "^4.1.12",
         "@types/jest-axe": "^3.5.9",
-        "@types/jquery": "^3.5.32",
+        "@types/jquery": "^3.5.33",
         "@types/node": "^22.15.21",
         "autoprefixer": "^10.4.21",
         "babel-jest": "^30",

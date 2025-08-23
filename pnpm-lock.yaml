@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       jquery:
-        specifier: 4.0.0-beta.2
-        version: 4.0.0-beta.2
+        specifier: 4.0.0-rc.1
+        version: 4.0.0-rc.1
     devDependencies:
       '@babel/cli':
         specifier: ^7.27.2
@@ -58,8 +58,8 @@ importers:
         specifier: ^3.5.9
         version: 3.5.9
       '@types/jquery':
-        specifier: ^3.5.32
-        version: 3.5.32
+        specifier: ^3.5.33
+        version: 3.5.33
       '@types/node':
         specifier: ^22.15.21
         version: 22.15.21
@@ -1294,8 +1294,8 @@ packages:
   '@types/jest@29.5.14':
     resolution: {integrity: sha512-ZN+4sdnLUbo8EVvVc2ao0GFW6oVrQRPn4K2lglySj7APvSrgzxHiNNK99us4WDMi57xxA2yggblIAMNhXOotLQ==}
 
-  '@types/jquery@3.5.32':
-    resolution: {integrity: sha512-b9Xbf4CkMqS02YH8zACqN1xzdxc3cO735Qe5AbSUFmyOiaWAbcpqh9Wna+Uk0vgACvoQHpWDg2rGdHkYPLmCiQ==}
+  '@types/jquery@3.5.33':
+    resolution: {integrity: sha512-SeyVJXlCZpEki5F0ghuYe+L+PprQta6nRZqhONt9F13dWBtR/ftoaIbdRQ7cis7womE+X2LKhsDdDtkkDhJS6g==}
 
   '@types/jsdom@20.0.1':
     resolution: {integrity: sha512-d0r18sZPmMQr1eG35u12FZfhIXNrnsPU/g5wvRKCUf/tOGilKKwYMYGqh33BNR6ba+2gkHw1EUiHoN3mn7E5IQ==}
@@ -2697,8 +2697,8 @@ packages:
       node-notifier:
         optional: true
 
-  jquery@4.0.0-beta.2:
-    resolution: {integrity: sha512-2/cB7q2vtwltOGph8cNaNBRfVRdewrgdmYipXJ9ZYLQOPYjBKHH8+l5ZLVTFV7emKVIPXwDP3excXS0zUcx9kw==}
+  jquery@4.0.0-rc.1:
+    resolution: {integrity: sha512-ima3YNbwR733XSQ/yFbO4Kjq7Z01feW8BmzZ4VjuuFvWVpGdjXSpmOJZRaehA4V60Aj97HsHNRnDM188c8pHHw==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -5242,7 +5242,7 @@ snapshots:
       expect: 29.7.0
       pretty-format: 29.7.0
 
-  '@types/jquery@3.5.32':
+  '@types/jquery@3.5.33':
     dependencies:
       '@types/sizzle': 2.3.9
 
@@ -7009,7 +7009,7 @@ snapshots:
       - supports-color
       - ts-node
 
-  jquery@4.0.0-beta.2: {}
+  jquery@4.0.0-rc.1: {}
 
   js-tokens@4.0.0: {}
 
