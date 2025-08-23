@@ -1386,9 +1386,6 @@ var jqtree = (function (exports) {
           return null;
         } else {
           const lastChild = this.children[this.children.length - 1];
-          if (!lastChild) {
-            return null;
-          }
           if (!(lastChild.hasChildren() && lastChild.is_open)) {
             return lastChild;
           } else {
@@ -2711,7 +2708,7 @@ var jqtree = (function (exports) {
         return this.tree.getNodeByCallback(callback);
       }
       getNodeByHtmlElement(inputElement) {
-        const element = inputElement instanceof HTMLElement ? inputElement : inputElement[0];
+        const element = inputElement instanceof HTMLElement ? inputElement : inputElement.get(0);
         if (!element) {
           return null;
         }
