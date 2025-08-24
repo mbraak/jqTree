@@ -198,7 +198,7 @@ export default class ElementsRenderer {
      * Call onCreateLi
      */
     private createLi(node: Node, level: number): HTMLLIElement {
-        const isSelected = Boolean(this.isNodeSelected(node));
+        const isSelected = this.isNodeSelected(node);
 
         const mustShowFolder =
             node.isFolder() || (node.isEmptyFolder && this.showEmptyFolder);

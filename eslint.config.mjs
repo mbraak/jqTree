@@ -61,6 +61,7 @@ export default [
             "jest/no-duplicate-hooks": "off",
             "jest/no-hooks": "off",
             "jest/no-identical-title": "off",
+            "jest/prefer-ending-with-an-expect": "off",
             "jest/prefer-expect-assertions": "off",
             "jest/prefer-importing-jest-globals": [
                 "error",

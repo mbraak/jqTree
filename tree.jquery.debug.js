@@ -766,7 +766,7 @@ var jqtree = (function (exports) {
        * Call onCreateLi
        */
       createLi(node, level) {
-        const isSelected = Boolean(this.isNodeSelected(node));
+        const isSelected = this.isNodeSelected(node);
         const mustShowFolder = node.isFolder() || node.isEmptyFolder && this.showEmptyFolder;
         const li = mustShowFolder ? this.createFolderLi(node, level, isSelected) : this.createNodeLi(node, level, isSelected);
         this.attachNodeData(node, li);
@@ -1386,9 +1386,6 @@ var jqtree = (function (exports) {
           return null;
         } else {
           const lastChild = this.children[this.children.length - 1];
-          if (!lastChild) {
-            return null;
-          }
           if (!(lastChild.hasChildren() && lastChild.is_open)) {
             return lastChild;
           } else {
@@ -2711,7 +2708,7 @@ var jqtree = (function (exports) {
         return this.tree.getNodeByCallback(callback);
       }
       getNodeByHtmlElement(inputElement) {
-        const element = inputElement instanceof HTMLElement ? inputElement : inputElement[0];
+        const element = inputElement instanceof HTMLElement ? inputElement : inputElement.get(0);
         if (!element) {
           return null;
         }
