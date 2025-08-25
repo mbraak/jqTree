@@ -766,7 +766,7 @@ var jqtree = (function (exports) {
        * Call onCreateLi
        */
       createLi(node, level) {
-        const isSelected = Boolean(this.isNodeSelected(node));
+        const isSelected = this.isNodeSelected(node);
         const mustShowFolder = node.isFolder() || node.isEmptyFolder && this.showEmptyFolder;
         const li = mustShowFolder ? this.createFolderLi(node, level, isSelected) : this.createNodeLi(node, level, isSelected);
         this.attachNodeData(node, li);
