@@ -1,58 +1,58 @@
 name: Deploy static content to Pages
 
 on:
-  push:
-    branches: ["master", "test-docs"]
-  workflow_dispatch:
+    push:
+        branches: ["master", "test-docs"]
+    workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+    contents: read
+    pages: write
+    id-token: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    group: "pages"
+    cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    env:
-      BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3.6'
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install pnpm
-        run: npm install -g pnpm
-      - name: Install ruby packages
-        working-directory: ./docs
-        run: bundle
-      - name: Install javascript packages
-        working-directory: ./docs
-        run: pnpm install
-      - name: Build docs css
-        working-directory: ./docs
-        run: pnpm run build_docs_css
-      - name: Jekyll Build
-        working-directory: ./docs
-        run: bundle exec jekyll build
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './docs/_site'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    deploy:
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        env:
+            BUNDLE_GEMFILE: ${{ github.workspace }}/docs/Gemfile
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup ruby
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: "3.4.5"
+            - name: Setup node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+            - name: Install pnpm
+              run: npm install -g pnpm
+            - name: Install ruby packages
+              working-directory: ./docs
+              run: bundle
+            - name: Install javascript packages
+              working-directory: ./docs
+              run: pnpm install
+            - name: Build docs css
+              working-directory: ./docs
+              run: pnpm run build_docs_css
+            - name: Jekyll Build
+              working-directory: ./docs
+              run: bundle exec jekyll build
+            - name: Setup Pages
+              uses: actions/configure-pages@v5
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: "./docs/_site"
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
