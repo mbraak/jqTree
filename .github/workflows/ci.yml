@@ -67,7 +67,7 @@ jobs:
                   name: screenshots
                   path: test-results/
             - name: Merge coverage
-              run: cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
+              run: cp js-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
             - name: Codecov
               uses: codecov/codecov-action@v5
               with:
