@@ -61,7 +61,6 @@
         "givens": "^1.3.9",
         "jest-axe": "^10.0.0",
         "jest-extended": "^6.0.0",
-        "jest-fixed-jsdom": "^0.0.9",
         "jsdom-testing-mocks": "^1.15.2",
         "jsonfile": "^6.2.0",
         "lodash": "^4.17.21",
