@@ -1,8 +1,8 @@
-import { jest } from "@jest/globals";
 import { screen, waitFor } from "@testing-library/dom";
 import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import { vi } from 'vitest'
 
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
@@ -291,7 +291,7 @@ describe("options", () => {
                 http.get("/tree/", () => HttpResponse.json(exampleData)),
             );
 
-            const dataFilter = jest.fn((data) => [
+            const dataFilter = vi.fn((data) => [
                 (data as number[])[1] as unknown as NodeData,
             ]);
 
@@ -544,7 +544,7 @@ describe("options", () => {
             });
 
             it("calls onLoadFailed", async () => {
-                const onLoadFailed = jest.fn();
+                const onLoadFailed = vi.fn();
 
                 given.$tree.tree({
                     dataUrl: "/tree/",

@@ -1,9 +1,9 @@
-import { jest } from "@jest/globals";
 import { waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import { vi } from 'vitest'
 
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
@@ -41,7 +41,7 @@ describe("events", () => {
         });
 
         it("fires tree.click", async () => {
-            const onClick = jest.fn();
+            const onClick = vi.fn();
             given.$tree.on("tree.click", onClick);
 
             await userEvent.click(given.titleSpan);
@@ -71,7 +71,7 @@ describe("events", () => {
         });
 
         it("fires tree.contextmenu", async () => {
-            const onContextMenu = jest.fn();
+            const onContextMenu = vi.fn();
             given.$tree.on("tree.contextmenu", onContextMenu);
 
             await userEvent.pointer({
@@ -104,7 +104,7 @@ describe("events", () => {
         });
 
         it("fires tree.dblclick", async () => {
-            const onDoubleClick = jest.fn();
+            const onDoubleClick = vi.fn();
             given.$tree.on("tree.dblclick", onDoubleClick);
 
             await userEvent.dblClick(given.titleSpan);
@@ -124,7 +124,7 @@ describe("events", () => {
 
         context("with json data", () => {
             it("is called", () => {
-                const onInit = jest.fn();
+                const onInit = vi.fn();
                 given.$tree.on("tree.init", onInit);
 
                 given.$tree.tree({
@@ -149,7 +149,7 @@ describe("events", () => {
             });
 
             it("is called", async () => {
-                const onInit = jest.fn();
+                const onInit = vi.fn();
                 given.$tree.on("tree.init", onInit);
 
                 given.$tree.tree({ dataUrl: "/tree/" });
@@ -170,7 +170,7 @@ describe("events", () => {
 
         context("when the tree is initialized with data", () => {
             it("fires tree.load_data", () => {
-                const onLoadData = jest.fn();
+                const onLoadData = vi.fn();
                 given.$tree.on("tree.load_data", onLoadData);
 
                 given.$tree.tree({ data: exampleData });
@@ -203,7 +203,7 @@ describe("events", () => {
         });
 
         it("fires tree.select", async () => {
-            const onSelect = jest.fn();
+            const onSelect = vi.fn();
             given.$tree.on("tree.select", onSelect);
 
             await userEvent.click(given.titleSpan);
@@ -222,7 +222,7 @@ describe("events", () => {
             });
 
             it("fires tree.select with node is null", async () => {
-                const onSelect = jest.fn();
+                const onSelect = vi.fn();
                 given.$tree.on("tree.select", onSelect);
 
                 await userEvent.click(given.titleSpan);
@@ -253,7 +253,7 @@ describe("events", () => {
         it("fires tree.loading_data when the data is loading from an url", async () => {
             const $tree = $("#tree1");
 
-            const onLoading = jest.fn();
+            const onLoading = vi.fn();
             $tree.on("tree.loading_data", onLoading);
 
             $tree.tree({ dataUrl: "/tree/" });
@@ -293,7 +293,7 @@ describe("events", () => {
 
         it("calls onLoading", async () => {
             const $tree = $("#tree1");
-            const onLoading = jest.fn();
+            const onLoading = vi.fn();
 
             $tree.tree({ dataUrl: "/tree/", onLoading });
 
