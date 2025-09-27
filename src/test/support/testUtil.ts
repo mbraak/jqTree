@@ -36,7 +36,7 @@ export const singleChild = (
 ) => {
     const children = getChilden(el, nodeName, className);
 
-    /* istanbul ignore if */
+    /* istanbul ignore if @preserve */
     if (children.length !== 1) {
         throw new Error(
             `Expected single child, got ${el.children.length} for ${nodeName} ${className}`,
