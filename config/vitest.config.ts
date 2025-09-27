@@ -6,7 +6,7 @@ export default defineConfig({
       exclude: ['src/playwright'],
       include: ['src/**'],
       provider: "istanbul",
-      reporter: ["lcov", "text"],
+      reporter: ["json"],
       reportsDirectory: "jest-coverage"
     },
     environment: "jsdom",
