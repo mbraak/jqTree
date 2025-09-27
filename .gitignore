@@ -9,7 +9,7 @@ docs/static/documentation.css
 docs/static/example.css
 docs/static/vendor/
 docs/tree.jquery.js
-jest-coverage/
+js-coverage/
 lib/
 node_modules/
 test-results/
