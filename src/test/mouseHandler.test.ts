@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { vi } from 'vitest'
 
 import { TriggerEvent } from "../jqtreeMethodTypes";
 import MouseHandler, {
@@ -7,32 +7,33 @@ import MouseHandler, {
     MouseCapture,
     MouseStart,
 } from "../mouseHandler";
+import { PositionInfo } from '../mouseUtils'
 import { Node } from "../node";
 
 interface CreateMouseHandlerParams {
     element: HTMLElement;
-    getMouseDelay?: jest.Mock<GetMouseDelay>;
-    getNode?: jest.Mock<GetNode>;
-    onClickButton?: jest.Mock;
-    onMouseCapture?: jest.Mock<MouseCapture>;
-    onMouseDrag?: jest.Mock;
-    onMouseStart?: jest.Mock<MouseStart>;
-    onMouseStop?: jest.Mock;
-    triggerEvent?: jest.Mock<TriggerEvent>;
+    getMouseDelay?: GetMouseDelay;
+    getNode?: GetNode;
+    onClickButton?: (node: Node) => void;
+    onMouseCapture?: MouseCapture;
+    onMouseDrag?: (positionInfo: PositionInfo) => void;
+    onMouseStart?: MouseStart;
+    onMouseStop?: (positionInfo: PositionInfo) => void;
+    triggerEvent?: TriggerEvent;
 }
 
 const createMouseHandler = ({
     element,
-    getMouseDelay = jest.fn(() => 0),
-    getNode = jest.fn(),
-    onClickButton = jest.fn(),
-    onMouseCapture = jest.fn(),
-    onMouseDrag = jest.fn(),
-    onMouseStart = jest.fn(),
-    onMouseStop = jest.fn(),
-    triggerEvent = jest.fn(),
+    getMouseDelay = vi.fn(() => 0),
+    getNode = vi.fn(),
+    onClickButton = vi.fn(),
+    onMouseCapture = vi.fn(),
+    onMouseDrag = vi.fn(),
+    onMouseStart = vi.fn(),
+    onMouseStop = vi.fn(),
+    triggerEvent = vi.fn(),
 }: CreateMouseHandlerParams) => {
-    const onClickTitle = jest.fn();
+    const onClickTitle = vi.fn();
 
     return new MouseHandler({
         element,
@@ -65,7 +66,7 @@ describe("handleClick", () => {
 
         const node = new Node();
 
-        const getNode = jest.fn((element: HTMLElement) => {
+        const getNode = vi.fn((element: HTMLElement) => {
             if (element === button) {
                 return node;
             } else {
@@ -73,7 +74,7 @@ describe("handleClick", () => {
             }
         });
 
-        const onClickButton = jest.fn();
+        const onClickButton = vi.fn();
 
         createMouseHandler({ element, getNode, onClickButton });
 
@@ -85,11 +86,11 @@ describe("handleClick", () => {
 
     it("handles a click with an empty target", () => {
         const element = document.createElement("div");
-        const onClickButton = jest.fn();
+        const onClickButton = vi.fn();
         createMouseHandler({ element, onClickButton });
 
         const event = new MouseEvent("click");
-        jest.spyOn(event, "target", "get").mockReturnValue(null);
+        vi.spyOn(event, "target", "get").mockReturnValue(null);
 
         element.dispatchEvent(event);
 
@@ -113,7 +114,7 @@ describe("handleContextmenu", () => {
 
         const node = new Node();
 
-        const getNode = jest.fn((element: HTMLElement) => {
+        const getNode = vi.fn((element: HTMLElement) => {
             if (element === nodeElement) {
                 return node;
             } else {
@@ -121,7 +122,7 @@ describe("handleContextmenu", () => {
             }
         });
 
-        const triggerEvent = jest.fn<TriggerEvent>();
+        const triggerEvent = vi.fn<TriggerEvent>();
 
         createMouseHandler({ element: nodeElement, getNode, triggerEvent });
 
@@ -138,8 +139,8 @@ describe("handleContextmenu", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const getNode = jest.fn(() => null);
-        const triggerEvent = jest.fn<TriggerEvent>();
+        const getNode = vi.fn(() => null);
+        const triggerEvent = vi.fn<TriggerEvent>();
 
         createMouseHandler({ element, getNode, triggerEvent });
 
@@ -153,12 +154,12 @@ describe("handleContextmenu", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const triggerEvent = jest.fn<TriggerEvent>();
+        const triggerEvent = vi.fn<TriggerEvent>();
 
         createMouseHandler({ element, triggerEvent });
 
         const event = new MouseEvent("contextmenu", { bubbles: true });
-        jest.spyOn(event, "target", "get").mockReturnValue(null);
+        vi.spyOn(event, "target", "get").mockReturnValue(null);
 
         element.dispatchEvent(event);
 
@@ -182,7 +183,7 @@ describe("handleDblclick", () => {
 
         const node = new Node();
 
-        const getNode = jest.fn((element: HTMLElement) => {
+        const getNode = vi.fn((element: HTMLElement) => {
             if (element === label) {
                 return node;
             } else {
@@ -190,7 +191,7 @@ describe("handleDblclick", () => {
             }
         });
 
-        const triggerEvent = jest.fn<TriggerEvent>();
+        const triggerEvent = vi.fn<TriggerEvent>();
 
         createMouseHandler({ element, getNode, triggerEvent });
 
@@ -207,12 +208,12 @@ describe("handleDblclick", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const triggerEvent = jest.fn<TriggerEvent>();
+        const triggerEvent = vi.fn<TriggerEvent>();
 
         createMouseHandler({ element, triggerEvent });
 
         const event = new MouseEvent("dblclick", { bubbles: true });
-        jest.spyOn(event, "target", "get").mockReturnValue(null);
+        vi.spyOn(event, "target", "get").mockReturnValue(null);
 
         element.dispatchEvent(event);
 
@@ -229,7 +230,7 @@ describe("touchStart", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn<MouseCapture>();
+        const onMouseCapture = vi.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
@@ -256,7 +257,7 @@ describe("touchStart", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn<MouseCapture>();
+        const onMouseCapture = vi.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
@@ -278,7 +279,7 @@ describe("touchStart", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn<MouseCapture>();
+        const onMouseCapture = vi.fn<MouseCapture>();
 
         createMouseHandler({ element, onMouseCapture });
 
@@ -301,9 +302,9 @@ describe("touchEnd", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn(() => true);
-        const onMouseStart = jest.fn(() => true);
-        const onMouseStop = jest.fn();
+        const onMouseCapture = vi.fn(() => true);
+        const onMouseStart = vi.fn(() => true);
+        const onMouseStop = vi.fn();
 
         createMouseHandler({
             element,
@@ -346,9 +347,9 @@ describe("touchEnd", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn(() => true);
-        const onMouseStart = jest.fn(() => true);
-        const onMouseStop = jest.fn();
+        const onMouseCapture = vi.fn(() => true);
+        const onMouseStart = vi.fn(() => true);
+        const onMouseStop = vi.fn();
 
         createMouseHandler({
             element,
@@ -393,8 +394,8 @@ describe("touchMove", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn(() => true);
-        const onMouseDrag = jest.fn();
+        const onMouseCapture = vi.fn(() => true);
+        const onMouseDrag = vi.fn();
 
         createMouseHandler({
             element,
@@ -426,8 +427,8 @@ describe("touchMove", () => {
         const element = document.createElement("div");
         document.body.append(element);
 
-        const onMouseCapture = jest.fn(() => true);
-        const onMouseDrag = jest.fn();
+        const onMouseCapture = vi.fn(() => true);
+        const onMouseDrag = vi.fn();
 
         createMouseHandler({
             element,
@@ -462,11 +463,11 @@ describe("mouseMove", () => {
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("calls onMouseStart when the delay is met and there is a mouse move", () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
 
         const treeElement = document.createElement("ul");
         treeElement.classList.add("jqtree-tree");
@@ -478,7 +479,7 @@ describe("mouseMove", () => {
 
         const node = new Node();
 
-        const getNode = jest.fn((element: HTMLElement) => {
+        const getNode = vi.fn((element: HTMLElement) => {
             if (element === nodeElement) {
                 return node;
             } else {
@@ -486,9 +487,9 @@ describe("mouseMove", () => {
             }
         });
 
-        const getMouseDelay = jest.fn(() => 1_000);
-        const onMouseCapture = jest.fn(() => true);
-        const onMouseStart = jest.fn(() => true);
+        const getMouseDelay = vi.fn(() => 1_000);
+        const onMouseCapture = vi.fn(() => true);
+        const onMouseStart = vi.fn(() => true);
 
         createMouseHandler({
             element: nodeElement,
@@ -508,7 +509,7 @@ describe("mouseMove", () => {
 
         expect(onMouseStart).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(1_500);
+        vi.advanceTimersByTime(1_500);
 
         nodeElement.dispatchEvent(
             new MouseEvent("mousemove", { bubbles: true }),
@@ -522,7 +523,7 @@ describe("mouseMove", () => {
     });
 
     it("calls onMouseStart when mousedown is triggered twice", () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
 
         const treeElement = document.createElement("ul");
         treeElement.classList.add("jqtree-tree");
@@ -534,7 +535,7 @@ describe("mouseMove", () => {
 
         const node = new Node();
 
-        const getNode = jest.fn((element: HTMLElement) => {
+        const getNode = vi.fn((element: HTMLElement) => {
             if (element === nodeElement) {
                 return node;
             } else {
@@ -542,9 +543,9 @@ describe("mouseMove", () => {
             }
         });
 
-        const getMouseDelay = jest.fn(() => 1_000);
-        const onMouseCapture = jest.fn(() => true);
-        const onMouseStart = jest.fn(() => true);
+        const getMouseDelay = vi.fn(() => 1_000);
+        const onMouseCapture = vi.fn(() => true);
+        const onMouseStart = vi.fn(() => true);
 
         createMouseHandler({
             element: nodeElement,
@@ -558,11 +559,11 @@ describe("mouseMove", () => {
             new MouseEvent("mousedown", { bubbles: true }),
         );
 
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
 
         nodeElement.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
 
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
 
         expect(onMouseStart).not.toHaveBeenCalled();
 
@@ -570,7 +571,7 @@ describe("mouseMove", () => {
             new MouseEvent("mousedown", { bubbles: true }),
         );
 
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
 
         nodeElement.dispatchEvent(
             new MouseEvent("mousemove", { bubbles: true }),
@@ -578,7 +579,7 @@ describe("mouseMove", () => {
 
         expect(onMouseStart).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(600);
+        vi.advanceTimersByTime(600);
 
         nodeElement.dispatchEvent(
             new MouseEvent("mousemove", { bubbles: true }),

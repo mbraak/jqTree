@@ -1,9 +1,9 @@
-import { jest } from "@jest/globals";
 import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import { vi } from 'vitest'
 
 import "../../tree.jquery";
 import __version__ from "../../version";
@@ -1089,7 +1089,7 @@ describe("methods", () => {
         });
 
         it("calls the function with onFinished parameter", async () => {
-            const onFinished = jest.fn();
+            const onFinished = vi.fn();
 
             given.$tree.tree("openNode", given.node1, onFinished);
 
@@ -1236,7 +1236,7 @@ describe("methods", () => {
 
         context("with a onFinished parameter", () => {
             it("calls onFinished", async () => {
-                const handleFinished = jest.fn();
+                const handleFinished = vi.fn();
 
                 given.$tree.tree("reload", handleFinished);
 

@@ -1,0 +1,18 @@
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    coverage: {
+      provider: "istanbul",
+      reporter: ["lcov", "text"],
+    },
+    environment: "jsdom",
+    globals: true,
+    include: ['src/test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    setupFiles: [
+      "./src/test/support/setupTests.ts",
+      "givens/setup.js",
+      "jest-extended/all",
+    ],
+  },
+});
