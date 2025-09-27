@@ -1,20 +1,20 @@
-import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
+import { vi } from 'vitest'
 
 import ContainerScrollParent from "../../scrollHandler/containerScrollParent";
 
 describe("checkHorizontalScrolling", () => {
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("scrolls to the left when pageX is near the left edge", () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
 
-        const refreshHitAreas = jest.fn();
+        const refreshHitAreas = vi.fn();
         const container = document.createElement("div");
 
-        const scrollBy = jest.fn();
+        const scrollBy = vi.fn();
         container.scrollBy = scrollBy;
 
         mockElementBoundingClientRect(container, {
@@ -33,7 +33,7 @@ describe("checkHorizontalScrolling", () => {
 
         expect(scrollBy).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
 
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
@@ -43,12 +43,12 @@ describe("checkHorizontalScrolling", () => {
     });
 
     it("stops scrolling when pageX is moved from the left edge", () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
 
-        const refreshHitAreas = jest.fn();
+        const refreshHitAreas = vi.fn();
         const container = document.createElement("div");
 
-        const scrollBy = jest.fn();
+        const scrollBy = vi.fn();
         container.scrollBy = scrollBy;
 
         mockElementBoundingClientRect(container, {
@@ -67,7 +67,7 @@ describe("checkHorizontalScrolling", () => {
 
         expect(scrollBy).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
 
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
@@ -76,7 +76,7 @@ describe("checkHorizontalScrolling", () => {
         });
 
         containerScrollParent.checkHorizontalScrolling(50);
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
 
         expect(scrollBy).toHaveBeenCalledTimes(1);
     });
@@ -84,12 +84,12 @@ describe("checkHorizontalScrolling", () => {
 
 describe("checkVerticalScrolling", () => {
     it("scrolls to the top when pageY is near the top edge", () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
 
-        const refreshHitAreas = jest.fn();
+        const refreshHitAreas = vi.fn();
         const container = document.createElement("div");
 
-        const scrollBy = jest.fn();
+        const scrollBy = vi.fn();
         container.scrollBy = scrollBy;
 
         mockElementBoundingClientRect(container, {
@@ -108,7 +108,7 @@ describe("checkVerticalScrolling", () => {
 
         expect(scrollBy).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
 
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
@@ -118,12 +118,12 @@ describe("checkVerticalScrolling", () => {
     });
 
     it("stops scrolling when pageX is moved from the left edge", () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
 
-        const refreshHitAreas = jest.fn();
+        const refreshHitAreas = vi.fn();
         const container = document.createElement("div");
 
-        const scrollBy = jest.fn();
+        const scrollBy = vi.fn();
         container.scrollBy = scrollBy;
 
         mockElementBoundingClientRect(container, {
@@ -142,7 +142,7 @@ describe("checkVerticalScrolling", () => {
 
         expect(scrollBy).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
 
         expect(scrollBy).toHaveBeenCalledWith({
             behavior: "instant",
@@ -151,7 +151,7 @@ describe("checkVerticalScrolling", () => {
         });
 
         containerScrollParent.checkVerticalScrolling(50);
-        jest.advanceTimersByTime(50);
+        vi.advanceTimersByTime(50);
 
         expect(scrollBy).toHaveBeenCalledTimes(1);
     });

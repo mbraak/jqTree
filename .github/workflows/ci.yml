@@ -15,27 +15,27 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v4
               with:
-                node-version: "20"
+                  node-version: "20"
             - name: Install pnpm
               run: npm install -g pnpm
             - name: Get pnpm store directory
               id: pnpm-cache
               run: |
-                echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+                  echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
             - uses: actions/cache@v4
               name: Setup pnpm cache
               with:
-                path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-                key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-                restore-keys: |
-                  ${{ runner.os }}-pnpm-store-
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pnpm-store-
             - uses: actions/cache@v4
               name: Setup Playwright browsers cache
               with:
-                path: /home/runner/.cache/ms-playwright/
-                key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-                restore-keys: |
-                  ${{ runner.os }}-playwright-
+                  path: /home/runner/.cache/ms-playwright/
+                  key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-playwright-
             - name: Install packages
               run: |
                   pnpm install
@@ -49,9 +49,9 @@ jobs:
               run: |
                   pnpm run tsc
             - name: Clean coverage
-              run: rm -rf .nyc_output && npx jest --clearCache
-            - name: Run jest tests
-              run: pnpm run jest
+              run: rm -rf .nyc_output && rm -rf node_modules/.vite
+            - name: Run vitest tests
+              run: pnpm run vitest
             - name: Playwright install
               run: npx playwright install chromium
             - name: Copy vendor files
@@ -63,13 +63,13 @@ jobs:
               if: always()
               uses: actions/upload-artifact@v4
               with:
-                if-no-files-found: ignore
-                name: screenshots
-                path: test-results/
+                  if-no-files-found: ignore
+                  name: screenshots
+                  path: test-results/
             - name: Merge coverage
-              run: cp jest-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
+              run: cp js-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
             - name: Codecov
               uses: codecov/codecov-action@v5
               with:
-                directory: .nyc_output
-                verbose: true
+                  directory: .nyc_output
+                  verbose: true

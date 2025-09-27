@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { vi } from 'vitest'
 
 import {
     AddToSelection,
@@ -14,14 +14,14 @@ import { Node } from "../node";
 import SaveStateHandler from "../saveStateHandler";
 
 const createSaveStateHandler = ({
-    addToSelection = jest.fn<AddToSelection>(),
-    getNodeById = jest.fn<GetNodeById>(),
-    getSelectedNodes = jest.fn<GetSelectedNodes>(),
-    openNode = jest.fn<OpenNode>(),
-    refreshElements = jest.fn<RefreshElements>(),
-    removeFromSelection = jest.fn<RemoveFromSelection>(),
+    addToSelection = vi.fn<AddToSelection>(),
+    getNodeById = vi.fn<GetNodeById>(),
+    getSelectedNodes = vi.fn<GetSelectedNodes>(),
+    openNode = vi.fn<OpenNode>(),
+    refreshElements = vi.fn<RefreshElements>(),
+    removeFromSelection = vi.fn<RemoveFromSelection>(),
 }) => {
-    const getTree = jest.fn<GetTree>();
+    const getTree = vi.fn<GetTree>();
 
     return new SaveStateHandler({
         addToSelection,
@@ -63,8 +63,8 @@ describe("setInitialState", () => {
     it("deselects nodes that are currently selected", () => {
         const node = new Node({ id: 123 });
 
-        const getSelectedNodes = jest.fn(() => [node]);
-        const removeFromSelection = jest.fn();
+        const getSelectedNodes = vi.fn(() => [node]);
+        const removeFromSelection = vi.fn();
 
         const saveStateHandler = createSaveStateHandler({
             getSelectedNodes,
@@ -78,24 +78,24 @@ describe("setInitialState", () => {
 
 describe("setInitialStateOnDemand", () => {
     it("doesn't open a node when open_nodes in the state is empty", () => {
-        const openNode = jest.fn();
+        const openNode = vi.fn();
 
         const saveStateHandler = createSaveStateHandler({ openNode });
-        saveStateHandler.setInitialStateOnDemand({}, jest.fn());
+        saveStateHandler.setInitialStateOnDemand({}, vi.fn());
 
         expect(openNode).not.toHaveBeenCalled();
     });
 
     it("opens a node when the node id is in open_nodes in the state", () => {
         const node = new Node({ id: 123 });
-        const getNodeById = jest.fn((nodeId) => {
+        const getNodeById = vi.fn((nodeId) => {
             if (nodeId === 123) {
                 return node;
             } else {
                 return null;
             }
         });
-        const openNode = jest.fn();
+        const openNode = vi.fn();
 
         const saveStateHandler = createSaveStateHandler({
             getNodeById,
@@ -103,7 +103,7 @@ describe("setInitialStateOnDemand", () => {
         });
         saveStateHandler.setInitialStateOnDemand(
             { open_nodes: [123] },
-            jest.fn(),
+            vi.fn(),
         );
 
         expect(openNode).toHaveBeenCalledWith(node, false);
@@ -111,15 +111,15 @@ describe("setInitialStateOnDemand", () => {
 
     it("selects a node and redraws the tree when the node id is in selected_node in the state", () => {
         const node = new Node({ id: 123 });
-        const getNodeById = jest.fn((nodeId) => {
+        const getNodeById = vi.fn((nodeId) => {
             if (nodeId === 123) {
                 return node;
             } else {
                 return null;
             }
         });
-        const addToSelection = jest.fn();
-        const refreshElements = jest.fn();
+        const addToSelection = vi.fn();
+        const refreshElements = vi.fn();
 
         const saveStateHandler = createSaveStateHandler({
             addToSelection,
@@ -129,7 +129,7 @@ describe("setInitialStateOnDemand", () => {
 
         saveStateHandler.setInitialStateOnDemand(
             { open_nodes: [123], selected_node: [123] },
-            jest.fn(),
+            vi.fn(),
         );
 
         expect(addToSelection).toHaveBeenCalledWith(node);
@@ -141,7 +141,7 @@ describe("setInitialStateOnDemand", () => {
         const node2 = new Node({ id: 2 });
         let calledGetNodeByIdForNode2 = false;
 
-        const getNodeById = jest.fn((nodeId) => {
+        const getNodeById = vi.fn((nodeId) => {
             switch (nodeId) {
                 case 1:
                     return node1;
@@ -159,7 +159,7 @@ describe("setInitialStateOnDemand", () => {
             }
         });
 
-        const openNode = jest.fn<OpenNode>(
+        const openNode = vi.fn<OpenNode>(
             (node: Node, _slide?: boolean, onFinished?: OnFinishOpenNode) => {
                 node.load_on_demand = false;
 
@@ -176,7 +176,7 @@ describe("setInitialStateOnDemand", () => {
 
         saveStateHandler.setInitialStateOnDemand(
             { open_nodes: [1, 2] },
-            jest.fn(),
+            vi.fn(),
         );
 
         expect(openNode).toHaveBeenNthCalledWith(
