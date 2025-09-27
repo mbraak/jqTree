@@ -1,7 +1,7 @@
-import { jest } from "@jest/globals";
 import { waitFor } from "@testing-library/dom";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import { vi } from 'vitest'
 
 import DataLoader from "../dataLoader";
 import { TriggerEvent } from "../jqtreeMethodTypes";
@@ -24,7 +24,7 @@ describe("loadFromUrl", () => {
     it("does nothing when urlInfo is empty", () => {
         const loadData = () => null;
         const treeElement = document.createElement("div");
-        const triggerEvent = jest.fn<TriggerEvent>();
+        const triggerEvent = vi.fn<TriggerEvent>();
 
         const dataLoader = new DataLoader({
             loadData,
@@ -51,9 +51,9 @@ describe("loadFromUrl", () => {
             ),
         );
 
-        const loadData = jest.fn();
+        const loadData = vi.fn();
         const treeElement = document.createElement("div");
-        const triggerEvent = jest.fn<TriggerEvent>();
+        const triggerEvent = vi.fn<TriggerEvent>();
 
         const dataLoader = new DataLoader({
             loadData,

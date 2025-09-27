@@ -1,5 +1,5 @@
-import { jest } from "@jest/globals";
 import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
+import { vi } from 'vitest'
 
 import { Node } from "../../node";
 
@@ -36,7 +36,7 @@ export const singleChild = (
 ) => {
     const children = getChilden(el, nodeName, className);
 
-    /* istanbul ignore if */
+    /* istanbul ignore if @preserve */
     if (children.length !== 1) {
         throw new Error(
             `Expected single child, got ${el.children.length} for ${nodeName} ${className}`,
@@ -56,9 +56,9 @@ const nodeElement = (liNode: HTMLElement): HTMLElement =>
     singleChild(liNode, "div", "jqtree-element");
 
 const mockLayout = (element: HTMLElement, rect: Rect) => {
-    jest.spyOn(element, "clientHeight", "get").mockReturnValue(rect.height);
-    jest.spyOn(element, "clientWidth", "get").mockReturnValue(rect.width);
-    jest.spyOn(element, "offsetParent", "get").mockReturnValue(
+    vi.spyOn(element, "clientHeight", "get").mockReturnValue(rect.height);
+    vi.spyOn(element, "clientWidth", "get").mockReturnValue(rect.width);
+    vi.spyOn(element, "offsetParent", "get").mockReturnValue(
         element.parentElement,
     );
 

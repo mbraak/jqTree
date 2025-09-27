@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { vi } from 'vitest'
 
 import { DragAndDropHandler } from "../../dragAndDropHandler";
 import { GetScrollLeft, GetTree, OpenNode } from "../../jqtreeMethodTypes";
@@ -35,12 +35,12 @@ const createDragAndDropHandler = ({
     openNode,
     tree,
 }: CreateDragAndDropHandlerParams) => {
-    const getScrollLeft = jest.fn<GetScrollLeft>();
-    const refreshElements = jest.fn();
+    const getScrollLeft = vi.fn<GetScrollLeft>();
+    const refreshElements = vi.fn();
 
     const treeElement = generateHtmlElementsForTree(tree);
 
-    const triggerEvent = jest.fn(
+    const triggerEvent = vi.fn(
         (eventName: string, values?: Record<string, unknown>) => {
             const event = jQuery.Event(eventName, values);
             jQuery(treeElement).trigger(event);
@@ -48,7 +48,7 @@ const createDragAndDropHandler = ({
         },
     );
 
-    const getNodeElementForNode = jest.fn(
+    const getNodeElementForNode = vi.fn(
         (node: Node) =>
             new NodeElement({
                 getScrollLeft,
@@ -57,7 +57,7 @@ const createDragAndDropHandler = ({
             }),
     );
 
-    const getNodeElement = jest.fn((element: HTMLElement) => {
+    const getNodeElement = vi.fn((element: HTMLElement) => {
         let resultNode: Node | null = null;
 
         tree.iterate((node) => {
@@ -88,14 +88,14 @@ const createDragAndDropHandler = ({
         getNodeElement,
         getNodeElementForNode,
         getScrollLeft,
-        getTree: getTree ?? jest.fn(() => tree),
+        getTree: getTree ?? vi.fn(() => tree),
         onCanMove,
         onCanMoveTo,
         onDragMove,
         onDragStop,
         onIsMoveHandle,
         openFolderDelay: openFolderDelay ?? false,
-        openNode: openNode ?? jest.fn(),
+        openNode: openNode ?? vi.fn(),
         refreshElements,
         slide: false,
         treeElement: treeElement,
@@ -111,7 +111,7 @@ describe("DragAndDropHandler", () => {
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     describe(".mouseCapture", () => {
@@ -212,7 +212,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const onIsMoveHandle = jest.fn(
+            const onIsMoveHandle = vi.fn(
                 (jQueryElement: JQuery) =>
                     jQueryElement.get(0) === node1.element,
             );
@@ -241,7 +241,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const onIsMoveHandle = jest.fn(() => false);
+            const onIsMoveHandle = vi.fn(() => false);
             const { dragAndDropHandler } = createDragAndDropHandler({
                 onIsMoveHandle,
                 tree,
@@ -267,7 +267,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const onCanMove = jest.fn(() => false);
+            const onCanMove = vi.fn(() => false);
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 onCanMove,
@@ -297,7 +297,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const onCanMove = jest.fn(() => true);
+            const onCanMove = vi.fn(() => true);
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 onCanMove,
@@ -487,7 +487,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const mockMoveNode = jest.spyOn(tree, "moveNode");
+            const mockMoveNode = vi.spyOn(tree, "moveNode");
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 tree,
@@ -534,7 +534,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const onDragStop = jest.fn();
+            const onDragStop = vi.fn();
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 onDragStop,
@@ -758,7 +758,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const onDragMove = jest.fn();
+            const onDragMove = vi.fn();
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 onDragMove,
@@ -803,7 +803,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const onCanMoveTo = jest.fn(() => false);
+            const onCanMoveTo = vi.fn(() => false);
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 onCanMoveTo,
@@ -841,7 +841,7 @@ describe("DragAndDropHandler", () => {
         });
 
         it("opens a closed folder when it is hovered for a certain time", () => {
-            jest.useFakeTimers();
+            vi.useFakeTimers();
 
             const tree = new Node(null, true);
             const node1 = new Node({ name: "node1" });
@@ -850,7 +850,7 @@ describe("DragAndDropHandler", () => {
             tree.addChild(node2);
             node2.addChild(new Node({ name: "child" }));
 
-            const openNode = jest.fn();
+            const openNode = vi.fn();
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 openFolderDelay: 100,
@@ -880,11 +880,11 @@ describe("DragAndDropHandler", () => {
                 target: node2.element as HTMLElement,
             });
 
-            jest.advanceTimersByTime(10);
+            vi.advanceTimersByTime(10);
 
             expect(openNode).not.toHaveBeenCalled();
 
-            jest.advanceTimersByTime(100);
+            vi.advanceTimersByTime(100);
 
             expect(openNode).toHaveBeenCalledWith(
                 node2,
@@ -894,7 +894,7 @@ describe("DragAndDropHandler", () => {
         });
 
         it("doesn't open a closed folder when it is hovered over but not long enough", () => {
-            jest.useFakeTimers();
+            vi.useFakeTimers();
 
             const tree = new Node(null, true);
             const node1 = new Node({ name: "node1" });
@@ -903,7 +903,7 @@ describe("DragAndDropHandler", () => {
             tree.addChild(node2);
             node2.addChild(new Node({ name: "child" }));
 
-            const openNode = jest.fn();
+            const openNode = vi.fn();
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 openFolderDelay: 100,
@@ -933,7 +933,7 @@ describe("DragAndDropHandler", () => {
                 target: node2.element as HTMLElement,
             });
 
-            jest.advanceTimersByTime(10);
+            vi.advanceTimersByTime(10);
 
             // Move mouse outside of the tree
             dragAndDropHandler.mouseDrag({
@@ -943,7 +943,7 @@ describe("DragAndDropHandler", () => {
                 target: document.body,
             });
 
-            jest.advanceTimersByTime(100);
+            vi.advanceTimersByTime(100);
 
             expect(openNode).not.toHaveBeenCalled();
         });
@@ -997,7 +997,7 @@ describe("DragAndDropHandler", () => {
             const node2 = new Node({ name: "node2" });
             tree.addChild(node2);
 
-            const getTree = jest.fn(() => null);
+            const getTree = vi.fn(() => null);
 
             const { dragAndDropHandler } = createDragAndDropHandler({
                 getTree,

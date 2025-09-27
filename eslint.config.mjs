@@ -1,11 +1,11 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import";
-import jestPlugin from "eslint-plugin-jest";
 import jestDomPlugin from "eslint-plugin-jest-dom";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
 import playwrightPlugin from "eslint-plugin-playwright";
 import testingLibraryPlugin from "eslint-plugin-testing-library";
+import vitestPlugin from "@vitest/eslint-plugin";
 
 export default [
     eslint.configs.recommended,
@@ -52,23 +52,21 @@ export default [
     },
     {
         files: ["src/test/**/*.ts"],
-        ...jestPlugin.configs["flat/all"],
+        ...vitestPlugin.configs.all,
     },
     {
         files: ["src/test/**/*.ts"],
         rules: {
-            "jest/no-conditional-in-test": "off",
-            "jest/no-duplicate-hooks": "off",
-            "jest/no-hooks": "off",
-            "jest/no-identical-title": "off",
-            "jest/prefer-ending-with-an-expect": "off",
-            "jest/prefer-expect-assertions": "off",
-            "jest/prefer-importing-jest-globals": [
-                "error",
-                { types: ["jest"] },
-            ],
-            "jest/prefer-lowercase-title": "off",
-            "jest/require-hook": "off",
+            "vitest/no-duplicate-hooks": "off",
+            "vitest/no-hooks": "off",
+            "vitest/no-identical-title": "off",
+            "vitest/prefer-describe-function-title": "off",
+            "vitest/prefer-expect-assertions": "off",
+            "vitest/prefer-importing-vitest-globals": "off",
+            "vitest/prefer-lowercase-title": "off",
+            "vitest/prefer-strict-boolean-matchers": "off",
+            "vitest/require-hook": "off",
+            "vitest/require-mock-type-parameters": "off",
         },
     },
     {
