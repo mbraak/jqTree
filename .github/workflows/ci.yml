@@ -50,8 +50,8 @@ jobs:
                   pnpm run tsc
             - name: Clean coverage
               run: rm -rf .nyc_output && rm -rf node_modules/.vite
-            - name: Run jest tests
-              run: pnpm run jest
+            - name: Run vitest tests
+              run: pnpm run vitest
             - name: Playwright install
               run: npx playwright install chromium
             - name: Copy vendor files
