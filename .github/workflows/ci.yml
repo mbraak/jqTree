@@ -11,11 +11,11 @@ jobs:
 
         steps:
             - name: Check out repository code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Setup node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v5
               with:
-                  node-version: "20"
+                  node-version: "22"
             - name: Install pnpm
               run: npm install -g pnpm
             - name: Get pnpm store directory

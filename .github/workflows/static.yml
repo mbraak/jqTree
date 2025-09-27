@@ -24,15 +24,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Setup ruby
               uses: ruby/setup-ruby@v1
               with:
                   ruby-version: "3.4.5"
             - name: Setup node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v5
               with:
-                  node-version: 20
+                  node-version: 22
             - name: Install pnpm
               run: npm install -g pnpm
             - name: Install ruby packages
@@ -50,7 +50,7 @@ jobs:
             - name: Setup Pages
               uses: actions/configure-pages@v5
             - name: Upload artifact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-pages-artifact@v4
               with:
                   path: "./docs/_site"
             - name: Deploy to GitHub Pages
