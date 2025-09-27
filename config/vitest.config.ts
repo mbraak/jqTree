@@ -7,6 +7,7 @@ export default defineConfig({
       include: ['src/**'],
       provider: "istanbul",
       reporter: ["lcov", "text"],
+      reportsDirectory: "jest-coverage"
     },
     environment: "jsdom",
     globals: true,
