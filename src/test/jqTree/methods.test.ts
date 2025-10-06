@@ -1094,7 +1094,7 @@ describe("methods", () => {
             given.$tree.tree("openNode", given.node1, onFinished);
 
             await waitFor(() => {
-                expect(onFinished).toHaveBeenCalledWith(given.node1);
+                expect(onFinished).toHaveBeenCalledExactlyOnceWith(given.node1);
             });
         });
 
@@ -1241,7 +1241,7 @@ describe("methods", () => {
                 given.$tree.tree("reload", handleFinished);
 
                 await waitFor(() => {
-                    expect(handleFinished).toHaveBeenCalledWith();
+                    expect(handleFinished).toHaveBeenCalledExactlyOnceWith();
                 });
 
                 expect(given.$tree).toHaveTreeStructure([

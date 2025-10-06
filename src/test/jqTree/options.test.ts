@@ -304,7 +304,7 @@ describe("options", () => {
             await screen.findByText("node2");
 
             expect(screen.queryByText("node1")).not.toBeInTheDocument();
-            expect(dataFilter).toHaveBeenCalledWith(exampleData);
+            expect(dataFilter).toHaveBeenCalledExactlyOnceWith(exampleData);
         });
     });
 
@@ -552,7 +552,7 @@ describe("options", () => {
                 });
 
                 await waitFor(() => {
-                    expect(onLoadFailed).toHaveBeenCalledWith(
+                    expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith(
                         expect.objectContaining({ status: 500 }),
                     );
                 });
