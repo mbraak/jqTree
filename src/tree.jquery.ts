@@ -1001,11 +1001,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private isFocusOnTree(): boolean {
         const activeElement = document.activeElement;
 
-        return Boolean(
-            activeElement &&
-                activeElement.tagName === "SPAN" &&
-                this.containsElement(activeElement as HTMLElement),
-        );
+        return activeElement?.tagName === "SPAN" && this.containsElement(activeElement as HTMLElement);
     }
 
     private isSelectedNodeInSubtree(subtree: Node): boolean {
