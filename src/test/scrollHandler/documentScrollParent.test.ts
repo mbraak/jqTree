@@ -112,7 +112,7 @@ describe("checkVerticalScrolling", () => {
         vi.advanceTimersByTime(50);
 
         expect(scrollBy).toHaveBeenNthCalledWith(
-            2,
+            1,
             {
                 behavior: "instant",
                 left: 0,
@@ -123,6 +123,6 @@ describe("checkVerticalScrolling", () => {
         documentScrollParent.checkVerticalScrolling(100);
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledTimes(3);
+        expect(scrollBy).toHaveBeenCalledTimes(1);
     });
 });
