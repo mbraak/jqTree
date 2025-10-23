@@ -46,7 +46,7 @@ describe("events", () => {
 
             await userEvent.click(given.titleSpan);
 
-            expect(onClick).toHaveBeenCalledWith(
+            expect(onClick).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({ node: given.node1 }),
             );
         });
@@ -79,7 +79,7 @@ describe("events", () => {
                 target: given.titleSpan,
             });
 
-            expect(onContextMenu).toHaveBeenCalledWith(
+            expect(onContextMenu).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({ node: given.node1 }),
             );
         });
@@ -109,7 +109,7 @@ describe("events", () => {
 
             await userEvent.dblClick(given.titleSpan);
 
-            expect(onDoubleClick).toHaveBeenCalledWith(
+            expect(onDoubleClick).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({ node: given.node1 }),
             );
         });
@@ -131,7 +131,7 @@ describe("events", () => {
                     data: exampleData,
                 });
 
-                expect(onInit).toHaveBeenCalledWith(expect.anything());
+                expect(onInit).toHaveBeenCalledExactlyOnceWith(expect.anything());
             });
         });
 
@@ -155,7 +155,7 @@ describe("events", () => {
                 given.$tree.tree({ dataUrl: "/tree/" });
 
                 await waitFor(() => {
-                    expect(onInit).toHaveBeenCalledWith(expect.anything());
+                    expect(onInit).toHaveBeenCalledExactlyOnceWith(expect.anything());
                 });
             });
         });
@@ -175,7 +175,7 @@ describe("events", () => {
 
                 given.$tree.tree({ data: exampleData });
 
-                expect(onLoadData).toHaveBeenCalledWith(
+                expect(onLoadData).toHaveBeenCalledExactlyOnceWith(
                     expect.objectContaining({ tree_data: exampleData }),
                 );
             });
@@ -208,7 +208,7 @@ describe("events", () => {
 
             await userEvent.click(given.titleSpan);
 
-            expect(onSelect).toHaveBeenCalledWith(
+            expect(onSelect).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({
                     deselected_node: null,
                     node: given.node1,
@@ -227,7 +227,7 @@ describe("events", () => {
 
                 await userEvent.click(given.titleSpan);
 
-                expect(onSelect).toHaveBeenCalledWith(
+                expect(onSelect).toHaveBeenCalledExactlyOnceWith(
                     expect.objectContaining({
                         node: null,
                         previous_node: given.node1,
@@ -259,7 +259,7 @@ describe("events", () => {
             $tree.tree({ dataUrl: "/tree/" });
 
             await waitFor(() => {
-                expect(onLoading).toHaveBeenCalledWith(
+                expect(onLoading).toHaveBeenCalledExactlyOnceWith(
                     expect.objectContaining({
                         isLoading: true,
                         node: null,
@@ -298,11 +298,7 @@ describe("events", () => {
             $tree.tree({ dataUrl: "/tree/", onLoading });
 
             await waitFor(() => {
-                expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
-            });
-
-            await waitFor(() => {
-                expect(onLoading).toHaveBeenCalledWith(false, null, $tree);
+                expect(onLoading).toHaveBeenNthCalledWith(2, false, null, $tree);
             });
         });
     });

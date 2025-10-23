@@ -3334,7 +3334,7 @@ var jqtree = (function (exports) {
       }
       isFocusOnTree() {
         const activeElement = document.activeElement;
-        return Boolean(activeElement && activeElement.tagName === "SPAN" && this.containsElement(activeElement));
+        return activeElement?.tagName === "SPAN" && this.containsElement(activeElement);
       }
       isSelectedNodeInSubtree(subtree) {
         const selectedNode = this.getSelectedNode();

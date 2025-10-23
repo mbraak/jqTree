@@ -26,7 +26,7 @@ describe("checkHorizontalScrolling", () => {
 
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledWith({
+        expect(scrollBy).toHaveBeenCalledExactlyOnceWith({
             behavior: "instant",
             left: -20,
             top: 0,
@@ -52,7 +52,7 @@ describe("checkHorizontalScrolling", () => {
 
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledWith({
+        expect(scrollBy).toHaveBeenCalledExactlyOnceWith({
             behavior: "instant",
             left: -20,
             top: 0,
@@ -85,7 +85,7 @@ describe("checkVerticalScrolling", () => {
 
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledWith({
+        expect(scrollBy).toHaveBeenCalledExactlyOnceWith({
             behavior: "instant",
             left: 0,
             top: -20,
@@ -111,15 +111,18 @@ describe("checkVerticalScrolling", () => {
 
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledWith({
-            behavior: "instant",
-            left: 0,
-            top: -20,
-        });
+        expect(scrollBy).toHaveBeenNthCalledWith(
+            1,
+            {
+                behavior: "instant",
+                left: 0,
+                top: -20,
+            }
+        );
 
         documentScrollParent.checkVerticalScrolling(100);
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledTimes(3);
+        expect(scrollBy).toHaveBeenCalledTimes(1);
     });
 });

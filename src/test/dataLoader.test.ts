@@ -63,7 +63,7 @@ describe("loadFromUrl", () => {
         dataLoader.loadFromUrl({ dataType: "text", url: "/test" }, null, null);
 
         await waitFor(() => {
-            expect(loadData).toHaveBeenCalledWith({ key1: "value1" }, null);
+            expect(loadData).toHaveBeenCalledExactlyOnceWith({ key1: "value1" }, null);
         });
     });
 });
