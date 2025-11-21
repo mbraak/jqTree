@@ -26,7 +26,8 @@
         "prettier": "prettier src/*.ts --write --tab-width 4",
         "tsc": "tsc --noEmit --project tsconfig.json",
         "playwright": "pnpm build-with-coverage && playwright test --config config/playwright.config.js",
-        "test": "pnpm vitest && pnpm playwright"
+        "test": "pnpm vitest && pnpm playwright",
+        "spelling": "cspell -c ./config/cspell.json \"src/**/*.ts\""
     },
     "peerDependencies": {
         "jquery": "^3"
@@ -52,6 +53,7 @@
         "@vitest/eslint-plugin": "^1.4.3",
         "autoprefixer": "^10.4.22",
         "babel-plugin-istanbul": "^7.0.1",
+        "cspell": "^9.3.2",
         "eslint": "^9.39.1",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-jest-dom": "^5.5.0",
