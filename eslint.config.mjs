@@ -1,3 +1,4 @@
+import cspellESLintPluginRecommended from "@cspell/eslint-plugin/recommended";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import";
@@ -14,6 +15,7 @@ export default [
     importPlugin.flatConfigs.recommended,
     importPlugin.flatConfigs.typescript,
     perfectionistPlugin.configs["recommended-natural"],
+    cspellESLintPluginRecommended,
     {
         languageOptions: {
             parserOptions: {
@@ -48,6 +50,12 @@ export default [
                 },
             ],
             "@typescript-eslint/unified-signatures": "off",
+            "@cspell/spellchecker": [
+                "error",
+                {
+                    configFile: "./config/cspell.json",
+                },
+            ],
         },
     },
     {

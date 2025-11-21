@@ -10,7 +10,7 @@ interface Rect {
     y: number;
 }
 
-export const getChilden = (
+export const getChildren = (
     el: HTMLElement,
     nodeName: string,
     className: string,
@@ -34,7 +34,7 @@ export const singleChild = (
     nodeName: string,
     className: string,
 ) => {
-    const children = getChilden(el, nodeName, className);
+    const children = getChildren(el, nodeName, className);
 
     /* istanbul ignore if @preserve */
     if (children.length !== 1) {
