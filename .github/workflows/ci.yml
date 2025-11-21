@@ -11,9 +11,9 @@ jobs:
 
         steps:
             - name: Check out repository code
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Setup node
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@v6
               with:
                   node-version: "22"
             - name: Install pnpm
@@ -61,7 +61,7 @@ jobs:
               run: pnpm run playwright
             - name: Screenshots artifact
               if: always()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               with:
                   if-no-files-found: ignore
                   name: screenshots
