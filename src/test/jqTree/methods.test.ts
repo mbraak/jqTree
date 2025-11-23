@@ -739,7 +739,7 @@ describe("methods", () => {
             given.$tree.tree({ data: exampleData });
         });
 
-        it("returns truewhen the node is selected", () => {
+        it("returns true when the node is selected", () => {
             given.$tree.tree("selectNode", given.node1);
 
             expect(given.$tree.tree("isNodeSelected", given.node1)).toBeTrue();

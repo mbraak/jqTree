@@ -137,7 +137,7 @@ describe("DragAndDropHandler", () => {
             expect(dragAndDropHandler.currentItem?.node).toBe(node1);
         });
 
-        it("doesn'set the current item and returns false when no node can be moved", () => {
+        it("doesn't set the current item and returns false when no node can be moved", () => {
             const tree = new Node(null, true);
             const node1 = new Node({ name: "node1" });
             tree.addChild(node1);

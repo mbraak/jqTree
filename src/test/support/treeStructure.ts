@@ -1,4 +1,4 @@
-import { getChilden, singleChild } from "./testUtil";
+import { getChildren, singleChild } from "./testUtil";
 
 const getTreeNode = (li: HTMLElement): JQTreeMatchers.TreeNode => {
     const div = singleChild(li, "div", "jqtree-element");
@@ -7,7 +7,7 @@ const getTreeNode = (li: HTMLElement): JQTreeMatchers.TreeNode => {
     const selected = li.classList.contains("jqtree-selected");
 
     if (li.classList.contains("jqtree-folder")) {
-        const ulChildren = getChilden(li, "ul", "jqtree_common");
+        const ulChildren = getChildren(li, "ul", "jqtree_common");
 
         const children =
             ulChildren.length === 1
@@ -31,7 +31,7 @@ const getTreeNode = (li: HTMLElement): JQTreeMatchers.TreeNode => {
 };
 
 const getChildNodes = (ul: HTMLElement) =>
-    getChilden(ul, "li", "jqtree_common").map((li) => getTreeNode(li));
+    getChildren(ul, "li", "jqtree_common").map((li) => getTreeNode(li));
 
 const treeStructure = (el: HTMLElement): JQTreeMatchers.TreeStructure => {
     return getChildNodes(singleChild(el, "ul", "jqtree-tree"));
