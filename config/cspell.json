@@ -1,4 +1,5 @@
 {
+    "language": "en-GB",
     "words": [
         "Ceratopsians",
         "Coelophysoids",
@@ -8,10 +9,13 @@
         "Heterodontosaurids",
         "jqtree",
         "newchild",
+        "Ornithopods",
         "Pachycephalosaurians",
         "Saurischia",
         "Sauropodomorphs",
         "Thyreophorans",
-        "Tyrannosauroids"
+        "toggler",
+        "Tyrannosauroids",
+        "vars"
     ]
 }
