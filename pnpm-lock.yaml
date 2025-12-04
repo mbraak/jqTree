@@ -84,6 +84,9 @@ importers:
       eslint-plugin-jest-dom:
         specifier: ^5.5.0
         version: 5.5.0(@testing-library/dom@10.4.1)(eslint@9.39.1)
+      eslint-plugin-jest-extended:
+        specifier: ^3.0.1
+        version: 3.0.1(eslint@9.39.1)(typescript@5.9.3)
       eslint-plugin-perfectionist:
         specifier: ^4.15.1
         version: 4.15.1(eslint@9.39.1)(typescript@5.9.3)
@@ -2467,6 +2470,12 @@ packages:
     peerDependenciesMeta:
       '@testing-library/dom':
         optional: true
+
+  eslint-plugin-jest-extended@3.0.1:
+    resolution: {integrity: sha512-1gxhl0yEYsvIT3ygez5noyv3feR1+p3YHiWoTZLM0OmN9u/nn/rOvVg8wUaNzWDx+44TH5nUV11iuCC08Hl2+w==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+    peerDependencies:
+      eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
 
   eslint-plugin-perfectionist@4.15.1:
     resolution: {integrity: sha512-MHF0cBoOG0XyBf7G0EAFCuJJu4I18wy0zAoT1OHfx2o6EOx1EFTIzr2HGeuZa1kDcusoX0xJ9V7oZmaeFd773Q==}
@@ -7006,6 +7015,14 @@ snapshots:
       requireindex: 1.2.0
     optionalDependencies:
       '@testing-library/dom': 10.4.1
+
+  eslint-plugin-jest-extended@3.0.1(eslint@9.39.1)(typescript@5.9.3):
+    dependencies:
+      '@typescript-eslint/utils': 8.47.0(eslint@9.39.1)(typescript@5.9.3)
+      eslint: 9.39.1
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
 
   eslint-plugin-perfectionist@4.15.1(eslint@9.39.1)(typescript@5.9.3):
     dependencies:

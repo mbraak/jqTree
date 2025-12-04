@@ -61,7 +61,7 @@ describe("checkHorizontalScrolling", () => {
         documentScrollParent.checkHorizontalScrolling(100);
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledTimes(1);
+        expect(scrollBy).toHaveBeenCalledOnce();
     });
 });
 
@@ -123,6 +123,6 @@ describe("checkVerticalScrolling", () => {
         documentScrollParent.checkVerticalScrolling(100);
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledTimes(1);
+        expect(scrollBy).toHaveBeenCalledOnce();
     });
 });

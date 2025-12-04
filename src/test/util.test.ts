@@ -11,17 +11,17 @@ describe("getBoolString", () => {
 
 describe("isFunction", () => {
     it("returns a boolean", () => {
-        expect(isFunction(isInt)).toBe(true);
-        expect(isFunction("isInt")).toBe(false);
+        expect(isFunction(isInt)).toBeTrue();
+        expect(isFunction("isInt")).toBeFalse();
     });
 });
 
 describe("isInt", () => {
     it("returns a boolean", () => {
-        expect(isInt(10)).toBe(true);
-        expect(isInt(0)).toBe(true);
-        expect(isInt(-1)).toBe(true);
-        expect(isInt("1")).toBe(false);
-        expect(isInt(null)).toBe(false);
+        expect(isInt(10)).toBeTrue();
+        expect(isInt(0)).toBeTrue();
+        expect(isInt(-1)).toBeTrue();
+        expect(isInt("1")).toBeFalse();
+        expect(isInt(null)).toBeFalse();
     });
 });
