@@ -233,7 +233,7 @@ describe("methods", () => {
 
             given.$tree.tree("addToSelection", given.child1);
 
-            expect(node1.is_open).toBe(true);
+            expect(node1.is_open).toBeTrue();
         });
 
         it("throws an error without a node parameter", () => {
@@ -547,7 +547,7 @@ describe("methods", () => {
 
             context("when no node is selected", () => {
                 it("returns false", () => {
-                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
                 });
             });
 
@@ -572,7 +572,7 @@ describe("methods", () => {
 
             context("when no node is selected", () => {
                 it("returns false", () => {
-                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
                 });
             });
 
@@ -1331,7 +1331,7 @@ describe("methods", () => {
                 it("removes and deselects the node", () => {
                     given.$tree.tree("removeNode", given.node);
 
-                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
                 });
             });
         });
@@ -1364,7 +1364,7 @@ describe("methods", () => {
                 it("removes the node and deselects the child", () => {
                     given.$tree.tree("removeNode", given.node);
 
-                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
                 });
             });
         });
@@ -1488,7 +1488,7 @@ describe("methods", () => {
             const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
             given.$tree.tree("selectNode", child1);
 
-            expect(given.node1.is_open).toBe(true);
+            expect(given.node1.is_open).toBeTrue();
         });
     });
 

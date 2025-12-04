@@ -354,7 +354,7 @@ describe("constructor", () => {
         });
 
         it("sets isEmptyFolder to false", () => {
-            expect(given.node.isEmptyFolder).toBe(false);
+            expect(given.node.isEmptyFolder).toBeFalse();
         });
     });
 
@@ -443,7 +443,7 @@ describe("constructor", () => {
         });
 
         it("sets isEmptyFolder to false", () => {
-            expect(given.node.isEmptyFolder).toBe(false);
+            expect(given.node.isEmptyFolder).toBeFalse();
         });
     });
 
@@ -454,7 +454,7 @@ describe("constructor", () => {
         }));
 
         it("sets isEmptyFolder to true", () => {
-            expect(given.node.isEmptyFolder).toBe(true);
+            expect(given.node.isEmptyFolder).toBeTrue()
         });
     });
 });
@@ -968,13 +968,13 @@ describe("hasChildren", () => {
         });
 
         it("returns true", () => {
-            expect(given.node.hasChildren()).toBe(true);
+            expect(given.node.hasChildren()).toBeTrue();
         });
     });
 
     context("when a node doesn't have children", () => {
         it("returns false", () => {
-            expect(given.node.hasChildren()).toBe(false);
+            expect(given.node.hasChildren()).toBeFalse();
         });
     });
 });
@@ -1018,7 +1018,7 @@ describe("isFolder", () => {
 
     context("when the node has no children", () => {
         it("returns false", () => {
-            expect(given.node.isFolder()).toBe(false);
+            expect(given.node.isFolder()).toBeFalse();
         });
 
         context("when the node is loaded on demand", () => {
@@ -1027,7 +1027,7 @@ describe("isFolder", () => {
             });
 
             it("returns false", () => {
-                expect(given.node.isFolder()).toBe(true);
+                expect(given.node.isFolder()).toBeTrue();
             });
         });
     });
@@ -1038,7 +1038,7 @@ describe("isFolder", () => {
         });
 
         it("returns false", () => {
-            expect(given.node.isFolder()).toBe(true);
+            expect(given.node.isFolder()).toBeTrue();
         });
     });
 });
@@ -1126,7 +1126,7 @@ describe("loadFromData", () => {
         ];
         const tree = new Node().loadFromData(data);
 
-        expect((tree.children[0] as Node).isEmptyFolder).toBe(true);
+        expect((tree.children[0] as Node).isEmptyFolder).toBeTrue();
     });
 
     it("sets isEmptyFolder to false for a node when it doesn't have a children attribute", () => {
@@ -1137,7 +1137,7 @@ describe("loadFromData", () => {
         ];
         const tree = new Node().loadFromData(data);
 
-        expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
+        expect((tree.children[0] as Node).isEmptyFolder).toBeFalse();
     });
 
     it("sets isEmptyFolder to false for a node when it has a children attribute that is not empty", () => {
@@ -1149,7 +1149,7 @@ describe("loadFromData", () => {
         ];
         const tree = new Node().loadFromData(data);
 
-        expect((tree.children[0] as Node).isEmptyFolder).toBe(false);
+        expect((tree.children[0] as Node).isEmptyFolder).toBeFalse();
     });
 });
 
@@ -1174,7 +1174,7 @@ describe("moveNode", () => {
         it("moves the node", () => {
             expect(
                 given.tree.moveNode(given.child2, given.node2, "after"),
-            ).toBe(true);
+            ).toBeTrue();
 
             expect(given.tree).toMatchObject({
                 children: [
@@ -1193,7 +1193,7 @@ describe("moveNode", () => {
             it("returns false", () => {
                 expect(
                     given.tree.moveNode(given.child2, given.tree, "after"),
-                ).toBe(false);
+                ).toBeFalse();
             });
         });
     });
@@ -1202,7 +1202,7 @@ describe("moveNode", () => {
         it("moves the node", () => {
             expect(
                 given.tree.moveNode(given.child1, given.node2, "inside"),
-            ).toBe(true);
+            ).toBeTrue();
 
             expect(given.tree).toMatchObject({
                 children: [
@@ -1227,7 +1227,7 @@ describe("moveNode", () => {
         it("moves the node", () => {
             expect(
                 given.tree.moveNode(given.child2, given.child1, "before"),
-            ).toBe(true);
+            ).toBeTrue();
 
             expect(given.tree).toMatchObject({
                 children: [
@@ -1248,7 +1248,7 @@ describe("moveNode", () => {
             it("returns false", () => {
                 expect(
                     given.tree.moveNode(given.child2, given.tree, "before"),
-                ).toBe(false);
+                ).toBeFalse();
             });
         });
     });
@@ -1257,7 +1257,7 @@ describe("moveNode", () => {
         it("doesn't move the node", () => {
             expect(
                 given.tree.moveNode(given.node1, given.child1, "before"),
-            ).toBe(false);
+            ).toBeFalse();
 
             expect(given.tree).toMatchObject({
                 children: [
@@ -1322,7 +1322,7 @@ describe("prepend", () => {
             name: "test1",
         });
 
-        expect((given.node.children[0] as Node).isEmptyFolder).toBe(true);
+        expect((given.node.children[0] as Node).isEmptyFolder).toBeTrue();
     });
 });
 
