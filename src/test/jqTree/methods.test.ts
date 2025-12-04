@@ -321,7 +321,7 @@ describe("methods", () => {
 
             it("sets the properties of the object", () => {
                 expect(given.$tree.tree("getNodeById", 99)).toMatchObject(
-                    given.nodeData,
+                    given.nodeData as NodeRecord,
                 );
             });
         });
@@ -1700,7 +1700,7 @@ describe("methods", () => {
                     expect.objectContaining({ name: "node2" }),
                 ]);
                 expect(given.$tree.tree("getNodeById", 999)).toMatchObject(
-                    given.nodeData,
+                    given.nodeData as NodeRecord,
                 );
             });
         });
