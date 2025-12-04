@@ -61,7 +61,7 @@ describe("keyboard support", () => {
 
         context("when no node is selected", () => {
             it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
             });
         });
 
@@ -96,7 +96,7 @@ describe("keyboard support", () => {
 
         context("when no node is selected", () => {
             it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
             });
         });
     });
@@ -158,7 +158,7 @@ describe("keyboard support", () => {
 
         context("when no node is selected", () => {
             it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
             });
         });
 
@@ -227,7 +227,7 @@ describe("keyboard support", () => {
 
         context("when no node is selected", () => {
             it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
             });
         });
     });

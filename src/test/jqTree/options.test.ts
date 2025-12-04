@@ -423,7 +423,7 @@ describe("options", () => {
         it("doesn't select the node", () => {
             given.$tree.tree("selectNode", given.node1);
 
-            expect(given.$tree.tree("getSelectedNode")).toBe(false);
+            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
         });
     });
 
