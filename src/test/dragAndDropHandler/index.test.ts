@@ -889,7 +889,7 @@ describe("DragAndDropHandler", () => {
             expect(openNode).toHaveBeenCalledExactlyOnceWith(
                 node2,
                 false,
-                expect.toBeFunction(),
+                expect.any(Function),
             );
         });
 
