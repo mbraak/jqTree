@@ -1,19 +1,22 @@
-import { axe, toHaveNoViolations } from "jest-axe";
+import axe from "axe-core";
 
 import "../../tree.jquery";
 import exampleData from "../support/exampleData";
 
-expect.extend(toHaveNoViolations);
-
 describe("accessibility", () => {
     beforeEach(() => {
-        $("body").append('<div id="tree1"></div>');
+        document.title = 'Test title';
+        document.body.innerHTML = '<main><div id="tree1"></div></main>';
+        document.documentElement.setAttribute('lang', 'en');
     });
 
     afterEach(() => {
-        const $tree = $("#tree1");
-        $tree.tree("destroy");
-        $tree.remove();
+        const treeElement = document.querySelector('#tree1');
+
+        if (treeElement) {
+            $(treeElement).tree("destroy");
+            treeElement.remove();
+        }
     });
 
     it("has an accessible ui", async () => {
@@ -21,8 +24,16 @@ describe("accessibility", () => {
         $tree.tree({
             data: exampleData,
         });
-        const element = $tree.get()[0] as HTMLElement;
 
-        await expect(axe(element)).resolves.toHaveNoViolations();
+        const rules = axe.getRules(["cat.color"]).map(({ ruleId: id }) => ({
+            enabled: false,
+            id,
+        }));
+
+        axe.configure({ rules })
+
+        const results = await axe.run();
+
+        expect(results.violations).toBeEmpty();
     });
 });

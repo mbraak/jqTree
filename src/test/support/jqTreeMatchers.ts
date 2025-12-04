@@ -54,10 +54,7 @@ expect.extend({
                 this.utils.printDiffOrStringify(
                     expectedStructure,
                     receivedStructure,
-                    "expected",
-                    "received",
-                    true,
-                ),
+                ) ?? '',
             pass: this.equals(receivedStructure, expectedStructure),
         };
     },

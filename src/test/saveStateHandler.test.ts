@@ -183,7 +183,7 @@ describe("setInitialStateOnDemand", () => {
             1,
             node1,
             false,
-            expect.toBeFunction(),
+            expect.any(Function),
         );
         expect(openNode).toHaveBeenNthCalledWith(2, node1, false);
         expect(openNode).toHaveBeenNthCalledWith(3, node2, false);
