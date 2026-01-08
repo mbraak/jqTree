@@ -1,7 +1,7 @@
 /*
 JqTree 1.8.10
 
-Copyright 2025 Marco Braak
+Copyright 2026 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -3088,7 +3088,7 @@ var jqtree = (function (exports) {
       }
       containsElement(element) {
         const node = this.getNode(element);
-        return node != null && node.tree === this.tree;
+        return node?.tree === this.tree;
       }
       createFolderElement(node) {
         const closedIconElement = this.renderer.closedIconElement;

@@ -699,7 +699,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private containsElement(element: HTMLElement): boolean {
         const node = this.getNode(element);
 
-        return node != null && node.tree === this.tree;
+        return node?.tree === this.tree;
     }
 
     private createFolderElement(node: Node) {
