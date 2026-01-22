@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       jquery:
-        specifier: 4.0.0-rc.1
-        version: 4.0.0-rc.1
+        specifier: '>= 3'
+        version: 4.0.0
     devDependencies:
       '@babel/cli':
         specifier: ^7.28.6
@@ -3121,8 +3121,8 @@ packages:
       node-notifier:
         optional: true
 
-  jquery@4.0.0-rc.1:
-    resolution: {integrity: sha512-ima3YNbwR733XSQ/yFbO4Kjq7Z01feW8BmzZ4VjuuFvWVpGdjXSpmOJZRaehA4V60Aj97HsHNRnDM188c8pHHw==}
+  jquery@4.0.0:
+    resolution: {integrity: sha512-TXCHVR3Lb6TZdtw1l3RTLf8RBWVGexdxL6AC8/e0xZKEpBflBsjh9/8LXw+dkNFuOyW9B7iB3O1sP7hS0Kiacg==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -7861,7 +7861,7 @@ snapshots:
       - ts-node
     optional: true
 
-  jquery@4.0.0-rc.1: {}
+  jquery@4.0.0: {}
 
   js-tokens@4.0.0: {}
 
