@@ -81,7 +81,7 @@ describe("handleClick", () => {
         const event = new MouseEvent("click", { bubbles: true });
         button.dispatchEvent(event);
 
-        expect(onClickButton).toHaveBeenCalledWith(node);
+        expect(onClickButton).toHaveBeenCalledExactlyOnceWith(node);
     });
 
     it("handles a click with an empty target", () => {
@@ -129,7 +129,7 @@ describe("handleContextmenu", () => {
         const event = new MouseEvent("contextmenu", { bubbles: true });
         nodeElement.dispatchEvent(event);
 
-        expect(triggerEvent).toHaveBeenCalledWith("tree.contextmenu", {
+        expect(triggerEvent).toHaveBeenCalledExactlyOnceWith("tree.contextmenu", {
             click_event: event,
             node,
         });
@@ -198,7 +198,7 @@ describe("handleDblclick", () => {
         const event = new MouseEvent("dblclick", { bubbles: true });
         label.dispatchEvent(event);
 
-        expect(triggerEvent).toHaveBeenCalledWith("tree.dblclick", {
+        expect(triggerEvent).toHaveBeenCalledExactlyOnceWith("tree.dblclick", {
             click_event: event,
             node,
         });
@@ -245,7 +245,7 @@ describe("touchStart", () => {
         });
         element.dispatchEvent(event);
 
-        expect(onMouseCapture).toHaveBeenCalledWith({
+        expect(onMouseCapture).toHaveBeenCalledExactlyOnceWith({
             originalEvent: event,
             pageX: 0,
             pageY: 0,
@@ -336,7 +336,7 @@ describe("touchEnd", () => {
         });
         element.dispatchEvent(touchEndEvent);
 
-        expect(onMouseStop).toHaveBeenCalledWith({
+        expect(onMouseStop).toHaveBeenCalledExactlyOnceWith({
             originalEvent: touchEndEvent,
             pageX: 0,
             pageY: 0,

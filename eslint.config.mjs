@@ -1,7 +1,9 @@
+import cspellESLintPluginRecommended from "@cspell/eslint-plugin/recommended";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import";
 import jestDomPlugin from "eslint-plugin-jest-dom";
+import jestExtendedPlugin from "eslint-plugin-jest-extended";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
 import playwrightPlugin from "eslint-plugin-playwright";
 import testingLibraryPlugin from "eslint-plugin-testing-library";
@@ -14,6 +16,7 @@ export default [
     importPlugin.flatConfigs.recommended,
     importPlugin.flatConfigs.typescript,
     perfectionistPlugin.configs["recommended-natural"],
+    cspellESLintPluginRecommended,
     {
         languageOptions: {
             parserOptions: {
@@ -48,6 +51,12 @@ export default [
                 },
             ],
             "@typescript-eslint/unified-signatures": "off",
+            "@cspell/spellchecker": [
+                "error",
+                {
+                    configFile: "./config/cspell.json",
+                },
+            ],
         },
     },
     {
@@ -60,6 +69,7 @@ export default [
             "vitest/no-duplicate-hooks": "off",
             "vitest/no-hooks": "off",
             "vitest/no-identical-title": "off",
+            "vitest/prefer-called-times": "off",
             "vitest/prefer-describe-function-title": "off",
             "vitest/prefer-expect-assertions": "off",
             "vitest/prefer-importing-vitest-globals": "off",
@@ -76,6 +86,10 @@ export default [
     {
         files: ["src/test/**/*.ts"],
         ...jestDomPlugin.configs["flat/recommended"],
+    },
+    {
+        files: ["src/test/**/*.ts"],
+        ...jestExtendedPlugin.configs["flat/all"],
     },
     {
         files: ["src/playwright/**/*.ts"],

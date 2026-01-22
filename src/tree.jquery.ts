@@ -699,7 +699,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private containsElement(element: HTMLElement): boolean {
         const node = this.getNode(element);
 
-        return node != null && node.tree === this.tree;
+        return node?.tree === this.tree;
     }
 
     private createFolderElement(node: Node) {
@@ -1001,11 +1001,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private isFocusOnTree(): boolean {
         const activeElement = document.activeElement;
 
-        return Boolean(
-            activeElement &&
-                activeElement.tagName === "SPAN" &&
-                this.containsElement(activeElement as HTMLElement),
-        );
+        return activeElement?.tagName === "SPAN" && this.containsElement(activeElement as HTMLElement);
     }
 
     private isSelectedNodeInSubtree(subtree: Node): boolean {

@@ -72,7 +72,7 @@ describe("setInitialState", () => {
         });
         saveStateHandler.setInitialState({});
 
-        expect(removeFromSelection).toHaveBeenCalledWith(node);
+        expect(removeFromSelection).toHaveBeenCalledExactlyOnceWith(node);
     });
 });
 
@@ -106,7 +106,7 @@ describe("setInitialStateOnDemand", () => {
             vi.fn(),
         );
 
-        expect(openNode).toHaveBeenCalledWith(node, false);
+        expect(openNode).toHaveBeenCalledExactlyOnceWith(node, false);
     });
 
     it("selects a node and redraws the tree when the node id is in selected_node in the state", () => {
@@ -132,8 +132,8 @@ describe("setInitialStateOnDemand", () => {
             vi.fn(),
         );
 
-        expect(addToSelection).toHaveBeenCalledWith(node);
-        expect(refreshElements).toHaveBeenCalledWith(null);
+        expect(addToSelection).toHaveBeenCalledExactlyOnceWith(node);
+        expect(refreshElements).toHaveBeenCalledExactlyOnceWith(null);
     });
 
     it("opens nodes recursively", () => {
@@ -183,7 +183,7 @@ describe("setInitialStateOnDemand", () => {
             1,
             node1,
             false,
-            expect.toBeFunction(),
+            expect.any(Function),
         );
         expect(openNode).toHaveBeenNthCalledWith(2, node1, false);
         expect(openNode).toHaveBeenNthCalledWith(3, node2, false);

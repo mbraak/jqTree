@@ -101,7 +101,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("addNodeBefore", "added-node");
-            }).toThrow("Parameter is empty: existingNode");
+            }).toThrowError("Parameter is empty: existingNode");
         });
     });
 
@@ -150,7 +150,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("addParentNode", "new-parent-node");
-            }).toThrow("Parameter is empty: existingNode");
+            }).toThrowError("Parameter is empty: existingNode");
         });
     });
 
@@ -233,7 +233,7 @@ describe("methods", () => {
 
             given.$tree.tree("addToSelection", given.child1);
 
-            expect(node1.is_open).toBe(true);
+            expect(node1.is_open).toBeTrue();
         });
 
         it("throws an error without a node parameter", () => {
@@ -247,7 +247,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("addToSelection");
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
     });
 
@@ -321,7 +321,7 @@ describe("methods", () => {
 
             it("sets the properties of the object", () => {
                 expect(given.$tree.tree("getNodeById", 99)).toMatchObject(
-                    given.nodeData,
+                    given.nodeData as NodeRecord,
                 );
             });
         });
@@ -358,7 +358,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("closeNode");
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
     });
 
@@ -547,7 +547,7 @@ describe("methods", () => {
 
             context("when no node is selected", () => {
                 it("returns false", () => {
-                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
                 });
             });
 
@@ -572,7 +572,7 @@ describe("methods", () => {
 
             context("when no node is selected", () => {
                 it("returns false", () => {
-                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
                 });
             });
 
@@ -739,7 +739,7 @@ describe("methods", () => {
             given.$tree.tree({ data: exampleData });
         });
 
-        it("returns truewhen the node is selected", () => {
+        it("returns true when the node is selected", () => {
             given.$tree.tree("selectNode", given.node1);
 
             expect(given.$tree.tree("isNodeSelected", given.node1)).toBeTrue();
@@ -755,7 +755,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("isNodeSelected");
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
     });
 
@@ -1016,7 +1016,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("moveNode");
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
 
         it("throws an error without a targetNode parameter", () => {
@@ -1025,7 +1025,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("moveNode", given.child1);
-            }).toThrow("Parameter is empty: targetNode");
+            }).toThrowError("Parameter is empty: targetNode");
         });
 
         it("throws an error without a position parameter", () => {
@@ -1034,7 +1034,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("moveNode", given.child1, given.node2);
-            }).toThrow("Parameter is empty: position");
+            }).toThrowError("Parameter is empty: position");
         });
     });
 
@@ -1094,7 +1094,7 @@ describe("methods", () => {
             given.$tree.tree("openNode", given.node1, onFinished);
 
             await waitFor(() => {
-                expect(onFinished).toHaveBeenCalledWith(given.node1);
+                expect(onFinished).toHaveBeenCalledExactlyOnceWith(given.node1);
             });
         });
 
@@ -1104,7 +1104,7 @@ describe("methods", () => {
 
             expect(() => {
                 given.$tree.tree("openNode", child1, false);
-            }).not.toThrow();
+            }).not.toThrowError();
         });
 
         it("throws an error without a node parameter", () => {
@@ -1113,7 +1113,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("openNode");
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
     });
 
@@ -1241,7 +1241,7 @@ describe("methods", () => {
                 given.$tree.tree("reload", handleFinished);
 
                 await waitFor(() => {
-                    expect(handleFinished).toHaveBeenCalledWith();
+                    expect(handleFinished).toHaveBeenCalledExactlyOnceWith();
                 });
 
                 expect(given.$tree).toHaveTreeStructure([
@@ -1284,7 +1284,7 @@ describe("methods", () => {
                     "removeFromSelection",
                     undefined as unknown as INode,
                 );
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
     });
 
@@ -1331,7 +1331,7 @@ describe("methods", () => {
                 it("removes and deselects the node", () => {
                     given.$tree.tree("removeNode", given.node);
 
-                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
                 });
             });
         });
@@ -1364,7 +1364,7 @@ describe("methods", () => {
                 it("removes the node and deselects the child", () => {
                     given.$tree.tree("removeNode", given.node);
 
-                    expect(given.$tree.tree("getSelectedNode")).toBe(false);
+                    expect(given.$tree.tree("getSelectedNode")).toBeFalse();
                 });
             });
         });
@@ -1375,7 +1375,7 @@ describe("methods", () => {
             it("raises an exception", () => {
                 expect(() =>
                     given.$tree.tree("removeNode", given.node),
-                ).toThrow("Node has no parent");
+                ).toThrowError("Node has no parent");
             });
         });
 
@@ -1385,7 +1385,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("removeNode");
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
     });
 
@@ -1398,7 +1398,7 @@ describe("methods", () => {
 
             expect(() => {
                 $tree.tree("scrollToNode", undefined as unknown as INode);
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
 
         it("handles a node without an element", () => {
@@ -1488,7 +1488,7 @@ describe("methods", () => {
             const child1 = given.$tree.tree("getNodeByNameMustExist", "child1");
             given.$tree.tree("selectNode", child1);
 
-            expect(given.node1.is_open).toBe(true);
+            expect(given.node1.is_open).toBeTrue();
         });
     });
 
@@ -1612,7 +1612,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("toggle");
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
     });
 
@@ -1700,7 +1700,7 @@ describe("methods", () => {
                     expect.objectContaining({ name: "node2" }),
                 ]);
                 expect(given.$tree.tree("getNodeById", 999)).toMatchObject(
-                    given.nodeData,
+                    given.nodeData as NodeRecord,
                 );
             });
         });
@@ -1797,7 +1797,7 @@ describe("methods", () => {
                 const $tree = given.$tree as unknown as any;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                 $tree.tree("updateNode");
-            }).toThrow("Node parameter is empty");
+            }).toThrowError("Node parameter is empty");
         });
     });
 

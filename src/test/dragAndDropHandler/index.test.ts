@@ -137,7 +137,7 @@ describe("DragAndDropHandler", () => {
             expect(dragAndDropHandler.currentItem?.node).toBe(node1);
         });
 
-        it("doesn'set the current item and returns false when no node can be moved", () => {
+        it("doesn't set the current item and returns false when no node can be moved", () => {
             const tree = new Node(null, true);
             const node1 = new Node({ name: "node1" });
             tree.addChild(node1);
@@ -231,7 +231,7 @@ describe("DragAndDropHandler", () => {
             expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeTrue();
             expect(dragAndDropHandler.currentItem?.node).toBe(node1);
 
-            expect(onIsMoveHandle).toHaveBeenCalledWith(expect.anything());
+            expect(onIsMoveHandle).toHaveBeenCalledExactlyOnceWith(expect.anything());
         });
 
         it("doesn't capture the node when onIsMoveHandle returns false", () => {
@@ -257,7 +257,7 @@ describe("DragAndDropHandler", () => {
             expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeNull();
             expect(dragAndDropHandler.currentItem).toBeNull();
 
-            expect(onIsMoveHandle).toHaveBeenCalledWith(expect.anything());
+            expect(onIsMoveHandle).toHaveBeenCalledExactlyOnceWith(expect.anything());
         });
 
         it("doesn't capture when onCanMove returns false", () => {
@@ -287,7 +287,7 @@ describe("DragAndDropHandler", () => {
             expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeFalse();
             expect(dragAndDropHandler.currentItem).toBeNull();
 
-            expect(onCanMove).toHaveBeenCalledWith(node2);
+            expect(onCanMove).toHaveBeenCalledExactlyOnceWith(node2);
         });
 
         it("captures when onCanMove returns true", () => {
@@ -317,7 +317,7 @@ describe("DragAndDropHandler", () => {
             expect(dragAndDropHandler.mouseCapture(positionInfo)).toBeTrue();
             expect(dragAndDropHandler.currentItem?.node).toStrictEqual(node2);
 
-            expect(onCanMove).toHaveBeenCalledWith(node2);
+            expect(onCanMove).toHaveBeenCalledExactlyOnceWith(node2);
         });
     });
 
@@ -465,7 +465,7 @@ describe("DragAndDropHandler", () => {
             // Stop
             dragAndDropHandler.mouseStop(dragPositionInfo);
 
-            expect(triggerEvent).toHaveBeenCalledWith(
+            expect(triggerEvent).toHaveBeenCalledExactlyOnceWith(
                 "tree.move",
                 expect.objectContaining({
                     move_info: {
@@ -524,7 +524,7 @@ describe("DragAndDropHandler", () => {
             // Stop
             dragAndDropHandler.mouseStop(dragPositionInfo);
 
-            expect(mockMoveNode).toHaveBeenCalledWith(node1, node2, "inside");
+            expect(mockMoveNode).toHaveBeenCalledExactlyOnceWith(node1, node2, "inside");
         });
 
         it("calls onDragStop when there is no hovered area", () => {
@@ -573,7 +573,7 @@ describe("DragAndDropHandler", () => {
                 target: document.body,
             });
 
-            expect(onDragStop).toHaveBeenCalledWith(node1, originalEvent);
+            expect(onDragStop).toHaveBeenCalledExactlyOnceWith(node1, originalEvent);
         });
     });
 
@@ -790,7 +790,7 @@ describe("DragAndDropHandler", () => {
             // Move mouse
             dragAndDropHandler.mouseDrag(positionInfoForDragging);
 
-            expect(onDragMove).toHaveBeenCalledWith(
+            expect(onDragMove).toHaveBeenCalledExactlyOnceWith(
                 node1,
                 positionInfoForDragging.originalEvent,
             );
@@ -832,7 +832,7 @@ describe("DragAndDropHandler", () => {
                 target: node2.element as HTMLElement,
             });
 
-            expect(onCanMoveTo).toHaveBeenCalledWith(node1, node2, "inside");
+            expect(onCanMoveTo).toHaveBeenCalledExactlyOnceWith(node1, node2, "inside");
 
             // Still sets hoveredArea to the new node
             expect(dragAndDropHandler.hoveredArea?.node).toStrictEqual(node2);
@@ -886,10 +886,10 @@ describe("DragAndDropHandler", () => {
 
             vi.advanceTimersByTime(100);
 
-            expect(openNode).toHaveBeenCalledWith(
+            expect(openNode).toHaveBeenCalledExactlyOnceWith(
                 node2,
                 false,
-                expect.toBeFunction(),
+                expect.any(Function),
             );
         });
 
