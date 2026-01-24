@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### development
+#### 1.8.11 (january 24 2026)
 
 - Support jQuery 4.
 
