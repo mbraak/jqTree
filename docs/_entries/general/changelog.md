@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### development
+
+- Support jQuery 4.
+
 #### 1.8.10 (january 6 2025)
 
 - Issue #878: fix timeout for opening folder
