@@ -1,10 +1,6 @@
-$.mockjax({
-    url: "*",
-    response: function(options) {
-        this.responseText = ExampleData.exampleData;
-    },
-    responseTime: 0
-});
+$.ajax = function (settings) {
+    settings.success(ExampleData.exampleData);
+};
 
 var targetCollisionDiv = $("#targetDiv");
 
@@ -12,8 +8,7 @@ function isOverTarget(e) {
     return (
         e.clientX > targetCollisionDiv.position().left &&
         e.clientX <
-            targetCollisionDiv.position().left +
-                targetCollisionDiv.width() &&
+            targetCollisionDiv.position().left + targetCollisionDiv.width() &&
         e.clientY > targetCollisionDiv.position().top &&
         e.clientY <
             targetCollisionDiv.position().top + targetCollisionDiv.height()
@@ -33,5 +28,5 @@ function handleStop(node, e) {
 $("#tree1").tree({
     dragAndDrop: true,
     onDragMove: handleMove,
-    onDragStop: handleStop
+    onDragStop: handleStop,
 });

@@ -1,10 +1,6 @@
-$.mockjax({
-    url: "*",
-    response: function () {
-        this.responseText = ExampleData.exampleData;
-    },
-    responseTime: 0,
-});
+$.ajax = function (settings) {
+    settings.success(ExampleData.exampleData);
+};
 
 $("#tree1").tree({
     closedIcon: $(

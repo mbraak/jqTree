@@ -1,13 +1,9 @@
-$.mockjax({
-    url: "*",
-    response: function(options) {
-        this.responseText = ExampleData.exampleData;
-    },
-    responseTime: 0
-});
+$.ajax = function (settings) {
+    settings.success(ExampleData.exampleData);
+};
 
 var $tree = $("#tree1");
 $tree.tree({
     dragAndDrop: true,
-    autoOpen: 0
+    autoOpen: 0,
 });
