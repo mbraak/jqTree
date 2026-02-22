@@ -1,9 +1,5 @@
-$.mockjax({
-    url: "*",
-    response: function(options) {
-        this.responseText = ExampleData.exampleData;
-    },
-    responseTime: 0
-});
+$.ajax = function (settings) {
+    settings.success(ExampleData.exampleData);
+};
 
 $("#tree1").tree();
