@@ -796,7 +796,7 @@ describe("getNodeByNameMustExist", () => {
         it("throws an exception", () => {
             expect(() =>
                 given.tree.getNodeByNameMustExist("non-existing"),
-            ).toThrowError("Node with name non-existing not found");
+            ).toThrow("Node with name non-existing not found");
         });
     });
 });
