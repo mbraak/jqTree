@@ -111,7 +111,7 @@ export default class SaveStateHandler {
         const jsonData = this.loadFromStorage();
 
         if (jsonData) {
-            return this.parseState(jsonData) as unknown as SavedState;
+            return this.parseState(jsonData);
         } else {
             return null;
         }
@@ -246,7 +246,7 @@ export default class SaveStateHandler {
             state.selected_node = [state.selected_node];
         }
 
-        return state as unknown as SavedState;
+        return state;
     }
 
     private resetSelection(): void {

@@ -528,7 +528,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             node.removeChildren();
 
             if (data.children.length) {
-                node.loadFromData(data.children as Node[]);
+                node.loadFromData(data.children);
             }
         }
 
