@@ -1,8 +1,7 @@
 import cspellESLintPluginRecommended from "@cspell/eslint-plugin/recommended";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import importPlugin from "eslint-plugin-import-x";
-import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import importPlugin from "eslint-plugin-import";
 import jestDomPlugin from "eslint-plugin-jest-dom";
 import jestExtendedPlugin from "eslint-plugin-jest-extended";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
