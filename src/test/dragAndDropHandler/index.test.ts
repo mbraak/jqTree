@@ -10,6 +10,7 @@ import {
 } from "app/jqtreeOptions";
 import { Node } from "app/node";
 import NodeElement from "app/nodeElement";
+
 import { generateHtmlElementsForTree } from "../support/testUtil";
 
 interface CreateDragAndDropHandlerParams {

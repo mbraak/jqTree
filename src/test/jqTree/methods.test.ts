@@ -7,6 +7,7 @@ import { vi } from "vitest";
 
 import "app/tree.jquery";
 import __version__ from "app/version";
+
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
 

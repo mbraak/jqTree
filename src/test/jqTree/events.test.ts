@@ -6,6 +6,7 @@ import { setupServer } from "msw/node";
 import { vi } from "vitest"
 
 import "app/tree.jquery";
+
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
 

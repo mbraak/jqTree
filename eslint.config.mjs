@@ -1,7 +1,8 @@
 import cspellESLintPluginRecommended from "@cspell/eslint-plugin/recommended";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import importPlugin from "eslint-plugin-import";
+import importPlugin from "eslint-plugin-import-x";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import jestDomPlugin from "eslint-plugin-jest-dom";
 import jestExtendedPlugin from "eslint-plugin-jest-extended";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
@@ -90,6 +91,17 @@ export default [
     {
         files: ["src/test/**/*.ts"],
         ...jestExtendedPlugin.configs["flat/all"],
+    },
+    {
+        files: ["src/test/**/*.ts"],
+        rules: {
+            "perfectionist/sort-imports": [
+                "error",
+                {
+                    internalPattern: ["^app"],
+                },
+            ],
+        },
     },
     {
         files: ["src/playwright/**/*.ts"],

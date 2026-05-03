@@ -2,6 +2,7 @@ import getGiven from "givens";
 import "jest-extended";
 
 import { Node } from "app/node";
+
 import exampleData from "./support/exampleData";
 
 const context = describe;
