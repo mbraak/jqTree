@@ -1,7 +1,7 @@
 {
     "compileOnSave": false,
     "exclude": ["_site", "node_modules"],
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "test/**/*"],
     "compilerOptions": {
         "erasableSyntaxOnly": true,
         "esModuleInterop": true,
@@ -19,7 +19,7 @@
         "paths": {
             "app/*": ["./src/*"]
         },
-        "rootDir": "src",
+        "rootDir": "./",
         "skipLibCheck": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
