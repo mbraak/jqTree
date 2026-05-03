@@ -9,18 +9,17 @@ export default defineConfig({
   },
   test: {
     coverage: {
-      exclude: ['src/playwright'],
-      include: ['src/**'],
+      include: ["src/**", "test/**"],
       provider: "istanbul",
       reporter: ["json"],
       reportsDirectory: "js-coverage"
     },
     environment: "jsdom",
     globals: true,
-    include: ['src/test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    include: ['test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
 
     setupFiles: [
-      "./src/test/support/setupTests.ts",
+      "./test/support/setupTests.ts",
       "givens/setup.js",
       "jest-extended/all",
     ],

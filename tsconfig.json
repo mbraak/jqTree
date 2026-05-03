@@ -1,8 +1,9 @@
 {
     "compileOnSave": false,
     "exclude": ["_site", "node_modules"],
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "playwright/**/*", "test/**/*"],
     "compilerOptions": {
+        "allowJs": true,
         "erasableSyntaxOnly": true,
         "esModuleInterop": true,
         "lib": ["ES2022", "DOM", "DOM.Iterable"],
@@ -19,7 +20,7 @@
         "paths": {
             "app/*": ["./src/*"]
         },
-        "rootDir": "src",
+        "rootDir": "./",
         "skipLibCheck": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
