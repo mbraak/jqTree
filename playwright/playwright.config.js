@@ -1,13 +1,14 @@
-const { devices } = require("@playwright/test");
+//const { devices } = require("@playwright/test");
+import { devices } from "@playwright/test";
 
 const config = {
-    testDir: "../src/playwright",
     projects: [
         {
             name: "Chromium",
             use: { ...devices["Desktop Chrome"] },
         },
     ],
+    testDir: "./",
     webServer: {
         command: "pnpm devserver-with-coverage",
         cwd: "..",
@@ -15,4 +16,4 @@ const config = {
     },
 };
 
-module.exports = config;
+export default config;

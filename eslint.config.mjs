@@ -60,11 +60,11 @@ export default [
         },
     },
     {
-        files: ["src/test/**/*.ts"],
+        files: ["test/**/*.ts"],
         ...vitestPlugin.configs.all,
     },
     {
-        files: ["src/test/**/*.ts"],
+        files: ["test/**/*.ts"],
         rules: {
             "import-x/no-named-as-default": "off",
             "import-x/no-named-as-default-member": "off",
@@ -82,19 +82,19 @@ export default [
         },
     },
     {
-        files: ["src/test/**/*.ts"],
+        files: ["test/**/*.ts"],
         ...testingLibraryPlugin.configs["flat/dom"],
     },
     {
-        files: ["src/test/**/*.ts"],
+        files: ["test/**/*.ts"],
         ...jestDomPlugin.configs["flat/recommended"],
     },
     {
-        files: ["src/test/**/*.ts"],
+        files: ["test/**/*.ts"],
         ...jestExtendedPlugin.configs["flat/all"],
     },
     {
-        files: ["src/test/**/*.ts"],
+        files: ["test/**/*.ts"],
         rules: {
             "perfectionist/sort-imports": [
                 "error",
@@ -105,7 +105,7 @@ export default [
         },
     },
     {
-        files: ["src/playwright/**/*.ts"],
+        files: ["playwright/**/*.ts"],
         ...playwrightPlugin.configs["flat/recommended"],
     },
 ];
