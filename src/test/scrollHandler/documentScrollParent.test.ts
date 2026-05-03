@@ -1,6 +1,6 @@
-import { vi } from 'vitest'
+import { vi } from "vitest";
 
-import DocumentScrollParent from "../../scrollHandler/documentScrollParent";
+import DocumentScrollParent from "app/scrollHandler/documentScrollParent";
 
 describe("checkHorizontalScrolling", () => {
     afterEach(() => {

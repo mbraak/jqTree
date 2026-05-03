@@ -1,7 +1,8 @@
 import getGiven from "givens";
 import "jest-extended";
 
-import { Node } from "../node";
+import { Node } from "app/node";
+
 import exampleData from "./support/exampleData";
 
 const context = describe;

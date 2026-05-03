@@ -1,14 +1,14 @@
-import { vi } from 'vitest'
+import { vi } from "vitest";
 
-import { TriggerEvent } from "../jqtreeMethodTypes";
+import { TriggerEvent } from "app/jqtreeMethodTypes";
 import MouseHandler, {
     GetMouseDelay,
     GetNode,
     MouseCapture,
     MouseStart,
-} from "../mouseHandler";
-import { PositionInfo } from '../mouseUtils'
-import { Node } from "../node";
+} from "app/mouseHandler";
+import { PositionInfo } from "app/mouseUtils";
+import { Node } from "app/node";
 
 interface CreateMouseHandlerParams {
     element: HTMLElement;

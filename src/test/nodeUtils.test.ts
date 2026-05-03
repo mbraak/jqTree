@@ -1,4 +1,4 @@
-import { isNodeRecordWithChildren } from "../nodeUtils";
+import { isNodeRecordWithChildren } from "app/nodeUtils";
 
 describe("isNodeRecordWithChildren", () => {
     it("returns true when the data is an object with the children attribute of type array", () => {

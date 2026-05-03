@@ -94,6 +94,17 @@ export default [
         ...jestExtendedPlugin.configs["flat/all"],
     },
     {
+        files: ["src/test/**/*.ts"],
+        rules: {
+            "perfectionist/sort-imports": [
+                "error",
+                {
+                    internalPattern: ["^app"],
+                },
+            ],
+        },
+    },
+    {
         files: ["src/playwright/**/*.ts"],
         ...playwrightPlugin.configs["flat/recommended"],
     },

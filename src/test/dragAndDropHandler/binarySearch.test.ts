@@ -1,4 +1,4 @@
-import binarySearch from "../../dragAndDropHandler/binarySearch";
+import binarySearch from "app/dragAndDropHandler/binarySearch";
 
 describe("binarySearch", () => {
     it("returns null when the array is empty", () => {

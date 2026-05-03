@@ -1,4 +1,4 @@
-import { getBoolString, isFunction, isInt } from "../util";
+import { getBoolString, isFunction, isInt } from "app/util";
 
 describe("getBoolString", () => {
     it("returns true or false", () => {

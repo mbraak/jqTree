@@ -1,4 +1,4 @@
-import DragElement from "../../dragAndDropHandler/dragElement";
+import DragElement from "app/dragAndDropHandler/dragElement";
 
 describe("DragElement", () => {
     it("creates an element with autoEscape is true", () => {

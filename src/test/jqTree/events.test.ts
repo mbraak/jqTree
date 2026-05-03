@@ -3,9 +3,10 @@ import { userEvent } from "@testing-library/user-event";
 import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { vi } from 'vitest'
+import { vi } from "vitest"
 
-import "../../tree.jquery";
+import "app/tree.jquery";
+
 import exampleData from "../support/exampleData";
 import { titleSpan } from "../support/testUtil";
 

@@ -1,10 +1,10 @@
 import { waitFor } from "@testing-library/dom";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { vi } from 'vitest'
+import { vi } from "vitest";
 
-import DataLoader from "../dataLoader";
-import { TriggerEvent } from "../jqtreeMethodTypes";
+import DataLoader from "app/dataLoader";
+import { TriggerEvent } from "app/jqtreeMethodTypes";
 
 describe("loadFromUrl", () => {
     const server = setupServer();

@@ -1,5 +1,5 @@
-import { Node } from "../../node";
-import NodeElement from "../../nodeElement";
+import { Node } from "app/node";
+import NodeElement from "app/nodeElement";
 
 describe("NodeElement", () => {
     it("sets the element to the element of the node", () => {

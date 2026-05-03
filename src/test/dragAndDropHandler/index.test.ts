@@ -1,15 +1,16 @@
-import { vi } from 'vitest'
+import { vi } from "vitest";
 
-import { DragAndDropHandler } from "../../dragAndDropHandler";
-import { GetScrollLeft, GetTree, OpenNode } from "../../jqtreeMethodTypes";
+import { DragAndDropHandler } from "app/dragAndDropHandler";
+import { GetScrollLeft, GetTree, OpenNode } from "app/jqtreeMethodTypes";
 import {
     DragMethod,
     OnCanMove,
     OnCanMoveTo,
     OnIsMoveHandle,
-} from "../../jqtreeOptions";
-import { Node } from "../../node";
-import NodeElement from "../../nodeElement";
+} from "app/jqtreeOptions";
+import { Node } from "app/node";
+import NodeElement from "app/nodeElement";
+
 import { generateHtmlElementsForTree } from "../support/testUtil";
 
 interface CreateDragAndDropHandlerParams {

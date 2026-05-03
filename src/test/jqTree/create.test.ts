@@ -1,6 +1,7 @@
 import getGiven from "givens";
 
-import "../../tree.jquery";
+import "app/tree.jquery";
+
 import exampleData from "../support/exampleData";
 
 describe("create with data", () => {
