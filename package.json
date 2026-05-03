@@ -16,8 +16,8 @@
     },
     "scripts": {
         "ci": "pnpm lint && pnpm tsc && pnpm test",
-        "vitest": "vitest run --coverage --config config/vitest.config.ts",
-        "vitest-watch": "vitest --config config/vitest.config.ts",
+        "vitest": "vitest run --coverage --config test/vitest.config.ts",
+        "vitest-watch": "vitest --config test/vitest.config.ts",
         "lint": "eslint src",
         "production": "./config/production",
         "devserver": "SERVE=true rollup --config config/rollup.config.mjs --watch",
