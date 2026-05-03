@@ -9,8 +9,8 @@ export default defineConfig({
   },
   test: {
     coverage: {
-      exclude: ['src/playwright'],
-      include: ['src/**'],
+      exclude: ["playwright", "test/support/"],
+      include: ["src/**"],
       provider: "istanbul",
       reporter: ["json"],
       reportsDirectory: "js-coverage"
