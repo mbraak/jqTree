@@ -1,7 +1,7 @@
 import cspellESLintPluginRecommended from "@cspell/eslint-plugin/recommended";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import importPlugin from "eslint-plugin-import";
+import importPlugin from "eslint-plugin-import-x";
 import jestDomPlugin from "eslint-plugin-jest-dom";
 import jestExtendedPlugin from "eslint-plugin-jest-extended";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
@@ -66,6 +66,8 @@ export default [
     {
         files: ["src/test/**/*.ts"],
         rules: {
+            "import-x/no-named-as-default": "off",
+            "import-x/no-named-as-default-member": "off",
             "vitest/no-duplicate-hooks": "off",
             "vitest/no-hooks": "off",
             "vitest/no-identical-title": "off",
