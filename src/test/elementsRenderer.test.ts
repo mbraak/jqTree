@@ -1,5 +1,5 @@
-import ElementsRenderer from "../elementsRenderer";
-import { Node } from "../node";
+import ElementsRenderer from "app/elementsRenderer";
+import { Node } from "app/node";
 
 describe("renderFromNode", () => {
     beforeEach(() => {

@@ -1,5 +1,5 @@
-import { Node } from "../../node";
-import GhostDropHint from "../../nodeElement/ghostDropHint";
+import { Node } from "app/node";
+import GhostDropHint from "app/nodeElement/ghostDropHint";
 
 describe("GhostDropHint", () => {
     beforeEach(() => {

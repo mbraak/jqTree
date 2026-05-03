@@ -1,4 +1,4 @@
-import BorderDropHint from "../../nodeElement/borderDropHint";
+import BorderDropHint from "app/nodeElement/borderDropHint";
 
 describe("BorderDropHint", () => {
     it("creates an element", () => {

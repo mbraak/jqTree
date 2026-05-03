@@ -1,6 +1,6 @@
 import axe from "axe-core";
 
-import "../../tree.jquery";
+import "app/tree.jquery";
 import exampleData from "../support/exampleData";
 
 describe("accessibility", () => {

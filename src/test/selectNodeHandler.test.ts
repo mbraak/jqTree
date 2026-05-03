@@ -1,5 +1,5 @@
-import { Node } from "../node";
-import SelectNodeHandler from "../selectNodeHandler";
+import { Node } from "app/node";
+import SelectNodeHandler from "app/selectNodeHandler";
 
 describe("getSelectedNodesUnder", () => {
     it("returns the nodes when the nodes have an id", () => {

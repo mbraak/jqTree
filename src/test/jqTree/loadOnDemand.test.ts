@@ -4,7 +4,7 @@ import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
-import "../../tree.jquery";
+import "app/tree.jquery";
 import { togglerLink } from "../support/testUtil";
 
 const context = describe;

@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { vi } from "vitest";
 
 import {
     AddToSelection,
@@ -9,9 +9,9 @@ import {
     OpenNode,
     RefreshElements,
     RemoveFromSelection,
-} from "../jqtreeMethodTypes";
-import { Node } from "../node";
-import SaveStateHandler from "../saveStateHandler";
+} from "app/jqtreeMethodTypes";
+import { Node } from "app/node";
+import SaveStateHandler from "app/saveStateHandler";
 
 const createSaveStateHandler = ({
     addToSelection = vi.fn<AddToSelection>(),

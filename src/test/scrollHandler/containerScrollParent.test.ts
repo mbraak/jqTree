@@ -1,7 +1,7 @@
 import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
-import { vi } from 'vitest'
+import { vi } from "vitest";
 
-import ContainerScrollParent from "../../scrollHandler/containerScrollParent";
+import ContainerScrollParent from "app/scrollHandler/containerScrollParent";
 
 describe("checkHorizontalScrolling", () => {
     afterEach(() => {
