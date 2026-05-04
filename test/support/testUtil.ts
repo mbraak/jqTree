@@ -10,6 +10,13 @@ interface Rect {
     y: number;
 }
 
+export const assertJqTreeFolder = (el: HTMLElement) => {
+    /* istanbul ignore if @preserve */
+    if (!el.classList.contains("jqtree-folder")) {
+        throw new Error("Node is not a folder");
+    }
+};
+
 export const getChildren = (
     el: HTMLElement,
     nodeName: string,
