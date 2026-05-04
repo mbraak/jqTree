@@ -518,7 +518,7 @@ describe("options", () => {
                     }),
                     expect.objectContaining({ name: "node2", open: false }),
                 ]);
-                expect(given.node1.element).toBeSelected();
+                expect(given.node1.element).toBeSelectedTreeNode();
             });
         });
     });

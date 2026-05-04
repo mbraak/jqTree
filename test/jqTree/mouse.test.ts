@@ -22,12 +22,12 @@ describe("mouse", () => {
 
         const node = $tree.tree("getNodeByNameMustExist", "node1");
 
-        expect(node.element).not.toBeSelected();
-        expect(node.element).not.toBeFocused();
+        expect(node.element).not.toBeSelectedTreeNode();
+        expect(node.element).not.toBeFocusedTreeNode();
 
         await userEvent.click(titleSpan(node.element as HTMLElement));
 
-        expect(node.element).toBeSelected();
+        expect(node.element).toBeSelectedTreeNode();
     });
 
     it("deselects when a selected node is clicked", async () => {
@@ -37,11 +37,11 @@ describe("mouse", () => {
         const node = $tree.tree("getNodeByNameMustExist", "node1");
         $tree.tree("selectNode", node);
 
-        expect(node.element).toBeSelected();
+        expect(node.element).toBeSelectedTreeNode();
 
         await userEvent.click(titleSpan(node.element as HTMLElement));
 
-        expect(node.element).not.toBeSelected();
+        expect(node.element).not.toBeSelectedTreeNode();
     });
 
     it("opens a node when the toggle button is clicked", async () => {
@@ -50,11 +50,11 @@ describe("mouse", () => {
 
         const node = $tree.tree("getNodeByNameMustExist", "node1");
 
-        expect(node.element).not.toBeOpen();
+        expect(node.element).not.toBeOpenTreeNode();
 
         await userEvent.click(togglerLink(node.element as HTMLElement));
 
-        expect(node.element).toBeOpen();
+        expect(node.element).toBeOpenTreeNode();
     });
 
     it("doesn't select a node when it is opened", async () => {
@@ -63,13 +63,13 @@ describe("mouse", () => {
 
         const node = $tree.tree("getNodeByNameMustExist", "node1");
 
-        expect(node.element).not.toBeSelected();
-        expect(node.element).not.toBeOpen();
+        expect(node.element).not.toBeSelectedTreeNode();
+        expect(node.element).not.toBeOpenTreeNode();
 
         await userEvent.click(togglerLink(node.element as HTMLElement));
 
-        expect(node.element).not.toBeSelected();
-        expect(node.element).toBeOpen();
+        expect(node.element).not.toBeSelectedTreeNode();
+        expect(node.element).toBeOpenTreeNode();
     });
 
     it("keeps it selected when a selected node is opened", async () => {
@@ -79,12 +79,12 @@ describe("mouse", () => {
         const node = $tree.tree("getNodeByNameMustExist", "node1");
         $tree.tree("selectNode", node);
 
-        expect(node.element).toBeSelected();
-        expect(node.element).not.toBeOpen();
+        expect(node.element).toBeSelectedTreeNode();
+        expect(node.element).not.toBeOpenTreeNode();
 
         await userEvent.click(togglerLink(node.element as HTMLElement));
 
-        expect(node.element).toBeSelected();
-        expect(node.element).toBeOpen();
+        expect(node.element).toBeSelectedTreeNode();
+        expect(node.element).toBeOpenTreeNode();
     });
 });

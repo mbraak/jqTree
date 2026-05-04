@@ -1,6 +1,6 @@
 import { titleSpan } from "../testUtil";
 
-export function toBeFocused(el: HTMLElement) {
+export function toBeFocusedTreeNode(el: HTMLElement) {
   /* istanbul ignore next @preserve */
   return {
     message: () => "The is node is not focused",

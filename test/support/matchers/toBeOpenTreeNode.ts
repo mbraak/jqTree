@@ -1,6 +1,6 @@
 import { assertJqTreeFolder } from "../testUtil";
 
-export function toBeOpen(el: HTMLElement) {
+export function toBeOpenTreeNode(el: HTMLElement) {
   assertJqTreeFolder(el);
 
   /* istanbul ignore next @preserve */
