@@ -1,5 +1,7 @@
 import { ElementHandle, Locator, Page } from "@playwright/test";
 
+import { TreeStructure } from "../test/support/treeStructure";
+
 interface BoundingBox {
     height: number;
     width: number;
@@ -111,7 +113,7 @@ export const getTreeStructure = async (page: Page) => {
     JSON.stringify(window.getChildren(jQuery("ul.jqtree-tree")));
 `);
 
-    return JSON.parse(structure) as JQTreeMatchers.TreeStructure;
+    return JSON.parse(structure) as TreeStructure;
 };
 
 export const getNodeRect = async (

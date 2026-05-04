@@ -1,5 +1,5 @@
 import { titleSpan } from "./testUtil";
-import treeStructure from "./treeStructure";
+import treeStructure, { TreeStructure } from "./treeStructure";
 
 const assertJqTreeFolder = (el: HTMLElement) => {
     /* istanbul ignore if @preserve */
@@ -43,7 +43,7 @@ expect.extend({
     },
     toHaveTreeStructure(
         $el: JQuery,
-        expectedStructure: JQTreeMatchers.TreeStructure,
+        expectedStructure: TreeStructure,
     ) {
         const el = $el.get(0) as HTMLElement;
         const receivedStructure = treeStructure(el);

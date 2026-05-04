@@ -1,6 +1,23 @@
 import { getChildren, singleChild } from "./testUtil";
 
-const getTreeNode = (li: HTMLElement): JQTreeMatchers.TreeNode => {
+export type TreeNode = TreeChild | TreeFolder;
+
+export type TreeStructure = TreeNode[];
+
+interface TreeChild {
+    name: string;
+    nodeType: "child";
+    selected: boolean;
+}
+interface TreeFolder {
+    children: TreeNode[];
+    name: string;
+    nodeType: "folder";
+    open: boolean;
+    selected: boolean;
+}
+
+const getTreeNode = (li: HTMLElement): TreeNode => {
     const div = singleChild(li, "div", "jqtree-element");
     const span = singleChild(div, "span", "jqtree-title");
     const name = span.innerHTML;
@@ -33,7 +50,7 @@ const getTreeNode = (li: HTMLElement): JQTreeMatchers.TreeNode => {
 const getChildNodes = (ul: HTMLElement) =>
     getChildren(ul, "li", "jqtree_common").map((li) => getTreeNode(li));
 
-const treeStructure = (el: HTMLElement): JQTreeMatchers.TreeStructure => {
+const treeStructure = (el: HTMLElement): TreeStructure => {
     return getChildNodes(singleChild(el, "ul", "jqtree-tree"));
 };
 
