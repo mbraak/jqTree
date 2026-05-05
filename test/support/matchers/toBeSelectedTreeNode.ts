@@ -1,4 +1,4 @@
-export function toBeSelected(el: HTMLElement) {
+export function toBeSelectedTreeNode(el: HTMLElement) {
   /* istanbul ignore next @preserve */
   return {
     message: () => "The node is not selected",

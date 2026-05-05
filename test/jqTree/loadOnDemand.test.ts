@@ -122,28 +122,28 @@ describe("load on demand", () => {
             });
 
             it("keeps the node selected", async () => {
-                expect(given.node.element).toBeSelected();
-                expect(given.node.element).toBeFocused();
+                expect(given.node.element).toBeSelectedTreeNode();
+                expect(given.node.element).toBeFocusedTreeNode();
 
                 const toggler = togglerLink(given.node.element as HTMLElement);
                 await userEvent.click(toggler);
 
                 await screen.findByText("loaded-on-demand");
 
-                expect(given.node.element).toBeSelected();
+                expect(given.node.element).toBeSelectedTreeNode();
             });
         });
 
         context("when the node is not selected", () => {
             it("doesn't select the node", async () => {
-                expect(given.node.element).not.toBeSelected();
+                expect(given.node.element).not.toBeSelectedTreeNode();
 
                 const toggler = togglerLink(given.node.element as HTMLElement);
                 await userEvent.click(toggler);
 
                 await screen.findByText("loaded-on-demand");
 
-                expect(given.node.element).not.toBeSelected();
+                expect(given.node.element).not.toBeSelectedTreeNode();
             });
         });
 
@@ -154,16 +154,16 @@ describe("load on demand", () => {
             });
 
             it("keeps the node selected and not focused", async () => {
-                expect(given.node.element).toBeSelected();
-                expect(given.node.element).not.toBeFocused();
+                expect(given.node.element).toBeSelectedTreeNode();
+                expect(given.node.element).not.toBeFocusedTreeNode();
 
                 const toggler = togglerLink(given.node.element as HTMLElement);
                 await userEvent.click(toggler);
 
                 await screen.findByText("loaded-on-demand");
 
-                expect(given.node.element).toBeSelected();
-                expect(given.node.element).not.toBeFocused();
+                expect(given.node.element).toBeSelectedTreeNode();
+                expect(given.node.element).not.toBeFocusedTreeNode();
             });
         });
     });

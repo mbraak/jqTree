@@ -350,7 +350,7 @@ describe("methods", () => {
         it("closes the node", () => {
             given.$tree.tree("closeNode", given.node1, false);
 
-            expect(given.node1.element).toBeClosed();
+            expect(given.node1.element).toBeClosedTreeNode();
         });
 
         it("throws an error without a node parameter", () => {
@@ -1086,7 +1086,7 @@ describe("methods", () => {
         it("opens the node", () => {
             given.$tree.tree("openNode", given.node1, false);
 
-            expect(given.node1.element).toBeOpen();
+            expect(given.node1.element).toBeOpenTreeNode();
         });
 
         it("calls the function with onFinished parameter", async () => {
@@ -1444,8 +1444,8 @@ describe("methods", () => {
             });
 
             it("selects the node and deselects the previous node", () => {
-                expect(given.node1.element).toBeSelected();
-                expect(given.node2.element).not.toBeSelected();
+                expect(given.node1.element).toBeSelectedTreeNode();
+                expect(given.node2.element).not.toBeSelectedTreeNode();
             });
         });
 
@@ -1455,7 +1455,7 @@ describe("methods", () => {
             });
 
             it("selects the node", () => {
-                expect(given.node1.element).toBeSelected();
+                expect(given.node1.element).toBeSelectedTreeNode();
             });
         });
 
@@ -1467,7 +1467,7 @@ describe("methods", () => {
             it("deselects the node", () => {
                 given.$tree.tree("selectNode", given.node1);
 
-                expect(given.node1.element).not.toBeSelected();
+                expect(given.node1.element).not.toBeSelectedTreeNode();
             });
         });
 
@@ -1594,7 +1594,7 @@ describe("methods", () => {
         it("opens the node when the node is closed", () => {
             given.$tree.tree("toggle", given.node1, false);
 
-            expect(given.node1.element).toBeOpen();
+            expect(given.node1.element).toBeOpenTreeNode();
         });
 
         context("when the node is open", () => {
@@ -1603,7 +1603,7 @@ describe("methods", () => {
             it("closes the node", () => {
                 given.$tree.tree("toggle", given.node1, false);
 
-                expect(given.node1.element).toBeClosed();
+                expect(given.node1.element).toBeClosedTreeNode();
             });
         });
 
@@ -1788,7 +1788,7 @@ describe("methods", () => {
             it("keeps the focus on the node", () => {
                 given.$tree.tree("updateNode", given.node, given.nodeData);
 
-                expect(given.node.element).toBeFocused();
+                expect(given.node.element).toBeFocusedTreeNode();
             });
         });
 
