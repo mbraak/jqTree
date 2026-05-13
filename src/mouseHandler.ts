@@ -1,10 +1,11 @@
-import { TriggerEvent } from "./jqtreeMethodTypes";
+import type { TriggerEvent } from "./jqtreeMethodTypes";
+import type { PositionInfo } from "./mouseUtils";
+import type { Node } from "./node";
+
 import {
     getPositionInfoFromMouseEvent,
     getPositionInfoFromTouch,
-    PositionInfo,
 } from "./mouseUtils";
-import { Node } from "./node";
 
 export type GetMouseDelay = () => number;
 export type GetNode = (element: HTMLElement) => Node | null;

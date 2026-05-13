@@ -1,24 +1,25 @@
-import {
+import type {
     GetScrollLeft,
     GetTree,
     OpenNode,
     RefreshElements,
     TriggerEvent,
 } from "../jqtreeMethodTypes";
-import {
+import type {
     DragMethod,
     OnCanMove,
     OnCanMoveTo,
     OnIsMoveHandle,
 } from "../jqtreeOptions";
-import { PositionInfo } from "../mouseUtils";
-import { Node } from "../node";
-import NodeElement from "../nodeElement";
+import type { PositionInfo } from "../mouseUtils";
+import type { Node } from "../node";
+import type NodeElement from "../nodeElement";
+import type { DropHint, HitArea } from "./types";
+
 import { getElementPosition } from "../util";
 import binarySearch from "./binarySearch";
 import DragElement from "./dragElement";
 import generateHitAreas from "./generateHitAreas";
-import { DropHint, HitArea } from "./types";
 
 interface Dimensions {
     bottom: number;

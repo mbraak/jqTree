@@ -1,6 +1,8 @@
-import { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
-import { Position } from "../node";
-import NodeElement, { NodeElementParams } from "./index";
+import type { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
+import type { Position } from "../node";
+import type { NodeElementParams } from "./index";
+
+import NodeElement from "./index";
 
 interface FolderElementParams extends NodeElementParams {
     closedIconElement?: HTMLElement | Text;

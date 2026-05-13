@@ -1,13 +1,14 @@
 import { vi } from "vitest";
 
-import { DragAndDropHandler } from "app/dragAndDropHandler";
-import { GetScrollLeft, GetTree, OpenNode } from "app/jqtreeMethodTypes";
-import {
+import type { GetScrollLeft, GetTree, OpenNode } from "app/jqtreeMethodTypes";
+import type {
     DragMethod,
     OnCanMove,
     OnCanMoveTo,
     OnIsMoveHandle,
 } from "app/jqtreeOptions";
+
+import { DragAndDropHandler } from "app/dragAndDropHandler";
 import { Node } from "app/node";
 import NodeElement from "app/nodeElement";
 
