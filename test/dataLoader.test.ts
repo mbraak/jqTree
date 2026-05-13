@@ -3,8 +3,9 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
+import type { TriggerEvent } from "app/jqtreeMethodTypes";
+
 import DataLoader from "app/dataLoader";
-import { TriggerEvent } from "app/jqtreeMethodTypes";
 
 describe("loadFromUrl", () => {
     const server = setupServer();

@@ -1,6 +1,7 @@
-import { DropHint } from "../dragAndDropHandler/types";
-import { GetScrollLeft } from "../jqtreeMethodTypes";
-import { Node, Position } from "../node";
+import type { DropHint } from "../dragAndDropHandler/types";
+import type { GetScrollLeft } from "../jqtreeMethodTypes";
+import type { Node, Position } from "../node";
+
 import BorderDropHint from "./borderDropHint";
 import GhostDropHint from "./ghostDropHint";
 

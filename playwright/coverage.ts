@@ -1,4 +1,5 @@
-import { BrowserContext } from "@playwright/test";
+import type { BrowserContext } from "@playwright/test";
+
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";

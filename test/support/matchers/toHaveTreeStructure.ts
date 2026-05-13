@@ -1,6 +1,8 @@
-import { MatcherState } from 'vitest'
+import type { MatcherState } from 'vitest';
 
-import treeStructure, { TreeStructure } from "../treeStructure";
+import type { TreeStructure } from "../treeStructure";
+
+import treeStructure from "../treeStructure";
 
 export function toHaveTreeStructure(
   this: MatcherState,

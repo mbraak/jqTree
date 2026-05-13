@@ -1,15 +1,19 @@
-import DataLoader, { HandleFinishedLoading } from "./dataLoader";
+import type { HandleFinishedLoading } from "./dataLoader";
+import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
+import type { JQTreeOptions } from "./jqtreeOptions";
+import type { PositionInfo } from "./mouseUtils";
+import type { Position } from "./node";
+import type { SavedState } from "./saveStateHandler";
+
+import DataLoader from "./dataLoader";
 import { DragAndDropHandler } from "./dragAndDropHandler";
 import ElementsRenderer from "./elementsRenderer";
-import { OnFinishOpenNode } from "./jqtreeMethodTypes";
-import { JQTreeOptions } from "./jqtreeOptions";
 import KeyHandler from "./keyHandler";
 import MouseHandler from "./mouseHandler";
-import { PositionInfo } from "./mouseUtils";
-import { Node, Position } from "./node";
+import { Node } from "./node";
 import NodeElement from "./nodeElement";
 import FolderElement from "./nodeElement/folderElement";
-import SaveStateHandler, { SavedState } from "./saveStateHandler";
+import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
