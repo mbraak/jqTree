@@ -1,5 +1,5 @@
-import { GetNodeById } from "./jqtreeMethodTypes";
-import { Node } from "./node";
+import type { GetNodeById } from "./jqtreeMethodTypes";
+import type { Node } from "./node";
 
 interface SelectNodeHandlerParameters {
     getNodeById: GetNodeById;

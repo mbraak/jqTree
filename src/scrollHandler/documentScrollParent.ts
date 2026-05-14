@@ -1,9 +1,10 @@
-import { getOffsetTop } from "../util";
-import {
+import type {
     HorizontalScrollDirection,
-    ScrollParent,
     VerticalScrollDirection,
 } from "./scrollParent";
+
+import { getOffsetTop } from "../util";
+import { ScrollParent } from "./scrollParent";
 
 interface Params {
     refreshHitAreas: () => void;

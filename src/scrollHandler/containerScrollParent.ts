@@ -1,9 +1,11 @@
-import { getElementPosition, getOffsetTop } from "../util";
-import {
+import type {
     HorizontalScrollDirection,
-    ScrollParent,
     VerticalScrollDirection,
 } from "./scrollParent";
+
+import { getElementPosition, getOffsetTop } from "../util";
+import { ScrollParent } from "./scrollParent";
+
 
 export default class ContainerScrollParent extends ScrollParent {
     private scrollParentBottom?: number;

@@ -1,11 +1,11 @@
-import {
+import type {
     CloseNode,
     GetSelectedNode,
     IsFocusOnTree,
     OpenNode,
     SelectNode,
 } from "./jqtreeMethodTypes";
-import { Node } from "./node";
+import type { Node } from "./node";
 
 interface KeyHandlerParams {
     closeNode: CloseNode;

@@ -1,4 +1,4 @@
-import { Node } from "../node";
+import type { Node } from "../node";
 
 interface Options {
     handleAfterOpenFolder: (node: Node, nextNode: Node | null) => void;

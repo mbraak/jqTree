@@ -1,7 +1,8 @@
-import { Node, Position } from "../node";
+import type { Node, Position } from "../node";
+import type { HitArea } from "./types";
+
 import { getOffsetTop } from "../util";
 import iterateVisibleNodes from "./iterateVisibleNodes";
-import { HitArea } from "./types";
 
 interface HitPosition {
     node: Node;

@@ -25,6 +25,7 @@ export default [
             },
         },
         rules: {
+            "@typescript-eslint/consistent-type-imports": "error",
             "@typescript-eslint/explicit-function-return-type": "off",
             "@typescript-eslint/interface-name-prefix": "off",
             "@typescript-eslint/no-empty-object-type": "off",

@@ -1,4 +1,4 @@
-import {
+import type {
     AddToSelection,
     GetNodeById,
     GetSelectedNodes,
@@ -7,8 +7,9 @@ import {
     RefreshElements,
     RemoveFromSelection,
 } from "./jqtreeMethodTypes";
-import { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
-import { Node } from "./node";
+import type { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
+import type { Node } from "./node";
+
 import { isInt } from "./util";
 
 export interface SavedState {

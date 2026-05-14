@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-import {
+import type {
     AddToSelection,
     GetNodeById,
     GetSelectedNodes,
@@ -10,6 +10,7 @@ import {
     RefreshElements,
     RemoveFromSelection,
 } from "app/jqtreeMethodTypes";
+
 import { Node } from "app/node";
 import SaveStateHandler from "app/saveStateHandler";
 

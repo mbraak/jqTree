@@ -1,6 +1,7 @@
-import { GetTree, IsNodeSelected } from "./jqtreeMethodTypes";
-import { IconElement, OnCreateLi } from "./jqtreeOptions";
-import { Node } from "./node";
+import type { GetTree, IsNodeSelected } from "./jqtreeMethodTypes";
+import type { IconElement, OnCreateLi } from "./jqtreeOptions";
+import type { Node } from "./node";
+
 import { getBoolString } from "./util";
 
 interface ElementsRendererParams {

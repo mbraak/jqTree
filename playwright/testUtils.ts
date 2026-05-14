@@ -1,6 +1,6 @@
-import { ElementHandle, Locator, Page } from "@playwright/test";
+import type { ElementHandle, Locator, Page } from "@playwright/test";
 
-import { TreeStructure } from "../test/support/treeStructure";
+import type { TreeStructure } from "../test/support/treeStructure";
 
 interface BoundingBox {
     height: number;
