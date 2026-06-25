@@ -69,7 +69,7 @@ jobs:
             - name: Merge coverage
               run: cp js-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
             - name: Codecov
-              uses: codecov/codecov-action@v6
+              uses: codecov/codecov-action@v7
               with:
                   directory: .nyc_output
                   verbose: true
