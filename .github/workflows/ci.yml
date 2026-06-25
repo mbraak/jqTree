@@ -22,14 +22,14 @@ jobs:
               id: pnpm-cache
               run: |
                   echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v5
+            - uses: actions/cache@v6
               name: Setup pnpm cache
               with:
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
                   restore-keys: |
                       ${{ runner.os }}-pnpm-store-
-            - uses: actions/cache@v5
+            - uses: actions/cache@v6
               name: Setup Playwright browsers cache
               with:
                   path: /home/runner/.cache/ms-playwright/
