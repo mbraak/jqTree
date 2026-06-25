@@ -17,7 +17,7 @@ jobs:
             - name: Install packages
               run: pnpm install
             - name: Check compressed size
-              uses: preactjs/compressed-size-action@v2
+              uses: preactjs/compressed-size-action@v3
               with:
                   build-script: "production"
                   pattern: "./lib/**/*.js"
