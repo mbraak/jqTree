@@ -11,7 +11,7 @@ jobs:
 
         steps:
             - name: Check out repository code
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
             - name: Setup node
               uses: actions/setup-node@v6
               with:
@@ -22,14 +22,14 @@ jobs:
               id: pnpm-cache
               run: |
                   echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v5
+            - uses: actions/cache@v6
               name: Setup pnpm cache
               with:
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
                   restore-keys: |
                       ${{ runner.os }}-pnpm-store-
-            - uses: actions/cache@v5
+            - uses: actions/cache@v6
               name: Setup Playwright browsers cache
               with:
                   path: /home/runner/.cache/ms-playwright/
@@ -61,7 +61,7 @@ jobs:
               run: pnpm run playwright
             - name: Screenshots artifact
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   if-no-files-found: ignore
                   name: screenshots
