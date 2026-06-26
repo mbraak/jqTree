@@ -61,7 +61,7 @@ jobs:
               run: pnpm run playwright
             - name: Screenshots artifact
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   if-no-files-found: ignore
                   name: screenshots
