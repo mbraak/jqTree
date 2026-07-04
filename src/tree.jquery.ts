@@ -17,7 +17,7 @@ import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
-import { getOffsetTop, isFunction } from "./util";
+import { getOffsetTop, isFunction, setQueryParameter } from "./util";
 import __version__ from "./version";
 
 interface SelectNodeOptions {
@@ -860,38 +860,15 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const dataUrl =
             this.options.dataUrl ?? (this.element.data("url") as null | string);
 
-        const addDataToUrl = (inputUrl: string, key: string, value: string) => {
-            // todo: move to util and test
-            // todo: update dataUrl docs (more?)
-            const isAbsolute = inputUrl.startsWith('http://');
-            let url: URL;
-            const localhost = 'http://localhost';
-
-            if (isAbsolute) {
-                url = new URL(inputUrl)
-            }
-            else {
-                url = new URL(inputUrl, localhost);
-            }
-
-            url.searchParams.set(key, value);
-
-            if (isAbsolute) {
-                return url.href;
-            } else {
-                return url.href.slice(localhost.length);
-            }
-        };
-
         const setUrlInfoData = (url: string): string => {
             if (node?.id) {
                 // Load on demand of a subtree; add node parameter
-                return addDataToUrl(url, 'node', node.id.toString());
+                return setQueryParameter(url, 'node', node.id.toString());
             } else {
                 // Add selected_node parameter
                 const selectedNodeId = this.getNodeIdToBeSelected();
                 if (selectedNodeId) {
-                    return addDataToUrl(url, 'selected_node', selectedNodeId.toString());
+                    return setQueryParameter(url, 'selected_node', selectedNodeId.toString());
                 } else {
                     return url;
                 }

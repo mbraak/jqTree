@@ -1,4 +1,4 @@
-import { getBoolString, isFunction, isInt } from "app/util";
+import { getBoolString, isFunction, isInt, setQueryParameter } from "app/util";
 
 describe("getBoolString", () => {
     it("returns true or false", () => {
@@ -23,5 +23,23 @@ describe("isInt", () => {
         expect(isInt(-1)).toBeTrue();
         expect(isInt("1")).toBeFalse();
         expect(isInt(null)).toBeFalse();
+    });
+});
+
+describe("setQueryParameter", () => {
+    it("adds a query parameter to a relative url", () => {
+        expect(setQueryParameter('/data', 'node', '123')).toBe('/data?node=123')
+    });
+
+    it("adds a query parameter to an absolute url", () => {
+        expect(setQueryParameter('https://myserver/data', 'node', '123')).toBe('https://myserver/data?node=123')
+    });
+
+    it("adds a query parameter when the url already has a query parameter", () => {
+        expect(setQueryParameter('/data?param1=xyz', 'node', '123')).toBe('/data?param1=xyz&node=123')
+    });
+
+    it("todo encode", () => {
+        expect(setQueryParameter('/data', 'node', '?')).toBe('/data?node=%3F')
     });
 });
