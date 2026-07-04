@@ -778,7 +778,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private doLoadDataFromUrl(
-        urlInfoParam: JQuery.AjaxSettings | null | string,
+        urlInfoParam: null | string,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {
@@ -856,43 +856,62 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private getDataUrlInfo(node: Node | null): JQuery.AjaxSettings | null {
+    private getDataUrlInfo(node: Node | null): null | string {
         const dataUrl =
             this.options.dataUrl ?? (this.element.data("url") as null | string);
 
-        const getUrlFromString = (url: string): JQuery.AjaxSettings => {
-            const urlInfo: JQuery.AjaxSettings = { url };
+        const addDataToUrl = (inputUrl: string, key: string, value: string) => {
+            // todo: move to util and test
+            // todo: update dataUrl docs (more?)
+            const isAbsolute = inputUrl.startsWith('http://');
+            let url: URL;
+            const localhost = 'http://localhost';
 
-            setUrlInfoData(urlInfo);
+            if (isAbsolute) {
+                url = new URL(inputUrl)
+            }
+            else {
+                url = new URL(inputUrl, localhost);
+            }
 
-            return urlInfo;
+            url.searchParams.set(key, value);
+
+            if (isAbsolute) {
+                return url.href;
+            } else {
+                return url.href.slice(localhost.length);
+            }
         };
 
-        const setUrlInfoData = (urlInfo: JQuery.AjaxSettings): void => {
+        const setUrlInfoData = (url: string): string => {
             if (node?.id) {
                 // Load on demand of a subtree; add node parameter
-                const data = { node: node.id };
-                urlInfo.data = data;
+                return addDataToUrl(url, 'node', node.id.toString());
             } else {
                 // Add selected_node parameter
                 const selectedNodeId = this.getNodeIdToBeSelected();
                 if (selectedNodeId) {
-                    const data = { selected_node: selectedNodeId };
-                    urlInfo.data = data;
+                    return addDataToUrl(url, 'selected_node', selectedNodeId.toString());
+                } else {
+                    return url;
                 }
             }
         };
 
+        let url;
+
         if (typeof dataUrl === "function") {
-            return dataUrl(node);
-        } else if (typeof dataUrl === "string") {
-            return getUrlFromString(dataUrl);
-        } else if (dataUrl && typeof dataUrl === "object") {
-            setUrlInfoData(dataUrl);
-            return dataUrl;
+            url = dataUrl(node);
+        } else {
+            url = dataUrl;
+        }
+
+        if (url) {
+            return setUrlInfoData(url);
         } else {
             return null;
         }
+
     }
 
     private getDefaultClosedIcon(): string {

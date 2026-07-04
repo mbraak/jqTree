@@ -38,7 +38,7 @@ export default class DataLoader {
     }
 
     public loadFromUrl(
-        urlInfo: JQuery.AjaxSettings | null | string,
+        urlInfo: null | string,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {

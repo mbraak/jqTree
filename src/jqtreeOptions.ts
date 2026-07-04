@@ -2,7 +2,7 @@ import type { Node } from "./node";
 
 export type DataFilter = (data: unknown) => NodeData[];
 
-export type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
+export type DataUrl = DataUrlFunction | string;
 
 export type DragMethod = (node: Node, event: Event | Touch) => void;
 
@@ -67,4 +67,4 @@ export type OnLoading = (
 
 export type OnSetStateFromStorage = ((data: string) => void) | undefined;
 
-type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
+type DataUrlFunction = (node: Node | null) => string;

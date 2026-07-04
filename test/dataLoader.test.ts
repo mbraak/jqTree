@@ -61,7 +61,7 @@ describe("loadFromUrl", () => {
             treeElement,
             triggerEvent,
         });
-        dataLoader.loadFromUrl({ dataType: "text", url: "/test" }, null, null);
+        dataLoader.loadFromUrl("/test", null, null);
 
         await waitFor(() => {
             expect(loadData).toHaveBeenCalledExactlyOnceWith({ key1: "value1" }, null);

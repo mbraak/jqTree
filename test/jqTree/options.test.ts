@@ -377,7 +377,7 @@ describe("options", () => {
             localStorage.setItem("tree", '{"selected_node":[124]}');
 
             given.$tree.tree({
-                dataUrl: { url: "/tree/" },
+                dataUrl: "/tree/",
                 saveState: true,
             });
 
@@ -392,7 +392,7 @@ describe("options", () => {
             localStorage.setItem("tree", "{}");
 
             given.$tree.tree({
-                dataUrl: { url: "/tree/" },
+                dataUrl: "/tree/",
                 saveState: true,
             });
 
