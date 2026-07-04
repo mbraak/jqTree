@@ -8,6 +8,7 @@ import type { SavedState } from "./saveStateHandler";
 import DataLoader from "./dataLoader";
 import { DragAndDropHandler } from "./dragAndDropHandler";
 import ElementsRenderer from "./elementsRenderer";
+import HtmlTree from "./htmlTree";
 import KeyHandler from "./keyHandler";
 import MouseHandler from "./mouseHandler";
 import { Node } from "./node";
@@ -72,7 +73,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private dndHandler: DragAndDropHandler;
     private element: JQuery;
 
-    private isInitialized: boolean;
     private keyHandler: KeyHandler;
     private mouseHandler: MouseHandler;
     private renderer: ElementsRenderer;
@@ -247,11 +247,9 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         super.init();
 
         this.element = this.$el;
-        this.isInitialized = false;
 
-        this.options.rtl = this.getRtlOption();
-
-        this.options.closedIcon ??= this.getDefaultClosedIcon();
+        const htmlElement = this.$el.get(0) as HTMLElement;
+        this.htmlTree = new HtmlTree(htmlElement, this.options);
 
         this.connectHandlers();
 
@@ -895,16 +893,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private getDefaultClosedIcon(): string {
-        if (this.options.rtl) {
-            // triangle to the left
-            return "&#x25c0;";
-        } else {
-            // triangle to the right
-            return "&#x25ba;";
-        }
-    }
-
     private getNode(element: HTMLElement): Node | null {
         const liElement = element.closest("li.jqtree_common");
 
@@ -937,24 +925,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return this.saveStateHandler.getNodeIdToBeSelected();
         } else {
             return null;
-        }
-    }
-
-    private getRtlOption(): boolean {
-        if (this.options.rtl != null) {
-            return this.options.rtl;
-        } else {
-            const dataRtl = this.element.data("rtl") as unknown;
-
-            if (
-                dataRtl !== null &&
-                dataRtl !== false &&
-                dataRtl !== undefined
-            ) {
-                return true;
-            } else {
-                return false;
-            }
         }
     }
 
