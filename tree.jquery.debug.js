@@ -130,6 +130,37 @@ var jqtree = (function (exports) {
       };
     };
 
+    /* Set query parameter of an url.
+
+    # relative url
+    setQueryParameter('/data', 'node', '123');
+    => '/data?node=123'
+
+    # absolute url
+    setQueryParameter('http://server/data', 'node', '123');
+    => 'http://server/data?node=123'
+
+    # existing parameter
+    setQueryParameter('/data?param1=xyz', 'node', '123');
+    => '/data?param1=xyz&node=123'
+    */
+    const setQueryParameter = (inputUrl, key, value) => {
+      const isAbsolute = inputUrl.startsWith('http');
+      let url;
+      const localhost = 'http://localhost';
+      if (isAbsolute) {
+        url = new URL(inputUrl);
+      } else {
+        url = new URL(inputUrl, localhost);
+      }
+      url.searchParams.set(key, value);
+      if (isAbsolute) {
+        return url.href;
+      } else {
+        return url.href.slice(localhost.length);
+      }
+    };
+
     function binarySearch(items, compareFn) {
       let low = 0;
       let high = items.length;
@@ -3214,38 +3245,28 @@ var jqtree = (function (exports) {
       }
       getDataUrlInfo(node) {
         const dataUrl = this.options.dataUrl ?? this.element.data("url");
-        const getUrlFromString = url => {
-          const urlInfo = {
-            url
-          };
-          setUrlInfoData(urlInfo);
-          return urlInfo;
-        };
-        const setUrlInfoData = urlInfo => {
+        const setUrlInfoData = url => {
           if (node?.id) {
             // Load on demand of a subtree; add node parameter
-            const data = {
-              node: node.id
-            };
-            urlInfo.data = data;
+            return setQueryParameter(url, 'node', node.id.toString());
           } else {
             // Add selected_node parameter
             const selectedNodeId = this.getNodeIdToBeSelected();
             if (selectedNodeId) {
-              const data = {
-                selected_node: selectedNodeId
-              };
-              urlInfo.data = data;
+              return setQueryParameter(url, 'selected_node', selectedNodeId.toString());
+            } else {
+              return url;
             }
           }
         };
+        let url;
         if (typeof dataUrl === "function") {
-          return dataUrl(node);
-        } else if (typeof dataUrl === "string") {
-          return getUrlFromString(dataUrl);
-        } else if (dataUrl && typeof dataUrl === "object") {
-          setUrlInfoData(dataUrl);
-          return dataUrl;
+          url = dataUrl(node);
+        } else {
+          url = dataUrl;
+        }
+        if (url) {
+          return setUrlInfoData(url);
         } else {
           return null;
         }
