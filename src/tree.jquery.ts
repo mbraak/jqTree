@@ -782,9 +782,11 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {
-        const urlInfo = urlInfoParam ?? this.getDataUrlInfo(parentNode);
+        const url = urlInfoParam ?? this.getDataUrlInfo(parentNode);
 
-        this.dataLoader.loadFromUrl(urlInfo, parentNode, onFinished);
+        if (url) {
+            this.dataLoader.loadFromUrl(url, parentNode, onFinished);
+        }
     }
 
     private doSelectNode(

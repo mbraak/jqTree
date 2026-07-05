@@ -57,7 +57,7 @@ export type OnGetStateFromStorage = (() => string) | undefined;
 
 export type OnIsMoveHandle = (el: JQuery) => boolean;
 
-export type OnLoadFailed = (response: JQuery.jqXHR) => void;
+export type OnLoadFailed = (response: Response) => void;
 
 export type OnLoading = (
     isLoading: boolean,
