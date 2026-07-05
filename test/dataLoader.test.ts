@@ -204,4 +204,32 @@ describe("loadFromUrl", () => {
             expect(loadData).toHaveBeenCalledExactlyOnceWith(["changed"], null);
         });
     });
+
+    it("adds a parameter with a timestamp to force the response not to be cached", async () => {
+        let requestUrl = "";
+
+        server.use(
+            http.get(
+                "/test",
+                ({ request }) => {
+                    requestUrl = request.url;
+                    return new HttpResponse('{ "key1": "value1" }')
+                }
+            ),
+        );
+
+        const { dataLoader } = createDataLoader();
+        dataLoader.loadFromUrl("/test", null, null);
+
+        await waitFor(() => {
+            const url = new URL(requestUrl);
+
+            expect(url.pathname).toBe("/test");
+
+            const cacheBuster = url.searchParams.get('_');
+
+            expect(cacheBuster).toBeString();
+            expect(cacheBuster).not.toBeEmpty();
+        });
+    });
 });
