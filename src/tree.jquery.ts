@@ -17,7 +17,7 @@ import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
-import { getOffsetTop, isFunction } from "./util";
+import { getOffsetTop } from "./util";
 import __version__ from "./version";
 
 interface SelectNodeOptions {
@@ -367,8 +367,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             let onFinished: null | OnFinishOpenNode;
             let slide: boolean | null;
 
-            if (isFunction(param1)) {
-                onFinished = param1 as OnFinishOpenNode;
+            if (typeof param1 === "function") {
+                onFinished = param1;
                 slide = null;
             } else {
                 slide = param1 as boolean;
