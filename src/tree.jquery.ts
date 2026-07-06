@@ -13,11 +13,12 @@ import MouseHandler from "./mouseHandler";
 import { Node } from "./node";
 import NodeElement from "./nodeElement";
 import FolderElement from "./nodeElement/folderElement";
+import RequestUrl from "./requestUrl";
 import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
-import { getOffsetTop, isFunction, setQueryParameter } from "./util";
+import { getOffsetTop, isFunction } from "./util";
 import __version__ from "./version";
 
 interface SelectNodeOptions {
@@ -742,6 +743,38 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         });
     }
 
+    private createRequestUrl(node: Node | null): null | RequestUrl {
+        const dataUrl =
+            this.options.dataUrl ?? (this.element.data("url") as null | string);
+
+        let url;
+
+        if (typeof dataUrl === "function") {
+            url = dataUrl(node);
+        } else {
+            url = dataUrl;
+        }
+
+        if (!url) {
+            return null;
+        }
+
+        const requestUrl = new RequestUrl(url);
+
+        if (node?.id) {
+            // Load on demand of a subtree; add node parameter
+            requestUrl.setSearchParam('node', node.id.toString());
+        } else {
+            // Add selected_node parameter
+            const selectedNodeId = this.getNodeIdToBeSelected();
+            if (selectedNodeId) {
+                requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
+            }
+        }
+
+        return requestUrl;
+    }
+
     private deselectCurrentNode(): void {
         const node = this.getSelectedNode();
         if (node) {
@@ -778,11 +811,11 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private doLoadDataFromUrl(
-        urlInfoParam: null | string,
+        inputUrl: null | string,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {
-        const url = urlInfoParam ?? this.getDataUrlInfo(parentNode);
+        const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
 
         if (url) {
             this.dataLoader.loadFromUrl(url, parentNode, onFinished);
@@ -858,41 +891,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private getDataUrlInfo(node: Node | null): null | string {
-        const dataUrl =
-            this.options.dataUrl ?? (this.element.data("url") as null | string);
-
-        const setUrlInfoData = (url: string): string => {
-            if (node?.id) {
-                // Load on demand of a subtree; add node parameter
-                return setQueryParameter(url, 'node', node.id.toString());
-            } else {
-                // Add selected_node parameter
-                const selectedNodeId = this.getNodeIdToBeSelected();
-                if (selectedNodeId) {
-                    return setQueryParameter(url, 'selected_node', selectedNodeId.toString());
-                } else {
-                    return url;
-                }
-            }
-        };
-
-        let url;
-
-        if (typeof dataUrl === "function") {
-            url = dataUrl(node);
-        } else {
-            url = dataUrl;
-        }
-
-        if (url) {
-            return setUrlInfoData(url);
-        } else {
-            return null;
-        }
-
-    }
-
     private getDefaultClosedIcon(): string {
         if (this.options.rtl) {
             // triangle to the left
@@ -960,7 +958,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (this.options.data) {
             this.doLoadData(this.options.data, null);
         } else {
-            const dataUrl = this.getDataUrlInfo(null);
+            const dataUrl = this.createRequestUrl(null);
 
             if (dataUrl) {
                 this.doLoadDataFromUrl(null, null, null);

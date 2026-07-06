@@ -1,8 +1,7 @@
 import type { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
 import type { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
 import type { Node } from "./node";
-
-import { setQueryParameter } from "./util"
+import type RequestUrl from "./requestUrl";
 
 export type HandleFinishedLoading = () => void;
 
@@ -42,7 +41,7 @@ export default class DataLoader {
     }
 
     public loadFromUrl(
-        url: string,
+        url: RequestUrl,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {
@@ -118,15 +117,15 @@ export default class DataLoader {
     }
 
     private async submitRequest(
-        url: string,
+        url: RequestUrl,
         handleSuccess: HandleSuccess,
         handleError: OnLoadFailed,
     ): Promise<void> {
         const headers = { "Content-Type": "application/json" };
 
-        const urlWithCacheBuster = setQueryParameter(url, "_", Date.now().toString());
+        url.setSearchParam("_", Date.now().toString());
 
-        const response = await fetch(urlWithCacheBuster, { headers });
+        const response = await fetch(url.toString(), { headers });
 
         if (response.ok) {
             const data = await response.json() as NodeData[];
