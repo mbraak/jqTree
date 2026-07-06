@@ -94,7 +94,8 @@ var jqtree = (function (exports) {
         const headers = {
           "Content-Type": "application/json"
         };
-        const response = await fetch(url, {
+        url.setSearchParam("_", Date.now().toString());
+        const response = await fetch(url.toString(), {
           headers
         });
         if (response.ok) {
@@ -116,37 +117,6 @@ var jqtree = (function (exports) {
         left: rect.x + window.scrollX,
         top: rect.y + window.scrollY
       };
-    };
-
-    /* Set query parameter of an url.
-
-    # relative url
-    setQueryParameter('/data', 'node', '123');
-    => '/data?node=123'
-
-    # absolute url
-    setQueryParameter('http://server/data', 'node', '123');
-    => 'http://server/data?node=123'
-
-    # existing parameter
-    setQueryParameter('/data?param1=xyz', 'node', '123');
-    => '/data?param1=xyz&node=123'
-    */
-    const setQueryParameter = (inputUrl, key, value) => {
-      const isAbsolute = inputUrl.startsWith('http');
-      let url;
-      const localhost = 'http://localhost';
-      if (isAbsolute) {
-        url = new URL(inputUrl);
-      } else {
-        url = new URL(inputUrl, localhost);
-      }
-      url.searchParams.set(key, value);
-      if (isAbsolute) {
-        return url.href;
-      } else {
-        return url.href.slice(localhost.length);
-      }
     };
 
     function binarySearch(items, compareFn) {
@@ -1994,6 +1964,40 @@ var jqtree = (function (exports) {
       }
     }
 
+    const isAbsoluteUrl = inputUrl => {
+      try {
+        new URL(inputUrl);
+        return true;
+      } catch (e) {
+        if (e instanceof TypeError) {
+          return false;
+        }
+        throw e;
+      }
+    };
+    const LOCALHOST = "http://localhost";
+    class RequestUrl {
+      constructor(inputUrl) {
+        if (isAbsoluteUrl(inputUrl)) {
+          this.url = new URL(inputUrl);
+          this.isAbsolute = true;
+        } else {
+          this.url = new URL(inputUrl, LOCALHOST);
+          this.isAbsolute = false;
+        }
+      }
+      setSearchParam(key, value) {
+        this.url.searchParams.set(key, value);
+      }
+      toString() {
+        if (this.isAbsolute) {
+          return this.url.href;
+        } else {
+          return this.url.href.slice(LOCALHOST.length);
+        }
+      }
+    }
+
     class SaveStateHandler {
       constructor({
         addToSelection,
@@ -3137,6 +3141,30 @@ var jqtree = (function (exports) {
           treeElement
         });
       }
+      createRequestUrl(node) {
+        const dataUrl = this.options.dataUrl ?? this.element.data("url");
+        let url;
+        if (typeof dataUrl === "function") {
+          url = dataUrl(node);
+        } else {
+          url = dataUrl;
+        }
+        if (!url) {
+          return null;
+        }
+        const requestUrl = new RequestUrl(url);
+        if (node?.id) {
+          // Load on demand of a subtree; add node parameter
+          requestUrl.setSearchParam('node', node.id.toString());
+        } else {
+          // Add selected_node parameter
+          const selectedNodeId = this.getNodeIdToBeSelected();
+          if (selectedNodeId) {
+            requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
+          }
+        }
+        return requestUrl;
+      }
       deselectCurrentNode() {
         const node = this.getSelectedNode();
         if (node) {
@@ -3166,8 +3194,8 @@ var jqtree = (function (exports) {
           tree_data: data
         });
       }
-      doLoadDataFromUrl(urlInfoParam, parentNode, onFinished) {
-        const url = urlInfoParam ?? this.getDataUrlInfo(parentNode);
+      doLoadDataFromUrl(inputUrl, parentNode, onFinished) {
+        const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
         if (url) {
           this.dataLoader.loadFromUrl(url, parentNode, onFinished);
         }
@@ -3233,34 +3261,6 @@ var jqtree = (function (exports) {
           return 0;
         }
       }
-      getDataUrlInfo(node) {
-        const dataUrl = this.options.dataUrl ?? this.element.data("url");
-        const setUrlInfoData = url => {
-          if (node?.id) {
-            // Load on demand of a subtree; add node parameter
-            return setQueryParameter(url, 'node', node.id.toString());
-          } else {
-            // Add selected_node parameter
-            const selectedNodeId = this.getNodeIdToBeSelected();
-            if (selectedNodeId) {
-              return setQueryParameter(url, 'selected_node', selectedNodeId.toString());
-            } else {
-              return url;
-            }
-          }
-        };
-        let url;
-        if (typeof dataUrl === "function") {
-          url = dataUrl(node);
-        } else {
-          url = dataUrl;
-        }
-        if (url) {
-          return setUrlInfoData(url);
-        } else {
-          return null;
-        }
-      }
       getDefaultClosedIcon() {
         if (this.options.rtl) {
           // triangle to the left
@@ -3316,7 +3316,7 @@ var jqtree = (function (exports) {
         if (this.options.data) {
           this.doLoadData(this.options.data, null);
         } else {
-          const dataUrl = this.getDataUrlInfo(null);
+          const dataUrl = this.createRequestUrl(null);
           if (dataUrl) {
             this.doLoadDataFromUrl(null, null, null);
           } else {
