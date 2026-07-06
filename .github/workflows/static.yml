@@ -28,11 +28,11 @@ jobs:
             - name: Setup ruby
               uses: ruby/setup-ruby@v1
               with:
-                  ruby-version: "3.4.5"
+                  ruby-version: 4.0.5
             - name: Setup node
               uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: 24
             - name: Install pnpm
               run: npm install -g pnpm
             - name: Install ruby packages
