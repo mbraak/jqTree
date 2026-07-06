@@ -2,6 +2,8 @@ import type { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
 import type { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
 import type { Node } from "./node";
 
+import { setQueryParameter } from "./util"
+
 export type HandleFinishedLoading = () => void;
 
 interface DataLoaderParams {
@@ -122,7 +124,9 @@ export default class DataLoader {
     ): Promise<void> {
         const headers = { "Content-Type": "application/json" };
 
-        const response = await fetch(url, { headers });
+        const urlWithCacheBuster = setQueryParameter(url, "_", Date.now().toString());
+
+        const response = await fetch(urlWithCacheBuster, { headers });
 
         if (response.ok) {
             const data = await response.json() as NodeData[];
