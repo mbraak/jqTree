@@ -11,7 +11,7 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v6
               with:
-                  node-version: "20"
+                  node-version: "22"
             - name: Install pnpm
               run: npm install -g pnpm
             - name: Install packages
@@ -19,6 +19,6 @@ jobs:
             - name: Check compressed size
               uses: preactjs/compressed-size-action@v3
               with:
-                  build-script: "production"
+                  build-script: pnpm run production
                   pattern: "./lib/**/*.js"
                   exclude: "{./lib/**/*.d.js,./lib/playwright/**,./lib/test/**}"
