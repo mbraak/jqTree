@@ -36,10 +36,7 @@ var jqtree = (function (exports) {
         this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
       }
-      loadFromUrl(urlInfo, parentNode, onFinished) {
-        if (!urlInfo) {
-          return;
-        }
+      loadFromUrl(url, parentNode, onFinished) {
         const element = this.getDomElement(parentNode);
         this.addLoadingClass(element);
         this.notifyLoading(true, parentNode, element);
@@ -54,13 +51,13 @@ var jqtree = (function (exports) {
             onFinished();
           }
         };
-        const handleError = jqXHR => {
+        const handleError = response => {
           stopLoading();
           if (this.onLoadFailed) {
-            this.onLoadFailed(jqXHR);
+            this.onLoadFailed(response);
           }
         };
-        this.submitRequest(urlInfo, handleSuccess, handleError);
+        void this.submitRequest(url, handleSuccess, handleError);
       }
       addLoadingClass(element) {
         element.classList.add("jqtree-loading");
@@ -84,37 +81,28 @@ var jqtree = (function (exports) {
         });
       }
       parseData(data) {
-        const getParsedData = () => {
-          if (typeof data === "string") {
-            return JSON.parse(data);
-          } else {
-            return data;
-          }
-        };
-        const parsedData = getParsedData();
         if (this.dataFilter) {
-          return this.dataFilter(parsedData);
+          return this.dataFilter(data);
         } else {
-          return parsedData;
+          return data;
         }
       }
       removeLoadingClass(element) {
         element.classList.remove("jqtree-loading");
       }
-      submitRequest(urlInfoInput, handleSuccess, handleError) {
-        const urlInfo = typeof urlInfoInput === "string" ? {
-          url: urlInfoInput
-        } : urlInfoInput;
-        const ajaxSettings = {
-          cache: false,
-          dataType: "json",
-          error: handleError,
-          method: "GET",
-          success: handleSuccess,
-          ...urlInfo
+      async submitRequest(url, handleSuccess, handleError) {
+        const headers = {
+          "Content-Type": "application/json"
         };
-        ajaxSettings.method = ajaxSettings.method?.toUpperCase() ?? "GET";
-        void jQuery.ajax(ajaxSettings);
+        const response = await fetch(url, {
+          headers
+        });
+        if (response.ok) {
+          const data = await response.json();
+          handleSuccess(data);
+        } else {
+          handleError(response);
+        }
       }
     }
 
@@ -3179,8 +3167,10 @@ var jqtree = (function (exports) {
         });
       }
       doLoadDataFromUrl(urlInfoParam, parentNode, onFinished) {
-        const urlInfo = urlInfoParam ?? this.getDataUrlInfo(parentNode);
-        this.dataLoader.loadFromUrl(urlInfo, parentNode, onFinished);
+        const url = urlInfoParam ?? this.getDataUrlInfo(parentNode);
+        if (url) {
+          this.dataLoader.loadFromUrl(url, parentNode, onFinished);
+        }
       }
       doSelectNode(node, optionsParam) {
         const saveState = () => {
