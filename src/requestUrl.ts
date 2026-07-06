@@ -1,13 +1,11 @@
+// Url class for absolute and relative urls.
+
 const isAbsoluteUrl = (inputUrl: string) => {
   try {
     new URL(inputUrl);
     return true;
-  } catch (e) {
-    if (e instanceof TypeError) {
-      return false;
-    }
-
-    throw e;
+  } catch {
+    return false;
   }
 }
 
