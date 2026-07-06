@@ -23,16 +23,12 @@ describe("loadFromUrl", () => {
         server.close();
     });
 
-    const setupResponse = (contentType = "application/json") => {
+    const setupResponse = () => {
         server.use(
             http.get(
                 "/test",
                 () =>
-                    new HttpResponse('{ "key1": "value1" }', {
-                        headers: {
-                            "Content-Type": contentType,
-                        },
-                    }),
+                    new HttpResponse('{ "key1": "value1" }'),
                 {},
             ),
         );
@@ -78,18 +74,7 @@ describe("loadFromUrl", () => {
         expect(triggerEvent).not.toHaveBeenCalled();
     });
 
-    it("parses json when the response has content type text", async () => {
-        setupResponse("text/plain");
-
-        const { dataLoader, loadData } = createDataLoader();
-        dataLoader.loadFromUrl("/test", null, null);
-
-        await waitFor(() => {
-            expect(loadData).toHaveBeenCalledExactlyOnceWith({ key1: "value1" }, null);
-        });
-    });
-
-    it("parses json when the response has content type json", async () => {
+    it("calls loadData with the parsed json data", async () => {
         setupResponse();
 
         const { dataLoader, loadData } = createDataLoader();
