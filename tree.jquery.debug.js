@@ -84,18 +84,10 @@ var jqtree = (function (exports) {
         });
       }
       parseData(data) {
-        const getParsedData = () => {
-          if (typeof data === "string") {
-            return JSON.parse(data);
-          } else {
-            return data;
-          }
-        };
-        const parsedData = getParsedData();
         if (this.dataFilter) {
-          return this.dataFilter(parsedData);
+          return this.dataFilter(data);
         } else {
-          return parsedData;
+          return data;
         }
       }
       removeLoadingClass(element) {
