@@ -1,13 +1,5 @@
 {
-    "presets": [
-        "@babel/preset-typescript",
-        [
-            "@babel/preset-env",
-            {
-                "bugfixes": true
-            }
-        ]
-    ],
+    "presets": ["@babel/preset-typescript", "@babel/preset-env"],
     "plugins": ["istanbul"],
     "targets": "defaults"
 }

@@ -21,6 +21,12 @@ var jqtree = (function (exports) {
     'use strict';
 
     class DataLoader {
+      dataFilter;
+      loadData;
+      onLoadFailed;
+      onLoading;
+      treeElement;
+      triggerEvent;
       constructor({
         dataFilter,
         loadData,
@@ -140,6 +146,9 @@ var jqtree = (function (exports) {
     }
 
     class DragElement {
+      element;
+      offsetX;
+      offsetY;
       constructor({
         autoEscape,
         nodeName,
@@ -350,6 +359,29 @@ var jqtree = (function (exports) {
     const generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFromPositions(generateHitPositions(tree, currentNode), treeBottom);
 
     class DragAndDropHandler {
+      currentItem;
+      hitAreas;
+      hoveredArea;
+      isDragging;
+      autoEscape;
+      dragElement;
+      getNodeElement;
+      getNodeElementForNode;
+      getScrollLeft;
+      getTree;
+      onCanMove;
+      onCanMoveTo;
+      onDragMove;
+      onDragStop;
+      onIsMoveHandle;
+      openFolderDelay;
+      openFolderTimer;
+      openNode;
+      previousGhost;
+      refreshElements;
+      slide;
+      treeElement;
+      triggerEvent;
       constructor({
         autoEscape,
         getNodeElement,
@@ -625,6 +657,18 @@ var jqtree = (function (exports) {
     }
 
     class ElementsRenderer {
+      closedIconElement;
+      openedIconElement;
+      $element;
+      autoEscape;
+      buttonLeft;
+      dragAndDrop;
+      getTree;
+      isNodeSelected;
+      onCreateLi;
+      rtl;
+      showEmptyFolder;
+      tabIndex;
       constructor({
         $element,
         autoEscape,
@@ -863,6 +907,12 @@ var jqtree = (function (exports) {
     }
 
     class KeyHandler {
+      closeNode;
+      getSelectedNode;
+      isFocusOnTree;
+      keyboardSupport;
+      openNode;
+      originalSelectNode;
       constructor({
         closeNode,
         getSelectedNode,
@@ -975,6 +1025,21 @@ var jqtree = (function (exports) {
     });
 
     class MouseHandler {
+      element;
+      getMouseDelay;
+      getNode;
+      isMouseDelayMet;
+      isMouseStarted;
+      mouseDelayTimer;
+      mouseDownInfo;
+      onClickButton;
+      onClickTitle;
+      onMouseCapture;
+      onMouseDrag;
+      onMouseStart;
+      onMouseStop;
+      triggerEvent;
+      useContextMenu;
       constructor({
         element,
         getMouseDelay,
@@ -1239,6 +1304,18 @@ var jqtree = (function (exports) {
     const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
 
     class Node {
+      children;
+      element;
+      id;
+      idMapping;
+      is_loading;
+      is_open;
+      isEmptyFolder;
+      load_on_demand;
+      name;
+      nodeClass;
+      parent;
+      tree;
       constructor(nodeData = null, isRoot = false, nodeClass = Node) {
         this.name = "";
         this.load_on_demand = false;
@@ -1746,6 +1823,7 @@ var jqtree = (function (exports) {
     }
 
     class BorderDropHint {
+      hint;
       constructor(element, scrollLeft) {
         const div = element.querySelector(":scope > .jqtree-element");
         if (!div) {
@@ -1767,6 +1845,9 @@ var jqtree = (function (exports) {
     }
 
     class GhostDropHint {
+      element;
+      ghost;
+      node;
       constructor(node, element, position) {
         this.element = element;
         this.node = node;
@@ -1821,6 +1902,11 @@ var jqtree = (function (exports) {
     }
 
     class NodeElement {
+      element;
+      node;
+      getScrollLeft;
+      tabIndex;
+      treeElement;
       constructor({
         getScrollLeft,
         node,
@@ -1877,6 +1963,9 @@ var jqtree = (function (exports) {
     }
 
     class FolderElement extends NodeElement {
+      closedIconElement;
+      openedIconElement;
+      triggerEvent;
       constructor({
         closedIconElement,
         getScrollLeft,
@@ -1975,6 +2064,8 @@ var jqtree = (function (exports) {
     };
     const LOCALHOST = "http://localhost";
     class RequestUrl {
+      isAbsolute;
+      url;
       constructor(inputUrl) {
         if (isAbsoluteUrl(inputUrl)) {
           this.url = new URL(inputUrl);
@@ -1997,6 +2088,16 @@ var jqtree = (function (exports) {
     }
 
     class SaveStateHandler {
+      addToSelection;
+      getNodeById;
+      getSelectedNodes;
+      getTree;
+      onGetStateFromStorage;
+      onSetStateFromStorage;
+      openNode;
+      refreshElements;
+      removeFromSelection;
+      saveStateOption;
       constructor({
         addToSelection,
         getNodeById,
@@ -2185,6 +2286,12 @@ var jqtree = (function (exports) {
     }
 
     class ScrollParent {
+      container;
+      horizontalScrollDirection;
+      horizontalScrollTimeout;
+      refreshHitAreas;
+      verticalScrollDirection;
+      verticalScrollTimeout;
       constructor({
         container,
         refreshHitAreas
@@ -2256,6 +2363,8 @@ var jqtree = (function (exports) {
     }
 
     class ContainerScrollParent extends ScrollParent {
+      scrollParentBottom;
+      scrollParentTop;
       stopScrolling() {
         super.stopScrolling();
         this.horizontalScrollDirection = undefined;
@@ -2298,6 +2407,9 @@ var jqtree = (function (exports) {
     }
 
     class DocumentScrollParent extends ScrollParent {
+      documentScrollHeight;
+      documentScrollWidth;
+      treeElement;
       constructor({
         refreshHitAreas,
         treeElement
@@ -2394,6 +2506,9 @@ var jqtree = (function (exports) {
     };
 
     class ScrollHandler {
+      refreshHitAreas;
+      scrollParent;
+      treeElement;
       constructor({
         refreshHitAreas,
         treeElement
@@ -2428,6 +2543,9 @@ var jqtree = (function (exports) {
     }
 
     class SelectNodeHandler {
+      getNodeById;
+      selectedNodes;
+      selectedSingleNode;
       constructor({
         getNodeById
       }) {
@@ -2588,6 +2706,8 @@ var jqtree = (function (exports) {
     };
     class SimpleWidget {
       static defaults = {};
+      $el;
+      options;
       constructor(el, options) {
         this.$el = jQuery(el);
 
@@ -2663,6 +2783,17 @@ var jqtree = (function (exports) {
         tabIndex: 0,
         useContextMenu: true
       };
+      dataLoader;
+      dndHandler;
+      element;
+      isInitialized;
+      keyHandler;
+      mouseHandler;
+      renderer;
+      saveStateHandler;
+      scrollHandler;
+      selectNodeHandler;
+      tree;
       addNodeAfter(newNodeInfo, existingNode) {
         const newNode = existingNode.addAfter(newNodeInfo);
         if (newNode) {
