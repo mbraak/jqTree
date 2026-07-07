@@ -402,6 +402,30 @@ describe("options", () => {
         });
     });
 
+    describe("data-url in html", () => {
+        it("loads the data from the url", async () => {
+            server.use(
+                http.get(
+                    "/tree",
+                    () => HttpResponse.json(exampleData)
+                ),
+            );
+
+            const $tree = $("#tree1");
+            const treeElement = $tree.get(0) as HTMLElement;
+            treeElement.dataset.url = "/tree";
+
+            $tree.tree();
+
+            await screen.findByText("node1");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+    });
+
     describe("onCanSelectNode", () => {
         interface Vars {
             $tree: JQuery;
