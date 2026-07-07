@@ -90,18 +90,10 @@ var jqtree = (function (exports) {
         });
       }
       parseData(data) {
-        const getParsedData = () => {
-          if (typeof data === "string") {
-            return JSON.parse(data);
-          } else {
-            return data;
-          }
-        };
-        const parsedData = getParsedData();
         if (this.dataFilter) {
-          return this.dataFilter(parsedData);
+          return this.dataFilter(data);
         } else {
-          return parsedData;
+          return data;
         }
       }
       removeLoadingClass(element) {
@@ -125,7 +117,6 @@ var jqtree = (function (exports) {
     }
 
     const isInt = n => typeof n === "number" && n % 1 === 0;
-    const isFunction = v => typeof v === "function";
     const getBoolString = value => value ? "true" : "false";
     const getOffsetTop = element => getElementPosition(element).top;
     const getElementPosition = element => {
@@ -2954,7 +2945,7 @@ var jqtree = (function (exports) {
         const parseParams = () => {
           let onFinished;
           let slide;
-          if (isFunction(param1)) {
+          if (typeof param1 === "function") {
             onFinished = param1;
             slide = null;
           } else {

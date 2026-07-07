@@ -55,7 +55,7 @@ export default class DataLoader {
             this.notifyLoading(false, parentNode, element);
         };
 
-        const handleSuccess = (data: NodeData[] | string): void => {
+        const handleSuccess = (data: NodeData[]): void => {
             stopLoading();
             this.loadData(this.parseData(data), parentNode);
 
@@ -105,21 +105,11 @@ export default class DataLoader {
         });
     }
 
-    private parseData(data: NodeData[] | string): NodeData[] {
-        const getParsedData = () => {
-            if (typeof data === "string") {
-                return JSON.parse(data) as NodeData[];
-            } else {
-                return data;
-            }
-        };
-
-        const parsedData = getParsedData();
-
+    private parseData(data: NodeData[]): NodeData[] {
         if (this.dataFilter) {
-            return this.dataFilter(parsedData);
+            return this.dataFilter(data);
         } else {
-            return parsedData;
+            return data;
         }
     }
 

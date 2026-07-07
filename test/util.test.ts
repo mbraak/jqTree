@@ -1,4 +1,4 @@
-import { getBoolString, isFunction, isInt } from "app/util";
+import { getBoolString, isInt } from "app/util";
 
 describe("getBoolString", () => {
     it("returns true or false", () => {
@@ -6,13 +6,6 @@ describe("getBoolString", () => {
         expect(getBoolString(false)).toBe("false");
         expect(getBoolString(1)).toBe("true");
         expect(getBoolString(null)).toBe("false");
-    });
-});
-
-describe("isFunction", () => {
-    it("returns a boolean", () => {
-        expect(isFunction(isInt)).toBeTrue();
-        expect(isFunction("isInt")).toBeFalse();
     });
 });
 

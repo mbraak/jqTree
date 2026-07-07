@@ -37,7 +37,7 @@ var node = $tree.tree('getNodeById', 456);
 $tree.tree('loadDataFromUrl', node);
 {% endhighlight %}
 
-You can also add an **on_finished** callback parameter that will be called when the data is loaded:
+You can also add an **onFinished** callback parameter that will be called when the data is loaded:
 
 **function loadDataFromUrl(url, parentNode, onFinished);**
 
