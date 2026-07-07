@@ -1,19 +1,8 @@
 {
-    "presets": [
-        "@babel/preset-typescript",
-        [
-            "@babel/preset-env",
-            {
-                "bugfixes": true
-            }
-        ]
-    ],
+    "presets": ["@babel/preset-typescript", "@babel/preset-env"],
     "env": {
         "test": {
-            "presets": [
-                "@babel/preset-typescript",
-                "@babel/preset-env"
-            ]
+            "presets": ["@babel/preset-typescript", "@babel/preset-env"]
         }
     },
     "targets": "defaults"

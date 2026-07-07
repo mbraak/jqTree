@@ -78,7 +78,7 @@ describe("checkHorizontalScrolling", () => {
         containerScrollParent.checkHorizontalScrolling(50);
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledOnce();
+        expect(scrollBy).toHaveBeenCalledOnce(); // eslint-disable-line vitest/prefer-called-with
     });
 });
 
@@ -153,6 +153,6 @@ describe("checkVerticalScrolling", () => {
         containerScrollParent.checkVerticalScrolling(50);
         vi.advanceTimersByTime(50);
 
-        expect(scrollBy).toHaveBeenCalledOnce();
+        expect(scrollBy).toHaveBeenCalledOnce(); // eslint-disable-line vitest/prefer-called-with
     });
 });
