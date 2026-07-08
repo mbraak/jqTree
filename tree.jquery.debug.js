@@ -116,9 +116,10 @@ var jqtree = (function (exports) {
       }
     }
 
-    const isInt = n => typeof n === "number" && n % 1 === 0;
-    const getBoolString = value => value ? "true" : "false";
+    // Get the top position of the HTML element.
     const getOffsetTop = element => getElementPosition(element).top;
+
+    // Get the top left position of the HTML element.
     const getElementPosition = element => {
       const rect = element.getBoundingClientRect();
       return {
@@ -658,6 +659,9 @@ var jqtree = (function (exports) {
         this.previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
       }
     }
+
+    const isInt = n => typeof n === "number" && n % 1 === 0;
+    const getBoolString = value => value ? "true" : "false";
 
     class ElementsRenderer {
       closedIconElement;
