@@ -15,6 +15,7 @@ interface ElementsRendererParams {
     onCreateLi?: OnCreateLi;
     openedIcon?: IconElement;
     rtl?: boolean;
+    setNodeElement: (element: HTMLElement, node: Node) => void;
     showEmptyFolder: boolean;
     tabIndex?: number;
 }
@@ -30,7 +31,7 @@ export default class ElementsRenderer {
     private isNodeSelected: IsNodeSelected;
     private onCreateLi?: OnCreateLi;
     private rtl?: boolean;
-
+    private setNodeElement: (element: HTMLElement, node: Node) => void;
     private showEmptyFolder: boolean;
     private tabIndex?: number;
 
@@ -45,6 +46,7 @@ export default class ElementsRenderer {
         onCreateLi,
         openedIcon,
         rtl,
+        setNodeElement,
         showEmptyFolder,
         tabIndex,
     }: ElementsRendererParams) {
@@ -56,6 +58,7 @@ export default class ElementsRenderer {
         this.isNodeSelected = isNodeSelected;
         this.onCreateLi = onCreateLi;
         this.rtl = rtl;
+        this.setNodeElement = setNodeElement;
         this.showEmptyFolder = showEmptyFolder;
         this.tabIndex = tabIndex;
         this.openedIconElement = this.createButtonElement(openedIcon ?? "+");
@@ -103,7 +106,7 @@ export default class ElementsRenderer {
 
     private attachNodeData(node: Node, li: HTMLElement): void {
         node.element = li;
-        jQuery(li).data("node", node);
+        this.setNodeElement(li, node);
     }
 
     private createButtonElement(

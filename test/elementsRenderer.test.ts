@@ -9,6 +9,7 @@ describe("renderFromNode", () => {
     it("handles a node without an element", () => {
         const element = document.createElement("div");
         const node = new Node();
+        const setNodeElement = vi.fn();
 
         const elementsRenderer = new ElementsRenderer({
             $element: jQuery(element),
@@ -17,6 +18,7 @@ describe("renderFromNode", () => {
             dragAndDrop: false,
             getTree: () => node,
             isNodeSelected: () => false,
+            setNodeElement,
             showEmptyFolder: false,
         });
 
