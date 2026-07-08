@@ -950,7 +950,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return this.options.rtl;
         } else {
             const dataRtl = (this.element.get(0) as HTMLElement).dataset.rtl;
-            return dataRtl === "true";
+            return dataRtl !== undefined;
         }
     }
 
