@@ -3422,7 +3422,7 @@ var jqtree = (function (exports) {
           return this.options.rtl;
         } else {
           const dataRtl = this.element.get(0).dataset.rtl;
-          return dataRtl === "true";
+          return dataRtl !== undefined;
         }
       }
       initData() {
