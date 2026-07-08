@@ -139,7 +139,7 @@ describe("close", () => {
 
         folderElement.close(true, 123);
 
-        expect(slideUp).toHaveBeenCalledExactlyOnceWith(123, expect.anything());
+        expect(slideUp).toHaveBeenCalledExactlyOnceWith(123, expect.any(Function));
         expect(element).toBeClosedTreeNode();
 
         slideUp.mockRestore();
@@ -234,7 +234,7 @@ describe("open", () => {
 
         expect(slideDown).toHaveBeenCalledExactlyOnceWith(
             456,
-            expect.anything(),
+            expect.any(Function),
         );
         expect(element).toBeOpenTreeNode();
 
