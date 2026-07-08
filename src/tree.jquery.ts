@@ -863,7 +863,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
     private getDataUrlInfo(node: Node | null): JQuery.AjaxSettings | null {
         const dataUrl =
-            this.options.dataUrl ?? (this.element.data("url") as null | string);
+            this.options.dataUrl ?? (this.element.get(0) as HTMLElement).dataset.url;
 
         const getUrlFromString = (url: string): JQuery.AjaxSettings => {
             const urlInfo: JQuery.AjaxSettings = { url };
@@ -949,17 +949,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (this.options.rtl != null) {
             return this.options.rtl;
         } else {
-            const dataRtl = this.element.data("rtl") as unknown;
-
-            if (
-                dataRtl !== null &&
-                dataRtl !== false &&
-                dataRtl !== undefined
-            ) {
-                return true;
-            } else {
-                return false;
-            }
+            const dataRtl = (this.element.get(0) as HTMLElement).dataset.rtl;
+            return dataRtl === "true";
         }
     }
 
