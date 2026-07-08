@@ -670,6 +670,7 @@ var jqtree = (function (exports) {
       isNodeSelected;
       onCreateLi;
       rtl;
+      setNodeElement;
       showEmptyFolder;
       tabIndex;
       constructor({
@@ -683,6 +684,7 @@ var jqtree = (function (exports) {
         onCreateLi,
         openedIcon,
         rtl,
+        setNodeElement,
         showEmptyFolder,
         tabIndex
       }) {
@@ -694,6 +696,7 @@ var jqtree = (function (exports) {
         this.isNodeSelected = isNodeSelected;
         this.onCreateLi = onCreateLi;
         this.rtl = rtl;
+        this.setNodeElement = setNodeElement;
         this.showEmptyFolder = showEmptyFolder;
         this.tabIndex = tabIndex;
         this.openedIconElement = this.createButtonElement(openedIcon ?? "+");
@@ -735,7 +738,7 @@ var jqtree = (function (exports) {
       }
       attachNodeData(node, li) {
         node.element = li;
-        jQuery(li).data("node", node);
+        this.setNodeElement(li, node);
       }
       createButtonElement(value) {
         if (typeof value === "string") {
@@ -2757,6 +2760,7 @@ var jqtree = (function (exports) {
       isInitialized;
       keyHandler;
       mouseHandler;
+      nodeMap;
       renderer;
       saveStateHandler;
       scrollHandler;
@@ -2822,6 +2826,7 @@ var jqtree = (function (exports) {
         this.keyHandler.deinit();
         this.mouseHandler.deinit();
         this.tree = new Node({}, true);
+        this.nodeMap = new WeakMap();
         super.deinit();
       }
       getNodeByCallback(callback) {
@@ -2868,6 +2873,7 @@ var jqtree = (function (exports) {
         super.init();
         this.element = this.$el;
         this.isInitialized = false;
+        this.nodeMap = new WeakMap();
         this.options.rtl = this.getRtlOption();
         this.options.closedIcon ??= this.getDefaultClosedIcon();
         this.connectHandlers();
@@ -3103,6 +3109,7 @@ var jqtree = (function (exports) {
         const refreshElements = this.refreshElements.bind(this);
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
+        const setNodeElement = this.setNodeElement.bind(this);
         const $treeElement = this.element;
         const treeElement = this.element.get(0);
         const triggerEvent = this.triggerEvent.bind(this);
@@ -3176,6 +3183,7 @@ var jqtree = (function (exports) {
           onCreateLi,
           openedIcon,
           rtl,
+          setNodeElement,
           showEmptyFolder,
           tabIndex
         });
@@ -3333,7 +3341,7 @@ var jqtree = (function (exports) {
         }
       }
       getDataUrlInfo(node) {
-        const dataUrl = this.options.dataUrl ?? this.element.data("url");
+        const dataUrl = this.options.dataUrl ?? this.element.get(0).dataset.url;
         const getUrlFromString = url => {
           const urlInfo = {
             url
@@ -3382,7 +3390,7 @@ var jqtree = (function (exports) {
       getNode(element) {
         const liElement = element.closest("li.jqtree_common");
         if (liElement) {
-          return jQuery(liElement).data("node");
+          return this.nodeMap.get(liElement) ?? null;
         } else {
           return null;
         }
@@ -3413,12 +3421,8 @@ var jqtree = (function (exports) {
         if (this.options.rtl != null) {
           return this.options.rtl;
         } else {
-          const dataRtl = this.element.data("rtl");
-          if (dataRtl !== null && dataRtl !== false && dataRtl !== undefined) {
-            return true;
-          } else {
-            return false;
-          }
+          const dataRtl = this.element.get(0).dataset.rtl;
+          return dataRtl !== undefined;
         }
       }
       initData() {
@@ -3659,6 +3663,9 @@ var jqtree = (function (exports) {
         if (!restoreState()) {
           autoOpenNodes();
         }
+      }
+      setNodeElement(element, node) {
+        this.nodeMap.set(element, node);
       }
       triggerEvent(eventName, values) {
         const event = jQuery.Event(eventName, values);
