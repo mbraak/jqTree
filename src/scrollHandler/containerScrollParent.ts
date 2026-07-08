@@ -3,7 +3,7 @@ import type {
     VerticalScrollDirection,
 } from "./scrollParent";
 
-import { getElementPosition, getOffsetTop } from "../util";
+import { getElementPosition, getOffsetTop } from "../positionUtils";
 import { ScrollParent } from "./scrollParent";
 
 
