@@ -597,9 +597,22 @@ describe("options", () => {
             });
         });
 
-        context("with the rtl data option", () => {
+        context("with the rtl data option set to 'true'", () => {
             beforeEach(() => {
                 given.$tree.attr("data-rtl", "true");
+                given.$tree.tree({ data: exampleData });
+            });
+
+            it("has a different closed icon", () => {
+                expect(
+                    togglerLink(given.node1.element as HTMLElement).innerHTML,
+                ).toBe("◀");
+            });
+        });
+
+        context("with the rtl data option without a value", () => {
+            beforeEach(() => {
+                given.$tree.attr("data-rtl", "");
                 given.$tree.tree({ data: exampleData });
             });
 

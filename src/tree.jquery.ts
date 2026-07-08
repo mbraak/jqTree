@@ -76,6 +76,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private isInitialized: boolean;
     private keyHandler: KeyHandler;
     private mouseHandler: MouseHandler;
+    private nodeMap: WeakMap<HTMLElement, Node>;
     private renderer: ElementsRenderer;
     private saveStateHandler: SaveStateHandler;
     private scrollHandler: ScrollHandler;
@@ -181,6 +182,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.mouseHandler.deinit();
 
         this.tree = new Node({}, true);
+        this.nodeMap = new WeakMap();
 
         super.deinit();
     }
@@ -249,6 +251,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         this.element = this.$el;
         this.isInitialized = false;
+        this.nodeMap = new WeakMap();
 
         this.options.rtl = this.getRtlOption();
 
@@ -581,6 +584,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const refreshElements = this.refreshElements.bind(this);
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
+        const setNodeElement = this.setNodeElement.bind(this);
         const $treeElement = this.element;
         const treeElement = this.element.get(0) as HTMLElement;
         const triggerEvent = this.triggerEvent.bind(this);
@@ -667,6 +671,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             onCreateLi,
             openedIcon,
             rtl,
+            setNodeElement,
             showEmptyFolder,
             tabIndex,
         });
@@ -902,10 +907,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private getNode(element: HTMLElement): Node | null {
-        const liElement = element.closest("li.jqtree_common");
+        const liElement = element.closest<HTMLElement>("li.jqtree_common");
 
         if (liElement) {
-            return jQuery(liElement).data("node") as Node;
+            return this.nodeMap.get(liElement) ?? null;
         } else {
             return null;
         }
@@ -940,17 +945,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (this.options.rtl != null) {
             return this.options.rtl;
         } else {
-            const dataRtl = this.element.data("rtl") as unknown;
-
-            if (
-                dataRtl !== null &&
-                dataRtl !== false &&
-                dataRtl !== undefined
-            ) {
-                return true;
-            } else {
-                return false;
-            }
+            const dataRtl = (this.element.get(0) as HTMLElement).dataset.rtl;
+            return dataRtl !== undefined;
         }
     }
 
@@ -1269,6 +1265,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (!restoreState()) {
             autoOpenNodes();
         }
+    }
+
+    private setNodeElement(element: HTMLElement, node: Node) {
+        this.nodeMap.set(element, node);
     }
 
     private triggerEvent(
