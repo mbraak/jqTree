@@ -323,18 +323,7 @@ describe("options", () => {
                 name: "string",
             },
             {
-                dataUrl: {
-                    headers: { node: "test-node" },
-                    url: "/tree/",
-                },
-                expectedNode: "test-node",
-                expectedStructure: [
-                    expect.objectContaining({ name: "test-node" }),
-                ],
-                name: "object with url and headers",
-            },
-            {
-                dataUrl: () => ({ url: "/tree/" }),
+                dataUrl: () => "/tree/",
                 expectedNode: "node1",
                 expectedStructure: exampleStructure,
                 name: "function",
@@ -377,7 +366,7 @@ describe("options", () => {
             localStorage.setItem("tree", '{"selected_node":[124]}');
 
             given.$tree.tree({
-                dataUrl: { url: "/tree/" },
+                dataUrl: "/tree/",
                 saveState: true,
             });
 
@@ -392,7 +381,7 @@ describe("options", () => {
             localStorage.setItem("tree", "{}");
 
             given.$tree.tree({
-                dataUrl: { url: "/tree/" },
+                dataUrl: "/tree/",
                 saveState: true,
             });
 

@@ -1,6 +1,7 @@
 import type { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
 import type { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
 import type { Node } from "./node";
+import type RequestUrl from "./requestUrl";
 
 export type HandleFinishedLoading = () => void;
 
@@ -12,6 +13,8 @@ interface DataLoaderParams {
     treeElement: HTMLElement;
     triggerEvent: TriggerEvent;
 }
+
+type HandleSuccess = (data: NodeData[]) => void;
 
 export default class DataLoader {
     private dataFilter?: DataFilter;
@@ -38,14 +41,10 @@ export default class DataLoader {
     }
 
     public loadFromUrl(
-        urlInfo: JQuery.AjaxSettings | null | string,
+        url: RequestUrl,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {
-        if (!urlInfo) {
-            return;
-        }
-
         const element = this.getDomElement(parentNode);
         this.addLoadingClass(element);
         this.notifyLoading(true, parentNode, element);
@@ -64,15 +63,15 @@ export default class DataLoader {
             }
         };
 
-        const handleError = (jqXHR: JQuery.jqXHR): void => {
+        const handleError = (response: Response): void => {
             stopLoading();
 
             if (this.onLoadFailed) {
-                this.onLoadFailed(jqXHR);
+                this.onLoadFailed(response);
             }
         };
 
-        this.submitRequest(urlInfo, handleSuccess, handleError);
+        void this.submitRequest(url, handleSuccess, handleError);
     }
 
     private addLoadingClass(element: HTMLElement): void {
@@ -117,27 +116,22 @@ export default class DataLoader {
         element.classList.remove("jqtree-loading");
     }
 
-    private submitRequest(
-        urlInfoInput: JQuery.AjaxSettings | string,
-        handleSuccess: JQuery.Ajax.SuccessCallback<any>,
-        handleError: JQuery.Ajax.ErrorCallback<any>,
-    ): void {
-        const urlInfo =
-            typeof urlInfoInput === "string"
-                ? { url: urlInfoInput }
-                : urlInfoInput;
+    private async submitRequest(
+        url: RequestUrl,
+        handleSuccess: HandleSuccess,
+        handleError: OnLoadFailed,
+    ): Promise<void> {
+        const headers = { "Content-Type": "application/json" };
 
-        const ajaxSettings: JQuery.AjaxSettings = {
-            cache: false,
-            dataType: "json",
-            error: handleError,
-            method: "GET",
-            success: handleSuccess,
-            ...urlInfo,
-        };
+        url.setSearchParam("_", Date.now().toString());
 
-        ajaxSettings.method = ajaxSettings.method?.toUpperCase() ?? "GET";
+        const response = await fetch(url.toString(), { headers });
 
-        void jQuery.ajax(ajaxSettings);
+        if (response.ok) {
+            const data = await response.json() as NodeData[];
+            handleSuccess(data);
+        } else {
+            handleError(response);
+        }
     }
 }

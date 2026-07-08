@@ -5,9 +5,9 @@ interface ClickNodeEvent {
     previous_node?: INode;
 }
 
-type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
+type DataUrl = DataUrlFunction | string;
 
-type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
+type DataUrlFunction = (node?: Node) => string;
 
 interface IJQTreeOptions {
     animationSpeed?: number | string;

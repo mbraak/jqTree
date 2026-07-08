@@ -13,6 +13,7 @@ import MouseHandler from "./mouseHandler";
 import { Node } from "./node";
 import NodeElement from "./nodeElement";
 import FolderElement from "./nodeElement/folderElement";
+import RequestUrl from "./requestUrl";
 import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
@@ -747,6 +748,38 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         });
     }
 
+    private createRequestUrl(node: Node | null): null | RequestUrl {
+        const dataUrl =
+            this.options.dataUrl ?? (this.element.data("url") as null | string);
+
+        let url;
+
+        if (typeof dataUrl === "function") {
+            url = dataUrl(node);
+        } else {
+            url = dataUrl;
+        }
+
+        if (!url) {
+            return null;
+        }
+
+        const requestUrl = new RequestUrl(url);
+
+        if (node?.id) {
+            // Load on demand of a subtree; add node parameter
+            requestUrl.setSearchParam('node', node.id.toString());
+        } else {
+            // Add selected_node parameter
+            const selectedNodeId = this.getNodeIdToBeSelected();
+            if (selectedNodeId) {
+                requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
+            }
+        }
+
+        return requestUrl;
+    }
+
     private deselectCurrentNode(): void {
         const node = this.getSelectedNode();
         if (node) {
@@ -783,13 +816,15 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private doLoadDataFromUrl(
-        urlInfoParam: JQuery.AjaxSettings | null | string,
+        inputUrl: null | string,
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {
-        const urlInfo = urlInfoParam ?? this.getDataUrlInfo(parentNode);
+        const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
 
-        this.dataLoader.loadFromUrl(urlInfo, parentNode, onFinished);
+        if (url) {
+            this.dataLoader.loadFromUrl(url, parentNode, onFinished);
+        }
     }
 
     private doSelectNode(
@@ -861,45 +896,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private getDataUrlInfo(node: Node | null): JQuery.AjaxSettings | null {
-        const dataUrl =
-            this.options.dataUrl ?? (this.element.get(0) as HTMLElement).dataset.url;
-
-        const getUrlFromString = (url: string): JQuery.AjaxSettings => {
-            const urlInfo: JQuery.AjaxSettings = { url };
-
-            setUrlInfoData(urlInfo);
-
-            return urlInfo;
-        };
-
-        const setUrlInfoData = (urlInfo: JQuery.AjaxSettings): void => {
-            if (node?.id) {
-                // Load on demand of a subtree; add node parameter
-                const data = { node: node.id };
-                urlInfo.data = data;
-            } else {
-                // Add selected_node parameter
-                const selectedNodeId = this.getNodeIdToBeSelected();
-                if (selectedNodeId) {
-                    const data = { selected_node: selectedNodeId };
-                    urlInfo.data = data;
-                }
-            }
-        };
-
-        if (typeof dataUrl === "function") {
-            return dataUrl(node);
-        } else if (typeof dataUrl === "string") {
-            return getUrlFromString(dataUrl);
-        } else if (dataUrl && typeof dataUrl === "object") {
-            setUrlInfoData(dataUrl);
-            return dataUrl;
-        } else {
-            return null;
-        }
-    }
-
     private getDefaultClosedIcon(): string {
         if (this.options.rtl) {
             // triangle to the left
@@ -958,7 +954,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (this.options.data) {
             this.doLoadData(this.options.data, null);
         } else {
-            const dataUrl = this.getDataUrlInfo(null);
+            const dataUrl = this.createRequestUrl(null);
 
             if (dataUrl) {
                 this.doLoadDataFromUrl(null, null, null);

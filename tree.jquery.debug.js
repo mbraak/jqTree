@@ -42,10 +42,7 @@ var jqtree = (function (exports) {
         this.treeElement = treeElement;
         this.triggerEvent = triggerEvent;
       }
-      loadFromUrl(urlInfo, parentNode, onFinished) {
-        if (!urlInfo) {
-          return;
-        }
+      loadFromUrl(url, parentNode, onFinished) {
         const element = this.getDomElement(parentNode);
         this.addLoadingClass(element);
         this.notifyLoading(true, parentNode, element);
@@ -60,13 +57,13 @@ var jqtree = (function (exports) {
             onFinished();
           }
         };
-        const handleError = jqXHR => {
+        const handleError = response => {
           stopLoading();
           if (this.onLoadFailed) {
-            this.onLoadFailed(jqXHR);
+            this.onLoadFailed(response);
           }
         };
-        this.submitRequest(urlInfo, handleSuccess, handleError);
+        void this.submitRequest(url, handleSuccess, handleError);
       }
       addLoadingClass(element) {
         element.classList.add("jqtree-loading");
@@ -99,20 +96,20 @@ var jqtree = (function (exports) {
       removeLoadingClass(element) {
         element.classList.remove("jqtree-loading");
       }
-      submitRequest(urlInfoInput, handleSuccess, handleError) {
-        const urlInfo = typeof urlInfoInput === "string" ? {
-          url: urlInfoInput
-        } : urlInfoInput;
-        const ajaxSettings = {
-          cache: false,
-          dataType: "json",
-          error: handleError,
-          method: "GET",
-          success: handleSuccess,
-          ...urlInfo
+      async submitRequest(url, handleSuccess, handleError) {
+        const headers = {
+          "Content-Type": "application/json"
         };
-        ajaxSettings.method = ajaxSettings.method?.toUpperCase() ?? "GET";
-        void jQuery.ajax(ajaxSettings);
+        url.setSearchParam("_", Date.now().toString());
+        const response = await fetch(url.toString(), {
+          headers
+        });
+        if (response.ok) {
+          const data = await response.json();
+          handleSuccess(data);
+        } else {
+          handleError(response);
+        }
       }
     }
 
@@ -2058,6 +2055,41 @@ var jqtree = (function (exports) {
       }
     }
 
+    // Url class for absolute and relative urls.
+
+    const isAbsoluteUrl = inputUrl => {
+      try {
+        new URL(inputUrl);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    const LOCALHOST = "http://localhost";
+    class RequestUrl {
+      isAbsolute;
+      url;
+      constructor(inputUrl) {
+        if (isAbsoluteUrl(inputUrl)) {
+          this.url = new URL(inputUrl);
+          this.isAbsolute = true;
+        } else {
+          this.url = new URL(inputUrl, LOCALHOST);
+          this.isAbsolute = false;
+        }
+      }
+      setSearchParam(key, value) {
+        this.url.searchParams.set(key, value);
+      }
+      toString() {
+        if (this.isAbsolute) {
+          return this.url.href;
+        } else {
+          return this.url.href.slice(LOCALHOST.length);
+        }
+      }
+    }
+
     class SaveStateHandler {
       addToSelection;
       getNodeById;
@@ -3246,6 +3278,30 @@ var jqtree = (function (exports) {
           treeElement
         });
       }
+      createRequestUrl(node) {
+        const dataUrl = this.options.dataUrl ?? this.element.data("url");
+        let url;
+        if (typeof dataUrl === "function") {
+          url = dataUrl(node);
+        } else {
+          url = dataUrl;
+        }
+        if (!url) {
+          return null;
+        }
+        const requestUrl = new RequestUrl(url);
+        if (node?.id) {
+          // Load on demand of a subtree; add node parameter
+          requestUrl.setSearchParam('node', node.id.toString());
+        } else {
+          // Add selected_node parameter
+          const selectedNodeId = this.getNodeIdToBeSelected();
+          if (selectedNodeId) {
+            requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
+          }
+        }
+        return requestUrl;
+      }
       deselectCurrentNode() {
         const node = this.getSelectedNode();
         if (node) {
@@ -3275,9 +3331,11 @@ var jqtree = (function (exports) {
           tree_data: data
         });
       }
-      doLoadDataFromUrl(urlInfoParam, parentNode, onFinished) {
-        const urlInfo = urlInfoParam ?? this.getDataUrlInfo(parentNode);
-        this.dataLoader.loadFromUrl(urlInfo, parentNode, onFinished);
+      doLoadDataFromUrl(inputUrl, parentNode, onFinished) {
+        const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
+        if (url) {
+          this.dataLoader.loadFromUrl(url, parentNode, onFinished);
+        }
       }
       doSelectNode(node, optionsParam) {
         const saveState = () => {
@@ -3340,44 +3398,6 @@ var jqtree = (function (exports) {
           return 0;
         }
       }
-      getDataUrlInfo(node) {
-        const dataUrl = this.options.dataUrl ?? this.element.get(0).dataset.url;
-        const getUrlFromString = url => {
-          const urlInfo = {
-            url
-          };
-          setUrlInfoData(urlInfo);
-          return urlInfo;
-        };
-        const setUrlInfoData = urlInfo => {
-          if (node?.id) {
-            // Load on demand of a subtree; add node parameter
-            const data = {
-              node: node.id
-            };
-            urlInfo.data = data;
-          } else {
-            // Add selected_node parameter
-            const selectedNodeId = this.getNodeIdToBeSelected();
-            if (selectedNodeId) {
-              const data = {
-                selected_node: selectedNodeId
-              };
-              urlInfo.data = data;
-            }
-          }
-        };
-        if (typeof dataUrl === "function") {
-          return dataUrl(node);
-        } else if (typeof dataUrl === "string") {
-          return getUrlFromString(dataUrl);
-        } else if (dataUrl && typeof dataUrl === "object") {
-          setUrlInfoData(dataUrl);
-          return dataUrl;
-        } else {
-          return null;
-        }
-      }
       getDefaultClosedIcon() {
         if (this.options.rtl) {
           // triangle to the left
@@ -3429,7 +3449,7 @@ var jqtree = (function (exports) {
         if (this.options.data) {
           this.doLoadData(this.options.data, null);
         } else {
-          const dataUrl = this.getDataUrlInfo(null);
+          const dataUrl = this.createRequestUrl(null);
           if (dataUrl) {
             this.doLoadDataFromUrl(null, null, null);
           } else {
