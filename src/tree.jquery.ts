@@ -13,11 +13,11 @@ import MouseHandler from "./mouseHandler";
 import { Node } from "./node";
 import NodeElement from "./nodeElement";
 import FolderElement from "./nodeElement/folderElement";
+import { getOffsetTop } from "./positionUtils";
 import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
-import { getOffsetTop } from "./util";
 import __version__ from "./version";
 
 interface SelectNodeOptions {
