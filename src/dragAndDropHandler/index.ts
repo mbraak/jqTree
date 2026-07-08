@@ -16,7 +16,7 @@ import type { Node } from "../node";
 import type NodeElement from "../nodeElement";
 import type { DropHint, HitArea } from "./types";
 
-import { getElementPosition } from "../util";
+import { getElementPosition } from "../positionUtils";
 import binarySearch from "./binarySearch";
 import DragElement from "./dragElement";
 import generateHitAreas from "./generateHitAreas";
