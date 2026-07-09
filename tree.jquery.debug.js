@@ -2016,7 +2016,8 @@ var jqtree = (function (exports) {
         if (slide) {
           jQuery(this.getUl()).slideUp(animationSpeed, doClose);
         } else {
-          jQuery(this.getUl()).hide();
+          const ul = this.getUl();
+          ul.style.display = "none";
           doClose();
         }
       }
@@ -2047,7 +2048,8 @@ var jqtree = (function (exports) {
         if (slide) {
           jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
         } else {
-          jQuery(this.getUl()).show();
+          const ul = this.getUl();
+          ul.style.display = "block";
           doOpen();
         }
       }
