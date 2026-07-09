@@ -142,9 +142,7 @@ describe("select", () => {
 
         nodeElement.select(false);
 
-        const selected = "true";
-
-        expect(titleSpan(element)).toHaveAttribute("aria-selected", selected);
+        expect(titleSpan(element)).toHaveAttribute("aria-selected", "true");
     });
 
     it("sets the tabindex on the title span when a tabIndex is given", () => {
@@ -152,9 +150,7 @@ describe("select", () => {
 
         nodeElement.select(false);
 
-        const tabIndex = "0";
-
-        expect(titleSpan(element)).toHaveAttribute("tabindex", tabIndex);
+        expect(titleSpan(element)).toHaveAttribute("tabindex", "0");
     });
 
     it("doesn't set the tabindex on the title span when no tabIndex is given", () => {

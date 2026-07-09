@@ -158,13 +158,11 @@ describe("open", () => {
 
         folderElement.open(undefined, false, 0);
 
-        const expanded = "true";
-
         expect(folderNode.is_open).toBeTrue();
         expect(element).toBeOpenTreeNode();
         expect(getButton(element)).not.toHaveClass("jqtree-closed");
         expect(getUl(element)).toBeVisible();
-        expect(getTitleSpan(element)).toHaveAttribute("aria-expanded", expanded);
+        expect(getTitleSpan(element)).toHaveAttribute("aria-expanded", "true");
     });
 
     it("triggers the tree.open event", () => {
