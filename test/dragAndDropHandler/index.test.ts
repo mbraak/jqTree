@@ -951,6 +951,123 @@ describe("DragAndDropHandler", () => {
         });
     });
 
+    describe("updateDropHint", () => {
+        it("adds a border drop hint for an inside position", () => {
+            const tree = new Node(null, true);
+            const node1 = new Node({ name: "node1" });
+            tree.addChild(node1);
+            const node2 = new Node({ name: "node2" });
+            tree.addChild(node2);
+
+            const { dragAndDropHandler } = createDragAndDropHandler({ tree });
+
+            // Start dragging
+            const positionInfo = {
+                originalEvent: new Event("click"),
+                pageX: 10,
+                pageY: 10,
+                target: node1.element as HTMLElement,
+            };
+
+            dragAndDropHandler.mouseCapture(positionInfo);
+            dragAndDropHandler.mouseStart(positionInfo);
+
+            // Move mouse to the inside area of node2
+            dragAndDropHandler.mouseDrag({
+                originalEvent: new Event("mousemove"),
+                pageX: 15,
+                pageY: 30,
+                target: node2.element as HTMLElement,
+            });
+
+            expect(dragAndDropHandler.hoveredArea?.position).toBe("inside");
+            expect(
+                node2.element?.querySelector(".jqtree-border"),
+            ).toBeInTheDocument();
+        });
+
+        it("adds a ghost drop hint for an after position", () => {
+            const tree = new Node(null, true);
+            const node1 = new Node({ name: "node1" });
+            tree.addChild(node1);
+            const node2 = new Node({ name: "node2" });
+            tree.addChild(node2);
+
+            const { dragAndDropHandler } = createDragAndDropHandler({ tree });
+
+            // Start dragging
+            const positionInfo = {
+                originalEvent: new Event("click"),
+                pageX: 10,
+                pageY: 10,
+                target: node1.element as HTMLElement,
+            };
+
+            dragAndDropHandler.mouseCapture(positionInfo);
+            dragAndDropHandler.mouseStart(positionInfo);
+
+            // Move mouse to the after area of node2
+            dragAndDropHandler.mouseDrag({
+                originalEvent: new Event("mousemove"),
+                pageX: 15,
+                pageY: 45,
+                target: node2.element as HTMLElement,
+            });
+
+            expect(dragAndDropHandler.hoveredArea?.position).toBe("after");
+            expect(
+                document.querySelector(".jqtree-ghost"),
+            ).toBeInTheDocument();
+        });
+
+        it("removes the previous drop hint when the hovered area changes", () => {
+            const tree = new Node(null, true);
+            const node1 = new Node({ name: "node1" });
+            tree.addChild(node1);
+            const node2 = new Node({ name: "node2" });
+            tree.addChild(node2);
+
+            const { dragAndDropHandler } = createDragAndDropHandler({ tree });
+
+            // Start dragging
+            const positionInfo = {
+                originalEvent: new Event("click"),
+                pageX: 10,
+                pageY: 10,
+                target: node1.element as HTMLElement,
+            };
+
+            dragAndDropHandler.mouseCapture(positionInfo);
+            dragAndDropHandler.mouseStart(positionInfo);
+
+            // Move mouse to the inside area of node2
+            dragAndDropHandler.mouseDrag({
+                originalEvent: new Event("mousemove"),
+                pageX: 15,
+                pageY: 30,
+                target: node2.element as HTMLElement,
+            });
+
+            expect(
+                node2.element?.querySelector(".jqtree-border"),
+            ).toBeInTheDocument();
+
+            // Move mouse to the after area of node2
+            dragAndDropHandler.mouseDrag({
+                originalEvent: new Event("mousemove"),
+                pageX: 15,
+                pageY: 45,
+                target: node2.element as HTMLElement,
+            });
+
+            // The border drop hint is replaced by a ghost drop hint
+            expect(node2.element?.querySelector(".jqtree-border")).toBeNull();
+            expect(
+                document.querySelector(".jqtree-ghost"),
+            ).toBeInTheDocument();
+        });
+    });
+
     describe(".refresh", () => {
         it("generates hit areas", () => {
             const tree = new Node(null, true);
