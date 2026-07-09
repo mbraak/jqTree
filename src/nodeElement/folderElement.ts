@@ -114,7 +114,8 @@ class FolderElement extends NodeElement {
         if (slide) {
             jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
         } else {
-            jQuery(this.getUl()).show();
+            const ul = this.getUl();
+            ul.style.display = "block";
             doOpen();
         }
     }
