@@ -68,7 +68,8 @@ class FolderElement extends NodeElement {
         if (slide) {
             jQuery(this.getUl()).slideUp(animationSpeed, doClose);
         } else {
-            jQuery(this.getUl()).hide();
+            const ul = this.getUl();
+            ul.style.display = "none";
             doClose();
         }
     }
