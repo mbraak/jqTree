@@ -1,4 +1,3 @@
-import { mockAnimationsApi } from "jsdom-testing-mocks";
 import { vi } from "vitest";
 
 import ElementsRenderer from "app/elementsRenderer";
@@ -8,8 +7,6 @@ import FolderElement from "app/nodeElement/folderElement";
 import GhostDropHint from "app/nodeElement/ghostDropHint";
 
 import { togglerLink } from "../support/testUtil";
-
-mockAnimationsApi();
 
 interface CreateFolderElementParams {
     closedIconElement?: HTMLElement | Text;

@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import getGiven from "givens";
 import { http, HttpResponse } from "msw";
@@ -103,17 +103,19 @@ describe("load on demand", () => {
 
             await screen.findByText("loaded-on-demand");
 
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({
-                            name: "loaded-on-demand",
-                        }),
-                    ],
-                    name: "parent-node",
-                    open: true,
-                }),
-            ]);
+            await waitFor(() => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({
+                                name: "loaded-on-demand",
+                            }),
+                        ],
+                        name: "parent-node",
+                        open: true,
+                    }),
+                ]);
+            });
         });
 
         context("when the node is selected", () => {

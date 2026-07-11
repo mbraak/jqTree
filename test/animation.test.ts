@@ -1,8 +1,4 @@
-import { mockAnimationsApi } from "jsdom-testing-mocks";
-
 import { getAnimationDuration, slideDown, slideUp } from "app/animation";
-
-mockAnimationsApi();
 
 describe("getAnimationDuration", () => {
     it("returns a number unchanged", () => {
