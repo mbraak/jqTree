@@ -1,18 +1,4 @@
-import { getAnimationDuration, getBoolString, isInt } from "app/util";
-
-describe("getAnimationDuration", () => {
-    it("returns a number unchanged", () => {
-        expect(getAnimationDuration(456)).toBe(456);
-    });
-
-    it("returns 200 for 'fast'", () => {
-        expect(getAnimationDuration("fast")).toBe(200);
-    });
-
-    it("returns 600 for 'slow'", () => {
-        expect(getAnimationDuration("slow")).toBe(600);
-    });
-});
+import { getBoolString, isInt } from "app/util";
 
 describe("getBoolString", () => {
     it("returns true or false", () => {

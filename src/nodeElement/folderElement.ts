@@ -2,7 +2,7 @@ import type { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 import type { Position } from "../node";
 import type { NodeElementParams } from "./index";
 
-import { getAnimationDuration } from "../util";
+import { slideDown, slideUp } from "../animation";
 import NodeElement from "./index";
 
 interface FolderElementParams extends NodeElementParams {
@@ -67,20 +67,7 @@ class FolderElement extends NodeElement {
         };
 
         if (slide) {
-            const ul = this.getUl();
-
-            const animation = ul.animate(
-                [
-                    { height: `${ul.scrollHeight}px`, overflow: "hidden" },
-                    { height: "0", overflow: "hidden" },
-                ],
-                { duration: getAnimationDuration(animationSpeed) },
-            );
-
-            animation.onfinish = () => {
-                ul.style.display = "none";
-                doClose();
-            };
+            slideUp(this.getUl(), animationSpeed, doClose);
         } else {
             const ul = this.getUl();
             ul.style.display = "none";
@@ -126,20 +113,7 @@ class FolderElement extends NodeElement {
         };
 
         if (slide) {
-            const ul = this.getUl();
-            ul.style.display = "block";
-
-            const animation = ul.animate(
-                [
-                    { height: "0", overflow: "hidden" },
-                    { height: `${ul.scrollHeight}px`, overflow: "hidden" },
-                ],
-                { duration: getAnimationDuration(animationSpeed) },
-            );
-
-            animation.onfinish = () => {
-                doOpen();
-            };
+            slideDown(this.getUl(), animationSpeed, doOpen);
         } else {
             const ul = this.getUl();
             ul.style.display = "block";
