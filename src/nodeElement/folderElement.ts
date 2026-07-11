@@ -2,6 +2,7 @@ import type { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 import type { Position } from "../node";
 import type { NodeElementParams } from "./index";
 
+import { getAnimationDuration } from "../util";
 import NodeElement from "./index";
 
 interface FolderElementParams extends NodeElementParams {
@@ -66,7 +67,20 @@ class FolderElement extends NodeElement {
         };
 
         if (slide) {
-            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
+            const ul = this.getUl();
+
+            const animation = ul.animate(
+                [
+                    { height: `${ul.scrollHeight}px`, overflow: "hidden" },
+                    { height: "0", overflow: "hidden" },
+                ],
+                { duration: getAnimationDuration(animationSpeed) },
+            );
+
+            animation.onfinish = () => {
+                ul.style.display = "none";
+                doClose();
+            };
         } else {
             const ul = this.getUl();
             ul.style.display = "none";
@@ -112,7 +126,20 @@ class FolderElement extends NodeElement {
         };
 
         if (slide) {
-            jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
+            const ul = this.getUl();
+            ul.style.display = "block";
+
+            const animation = ul.animate(
+                [
+                    { height: "0", overflow: "hidden" },
+                    { height: `${ul.scrollHeight}px`, overflow: "hidden" },
+                ],
+                { duration: getAnimationDuration(animationSpeed) },
+            );
+
+            animation.onfinish = () => {
+                doOpen();
+            };
         } else {
             const ul = this.getUl();
             ul.style.display = "block";
