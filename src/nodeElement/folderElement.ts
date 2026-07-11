@@ -1,3 +1,4 @@
+import type { AnimationSpeed } from "../animation";
 import type { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 import type { Position } from "../node";
 import type { NodeElementParams } from "./index";
@@ -37,7 +38,7 @@ class FolderElement extends NodeElement {
         this.triggerEvent = triggerEvent;
     }
 
-    public close(slide: boolean, animationSpeed: JQuery.Duration): void {
+    public close(slide: boolean, animationSpeed: AnimationSpeed): void {
         if (!this.node.is_open) {
             return;
         }
@@ -78,7 +79,7 @@ class FolderElement extends NodeElement {
     public open(
         onFinished: OnFinishOpenNode | undefined,
         slide: boolean,
-        animationSpeed: JQuery.Duration,
+        animationSpeed: AnimationSpeed,
     ): void {
         if (this.node.is_open) {
             return;

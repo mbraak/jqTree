@@ -1,4 +1,6 @@
-export const getAnimationDuration = (duration: JQuery.Duration): number => {
+export type AnimationSpeed = "fast" | "slow" | number;
+
+export const getAnimationDuration = (duration: AnimationSpeed): number => {
     if (typeof duration === "number") {
         return duration;
     }
@@ -8,7 +10,7 @@ export const getAnimationDuration = (duration: JQuery.Duration): number => {
 
 export const slideDown = (
     element: HTMLElement,
-    animationSpeed: JQuery.Duration,
+    animationSpeed: AnimationSpeed,
     onFinished: () => void,
 ): void => {
     element.style.display = "block";
@@ -28,7 +30,7 @@ export const slideDown = (
 
 export const slideUp = (
     element: HTMLElement,
-    animationSpeed: JQuery.Duration,
+    animationSpeed: AnimationSpeed,
     onFinished: () => void,
 ): void => {
     const animation = element.animate(
