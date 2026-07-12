@@ -77,7 +77,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
     private keyHandler: KeyHandler;
     private mouseHandler: MouseHandler;
-    private nodeMap: WeakMap<HTMLElement, Node>;
     private renderer: ElementsRenderer;
     private saveStateHandler: SaveStateHandler;
     private scrollHandler: ScrollHandler;
@@ -182,7 +181,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.mouseHandler.deinit();
 
         this.htmlTree.tree = new Node({}, true);
-        this.nodeMap = new WeakMap();
 
         super.deinit();
     }
@@ -250,7 +248,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         super.init();
 
         this.element = this.$el;
-        this.nodeMap = new WeakMap();
 
         const htmlElement = this.$el.get(0) as HTMLElement;
         this.htmlTree = new HtmlTree(htmlElement, this.options);
@@ -898,7 +895,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const liElement = element.closest<HTMLElement>("li.jqtree_common");
 
         if (liElement) {
-            return this.nodeMap.get(liElement) ?? null;
+            return this.htmlTree.nodeMap.get(liElement) ?? null;
         } else {
             return null;
         }
@@ -1247,7 +1244,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private setNodeElement(element: HTMLElement, node: Node) {
-        this.nodeMap.set(element, node);
+        this.htmlTree.nodeMap.set(element, node);
     }
 
     private triggerEvent(

@@ -6,6 +6,7 @@ import { Node } from "./node";
 export default class HtmlTree {
   public htmlElement: HTMLElement;
   public isInitialized: boolean;
+  public nodeMap: WeakMap<HTMLElement, Node>;
   public options: JQTreeOptions;
   public tree: Node;
 
@@ -17,5 +18,6 @@ export default class HtmlTree {
 
     this.isInitialized = false;
     this.tree = new Node({}, true);
+    this.nodeMap = new WeakMap();
   }
 }
