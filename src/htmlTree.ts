@@ -20,4 +20,15 @@ export default class HtmlTree {
     this.tree = new Node({}, true);
     this.nodeMap = new WeakMap();
   }
+
+  // Return the tree node for an HTMl element.
+  public getNode(element: HTMLElement): Node | null {
+    const liElement = element.closest<HTMLElement>("li.jqtree_common");
+
+    if (liElement) {
+      return this.nodeMap.get(liElement) ?? null;
+    } else {
+      return null;
+    }
+  }
 }

@@ -201,7 +201,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return null;
         }
 
-        return this.getNode(element);
+        return this.htmlTree.getNode(element);
     }
 
     public getNodeById(nodeId: NodeId): Node | null {
@@ -671,7 +671,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             tabIndex,
         });
 
-        const getNode = this.getNode.bind(this);
+        const getNode = this.htmlTree.getNode.bind(this.htmlTree);
         const onMouseCapture = this.mouseCapture.bind(this);
         const onMouseDrag = this.mouseDrag.bind(this);
         const onMouseStart = this.mouseStart.bind(this);
@@ -702,7 +702,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private containsElement(element: HTMLElement): boolean {
-        const node = this.getNode(element);
+        const node = this.htmlTree.getNode(element);
 
         return node?.tree === this.htmlTree.tree;
     }
@@ -891,18 +891,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private getNode(element: HTMLElement): Node | null {
-        const liElement = element.closest<HTMLElement>("li.jqtree_common");
-
-        if (liElement) {
-            return this.htmlTree.nodeMap.get(liElement) ?? null;
-        } else {
-            return null;
-        }
-    }
-
     private getNodeElement(element: HTMLElement): NodeElement | null {
-        const node = this.getNode(element);
+        const node = this.htmlTree.getNode(element);
         if (node) {
             return this.getNodeElementForNode(node);
         } else {
