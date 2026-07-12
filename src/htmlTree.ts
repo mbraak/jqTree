@@ -45,4 +45,9 @@ export default class HtmlTree {
 
     return activeElement?.tagName === "SPAN" && this.containsElement(activeElement as HTMLElement);
   }
+
+  // Set this HTML element to this node in the node map.
+  public setNodeElement(element: HTMLElement, node: Node) {
+    this.nodeMap.set(element, node);
+  }
 }
