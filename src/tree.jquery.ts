@@ -1274,9 +1274,13 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private triggerEvent(
         eventName: string,
         values?: Record<string, unknown>,
-    ): JQuery.Event {
-        const event = jQuery.Event(eventName, values);
-        this.element.trigger(event);
+    ): CustomEvent {
+        const event = new CustomEvent(eventName, {
+            bubbles: true,
+            cancelable: true,
+            detail: values,
+        });
+        (this.element.get(0) as HTMLElement).dispatchEvent(event);
         return event;
     }
 }

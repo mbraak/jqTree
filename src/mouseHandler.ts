@@ -168,7 +168,7 @@ class MouseHandler {
                     node: clickTarget.node,
                 });
 
-                if (!event.isDefaultPrevented()) {
+                if (!event.defaultPrevented) {
                     this.onClickTitle(clickTarget.node);
                 }
                 break;

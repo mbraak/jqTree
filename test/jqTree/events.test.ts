@@ -43,13 +43,20 @@ describe("events", () => {
 
         it("fires tree.click", async () => {
             const onClick = vi.fn();
-            given.$tree.on("tree.click", onClick);
+            (given.$tree.get(0) as HTMLElement).addEventListener(
+                "tree.click",
+                onClick,
+            );
 
             await userEvent.click(given.titleSpan);
 
             expect(onClick).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: given.node1 }),
+                expect.objectContaining({ type: "tree.click" }),
             );
+
+            const event = onClick.mock.calls[0]?.[0] as CustomEvent;
+
+            expect(event.detail).toMatchObject({ node: given.node1 });
         });
     });
 
@@ -73,7 +80,10 @@ describe("events", () => {
 
         it("fires tree.contextmenu", async () => {
             const onContextMenu = vi.fn();
-            given.$tree.on("tree.contextmenu", onContextMenu);
+            (given.$tree.get(0) as HTMLElement).addEventListener(
+                "tree.contextmenu",
+                onContextMenu,
+            );
 
             await userEvent.pointer({
                 keys: "[MouseRight]",
@@ -81,8 +91,12 @@ describe("events", () => {
             });
 
             expect(onContextMenu).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: given.node1 }),
+                expect.objectContaining({ type: "tree.contextmenu" }),
             );
+
+            const event = onContextMenu.mock.calls[0]?.[0] as CustomEvent;
+
+            expect(event.detail).toMatchObject({ node: given.node1 });
         });
     });
 
@@ -106,13 +120,20 @@ describe("events", () => {
 
         it("fires tree.dblclick", async () => {
             const onDoubleClick = vi.fn();
-            given.$tree.on("tree.dblclick", onDoubleClick);
+            (given.$tree.get(0) as HTMLElement).addEventListener(
+                "tree.dblclick",
+                onDoubleClick,
+            );
 
             await userEvent.dblClick(given.titleSpan);
 
             expect(onDoubleClick).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: given.node1 }),
+                expect.objectContaining({ type: "tree.dblclick" }),
             );
+
+            const event = onDoubleClick.mock.calls[0]?.[0] as CustomEvent;
+
+            expect(event.detail).toMatchObject({ node: given.node1 });
         });
     });
 
@@ -126,7 +147,10 @@ describe("events", () => {
         context("with json data", () => {
             it("is called", () => {
                 const onInit = vi.fn();
-                given.$tree.on("tree.init", onInit);
+                (given.$tree.get(0) as HTMLElement).addEventListener(
+                    "tree.init",
+                    onInit,
+                );
 
                 given.$tree.tree({
                     data: exampleData,
@@ -151,7 +175,10 @@ describe("events", () => {
 
             it("is called", async () => {
                 const onInit = vi.fn();
-                given.$tree.on("tree.init", onInit);
+                (given.$tree.get(0) as HTMLElement).addEventListener(
+                    "tree.init",
+                    onInit,
+                );
 
                 given.$tree.tree({ dataUrl: "/tree/" });
 
@@ -172,13 +199,20 @@ describe("events", () => {
         context("when the tree is initialized with data", () => {
             it("fires tree.load_data", () => {
                 const onLoadData = vi.fn();
-                given.$tree.on("tree.load_data", onLoadData);
+                (given.$tree.get(0) as HTMLElement).addEventListener(
+                    "tree.load_data",
+                    onLoadData,
+                );
 
                 given.$tree.tree({ data: exampleData });
 
                 expect(onLoadData).toHaveBeenCalledExactlyOnceWith(
-                    expect.objectContaining({ tree_data: exampleData }),
+                    expect.objectContaining({ type: "tree.load_data" }),
                 );
+
+                const event = onLoadData.mock.calls[0]?.[0] as CustomEvent;
+
+                expect(event.detail).toMatchObject({ tree_data: exampleData });
             });
         });
     });
@@ -205,16 +239,23 @@ describe("events", () => {
 
         it("fires tree.select", async () => {
             const onSelect = vi.fn();
-            given.$tree.on("tree.select", onSelect);
+            (given.$tree.get(0) as HTMLElement).addEventListener(
+                "tree.select",
+                onSelect,
+            );
 
             await userEvent.click(given.titleSpan);
 
             expect(onSelect).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({
-                    deselected_node: null,
-                    node: given.node1,
-                }),
+                expect.objectContaining({ type: "tree.select" }),
             );
+
+            const event = onSelect.mock.calls[0]?.[0] as CustomEvent;
+
+            expect(event.detail).toMatchObject({
+                deselected_node: null,
+                node: given.node1,
+            });
         });
 
         context("when the node was selected", () => {
@@ -224,16 +265,23 @@ describe("events", () => {
 
             it("fires tree.select with node is null", async () => {
                 const onSelect = vi.fn();
-                given.$tree.on("tree.select", onSelect);
+                (given.$tree.get(0) as HTMLElement).addEventListener(
+                    "tree.select",
+                    onSelect,
+                );
 
                 await userEvent.click(given.titleSpan);
 
                 expect(onSelect).toHaveBeenCalledExactlyOnceWith(
-                    expect.objectContaining({
-                        node: null,
-                        previous_node: given.node1,
-                    }),
+                    expect.objectContaining({ type: "tree.select" }),
                 );
+
+                const event = onSelect.mock.calls[0]?.[0] as CustomEvent;
+
+                expect(event.detail).toMatchObject({
+                    node: null,
+                    previous_node: given.node1,
+                });
             });
         });
     });
@@ -255,26 +303,33 @@ describe("events", () => {
             const $tree = $("#tree1");
 
             const onLoading = vi.fn();
-            $tree.on("tree.loading_data", onLoading);
+            ($tree.get(0) as HTMLElement).addEventListener(
+                "tree.loading_data",
+                onLoading,
+            );
 
             $tree.tree({ dataUrl: "/tree/" });
 
             await waitFor(() => {
-                expect(onLoading).toHaveBeenCalledExactlyOnceWith(
-                    expect.objectContaining({
-                        isLoading: true,
-                        node: null,
-                    }),
-                );
+                const event = onLoading.mock.calls[0]?.[0] as
+                    | CustomEvent
+                    | undefined;
+
+                expect(event?.detail).toMatchObject({
+                    isLoading: true,
+                    node: null,
+                });
             });
 
             await waitFor(() => {
-                expect(onLoading).toHaveBeenLastCalledWith(
-                    expect.objectContaining({
-                        isLoading: false,
-                        node: null,
-                    }),
-                );
+                const event = onLoading.mock.lastCall?.[0] as
+                    | CustomEvent
+                    | undefined;
+
+                expect(event?.detail).toMatchObject({
+                    isLoading: false,
+                    node: null,
+                });
             });
         });
     });

@@ -44,8 +44,12 @@ const createDragAndDropHandler = ({
 
     const triggerEvent = vi.fn(
         (eventName: string, values?: Record<string, unknown>) => {
-            const event = jQuery.Event(eventName, values);
-            jQuery(treeElement).trigger(event);
+            const event = new CustomEvent(eventName, {
+                bubbles: true,
+                cancelable: true,
+                detail: values,
+            });
+            treeElement.dispatchEvent(event);
             return event;
         },
     );

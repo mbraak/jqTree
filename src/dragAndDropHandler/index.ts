@@ -356,7 +356,7 @@ export class DragAndDropHandler {
                 },
             });
 
-            if (!event.isDefaultPrevented()) {
+            if (!event.defaultPrevented) {
                 doMove();
             }
         }
