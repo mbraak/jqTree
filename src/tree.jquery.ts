@@ -573,7 +573,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const getNodeById = this.getNodeById.bind(this);
         const getSelectedNode = this.getSelectedNode.bind(this);
         const getTree = this.getTree.bind(this);
-        const isFocusOnTree = this.isFocusOnTree.bind(this);
+        const isFocusOnTree = this.htmlTree.isFocusOnTree.bind(this.htmlTree);
         const loadData = this.loadData.bind(this);
         const openNode = this.openNodeInternal.bind(this);
         const refreshElements = this.refreshElements.bind(this);
@@ -699,12 +699,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.saveStateHandler = saveStateHandler;
         this.scrollHandler = scrollHandler;
         this.selectNodeHandler = selectNodeHandler;
-    }
-
-    private containsElement(element: HTMLElement): boolean {
-        const node = this.htmlTree.getNode(element);
-
-        return node?.tree === this.htmlTree.tree;
     }
 
     private createFolderElement(node: Node) {
@@ -960,12 +954,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private isFocusOnTree(): boolean {
-        const activeElement = document.activeElement;
-
-        return activeElement?.tagName === "SPAN" && this.containsElement(activeElement as HTMLElement);
-    }
-
     private isSelectedNodeInSubtree(subtree: Node): boolean {
         const selectedNode = this.getSelectedNode();
 
@@ -1088,7 +1076,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
      from_node: redraw this subtree
     */
     private refreshElements(fromNode: Node | null): void {
-        const mustSetFocus = this.isFocusOnTree();
+        const mustSetFocus = this.htmlTree.isFocusOnTree();
         const mustSelect = fromNode
             ? this.isSelectedNodeInSubtree(fromNode)
             : false;

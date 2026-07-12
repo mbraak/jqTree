@@ -21,6 +21,13 @@ export default class HtmlTree {
     this.nodeMap = new WeakMap();
   }
 
+  // Is this HTML element part of the tree?
+  public containsElement(element: HTMLElement): boolean {
+    const node = this.getNode(element);
+
+    return node?.tree === this.tree;
+  }
+
   // Return the tree node for an HTMl element.
   public getNode(element: HTMLElement): Node | null {
     const liElement = element.closest<HTMLElement>("li.jqtree_common");
@@ -30,5 +37,12 @@ export default class HtmlTree {
     } else {
       return null;
     }
+  }
+
+  // Does an HTML element of the tree have the focus?
+  public isFocusOnTree(): boolean {
+    const activeElement = document.activeElement;
+
+    return activeElement?.tagName === "SPAN" && this.containsElement(activeElement as HTMLElement);
   }
 }
