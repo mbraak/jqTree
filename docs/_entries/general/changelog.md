@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+- Issue #953. Do not explicitly parse the server response as JSON. That is already handled by jquery.ajax.
+
 #### 1.8.11 (january 24 2026)
 
 - Support jQuery 4.

@@ -323,18 +323,7 @@ describe("options", () => {
                 name: "string",
             },
             {
-                dataUrl: {
-                    headers: { node: "test-node" },
-                    url: "/tree/",
-                },
-                expectedNode: "test-node",
-                expectedStructure: [
-                    expect.objectContaining({ name: "test-node" }),
-                ],
-                name: "object with url and headers",
-            },
-            {
-                dataUrl: () => ({ url: "/tree/" }),
+                dataUrl: () => "/tree/",
                 expectedNode: "node1",
                 expectedStructure: exampleStructure,
                 name: "function",
@@ -377,7 +366,7 @@ describe("options", () => {
             localStorage.setItem("tree", '{"selected_node":[124]}');
 
             given.$tree.tree({
-                dataUrl: { url: "/tree/" },
+                dataUrl: "/tree/",
                 saveState: true,
             });
 
@@ -392,13 +381,37 @@ describe("options", () => {
             localStorage.setItem("tree", "{}");
 
             given.$tree.tree({
-                dataUrl: { url: "/tree/" },
+                dataUrl: "/tree/",
                 saveState: true,
             });
 
             await screen.findByText("node1");
 
             expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+        });
+    });
+
+    describe("data-url in html", () => {
+        it("loads the data from the url", async () => {
+            server.use(
+                http.get(
+                    "/tree",
+                    () => HttpResponse.json(exampleData)
+                ),
+            );
+
+            const $tree = $("#tree1");
+            const treeElement = $tree.get(0) as HTMLElement;
+            treeElement.dataset.url = "/tree";
+
+            $tree.tree();
+
+            await screen.findByText("node1");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
         });
     });
 
@@ -584,9 +597,22 @@ describe("options", () => {
             });
         });
 
-        context("with the rtl data option", () => {
+        context("with the rtl data option set to 'true'", () => {
             beforeEach(() => {
                 given.$tree.attr("data-rtl", "true");
+                given.$tree.tree({ data: exampleData });
+            });
+
+            it("has a different closed icon", () => {
+                expect(
+                    togglerLink(given.node1.element as HTMLElement).innerHTML,
+                ).toBe("◀");
+            });
+        });
+
+        context("with the rtl data option without a value", () => {
+            beforeEach(() => {
+                given.$tree.attr("data-rtl", "");
                 given.$tree.tree({ data: exampleData });
             });
 

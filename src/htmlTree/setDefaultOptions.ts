@@ -20,14 +20,7 @@ const getRtlOption = (htmlElement: HTMLElement, options: JQTreeOptions): boolean
     return options.rtl;
   } else {
     const dataRtl = htmlElement.dataset.rtl;
-
-    if (
-      dataRtl !== undefined && dataRtl !== 'false'
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    return dataRtl !== undefined;
   }
 }
 

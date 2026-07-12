@@ -1,26 +1,34 @@
 {
-    "name": "jqtree_documentation",
-    "private": true,
-    "scripts": {
-        "jekyll-build": "bundle exec jekyll build",
-        "jekyll-serve": "bundle exec jekyll serve",
-        "build_docs_css": "pnpm tailwind && pnpm build_example_css && pnpm copy_jqtree && pnpm copy_vendor_files",
-        "tailwind": "tailwindcss -m -i documentation.css -o static/documentation.css",
-        "build_example_css": "postcss -o static/example.css static/example.postcss",
-        "copy_jqtree": "cp ../tree.jquery.js . && cp ../jqtree.css .",
-        "copy_vendor_files": "./copy_vendor_files"
-    },
-    "devDependencies": {
-        "@tailwindcss/cli": "^4.3.0",
-        "@tailwindcss/postcss": "^4.3.0",
-        "@tailwindcss/typography": "^0.5.19",
-        "autoprefixer": "^10.5.0",
-        "jquery": "^4.0.0",
-        "postcss": "^8.5.15",
-        "postcss-cli": "^11.0.1",
-        "postcss-import": "^16.1.1",
-        "postcss-load-config": "^6.0.1",
-        "postcss-nested": "^7.0.2",
-        "tailwindcss": "^4.3.0"
-    }
+  "name": "jqtree_documentation",
+  "private": true,
+  "scripts": {
+    "jekyll-build": "bundle exec jekyll build",
+    "jekyll-serve": "bundle exec jekyll serve",
+    "build_docs_css": "pnpm tailwind && pnpm build_example_css && pnpm copy_jqtree && pnpm copy_vendor_files",
+    "tailwind": "tailwindcss -m -i documentation.css -o static/documentation.css",
+    "build_example_css": "postcss -o static/example.css static/example.postcss",
+    "copy_jqtree": "cp ../tree.jquery.js . && cp ../jqtree.css .",
+    "copy_vendor_files": "./copy_vendor_files"
+  },
+  "dependencies": {
+    "jquery": "^4.0.0",
+    "msw": "^2"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.2",
+    "@tailwindcss/postcss": "^4.3.2",
+    "@tailwindcss/typography": "^0.5.20",
+    "autoprefixer": "^10.5.2",
+    "postcss": "^8.5.16",
+    "postcss-cli": "^11.0.1",
+    "postcss-import": "^16.1.1",
+    "postcss-load-config": "^6.0.1",
+    "postcss-nested": "^7.0.2",
+    "tailwindcss": "^4.3.2"
+  },
+  "msw": {
+    "workerDirectory": [
+      "_examples"
+    ]
+  }
 }

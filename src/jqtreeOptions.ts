@@ -1,15 +1,16 @@
+import type { AnimationSpeed } from "./animation";
 import type { Node } from "./node";
 
 export type DataFilter = (data: unknown) => NodeData[];
 
-export type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
+export type DataUrl = DataUrlFunction | string;
 
 export type DragMethod = (node: Node, event: Event | Touch) => void;
 
 export type IconElement = HTMLElement | JQuery | string;
 
 export interface JQTreeOptions {
-    animationSpeed: JQuery.Duration;
+    animationSpeed: AnimationSpeed;
     autoEscape: boolean;
     autoOpen: boolean | number;
     buttonLeft: boolean;
@@ -57,7 +58,7 @@ export type OnGetStateFromStorage = (() => string) | undefined;
 
 export type OnIsMoveHandle = (el: JQuery) => boolean;
 
-export type OnLoadFailed = (response: JQuery.jqXHR) => void;
+export type OnLoadFailed = (response: Response) => void;
 
 export type OnLoading = (
     isLoading: boolean,
@@ -67,4 +68,4 @@ export type OnLoading = (
 
 export type OnSetStateFromStorage = ((data: string) => void) | undefined;
 
-type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
+type DataUrlFunction = (node: Node | null) => string;

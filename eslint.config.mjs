@@ -80,6 +80,7 @@ export default [
             "vitest/prefer-strict-boolean-matchers": "off",
             "vitest/require-hook": "off",
             "vitest/require-mock-type-parameters": "off",
+            "vitest/valid-expect": "off",
         },
     },
     {

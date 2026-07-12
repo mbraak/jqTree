@@ -1,7 +1,9 @@
+import type { AnimationSpeed } from "../animation";
 import type { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 import type { Position } from "../node";
 import type { NodeElementParams } from "./index";
 
+import { slideDown, slideUp } from "../animation";
 import NodeElement from "./index";
 
 interface FolderElementParams extends NodeElementParams {
@@ -36,7 +38,7 @@ class FolderElement extends NodeElement {
         this.triggerEvent = triggerEvent;
     }
 
-    public close(slide: boolean, animationSpeed: JQuery.Duration): void {
+    public close(slide: boolean, animationSpeed: AnimationSpeed): void {
         if (!this.node.is_open) {
             return;
         }
@@ -66,9 +68,10 @@ class FolderElement extends NodeElement {
         };
 
         if (slide) {
-            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
+            slideUp(this.getUl(), animationSpeed, doClose);
         } else {
-            jQuery(this.getUl()).hide();
+            const ul = this.getUl();
+            ul.style.display = "none";
             doClose();
         }
     }
@@ -76,7 +79,7 @@ class FolderElement extends NodeElement {
     public open(
         onFinished: OnFinishOpenNode | undefined,
         slide: boolean,
-        animationSpeed: JQuery.Duration,
+        animationSpeed: AnimationSpeed,
     ): void {
         if (this.node.is_open) {
             return;
@@ -111,9 +114,10 @@ class FolderElement extends NodeElement {
         };
 
         if (slide) {
-            jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
+            slideDown(this.getUl(), animationSpeed, doOpen);
         } else {
-            jQuery(this.getUl()).show();
+            const ul = this.getUl();
+            ul.style.display = "block";
             doOpen();
         }
     }
