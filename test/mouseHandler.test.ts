@@ -17,6 +17,7 @@ interface CreateMouseHandlerParams {
     getMouseDelay?: GetMouseDelay;
     getNode?: GetNode;
     onClickButton?: (node: Node) => void;
+    onClickTitle?: (node: Node) => void;
     onMouseCapture?: MouseCapture;
     onMouseDrag?: (positionInfo: PositionInfo) => void;
     onMouseStart?: MouseStart;
@@ -29,14 +30,13 @@ const createMouseHandler = ({
     getMouseDelay = vi.fn(() => 0),
     getNode = vi.fn(),
     onClickButton = vi.fn(),
+    onClickTitle = vi.fn(),
     onMouseCapture = vi.fn(),
     onMouseDrag = vi.fn(),
     onMouseStart = vi.fn(),
     onMouseStop = vi.fn(),
     triggerEvent = vi.fn(),
 }: CreateMouseHandlerParams) => {
-    const onClickTitle = vi.fn();
-
     return new MouseHandler({
         element,
         getMouseDelay,
@@ -97,6 +97,76 @@ describe("handleClick", () => {
         element.dispatchEvent(event);
 
         expect(onClickButton).not.toHaveBeenCalled();
+    });
+
+    it("calls onClickTitle when a title is clicked", () => {
+        const element = document.createElement("div");
+
+        const label = document.createElement("div");
+        label.classList.add("jqtree-element");
+        element.appendChild(label);
+
+        document.body.append(element);
+
+        const node = new Node();
+
+        const getNode = vi.fn((element: HTMLElement) => {
+            if (element === label) {
+                return node;
+            } else {
+                return null;
+            }
+        });
+
+        const triggerEvent = vi.fn<TriggerEvent>(() =>
+            jQuery.Event("tree.click"),
+        );
+        const onClickTitle = vi.fn();
+
+        createMouseHandler({ element, getNode, onClickTitle, triggerEvent });
+
+        const event = new MouseEvent("click", { bubbles: true });
+        label.dispatchEvent(event);
+
+        expect(triggerEvent).toHaveBeenCalledExactlyOnceWith("tree.click", {
+            click_event: event,
+            node,
+        });
+        expect(onClickTitle).toHaveBeenCalledExactlyOnceWith(node);
+    });
+
+    it("doesn't call onClickTitle when the default of tree.click is prevented", () => {
+        const element = document.createElement("div");
+
+        const label = document.createElement("div");
+        label.classList.add("jqtree-element");
+        element.appendChild(label);
+
+        document.body.append(element);
+
+        const node = new Node();
+
+        const getNode = vi.fn((element: HTMLElement) => {
+            if (element === label) {
+                return node;
+            } else {
+                return null;
+            }
+        });
+
+        const triggerEvent = vi.fn<TriggerEvent>(() => {
+            const treeClickEvent = jQuery.Event("tree.click");
+            treeClickEvent.preventDefault();
+            return treeClickEvent;
+        });
+        const onClickTitle = vi.fn();
+
+        createMouseHandler({ element, getNode, onClickTitle, triggerEvent });
+
+        const event = new MouseEvent("click", { bubbles: true });
+        label.dispatchEvent(event);
+
+        expect(onClickTitle).not.toHaveBeenCalled();
     });
 });
 
