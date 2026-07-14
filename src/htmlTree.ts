@@ -3,6 +3,7 @@ import type { JQTreeOptions } from "./jqtreeOptions";
 import setDefaultOptions from "./htmlTree/setDefaultOptions";
 import triggerCustomEvent from "./htmlTree/triggerCustomEvent";
 import { Node } from "./node";
+import SelectNodeHandler from "./selectNodeHandler";
 
 export type TriggerEventProvider = (element: HTMLElement, eventName: string, values?: Record<string, unknown>) => boolean;
 
@@ -11,6 +12,7 @@ export default class HtmlTree {
   public isInitialized: boolean;
   public nodeMap: WeakMap<HTMLElement, Node>;
   public options: JQTreeOptions;
+  public selectNodeHandler: SelectNodeHandler;
   public tree: Node;
 
   private triggerEventProvider: TriggerEventProvider;
@@ -25,6 +27,12 @@ export default class HtmlTree {
     this.isInitialized = false;
     this.tree = new Node({}, true);
     this.nodeMap = new WeakMap();
+
+    const getNodeById = this.getNodeById.bind(this);
+
+    this.selectNodeHandler = new SelectNodeHandler({
+      getNodeById,
+    });
   }
 
   // Is this HTML element part of the tree?

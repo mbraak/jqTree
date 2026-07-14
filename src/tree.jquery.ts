@@ -18,7 +18,6 @@ import { getOffsetTop } from "./positionUtils";
 import RequestUrl from "./requestUrl";
 import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
-import SelectNodeHandler from "./selectNodeHandler";
 import SimpleWidget from "./simple.widget";
 import __version__ from "./version";
 
@@ -90,7 +89,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private renderer: ElementsRenderer;
     private saveStateHandler: SaveStateHandler;
     private scrollHandler: ScrollHandler;
-    private selectNodeHandler: SelectNodeHandler;
 
     public addNodeAfter(
         newNodeInfo: NodeData,
@@ -144,7 +142,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this.selectNodeHandler.addToSelection(node);
+        this.htmlTree.selectNodeHandler.addToSelection(node);
         this.openParents(node);
 
         this.getNodeElementForNode(node).select(mustSetFocus ?? true);
@@ -231,11 +229,11 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public getSelectedNode(): false | Node {
-        return this.selectNodeHandler.getSelectedNode();
+        return this.htmlTree.selectNodeHandler.getSelectedNode();
     }
 
     public getSelectedNodes(): Node[] {
-        return this.selectNodeHandler.getSelectedNodes();
+        return this.htmlTree.selectNodeHandler.getSelectedNodes();
     }
 
     public getState(): null | SavedState {
@@ -276,7 +274,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        return this.selectNodeHandler.isNodeSelected(node);
+        return this.htmlTree.selectNodeHandler.isNodeSelected(node);
     }
 
     public loadData(data: NodeData[], parentNode: Node | null): JQuery {
@@ -425,7 +423,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this.selectNodeHandler.removeFromSelection(node);
+        this.htmlTree.selectNodeHandler.removeFromSelection(node);
 
         this.getNodeElementForNode(node).deselect();
         this.saveState();
@@ -442,7 +440,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error("Node has no parent");
         }
 
-        this.selectNodeHandler.removeFromSelection(node, true); // including children
+        this.htmlTree.selectNodeHandler.removeFromSelection(node, true); // including children
 
         const parent = node.parent;
         node.remove();
@@ -593,10 +591,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const $treeElement = this.element;
         const treeElement = this.element.get(0) as HTMLElement;
         const triggerEvent = this.htmlTree.triggerEvent.bind(this.htmlTree);
-
-        const selectNodeHandler = new SelectNodeHandler({
-            getNodeById,
-        });
+        const selectNodeHandler = this.htmlTree.selectNodeHandler;
 
         const addToSelection =
             selectNodeHandler.addToSelection.bind(selectNodeHandler);
@@ -788,9 +783,9 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
     private deselectNodes(parentNode: Node): void {
         const selectedNodesUnderParent =
-            this.selectNodeHandler.getSelectedNodesUnder(parentNode);
+            this.htmlTree.selectNodeHandler.getSelectedNodesUnder(parentNode);
         for (const n of selectedNodesUnderParent) {
-            this.selectNodeHandler.removeFromSelection(n);
+            this.htmlTree.selectNodeHandler.removeFromSelection(n);
         }
     }
 
@@ -860,7 +855,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return;
         }
 
-        if (this.selectNodeHandler.isNodeSelected(node)) {
+        if (this.htmlTree.selectNodeHandler.isNodeSelected(node)) {
             if (selectOptions.mustToggle) {
                 this.deselectCurrentNode();
                 this.htmlTree.triggerEvent("tree.select", {
@@ -948,7 +943,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             this.options.nodeClass,
         );
 
-        this.selectNodeHandler.clear();
+        this.htmlTree.selectNodeHandler.clear();
 
         this.htmlTree.tree.loadFromData(data);
 
