@@ -1,6 +1,8 @@
+import type { TriggerEvent } from "./jqtreeMethodTypes";
 import type { JQTreeOptions } from "./jqtreeOptions";
 
 import setDefaultOptions from "./htmlTree/setDefaultOptions";
+import triggerCustomEvent from "./htmlTree/triggerCustomEvent";
 import { Node } from "./node";
 
 export default class HtmlTree {
@@ -10,9 +12,12 @@ export default class HtmlTree {
   public options: JQTreeOptions;
   public tree: Node;
 
-  constructor(htmlElement: HTMLElement, options: JQTreeOptions) {
+  private triggerEventMethod: TriggerEvent;
+
+  constructor(htmlElement: HTMLElement, options: JQTreeOptions, overrideTriggerEvent?: TriggerEvent) {
     this.htmlElement = htmlElement;
     this.options = options;
+    this.triggerEventMethod = overrideTriggerEvent ?? triggerCustomEvent;
 
     setDefaultOptions(htmlElement, options);
 
@@ -49,5 +54,9 @@ export default class HtmlTree {
   // Set this HTML element to this node in the node map.
   public setNodeElement(element: HTMLElement, node: Node) {
     this.nodeMap.set(element, node);
+  }
+
+  public triggerEvent(eventName: string, values?: Record<string, unknown>): boolean {
+    return this.triggerEventMethod(this.htmlElement, eventName, values)
   }
 }
