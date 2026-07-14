@@ -1,4 +1,4 @@
-import type { TriggerEvent } from "app/jqtreeMethodTypes";
+import type { TriggerEventProvider } from "app/htmlTree";
 import type { JQTreeOptions } from "app/jqtreeOptions";
 
 import HtmlTree from "app/htmlTree";
@@ -25,7 +25,7 @@ const defaultOptions: JQTreeOptions = {
 
 const createHtmlTree = (
     inputOptions: Partial<JQTreeOptions> = {},
-    overrideTriggerEvent?: TriggerEvent,
+    overrideTriggerEvent?: TriggerEventProvider,
 ) => {
     const htmlElement = document.createElement("div");
     document.body.append(htmlElement);

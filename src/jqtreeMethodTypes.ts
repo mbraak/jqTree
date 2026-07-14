@@ -36,7 +36,6 @@ export type SelectNode = (node: Node) => void;
 
 // Trigger an event. Return if the event is processed (true) or cancelled (false).
 export type TriggerEvent = (
-    element: HTMLElement,
     eventName: string,
     values?: Record<string, unknown>,
 ) => boolean;

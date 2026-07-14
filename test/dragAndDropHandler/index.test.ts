@@ -46,7 +46,7 @@ const createDragAndDropHandler = ({
         (eventName: string, values?: Record<string, unknown>) => {
             const event = jQuery.Event(eventName, values);
             jQuery(treeElement).trigger(event);
-            return event;
+            return !event.isDefaultPrevented();
         },
     );
 
@@ -529,7 +529,7 @@ describe("DragAndDropHandler", () => {
             expect(mockMoveNode).toHaveBeenCalledExactlyOnceWith(node1, node2, "inside");
         });
 
-        it("doesn't call tree.moveNode when the preventDefault is called on the event", () => {
+        it("doesn't call tree.moveNode when the the event is cancelled", () => {
             const tree = new Node(null, true);
             const node1 = new Node({ name: "node1" });
             tree.addChild(node1);

@@ -30,6 +30,16 @@ interface SelectNodeOptions {
 const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";
 
+const triggerJQueryEvent = (
+    element: HTMLElement,
+    eventName: string,
+    values?: Record<string, unknown>,
+): boolean => {
+    const event = jQuery.Event(eventName, values);
+    jQuery(element).trigger(event);
+    return !event.isDefaultPrevented();
+}
+
 export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     protected static defaults: JQTreeOptions = {
         animationSpeed: "fast",
@@ -250,7 +260,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.element = this.$el;
 
         const htmlElement = this.$el.get(0) as HTMLElement;
-        this.htmlTree = new HtmlTree(htmlElement, this.options);
+        this.htmlTree = new HtmlTree(htmlElement, this.options, triggerJQueryEvent);
 
         this.connectHandlers();
 
@@ -582,7 +592,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const setNodeElement = this.htmlTree.setNodeElement.bind(this.htmlTree);
         const $treeElement = this.element;
         const treeElement = this.element.get(0) as HTMLElement;
-        const triggerEvent = this.triggerEvent.bind(this);
+        const triggerEvent = this.htmlTree.triggerEvent.bind(this.htmlTree);
 
         const selectNodeHandler = new SelectNodeHandler({
             getNodeById,
@@ -709,7 +719,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
         const treeElement = this.element.get(0) as HTMLElement;
-        const triggerEvent = this.triggerEvent.bind(this);
+        const triggerEvent = this.htmlTree.triggerEvent.bind(this.htmlTree);
 
         return new FolderElement({
             closedIconElement,
@@ -798,7 +808,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             }
         }
 
-        this.triggerEvent("tree.load_data", {
+        this.htmlTree.triggerEvent("tree.load_data", {
             parent_node: parentNode,
             tree_data: data,
         });
@@ -853,7 +863,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (this.selectNodeHandler.isNodeSelected(node)) {
             if (selectOptions.mustToggle) {
                 this.deselectCurrentNode();
-                this.triggerEvent("tree.select", {
+                this.htmlTree.triggerEvent("tree.select", {
                     node: null,
                     previous_node: node,
                 });
@@ -863,7 +873,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             this.deselectCurrentNode();
             this.addToSelection(node, selectOptions.mustSetFocus);
 
-            this.triggerEvent("tree.select", {
+            this.htmlTree.triggerEvent("tree.select", {
                 deselected_node: deselectedNode,
                 node,
             });
@@ -928,7 +938,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const doInit = (): void => {
             if (!this.isInitialized) {
                 this.isInitialized = true;
-                this.triggerEvent("tree.init");
+                this.htmlTree.triggerEvent("tree.init");
             }
         };
 
@@ -1087,7 +1097,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             this.selectCurrentNode(mustSetFocus);
         }
 
-        this.triggerEvent("tree.refresh");
+        this.htmlTree.triggerEvent("tree.refresh");
     }
 
     private saveState(): void {
@@ -1219,15 +1229,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (!restoreState()) {
             autoOpenNodes();
         }
-    }
-
-    private triggerEvent(
-        eventName: string,
-        values?: Record<string, unknown>,
-    ): JQuery.Event {
-        const event = jQuery.Event(eventName, values);
-        this.element.trigger(event);
-        return event;
     }
 }
 
