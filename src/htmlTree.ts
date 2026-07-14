@@ -28,11 +28,7 @@ export default class HtmlTree {
     this.tree = new Node({}, true);
     this.nodeMap = new WeakMap();
 
-    const getNodeById = this.getNodeById.bind(this);
-
-    this.selectNodeHandler = new SelectNodeHandler({
-      getNodeById,
-    });
+    this.connectHandlers();
   }
 
   // Is this HTML element part of the tree?
@@ -71,5 +67,13 @@ export default class HtmlTree {
 
   public triggerEvent(eventName: string, values?: Record<string, unknown>): boolean {
     return this.triggerEventProvider(this.htmlElement, eventName, values)
+  }
+
+  private connectHandlers() {
+    const getNodeById = this.getNodeById.bind(this);
+
+    this.selectNodeHandler = new SelectNodeHandler({
+      getNodeById,
+    });
   }
 }
