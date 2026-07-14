@@ -590,7 +590,7 @@ var jqtree = (function (exports) {
               this.refreshElements(null);
             }
           };
-          const event = this.triggerEvent("tree.move", {
+          if (this.triggerEvent("tree.move", {
             move_info: {
               do_move: doMove,
               moved_node: movedNode,
@@ -599,8 +599,7 @@ var jqtree = (function (exports) {
               previous_parent: previousParent,
               target_node: targetNode
             }
-          });
-          if (!event.isDefaultPrevented()) {
+          })) {
             doMove();
           }
         }
@@ -933,6 +932,17 @@ var jqtree = (function (exports) {
         const dataRtl = htmlElement.dataset.rtl;
         return dataRtl !== undefined;
       }
+    };
+
+    // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
+    const triggerCustomEvent = (element, eventName, values) => {
+      const event = new CustomEvent(eventName, {
+        bubbles: true,
+        cancelable: true,
+        detail: values
+      });
+      element.dispatchEvent(event);
+      return !event.defaultPrevented;
     };
 
     const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
@@ -1459,14 +1469,48 @@ var jqtree = (function (exports) {
     class HtmlTree {
       htmlElement;
       isInitialized;
+      nodeMap;
       options;
       tree;
-      constructor(htmlElement, options) {
+      triggerEventProvider;
+      constructor(htmlElement, options, overrideTriggerEventProvider) {
         this.htmlElement = htmlElement;
         this.options = options;
+        this.triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
         setDefaultOptions(htmlElement, options);
         this.isInitialized = false;
         this.tree = new Node({}, true);
+        this.nodeMap = new WeakMap();
+      }
+
+      // Is this HTML element part of the tree?
+      containsElement(element) {
+        const node = this.getNode(element);
+        return node?.tree === this.tree;
+      }
+
+      // Return the tree node for an HTMl element.
+      getNode(element) {
+        const liElement = element.closest("li.jqtree_common");
+        if (liElement) {
+          return this.nodeMap.get(liElement) ?? null;
+        } else {
+          return null;
+        }
+      }
+
+      // Does an HTML element of the tree have the focus?
+      isFocusOnTree() {
+        const activeElement = document.activeElement;
+        return activeElement?.tagName === "SPAN" && this.containsElement(activeElement);
+      }
+
+      // Set this HTML element to this node in the node map.
+      setNodeElement(element, node) {
+        this.nodeMap.set(element, node);
+      }
+      triggerEvent(eventName, values) {
+        return this.triggerEventProvider(this.htmlElement, eventName, values);
       }
     }
 
@@ -1694,11 +1738,10 @@ var jqtree = (function (exports) {
             break;
           case "label":
             {
-              const event = this.triggerEvent("tree.click", {
+              if (this.triggerEvent("tree.click", {
                 click_event: e,
                 node: clickTarget.node
-              });
-              if (!event.isDefaultPrevented()) {
+              })) {
                 this.onClickTitle(clickTarget.node);
               }
               break;
@@ -2818,6 +2861,11 @@ var jqtree = (function (exports) {
 
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
+    const triggerJQueryEvent = (element, eventName, values) => {
+      const event = jQuery.Event(eventName, values);
+      jQuery(element).trigger(event);
+      return !event.isDefaultPrevented();
+    };
     class JqTreeWidget extends SimpleWidget {
       static defaults = {
         animationSpeed: "fast",
@@ -2871,7 +2919,6 @@ var jqtree = (function (exports) {
       htmlTree;
       keyHandler;
       mouseHandler;
-      nodeMap;
       renderer;
       saveStateHandler;
       scrollHandler;
@@ -2936,7 +2983,6 @@ var jqtree = (function (exports) {
         this.keyHandler.deinit();
         this.mouseHandler.deinit();
         this.htmlTree.tree = new Node({}, true);
-        this.nodeMap = new WeakMap();
         super.deinit();
       }
       getNodeByCallback(callback) {
@@ -2947,7 +2993,7 @@ var jqtree = (function (exports) {
         if (!element) {
           return null;
         }
-        return this.getNode(element);
+        return this.htmlTree.getNode(element);
       }
       getNodeById(nodeId) {
         return this.htmlTree.tree.getNodeById(nodeId);
@@ -2982,9 +3028,8 @@ var jqtree = (function (exports) {
       init() {
         super.init();
         this.element = this.$el;
-        this.nodeMap = new WeakMap();
         const htmlElement = this.$el.get(0);
-        this.htmlTree = new HtmlTree(htmlElement, this.options);
+        this.htmlTree = new HtmlTree(htmlElement, this.options, triggerJQueryEvent);
         this.connectHandlers();
         this.initData();
       }
@@ -3212,16 +3257,16 @@ var jqtree = (function (exports) {
         const getNodeById = this.getNodeById.bind(this);
         const getSelectedNode = this.getSelectedNode.bind(this);
         const getTree = this.getTree.bind(this);
-        const isFocusOnTree = this.isFocusOnTree.bind(this);
+        const isFocusOnTree = this.htmlTree.isFocusOnTree.bind(this.htmlTree);
         const loadData = this.loadData.bind(this);
         const openNode = this.openNodeInternal.bind(this);
         const refreshElements = this.refreshElements.bind(this);
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
-        const setNodeElement = this.setNodeElement.bind(this);
+        const setNodeElement = this.htmlTree.setNodeElement.bind(this.htmlTree);
         const $treeElement = this.element;
         const treeElement = this.element.get(0);
-        const triggerEvent = this.triggerEvent.bind(this);
+        const triggerEvent = this.htmlTree.triggerEvent.bind(this.htmlTree);
         const selectNodeHandler = new SelectNodeHandler({
           getNodeById
         });
@@ -3296,7 +3341,7 @@ var jqtree = (function (exports) {
           showEmptyFolder,
           tabIndex
         });
-        const getNode = this.getNode.bind(this);
+        const getNode = this.htmlTree.getNode.bind(this.htmlTree);
         const onMouseCapture = this.mouseCapture.bind(this);
         const onMouseDrag = this.mouseDrag.bind(this);
         const onMouseStart = this.mouseStart.bind(this);
@@ -3323,17 +3368,13 @@ var jqtree = (function (exports) {
         this.scrollHandler = scrollHandler;
         this.selectNodeHandler = selectNodeHandler;
       }
-      containsElement(element) {
-        const node = this.getNode(element);
-        return node?.tree === this.htmlTree.tree;
-      }
       createFolderElement(node) {
         const closedIconElement = this.renderer.closedIconElement;
         const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
         const treeElement = this.element.get(0);
-        const triggerEvent = this.triggerEvent.bind(this);
+        const triggerEvent = this.htmlTree.triggerEvent.bind(this.htmlTree);
         return new FolderElement({
           closedIconElement,
           getScrollLeft,
@@ -3403,7 +3444,7 @@ var jqtree = (function (exports) {
             this.dndHandler.refresh();
           }
         }
-        this.triggerEvent("tree.load_data", {
+        this.htmlTree.triggerEvent("tree.load_data", {
           parent_node: parentNode,
           tree_data: data
         });
@@ -3447,7 +3488,7 @@ var jqtree = (function (exports) {
         if (this.selectNodeHandler.isNodeSelected(node)) {
           if (selectOptions.mustToggle) {
             this.deselectCurrentNode();
-            this.triggerEvent("tree.select", {
+            this.htmlTree.triggerEvent("tree.select", {
               node: null,
               previous_node: node
             });
@@ -3456,7 +3497,7 @@ var jqtree = (function (exports) {
           const deselectedNode = this.getSelectedNode() || null;
           this.deselectCurrentNode();
           this.addToSelection(node, selectOptions.mustSetFocus);
-          this.triggerEvent("tree.select", {
+          this.htmlTree.triggerEvent("tree.select", {
             deselected_node: deselectedNode,
             node
           });
@@ -3475,16 +3516,8 @@ var jqtree = (function (exports) {
           return 0;
         }
       }
-      getNode(element) {
-        const liElement = element.closest("li.jqtree_common");
-        if (liElement) {
-          return this.nodeMap.get(liElement) ?? null;
-        } else {
-          return null;
-        }
-      }
       getNodeElement(element) {
-        const node = this.getNode(element);
+        const node = this.htmlTree.getNode(element);
         if (node) {
           return this.getNodeElementForNode(node);
         } else {
@@ -3521,7 +3554,7 @@ var jqtree = (function (exports) {
         const doInit = () => {
           if (!this.isInitialized) {
             this.isInitialized = true;
-            this.triggerEvent("tree.init");
+            this.htmlTree.triggerEvent("tree.init");
           }
         };
         this.htmlTree.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
@@ -3535,10 +3568,6 @@ var jqtree = (function (exports) {
           // Load data on demand and then init the tree
           this.setInitialStateOnDemand(doInit);
         }
-      }
-      isFocusOnTree() {
-        const activeElement = document.activeElement;
-        return activeElement?.tagName === "SPAN" && this.containsElement(activeElement);
       }
       isSelectedNodeInSubtree(subtree) {
         const selectedNode = this.getSelectedNode();
@@ -3628,13 +3657,13 @@ var jqtree = (function (exports) {
        from_node: redraw this subtree
       */
       refreshElements(fromNode) {
-        const mustSetFocus = this.isFocusOnTree();
+        const mustSetFocus = this.htmlTree.isFocusOnTree();
         const mustSelect = fromNode ? this.isSelectedNodeInSubtree(fromNode) : false;
         this.renderer.render(fromNode);
         if (mustSelect) {
           this.selectCurrentNode(mustSetFocus);
         }
-        this.triggerEvent("tree.refresh");
+        this.htmlTree.triggerEvent("tree.refresh");
       }
       saveState() {
         if (this.options.saveState) {
@@ -3743,14 +3772,6 @@ var jqtree = (function (exports) {
         if (!restoreState()) {
           autoOpenNodes();
         }
-      }
-      setNodeElement(element, node) {
-        this.nodeMap.set(element, node);
-      }
-      triggerEvent(eventName, values) {
-        const event = jQuery.Event(eventName, values);
-        this.element.trigger(event);
-        return event;
       }
     }
     SimpleWidget.register(JqTreeWidget, "tree");
