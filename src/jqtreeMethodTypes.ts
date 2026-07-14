@@ -34,7 +34,8 @@ export type RemoveFromSelection = (node: Node) => void;
 
 export type SelectNode = (node: Node) => void;
 
+// Trigger an event. Return if the event is processed (true) or cancelled (false).
 export type TriggerEvent = (
     eventName: string,
     values?: Record<string, unknown>,
-) => JQuery.Event;
+) => boolean;
