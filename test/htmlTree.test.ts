@@ -61,6 +61,16 @@ describe("HtmlTree", () => {
             expect(htmlTree.tree.tree).toBe(htmlTree.tree);
         });
 
+        it("creates a select node handler that resolves nodes from the tree", () => {
+            const htmlTree = createHtmlTree();
+
+            const node = new Node({ id: 123, name: "node1" });
+            htmlTree.tree.addChild(node);
+            htmlTree.selectNodeHandler.addToSelection(node);
+
+            expect(htmlTree.selectNodeHandler.getSelectedNode()).toBe(node);
+        });
+
         it("sets the default options", () => {
             const htmlTree = createHtmlTree({});
 
