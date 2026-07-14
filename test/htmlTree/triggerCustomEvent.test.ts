@@ -18,11 +18,11 @@ describe("triggerCustomEvent", () => {
 
         triggerCustomEvent(element, "tree.test");
 
-        expect(listener).toHaveBeenCalledOnce();
+        expect(listener).toHaveBeenCalledOnce(); // eslint-disable-line vitest/prefer-called-with
     });
 
     it("returns true when the event is not cancelled", () => {
-        expect(triggerCustomEvent(element, "tree.test")).toBe(true);
+        expect(triggerCustomEvent(element, "tree.test")).toBeTrue();
     });
 
     it("returns false when a listener calls preventDefault", () => {
@@ -30,11 +30,11 @@ describe("triggerCustomEvent", () => {
             e.preventDefault();
         });
 
-        expect(triggerCustomEvent(element, "tree.test")).toBe(false);
+        expect(triggerCustomEvent(element, "tree.test")).toBeFalse();
     });
 
     it("passes the values as the event detail", () => {
-        const values = { node: "test", index: 1 };
+        const values = { index: 1, node: "test" };
         let detail: unknown;
         element.addEventListener("tree.test", (e) => {
             detail = (e as CustomEvent).detail;
@@ -42,7 +42,7 @@ describe("triggerCustomEvent", () => {
 
         triggerCustomEvent(element, "tree.test", values);
 
-        expect(detail).toEqual(values);
+        expect(detail).toStrictEqual(values);
     });
 
     it("bubbles to ancestor elements", () => {
@@ -53,6 +53,6 @@ describe("triggerCustomEvent", () => {
 
         triggerCustomEvent(element, "tree.test");
 
-        expect(listener).toHaveBeenCalledOnce();
+        expect(listener).toHaveBeenCalledOnce(); // eslint-disable-line vitest/prefer-called-with
     });
 });
