@@ -45,6 +45,10 @@ export default class HtmlTree {
     }
   }
 
+  public getNodeById(nodeId: NodeId): Node | null {
+    return this.tree.getNodeById(nodeId);
+  }
+
   // Does an HTML element of the tree have the focus?
   public isFocusOnTree(): boolean {
     const activeElement = document.activeElement;

@@ -112,6 +112,23 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("getNodeById", () => {
+        it("returns the node with the id", () => {
+            const htmlTree = createHtmlTree();
+
+            const node = new Node({ id: 123, name: "node1" });
+            htmlTree.tree.addChild(node);
+
+            expect(htmlTree.getNodeById(123)).toBe(node);
+        });
+
+        it("returns null when there is no node with the id", () => {
+            const htmlTree = createHtmlTree();
+
+            expect(htmlTree.getNodeById(123)).toBeNull();
+        });
+    });
+
     describe("containsElement", () => {
         it("returns true when the element belongs to the tree", () => {
             const htmlTree = createHtmlTree();

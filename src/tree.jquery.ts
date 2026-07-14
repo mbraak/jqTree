@@ -215,7 +215,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public getNodeById(nodeId: NodeId): Node | null {
-        return this.htmlTree.tree.getNodeById(nodeId);
+        return this.htmlTree.getNodeById(nodeId);
     }
 
     public getNodeByName(name: string): Node | null {
@@ -580,7 +580,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const closeNode = this.closeNode.bind(this);
         const getNodeElement = this.getNodeElement.bind(this);
         const getNodeElementForNode = this.getNodeElementForNode.bind(this);
-        const getNodeById = this.getNodeById.bind(this);
+        const getNodeById = this.htmlTree.getNodeById.bind(this.htmlTree);
         const getSelectedNode = this.getSelectedNode.bind(this);
         const getTree = this.getTree.bind(this);
         const isFocusOnTree = this.htmlTree.isFocusOnTree.bind(this.htmlTree);
