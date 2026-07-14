@@ -79,16 +79,13 @@ export default class ElementsRenderer {
         }
 
         // remember current li
-        const $previousLi = jQuery(node.element);
+        const previousLi = node.element;
 
         // create element
         const li = this.createLi(node, node.getLevel());
 
-        // add element to dom
-        $previousLi.after(li);
-
-        // remove previous li
-        $previousLi.remove();
+        // replace previous li in the dom
+        previousLi.replaceWith(li);
 
         // create children
         this.createDomElements(li, node.children, false, node.getLevel() + 1);
