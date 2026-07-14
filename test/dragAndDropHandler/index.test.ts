@@ -55,7 +55,7 @@ const createDragAndDropHandler = ({
             new NodeElement({
                 getScrollLeft,
                 node,
-                treeElement: treeElement,
+                treeElement,
             }),
     );
 
@@ -104,7 +104,7 @@ const createDragAndDropHandler = ({
         triggerEvent,
     });
 
-    return { dragAndDropHandler, triggerEvent };
+    return { dragAndDropHandler, treeElement, triggerEvent };
 };
 
 describe("DragAndDropHandler", () => {
@@ -527,6 +527,57 @@ describe("DragAndDropHandler", () => {
             dragAndDropHandler.mouseStop(dragPositionInfo);
 
             expect(mockMoveNode).toHaveBeenCalledExactlyOnceWith(node1, node2, "inside");
+        });
+
+        it("doesn't call tree.moveNode when the preventDefault is called on the event", () => {
+            const tree = new Node(null, true);
+            const node1 = new Node({ name: "node1" });
+            tree.addChild(node1);
+            const node2 = new Node({ name: "node2" });
+            tree.addChild(node2);
+
+            const mockMoveNode = vi.spyOn(tree, "moveNode");
+
+            const { dragAndDropHandler, treeElement } = createDragAndDropHandler({
+                tree,
+            });
+
+            jQuery(treeElement).on('tree.move', e => {
+                e.preventDefault();
+            });
+
+            // Capture
+            const positionInfo = {
+                originalEvent: new Event("click"),
+                pageX: 10,
+                pageY: 10,
+                target: node1.element as HTMLElement,
+            };
+
+            dragAndDropHandler.mouseCapture(positionInfo);
+
+            expect(dragAndDropHandler.currentItem?.node).toBe(node1);
+
+            // Start
+            expect(dragAndDropHandler.mouseStart(positionInfo)).toBeTrue();
+            expect(dragAndDropHandler.isDragging).toBeTrue();
+
+            // Drag
+            const dragPositionInfo = {
+                originalEvent: new Event("mousemove"),
+                pageX: 15,
+                pageY: 30,
+                target: node2.element as HTMLElement,
+            };
+
+            dragAndDropHandler.mouseDrag(dragPositionInfo);
+
+            expect(dragAndDropHandler.hoveredArea?.node).toStrictEqual(node2);
+
+            // Stop
+            dragAndDropHandler.mouseStop(dragPositionInfo);
+
+            expect(mockMoveNode).not.toHaveBeenCalled();
         });
 
         it("calls onDragStop when there is no hovered area", () => {
