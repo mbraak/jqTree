@@ -704,7 +704,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
     private createRequestUrl(node: Node | null): null | RequestUrl {
         const dataUrl =
-            this.htmlTree.options.dataUrl ?? (this.element.data("url") as null | string);
+            this.htmlTree.options.dataUrl ?? this.htmlTree.htmlElement.dataset.url;
 
         let url;
 
