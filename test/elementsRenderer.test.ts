@@ -12,11 +12,11 @@ describe("renderFromNode", () => {
         const setNodeElement = vi.fn();
 
         const elementsRenderer = new ElementsRenderer({
-            $element: jQuery(element),
             autoEscape: true,
             buttonLeft: false,
             dragAndDrop: false,
             getTree: () => node,
+            htmlElement: element,
             isNodeSelected: () => false,
             setNodeElement,
             showEmptyFolder: false,

@@ -32,11 +32,11 @@ const createFolderElement = ({
     const setNodeElement = vi.fn();
 
     const renderer = new ElementsRenderer({
-        $element: jQuery(treeElement),
         autoEscape: true,
         buttonLeft: false,
         dragAndDrop: false,
         getTree: () => tree,
+        htmlElement: treeElement,
         isNodeSelected: () => false,
         setNodeElement,
         showEmptyFolder: false,

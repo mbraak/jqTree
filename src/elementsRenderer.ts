@@ -5,12 +5,12 @@ import type { Node } from "./node";
 import { getBoolString } from "./util";
 
 interface ElementsRendererParams {
-    $element: JQuery;
     autoEscape: boolean;
     buttonLeft: boolean;
     closedIcon?: IconElement;
     dragAndDrop: boolean;
     getTree: GetTree;
+    htmlElement: HTMLElement;
     isNodeSelected: IsNodeSelected;
     onCreateLi?: OnCreateLi;
     openedIcon?: IconElement;
@@ -23,11 +23,11 @@ interface ElementsRendererParams {
 export default class ElementsRenderer {
     public closedIconElement?: HTMLElement | Text;
     public openedIconElement?: HTMLElement | Text;
-    private $element: JQuery;
     private autoEscape: boolean;
     private buttonLeft: boolean;
     private dragAndDrop: boolean;
     private getTree: GetTree;
+    private htmlElement: HTMLElement;
     private isNodeSelected: IsNodeSelected;
     private onCreateLi?: OnCreateLi;
     private rtl?: boolean;
@@ -36,12 +36,12 @@ export default class ElementsRenderer {
     private tabIndex?: number;
 
     constructor({
-        $element,
         autoEscape,
         buttonLeft,
         closedIcon,
         dragAndDrop,
         getTree,
+        htmlElement,
         isNodeSelected,
         onCreateLi,
         openedIcon,
@@ -53,7 +53,7 @@ export default class ElementsRenderer {
         this.autoEscape = autoEscape;
         this.buttonLeft = buttonLeft;
         this.dragAndDrop = dragAndDrop;
-        this.$element = $element;
+        this.htmlElement = htmlElement;
         this.getTree = getTree;
         this.isNodeSelected = isNodeSelected;
         this.onCreateLi = onCreateLi;
@@ -79,28 +79,25 @@ export default class ElementsRenderer {
         }
 
         // remember current li
-        const $previousLi = jQuery(node.element);
+        const previousLi = node.element;
 
         // create element
         const li = this.createLi(node, node.getLevel());
 
-        // add element to dom
-        $previousLi.after(li);
-
-        // remove previous li
-        $previousLi.remove();
+        // replace previous li in the dom
+        previousLi.replaceWith(li);
 
         // create children
         this.createDomElements(li, node.children, false, node.getLevel() + 1);
     }
 
     public renderFromRoot(): void {
-        this.$element.empty();
+        this.htmlElement.textContent = '';
 
         const tree = this.getTree();
 
-        if (this.$element[0] && tree) {
-            this.createDomElements(this.$element[0], tree.children, true, 1);
+        if (tree) {
+            this.createDomElements(this.htmlElement, tree.children, true, 1);
         }
     }
 
