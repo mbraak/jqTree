@@ -4,14 +4,26 @@ import type { JQTreeOptions } from "app/jqtreeOptions";
 import HtmlTree from "app/htmlTree";
 import { Node } from "app/node";
 
-const createHtmlTree = (
-    options: Partial<JQTreeOptions> = {},
-    overrideTriggerEvent?: TriggerEventProvider,
-) => {
+interface CreateHtmlTreeParams {
+    getNodeIdToBeSelected?: () => NodeId | null;
+    options?: Partial<JQTreeOptions>;
+    overrideTriggerEvent?: TriggerEventProvider;
+}
+
+const createHtmlTree = ({
+    getNodeIdToBeSelected = () => null,
+    options = {},
+    overrideTriggerEvent,
+}: CreateHtmlTreeParams = {}) => {
     const htmlElement = document.createElement("div");
     document.body.append(htmlElement);
 
-    return new HtmlTree(htmlElement, options, overrideTriggerEvent);
+    return new HtmlTree({
+        getNodeIdToBeSelected,
+        htmlElement,
+        options,
+        overrideTriggerEventProvider: overrideTriggerEvent,
+    });
 };
 
 describe("HtmlTree", () => {
@@ -22,8 +34,9 @@ describe("HtmlTree", () => {
     describe("constructor", () => {
         it("stores the html element and options", () => {
             const htmlElement = document.createElement("div");
+            const getNodeIdToBeSelected = vi.fn();
 
-            const htmlTree = new HtmlTree(htmlElement, { tabIndex: 5 });
+            const htmlTree = new HtmlTree({ getNodeIdToBeSelected, htmlElement, options: { tabIndex: 5 } });
 
             expect(htmlTree.htmlElement).toBe(htmlElement);
             expect(htmlTree.options.tabIndex).toBe(5);
@@ -60,6 +73,78 @@ describe("HtmlTree", () => {
                 rtl: false,
                 tabIndex: 0,
             });
+        });
+    });
+
+    describe("createRequestUrl", () => {
+        it("returns null when there is no data url", () => {
+            const htmlTree = createHtmlTree();
+
+            expect(htmlTree.createRequestUrl(null)).toBeNull();
+        });
+
+        it("creates a url based on the dataUrl option", () => {
+            const htmlTree = createHtmlTree({
+                options: { dataUrl: "/tree/" },
+            });
+
+            expect(htmlTree.createRequestUrl(null)?.toString()).toBe("/tree/");
+        });
+
+        it("creates a url based on the data-url attribute of the html element", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.htmlElement.dataset.url = "/tree/";
+
+            expect(htmlTree.createRequestUrl(null)?.toString()).toBe("/tree/");
+        });
+
+        it("calls the dataUrl option when it is a function", () => {
+            const dataUrl = vi.fn().mockReturnValue("/tree/");
+            const htmlTree = createHtmlTree({ options: { dataUrl } });
+
+            expect(htmlTree.createRequestUrl(null)?.toString()).toBe("/tree/");
+            expect(dataUrl).toHaveBeenCalledWith(null);
+        });
+
+        it("returns null when the dataUrl function doesn't return a url", () => {
+            const dataUrl = vi.fn().mockReturnValue("");
+            const htmlTree = createHtmlTree({ options: { dataUrl } });
+
+            expect(htmlTree.createRequestUrl(null)).toBeNull();
+        });
+
+        it("adds a node parameter when a node is loaded on demand", () => {
+            const htmlTree = createHtmlTree({
+                options: { dataUrl: "/tree/" },
+            });
+            const node = new Node({ id: 123, name: "node1" });
+
+            expect(htmlTree.createRequestUrl(node)?.toString()).toBe(
+                "/tree/?node=123",
+            );
+        });
+
+        it("adds a selected_node parameter when a node must be selected", () => {
+            const htmlTree = createHtmlTree({
+                getNodeIdToBeSelected: () => 123,
+                options: { dataUrl: "/tree/" },
+            });
+
+            expect(htmlTree.createRequestUrl(null)?.toString()).toBe(
+                "/tree/?selected_node=123",
+            );
+        });
+
+        it("doesn't add a selected_node parameter when loading on demand", () => {
+            const htmlTree = createHtmlTree({
+                getNodeIdToBeSelected: () => 123,
+                options: { dataUrl: "/tree/" },
+            });
+            const node = new Node({ id: 456, name: "node1" });
+
+            expect(htmlTree.createRequestUrl(node)?.toString()).toBe(
+                "/tree/?node=456",
+            );
         });
     });
 
@@ -217,7 +302,7 @@ describe("HtmlTree", () => {
 
         it("uses the override trigger event when provided", () => {
             const overrideTriggerEvent = vi.fn().mockReturnValue(false);
-            const htmlTree = createHtmlTree({}, overrideTriggerEvent);
+            const htmlTree = createHtmlTree({ overrideTriggerEvent });
 
             const result = htmlTree.triggerEvent("tree.test", { a: 1 });
 

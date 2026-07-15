@@ -3,9 +3,19 @@ import type { JQTreeOptions } from "./jqtreeOptions";
 import setDefaultOptions from "./htmlTree/setDefaultOptions";
 import triggerCustomEvent from "./htmlTree/triggerCustomEvent";
 import { Node } from "./node";
+import RequestUrl from "./requestUrl";
 import SelectNodeHandler from "./selectNodeHandler";
 
 export type TriggerEventProvider = (element: HTMLElement, eventName: string, values?: Record<string, unknown>) => boolean;
+
+type GetNodeIdToBeSelected = () => NodeId | null;
+
+interface HtmlTreeParams {
+  getNodeIdToBeSelected: GetNodeIdToBeSelected;
+  htmlElement: HTMLElement;
+  options: Partial<JQTreeOptions>,
+  overrideTriggerEventProvider?: TriggerEventProvider
+}
 
 export default class HtmlTree {
   public htmlElement: HTMLElement;
@@ -15,9 +25,11 @@ export default class HtmlTree {
   public selectNodeHandler: SelectNodeHandler;
   public tree: Node;
 
+  private getNodeIdToBeSelected: GetNodeIdToBeSelected;
   private triggerEventProvider: TriggerEventProvider;
 
-  constructor(htmlElement: HTMLElement, options: Partial<JQTreeOptions>, overrideTriggerEventProvider?: TriggerEventProvider) {
+  constructor({ getNodeIdToBeSelected, htmlElement, options, overrideTriggerEventProvider }: HtmlTreeParams) {
+    this.getNodeIdToBeSelected = getNodeIdToBeSelected;
     this.htmlElement = htmlElement;
     this.options = setDefaultOptions(htmlElement, options);
     this.triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
@@ -34,6 +46,42 @@ export default class HtmlTree {
     const node = this.getNode(element);
 
     return node?.tree === this.tree;
+  }
+
+  /* Create a RequestUrl based on the url in the options.
+    * Add a 'node' query parameter for loading on demand
+    * Add a 'selected_node' query parameter if a node is selected.
+  */
+  public createRequestUrl(node: Node | null): null | RequestUrl {
+    const dataUrl =
+      this.options.dataUrl ?? this.htmlElement.dataset.url;
+
+    let url;
+
+    if (typeof dataUrl === "function") {
+      url = dataUrl(node);
+    } else {
+      url = dataUrl;
+    }
+
+    if (!url) {
+      return null;
+    }
+
+    const requestUrl = new RequestUrl(url);
+
+    if (node?.id) {
+      // Load on demand of a subtree; add node parameter
+      requestUrl.setSearchParam('node', node.id.toString());
+    } else {
+      // Add selected_node parameter
+      const selectedNodeId = this.getNodeIdToBeSelected();
+      if (selectedNodeId) {
+        requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
+      }
+    }
+
+    return requestUrl;
   }
 
   // Return the tree node for an HTMl element.

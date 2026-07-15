@@ -219,7 +219,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.element = this.$el;
 
         const htmlElement = this.$el.get(0) as HTMLElement;
-        this.htmlTree = new HtmlTree(htmlElement, this.inputOptions, triggerJQueryEvent);
+        const getNodeIdToBeSelected = this.getNodeIdToBeSelected.bind(this);
+        this.htmlTree = new HtmlTree({ getNodeIdToBeSelected, htmlElement, options: this.inputOptions, overrideTriggerEventProvider: triggerJQueryEvent });
 
         this.connectHandlers();
 
@@ -702,38 +703,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         });
     }
 
-    private createRequestUrl(node: Node | null): null | RequestUrl {
-        const dataUrl =
-            this.htmlTree.options.dataUrl ?? this.htmlTree.htmlElement.dataset.url;
-
-        let url;
-
-        if (typeof dataUrl === "function") {
-            url = dataUrl(node);
-        } else {
-            url = dataUrl;
-        }
-
-        if (!url) {
-            return null;
-        }
-
-        const requestUrl = new RequestUrl(url);
-
-        if (node?.id) {
-            // Load on demand of a subtree; add node parameter
-            requestUrl.setSearchParam('node', node.id.toString());
-        } else {
-            // Add selected_node parameter
-            const selectedNodeId = this.getNodeIdToBeSelected();
-            if (selectedNodeId) {
-                requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
-            }
-        }
-
-        return requestUrl;
-    }
-
     private deselectCurrentNode(): void {
         const node = this.getSelectedNode();
         if (node) {
@@ -774,7 +743,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         parentNode: Node | null,
         onFinished: HandleFinishedLoading | null,
     ): void {
-        const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
+        const url = inputUrl ? new RequestUrl(inputUrl) : this.htmlTree.createRequestUrl(parentNode);
 
         if (url) {
             this.dataLoader.loadFromUrl(url, parentNode, onFinished);
@@ -879,7 +848,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         if (this.htmlTree.options.data) {
             this.doLoadData(this.htmlTree.options.data, null);
         } else {
-            const dataUrl = this.createRequestUrl(null);
+            const dataUrl = this.htmlTree.createRequestUrl(null);
 
             if (dataUrl) {
                 this.doLoadDataFromUrl(null, null, null);
