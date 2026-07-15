@@ -40,45 +40,6 @@ const triggerJQueryEvent = (
 }
 
 export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
-    protected static defaults: JQTreeOptions = {
-        animationSpeed: "fast",
-        autoEscape: true,
-        autoOpen: false, // true / false / int (open n levels starting at 0)
-        buttonLeft: true,
-        // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
-        // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-        closedIcon: undefined,
-        data: undefined,
-        dataFilter: undefined,
-        dataUrl: undefined,
-        dragAndDrop: false,
-        keyboardSupport: true,
-        nodeClass: Node,
-        onCanMove: undefined, // Can this node be moved?
-        onCanMoveTo: undefined, // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanSelectNode: undefined,
-        onCreateLi: undefined,
-        onDragMove: undefined,
-        onDragStop: undefined,
-        onGetStateFromStorage: undefined,
-        onIsMoveHandle: undefined,
-        onLoadFailed: undefined,
-        onLoading: undefined,
-        onSetStateFromStorage: undefined,
-        openedIcon: "&#x25bc;",
-        openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
-        // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-        // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-        rtl: undefined, // right-to-left support; true / false (default)
-        saveState: false, // true / false / string (cookie name)
-        selectable: true,
-        showEmptyFolder: false,
-        slide: true, // must display slide animation?
-        startDndDelay: 300, // The delay for starting dnd (in milliseconds)
-        tabIndex: 0,
-        useContextMenu: true,
-    };
-
     private dataLoader: DataLoader;
     private dndHandler: DragAndDropHandler;
     private element: JQuery;
@@ -167,12 +128,12 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const slide = slideParam ?? this.options.slide;
+        const slide = slideParam ?? this.htmlTree.options.slide;
 
         if (node.isFolder() || node.isEmptyFolder) {
             this.createFolderElement(node).close(
                 slide,
-                this.options.animationSpeed,
+                this.htmlTree.options.animationSpeed,
             );
 
             this.saveState();
@@ -258,7 +219,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.element = this.$el;
 
         const htmlElement = this.$el.get(0) as HTMLElement;
-        this.htmlTree = new HtmlTree(htmlElement, this.options, triggerJQueryEvent);
+        this.htmlTree = new HtmlTree(htmlElement, this.inputOptions, triggerJQueryEvent);
 
         this.connectHandlers();
 
@@ -382,7 +343,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
                 onFinished = param2 as OnFinishOpenNode;
             }
 
-            slide ??= this.options.slide;
+            slide ??= this.htmlTree.options.slide;
 
             return [slide, onFinished];
         };
@@ -476,7 +437,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public setOption(option: string, value: unknown): JQuery {
-        (this.options as unknown as Record<string, unknown>)[option] = value;
+        (this.htmlTree.options as unknown as Record<string, unknown>)[option] = value;
         return this.element;
     }
 
@@ -494,7 +455,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const slide = slideParam ?? this.options.slide;
+        const slide = slideParam ?? this.htmlTree.options.slide;
 
         if (node.is_open) {
             this.closeNode(node, slide);
@@ -573,7 +534,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             showEmptyFolder,
             slide,
             tabIndex,
-        } = this.options;
+        } = this.htmlTree.options;
 
         const closeNode = this.closeNode.bind(this);
         const getNodeElement = this.getNodeElement.bind(this);
@@ -600,7 +561,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
         const removeFromSelection =
             selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
-        const getMouseDelay = () => this.options.startDndDelay ?? 0;
+        const getMouseDelay = () => this.htmlTree.options.startDndDelay ?? 0;
 
         const dataLoader = new DataLoader({
             dataFilter,
@@ -692,7 +653,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             onMouseStart,
             onMouseStop,
             triggerEvent,
-            useContextMenu: this.options.useContextMenu,
+            useContextMenu: this.htmlTree.options.useContextMenu,
         });
 
         this.dataLoader = dataLoader;
@@ -711,7 +672,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             this.scrollHandler,
         );
         const openedIconElement = this.renderer.openedIconElement;
-        const tabIndex = this.options.tabIndex;
+        const tabIndex = this.htmlTree.options.tabIndex;
         const treeElement = this.element.get(0) as HTMLElement;
         const triggerEvent = this.htmlTree.triggerEvent.bind(this.htmlTree);
 
@@ -730,7 +691,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const getScrollLeft = this.scrollHandler.getScrollLeft.bind(
             this.scrollHandler,
         );
-        const tabIndex = this.options.tabIndex;
+        const tabIndex = this.htmlTree.options.tabIndex;
         const treeElement = this.element.get(0) as HTMLElement;
 
         return new NodeElement({
@@ -743,7 +704,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
     private createRequestUrl(node: Node | null): null | RequestUrl {
         const dataUrl =
-            this.options.dataUrl ?? (this.element.data("url") as null | string);
+            this.htmlTree.options.dataUrl ?? (this.element.data("url") as null | string);
 
         let url;
 
@@ -825,7 +786,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         optionsParam?: SelectNodeOptions,
     ): void {
         const saveState = (): void => {
-            if (this.options.saveState) {
+            if (this.htmlTree.options.saveState) {
                 this.saveStateHandler.saveState();
             }
         };
@@ -840,13 +801,13 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const selectOptions = { ...defaultOptions, ...(optionsParam ?? {}) };
 
         const canSelect = (): boolean => {
-            if (this.options.onCanSelectNode) {
+            if (this.htmlTree.options.onCanSelectNode) {
                 return (
-                    this.options.selectable &&
-                    this.options.onCanSelectNode(node)
+                    this.htmlTree.options.selectable &&
+                    this.htmlTree.options.onCanSelectNode(node)
                 );
             } else {
-                return this.options.selectable;
+                return this.htmlTree.options.selectable;
             }
         };
 
@@ -878,12 +839,12 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private getAutoOpenMaxLevel(): number {
-        if (this.options.autoOpen === true) {
+        if (this.htmlTree.options.autoOpen === true) {
             return -1;
-        } else if (typeof this.options.autoOpen === "number") {
-            return this.options.autoOpen;
-        } else if (typeof this.options.autoOpen === "string") {
-            return parseInt(this.options.autoOpen, 10);
+        } else if (typeof this.htmlTree.options.autoOpen === "number") {
+            return this.htmlTree.options.autoOpen;
+        } else if (typeof this.htmlTree.options.autoOpen === "string") {
+            return parseInt(this.htmlTree.options.autoOpen, 10);
         } else {
             return 0;
         }
@@ -907,7 +868,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private getNodeIdToBeSelected(): NodeId | null {
-        if (this.options.saveState) {
+        if (this.htmlTree.options.saveState) {
             return this.saveStateHandler.getNodeIdToBeSelected();
         } else {
             return null;
@@ -915,8 +876,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private initData(): void {
-        if (this.options.data) {
-            this.doLoadData(this.options.data, null);
+        if (this.htmlTree.options.data) {
+            this.doLoadData(this.htmlTree.options.data, null);
         } else {
             const dataUrl = this.createRequestUrl(null);
 
@@ -936,10 +897,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             }
         };
 
-        this.htmlTree.tree = new this.options.nodeClass(
+        this.htmlTree.tree = new this.htmlTree.options.nodeClass(
             null,
             true,
-            this.options.nodeClass,
+            this.htmlTree.options.nodeClass,
         );
 
         this.htmlTree.selectNodeHandler.clear();
@@ -990,7 +951,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private mouseCapture(positionInfo: PositionInfo): boolean | null {
-        if (this.options.dragAndDrop) {
+        if (this.htmlTree.options.dragAndDrop) {
             return this.dndHandler.mouseCapture(positionInfo);
         } else {
             return false;
@@ -998,7 +959,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private mouseDrag(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this.htmlTree.options.dragAndDrop) {
             const result = this.dndHandler.mouseDrag(positionInfo);
 
             this.scrollHandler.checkScrolling(positionInfo);
@@ -1009,7 +970,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private mouseStart(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this.htmlTree.options.dragAndDrop) {
             return this.dndHandler.mouseStart(positionInfo);
         } else {
             return false;
@@ -1017,7 +978,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private mouseStop(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this.htmlTree.options.dragAndDrop) {
             this.scrollHandler.stopScrolling();
             return this.dndHandler.mouseStop(positionInfo);
         } else {
@@ -1043,7 +1004,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             folderElement.open(
                 _onFinished,
                 _slide,
-                this.options.animationSpeed,
+                this.htmlTree.options.animationSpeed,
             );
         };
 
@@ -1095,7 +1056,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private saveState(): void {
-        if (this.options.saveState) {
+        if (this.htmlTree.options.saveState) {
             this.saveStateHandler.saveState();
         }
     }
@@ -1113,7 +1074,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private setInitialState(): boolean {
         const restoreState = (): [boolean, boolean] => {
             // result: is state restored, must load on demand?
-            if (!this.options.saveState) {
+            if (!this.htmlTree.options.saveState) {
                 return [false, false];
             } else {
                 const state = this.saveStateHandler.getStateFromStorage();
@@ -1132,7 +1093,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         const autoOpenNodes = (): boolean => {
             // result: must load on demand?
-            if (this.options.autoOpen === false) {
+            if (this.htmlTree.options.autoOpen === false) {
                 return false;
             }
 
@@ -1167,7 +1128,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     // Call cb_finished when done
     private setInitialStateOnDemand(cbFinished: () => void): void {
         const restoreState = (): boolean => {
-            if (!this.options.saveState) {
+            if (!this.htmlTree.options.saveState) {
                 return false;
             } else {
                 const state = this.saveStateHandler.getStateFromStorage();

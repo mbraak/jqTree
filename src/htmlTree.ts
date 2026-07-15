@@ -17,12 +17,10 @@ export default class HtmlTree {
 
   private triggerEventProvider: TriggerEventProvider;
 
-  constructor(htmlElement: HTMLElement, options: JQTreeOptions, overrideTriggerEventProvider?: TriggerEventProvider) {
+  constructor(htmlElement: HTMLElement, options: Partial<JQTreeOptions>, overrideTriggerEventProvider?: TriggerEventProvider) {
     this.htmlElement = htmlElement;
-    this.options = options;
+    this.options = setDefaultOptions(htmlElement, options);
     this.triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
-
-    setDefaultOptions(htmlElement, options);
 
     this.isInitialized = false;
     this.tree = new Node({}, true);

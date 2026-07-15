@@ -106,14 +106,12 @@ export default class SimpleWidget<WidgetOptions> {
 
     public $el: JQuery;
 
-    public options: WidgetOptions;
+    protected inputOptions: Partial<WidgetOptions>;
 
     constructor(el: HTMLElement, options: WidgetOptions) {
         this.$el = jQuery(el);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const defaults = (this.constructor as any).defaults as WidgetOptions;
-        this.options = { ...defaults, ...options };
+        this.inputOptions = options;
     }
 
     public static register(widgetClass: unknown, widgetName: string): void {

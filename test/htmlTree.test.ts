@@ -4,33 +4,12 @@ import type { JQTreeOptions } from "app/jqtreeOptions";
 import HtmlTree from "app/htmlTree";
 import { Node } from "app/node";
 
-const defaultOptions: JQTreeOptions = {
-    animationSpeed: "fast",
-    autoEscape: true,
-    autoOpen: false,
-    buttonLeft: true,
-    dragAndDrop: false,
-    keyboardSupport: true,
-    nodeClass: Node,
-    openedIcon: "&#x25bc;",
-    openFolderDelay: 500,
-    saveState: false,
-    selectable: true,
-    showEmptyFolder: false,
-    slide: true,
-    startDndDelay: 300,
-    tabIndex: 0,
-    useContextMenu: true,
-};
-
 const createHtmlTree = (
-    inputOptions: Partial<JQTreeOptions> = {},
+    options: Partial<JQTreeOptions> = {},
     overrideTriggerEvent?: TriggerEventProvider,
 ) => {
     const htmlElement = document.createElement("div");
     document.body.append(htmlElement);
-
-    const options = { ...defaultOptions, ...inputOptions };
 
     return new HtmlTree(htmlElement, options, overrideTriggerEvent);
 };
@@ -44,7 +23,7 @@ describe("HtmlTree", () => {
         it("stores the html element and options", () => {
             const htmlElement = document.createElement("div");
 
-            const htmlTree = new HtmlTree(htmlElement, { ...defaultOptions, tabIndex: 5 });
+            const htmlTree = new HtmlTree(htmlElement, { tabIndex: 5 });
 
             expect(htmlTree.htmlElement).toBe(htmlElement);
             expect(htmlTree.options.tabIndex).toBe(5);
@@ -74,8 +53,13 @@ describe("HtmlTree", () => {
         it("sets the default options", () => {
             const htmlTree = createHtmlTree({});
 
-            expect(htmlTree.options.closedIcon).toBe("&#x25ba;");
-            expect(htmlTree.options.rtl).toBeFalse();
+            expect(htmlTree.options).toMatchObject({
+                autoEscape: true,
+                closedIcon: "&#x25ba;",
+                nodeClass: Node,
+                rtl: false,
+                tabIndex: 0,
+            });
         });
     });
 
