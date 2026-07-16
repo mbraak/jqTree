@@ -77,13 +77,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(PARAM_IS_EMPTY + "existingNode");
         }
 
-        const newNode = existingNode.addParent(newNodeInfo);
-
-        if (newNode) {
-            this.refreshElements(newNode.parent);
-        }
-
-        return newNode;
+        return this.htmlTree.addParentNode(newNodeInfo, existingNode);
     }
 
     public addToSelection(node?: Node, mustSetFocus?: boolean): JQuery {
