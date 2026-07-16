@@ -462,33 +462,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return this.element;
         }
 
-        const idIsChanged =
-            typeof data === "object" && data.id && data.id !== node.id;
-
-        if (idIsChanged) {
-            this.htmlTree.tree.removeNodeFromIndex(node);
-        }
-
-        node.setData(data);
-
-        if (idIsChanged) {
-            this.htmlTree.tree.addNodeToIndex(node);
-        }
-
-        if (
-            typeof data === "object" &&
-            data.children &&
-            data.children instanceof Array
-        ) {
-            node.removeChildren();
-
-            if (data.children.length) {
-                node.loadFromData(data.children);
-            }
-        }
-
-        this.refreshElements(node);
-
+        this.htmlTree.updateNode(node, data);
         return this.element;
     }
 

@@ -205,6 +205,36 @@ export default class HtmlTree {
     return this.triggerEventProvider(this.htmlElement, eventName, values)
   }
 
+  // Update the data of a node in the tree.
+  public updateNode(node: Node, data: NodeData): void {
+    const idIsChanged =
+      typeof data === "object" && data.id && data.id !== node.id;
+
+    if (idIsChanged) {
+      this.tree.removeNodeFromIndex(node);
+    }
+
+    node.setData(data);
+
+    if (idIsChanged) {
+      this.tree.addNodeToIndex(node);
+    }
+
+    if (
+      typeof data === "object" &&
+      data.children &&
+      data.children instanceof Array
+    ) {
+      node.removeChildren();
+
+      if (data.children.length) {
+        node.loadFromData(data.children);
+      }
+    }
+
+    this.refreshElements(node);
+  }
+
   private connectHandlers() {
     const getNodeById = this.getNodeById.bind(this);
 

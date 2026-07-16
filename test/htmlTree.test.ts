@@ -605,4 +605,77 @@ describe("HtmlTree", () => {
             expect(result).toBeFalse();
         });
     });
+
+    describe("updateNode", () => {
+        it("updates the data of the node", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([{ id: 1, name: "node1" }]);
+            const node = htmlTree.tree.children[0] as Node;
+
+            htmlTree.updateNode(node, { color: "green", name: "new-name" });
+
+            expect(node.name).toBe("new-name");
+            expect(node.color).toBe("green");
+        });
+
+        it("updates the id index when the id is changed", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([{ id: 1, name: "node1" }]);
+            const node = htmlTree.tree.children[0] as Node;
+
+            htmlTree.updateNode(node, { id: 2, name: "node1" });
+
+            expect(node.id).toBe(2);
+            expect(htmlTree.getNodeById(2)).toBe(node);
+            expect(htmlTree.getNodeById(1)).toBeNull();
+        });
+
+        it("replaces the children when the data contains children", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([
+                {
+                    children: [{ id: 2, name: "old-child" }],
+                    id: 1,
+                    name: "node1",
+                },
+            ]);
+            const node = htmlTree.tree.children[0] as Node;
+
+            htmlTree.updateNode(node, {
+                children: [{ id: 3, name: "new-child" }],
+                name: "node1",
+            });
+
+            expect(node.children).toStrictEqual([
+                expect.objectContaining({ id: 3, name: "new-child" }),
+            ]);
+        });
+
+        it("removes the children when the data contains an empty children array", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([
+                {
+                    children: [{ id: 2, name: "child1" }],
+                    id: 1,
+                    name: "node1",
+                },
+            ]);
+            const node = htmlTree.tree.children[0] as Node;
+
+            htmlTree.updateNode(node, { children: [], name: "node1" });
+
+            expect(node.children).toHaveLength(0);
+        });
+
+        it("calls refreshElements with the node", () => {
+            const refreshElements = vi.fn();
+            const htmlTree = createHtmlTree({ refreshElements });
+            htmlTree.tree.loadFromData([{ id: 1, name: "node1" }]);
+            const node = htmlTree.tree.children[0] as Node;
+
+            htmlTree.updateNode(node, { name: "new-name" });
+
+            expect(refreshElements).toHaveBeenCalledWith(node);
+        });
+    });
 });
