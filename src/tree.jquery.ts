@@ -66,13 +66,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(PARAM_IS_EMPTY + "existingNode");
         }
 
-        const newNode = existingNode.addBefore(newNodeInfo);
-
-        if (newNode) {
-            this.refreshElements(existingNode.parent);
-        }
-
-        return newNode;
+        return this.htmlTree.addNodeBefore(newNodeInfo, existingNode);
     }
 
     public addParentNode(

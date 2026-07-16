@@ -61,6 +61,20 @@ export default class HtmlTree {
     return newNode;
   }
 
+  // Add a node before another node.
+  public addNodeBefore(
+    newNodeInfo: NodeData,
+    existingNode: Node,
+  ): Node | null {
+    const newNode = existingNode.addBefore(newNodeInfo);
+
+    if (newNode) {
+      this.refreshElements(existingNode.parent);
+    }
+
+    return newNode;
+  }
+
   // Is this HTML element part of the tree?
   public containsElement(element: HTMLElement): boolean {
     const node = this.getNode(element);
