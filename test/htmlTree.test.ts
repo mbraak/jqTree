@@ -227,6 +227,38 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("appendNode", () => {
+        it("appends a node to the parent node and returns it", () => {
+            const htmlTree = createHtmlTree();
+
+            const parentNode = new Node({ id: 1, name: "parent" });
+            htmlTree.tree.addChild(parentNode);
+            parentNode.append("child1");
+
+            const node = htmlTree.appendNode({ name: "new-node" }, parentNode);
+
+            expect(node).toBeInstanceOf(Node);
+            expect(parentNode).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "child1" }),
+                    expect.objectContaining({ name: "new-node" }),
+                ],
+            });
+        });
+
+        it("calls refreshElements with the parent node", () => {
+            const refreshElements = vi.fn();
+            const htmlTree = createHtmlTree({ refreshElements });
+
+            const parentNode = new Node({ id: 1, name: "parent" });
+            htmlTree.tree.addChild(parentNode);
+
+            htmlTree.appendNode({ name: "new-node" }, parentNode);
+
+            expect(refreshElements).toHaveBeenCalledWith(parentNode);
+        });
+    });
+
     describe("createRequestUrl", () => {
         it("returns null when there is no data url", () => {
             const htmlTree = createHtmlTree();

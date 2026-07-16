@@ -89,6 +89,15 @@ export default class HtmlTree {
     return newNode;
   }
 
+  // Add a node as child of another node.
+  public appendNode(newNodeInfo: NodeData, parentNode: Node): Node {
+    const node = parentNode.append(newNodeInfo);
+
+    this.refreshElements(parentNode);
+
+    return node;
+  }
+
   // Is this HTML element part of the tree?
   public containsElement(element: HTMLElement): boolean {
     const node = this.getNode(element);

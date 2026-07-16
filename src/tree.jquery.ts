@@ -98,11 +98,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     public appendNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
         const parentNode = parentNodeParam ?? this.htmlTree.tree;
 
-        const node = parentNode.append(newNodeInfo);
-
-        this.refreshElements(parentNode);
-
-        return node;
+        return this.htmlTree.appendNode(newNodeInfo, parentNode);
     }
 
     public closeNode(node?: Node, slideParam?: boolean | null): JQuery {
