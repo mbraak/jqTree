@@ -402,6 +402,22 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("getSelectedNode", () => {
+        it("returns the selected node", () => {
+            const htmlTree = createHtmlTree();
+
+            const node = new Node({ id: 123, name: "node1" });
+            htmlTree.tree.addChild(node);
+            htmlTree.selectNodeHandler.addToSelection(node);
+
+            expect(htmlTree.getSelectedNode()).toBe(node);
+        });
+
+        it("returns false when no node is selected", () => {
+            expect(createHtmlTree().getSelectedNode()).toBeFalse();
+        });
+    });
+
     describe("getVersion", () => {
         it("returns the version", () => {
             expect(createHtmlTree().getVersion()).toBe(version);

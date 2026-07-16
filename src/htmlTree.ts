@@ -170,6 +170,11 @@ export default class HtmlTree {
     return this.tree.getNodeById(nodeId);
   }
 
+  // Return the node that is selected.
+  public getSelectedNode(): false | Node {
+    return this.selectNodeHandler.getSelectedNode();
+  }
+
   public getVersion(): string {
     return __version__;
   }

@@ -167,7 +167,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public getSelectedNode(): false | Node {
-        return this.htmlTree.selectNodeHandler.getSelectedNode();
+        return this.htmlTree.getSelectedNode();
     }
 
     public getSelectedNodes(): Node[] {
@@ -270,7 +270,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public moveDown(): JQuery {
-        const selectedNode = this.getSelectedNode();
+        const selectedNode = this.htmlTree.getSelectedNode();
         if (selectedNode) {
             this.keyHandler.moveDown(selectedNode);
         }
@@ -301,7 +301,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public moveUp(): JQuery {
-        const selectedNode = this.getSelectedNode();
+        const selectedNode = this.htmlTree.getSelectedNode();
         if (selectedNode) {
             this.keyHandler.moveUp(selectedNode);
         }
@@ -492,7 +492,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const getNodeElement = this.getNodeElement.bind(this);
         const getNodeElementForNode = this.getNodeElementForNode.bind(this);
         const getNodeById = this.htmlTree.getNodeById.bind(this.htmlTree);
-        const getSelectedNode = this.getSelectedNode.bind(this);
+        const getSelectedNode = this.htmlTree.getSelectedNode.bind(this);
         const getTree = this.getTree.bind(this);
         const isFocusOnTree = this.htmlTree.isFocusOnTree.bind(this.htmlTree);
         const loadData = this.loadData.bind(this);
@@ -655,7 +655,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private deselectCurrentNode(): void {
-        const node = this.getSelectedNode();
+        const node = this.htmlTree.getSelectedNode();
         if (node) {
             this.removeFromSelection(node);
         }
@@ -744,7 +744,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
                 });
             }
         } else {
-            const deselectedNode = this.getSelectedNode() || null;
+            const deselectedNode = this.htmlTree.getSelectedNode() || null;
             this.deselectCurrentNode();
             this.addToSelection(node, selectOptions.mustSetFocus);
 
@@ -828,7 +828,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private isSelectedNodeInSubtree(subtree: Node): boolean {
-        const selectedNode = this.getSelectedNode();
+        const selectedNode = this.htmlTree.getSelectedNode();
 
         if (!selectedNode) {
             return false;
@@ -970,7 +970,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private selectCurrentNode(mustSetFocus: boolean): void {
-        const node = this.getSelectedNode();
+        const node = this.htmlTree.getSelectedNode();
         if (node) {
             const nodeElement = this.getNodeElementForNode(node);
             nodeElement.select(mustSetFocus);
