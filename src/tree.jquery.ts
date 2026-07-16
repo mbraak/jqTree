@@ -661,18 +661,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
     }
 
-    private deselectNodes(parentNode: Node): void {
-        const selectedNodesUnderParent =
-            this.htmlTree.selectNodeHandler.getSelectedNodesUnder(parentNode);
-        for (const n of selectedNodesUnderParent) {
-            this.htmlTree.selectNodeHandler.removeFromSelection(n);
-        }
-    }
-
     private doLoadData(data: NodeData[] | null, parentNode: Node | null): void {
         if (data) {
             if (parentNode) {
-                this.deselectNodes(parentNode);
+                this.htmlTree.deselectNodes(parentNode);
                 this.loadSubtree(data, parentNode);
             } else {
                 this.initTree(data);

@@ -142,6 +142,15 @@ export default class HtmlTree {
     return requestUrl;
   }
 
+  // Deselect the children of the node.
+  public deselectNodes(parentNode: Node): void {
+    const selectedNodesUnderParent =
+      this.selectNodeHandler.getSelectedNodesUnder(parentNode);
+    for (const n of selectedNodesUnderParent) {
+      this.selectNodeHandler.removeFromSelection(n);
+    }
+  }
+
   // Get the maximum level for auto open
   public getAutoOpenMaxLevel(): number {
     if (this.options.autoOpen === true) {

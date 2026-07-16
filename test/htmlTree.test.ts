@@ -332,6 +332,59 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("deselectNodes", () => {
+        it("deselects selected nodes under the parent node", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([
+                {
+                    children: [
+                        { id: 2, name: "child1" },
+                        { id: 3, name: "child2" },
+                    ],
+                    id: 1,
+                    name: "node1",
+                },
+            ]);
+            const parentNode = htmlTree.tree.children[0] as Node;
+            htmlTree.selectNodeHandler.addToSelection(
+                parentNode.children[0] as Node,
+            );
+            htmlTree.selectNodeHandler.addToSelection(
+                parentNode.children[1] as Node,
+            );
+
+            htmlTree.deselectNodes(parentNode);
+
+            expect(htmlTree.selectNodeHandler.getSelectedNodes()).toHaveLength(
+                0,
+            );
+        });
+
+        it("keeps the selection of nodes outside the parent node", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([
+                {
+                    children: [{ id: 2, name: "child1" }],
+                    id: 1,
+                    name: "node1",
+                },
+                { id: 3, name: "node2" },
+            ]);
+            const parentNode = htmlTree.tree.children[0] as Node;
+            const otherNode = htmlTree.tree.children[1] as Node;
+            htmlTree.selectNodeHandler.addToSelection(
+                parentNode.children[0] as Node,
+            );
+            htmlTree.selectNodeHandler.addToSelection(otherNode);
+
+            htmlTree.deselectNodes(parentNode);
+
+            expect(htmlTree.selectNodeHandler.getSelectedNodes()).toStrictEqual(
+                [otherNode],
+            );
+        });
+    });
+
     describe("setNodeElement", () => {
         it("maps the element to the node", () => {
             const htmlTree = createHtmlTree();
