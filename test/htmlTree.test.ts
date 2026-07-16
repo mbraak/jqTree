@@ -556,6 +556,73 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("removeNode", () => {
+        it("removes the node and its children from the tree", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([
+                {
+                    children: [{ id: 2, name: "child1" }],
+                    id: 1,
+                    name: "node1",
+                },
+                { id: 3, name: "node2" },
+            ]);
+            const node = htmlTree.tree.children[0] as Node;
+
+            htmlTree.removeNode(node);
+
+            expect(htmlTree.tree).toMatchObject({
+                children: [expect.objectContaining({ name: "node2" })],
+            });
+            expect(htmlTree.getNodeById(1)).toBeNull();
+            expect(htmlTree.getNodeById(2)).toBeNull();
+        });
+
+        it("removes the node from the selection", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([{ id: 1, name: "node1" }]);
+            const node = htmlTree.tree.children[0] as Node;
+            htmlTree.selectNodeHandler.addToSelection(node);
+
+            htmlTree.removeNode(node);
+
+            expect(htmlTree.selectNodeHandler.isNodeSelected(node)).toBeFalse();
+        });
+
+        it("removes selected children of the node from the selection", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.tree.loadFromData([
+                {
+                    children: [{ id: 2, name: "child1" }],
+                    id: 1,
+                    name: "node1",
+                },
+            ]);
+            const node = htmlTree.tree.children[0] as Node;
+            const childNode = node.children[0] as Node;
+            htmlTree.selectNodeHandler.addToSelection(childNode);
+
+            htmlTree.removeNode(node);
+
+            expect(htmlTree.selectNodeHandler.getSelectedNodes()).toHaveLength(
+                0,
+            );
+        });
+
+        it("calls refreshElements with the parent of the node", () => {
+            const refreshElements = vi.fn();
+            const htmlTree = createHtmlTree({ refreshElements });
+
+            const parentNode = new Node({ id: 1, name: "parent" });
+            htmlTree.tree.addChild(parentNode);
+            const node = parentNode.append({ id: 2, name: "node1" });
+
+            htmlTree.removeNode(node);
+
+            expect(refreshElements).toHaveBeenCalledWith(parentNode);
+        });
+    });
+
     describe("toJson", () => {
         it("returns the tree as a json string", () => {
             const htmlTree = createHtmlTree();

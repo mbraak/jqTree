@@ -384,12 +384,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error("Node has no parent");
         }
 
-        this.htmlTree.selectNodeHandler.removeFromSelection(node, true); // including children
-
-        const parent = node.parent;
-        node.remove();
-        this.refreshElements(parent);
-
+        this.htmlTree.removeNode(node);
         return this.element;
     }
 

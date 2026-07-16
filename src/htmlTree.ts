@@ -200,6 +200,15 @@ export default class HtmlTree {
     return node;
   }
 
+  // Remove the node from the tree.
+  public removeNode(node: Node): void {
+    this.selectNodeHandler.removeFromSelection(node, true); // including children
+
+    const parent = node.parent;
+    node.remove();
+    this.refreshElements(parent);
+  }
+
   // Set this HTML element to this node in the node map.
   public setNodeElement(element: HTMLElement, node: Node) {
     this.nodeMap.set(element, node);
