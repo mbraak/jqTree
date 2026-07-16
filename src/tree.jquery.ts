@@ -19,7 +19,6 @@ import RequestUrl from "./requestUrl";
 import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SimpleWidget from "./simple.widget";
-import __version__ from "./version";
 
 interface SelectNodeOptions {
     mustSetFocus?: boolean;
@@ -188,7 +187,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public getVersion(): string {
-        return __version__;
+        return this.htmlTree.getVersion();
     }
 
     public init(): void {

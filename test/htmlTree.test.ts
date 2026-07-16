@@ -3,6 +3,7 @@ import type { JQTreeOptions } from "app/jqtreeOptions";
 
 import HtmlTree from "app/htmlTree";
 import { Node } from "app/node";
+import version from "app/version";
 
 interface CreateHtmlTreeParams {
     getNodeIdToBeSelected?: () => NodeId | null;
@@ -388,6 +389,12 @@ describe("HtmlTree", () => {
             const htmlTree = createHtmlTree();
 
             expect(htmlTree.getNodeById(123)).toBeNull();
+        });
+    });
+
+    describe("getVersion", () => {
+        it("returns the version", () => {
+            expect(createHtmlTree().getVersion()).toBe(version);
         });
     });
 

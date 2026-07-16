@@ -6,6 +6,7 @@ import triggerCustomEvent from "./htmlTree/triggerCustomEvent";
 import { Node } from "./node";
 import RequestUrl from "./requestUrl";
 import SelectNodeHandler from "./selectNodeHandler";
+import __version__ from "./version";
 
 export type TriggerEventProvider = (element: HTMLElement, eventName: string, values?: Record<string, unknown>) => boolean;
 
@@ -154,6 +155,10 @@ export default class HtmlTree {
 
   public getNodeById(nodeId: NodeId): Node | null {
     return this.tree.getNodeById(nodeId);
+  }
+
+  public getVersion(): string {
+    return __version__;
   }
 
   // Does an HTML element of the tree have the focus?
