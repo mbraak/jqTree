@@ -196,6 +196,11 @@ export default class HtmlTree {
     (this.options as unknown as Record<string, unknown>)[option] = value;
   }
 
+  // Return tree as json string.
+  public toJson(): string {
+    return JSON.stringify(this.tree.getData());
+  }
+
   public triggerEvent(eventName: string, values?: Record<string, unknown>): boolean {
     return this.triggerEventProvider(this.htmlElement, eventName, values)
   }

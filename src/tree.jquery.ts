@@ -450,7 +450,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public toJson(): string {
-        return JSON.stringify(this.htmlTree.tree.getData());
+        return this.htmlTree.toJson();
     }
 
     public updateNode(node?: Node, data?: NodeData): JQuery {

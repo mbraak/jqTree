@@ -556,6 +556,29 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("toJson", () => {
+        it("returns the tree as a json string", () => {
+            const htmlTree = createHtmlTree();
+
+            htmlTree.tree.loadFromData([
+                {
+                    children: [{ id: 2, name: "child1" }],
+                    id: 1,
+                    name: "node1",
+                },
+                { id: 3, name: "node2" },
+            ]);
+
+            expect(htmlTree.toJson()).toBe(
+                '[{"id":1,"name":"node1","children":[{"id":2,"name":"child1"}]},{"id":3,"name":"node2"}]',
+            );
+        });
+
+        it("returns an empty array for an empty tree", () => {
+            expect(createHtmlTree().toJson()).toBe("[]");
+        });
+    });
+
     describe("triggerEvent", () => {
         it("dispatches a custom event on the html element by default", () => {
             const htmlTree = createHtmlTree();
