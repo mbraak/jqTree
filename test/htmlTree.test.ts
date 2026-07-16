@@ -332,6 +332,38 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("prependNode", () => {
+        it("prepends a node to the parent node and returns it", () => {
+            const htmlTree = createHtmlTree();
+
+            const parentNode = new Node({ id: 1, name: "parent" });
+            htmlTree.tree.addChild(parentNode);
+            parentNode.append("child1");
+
+            const node = htmlTree.prependNode({ name: "new-node" }, parentNode);
+
+            expect(node).toBeInstanceOf(Node);
+            expect(parentNode).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "new-node" }),
+                    expect.objectContaining({ name: "child1" }),
+                ],
+            });
+        });
+
+        it("calls refreshElements with the parent node", () => {
+            const refreshElements = vi.fn();
+            const htmlTree = createHtmlTree({ refreshElements });
+
+            const parentNode = new Node({ id: 1, name: "parent" });
+            htmlTree.tree.addChild(parentNode);
+
+            htmlTree.prependNode({ name: "new-node" }, parentNode);
+
+            expect(refreshElements).toHaveBeenCalledWith(parentNode);
+        });
+    });
+
     describe("triggerEvent", () => {
         it("dispatches a custom event on the html element by default", () => {
             const htmlTree = createHtmlTree();

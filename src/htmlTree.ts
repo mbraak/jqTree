@@ -122,6 +122,15 @@ export default class HtmlTree {
     this.refreshElements(null);
   }
 
+  // Add a node before another node. 
+  public prependNode(newNodeInfo: NodeData, parentNode: Node): Node {
+    const node = parentNode.prepend(newNodeInfo);
+
+    this.refreshElements(parentNode);
+
+    return node;
+  }
+
   // Set this HTML element to this node in the node map.
   public setNodeElement(element: HTMLElement, node: Node) {
     this.nodeMap.set(element, node);

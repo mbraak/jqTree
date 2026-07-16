@@ -367,11 +367,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     public prependNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
         const parentNode = parentNodeParam ?? this.htmlTree.tree;
 
-        const node = parentNode.prepend(newNodeInfo);
-
-        this.refreshElements(parentNode);
-
-        return node;
+        return this.htmlTree.prependNode(newNodeInfo, parentNode);
     }
 
     public refresh(): JQuery {
