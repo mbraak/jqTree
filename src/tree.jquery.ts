@@ -55,13 +55,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         newNodeInfo: NodeData,
         existingNode: Node,
     ): Node | null {
-        const newNode = existingNode.addAfter(newNodeInfo);
-
-        if (newNode) {
-            this.refreshElements(existingNode.parent);
-        }
-
-        return newNode;
+        return this.htmlTree.addNodeAfter(newNodeInfo, existingNode);
     }
 
     public addNodeBefore(

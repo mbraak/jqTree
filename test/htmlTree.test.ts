@@ -84,6 +84,53 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("addNodeAfter", () => {
+        it("adds a node after the existing node and returns it", () => {
+            const htmlTree = createHtmlTree();
+
+            const node1 = new Node({ id: 1, name: "node1" });
+            const node2 = new Node({ id: 2, name: "node2" });
+            htmlTree.tree.addChild(node1);
+            htmlTree.tree.addChild(node2);
+
+            const newNode = htmlTree.addNodeAfter({ name: "new-node" }, node1);
+
+            expect(newNode).toBeInstanceOf(Node);
+            expect(htmlTree.tree).toMatchObject({
+                children: [
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "new-node" }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            });
+        });
+
+        it("calls refreshElements with the parent of the existing node", () => {
+            const refreshElements = vi.fn();
+            const htmlTree = createHtmlTree({ refreshElements });
+
+            const node = new Node({ id: 1, name: "node1" });
+            htmlTree.tree.addChild(node);
+
+            htmlTree.addNodeAfter({ name: "new-node" }, node);
+
+            expect(refreshElements).toHaveBeenCalledWith(htmlTree.tree);
+        });
+
+        it("returns null when the existing node has no parent", () => {
+            const refreshElements = vi.fn();
+            const htmlTree = createHtmlTree({ refreshElements });
+
+            const newNode = htmlTree.addNodeAfter(
+                { name: "new-node" },
+                htmlTree.tree,
+            );
+
+            expect(newNode).toBeNull();
+            expect(refreshElements).not.toHaveBeenCalled();
+        });
+    });
+
     describe("createRequestUrl", () => {
         it("returns null when there is no data url", () => {
             const htmlTree = createHtmlTree();

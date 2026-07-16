@@ -47,6 +47,20 @@ export default class HtmlTree {
     this.connectHandlers();
   }
 
+  // Add a node after an existing node.
+  public addNodeAfter(
+    newNodeInfo: NodeData,
+    existingNode: Node,
+  ): Node | null {
+    const newNode = existingNode.addAfter(newNodeInfo);
+
+    if (newNode) {
+      this.refreshElements(existingNode.parent);
+    }
+
+    return newNode;
+  }
+
   // Is this HTML element part of the tree?
   public containsElement(element: HTMLElement): boolean {
     const node = this.getNode(element);
