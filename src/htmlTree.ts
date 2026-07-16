@@ -192,6 +192,10 @@ export default class HtmlTree {
     this.nodeMap.set(element, node);
   }
 
+  public setOption(option: string, value: unknown) {
+    (this.options as unknown as Record<string, unknown>)[option] = value;
+  }
+
   public triggerEvent(eventName: string, values?: Record<string, unknown>): boolean {
     return this.triggerEventProvider(this.htmlElement, eventName, values)
   }

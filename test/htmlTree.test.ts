@@ -344,6 +344,16 @@ describe("HtmlTree", () => {
         });
     });
 
+    describe("setOption", () => {
+        it("sets the value of an option", () => {
+            const htmlTree = createHtmlTree();
+
+            htmlTree.setOption("autoEscape", false);
+
+            expect(htmlTree.options.autoEscape).toBeFalse();
+        });
+    });
+
     describe("getNode", () => {
         it("returns the node for the closest jqtree li element", () => {
             const htmlTree = createHtmlTree();

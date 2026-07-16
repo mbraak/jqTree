@@ -420,7 +420,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public setOption(option: string, value: unknown): JQuery {
-        (this.htmlTree.options as unknown as Record<string, unknown>)[option] = value;
+        this.htmlTree.setOption(option, value);
         return this.element;
     }
 
