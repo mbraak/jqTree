@@ -8,12 +8,14 @@ interface CreateHtmlTreeParams {
     getNodeIdToBeSelected?: () => NodeId | null;
     options?: Partial<JQTreeOptions>;
     overrideTriggerEvent?: TriggerEventProvider;
+    refreshElements?: (fromNode: Node | null) => void;
 }
 
 const createHtmlTree = ({
     getNodeIdToBeSelected = () => null,
     options = {},
     overrideTriggerEvent,
+    refreshElements = () => null,
 }: CreateHtmlTreeParams = {}) => {
     const htmlElement = document.createElement("div");
     document.body.append(htmlElement);
@@ -23,6 +25,7 @@ const createHtmlTree = ({
         htmlElement,
         options,
         overrideTriggerEventProvider: overrideTriggerEvent,
+        refreshElements,
     });
 };
 
@@ -36,7 +39,12 @@ describe("HtmlTree", () => {
             const htmlElement = document.createElement("div");
             const getNodeIdToBeSelected = vi.fn();
 
-            const htmlTree = new HtmlTree({ getNodeIdToBeSelected, htmlElement, options: { tabIndex: 5 } });
+            const htmlTree = new HtmlTree({
+                getNodeIdToBeSelected,
+                htmlElement,
+                options: { tabIndex: 5 },
+                refreshElements: vi.fn(),
+            });
 
             expect(htmlTree.htmlElement).toBe(htmlElement);
             expect(htmlTree.options.tabIndex).toBe(5);
@@ -285,6 +293,42 @@ describe("HtmlTree", () => {
             liElement.focus();
 
             expect(htmlTree.isFocusOnTree()).toBeFalse();
+        });
+    });
+
+    describe("moveNode", () => {
+        it("moves the node relative to the target node", () => {
+            const htmlTree = createHtmlTree();
+
+            const node1 = new Node({ id: 1, name: "node1" });
+            const node2 = new Node({ id: 2, name: "node2" });
+            htmlTree.tree.addChild(node1);
+            htmlTree.tree.addChild(node2);
+
+            htmlTree.moveNode(node1, node2, "inside");
+
+            expect(htmlTree.tree).toMatchObject({
+                children: [
+                    expect.objectContaining({
+                        children: [expect.objectContaining({ name: "node1" })],
+                        name: "node2",
+                    }),
+                ],
+            });
+        });
+
+        it("calls refreshElements", () => {
+            const refreshElements = vi.fn();
+            const htmlTree = createHtmlTree({ refreshElements });
+
+            const node1 = new Node({ id: 1, name: "node1" });
+            const node2 = new Node({ id: 2, name: "node2" });
+            htmlTree.tree.addChild(node1);
+            htmlTree.tree.addChild(node2);
+
+            htmlTree.moveNode(node1, node2, "after");
+
+            expect(refreshElements).toHaveBeenCalledWith(null);
         });
     });
 

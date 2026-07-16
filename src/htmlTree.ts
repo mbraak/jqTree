@@ -1,4 +1,5 @@
 import type { JQTreeOptions } from "./jqtreeOptions";
+import type { Position } from "./node";
 
 import setDefaultOptions from "./htmlTree/setDefaultOptions";
 import triggerCustomEvent from "./htmlTree/triggerCustomEvent";
@@ -14,8 +15,11 @@ interface HtmlTreeParams {
   getNodeIdToBeSelected: GetNodeIdToBeSelected;
   htmlElement: HTMLElement;
   options: Partial<JQTreeOptions>,
-  overrideTriggerEventProvider?: TriggerEventProvider
+  overrideTriggerEventProvider?: TriggerEventProvider,
+  refreshElements: RefreshElements;
 }
+
+type RefreshElements = (fromNode: Node | null) => void;
 
 export default class HtmlTree {
   public htmlElement: HTMLElement;
@@ -26,12 +30,14 @@ export default class HtmlTree {
   public tree: Node;
 
   private getNodeIdToBeSelected: GetNodeIdToBeSelected;
+  private refreshElements: RefreshElements;
   private triggerEventProvider: TriggerEventProvider;
 
-  constructor({ getNodeIdToBeSelected, htmlElement, options, overrideTriggerEventProvider }: HtmlTreeParams) {
+  constructor({ getNodeIdToBeSelected, htmlElement, options, overrideTriggerEventProvider, refreshElements }: HtmlTreeParams) {
     this.getNodeIdToBeSelected = getNodeIdToBeSelected;
     this.htmlElement = htmlElement;
     this.options = setDefaultOptions(htmlElement, options);
+    this.refreshElements = refreshElements;
     this.triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
 
     this.isInitialized = false;
@@ -104,6 +110,16 @@ export default class HtmlTree {
     const activeElement = document.activeElement;
 
     return activeElement?.tagName === "SPAN" && this.containsElement(activeElement as HTMLElement);
+  }
+
+  // Move a node inside the tree.
+  public moveNode(
+    node: Node,
+    targetNode: Node,
+    position: Position,
+  ): void {
+    this.tree.moveNode(node, targetNode, position);
+    this.refreshElements(null);
   }
 
   // Set this HTML element to this node in the node map.

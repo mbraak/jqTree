@@ -220,7 +220,17 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         const htmlElement = this.$el.get(0) as HTMLElement;
         const getNodeIdToBeSelected = this.getNodeIdToBeSelected.bind(this);
-        this.htmlTree = new HtmlTree({ getNodeIdToBeSelected, htmlElement, options: this.inputOptions, overrideTriggerEventProvider: triggerJQueryEvent });
+        const refreshElements = this.refreshElements.bind(this);
+
+        this.htmlTree = new HtmlTree(
+            {
+                getNodeIdToBeSelected,
+                htmlElement,
+                options: this.inputOptions,
+                overrideTriggerEventProvider: triggerJQueryEvent,
+                refreshElements,
+            }
+        );
 
         this.connectHandlers();
 
@@ -308,8 +318,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(PARAM_IS_EMPTY + "position");
         }
 
-        this.htmlTree.tree.moveNode(node, targetNode, position);
-        this.refreshElements(null);
+        this.htmlTree.moveNode(node, targetNode, position);
 
         return this.element;
     }
