@@ -142,6 +142,19 @@ export default class HtmlTree {
     return requestUrl;
   }
 
+  // Get the maximum level for auto open
+  public getAutoOpenMaxLevel(): number {
+    if (this.options.autoOpen === true) {
+      return -1;
+    } else if (typeof this.options.autoOpen === "number") {
+      return this.options.autoOpen;
+    } else if (typeof this.options.autoOpen === "string") {
+      return parseInt(this.options.autoOpen, 10);
+    } else {
+      return 0;
+    }
+  }
+
   // Return the tree node for an HTMl element.
   public getNode(element: HTMLElement): Node | null {
     const liElement = element.closest<HTMLElement>("li.jqtree_common");

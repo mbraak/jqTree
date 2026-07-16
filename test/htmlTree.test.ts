@@ -678,4 +678,31 @@ describe("HtmlTree", () => {
             expect(refreshElements).toHaveBeenCalledWith(node);
         });
     });
+
+    describe("getAutoOpenMaxLevel", () => {
+        it("returns -1 when the autoOpen option is true", () => {
+            const htmlTree = createHtmlTree({ options: { autoOpen: true } });
+
+            expect(htmlTree.getAutoOpenMaxLevel()).toBe(-1);
+        });
+
+        it("returns the autoOpen option when it is a number", () => {
+            const htmlTree = createHtmlTree({ options: { autoOpen: 2 } });
+
+            expect(htmlTree.getAutoOpenMaxLevel()).toBe(2);
+        });
+
+        it("parses the autoOpen option when it is a string", () => {
+            const htmlTree = createHtmlTree();
+            htmlTree.setOption("autoOpen", "3");
+
+            expect(htmlTree.getAutoOpenMaxLevel()).toBe(3);
+        });
+
+        it("returns 0 when the autoOpen option is false", () => {
+            const htmlTree = createHtmlTree({ options: { autoOpen: false } });
+
+            expect(htmlTree.getAutoOpenMaxLevel()).toBe(0);
+        });
+    });
 });

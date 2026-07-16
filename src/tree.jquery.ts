@@ -763,18 +763,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         saveState();
     }
 
-    private getAutoOpenMaxLevel(): number {
-        if (this.htmlTree.options.autoOpen === true) {
-            return -1;
-        } else if (typeof this.htmlTree.options.autoOpen === "number") {
-            return this.htmlTree.options.autoOpen;
-        } else if (typeof this.htmlTree.options.autoOpen === "string") {
-            return parseInt(this.htmlTree.options.autoOpen, 10);
-        } else {
-            return 0;
-        }
-    }
-
     private getNodeElement(element: HTMLElement): NodeElement | null {
         const node = this.htmlTree.getNode(element);
         if (node) {
@@ -1022,7 +1010,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
                 return false;
             }
 
-            const maxLevel = this.getAutoOpenMaxLevel();
+            const maxLevel = this.htmlTree.getAutoOpenMaxLevel();
             let mustLoadOnDemand = false;
 
             this.htmlTree.tree.iterate((node: Node, level: number) => {
@@ -1072,7 +1060,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         };
 
         const autoOpenNodes = (): void => {
-            const maxLevel = this.getAutoOpenMaxLevel();
+            const maxLevel = this.htmlTree.getAutoOpenMaxLevel();
             let loadingCount = 0;
 
             const loadAndOpenNode = (node: Node): void => {
