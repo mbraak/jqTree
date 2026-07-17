@@ -1,12 +1,10 @@
 import type { HandleFinishedLoading } from "./dataLoader";
 import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import type { JQTreeOptions } from "./jqtreeOptions";
-import type { Position } from "./node";
+import type { Node, Position } from "./node";
 import type { SavedState } from "./saveStateHandler";
 
 import HtmlTree from "./htmlTree";
-import { Node } from "./node";
-import { getOffsetTop } from "./positionUtils";
 import SimpleWidget from "./simple.widget";
 
 interface SelectNodeOptions {
@@ -86,19 +84,13 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public deinit(): void {
-        this.element.empty();
         this.element.off();
-
-        this.htmlTree.keyHandler.deinit();
-        this.htmlTree.mouseHandler.deinit();
-
-        this.htmlTree.tree = new Node({}, true);
-
+        this.htmlTree.deinit();
         super.deinit();
     }
 
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
-        return this.htmlTree.tree.getNodeByCallback(callback);
+        return this.htmlTree.getNodeByCallback(callback);
     }
 
     public getNodeByHtmlElement(
@@ -121,15 +113,15 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public getNodeByName(name: string): Node | null {
-        return this.htmlTree.tree.getNodeByName(name);
+        return this.htmlTree.getNodeByName(name);
     }
 
     public getNodeByNameMustExist(name: string): Node {
-        return this.htmlTree.tree.getNodeByNameMustExist(name);
+        return this.htmlTree.getNodeByNameMustExist(name);
     }
 
     public getNodesByProperty(key: string, value: unknown): Node[] {
-        return this.htmlTree.tree.getNodesByProperty(key, value);
+        return this.htmlTree.getNodesByProperty(key, value);
     }
 
     public getSelectedNode(): false | Node {
@@ -137,15 +129,15 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public getSelectedNodes(): Node[] {
-        return this.htmlTree.selectNodeHandler.getSelectedNodes();
+        return this.htmlTree.getSelectedNodes();
     }
 
     public getState(): null | SavedState {
-        return this.htmlTree.saveStateHandler.getState();
+        return this.htmlTree.getState();
     }
 
     public getStateFromStorage(): null | SavedState {
-        return this.htmlTree.saveStateHandler.getStateFromStorage();
+        return this.htmlTree.getStateFromStorage();
     }
 
     public getTree(): Node {
@@ -183,11 +175,11 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        return this.htmlTree.selectNodeHandler.isNodeSelected(node);
+        return this.htmlTree.isNodeSelected(node);
     }
 
     public loadData(data: NodeData[], parentNode: Node | null): JQuery {
-        this.doLoadData(data, parentNode);
+        this.htmlTree.loadData(data, parentNode);
         return this.element;
     }
 
@@ -212,14 +204,14 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     ): JQuery {
         if (typeof param1 === "string") {
             // first parameter is url
-            this.htmlTree.doLoadDataFromUrl(
+            this.htmlTree.loadDataFromUrl(
                 param1,
                 param2 as Node | null,
                 param3 ?? null,
             );
         } else {
             // first parameter is not url
-            this.htmlTree.doLoadDataFromUrl(
+            this.htmlTree.loadDataFromUrl(
                 null,
                 param1,
                 param2 as HandleFinishedLoading | null,
@@ -230,10 +222,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public moveDown(): JQuery {
-        const selectedNode = this.htmlTree.getSelectedNode();
-        if (selectedNode) {
-            this.htmlTree.keyHandler.moveDown(selectedNode);
-        }
+        this.htmlTree.moveDown();
 
         return this.element;
     }
@@ -261,11 +250,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public moveUp(): JQuery {
-        const selectedNode = this.htmlTree.getSelectedNode();
-        if (selectedNode) {
-            this.htmlTree.keyHandler.moveUp(selectedNode);
-        }
-
+        this.htmlTree.moveUp();
         return this.element;
     }
 
@@ -299,7 +284,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public reload(onFinished: HandleFinishedLoading | null): JQuery {
-        this.htmlTree.doLoadDataFromUrl(null, null, onFinished);
+        this.htmlTree.loadDataFromUrl(null, null, onFinished);
         return this.element;
     }
 
@@ -330,16 +315,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        if (!node.element) {
-            return this.element;
-        }
-
-        const top =
-            getOffsetTop(node.element) -
-            getOffsetTop(this.$el.get(0) as HTMLElement);
-
-        this.htmlTree.scrollHandler.scrollToY(top);
-
+        this.htmlTree.scrollToNode(node);
         return this.element;
     }
 
@@ -358,8 +334,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
     public setState(state?: SavedState): JQuery {
         if (state) {
-            this.htmlTree.saveStateHandler.setInitialState(state);
-            this.htmlTree.refreshElements(null);
+            this.htmlTree.setState(state);
         }
 
         return this.element;
@@ -389,10 +364,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         this.htmlTree.updateNode(node, data);
         return this.element;
-    }
-
-    private doLoadData(data: NodeData[] | null, parentNode: Node | null): void {
-        this.htmlTree.loadData(data, parentNode);
     }
 }
 

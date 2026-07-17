@@ -3,6 +3,7 @@ import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import type { JQTreeOptions } from "./jqtreeOptions";
 import type { PositionInfo } from "./mouseUtils";
 import type { Position } from "./node";
+import type { SavedState } from "./saveStateHandler";
 
 import DataLoader from "./dataLoader";
 import { DragAndDropHandler } from "./dragAndDropHandler";
@@ -14,6 +15,7 @@ import MouseHandler from "./mouseHandler";
 import { Node } from "./node";
 import NodeElement from "./nodeElement";
 import FolderElement from "./nodeElement/folderElement";
+import { getOffsetTop } from "./positionUtils";
 import RequestUrl from "./requestUrl";
 import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
@@ -209,6 +211,15 @@ export default class HtmlTree {
     return requestUrl;
   }
 
+  public deinit(): void {
+    this.htmlElement.textContent = '';
+
+    this.keyHandler.deinit();
+    this.mouseHandler.deinit();
+
+    this.tree = new Node({}, true);
+  }
+
   public deselectCurrentNode(): void {
     const node = this.getSelectedNode();
     if (node) {
@@ -222,18 +233,6 @@ export default class HtmlTree {
       this.selectNodeHandler.getSelectedNodesUnder(parentNode);
     for (const n of selectedNodesUnderParent) {
       this.selectNodeHandler.removeFromSelection(n);
-    }
-  }
-
-  public doLoadDataFromUrl(
-    inputUrl: null | string,
-    parentNode: Node | null,
-    onFinished: HandleFinishedLoading | null,
-  ): void {
-    const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
-
-    if (url) {
-      this.dataLoader.loadFromUrl(url, parentNode, onFinished);
     }
   }
 
@@ -261,8 +260,20 @@ export default class HtmlTree {
     }
   }
 
+  public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
+    return this.tree.getNodeByCallback(callback);
+  }
+
   public getNodeById(nodeId: NodeId): Node | null {
     return this.tree.getNodeById(nodeId);
+  }
+
+  public getNodeByName(name: string): Node | null {
+    return this.tree.getNodeByName(name);
+  }
+
+  public getNodeByNameMustExist(name: string): Node {
+    return this.tree.getNodeByNameMustExist(name);
   }
 
   public getNodeElement(element: HTMLElement): NodeElement | null {
@@ -290,9 +301,25 @@ export default class HtmlTree {
     }
   }
 
+  public getNodesByProperty(key: string, value: unknown): Node[] {
+    return this.tree.getNodesByProperty(key, value);
+  }
+
   // Return the node that is selected.
   public getSelectedNode(): false | Node {
     return this.selectNodeHandler.getSelectedNode();
+  }
+
+  public getSelectedNodes(): Node[] {
+    return this.selectNodeHandler.getSelectedNodes();
+  }
+
+  public getState(): null | SavedState {
+    return this.saveStateHandler.getState();
+  }
+
+  public getStateFromStorage(): null | SavedState {
+    return this.saveStateHandler.getStateFromStorage();
   }
 
   public getTree(): Node {
@@ -316,7 +343,7 @@ export default class HtmlTree {
       const dataUrl = this.createRequestUrl(null);
 
       if (dataUrl) {
-        this.doLoadDataFromUrl(null, null, null);
+        this.loadDataFromUrl(null, null, null);
       } else {
         this.loadData([], null);
       }
@@ -364,6 +391,10 @@ export default class HtmlTree {
     return activeElement?.tagName === "SPAN" && this.containsElement(activeElement as HTMLElement);
   }
 
+  public isNodeSelected(node: Node): boolean {
+    return this.selectNodeHandler.isNodeSelected(node);
+  }
+
   public isSelectedNodeInSubtree(subtree: Node): boolean {
     const selectedNode = this.getSelectedNode();
 
@@ -394,6 +425,18 @@ export default class HtmlTree {
     });
   }
 
+  public loadDataFromUrl(
+    inputUrl: null | string,
+    parentNode: Node | null,
+    onFinished: HandleFinishedLoading | null,
+  ): void {
+    const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
+
+    if (url) {
+      this.dataLoader.loadFromUrl(url, parentNode, onFinished);
+    }
+  }
+
   public loadFolderOnDemand(
     node: Node,
     slide = true,
@@ -401,7 +444,7 @@ export default class HtmlTree {
   ): void {
     node.is_loading = true;
 
-    this.doLoadDataFromUrl(null, node, () => {
+    this.loadDataFromUrl(null, node, () => {
       this.openNodeInternal(node, slide, onFinished);
     });
   }
@@ -451,6 +494,13 @@ export default class HtmlTree {
     }
   }
 
+  public moveDown() {
+    const selectedNode = this.getSelectedNode();
+    if (selectedNode) {
+      this.keyHandler.moveDown(selectedNode);
+    }
+  }
+
   // Move a node inside the tree.
   public moveNode(
     node: Node,
@@ -459,6 +509,13 @@ export default class HtmlTree {
   ): void {
     this.tree.moveNode(node, targetNode, position);
     this.refreshElements(null);
+  }
+
+  public moveUp() {
+    const selectedNode = this.getSelectedNode();
+    if (selectedNode) {
+      this.keyHandler.moveUp(selectedNode);
+    }
   }
 
   public openNode(
@@ -590,6 +647,18 @@ export default class HtmlTree {
     if (this.options.saveState) {
       this.saveStateHandler.saveState();
     }
+  }
+
+  public scrollToNode(node: Node) {
+    if (!node.element) {
+      return;
+    }
+
+    const top =
+      getOffsetTop(node.element) -
+      getOffsetTop(this.htmlElement);
+
+    this.scrollHandler.scrollToY(top);
   }
 
   public selectCurrentNode(mustSetFocus: boolean): void {
@@ -781,6 +850,11 @@ export default class HtmlTree {
 
   public setOption(option: string, value: unknown) {
     (this.options as unknown as Record<string, unknown>)[option] = value;
+  }
+
+  public setState(state: SavedState) {
+    this.saveStateHandler.setInitialState(state);
+    this.refreshElements(null);
   }
 
   public toggle(node: Node, slideParam: boolean | null = null) {
