@@ -6,53 +6,36 @@ import { Node } from "app/node";
 import version from "app/version";
 
 interface CreateHtmlTreeParams {
-    getNodeIdToBeSelected?: () => NodeId | null;
     options?: Partial<JQTreeOptions>;
     overrideTriggerEvent?: TriggerEventProvider;
-    refreshElements?: (fromNode: Node | null) => void;
 }
 
 const createHtmlTree = ({
-    getNodeIdToBeSelected = () => null,
     options = {},
     overrideTriggerEvent,
-    refreshElements = () => null,
 }: CreateHtmlTreeParams = {}) => {
     const htmlElement = document.createElement("div");
     document.body.append(htmlElement);
 
     return new HtmlTree({
-        getNodeIdToBeSelected,
         htmlElement,
         options,
         overrideTriggerEventProvider: overrideTriggerEvent,
-        refreshElements,
     });
 };
 
 describe("HtmlTree", () => {
-    afterEach(() => {
-        document.body.innerHTML = "";
-    });
-
     describe("constructor", () => {
         it("stores the html element and options", () => {
             const htmlElement = document.createElement("div");
-            const getNodeIdToBeSelected = vi.fn();
 
             const htmlTree = new HtmlTree({
-                getNodeIdToBeSelected,
                 htmlElement,
                 options: { tabIndex: 5 },
-                refreshElements: vi.fn(),
             });
 
             expect(htmlTree.htmlElement).toBe(htmlElement);
             expect(htmlTree.options.tabIndex).toBe(5);
-        });
-
-        it("is not initialized", () => {
-            expect(createHtmlTree().isInitialized).toBeFalse();
         });
 
         it("creates a root node", () => {
@@ -105,31 +88,6 @@ describe("HtmlTree", () => {
                 ],
             });
         });
-
-        it("calls refreshElements with the parent of the existing node", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const node = new Node({ id: 1, name: "node1" });
-            htmlTree.tree.addChild(node);
-
-            htmlTree.addNodeAfter({ name: "new-node" }, node);
-
-            expect(refreshElements).toHaveBeenCalledWith(htmlTree.tree);
-        });
-
-        it("returns null when the existing node has no parent", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const newNode = htmlTree.addNodeAfter(
-                { name: "new-node" },
-                htmlTree.tree,
-            );
-
-            expect(newNode).toBeNull();
-            expect(refreshElements).not.toHaveBeenCalled();
-        });
     });
 
     describe("addNodeBefore", () => {
@@ -151,31 +109,6 @@ describe("HtmlTree", () => {
                     expect.objectContaining({ name: "node2" }),
                 ],
             });
-        });
-
-        it("calls refreshElements with the parent of the existing node", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const node = new Node({ id: 1, name: "node1" });
-            htmlTree.tree.addChild(node);
-
-            htmlTree.addNodeBefore({ name: "new-node" }, node);
-
-            expect(refreshElements).toHaveBeenCalledWith(htmlTree.tree);
-        });
-
-        it("returns null when the existing node has no parent", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const newNode = htmlTree.addNodeBefore(
-                { name: "new-node" },
-                htmlTree.tree,
-            );
-
-            expect(newNode).toBeNull();
-            expect(refreshElements).not.toHaveBeenCalled();
         });
     });
 
@@ -202,21 +135,8 @@ describe("HtmlTree", () => {
             });
         });
 
-        it("calls refreshElements with the parent of the new node", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const node = new Node({ id: 1, name: "node1" });
-            htmlTree.tree.addChild(node);
-
-            htmlTree.addParentNode({ name: "new-parent" }, node);
-
-            expect(refreshElements).toHaveBeenCalledWith(htmlTree.tree);
-        });
-
         it("returns null when the existing node has no parent", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
+            const htmlTree = createHtmlTree({});
 
             const newNode = htmlTree.addParentNode(
                 { name: "new-parent" },
@@ -224,7 +144,6 @@ describe("HtmlTree", () => {
             );
 
             expect(newNode).toBeNull();
-            expect(refreshElements).not.toHaveBeenCalled();
         });
     });
 
@@ -245,90 +164,6 @@ describe("HtmlTree", () => {
                     expect.objectContaining({ name: "new-node" }),
                 ],
             });
-        });
-
-        it("calls refreshElements with the parent node", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const parentNode = new Node({ id: 1, name: "parent" });
-            htmlTree.tree.addChild(parentNode);
-
-            htmlTree.appendNode({ name: "new-node" }, parentNode);
-
-            expect(refreshElements).toHaveBeenCalledWith(parentNode);
-        });
-    });
-
-    describe("createRequestUrl", () => {
-        it("returns null when there is no data url", () => {
-            const htmlTree = createHtmlTree();
-
-            expect(htmlTree.createRequestUrl(null)).toBeNull();
-        });
-
-        it("creates a url based on the dataUrl option", () => {
-            const htmlTree = createHtmlTree({
-                options: { dataUrl: "/tree/" },
-            });
-
-            expect(htmlTree.createRequestUrl(null)?.toString()).toBe("/tree/");
-        });
-
-        it("creates a url based on the data-url attribute of the html element", () => {
-            const htmlTree = createHtmlTree();
-            htmlTree.htmlElement.dataset.url = "/tree/";
-
-            expect(htmlTree.createRequestUrl(null)?.toString()).toBe("/tree/");
-        });
-
-        it("calls the dataUrl option when it is a function", () => {
-            const dataUrl = vi.fn().mockReturnValue("/tree/");
-            const htmlTree = createHtmlTree({ options: { dataUrl } });
-
-            expect(htmlTree.createRequestUrl(null)?.toString()).toBe("/tree/");
-            expect(dataUrl).toHaveBeenCalledWith(null);
-        });
-
-        it("returns null when the dataUrl function doesn't return a url", () => {
-            const dataUrl = vi.fn().mockReturnValue("");
-            const htmlTree = createHtmlTree({ options: { dataUrl } });
-
-            expect(htmlTree.createRequestUrl(null)).toBeNull();
-        });
-
-        it("adds a node parameter when a node is loaded on demand", () => {
-            const htmlTree = createHtmlTree({
-                options: { dataUrl: "/tree/" },
-            });
-            const node = new Node({ id: 123, name: "node1" });
-
-            expect(htmlTree.createRequestUrl(node)?.toString()).toBe(
-                "/tree/?node=123",
-            );
-        });
-
-        it("adds a selected_node parameter when a node must be selected", () => {
-            const htmlTree = createHtmlTree({
-                getNodeIdToBeSelected: () => 123,
-                options: { dataUrl: "/tree/" },
-            });
-
-            expect(htmlTree.createRequestUrl(null)?.toString()).toBe(
-                "/tree/?selected_node=123",
-            );
-        });
-
-        it("doesn't add a selected_node parameter when loading on demand", () => {
-            const htmlTree = createHtmlTree({
-                getNodeIdToBeSelected: () => 123,
-                options: { dataUrl: "/tree/" },
-            });
-            const node = new Node({ id: 456, name: "node1" });
-
-            expect(htmlTree.createRequestUrl(node)?.toString()).toBe(
-                "/tree/?node=456",
-            );
         });
     });
 
@@ -577,20 +412,6 @@ describe("HtmlTree", () => {
                 ],
             });
         });
-
-        it("calls refreshElements", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const node1 = new Node({ id: 1, name: "node1" });
-            const node2 = new Node({ id: 2, name: "node2" });
-            htmlTree.tree.addChild(node1);
-            htmlTree.tree.addChild(node2);
-
-            htmlTree.moveNode(node1, node2, "after");
-
-            expect(refreshElements).toHaveBeenCalledWith(null);
-        });
     });
 
     describe("prependNode", () => {
@@ -610,18 +431,6 @@ describe("HtmlTree", () => {
                     expect.objectContaining({ name: "child1" }),
                 ],
             });
-        });
-
-        it("calls refreshElements with the parent node", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const parentNode = new Node({ id: 1, name: "parent" });
-            htmlTree.tree.addChild(parentNode);
-
-            htmlTree.prependNode({ name: "new-node" }, parentNode);
-
-            expect(refreshElements).toHaveBeenCalledWith(parentNode);
         });
     });
 
@@ -676,19 +485,6 @@ describe("HtmlTree", () => {
             expect(htmlTree.selectNodeHandler.getSelectedNodes()).toHaveLength(
                 0,
             );
-        });
-
-        it("calls refreshElements with the parent of the node", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-
-            const parentNode = new Node({ id: 1, name: "parent" });
-            htmlTree.tree.addChild(parentNode);
-            const node = parentNode.append({ id: 2, name: "node1" });
-
-            htmlTree.removeNode(node);
-
-            expect(refreshElements).toHaveBeenCalledWith(parentNode);
         });
     });
 
@@ -801,17 +597,6 @@ describe("HtmlTree", () => {
             htmlTree.updateNode(node, { children: [], name: "node1" });
 
             expect(node.children).toHaveLength(0);
-        });
-
-        it("calls refreshElements with the node", () => {
-            const refreshElements = vi.fn();
-            const htmlTree = createHtmlTree({ refreshElements });
-            htmlTree.tree.loadFromData([{ id: 1, name: "node1" }]);
-            const node = htmlTree.tree.children[0] as Node;
-
-            htmlTree.updateNode(node, { name: "new-name" });
-
-            expect(refreshElements).toHaveBeenCalledWith(node);
         });
     });
 
