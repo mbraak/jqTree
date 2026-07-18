@@ -663,11 +663,11 @@ var jqtree = (function (exports) {
     class ElementsRenderer {
       closedIconElement;
       openedIconElement;
-      $element;
       autoEscape;
       buttonLeft;
       dragAndDrop;
       getTree;
+      htmlElement;
       isNodeSelected;
       onCreateLi;
       rtl;
@@ -675,12 +675,12 @@ var jqtree = (function (exports) {
       showEmptyFolder;
       tabIndex;
       constructor({
-        $element,
         autoEscape,
         buttonLeft,
         closedIcon,
         dragAndDrop,
         getTree,
+        htmlElement,
         isNodeSelected,
         onCreateLi,
         openedIcon,
@@ -692,7 +692,7 @@ var jqtree = (function (exports) {
         this.autoEscape = autoEscape;
         this.buttonLeft = buttonLeft;
         this.dragAndDrop = dragAndDrop;
-        this.$element = $element;
+        this.htmlElement = htmlElement;
         this.getTree = getTree;
         this.isNodeSelected = isNodeSelected;
         this.onCreateLi = onCreateLi;
@@ -716,25 +716,22 @@ var jqtree = (function (exports) {
         }
 
         // remember current li
-        const $previousLi = jQuery(node.element);
+        const previousLi = node.element;
 
         // create element
         const li = this.createLi(node, node.getLevel());
 
-        // add element to dom
-        $previousLi.after(li);
-
-        // remove previous li
-        $previousLi.remove();
+        // replace previous li in the dom
+        previousLi.replaceWith(li);
 
         // create children
         this.createDomElements(li, node.children, false, node.getLevel() + 1);
       }
       renderFromRoot() {
-        this.$element.empty();
+        this.htmlElement.textContent = '';
         const tree = this.getTree();
-        if (this.$element[0] && tree) {
-          this.createDomElements(this.$element[0], tree.children, true, 1);
+        if (tree) {
+          this.createDomElements(this.htmlElement, tree.children, true, 1);
         }
       }
       attachNodeData(node, li) {
@@ -2832,6 +2829,7 @@ var jqtree = (function (exports) {
       dataLoader;
       dndHandler;
       element;
+      htmlElement;
       isInitialized;
       keyHandler;
       mouseHandler;
@@ -2896,7 +2894,7 @@ var jqtree = (function (exports) {
         return this.element;
       }
       deinit() {
-        this.element.empty();
+        this.htmlElement.textContent = "";
         this.element.off();
         this.keyHandler.deinit();
         this.mouseHandler.deinit();
@@ -2947,6 +2945,7 @@ var jqtree = (function (exports) {
       init() {
         super.init();
         this.element = this.$el;
+        this.htmlElement = this.element.get(0);
         this.isInitialized = false;
         this.nodeMap = new WeakMap();
         this.options.rtl = this.getRtlOption();
@@ -3088,7 +3087,7 @@ var jqtree = (function (exports) {
         if (!node.element) {
           return this.element;
         }
-        const top = getOffsetTop(node.element) - getOffsetTop(this.$el.get(0));
+        const top = getOffsetTop(node.element) - getOffsetTop(this.htmlElement);
         this.scrollHandler.scrollToY(top);
         return this.element;
       }
@@ -3185,8 +3184,7 @@ var jqtree = (function (exports) {
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
         const setNodeElement = this.setNodeElement.bind(this);
-        const $treeElement = this.element;
-        const treeElement = this.element.get(0);
+        const treeElement = this.htmlElement;
         const triggerEvent = this.triggerEvent.bind(this);
         const selectNodeHandler = new SelectNodeHandler({
           getNodeById
@@ -3248,12 +3246,12 @@ var jqtree = (function (exports) {
           selectNode
         });
         const renderer = new ElementsRenderer({
-          $element: $treeElement,
           autoEscape,
           buttonLeft,
           closedIcon,
           dragAndDrop,
           getTree,
+          htmlElement: treeElement,
           isNodeSelected,
           onCreateLi,
           openedIcon,
@@ -3298,7 +3296,6 @@ var jqtree = (function (exports) {
         const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
-        const treeElement = this.element.get(0);
         const triggerEvent = this.triggerEvent.bind(this);
         return new FolderElement({
           closedIconElement,
@@ -3306,23 +3303,22 @@ var jqtree = (function (exports) {
           node,
           openedIconElement,
           tabIndex,
-          treeElement,
+          treeElement: this.htmlElement,
           triggerEvent
         });
       }
       createNodeElement(node) {
         const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
         const tabIndex = this.options.tabIndex;
-        const treeElement = this.element.get(0);
         return new NodeElement({
           getScrollLeft,
           node,
           tabIndex,
-          treeElement
+          treeElement: this.htmlElement
         });
       }
       createRequestUrl(node) {
-        const dataUrl = this.options.dataUrl ?? this.element.data("url");
+        const dataUrl = this.options.dataUrl ?? this.htmlElement.dataset.url;
         let url;
         if (typeof dataUrl === "function") {
           url = dataUrl(node);
@@ -3484,7 +3480,7 @@ var jqtree = (function (exports) {
         if (this.options.rtl != null) {
           return this.options.rtl;
         } else {
-          const dataRtl = this.element.get(0).dataset.rtl;
+          const dataRtl = this.htmlElement.dataset.rtl;
           return dataRtl !== undefined;
         }
       }
