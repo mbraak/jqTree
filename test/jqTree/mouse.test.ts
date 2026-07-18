@@ -94,6 +94,6 @@ describe("mouse", () => {
             expect(node.element).toBeOpenTreeNode();
         });
 
-        expect(node.element).toBeOpenTreeNode();
+        expect(node.element).toBeSelectedTreeNode();
     });
 });
