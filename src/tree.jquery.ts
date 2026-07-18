@@ -260,7 +260,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.options.dataUrl ??= htmlElement.dataset.url;
 
         const dataRtl = htmlElement.dataset.rtl;
-        let rtlValue: boolean | undefined = undefined;;
+        let rtlValue: boolean | undefined = undefined;
         if (dataRtl == "") {
             rtlValue = true;
         } else if (dataRtl === "false") {
