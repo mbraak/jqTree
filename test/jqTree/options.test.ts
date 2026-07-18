@@ -619,7 +619,7 @@ describe("options", () => {
 
         it("has a different closed icon when the rtl data option has no value", () => {
             const $tree = $("#tree1");
-            $tree.attr("data-rtl", "false");
+            $tree.attr("data-rtl", "");
             $tree.tree({ data: exampleData });
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
