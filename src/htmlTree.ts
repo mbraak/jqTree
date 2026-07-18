@@ -180,8 +180,7 @@ export default class HtmlTree {
     * Add a 'selected_node' query parameter if a node is selected.
   */
   public createRequestUrl(node: Node | null): null | RequestUrl {
-    const dataUrl =
-      this.options.dataUrl ?? this.htmlElement.dataset.url;
+    const dataUrl = this.options.dataUrl;
 
     let url;
 

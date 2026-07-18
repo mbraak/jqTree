@@ -44,6 +44,7 @@ const defaults: JQTreeOptions = {
 const setDefaultOptions = (htmlElement: HTMLElement, inputOptions: Partial<JQTreeOptions>): JQTreeOptions => {
   const options = { ...defaults, ...inputOptions };
 
+  options.dataUrl ??= htmlElement.dataset.url;
   options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
   options.closedIcon ??= getDefaultClosedIcon(options);
 
