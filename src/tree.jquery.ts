@@ -249,11 +249,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.element = this.$el;
         this.isInitialized = false;
 
-        this.options.rtl ??= Boolean(this.element.data("rtl"));
-        this.options.closedIcon ??= this.getDefaultClosedIcon();
-
+        this.setDataOptions();
         this.connectHandlers();
-
         this.initData();
     }
 
@@ -1137,6 +1134,12 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             const nodeElement = this.getNodeElementForNode(node);
             nodeElement.select(mustSetFocus);
         }
+    }
+
+    // Set options that are defined in the data attribute.
+    private setDataOptions() {
+        this.options.rtl ??= Boolean(this.element.data("rtl"));
+        this.options.closedIcon ??= this.getDefaultClosedIcon();
     }
 
     // Set initial state, either by restoring the state or auto-opening nodes
