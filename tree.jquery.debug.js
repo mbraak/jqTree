@@ -2873,7 +2873,8 @@ var jqtree = (function (exports) {
         this.element = this.$el;
         this.isInitialized = false;
         this.options.dataUrl ??= this.element.data("url");
-        this.options.rtl ??= Boolean(this.element.data("rtl"));
+        const dataRtl = this.element.data("rtl");
+        this.options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
         this.options.closedIcon ??= this.getDefaultClosedIcon();
         this.connectHandlers();
         this.initData();

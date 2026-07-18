@@ -250,7 +250,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.isInitialized = false;
 
         this.options.dataUrl ??= this.element.data("url");
-        this.options.rtl ??= Boolean(this.element.data("rtl"));
+
+        const dataRtl = this.element.data("rtl") as unknown;
+        this.options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
+
         this.options.closedIcon ??= this.getDefaultClosedIcon();
 
         this.connectHandlers();
