@@ -249,8 +249,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.element = this.$el;
         this.isInitialized = false;
 
-        this.options.rtl ??= this.getRtlOption();
-
+        this.options.rtl ??= Boolean(this.element.data("rtl"));
         this.options.closedIcon ??= this.getDefaultClosedIcon();
 
         this.connectHandlers();
@@ -937,24 +936,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return this.saveStateHandler.getNodeIdToBeSelected();
         } else {
             return null;
-        }
-    }
-
-    private getRtlOption(): boolean {
-        if (this.options.rtl != null) {
-            return this.options.rtl;
-        } else {
-            const dataRtl = this.element.data("rtl") as unknown;
-
-            if (
-                dataRtl !== null &&
-                dataRtl !== false &&
-                dataRtl !== undefined
-            ) {
-                return true;
-            } else {
-                return false;
-            }
         }
     }
 
