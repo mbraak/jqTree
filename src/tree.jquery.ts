@@ -251,14 +251,24 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         super.init();
 
         this.element = this.$el;
-        this.htmlElement = this.element.get(0) as HTMLElement;
+        const htmlElement = this.element.get(0) as HTMLElement;
+        this.htmlElement = htmlElement;
+
         this.isInitialized = false;
         this.nodeMap = new WeakMap();
 
-        this.options.dataUrl ??= this.element.data("url");
+        this.options.dataUrl ??= htmlElement.dataset.url;
 
-        const dataRtl = this.element.data("rtl") as unknown;
-        this.options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
+        const dataRtl = htmlElement.dataset.rtl;
+        let rtlValue: boolean | undefined = undefined;;
+        if (dataRtl == "") {
+            rtlValue = true;
+        } else if (dataRtl === "false") {
+            rtlValue = false;
+        } else {
+            rtlValue = Boolean(dataRtl);
+        }
+        this.options.rtl ??= rtlValue;
 
         this.options.closedIcon ??= this.getDefaultClosedIcon();
 
