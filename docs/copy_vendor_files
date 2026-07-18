@@ -1,2 +1,4 @@
 mkdir -p static/vendor
 cp node_modules/jquery/dist/jquery.min.js static/vendor
+cp node_modules/msw/lib/iife/index.js static/vendor/msw.js
+npx msw init _examples --save
