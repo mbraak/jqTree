@@ -255,12 +255,11 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.isInitialized = false;
         this.nodeMap = new WeakMap();
 
-        this.options.rtl = this.getRtlOption();
-
+        this.options.dataUrl ??= this.element.data("url");
+        this.options.rtl ??= Boolean(this.element.data("rtl"));
         this.options.closedIcon ??= this.getDefaultClosedIcon();
 
         this.connectHandlers();
-
         this.initData();
     }
 
@@ -748,9 +747,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private createRequestUrl(node: Node | null): null | RequestUrl {
-        const dataUrl =
-            this.options.dataUrl ?? this.htmlElement.dataset.url;
-
+        const dataUrl = this.options.dataUrl;
         let url;
 
         if (typeof dataUrl === "function") {
@@ -937,15 +934,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             return this.saveStateHandler.getNodeIdToBeSelected();
         } else {
             return null;
-        }
-    }
-
-    private getRtlOption(): boolean {
-        if (this.options.rtl != null) {
-            return this.options.rtl;
-        } else {
-            const dataRtl = this.htmlElement.dataset.rtl;
-            return dataRtl !== undefined;
         }
     }
 

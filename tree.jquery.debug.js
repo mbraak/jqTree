@@ -2948,7 +2948,8 @@ var jqtree = (function (exports) {
         this.htmlElement = this.element.get(0);
         this.isInitialized = false;
         this.nodeMap = new WeakMap();
-        this.options.rtl = this.getRtlOption();
+        this.options.dataUrl ??= this.element.data("url");
+        this.options.rtl ??= Boolean(this.element.data("rtl"));
         this.options.closedIcon ??= this.getDefaultClosedIcon();
         this.connectHandlers();
         this.initData();
@@ -3318,7 +3319,7 @@ var jqtree = (function (exports) {
         });
       }
       createRequestUrl(node) {
-        const dataUrl = this.options.dataUrl ?? this.htmlElement.dataset.url;
+        const dataUrl = this.options.dataUrl;
         let url;
         if (typeof dataUrl === "function") {
           url = dataUrl(node);
@@ -3474,14 +3475,6 @@ var jqtree = (function (exports) {
           return this.saveStateHandler.getNodeIdToBeSelected();
         } else {
           return null;
-        }
-      }
-      getRtlOption() {
-        if (this.options.rtl != null) {
-          return this.options.rtl;
-        } else {
-          const dataRtl = this.htmlElement.dataset.rtl;
-          return dataRtl !== undefined;
         }
       }
       initData() {
