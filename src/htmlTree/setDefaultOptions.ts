@@ -62,7 +62,14 @@ const getDefaultClosedIcon = (options: JQTreeOptions): string => {
 
 const getRtlOptionFromHTMLElement = (htmlElement: HTMLElement): boolean => {
   const dataRtl = htmlElement.dataset.rtl;
-  return dataRtl !== undefined;
+
+  if (dataRtl == "") {
+    return true;
+  } else if (dataRtl === "false") {
+    return false;
+  } else {
+    return Boolean(dataRtl);
+  }
 }
 
 export default setDefaultOptions;
