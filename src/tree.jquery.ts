@@ -249,7 +249,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.element = this.$el;
         this.isInitialized = false;
 
-        this.options.rtl = this.getRtlOption();
+        this.options.rtl ??= this.getRtlOption();
 
         this.options.closedIcon ??= this.getDefaultClosedIcon();
 
