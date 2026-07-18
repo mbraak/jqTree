@@ -575,52 +575,57 @@ describe("options", () => {
     });
 
     describe("rtl", () => {
-        interface Vars {
-            $tree: JQuery;
-            node1: INode;
-        }
-        const given = getGiven<Vars>();
-        given("node1", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-        given("$tree", () => $("#tree1"));
+        it("has a different closed icon when the rtl option is true", () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData, rtl: true });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-        context("with the rtl option is true", () => {
-            beforeEach(() => {
-                given.$tree.tree({ data: exampleData, rtl: true });
-            });
-
-            it("has a different closed icon", () => {
-                expect(
-                    togglerLink(given.node1.element as HTMLElement).innerHTML,
-                ).toBe("◀");
-            });
+            expect(
+                togglerLink(node1.element as HTMLElement).innerHTML,
+            ).toBe("◀");
         });
 
-        context("with the rtl data option set to 'true'", () => {
-            beforeEach(() => {
-                given.$tree.attr("data-rtl", "true");
-                given.$tree.tree({ data: exampleData });
-            });
+        it("has the default closed icon when the rtl option is false", () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData, rtl: false });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            it("has a different closed icon", () => {
-                expect(
-                    togglerLink(given.node1.element as HTMLElement).innerHTML,
-                ).toBe("◀");
-            });
+            expect(
+                togglerLink(node1.element as HTMLElement).innerHTML,
+            ).toBe("►");
         });
 
-        context("with the rtl data option without a value", () => {
-            beforeEach(() => {
-                given.$tree.attr("data-rtl", "");
-                given.$tree.tree({ data: exampleData });
-            });
+        it("has a different closed icon when the rtl data option is true", () => {
+            const $tree = $("#tree1");
+            $tree.attr("data-rtl", "true");
+            $tree.tree({ data: exampleData });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            it("has a different closed icon", () => {
-                expect(
-                    togglerLink(given.node1.element as HTMLElement).innerHTML,
-                ).toBe("◀");
-            });
+            expect(
+                togglerLink(node1.element as HTMLElement).innerHTML,
+            ).toBe("◀");
+        });
+
+        it("has the default closed icon when the rtl data option is false", () => {
+            const $tree = $("#tree1");
+            $tree.attr("data-rtl", "false");
+            $tree.tree({ data: exampleData });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+
+            expect(
+                togglerLink(node1.element as HTMLElement).innerHTML,
+            ).toBe("►");
+        });
+
+        it("has a different closed icon when the rtl data option has no value", () => {
+            const $tree = $("#tree1");
+            $tree.attr("data-rtl", "");
+            $tree.tree({ data: exampleData });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+
+            expect(
+                togglerLink(node1.element as HTMLElement).innerHTML,
+            ).toBe("◀");
         });
     });
 
