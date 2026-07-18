@@ -114,6 +114,8 @@ describe("load on demand", () => {
                     }),
                 ]);
             });
+
+            await screen.findByText("loaded-on-demand");
         });
 
         context("when the node is selected", () => {
