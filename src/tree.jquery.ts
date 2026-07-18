@@ -152,7 +152,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         super.init();
 
         this.element = this.$el;
-
         const htmlElement = this.$el.get(0) as HTMLElement;
 
         const htmlTree = new HtmlTree(
