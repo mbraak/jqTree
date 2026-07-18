@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import getGiven from "givens";
 import { http, HttpResponse } from "msw";
@@ -101,19 +101,21 @@ describe("load on demand", () => {
             const toggler = togglerLink(given.node.element as HTMLElement);
             await userEvent.click(toggler);
 
-            await screen.findByText("loaded-on-demand");
+            await waitFor(() => {
+                expect(given.$tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({
+                                name: "loaded-on-demand",
+                            }),
+                        ],
+                        name: "parent-node",
+                        open: true,
+                    }),
+                ]);
+            });
 
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({
-                            name: "loaded-on-demand",
-                        }),
-                    ],
-                    name: "parent-node",
-                    open: true,
-                }),
-            ]);
+            await screen.findByText("loaded-on-demand");
         });
 
         context("when the node is selected", () => {
