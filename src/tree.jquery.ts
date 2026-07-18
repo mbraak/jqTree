@@ -249,7 +249,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this.element = this.$el;
         this.isInitialized = false;
 
-        this.setDataOptions();
+        this.options.dataUrl ??= this.element.data("url");
+        this.options.rtl ??= Boolean(this.element.data("rtl"));
+        this.options.closedIcon ??= this.getDefaultClosedIcon();
+
         this.connectHandlers();
         this.initData();
     }
@@ -853,9 +856,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private getDataUrlInfo(node: Node | null): JQuery.AjaxSettings | null {
-        const dataUrl =
-            this.options.dataUrl ?? (this.element.data("url") as null | string);
-
         const getUrlFromString = (url: string): JQuery.AjaxSettings => {
             const urlInfo: JQuery.AjaxSettings = { url };
 
@@ -879,6 +879,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             }
         };
 
+        const dataUrl = this.options.dataUrl;
         if (typeof dataUrl === "function") {
             return dataUrl(node);
         } else if (typeof dataUrl === "string") {
@@ -1134,12 +1135,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             const nodeElement = this.getNodeElementForNode(node);
             nodeElement.select(mustSetFocus);
         }
-    }
-
-    // Set options that are defined in the data attribute.
-    private setDataOptions() {
-        this.options.rtl ??= Boolean(this.element.data("rtl"));
-        this.options.closedIcon ??= this.getDefaultClosedIcon();
     }
 
     // Set initial state, either by restoring the state or auto-opening nodes
