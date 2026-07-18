@@ -1,7 +1,6 @@
-$.ajax = function (settings) {
-    settings.success(ExampleData.exampleData);
-};
-
-$("#tree1").tree({
-    saveState: true,
+mockServerWithDefaultData().then(() => {
+    const $tree = $("#tree1");
+    $tree.tree({
+        saveState: true,
+    });
 });

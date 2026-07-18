@@ -8,6 +8,7 @@ docs/jqtree.css
 docs/static/documentation.css
 docs/static/example.css
 docs/static/vendor/
+docs/_examples/mockServiceWorker.js
 docs/tree.jquery.js
 js-coverage/
 lib/

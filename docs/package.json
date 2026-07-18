@@ -10,6 +10,10 @@
         "copy_jqtree": "cp ../tree.jquery.js . && cp ../jqtree.css .",
         "copy_vendor_files": "./copy_vendor_files"
     },
+    "dependencies": {
+        "jquery": "^4.0.0",
+        "msw": "^2"
+    },
     "devDependencies": {
         "@tailwindcss/cli": "^4.3.2",
         "@tailwindcss/postcss": "^4.3.2",
@@ -22,5 +26,10 @@
         "postcss-load-config": "^6.0.1",
         "postcss-nested": "^7.0.2",
         "tailwindcss": "^4.3.2"
+    },
+    "msw": {
+        "workerDirectory": [
+            "_examples"
+        ]
     }
 }

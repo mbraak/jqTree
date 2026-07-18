@@ -1,7 +1,3 @@
-$.ajax = function (settings) {
-    settings.success(ExampleData.exampleData);
-};
-
 var targetCollisionDiv = $("#targetDiv");
 
 function isOverTarget(e) {
@@ -25,8 +21,10 @@ function handleStop(node, e) {
     console.log("stopped over target: ", isOverTarget(e));
 }
 
-$("#tree1").tree({
-    dragAndDrop: true,
-    onDragMove: handleMove,
-    onDragStop: handleStop,
+mockServerWithDefaultData().then(() => {
+    $("#tree1").tree({
+        dragAndDrop: true,
+        onDragMove: handleMove,
+        onDragStop: handleStop,
+    });
 });

@@ -1,5 +1,3 @@
-$.ajax = function (settings) {
-    settings.success(ExampleData.exampleData);
-};
-
-$("#tree1").tree();
+mockServerWithDefaultData().then(() => {
+    $("#tree1").tree();
+});
