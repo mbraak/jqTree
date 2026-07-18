@@ -175,7 +175,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public deinit(): void {
-        this.element.empty();
+        (this.element.get(0) as HTMLElement).textContent = "";
         this.element.off();
 
         this.keyHandler.deinit();
