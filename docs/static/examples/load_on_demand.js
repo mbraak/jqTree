@@ -1,16 +1,28 @@
-const handlers = [
-    MockServiceWorker.http.get("/nodes/", ({ request }) => {
-        const url = new URL(request.url);
-        const parentId = url.searchParams.get("node");
+const sleep = async (ms) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, ms);
+    });
+};
 
-        if (parentId) {
-            return MockServiceWorker.HttpResponse.json(
-                ExampleData.getChildrenOfNode(parentId),
-            );
-        } else {
-            return MockServiceWorker.HttpResponse.json(
-                ExampleData.getFirstLevelData(),
-            );
+const handlers = [
+    MockServiceWorker.http.get("/nodes/", async ({ request }) => {
+        {
+            await sleep(1000);
+
+            const url = new URL(request.url);
+            const parentId = url.searchParams.get("node");
+
+            if (parentId) {
+                return MockServiceWorker.HttpResponse.json(
+                    ExampleData.getChildrenOfNode(parentId),
+                );
+            } else {
+                return MockServiceWorker.HttpResponse.json(
+                    ExampleData.getFirstLevelData(),
+                );
+            }
         }
     }),
 ];
