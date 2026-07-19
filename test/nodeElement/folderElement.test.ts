@@ -43,6 +43,11 @@ const createFolderElement = ({
     });
     renderer.renderFromRoot();
 
+    if (!isOpen) {
+        const ul = getUl(folderNode.element as HTMLElement);
+        ul.style.display = "none";
+    }
+
     const triggerEvent = vi.fn();
 
     const folderElement = new FolderElement({

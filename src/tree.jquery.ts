@@ -73,7 +73,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private dndHandler: DragAndDropHandler;
     private element: JQuery;
     private htmlElement: HTMLElement;
-
     private isInitialized: boolean;
     private keyHandler: KeyHandler;
     private mouseHandler: MouseHandler;

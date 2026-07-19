@@ -692,8 +692,8 @@ var jqtree = (function (exports) {
         this.autoEscape = autoEscape;
         this.buttonLeft = buttonLeft;
         this.dragAndDrop = dragAndDrop;
-        this.htmlElement = htmlElement;
         this.getTree = getTree;
+        this.htmlElement = htmlElement;
         this.isNodeSelected = isNodeSelected;
         this.onCreateLi = onCreateLi;
         this.rtl = rtl;
@@ -714,18 +714,12 @@ var jqtree = (function (exports) {
         if (!node.element) {
           return;
         }
-
-        // remember current li
-        const previousLi = node.element;
-
-        // create element
-        const li = this.createLi(node, node.getLevel());
-
-        // replace previous li in the dom
-        previousLi.replaceWith(li);
+        const currentLi = node.element;
+        const newLi = this.createLi(node, node.getLevel());
+        currentLi.replaceWith(newLi);
 
         // create children
-        this.createDomElements(li, node.children, false, node.getLevel() + 1);
+        this.createDomElements(newLi, node.children, false, node.getLevel() + 1);
       }
       renderFromRoot() {
         this.htmlElement.textContent = '';
@@ -2047,10 +2041,10 @@ var jqtree = (function (exports) {
             node: this.node
           });
         };
+        const ul = this.getUl();
         if (slide) {
           slideUp(this.getUl(), animationSpeed, doClose);
         } else {
-          const ul = this.getUl();
           ul.style.display = "none";
           doClose();
         }
@@ -2079,10 +2073,10 @@ var jqtree = (function (exports) {
             node: this.node
           });
         };
+        const ul = this.getUl();
         if (slide) {
           slideDown(this.getUl(), animationSpeed, doOpen);
         } else {
-          const ul = this.getUl();
           ul.style.display = "block";
           doOpen();
         }
@@ -2945,12 +2939,21 @@ var jqtree = (function (exports) {
       init() {
         super.init();
         this.element = this.$el;
-        this.htmlElement = this.element.get(0);
+        const htmlElement = this.element.get(0);
+        this.htmlElement = htmlElement;
         this.isInitialized = false;
         this.nodeMap = new WeakMap();
-        this.options.dataUrl ??= this.element.data("url");
-        const dataRtl = this.element.data("rtl");
-        this.options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
+        this.options.dataUrl ??= htmlElement.dataset.url;
+        const dataRtl = htmlElement.dataset.rtl;
+        let rtlValue = undefined;
+        if (dataRtl == "") {
+          rtlValue = true;
+        } else if (dataRtl === "false") {
+          rtlValue = false;
+        } else {
+          rtlValue = Boolean(dataRtl);
+        }
+        this.options.rtl ??= rtlValue;
         this.options.closedIcon ??= this.getDefaultClosedIcon();
         this.connectHandlers();
         this.initData();
