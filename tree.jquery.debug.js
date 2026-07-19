@@ -2128,7 +2128,7 @@ var jqtree = (function (exports) {
         };
         const ul = this.getUl();
         if (slide) {
-          slideUp(this.getUl(), animationSpeed, doClose);
+          slideUp(ul, animationSpeed, doClose);
         } else {
           ul.style.display = "none";
           doClose();
@@ -2160,7 +2160,7 @@ var jqtree = (function (exports) {
         };
         const ul = this.getUl();
         if (slide) {
-          slideDown(this.getUl(), animationSpeed, doOpen);
+          slideDown(ul, animationSpeed, doOpen);
         } else {
           ul.style.display = "block";
           doOpen();
