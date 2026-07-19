@@ -1,3 +1,4 @@
+import { waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 
 import "app/tree.jquery";
@@ -54,7 +55,9 @@ describe("mouse", () => {
 
         await userEvent.click(togglerLink(node.element as HTMLElement));
 
-        expect(node.element).toBeOpenTreeNode();
+        await waitFor(() => {
+            expect(node.element).toBeOpenTreeNode();
+        });
     });
 
     it("doesn't select a node when it is opened", async () => {
@@ -68,8 +71,11 @@ describe("mouse", () => {
 
         await userEvent.click(togglerLink(node.element as HTMLElement));
 
+        await waitFor(() => {
+            expect(node.element).toBeOpenTreeNode();
+        });
+
         expect(node.element).not.toBeSelectedTreeNode();
-        expect(node.element).toBeOpenTreeNode();
     });
 
     it("keeps it selected when a selected node is opened", async () => {
@@ -84,7 +90,10 @@ describe("mouse", () => {
 
         await userEvent.click(togglerLink(node.element as HTMLElement));
 
+        await waitFor(() => {
+            expect(node.element).toBeOpenTreeNode();
+        });
+
         expect(node.element).toBeSelectedTreeNode();
-        expect(node.element).toBeOpenTreeNode();
     });
 });

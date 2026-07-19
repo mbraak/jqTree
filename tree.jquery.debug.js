@@ -2872,7 +2872,9 @@ var jqtree = (function (exports) {
         super.init();
         this.element = this.$el;
         this.isInitialized = false;
-        this.options.rtl = this.getRtlOption();
+        this.options.dataUrl ??= this.element.data("url");
+        const dataRtl = this.element.data("rtl");
+        this.options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
         this.options.closedIcon ??= this.getDefaultClosedIcon();
         this.connectHandlers();
         this.initData();
@@ -3337,7 +3339,6 @@ var jqtree = (function (exports) {
         }
       }
       getDataUrlInfo(node) {
-        const dataUrl = this.options.dataUrl ?? this.element.data("url");
         const getUrlFromString = url => {
           const urlInfo = {
             url
@@ -3363,6 +3364,7 @@ var jqtree = (function (exports) {
             }
           }
         };
+        const dataUrl = this.options.dataUrl;
         if (typeof dataUrl === "function") {
           return dataUrl(node);
         } else if (typeof dataUrl === "string") {
@@ -3411,18 +3413,6 @@ var jqtree = (function (exports) {
           return this.saveStateHandler.getNodeIdToBeSelected();
         } else {
           return null;
-        }
-      }
-      getRtlOption() {
-        if (this.options.rtl != null) {
-          return this.options.rtl;
-        } else {
-          const dataRtl = this.element.data("rtl");
-          if (dataRtl !== null && dataRtl !== false && dataRtl !== undefined) {
-            return true;
-          } else {
-            return false;
-          }
         }
       }
       initData() {

@@ -1,15 +1,35 @@
-$.ajax = function (settings) {
-    setTimeout(function () {
-        if (settings.data && settings.data.node) {
-            settings.success(ExampleData.getChildrenOfNode(settings.data.node));
-        } else {
-            settings.success(ExampleData.getFirstLevelData());
-        }
-    }, 1000);
+const sleep = async (ms) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, ms);
+    });
 };
 
-var $tree = $("#tree1");
+const handlers = [
+    MockServiceWorker.http.get("/nodes/", async ({ request }) => {
+        {
+            await sleep(1000);
 
-$tree.tree({
-    saveState: true,
+            const url = new URL(request.url);
+            const parentId = url.searchParams.get("node");
+
+            if (parentId) {
+                return MockServiceWorker.HttpResponse.json(
+                    ExampleData.getChildrenOfNode(parentId),
+                );
+            } else {
+                return MockServiceWorker.HttpResponse.json(
+                    ExampleData.getFirstLevelData(),
+                );
+            }
+        }
+    }),
+];
+
+mockServer(handlers).then(() => {
+    const $tree = $("#tree1");
+    $tree.tree({
+        saveState: true,
+    });
 });
