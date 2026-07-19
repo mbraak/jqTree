@@ -23,17 +23,17 @@ interface ElementsRendererParams {
 export default class ElementsRenderer {
     public closedIconElement?: HTMLElement | Text;
     public openedIconElement?: HTMLElement | Text;
-    private autoEscape: boolean;
-    private buttonLeft: boolean;
-    private dragAndDrop: boolean;
-    private getTree: GetTree;
-    private htmlElement: HTMLElement;
-    private isNodeSelected: IsNodeSelected;
-    private onCreateLi?: OnCreateLi;
-    private rtl?: boolean;
-    private setNodeElement: (element: HTMLElement, node: Node) => void;
-    private showEmptyFolder: boolean;
-    private tabIndex?: number;
+    private _autoEscape: boolean;
+    private _buttonLeft: boolean;
+    private _dragAndDrop: boolean;
+    private _getTree: GetTree;
+    private _htmlElement: HTMLElement;
+    private _isNodeSelected: IsNodeSelected;
+    private _onCreateLi?: OnCreateLi;
+    private _rtl?: boolean;
+    private _setNodeElement: (element: HTMLElement, node: Node) => void;
+    private _showEmptyFolder: boolean;
+    private _tabIndex?: number;
 
     constructor({
         autoEscape,
@@ -50,19 +50,19 @@ export default class ElementsRenderer {
         showEmptyFolder,
         tabIndex,
     }: ElementsRendererParams) {
-        this.autoEscape = autoEscape;
-        this.buttonLeft = buttonLeft;
-        this.dragAndDrop = dragAndDrop;
-        this.getTree = getTree;
-        this.htmlElement = htmlElement;
-        this.isNodeSelected = isNodeSelected;
-        this.onCreateLi = onCreateLi;
-        this.rtl = rtl;
-        this.setNodeElement = setNodeElement;
-        this.showEmptyFolder = showEmptyFolder;
-        this.tabIndex = tabIndex;
-        this.openedIconElement = this.createButtonElement(openedIcon ?? "+");
-        this.closedIconElement = this.createButtonElement(closedIcon ?? "-");
+        this._autoEscape = autoEscape;
+        this._buttonLeft = buttonLeft;
+        this._dragAndDrop = dragAndDrop;
+        this._getTree = getTree;
+        this._htmlElement = htmlElement;
+        this._isNodeSelected = isNodeSelected;
+        this._onCreateLi = onCreateLi;
+        this._rtl = rtl;
+        this._setNodeElement = setNodeElement;
+        this._showEmptyFolder = showEmptyFolder;
+        this._tabIndex = tabIndex;
+        this.openedIconElement = this._createButtonElement(openedIcon ?? "+");
+        this.closedIconElement = this._createButtonElement(closedIcon ?? "-");
     }
 
     public render(fromNode: Node | null): void {
@@ -79,29 +79,29 @@ export default class ElementsRenderer {
         }
 
         const currentLi = node.element;
-        const newLi = this.createLi(node, node.getLevel());
+        const newLi = this._createLi(node, node.getLevel());
         currentLi.replaceWith(newLi);
 
         // create children
-        this.createDomElements(newLi, node.children, false, node.getLevel() + 1);
+        this._createDomElements(newLi, node.children, false, node.getLevel() + 1);
     }
 
     public renderFromRoot(): void {
-        this.htmlElement.textContent = '';
+        this._htmlElement.textContent = '';
 
-        const tree = this.getTree();
+        const tree = this._getTree();
 
         if (tree) {
-            this.createDomElements(this.htmlElement, tree.children, true, 1);
+            this._createDomElements(this._htmlElement, tree.children, true, 1);
         }
     }
 
-    private attachNodeData(node: Node, li: HTMLElement): void {
+    private _attachNodeData(node: Node, li: HTMLElement): void {
         node.element = li;
-        this.setNodeElement(li, node);
+        this._setNodeElement(li, node);
     }
 
-    private createButtonElement(
+    private _createButtonElement(
         value: IconElement,
     ): HTMLElement | Text | undefined {
         if (typeof value === "string") {
@@ -117,32 +117,32 @@ export default class ElementsRenderer {
         }
     }
 
-    private createDomElements(
+    private _createDomElements(
         element: Element,
         children: Node[],
         isRootNode: boolean,
         level: number,
     ): void {
-        const ul = this.createUl(isRootNode);
+        const ul = this._createUl(isRootNode);
         element.appendChild(ul);
 
         for (const child of children) {
-            const li = this.createLi(child, level);
+            const li = this._createLi(child, level);
             ul.appendChild(li);
 
             if (child.hasChildren()) {
-                this.createDomElements(li, child.children, false, level + 1);
+                this._createDomElements(li, child.children, false, level + 1);
             }
         }
     }
 
-    private createFolderLi(
+    private _createFolderLi(
         node: Node,
         level: number,
         isSelected: boolean,
     ): HTMLLIElement {
-        const buttonClasses = this.getButtonClasses(node);
-        const folderClasses = this.getFolderClasses(node, isSelected);
+        const buttonClasses = this._getButtonClasses(node);
+        const folderClasses = this._getFolderClasses(node, isSelected);
 
         const iconElement = node.is_open
             ? this.openedIconElement
@@ -168,12 +168,12 @@ export default class ElementsRenderer {
             buttonLink.appendChild(iconElement.cloneNode(true));
         }
 
-        if (this.buttonLeft) {
+        if (this._buttonLeft) {
             div.appendChild(buttonLink);
         }
 
         // title span
-        const titleSpan = this.createTitleSpan(
+        const titleSpan = this._createTitleSpan(
             node.name,
             isSelected,
             true,
@@ -182,7 +182,7 @@ export default class ElementsRenderer {
         titleSpan.setAttribute("aria-expanded", getBoolString(node.is_open));
         div.appendChild(titleSpan);
 
-        if (!this.buttonLeft) {
+        if (!this._buttonLeft) {
             div.appendChild(buttonLink);
         }
 
@@ -193,26 +193,26 @@ export default class ElementsRenderer {
      * Attach it to node.element.
      * Call onCreateLi
      */
-    private createLi(node: Node, level: number): HTMLLIElement {
-        const isSelected = this.isNodeSelected(node);
+    private _createLi(node: Node, level: number): HTMLLIElement {
+        const isSelected = this._isNodeSelected(node);
 
         const mustShowFolder =
-            node.isFolder() || (node.isEmptyFolder && this.showEmptyFolder);
+            node.isFolder() || (node.isEmptyFolder && this._showEmptyFolder);
 
         const li = mustShowFolder
-            ? this.createFolderLi(node, level, isSelected)
-            : this.createNodeLi(node, level, isSelected);
+            ? this._createFolderLi(node, level, isSelected)
+            : this._createNodeLi(node, level, isSelected);
 
-        this.attachNodeData(node, li);
+        this._attachNodeData(node, li);
 
-        if (this.onCreateLi) {
-            this.onCreateLi(node, jQuery(li), isSelected);
+        if (this._onCreateLi) {
+            this._onCreateLi(node, jQuery(li), isSelected);
         }
 
         return li;
     }
 
-    private createNodeLi(
+    private _createNodeLi(
         node: Node,
         level: number,
         isSelected: boolean,
@@ -238,7 +238,7 @@ export default class ElementsRenderer {
         li.appendChild(div);
 
         // title span
-        const titleSpan = this.createTitleSpan(
+        const titleSpan = this._createTitleSpan(
             node.name,
             isSelected,
             false,
@@ -249,7 +249,7 @@ export default class ElementsRenderer {
         return li;
     }
 
-    private createTitleSpan(
+    private _createTitleSpan(
         nodeName: string,
         isSelected: boolean,
         isFolder: boolean,
@@ -263,21 +263,21 @@ export default class ElementsRenderer {
             classes += " jqtree-title-folder";
         }
 
-        classes += ` jqtree-title-button-${this.buttonLeft ? "left" : "right"}`;
+        classes += ` jqtree-title-button-${this._buttonLeft ? "left" : "right"}`;
 
         titleSpan.className = classes;
 
         if (isSelected) {
-            const tabIndex = this.tabIndex;
+            const tabIndex = this._tabIndex;
 
             if (tabIndex !== undefined) {
                 titleSpan.setAttribute("tabindex", `${tabIndex}`);
             }
         }
 
-        this.setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
+        this._setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
 
-        if (this.autoEscape) {
+        if (this._autoEscape) {
             titleSpan.textContent = nodeName;
         } else {
             titleSpan.innerHTML = nodeName;
@@ -286,7 +286,7 @@ export default class ElementsRenderer {
         return titleSpan;
     }
 
-    private createUl(isRootNode: boolean): HTMLUListElement {
+    private _createUl(isRootNode: boolean): HTMLUListElement {
         let classString;
         let role;
 
@@ -297,12 +297,12 @@ export default class ElementsRenderer {
             classString = "jqtree-tree";
             role = "tree";
 
-            if (this.rtl) {
+            if (this._rtl) {
                 classString += " jqtree-rtl";
             }
         }
 
-        if (this.dragAndDrop) {
+        if (this._dragAndDrop) {
             classString += " jqtree-dnd";
         }
 
@@ -314,14 +314,14 @@ export default class ElementsRenderer {
         return ul;
     }
 
-    private getButtonClasses(node: Node): string {
+    private _getButtonClasses(node: Node): string {
         const classes = ["jqtree-toggler", "jqtree_common"];
 
         if (!node.is_open) {
             classes.push("jqtree-closed");
         }
 
-        if (this.buttonLeft) {
+        if (this._buttonLeft) {
             classes.push("jqtree-toggler-left");
         } else {
             classes.push("jqtree-toggler-right");
@@ -330,7 +330,7 @@ export default class ElementsRenderer {
         return classes.join(" ");
     }
 
-    private getFolderClasses(node: Node, isSelected: boolean): string {
+    private _getFolderClasses(node: Node, isSelected: boolean): string {
         const classes = ["jqtree-folder"];
 
         if (!node.is_open) {
@@ -348,7 +348,7 @@ export default class ElementsRenderer {
         return classes.join(" ");
     }
 
-    private setTreeItemAriaAttributes(
+    private _setTreeItemAriaAttributes(
         element: HTMLElement,
         name: string,
         level: number,

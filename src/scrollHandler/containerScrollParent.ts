@@ -8,8 +8,8 @@ import { ScrollParent } from "./scrollParent";
 
 
 export default class ContainerScrollParent extends ScrollParent {
-    private scrollParentBottom?: number;
-    private scrollParentTop?: number;
+    private _scrollParentBottom?: number;
+    private _scrollParentTop?: number;
 
     public stopScrolling() {
         super.stopScrolling();
@@ -41,31 +41,31 @@ export default class ContainerScrollParent extends ScrollParent {
     protected getNewVerticalScrollDirection(
         pageY: number,
     ): undefined | VerticalScrollDirection {
-        if (pageY < this.getScrollParentTop()) {
+        if (pageY < this._getScrollParentTop()) {
             return "top";
         }
 
-        if (pageY > this.getScrollParentBottom()) {
+        if (pageY > this._getScrollParentBottom()) {
             return "bottom";
         }
 
         return undefined;
     }
 
-    private getScrollParentBottom() {
-        if (this.scrollParentBottom == null) {
+    private _getScrollParentBottom() {
+        if (this._scrollParentBottom == null) {
             const containerHeight =
                 this.container.getBoundingClientRect().height;
-            this.scrollParentBottom =
-                this.getScrollParentTop() + containerHeight;
+            this._scrollParentBottom =
+                this._getScrollParentTop() + containerHeight;
         }
 
-        return this.scrollParentBottom;
+        return this._scrollParentBottom;
     }
 
-    private getScrollParentTop() {
-        this.scrollParentTop ??= getOffsetTop(this.container);
+    private _getScrollParentTop() {
+        this._scrollParentTop ??= getOffsetTop(this.container);
 
-        return this.scrollParentTop;
+        return this._scrollParentTop;
     }
 }

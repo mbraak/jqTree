@@ -12,28 +12,28 @@ const isAbsoluteUrl = (inputUrl: string) => {
 const LOCALHOST = "http://localhost";
 
 class RequestUrl {
-  private isAbsolute: boolean;
-  private url: URL;
+  private _isAbsolute: boolean;
+  private _url: URL;
 
   constructor(inputUrl: string) {
     if (isAbsoluteUrl(inputUrl)) {
-      this.url = new URL(inputUrl);
-      this.isAbsolute = true;
+      this._url = new URL(inputUrl);
+      this._isAbsolute = true;
     } else {
-      this.url = new URL(inputUrl, LOCALHOST);
-      this.isAbsolute = false;
+      this._url = new URL(inputUrl, LOCALHOST);
+      this._isAbsolute = false;
     }
   }
 
   setSearchParam(key: string, value: string) {
-    this.url.searchParams.set(key, value);
+    this._url.searchParams.set(key, value);
   }
 
   toString() {
-    if (this.isAbsolute) {
-      return this.url.href;
+    if (this._isAbsolute) {
+      return this._url.href;
     } else {
-      return this.url.href.slice(LOCALHOST.length);
+      return this._url.href.slice(LOCALHOST.length);
     }
   }
 }

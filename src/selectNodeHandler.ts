@@ -6,27 +6,27 @@ interface SelectNodeHandlerParameters {
 }
 
 export default class SelectNodeHandler {
-    private getNodeById: GetNodeById;
-    private selectedNodes: Set<NodeId>;
-    private selectedSingleNode: Node | null;
+    private _getNodeById: GetNodeById;
+    private _selectedNodes: Set<NodeId>;
+    private _selectedSingleNode: Node | null;
 
     constructor({ getNodeById }: SelectNodeHandlerParameters) {
-        this.getNodeById = getNodeById;
-        this.selectedNodes = new Set<NodeId>();
+        this._getNodeById = getNodeById;
+        this._selectedNodes = new Set<NodeId>();
         this.clear();
     }
 
     public addToSelection(node: Node): void {
         if (node.id != null) {
-            this.selectedNodes.add(node.id);
+            this._selectedNodes.add(node.id);
         } else {
-            this.selectedSingleNode = node;
+            this._selectedSingleNode = node;
         }
     }
 
     public clear(): void {
-        this.selectedNodes.clear();
-        this.selectedSingleNode = null;
+        this._selectedNodes.clear();
+        this._selectedSingleNode = null;
     }
 
     public getSelectedNode(): false | Node {
@@ -40,13 +40,13 @@ export default class SelectNodeHandler {
     }
 
     public getSelectedNodes(): Node[] {
-        if (this.selectedSingleNode) {
-            return [this.selectedSingleNode];
+        if (this._selectedSingleNode) {
+            return [this._selectedSingleNode];
         } else {
             const selectedNodes: Node[] = [];
 
-            this.selectedNodes.forEach((id) => {
-                const node = this.getNodeById(id);
+            this._selectedNodes.forEach((id) => {
+                const node = this._getNodeById(id);
                 if (node) {
                     selectedNodes.push(node);
                 }
@@ -57,17 +57,17 @@ export default class SelectNodeHandler {
     }
 
     public getSelectedNodesUnder(parent: Node): Node[] {
-        if (this.selectedSingleNode) {
-            if (parent.isParentOf(this.selectedSingleNode)) {
-                return [this.selectedSingleNode];
+        if (this._selectedSingleNode) {
+            if (parent.isParentOf(this._selectedSingleNode)) {
+                return [this._selectedSingleNode];
             } else {
                 return [];
             }
         } else {
             const selectedNodes: Node[] = [];
 
-            this.selectedNodes.forEach((id) => {
-                const node = this.getNodeById(id);
+            this._selectedNodes.forEach((id) => {
+                const node = this._getNodeById(id);
                 if (node && parent.isParentOf(node)) {
                     selectedNodes.push(node);
                 }
@@ -79,9 +79,9 @@ export default class SelectNodeHandler {
 
     public isNodeSelected(node: Node): boolean {
         if (node.id != null) {
-            return this.selectedNodes.has(node.id);
-        } else if (this.selectedSingleNode) {
-            return this.selectedSingleNode.element === node.element;
+            return this._selectedNodes.has(node.id);
+        } else if (this._selectedSingleNode) {
+            return this._selectedSingleNode.element === node.element;
         } else {
             return false;
         }
@@ -90,18 +90,18 @@ export default class SelectNodeHandler {
     public removeFromSelection(node: Node, includeChildren = false): void {
         if (node.id == null) {
             if (
-                this.selectedSingleNode &&
-                node.element === this.selectedSingleNode.element
+                this._selectedSingleNode &&
+                node.element === this._selectedSingleNode.element
             ) {
-                this.selectedSingleNode = null;
+                this._selectedSingleNode = null;
             }
         } else {
-            this.selectedNodes.delete(node.id);
+            this._selectedNodes.delete(node.id);
 
             if (includeChildren) {
                 node.iterate(() => {
                     if (node.id != null) {
-                        this.selectedNodes.delete(node.id);
+                        this._selectedNodes.delete(node.id);
                     }
                     return true;
                 });

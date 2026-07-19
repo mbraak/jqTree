@@ -17,14 +17,14 @@ interface KeyHandlerParams {
 }
 
 export default class KeyHandler {
-    private closeNode: CloseNode;
-    private getSelectedNode: GetSelectedNode;
+    private _closeNode: CloseNode;
+    private _getSelectedNode: GetSelectedNode;
 
-    private isFocusOnTree: IsFocusOnTree;
+    private _isFocusOnTree: IsFocusOnTree;
 
-    private keyboardSupport: boolean;
-    private openNode: OpenNode;
-    private originalSelectNode: SelectNode;
+    private _keyboardSupport: boolean;
+    private _openNode: OpenNode;
+    private _originalSelectNode: SelectNode;
     constructor({
         closeNode,
         getSelectedNode,
@@ -33,44 +33,44 @@ export default class KeyHandler {
         openNode,
         selectNode,
     }: KeyHandlerParams) {
-        this.closeNode = closeNode;
-        this.getSelectedNode = getSelectedNode;
-        this.isFocusOnTree = isFocusOnTree;
-        this.keyboardSupport = keyboardSupport;
-        this.openNode = openNode;
-        this.originalSelectNode = selectNode;
+        this._closeNode = closeNode;
+        this._getSelectedNode = getSelectedNode;
+        this._isFocusOnTree = isFocusOnTree;
+        this._keyboardSupport = keyboardSupport;
+        this._openNode = openNode;
+        this._originalSelectNode = selectNode;
 
         if (keyboardSupport) {
-            document.addEventListener("keydown", this.handleKeyDown);
+            document.addEventListener("keydown", this._handleKeyDown);
         }
     }
 
     public deinit(): void {
-        if (this.keyboardSupport) {
-            document.removeEventListener("keydown", this.handleKeyDown);
+        if (this._keyboardSupport) {
+            document.removeEventListener("keydown", this._handleKeyDown);
         }
     }
 
     public moveDown(selectedNode: Node): boolean {
-        return this.selectNode(selectedNode.getNextVisibleNode());
+        return this._selectNode(selectedNode.getNextVisibleNode());
     }
 
     public moveUp(selectedNode: Node): boolean {
-        return this.selectNode(selectedNode.getPreviousVisibleNode());
+        return this._selectNode(selectedNode.getPreviousVisibleNode());
     }
 
-    private canHandleKeyboard(): boolean {
-        return this.keyboardSupport && this.isFocusOnTree();
+    private _canHandleKeyboard(): boolean {
+        return this._keyboardSupport && this._isFocusOnTree();
     }
 
-    private handleKeyDown = (e: KeyboardEvent): void => {
-        if (!this.canHandleKeyboard()) {
+    private _handleKeyDown = (e: KeyboardEvent): void => {
+        if (!this._canHandleKeyboard()) {
             return;
         }
 
         let isKeyHandled = false;
 
-        const selectedNode = this.getSelectedNode();
+        const selectedNode = this._getSelectedNode();
         if (selectedNode) {
             switch (e.key) {
                 case "ArrowDown":
@@ -78,11 +78,11 @@ export default class KeyHandler {
                     break;
 
                 case "ArrowLeft":
-                    isKeyHandled = this.moveLeft(selectedNode);
+                    isKeyHandled = this._moveLeft(selectedNode);
                     break;
 
                 case "ArrowRight":
-                    isKeyHandled = this.moveRight(selectedNode);
+                    isKeyHandled = this._moveRight(selectedNode);
                     break;
 
                 case "ArrowUp":
@@ -96,28 +96,28 @@ export default class KeyHandler {
         }
     };
 
-    private moveLeft(selectedNode: Node): boolean {
+    private _moveLeft(selectedNode: Node): boolean {
         if (selectedNode.isFolder() && selectedNode.is_open) {
             // Left on an open node closes the node
-            this.closeNode(selectedNode);
+            this._closeNode(selectedNode);
             return true;
         } else {
             // Left on a closed or end node moves focus to the node's parent
-            return this.selectNode(selectedNode.getParent());
+            return this._selectNode(selectedNode.getParent());
         }
     }
 
-    private moveRight(selectedNode: Node): boolean {
+    private _moveRight(selectedNode: Node): boolean {
         if (!selectedNode.isFolder()) {
             return false;
         } else {
             // folder node
             if (selectedNode.is_open) {
                 // Right moves to the first child of an open node
-                return this.selectNode(selectedNode.getNextVisibleNode());
+                return this._selectNode(selectedNode.getNextVisibleNode());
             } else {
                 // Right expands a closed node
-                this.openNode(selectedNode);
+                this._openNode(selectedNode);
                 return true;
             }
         }
@@ -127,11 +127,11 @@ export default class KeyHandler {
      * Don't do anything if the node is null.
      * Result: a different node was selected.
      */
-    private selectNode(node: Node | null): boolean {
+    private _selectNode(node: Node | null): boolean {
         if (!node) {
             return false;
         } else {
-            this.originalSelectNode(node);
+            this._originalSelectNode(node);
 
             return true;
         }
