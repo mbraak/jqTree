@@ -7,9 +7,9 @@ interface DragElementParams {
 }
 
 class DragElement {
-    private element: HTMLElement;
-    private offsetX: number;
-    private offsetY: number;
+    private _element: HTMLElement;
+    private _offsetX: number;
+    private _offsetY: number;
 
     constructor({
         autoEscape,
@@ -18,24 +18,24 @@ class DragElement {
         offsetY,
         treeElement,
     }: DragElementParams) {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
+        this._offsetX = offsetX;
+        this._offsetY = offsetY;
 
-        this.element = this.createElement(nodeName, autoEscape);
+        this._element = this._createElement(nodeName, autoEscape);
 
-        treeElement.appendChild(this.element);
+        treeElement.appendChild(this._element);
     }
 
     public move(pageX: number, pageY: number): void {
-        this.element.style.left = `${pageX - this.offsetX}px`;
-        this.element.style.top = `${pageY - this.offsetY}px`;
+        this._element.style.left = `${pageX - this._offsetX}px`;
+        this._element.style.top = `${pageY - this._offsetY}px`;
     }
 
     public remove(): void {
-        this.element.remove();
+        this._element.remove();
     }
 
-    private createElement(nodeName: string, autoEscape: boolean) {
+    private _createElement(nodeName: string, autoEscape: boolean) {
         const element = document.createElement("span");
         element.classList.add("jqtree-title", "jqtree-dragging");
 
