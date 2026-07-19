@@ -1,13 +1,13 @@
 import type { DropHint } from "../dragAndDropHandler/types";
 
 class BorderDropHint implements DropHint {
-    private hint?: HTMLElement;
+    private _hint?: HTMLElement;
 
     constructor(element: HTMLElement, scrollLeft: number) {
         const div = element.querySelector(":scope > .jqtree-element");
 
         if (!div) {
-            this.hint = undefined;
+            this._hint = undefined;
             return;
         }
 
@@ -19,13 +19,13 @@ class BorderDropHint implements DropHint {
         hint.style.width = `${width}px`;
         hint.style.height = `${height}px`;
 
-        this.hint = hint;
+        this._hint = hint;
 
-        div.append(this.hint);
+        div.append(this._hint);
     }
 
     public remove(): void {
-        this.hint?.remove();
+        this._hint?.remove();
     }
 }
 

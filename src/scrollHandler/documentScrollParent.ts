@@ -12,18 +12,18 @@ interface Params {
 }
 
 export default class DocumentScrollParent extends ScrollParent {
-    private documentScrollHeight?: number;
-    private documentScrollWidth?: number;
-    private treeElement: HTMLElement;
+    private _documentScrollHeight?: number;
+    private _documentScrollWidth?: number;
+    private _treeElement: HTMLElement;
 
     constructor({ refreshHitAreas, treeElement }: Params) {
         super({ container: document.documentElement, refreshHitAreas });
 
-        this.treeElement = treeElement;
+        this._treeElement = treeElement;
     }
 
     public scrollToY(top: number): void {
-        const treeTop = getOffsetTop(this.treeElement);
+        const treeTop = getOffsetTop(this._treeElement);
 
         super.scrollToY(top + treeTop);
     }
@@ -31,8 +31,8 @@ export default class DocumentScrollParent extends ScrollParent {
     public stopScrolling() {
         super.stopScrolling();
 
-        this.documentScrollHeight = undefined;
-        this.documentScrollWidth = undefined;
+        this._documentScrollHeight = undefined;
+        this._documentScrollWidth = undefined;
     }
 
     protected getNewHorizontalScrollDirection(
@@ -44,7 +44,7 @@ export default class DocumentScrollParent extends ScrollParent {
         const isNearRightEdge = pageX > windowWidth - 20;
         const isNearLeftEdge = pageX - scrollLeft < 20;
 
-        if (isNearRightEdge && this.canScrollRight()) {
+        if (isNearRightEdge && this._canScrollRight()) {
             return "right";
         }
 
@@ -67,38 +67,38 @@ export default class DocumentScrollParent extends ScrollParent {
 
         const windowHeight = window.innerHeight;
 
-        if (windowHeight - (pageY - scrollTop) < 20 && this.canScrollDown()) {
+        if (windowHeight - (pageY - scrollTop) < 20 && this._canScrollDown()) {
             return "bottom";
         }
 
         return undefined;
     }
 
-    private canScrollDown() {
+    private _canScrollDown() {
         return (
             this.container.scrollTop + this.container.clientHeight <
-            this.getDocumentScrollHeight()
+            this._getDocumentScrollHeight()
         );
     }
 
-    private canScrollRight() {
+    private _canScrollRight() {
         return (
             this.container.scrollLeft + this.container.clientWidth <
-            this.getDocumentScrollWidth()
+            this._getDocumentScrollWidth()
         );
     }
 
-    private getDocumentScrollHeight() {
+    private _getDocumentScrollHeight() {
         // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
-        this.documentScrollHeight ??= this.container.scrollHeight;
+        this._documentScrollHeight ??= this.container.scrollHeight;
 
-        return this.documentScrollHeight;
+        return this._documentScrollHeight;
     }
 
-    private getDocumentScrollWidth() {
+    private _getDocumentScrollWidth() {
         // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
-        this.documentScrollWidth ??= this.container.scrollWidth;
+        this._documentScrollWidth ??= this.container.scrollWidth;
 
-        return this.documentScrollWidth;
+        return this._documentScrollWidth;
     }
 }
