@@ -1,7 +1,9 @@
+import type { AnimationSpeed } from "../animation";
 import type { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 import type { Position } from "../node";
 import type { NodeElementParams } from "./index";
 
+import { slideDown, slideUp } from "../animation";
 import NodeElement from "./index";
 
 interface FolderElementParams extends NodeElementParams {
@@ -36,7 +38,7 @@ class FolderElement extends NodeElement {
         this.triggerEvent = triggerEvent;
     }
 
-    public close(slide: boolean, animationSpeed: JQuery.Duration): void {
+    public close(slide: boolean, animationSpeed: AnimationSpeed): void {
         if (!this.node.is_open) {
             return;
         }
@@ -68,7 +70,7 @@ class FolderElement extends NodeElement {
         const ul = this.getUl();
 
         if (slide) {
-            jQuery(ul).slideUp(animationSpeed, doClose);
+            slideUp(ul, animationSpeed, doClose);
         } else {
             ul.style.display = "none";
             doClose();
@@ -78,7 +80,7 @@ class FolderElement extends NodeElement {
     public open(
         onFinished: OnFinishOpenNode | undefined,
         slide: boolean,
-        animationSpeed: JQuery.Duration,
+        animationSpeed: AnimationSpeed,
     ): void {
         if (this.node.is_open) {
             return;
@@ -115,7 +117,7 @@ class FolderElement extends NodeElement {
         const ul = this.getUl();
 
         if (slide) {
-            jQuery(ul).slideDown(animationSpeed, doOpen);
+            slideDown(ul, animationSpeed, doOpen);
         } else {
             ul.style.display = "block";
             doOpen();
