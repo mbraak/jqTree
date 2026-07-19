@@ -4,8 +4,6 @@ import { mockAnimationsApi } from "jsdom-testing-mocks";
 
 import "./jqTreeMatchers";
 
-mockAnimationsApi();
-
 declare global {
     interface Window {
         $: JQueryStatic;
@@ -13,6 +11,8 @@ declare global {
         TransformStream: any;
     }
 }
+
+mockAnimationsApi();
 
 window.$ = jQuery;
 window.jQuery = jQuery;
