@@ -1960,6 +1960,43 @@ var jqtree = (function (exports) {
       }
     }
 
+    const getAnimationDuration = duration => {
+      if (typeof duration === "number") {
+        return duration;
+      }
+      return duration === "slow" ? 600 : 200;
+    };
+    const slideDown = (element, animationSpeed, onFinished) => {
+      element.style.display = "block";
+      const animation = element.animate([{
+        height: "0",
+        overflow: "hidden"
+      }, {
+        height: `${element.scrollHeight}px`,
+        overflow: "hidden"
+      }], {
+        duration: getAnimationDuration(animationSpeed)
+      });
+      animation.onfinish = () => {
+        onFinished();
+      };
+    };
+    const slideUp = (element, animationSpeed, onFinished) => {
+      const animation = element.animate([{
+        height: `${element.scrollHeight}px`,
+        overflow: "hidden"
+      }, {
+        height: "0",
+        overflow: "hidden"
+      }], {
+        duration: getAnimationDuration(animationSpeed)
+      });
+      animation.onfinish = () => {
+        element.style.display = "none";
+        onFinished();
+      };
+    };
+
     class FolderElement extends NodeElement {
       closedIconElement;
       openedIconElement;
@@ -2006,7 +2043,7 @@ var jqtree = (function (exports) {
         };
         const ul = this.getUl();
         if (slide) {
-          jQuery(ul).slideUp(animationSpeed, doClose);
+          slideUp(ul, animationSpeed, doClose);
         } else {
           ul.style.display = "none";
           doClose();
@@ -2038,7 +2075,7 @@ var jqtree = (function (exports) {
         };
         const ul = this.getUl();
         if (slide) {
-          jQuery(ul).slideDown(animationSpeed, doOpen);
+          slideDown(ul, animationSpeed, doOpen);
         } else {
           ul.style.display = "block";
           doOpen();

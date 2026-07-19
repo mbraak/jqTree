@@ -132,22 +132,22 @@ describe("close", () => {
         expect(button.children[0]).not.toBe(closedIconElement);
     });
 
-    it("closes the node with animation", () => {
-        const slideUp = vi
-            .spyOn(jQuery.fn, "slideUp")
-            .mockImplementation(function (this: JQuery, ...callArgs: unknown[]) {
-                (callArgs[1] as () => void)();
-                return this;
-            });
-
+    it("closes the node with animation", async () => {
         const { element, folderElement } = createFolderElement({ isOpen: true });
+
+        const ul = getUl(element);
+        const animate = vi.spyOn(ul, "animate");
 
         folderElement.close(true, 123);
 
-        expect(slideUp).toHaveBeenCalledExactlyOnceWith(123, expect.any(Function));
-        expect(element).toBeClosedTreeNode();
+        expect(animate).toHaveBeenCalledExactlyOnceWith(expect.any(Array), {
+            duration: 123,
+        });
 
-        slideUp.mockRestore();
+        await ul.getAnimations()[0]?.finished;
+
+        expect(element).toBeClosedTreeNode();
+        expect(ul).not.toBeVisible();
     });
 });
 
@@ -221,27 +221,24 @@ describe("open", () => {
         expect(button.children[0]).not.toBe(openedIconElement);
     });
 
-    it("opens the node with animation", () => {
-        const slideDown = vi
-            .spyOn(jQuery.fn, "slideDown")
-            .mockImplementation(function (this: JQuery, ...callArgs: unknown[]) {
-                (callArgs[1] as () => void)();
-                return this;
-            });
-
+    it("opens the node with animation", async () => {
         const { element, folderElement } = createFolderElement({
             isOpen: false,
         });
 
+        const ul = getUl(element);
+        const animate = vi.spyOn(ul, "animate");
+
         folderElement.open(undefined, true, 456);
 
-        expect(slideDown).toHaveBeenCalledExactlyOnceWith(
-            456,
-            expect.any(Function),
-        );
-        expect(element).toBeOpenTreeNode();
+        expect(animate).toHaveBeenCalledExactlyOnceWith(expect.any(Array), {
+            duration: 456,
+        });
+        expect(ul).toBeVisible();
 
-        slideDown.mockRestore();
+        await ul.getAnimations()[0]?.finished;
+
+        expect(element).toBeOpenTreeNode();
     });
 });
 
