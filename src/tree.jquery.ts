@@ -71,7 +71,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private dataLoader: DataLoader;
     private dndHandler: DragAndDropHandler;
     private element: JQuery;
-
+    private htmlElement: HTMLElement;
     private isInitialized: boolean;
     private keyHandler: KeyHandler;
     private mouseHandler: MouseHandler;
@@ -173,7 +173,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public deinit(): void {
-        this.element.empty();
+        this.htmlElement.textContent = "";
         this.element.off();
 
         this.keyHandler.deinit();
@@ -247,6 +247,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         super.init();
 
         this.element = this.$el;
+        this.htmlElement = this.element.get(0) as HTMLElement;
         this.isInitialized = false;
 
         this.options.dataUrl ??= this.element.data("url");
@@ -455,7 +456,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         const top =
             getOffsetTop(node.element) -
-            getOffsetTop(this.$el.get(0) as HTMLElement);
+            getOffsetTop(this.htmlElement);
 
         this.scrollHandler.scrollToY(top);
 
@@ -582,7 +583,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const refreshElements = this.refreshElements.bind(this);
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
-        const treeElement = this.element.get(0) as HTMLElement;
+        const treeElement = this.htmlElement;
         const triggerEvent = this.triggerEvent.bind(this);
 
         const selectNodeHandler = new SelectNodeHandler({
@@ -714,7 +715,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         );
         const openedIconElement = this.renderer.openedIconElement;
         const tabIndex = this.options.tabIndex;
-        const treeElement = this.element.get(0) as HTMLElement;
         const triggerEvent = this.triggerEvent.bind(this);
 
         return new FolderElement({
@@ -723,7 +723,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             node,
             openedIconElement,
             tabIndex,
-            treeElement,
+            treeElement: this.htmlElement,
             triggerEvent,
         });
     }
@@ -733,13 +733,12 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             this.scrollHandler,
         );
         const tabIndex = this.options.tabIndex;
-        const treeElement = this.element.get(0) as HTMLElement;
 
         return new NodeElement({
             getScrollLeft,
             node,
             tabIndex,
-            treeElement,
+            treeElement: this.htmlElement
         });
     }
 
