@@ -39,6 +39,11 @@ const plugins = [resolvePlugin, babelPlugin];
 
 if (!debugBuild) {
     const terserPlugin = terser({
+        mangle: {
+            properties: {
+                regex: /^_/,
+            },
+        },
         output: {
             comments: /@license/,
         },
