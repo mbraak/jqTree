@@ -30,15 +30,20 @@ const createFolderElement = ({
     document.body.append(treeElement);
 
     const renderer = new ElementsRenderer({
-        $element: jQuery(treeElement),
         autoEscape: true,
         buttonLeft: false,
         dragAndDrop: false,
         getTree: () => tree,
+        htmlElement: treeElement,
         isNodeSelected: () => false,
         showEmptyFolder: false,
     });
     renderer.renderFromRoot();
+
+    if (!isOpen) {
+        const ul = getUl(folderNode.element as HTMLElement);
+        ul.style.display = "none";
+    }
 
     const triggerEvent = vi.fn();
 
