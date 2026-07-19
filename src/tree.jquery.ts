@@ -582,7 +582,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const refreshElements = this.refreshElements.bind(this);
         const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
-        const $treeElement = this.element;
         const treeElement = this.element.get(0) as HTMLElement;
         const triggerEvent = this.triggerEvent.bind(this);
 
@@ -658,12 +657,12 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         });
 
         const renderer = new ElementsRenderer({
-            $element: $treeElement,
             autoEscape,
             buttonLeft,
             closedIcon,
             dragAndDrop,
             getTree,
+            htmlElement: treeElement,
             isNodeSelected,
             onCreateLi,
             openedIcon,
