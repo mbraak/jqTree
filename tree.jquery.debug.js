@@ -691,8 +691,8 @@ var jqtree = (function (exports) {
         this.autoEscape = autoEscape;
         this.buttonLeft = buttonLeft;
         this.dragAndDrop = dragAndDrop;
-        this.htmlElement = htmlElement;
         this.getTree = getTree;
+        this.htmlElement = htmlElement;
         this.isNodeSelected = isNodeSelected;
         this.onCreateLi = onCreateLi;
         this.rtl = rtl;
@@ -713,18 +713,12 @@ var jqtree = (function (exports) {
         if (!node.element) {
           return;
         }
-
-        // remember current li
-        const previousLi = node.element;
-
-        // create element
-        const li = this.createLi(node, node.getLevel());
-
-        // replace previous li in the dom
-        previousLi.replaceWith(li);
+        const currentLi = node.element;
+        const newLi = this.createLi(node, node.getLevel());
+        currentLi.replaceWith(newLi);
 
         // create children
-        this.createDomElements(li, node.children, false, node.getLevel() + 1);
+        this.createDomElements(newLi, node.children, false, node.getLevel() + 1);
       }
       renderFromRoot() {
         this.htmlElement.textContent = '';
@@ -1481,6 +1475,7 @@ var jqtree = (function (exports) {
         ...defaults,
         ...inputOptions
       };
+      options.dataUrl ??= htmlElement.dataset.url;
       options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
       options.closedIcon ??= getDefaultClosedIcon(options);
       return options;
@@ -1496,7 +1491,13 @@ var jqtree = (function (exports) {
     };
     const getRtlOptionFromHTMLElement = htmlElement => {
       const dataRtl = htmlElement.dataset.rtl;
-      return dataRtl !== undefined;
+      if (dataRtl == "") {
+        return true;
+      } else if (dataRtl === "false") {
+        return false;
+      } else {
+        return Boolean(dataRtl);
+      }
     };
 
     // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
@@ -2125,10 +2126,10 @@ var jqtree = (function (exports) {
             node: this.node
           });
         };
+        const ul = this.getUl();
         if (slide) {
           slideUp(this.getUl(), animationSpeed, doClose);
         } else {
-          const ul = this.getUl();
           ul.style.display = "none";
           doClose();
         }
@@ -2157,10 +2158,10 @@ var jqtree = (function (exports) {
             node: this.node
           });
         };
+        const ul = this.getUl();
         if (slide) {
           slideDown(this.getUl(), animationSpeed, doOpen);
         } else {
-          const ul = this.getUl();
           ul.style.display = "block";
           doOpen();
         }
@@ -2870,7 +2871,7 @@ var jqtree = (function (exports) {
         * Add a 'selected_node' query parameter if a node is selected.
       */
       createRequestUrl(node) {
-        const dataUrl = this.options.dataUrl ?? this.htmlElement.dataset.url;
+        const dataUrl = this.options.dataUrl;
         let url;
         if (typeof dataUrl === "function") {
           url = dataUrl(node);

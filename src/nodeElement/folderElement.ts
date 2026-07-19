@@ -67,10 +67,11 @@ class FolderElement extends NodeElement {
             });
         };
 
+        const ul = this.getUl();
+
         if (slide) {
             slideUp(this.getUl(), animationSpeed, doClose);
         } else {
-            const ul = this.getUl();
             ul.style.display = "none";
             doClose();
         }
@@ -113,10 +114,11 @@ class FolderElement extends NodeElement {
             });
         };
 
+        const ul = this.getUl();
+
         if (slide) {
             slideDown(this.getUl(), animationSpeed, doOpen);
         } else {
-            const ul = this.getUl();
             ul.style.display = "block";
             doOpen();
         }

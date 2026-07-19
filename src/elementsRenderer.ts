@@ -53,8 +53,8 @@ export default class ElementsRenderer {
         this.autoEscape = autoEscape;
         this.buttonLeft = buttonLeft;
         this.dragAndDrop = dragAndDrop;
-        this.htmlElement = htmlElement;
         this.getTree = getTree;
+        this.htmlElement = htmlElement;
         this.isNodeSelected = isNodeSelected;
         this.onCreateLi = onCreateLi;
         this.rtl = rtl;
@@ -78,17 +78,12 @@ export default class ElementsRenderer {
             return;
         }
 
-        // remember current li
-        const previousLi = node.element;
-
-        // create element
-        const li = this.createLi(node, node.getLevel());
-
-        // replace previous li in the dom
-        previousLi.replaceWith(li);
+        const currentLi = node.element;
+        const newLi = this.createLi(node, node.getLevel());
+        currentLi.replaceWith(newLi);
 
         // create children
-        this.createDomElements(li, node.children, false, node.getLevel() + 1);
+        this.createDomElements(newLi, node.children, false, node.getLevel() + 1);
     }
 
     public renderFromRoot(): void {

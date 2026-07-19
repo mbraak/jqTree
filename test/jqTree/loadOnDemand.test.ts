@@ -101,8 +101,6 @@ describe("load on demand", () => {
             const toggler = togglerLink(given.node.element as HTMLElement);
             await userEvent.click(toggler);
 
-            await screen.findByText("loaded-on-demand");
-
             await waitFor(() => {
                 expect(given.$tree).toHaveTreeStructure([
                     expect.objectContaining({
@@ -116,6 +114,8 @@ describe("load on demand", () => {
                     }),
                 ]);
             });
+
+            await screen.findByText("loaded-on-demand");
         });
 
         context("when the node is selected", () => {

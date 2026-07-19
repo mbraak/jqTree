@@ -71,11 +71,11 @@ describe("mouse", () => {
 
         await userEvent.click(togglerLink(node.element as HTMLElement));
 
-        expect(node.element).not.toBeSelectedTreeNode();
-
         await waitFor(() => {
             expect(node.element).toBeOpenTreeNode();
         });
+
+        expect(node.element).not.toBeSelectedTreeNode();
     });
 
     it("keeps it selected when a selected node is opened", async () => {
@@ -90,10 +90,10 @@ describe("mouse", () => {
 
         await userEvent.click(togglerLink(node.element as HTMLElement));
 
-        expect(node.element).toBeSelectedTreeNode();
-
         await waitFor(() => {
             expect(node.element).toBeOpenTreeNode();
         });
+
+        expect(node.element).toBeSelectedTreeNode();
     });
 });
