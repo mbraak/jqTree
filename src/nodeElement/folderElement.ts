@@ -65,10 +65,12 @@ class FolderElement extends NodeElement {
             });
         };
 
+        const ul = this.getUl();
+
         if (slide) {
-            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
+            jQuery(ul).slideUp(animationSpeed, doClose);
         } else {
-            jQuery(this.getUl()).hide();
+            ul.style.display = "none";
             doClose();
         }
     }
@@ -110,10 +112,12 @@ class FolderElement extends NodeElement {
             });
         };
 
+        const ul = this.getUl();
+
         if (slide) {
-            jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
+            jQuery(ul).slideDown(animationSpeed, doOpen);
         } else {
-            jQuery(this.getUl()).show();
+            ul.style.display = "block";
             doOpen();
         }
     }
