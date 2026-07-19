@@ -45,12 +45,12 @@ export default class HtmlTree {
   public selectNodeHandler: SelectNodeHandler;
   public tree: Node;
 
-  private triggerEventProvider: TriggerEventProvider;
+  private _triggerEventProvider: TriggerEventProvider;
 
   constructor({ htmlElement, options, overrideTriggerEventProvider }: HtmlTreeParams) {
     this.htmlElement = htmlElement;
     this.options = setDefaultOptions(htmlElement, options);
-    this.triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
+    this._triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
 
     this.isInitialized = false;
     this.tree = new Node({}, true);
@@ -330,7 +330,7 @@ export default class HtmlTree {
   }
 
   public init(): void {
-    this.connectHandlers();
+    this._connectHandlers();
 
     this.initData();
   }
@@ -872,7 +872,7 @@ export default class HtmlTree {
   }
 
   public triggerEvent(eventName: string, values?: Record<string, unknown>): boolean {
-    return this.triggerEventProvider(this.htmlElement, eventName, values)
+    return this._triggerEventProvider(this.htmlElement, eventName, values)
   }
 
   // Update the data of a node in the tree.
@@ -905,7 +905,7 @@ export default class HtmlTree {
     this.refreshElements(node);
   }
 
-  private connectHandlers() {
+  private _connectHandlers() {
     const {
       autoEscape,
       buttonLeft,
