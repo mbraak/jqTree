@@ -14,12 +14,12 @@ interface DataLoaderParams {
 }
 
 export default class DataLoader {
-    private dataFilter?: DataFilter;
-    private loadData: LoadData;
-    private onLoadFailed?: OnLoadFailed;
-    private onLoading?: OnLoading;
-    private treeElement: HTMLElement;
-    private triggerEvent: TriggerEvent;
+    private _dataFilter?: DataFilter;
+    private _loadData: LoadData;
+    private _onLoadFailed?: OnLoadFailed;
+    private _onLoading?: OnLoading;
+    private _treeElement: HTMLElement;
+    private _triggerEvent: TriggerEvent;
 
     constructor({
         dataFilter,
@@ -29,12 +29,12 @@ export default class DataLoader {
         treeElement,
         triggerEvent,
     }: DataLoaderParams) {
-        this.dataFilter = dataFilter;
-        this.loadData = loadData;
-        this.onLoadFailed = onLoadFailed;
-        this.onLoading = onLoading;
-        this.treeElement = treeElement;
-        this.triggerEvent = triggerEvent;
+        this._dataFilter = dataFilter;
+        this._loadData = loadData;
+        this._onLoadFailed = onLoadFailed;
+        this._onLoading = onLoading;
+        this._treeElement = treeElement;
+        this._triggerEvent = triggerEvent;
     }
 
     public loadFromUrl(
@@ -46,18 +46,18 @@ export default class DataLoader {
             return;
         }
 
-        const element = this.getDomElement(parentNode);
-        this.addLoadingClass(element);
-        this.notifyLoading(true, parentNode, element);
+        const element = this._getDomElement(parentNode);
+        this._addLoadingClass(element);
+        this._notifyLoading(true, parentNode, element);
 
         const stopLoading = (): void => {
-            this.removeLoadingClass(element);
-            this.notifyLoading(false, parentNode, element);
+            this._removeLoadingClass(element);
+            this._notifyLoading(false, parentNode, element);
         };
 
         const handleSuccess = (data: NodeData[]): void => {
             stopLoading();
-            this.loadData(this.parseData(data), parentNode);
+            this._loadData(this._parseData(data), parentNode);
 
             if (onFinished && typeof onFinished === "function") {
                 onFinished();
@@ -67,57 +67,57 @@ export default class DataLoader {
         const handleError = (jqXHR: JQuery.jqXHR): void => {
             stopLoading();
 
-            if (this.onLoadFailed) {
-                this.onLoadFailed(jqXHR);
+            if (this._onLoadFailed) {
+                this._onLoadFailed(jqXHR);
             }
         };
 
-        this.submitRequest(urlInfo, handleSuccess, handleError);
+        this._submitRequest(urlInfo, handleSuccess, handleError);
     }
 
-    private addLoadingClass(element: HTMLElement): void {
+    private _addLoadingClass(element: HTMLElement): void {
         element.classList.add("jqtree-loading");
     }
 
-    private getDomElement(parentNode: Node | null): HTMLElement {
+    private _getDomElement(parentNode: Node | null): HTMLElement {
         if (parentNode?.element) {
             return parentNode.element;
         } else {
-            return this.treeElement;
+            return this._treeElement;
         }
     }
 
-    private notifyLoading(
+    private _notifyLoading(
         isLoading: boolean,
         node: Node | null,
         element: HTMLElement,
     ): void {
         const $el = jQuery(element);
 
-        if (this.onLoading) {
-            this.onLoading(isLoading, node, $el);
+        if (this._onLoading) {
+            this._onLoading(isLoading, node, $el);
         }
 
-        this.triggerEvent("tree.loading_data", {
+        this._triggerEvent("tree.loading_data", {
             $el,
             isLoading,
             node,
         });
     }
 
-    private parseData(data: NodeData[]): NodeData[] {
-        if (this.dataFilter) {
-            return this.dataFilter(data);
+    private _parseData(data: NodeData[]): NodeData[] {
+        if (this._dataFilter) {
+            return this._dataFilter(data);
         } else {
             return data;
         }
     }
 
-    private removeLoadingClass(element: HTMLElement): void {
+    private _removeLoadingClass(element: HTMLElement): void {
         element.classList.remove("jqtree-loading");
     }
 
-    private submitRequest(
+    private _submitRequest(
         urlInfoInput: JQuery.AjaxSettings | string,
         handleSuccess: JQuery.Ajax.SuccessCallback<any>,
         handleError: JQuery.Ajax.ErrorCallback<any>,

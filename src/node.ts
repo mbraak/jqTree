@@ -49,12 +49,12 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const node = this.createNode(nodeInfo);
+            const node = this._createNode(nodeInfo);
 
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex + 1);
 
-            node.loadChildrenFromData(nodeInfo);
+            node._loadChildrenFromData(nodeInfo);
             return node;
         }
     }
@@ -63,12 +63,12 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const node = this.createNode(nodeInfo);
+            const node = this._createNode(nodeInfo);
 
             const childIndex = this.parent.getChildIndex(this);
             this.parent.addChildAtPosition(node, childIndex);
 
-            node.loadChildrenFromData(nodeInfo);
+            node._loadChildrenFromData(nodeInfo);
             return node;
         }
     }
@@ -82,7 +82,7 @@ export class Node implements INode {
     */
     public addChild(node: Node): void {
         this.children.push(node);
-        node.setParent(this);
+        node._setParent(this);
     }
 
     /*
@@ -95,7 +95,7 @@ export class Node implements INode {
     */
     public addChildAtPosition(node: Node, index: number): void {
         this.children.splice(index, 0, node);
-        node.setParent(this);
+        node._setParent(this);
     }
 
     public addNodeToIndex(node: Node): void {
@@ -108,10 +108,10 @@ export class Node implements INode {
         if (!this.parent) {
             return null;
         } else {
-            const newParent = this.createNode(nodeInfo);
+            const newParent = this._createNode(nodeInfo);
 
             if (this.tree) {
-                newParent.setParent(this.tree);
+                newParent._setParent(this.tree);
             }
             const originalParent = this.parent;
 
@@ -126,10 +126,10 @@ export class Node implements INode {
     }
 
     public append(nodeInfo: NodeData): Node {
-        const node = this.createNode(nodeInfo);
+        const node = this._createNode(nodeInfo);
         this.addChild(node);
 
-        node.loadChildrenFromData(nodeInfo);
+        node._loadChildrenFromData(nodeInfo);
         return node;
     }
 
@@ -400,7 +400,7 @@ export class Node implements INode {
 
         const addChildren = (childrenData: NodeData[]): void => {
             for (const child of childrenData) {
-                const node = this.createNode();
+                const node = this._createNode();
                 node.initFromData(child);
                 this.addChild(node);
             }
@@ -479,7 +479,7 @@ export class Node implements INode {
         this.removeChildren();
 
         for (const childData of data) {
-            const node = this.createNode(childData);
+            const node = this._createNode(childData);
             this.addChild(node);
 
             if (isNodeRecordWithChildren(childData)) {
@@ -508,7 +508,7 @@ export class Node implements INode {
             // - Or, parent is empty
             return false;
         } else {
-            movedNode.parent.doRemoveChild(movedNode);
+            movedNode.parent._doRemoveChild(movedNode);
 
             switch (position) {
                 case "after": {
@@ -543,10 +543,10 @@ export class Node implements INode {
     }
 
     public prepend(nodeInfo: NodeData): Node {
-        const node = this.createNode(nodeInfo);
+        const node = this._createNode(nodeInfo);
         this.addChildAtPosition(node, 0);
 
-        node.loadChildrenFromData(nodeInfo);
+        node._loadChildrenFromData(nodeInfo);
         return node;
     }
 
@@ -566,7 +566,7 @@ export class Node implements INode {
         // remove children from the index
         node.removeChildren();
 
-        this.doRemoveChild(node);
+        this._doRemoveChild(node);
     }
 
     public removeChildren(): void {
@@ -624,28 +624,28 @@ export class Node implements INode {
         }
     }
 
-    private createNode(nodeData?: NodeData): Node {
-        const nodeClass = this.getNodeClass();
+    private _createNode(nodeData?: NodeData): Node {
+        const nodeClass = this._getNodeClass();
         return new nodeClass(nodeData);
     }
 
-    private doRemoveChild(node: Node): void {
+    private _doRemoveChild(node: Node): void {
         this.children.splice(this.getChildIndex(node), 1);
         this.tree?.removeNodeFromIndex(node);
     }
 
-    private getNodeClass(): typeof Node {
+    private _getNodeClass(): typeof Node {
         return this.nodeClass ?? this.tree?.nodeClass ?? Node;
     }
 
     // Load children data from nodeInfo if it has children
-    private loadChildrenFromData(nodeInfo: NodeData) {
+    private _loadChildrenFromData(nodeInfo: NodeData) {
         if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
             this.loadFromData(nodeInfo.children);
         }
     }
 
-    private setParent(parent: Node): void {
+    private _setParent(parent: Node): void {
         this.parent = parent;
         this.tree = parent.tree;
         this.tree?.addNodeToIndex(this);

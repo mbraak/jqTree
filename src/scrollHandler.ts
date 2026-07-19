@@ -9,47 +9,47 @@ interface ScrollHandlerParams {
 }
 
 export default class ScrollHandler {
-    private refreshHitAreas: () => void;
-    private scrollParent?: ScrollParent;
-    private treeElement: HTMLElement;
+    private _refreshHitAreas: () => void;
+    private _scrollParent?: ScrollParent;
+    private _treeElement: HTMLElement;
 
     constructor({ refreshHitAreas, treeElement }: ScrollHandlerParams) {
-        this.refreshHitAreas = refreshHitAreas;
-        this.scrollParent = undefined;
-        this.treeElement = treeElement;
+        this._refreshHitAreas = refreshHitAreas;
+        this._scrollParent = undefined;
+        this._treeElement = treeElement;
     }
 
     public checkScrolling(positionInfo: PositionInfo): void {
-        this.checkVerticalScrolling(positionInfo);
-        this.checkHorizontalScrolling(positionInfo);
+        this._checkVerticalScrolling(positionInfo);
+        this._checkHorizontalScrolling(positionInfo);
     }
 
     public getScrollLeft(): number {
-        return this.getScrollParent().getScrollLeft();
+        return this._getScrollParent().getScrollLeft();
     }
 
     public scrollToY(top: number): void {
-        this.getScrollParent().scrollToY(top);
+        this._getScrollParent().scrollToY(top);
     }
 
     public stopScrolling() {
-        this.getScrollParent().stopScrolling();
+        this._getScrollParent().stopScrolling();
     }
 
-    private checkHorizontalScrolling(positionInfo: PositionInfo): void {
-        this.getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
+    private _checkHorizontalScrolling(positionInfo: PositionInfo): void {
+        this._getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
     }
 
-    private checkVerticalScrolling(positionInfo: PositionInfo): void {
-        this.getScrollParent().checkVerticalScrolling(positionInfo.pageY);
+    private _checkVerticalScrolling(positionInfo: PositionInfo): void {
+        this._getScrollParent().checkVerticalScrolling(positionInfo.pageY);
     }
 
-    private getScrollParent(): ScrollParent {
-        this.scrollParent ??= createScrollParent(
-            this.treeElement,
-            this.refreshHitAreas,
+    private _getScrollParent(): ScrollParent {
+        this._scrollParent ??= createScrollParent(
+            this._treeElement,
+            this._refreshHitAreas,
         );
 
-        return this.scrollParent;
+        return this._scrollParent;
     }
 }
