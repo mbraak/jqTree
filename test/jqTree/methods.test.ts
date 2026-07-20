@@ -8,7 +8,7 @@ import "app/tree.jquery";
 import __version__ from "app/version";
 
 import exampleData from "../support/exampleData";
-import { titleSpan } from "../support/testUtil";
+import { getTitleElement } from "../support/queries";
 
 const server = setupServer();
 
@@ -1298,7 +1298,7 @@ describe("methods", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             $tree.tree("setOption", "selectable", true);
-            await userEvent.click(titleSpan(node1.element as HTMLElement));
+            await userEvent.click(getTitleElement(node1.element as HTMLElement));
 
             expect($tree.tree("getSelectedNode")).toMatchObject({
                 name: "node1",
