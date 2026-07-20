@@ -21,7 +21,9 @@ describe("methods", () => {
     });
 
     beforeEach(() => {
-        $("body").append('<div id="tree1"></div>');
+        const element = document.createElement("div");
+        element.id = "tree1";
+        document.body.appendChild(element);
     });
 
     afterEach(() => {
@@ -29,7 +31,7 @@ describe("methods", () => {
 
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        $tree.remove();
+        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
         localStorage.clear();
     });
 
