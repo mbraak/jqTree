@@ -1,3 +1,4 @@
+import type { AnimationSpeed } from "./animation";
 import type { Node } from "./node";
 
 export type DataFilter = (data: unknown) => NodeData[];
@@ -9,7 +10,7 @@ export type DragMethod = (node: Node, event: Event | Touch) => void;
 export type IconElement = HTMLElement | JQuery | string;
 
 export interface JQTreeOptions {
-    animationSpeed: JQuery.Duration;
+    animationSpeed: AnimationSpeed;
     autoEscape: boolean;
     autoOpen: boolean | number;
     buttonLeft: boolean;

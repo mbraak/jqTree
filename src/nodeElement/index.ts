@@ -15,9 +15,9 @@ export interface NodeElementParams {
 class NodeElement {
     public element: HTMLElement;
     public node: Node;
-    private getScrollLeft: GetScrollLeft;
-    private tabIndex?: number;
-    private treeElement: HTMLElement;
+    private _getScrollLeft: GetScrollLeft;
+    private _tabIndex?: number;
+    private _treeElement: HTMLElement;
 
     constructor({
         getScrollLeft,
@@ -25,16 +25,16 @@ class NodeElement {
         tabIndex,
         treeElement,
     }: NodeElementParams) {
-        this.getScrollLeft = getScrollLeft;
-        this.tabIndex = tabIndex;
-        this.treeElement = treeElement;
+        this._getScrollLeft = getScrollLeft;
+        this._tabIndex = tabIndex;
+        this._treeElement = treeElement;
 
         this.init(node);
     }
 
     public addDropHint(position: Position): DropHint {
         if (this.mustShowBorderDropHint(position)) {
-            return new BorderDropHint(this.element, this.getScrollLeft());
+            return new BorderDropHint(this.element, this._getScrollLeft());
         } else {
             return new GhostDropHint(this.node, this.element, position);
         }
@@ -53,7 +53,7 @@ class NodeElement {
     public init(node: Node): void {
         this.node = node;
 
-        node.element ??= this.treeElement;
+        node.element ??= this._treeElement;
 
         this.element = node.element;
     }
@@ -62,7 +62,7 @@ class NodeElement {
         this.element.classList.add("jqtree-selected");
 
         const titleSpan = this.getTitleSpan();
-        const tabIndex = this.tabIndex;
+        const tabIndex = this._tabIndex;
 
         // Check for null or undefined
         if (tabIndex != null) {

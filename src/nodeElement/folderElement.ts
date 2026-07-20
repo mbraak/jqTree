@@ -1,7 +1,9 @@
+import type { AnimationSpeed } from "../animation";
 import type { OnFinishOpenNode, TriggerEvent } from "../jqtreeMethodTypes";
 import type { Position } from "../node";
 import type { NodeElementParams } from "./index";
 
+import { slideDown, slideUp } from "../animation";
 import NodeElement from "./index";
 
 interface FolderElementParams extends NodeElementParams {
@@ -11,9 +13,9 @@ interface FolderElementParams extends NodeElementParams {
 }
 
 class FolderElement extends NodeElement {
-    private closedIconElement?: HTMLElement | Text;
-    private openedIconElement?: HTMLElement | Text;
-    private triggerEvent: TriggerEvent;
+    private _closedIconElement?: HTMLElement | Text;
+    private _openedIconElement?: HTMLElement | Text;
+    private _triggerEvent: TriggerEvent;
 
     constructor({
         closedIconElement,
@@ -31,23 +33,23 @@ class FolderElement extends NodeElement {
             treeElement,
         });
 
-        this.closedIconElement = closedIconElement;
-        this.openedIconElement = openedIconElement;
-        this.triggerEvent = triggerEvent;
+        this._closedIconElement = closedIconElement;
+        this._openedIconElement = openedIconElement;
+        this._triggerEvent = triggerEvent;
     }
 
-    public close(slide: boolean, animationSpeed: JQuery.Duration): void {
+    public close(slide: boolean, animationSpeed: AnimationSpeed): void {
         if (!this.node.is_open) {
             return;
         }
 
         this.node.is_open = false;
 
-        const button = this.getButton();
+        const button = this._getButton();
         button.classList.add("jqtree-closed");
         button.innerHTML = "";
 
-        const closedIconElement = this.closedIconElement;
+        const closedIconElement = this._closedIconElement;
 
         if (closedIconElement) {
             const icon = closedIconElement.cloneNode(true);
@@ -60,15 +62,17 @@ class FolderElement extends NodeElement {
             const titleSpan = this.getTitleSpan();
             titleSpan.setAttribute("aria-expanded", "false");
 
-            this.triggerEvent("tree.close", {
+            this._triggerEvent("tree.close", {
                 node: this.node,
             });
         };
 
+        const ul = this.getUl();
+
         if (slide) {
-            jQuery(this.getUl()).slideUp(animationSpeed, doClose);
+            slideUp(ul, animationSpeed, doClose);
         } else {
-            jQuery(this.getUl()).hide();
+            ul.style.display = "none";
             doClose();
         }
     }
@@ -76,7 +80,7 @@ class FolderElement extends NodeElement {
     public open(
         onFinished: OnFinishOpenNode | undefined,
         slide: boolean,
-        animationSpeed: JQuery.Duration,
+        animationSpeed: AnimationSpeed,
     ): void {
         if (this.node.is_open) {
             return;
@@ -84,11 +88,11 @@ class FolderElement extends NodeElement {
 
         this.node.is_open = true;
 
-        const button = this.getButton();
+        const button = this._getButton();
         button.classList.remove("jqtree-closed");
         button.innerHTML = "";
 
-        const openedIconElement = this.openedIconElement;
+        const openedIconElement = this._openedIconElement;
 
         if (openedIconElement) {
             const icon = openedIconElement.cloneNode(true);
@@ -105,15 +109,17 @@ class FolderElement extends NodeElement {
                 onFinished(this.node);
             }
 
-            this.triggerEvent("tree.open", {
+            this._triggerEvent("tree.open", {
                 node: this.node,
             });
         };
 
+        const ul = this.getUl();
+
         if (slide) {
-            jQuery(this.getUl()).slideDown(animationSpeed, doOpen);
+            slideDown(ul, animationSpeed, doOpen);
         } else {
-            jQuery(this.getUl()).show();
+            ul.style.display = "block";
             doOpen();
         }
     }
@@ -122,7 +128,7 @@ class FolderElement extends NodeElement {
         return !this.node.is_open && position === "inside";
     }
 
-    private getButton(): HTMLLinkElement {
+    private _getButton(): HTMLLinkElement {
         return this.element.querySelector(
             ":scope > .jqtree-element > a.jqtree-toggler",
         ) as HTMLLinkElement;

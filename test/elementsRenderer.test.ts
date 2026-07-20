@@ -11,11 +11,11 @@ describe("renderFromNode", () => {
         const node = new Node();
 
         const elementsRenderer = new ElementsRenderer({
-            $element: jQuery(element),
             autoEscape: true,
             buttonLeft: false,
             dragAndDrop: false,
             getTree: () => node,
+            htmlElement: element,
             isNodeSelected: () => false,
             showEmptyFolder: false,
         });

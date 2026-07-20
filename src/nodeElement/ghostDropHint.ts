@@ -2,39 +2,39 @@ import type { DropHint } from "../dragAndDropHandler/types";
 import type { Node, Position } from "../node";
 
 class GhostDropHint implements DropHint {
-    private element: HTMLElement;
-    private ghost: HTMLElement;
-    private node: Node;
+    private _element: HTMLElement;
+    private _ghost: HTMLElement;
+    private _node: Node;
 
     constructor(node: Node, element: HTMLElement, position: Position) {
-        this.element = element;
-        this.node = node;
-        this.ghost = this.createGhostElement();
+        this._element = element;
+        this._node = node;
+        this._ghost = this._createGhostElement();
 
         switch (position) {
             case "after":
-                this.moveAfter();
+                this._moveAfter();
                 break;
 
             case "before":
-                this.moveBefore();
+                this._moveBefore();
                 break;
 
             case "inside": {
                 if (node.isFolder() && node.is_open) {
-                    this.moveInsideOpenFolder();
+                    this._moveInsideOpenFolder();
                 } else {
-                    this.moveInside();
+                    this._moveInside();
                 }
             }
         }
     }
 
     public remove(): void {
-        this.ghost.remove();
+        this._ghost.remove();
     }
 
-    private createGhostElement() {
+    private _createGhostElement() {
         const ghost = document.createElement("li");
         ghost.className = "jqtree_common jqtree-ghost";
 
@@ -49,24 +49,24 @@ class GhostDropHint implements DropHint {
         return ghost;
     }
 
-    private moveAfter(): void {
-        this.element.after(this.ghost);
+    private _moveAfter(): void {
+        this._element.after(this._ghost);
     }
 
-    private moveBefore(): void {
-        this.element.before(this.ghost);
+    private _moveBefore(): void {
+        this._element.before(this._ghost);
     }
 
-    private moveInside(): void {
-        this.element.after(this.ghost);
-        this.ghost.classList.add("jqtree-inside");
+    private _moveInside(): void {
+        this._element.after(this._ghost);
+        this._ghost.classList.add("jqtree-inside");
     }
 
-    private moveInsideOpenFolder(): void {
-        const childElement = this.node.children[0]?.element;
+    private _moveInsideOpenFolder(): void {
+        const childElement = this._node.children[0]?.element;
 
         if (childElement) {
-            childElement.before(this.ghost);
+            childElement.before(this._ghost);
         }
     }
 }
