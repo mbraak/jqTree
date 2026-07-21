@@ -21,7 +21,7 @@ const getNodeElement = (container: HTMLElement) => {
   return elements[0] as HTMLElement;
 }
 
-const assertSingleElement = (container: HTMLElement, elements: NodeListOf<Element>, name: string) => {
+export const assertSingleElement = (container: HTMLElement, elements: NodeListOf<Element>, name: string) => {
   if (!elements.length) {
     throw queryHelpers.getElementError(`Unable to find ${name} element`, container);
   } else if (elements.length > 1) {

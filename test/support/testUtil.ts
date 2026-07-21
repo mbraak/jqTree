@@ -17,42 +17,6 @@ export const assertJqTreeFolder = (el: HTMLElement) => {
     }
 };
 
-export const getChildren = (
-    el: HTMLElement,
-    nodeName: string,
-    className: string,
-) => {
-    const result: HTMLElement[] = [];
-
-    for (const child of el.children) {
-        if (
-            child.nodeName === nodeName.toUpperCase() &&
-            child.classList.contains(className)
-        ) {
-            result.push(child as HTMLElement);
-        }
-    }
-
-    return result;
-};
-
-export const singleChild = (
-    el: HTMLElement,
-    nodeName: string,
-    className: string,
-) => {
-    const children = getChildren(el, nodeName, className);
-
-    /* istanbul ignore if @preserve */
-    if (children.length !== 1) {
-        throw new Error(
-            `Expected single child, got ${el.children.length} for ${nodeName} ${className}`,
-        );
-    }
-
-    return children[0] as HTMLElement;
-};
-
 const mockLayout = (element: HTMLElement, rect: Rect) => {
     vi.spyOn(element, "clientHeight", "get").mockReturnValue(rect.height);
     vi.spyOn(element, "clientWidth", "get").mockReturnValue(rect.width);
