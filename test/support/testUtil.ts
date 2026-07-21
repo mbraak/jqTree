@@ -53,12 +53,6 @@ export const singleChild = (
     return children[0] as HTMLElement;
 };
 
-export const togglerLink = (liNode: HTMLElement): HTMLElement =>
-    singleChild(nodeElement(liNode), "a", "jqtree-toggler");
-
-const nodeElement = (liNode: HTMLElement): HTMLElement =>
-    singleChild(liNode, "div", "jqtree-element");
-
 const mockLayout = (element: HTMLElement, rect: Rect) => {
     vi.spyOn(element, "clientHeight", "get").mockReturnValue(rect.height);
     vi.spyOn(element, "clientWidth", "get").mockReturnValue(rect.width);

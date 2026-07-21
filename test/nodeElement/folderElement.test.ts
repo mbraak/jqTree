@@ -6,7 +6,7 @@ import BorderDropHint from "app/nodeElement/borderDropHint";
 import FolderElement from "app/nodeElement/folderElement";
 import GhostDropHint from "app/nodeElement/ghostDropHint";
 
-import { togglerLink } from "../support/testUtil";
+import { getTogglerElement } from "../support/queries";
 
 interface CreateFolderElementParams {
     closedIconElement?: HTMLElement | Text;
@@ -61,7 +61,7 @@ const createFolderElement = ({
     return { element, folderElement, folderNode, treeElement, triggerEvent };
 };
 
-const getButton = (element: HTMLElement) => togglerLink(element);
+const getButton = (element: HTMLElement) => getTogglerElement(element);
 
 const getUl = (element: HTMLElement) =>
     element.querySelector(":scope > ul") as HTMLUListElement;
@@ -89,13 +89,18 @@ describe("close", () => {
         expect(element).toBeClosedTreeNode();
         expect(getButton(element)).toHaveClass("jqtree-closed");
         expect(getUl(element)).not.toBeVisible();
-        expect(getTitleSpan(element)).toHaveAttribute("aria-expanded", collapsed);
+        expect(getTitleSpan(element)).toHaveAttribute(
+            "aria-expanded",
+            collapsed,
+        );
     });
 
     it("triggers the tree.close event", () => {
-        const { folderElement, folderNode, triggerEvent } = createFolderElement({
-            isOpen: true,
-        });
+        const { folderElement, folderNode, triggerEvent } = createFolderElement(
+            {
+                isOpen: true,
+            },
+        );
 
         folderElement.close(false, 0);
 
@@ -105,9 +110,11 @@ describe("close", () => {
     });
 
     it("does nothing when the node is already closed", () => {
-        const { folderElement, folderNode, triggerEvent } = createFolderElement({
-            isOpen: false,
-        });
+        const { folderElement, folderNode, triggerEvent } = createFolderElement(
+            {
+                isOpen: false,
+            },
+        );
 
         folderElement.close(false, 0);
 
@@ -133,7 +140,9 @@ describe("close", () => {
     });
 
     it("closes the node with animation", async () => {
-        const { element, folderElement } = createFolderElement({ isOpen: true });
+        const { element, folderElement } = createFolderElement({
+            isOpen: true,
+        });
 
         const ul = getUl(element);
         const animate = vi.spyOn(ul, "animate");
@@ -171,9 +180,11 @@ describe("open", () => {
     });
 
     it("triggers the tree.open event", () => {
-        const { folderElement, folderNode, triggerEvent } = createFolderElement({
-            isOpen: false,
-        });
+        const { folderElement, folderNode, triggerEvent } = createFolderElement(
+            {
+                isOpen: false,
+            },
+        );
 
         folderElement.open(undefined, false, 0);
 
@@ -183,9 +194,11 @@ describe("open", () => {
     });
 
     it("does nothing when the node is already open", () => {
-        const { folderElement, folderNode, triggerEvent } = createFolderElement({
-            isOpen: true,
-        });
+        const { folderElement, folderNode, triggerEvent } = createFolderElement(
+            {
+                isOpen: true,
+            },
+        );
 
         folderElement.open(undefined, false, 0);
 
@@ -266,6 +279,8 @@ describe("addDropHint", () => {
     it("returns a ghost drop hint for a closed node and position after", () => {
         const { folderElement } = createFolderElement({ isOpen: false });
 
-        expect(folderElement.addDropHint("after")).toBeInstanceOf(GhostDropHint);
+        expect(folderElement.addDropHint("after")).toBeInstanceOf(
+            GhostDropHint,
+        );
     });
 });

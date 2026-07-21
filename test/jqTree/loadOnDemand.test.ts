@@ -5,7 +5,7 @@ import { setupServer } from "msw/node";
 
 import "app/tree.jquery";
 
-import { togglerLink } from "../support/testUtil";
+import { getTogglerElement } from "../support/queries";
 
 describe("load on demand", () => {
     const server = setupServer();
@@ -87,7 +87,7 @@ describe("load on demand", () => {
             });
             const node = $tree.tree("getNodeByNameMustExist", "parent-node");
 
-            const toggler = togglerLink(node.element as HTMLElement);
+            const toggler = getTogglerElement(node.element as HTMLElement);
             await userEvent.click(toggler);
 
             await waitFor(() => {
@@ -121,7 +121,7 @@ describe("load on demand", () => {
             expect(node.element).toBeSelectedTreeNode();
             expect(node.element).toBeFocusedTreeNode();
 
-            const toggler = togglerLink(node.element as HTMLElement);
+            const toggler = getTogglerElement(node.element as HTMLElement);
             await userEvent.click(toggler);
 
             await screen.findByText("loaded-on-demand");
@@ -141,7 +141,7 @@ describe("load on demand", () => {
 
             expect(node.element).not.toBeSelectedTreeNode();
 
-            const toggler = togglerLink(node.element as HTMLElement);
+            const toggler = getTogglerElement(node.element as HTMLElement);
             await userEvent.click(toggler);
 
             await screen.findByText("loaded-on-demand");
@@ -164,7 +164,7 @@ describe("load on demand", () => {
             expect(node.element).toBeSelectedTreeNode();
             expect(node.element).not.toBeFocusedTreeNode();
 
-            const toggler = togglerLink(node.element as HTMLElement);
+            const toggler = getTogglerElement(node.element as HTMLElement);
             await userEvent.click(toggler);
 
             await screen.findByText("loaded-on-demand");

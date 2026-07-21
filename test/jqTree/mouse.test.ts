@@ -4,8 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTitleElement } from "../support/queries";
-import { togglerLink } from "../support/testUtil";
+import { getTitleElement, getTogglerElement } from "../support/queries";
 
 describe("mouse", () => {
     beforeEach(() => {
@@ -56,7 +55,7 @@ describe("mouse", () => {
 
         expect(node.element).not.toBeOpenTreeNode();
 
-        await userEvent.click(togglerLink(node.element as HTMLElement));
+        await userEvent.click(getTogglerElement(node.element as HTMLElement));
 
         await waitFor(() => {
             expect(node.element).toBeOpenTreeNode();
@@ -72,7 +71,7 @@ describe("mouse", () => {
         expect(node.element).not.toBeSelectedTreeNode();
         expect(node.element).not.toBeOpenTreeNode();
 
-        await userEvent.click(togglerLink(node.element as HTMLElement));
+        await userEvent.click(getTogglerElement(node.element as HTMLElement));
 
         await waitFor(() => {
             expect(node.element).toBeOpenTreeNode();
@@ -91,7 +90,7 @@ describe("mouse", () => {
         expect(node.element).toBeSelectedTreeNode();
         expect(node.element).not.toBeOpenTreeNode();
 
-        await userEvent.click(togglerLink(node.element as HTMLElement));
+        await userEvent.click(getTogglerElement(node.element as HTMLElement));
 
         await waitFor(() => {
             expect(node.element).toBeOpenTreeNode();
