@@ -53,9 +53,6 @@ export const singleChild = (
     return children[0] as HTMLElement;
 };
 
-export const titleSpan = (liNode: HTMLElement): HTMLElement =>
-    singleChild(nodeElement(liNode), "span", "jqtree-title");
-
 export const togglerLink = (liNode: HTMLElement): HTMLElement =>
     singleChild(nodeElement(liNode), "a", "jqtree-toggler");
 

@@ -4,7 +4,8 @@ import { userEvent } from "@testing-library/user-event";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { titleSpan, togglerLink } from "../support/testUtil";
+import { getTitleElement } from "../support/queries";
+import { togglerLink } from "../support/testUtil";
 
 describe("mouse", () => {
     beforeEach(() => {
@@ -28,7 +29,7 @@ describe("mouse", () => {
         expect(node.element).not.toBeSelectedTreeNode();
         expect(node.element).not.toBeFocusedTreeNode();
 
-        await userEvent.click(titleSpan(node.element as HTMLElement));
+        await userEvent.click(getTitleElement(node.element as HTMLElement));
 
         expect(node.element).toBeSelectedTreeNode();
     });
@@ -42,7 +43,7 @@ describe("mouse", () => {
 
         expect(node.element).toBeSelectedTreeNode();
 
-        await userEvent.click(titleSpan(node.element as HTMLElement));
+        await userEvent.click(getTitleElement(node.element as HTMLElement));
 
         expect(node.element).not.toBeSelectedTreeNode();
     });
