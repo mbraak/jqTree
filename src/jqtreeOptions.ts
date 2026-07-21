@@ -52,7 +52,7 @@ export type OnCanMoveTo = (
     positionName: string,
 ) => boolean;
 
-export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
+export type OnCreateLi = (node: Node, el: HTMLElement, isSelected: boolean) => void;
 
 export type OnGetStateFromStorage = (() => string) | undefined;
 

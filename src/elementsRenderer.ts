@@ -206,7 +206,7 @@ export default class ElementsRenderer {
         this._attachNodeData(node, li);
 
         if (this._onCreateLi) {
-            this._onCreateLi(node, jQuery(li), isSelected);
+            this._onCreateLi(node, li, isSelected);
         }
 
         return li;
