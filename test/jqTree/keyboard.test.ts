@@ -1,247 +1,293 @@
 import { userEvent } from "@testing-library/user-event";
-import getGiven from "givens";
 
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
 
-const context = describe;
-
 describe("keyboard support", () => {
     beforeEach(() => {
-        $("body").append('<div id="tree1"></div>');
+        const element = document.createElement("div");
+        element.id = "tree1";
+        document.body.appendChild(element);
     });
 
     afterEach(() => {
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        $tree.remove();
+        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
     });
 
-    interface Vars {
-        $tree: JQuery;
-        autoOpen: boolean;
-        initialSelectedNode: INode | null;
-        pressedKey: string;
-    }
+    describe("with key down", () => {
+        it("selects the next node when a node is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+            });
 
-    const given = getGiven<Vars>();
-    given("autoOpen", () => false);
-    given("initialSelectedNode", () => null);
-    given("$tree", () => $("#tree1"));
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1);
 
-    beforeEach(async () => {
-        given.$tree.tree({
-            animationSpeed: 0,
-            autoOpen: given.autoOpen,
-            data: exampleData,
+            await userEvent.keyboard("{ArrowDown}");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", selected: false }),
+                expect.objectContaining({ name: "node2", selected: true }),
+            ]);
         });
 
-        if (given.initialSelectedNode) {
-            given.$tree.tree("selectNode", given.initialSelectedNode);
-        }
+        it("does nothing when no node is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+            });
 
-        await userEvent.keyboard(`{${given.pressedKey}}`);
+            await userEvent.keyboard("{ArrowDown}");
+
+            expect($tree.tree("getSelectedNode")).toBeFalse();
+        });
+
+        it("keeps the node selected when the last node is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+            });
+
+            const node2 = $tree.tree("getNodeByNameMustExist", "node2");
+            $tree.tree("selectNode", node2);
+
+            await userEvent.keyboard("{ArrowDown}");
+
+            expect($tree.tree("getSelectedNode")).toMatchObject({
+                name: "node2",
+            });
+        });
     });
 
-    context("with key down", () => {
-        given("pressedKey", () => "ArrowDown");
-
-        context("when a node is selected", () => {
-            given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node1"),
-            );
-
-            it("selects the next node", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "node1", selected: false }),
-                    expect.objectContaining({ name: "node2", selected: true }),
-                ]);
+    describe("with key up", () => {
+        it("selects the next node when a node is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
             });
+
+            const node2 = $tree.tree("getNodeByNameMustExist", "node2");
+            $tree.tree("selectNode", node2);
+
+            await userEvent.keyboard("{ArrowUp}");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", selected: true }),
+                expect.objectContaining({ name: "node2", selected: false }),
+            ]);
         });
 
-        context("when no node is selected", () => {
-            it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+        it("does nothing when no node is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
             });
+
+            await userEvent.keyboard("{ArrowUp}");
+
+            expect($tree.tree("getSelectedNode")).toBeFalse();
         });
+    });
 
-        context("when the last node is selected", () => {
-            given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node2"),
-            );
+    describe("with key right", () => {
+        it("opens the folder when a closed folder is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+            });
 
-            it("keeps the node selected", () => {
-                expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1);
+
+            await userEvent.keyboard("{ArrowRight}");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    open: true,
+                    selected: true,
+                }),
+                expect.objectContaining({
                     name: "node2",
-                });
+                    open: false,
+                    selected: false,
+                }),
+            ]);
+        });
+
+        it("selects the first child when an open folder is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: true,
+                data: exampleData,
+            });
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1);
+
+            await userEvent.keyboard("{ArrowRight}");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "child1",
+                            selected: true,
+                        }),
+                        expect.objectContaining({
+                            name: "child2",
+                            selected: false,
+                        }),
+                    ],
+                    name: "node1",
+                    open: true,
+                    selected: false,
+                }),
+                expect.objectContaining({
+                    name: "node2",
+                    selected: false,
+                }),
+            ]);
+        });
+
+        it("does nothing when no node is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+            });
+
+            await userEvent.keyboard("{ArrowRight}");
+
+            expect($tree.tree("getSelectedNode")).toBeFalse();
+        });
+
+        it("does nothing when a child is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+            });
+
+            const child1 = $tree.tree("getNodeByNameMustExist", "child1");
+            $tree.tree("selectNode", child1);
+
+            await userEvent.keyboard("{ArrowRight}");
+
+            expect($tree.tree("getSelectedNode")).toMatchObject({
+                name: "child1",
             });
         });
     });
 
-    context("with key up", () => {
-        given("pressedKey", () => "ArrowUp");
-
-        context("when a node is selected", () => {
-            given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node2"),
-            );
-
-            it("selects the next node", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "node1", selected: true }),
-                    expect.objectContaining({ name: "node2", selected: false }),
-                ]);
+    describe("with key left", () => {
+        it("selects the previous node when a closed folder is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
             });
+
+            const node3 = $tree.tree("getNodeByNameMustExist", "node3");
+            $tree.tree("selectNode", node3);
+
+            await userEvent.keyboard("{ArrowLeft}");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    selected: false,
+                }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "node3",
+                            open: false,
+                            selected: false,
+                        }),
+                    ],
+                    name: "node2",
+                    selected: true,
+                }),
+            ]);
         });
 
-        context("when no node is selected", () => {
-            it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+        it("closes the folder when an open folder is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: true,
+                data: exampleData,
             });
-        });
-    });
 
-    context("with key right", () => {
-        given("pressedKey", () => "ArrowRight");
+            const node2 = $tree.tree("getNodeByNameMustExist", "node2");
+            $tree.tree("selectNode", node2);
 
-        context("when a closed folder is selected", () => {
-            given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node1"),
-            );
+            await userEvent.keyboard("{ArrowLeft}");
 
-            it("opens the folder", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        name: "node1",
-                        open: true,
-                        selected: true,
-                    }),
-                    expect.objectContaining({
-                        name: "node2",
-                        open: false,
-                        selected: false,
-                    }),
-                ]);
-            });
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    open: true,
+                    selected: false,
+                }),
+                expect.objectContaining({
+                    name: "node2",
+                    open: false,
+                    selected: true,
+                }),
+            ]);
         });
 
-        context("when an open folder is selected", () => {
-            given("autoOpen", () => true);
-            given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node1"),
-            );
-
-            it("selects the first child", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({
-                                name: "child1",
-                                selected: true,
-                            }),
-                            expect.objectContaining({
-                                name: "child2",
-                                selected: false,
-                            }),
-                        ],
-                        name: "node1",
-                        open: true,
-                        selected: false,
-                    }),
-                    expect.objectContaining({
-                        name: "node2",
-                        selected: false,
-                    }),
-                ]);
+        it("does nothing when no node is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
             });
-        });
 
-        context("when no node is selected", () => {
-            it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
-            });
-        });
+            await userEvent.keyboard("{ArrowLeft}");
 
-        context("when a child is selected", () => {
-            given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "child1"),
-            );
-
-            it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toMatchObject({
-                    name: "child1",
-                });
-            });
-        });
-    });
-    context("with key left", () => {
-        given("pressedKey", () => "ArrowLeft");
-
-        context("when a closed folder is selected", () => {
-            given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node3"),
-            );
-
-            it("selects the previous node", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        name: "node1",
-                        selected: false,
-                    }),
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({
-                                name: "node3",
-                                open: false,
-                                selected: false,
-                            }),
-                        ],
-                        name: "node2",
-                        selected: true,
-                    }),
-                ]);
-            });
-        });
-
-        context("when an open folder is selected", () => {
-            given("autoOpen", () => true);
-            given("initialSelectedNode", () =>
-                given.$tree.tree("getNodeByNameMustExist", "node2"),
-            );
-
-            it("closes the folder", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        name: "node1",
-                        open: true,
-                        selected: false,
-                    }),
-                    expect.objectContaining({
-                        name: "node2",
-                        open: false,
-                        selected: true,
-                    }),
-                ]);
-            });
-        });
-
-        context("when no node is selected", () => {
-            it("does nothing", () => {
-                expect(given.$tree.tree("getSelectedNode")).toBeFalse();
-            });
+            expect($tree.tree("getSelectedNode")).toBeFalse();
         });
     });
 
-    context("with page up key", () => {
-        given("pressedKey", () => "PageUp");
+    describe("with page up key", () => {
+        it("does nothing", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+            });
 
-        given("initialSelectedNode", () =>
-            given.$tree.tree("getNodeByNameMustExist", "child1"),
-        );
+            const child1 = $tree.tree("getNodeByNameMustExist", "child1");
+            $tree.tree("selectNode", child1);
 
-        it("does nothing", () => {
-            expect(given.$tree.tree("getSelectedNode")).toMatchObject({
+            await userEvent.keyboard("{PageUp}");
+
+            expect($tree.tree("getSelectedNode")).toMatchObject({
                 name: "child1",
             });
         });

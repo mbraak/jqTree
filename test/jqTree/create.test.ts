@@ -1,35 +1,27 @@
-import getGiven from "givens";
-
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
 
 describe("create with data", () => {
     beforeEach(() => {
-        $("body").append('<div id="tree1"></div>');
+        const element = document.createElement("div");
+        element.id = "tree1";
+        document.body.appendChild(element);
     });
 
     afterEach(() => {
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        $tree.remove();
-    });
-
-    interface Vars {
-        $tree: JQuery;
-    }
-
-    const given = getGiven<Vars>();
-    given("$tree", () => $("#tree1"));
-
-    beforeEach(() => {
-        given.$tree.tree({
-            data: exampleData,
-        });
+        (document.getElementById("tree1") as HTMLElement).remove();
     });
 
     it("creates a tree", () => {
-        expect(given.$tree).toHaveTreeStructure([
+        const $tree = $("#tree1");
+        $tree.tree({
+            data: exampleData,
+        });
+
+        expect($tree).toHaveTreeStructure([
             expect.objectContaining({
                 children: [
                     expect.objectContaining({ name: "child1" }),

@@ -4,7 +4,7 @@ import NodeElement from "app/nodeElement";
 import BorderDropHint from "app/nodeElement/borderDropHint";
 import GhostDropHint from "app/nodeElement/ghostDropHint";
 
-import { titleSpan } from "../support/testUtil";
+import { getTitleElement } from "../support/queries";
 
 interface CreateNodeElementParams {
     tabIndex?: number;
@@ -145,7 +145,10 @@ describe("select", () => {
 
         nodeElement.select(false);
 
-        expect(titleSpan(element)).toHaveAttribute("aria-selected", "true");
+        expect(getTitleElement(element)).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
     });
 
     it("sets the tabindex on the title span when a tabIndex is given", () => {
@@ -153,7 +156,7 @@ describe("select", () => {
 
         nodeElement.select(false);
 
-        expect(titleSpan(element)).toHaveAttribute("tabindex", "0");
+        expect(getTitleElement(element)).toHaveAttribute("tabindex", "0");
     });
 
     it("doesn't set the tabindex on the title span when no tabIndex is given", () => {
@@ -161,7 +164,7 @@ describe("select", () => {
 
         nodeElement.select(false);
 
-        expect(titleSpan(element)).not.toHaveAttribute("tabindex");
+        expect(getTitleElement(element)).not.toHaveAttribute("tabindex");
     });
 
     it("focuses the title span when mustSetFocus is true", () => {
@@ -169,7 +172,7 @@ describe("select", () => {
 
         nodeElement.select(true);
 
-        expect(titleSpan(element)).toHaveFocus();
+        expect(getTitleElement(element)).toHaveFocus();
     });
 
     it("doesn't focus the title span when mustSetFocus is false", () => {
@@ -177,7 +180,7 @@ describe("select", () => {
 
         nodeElement.select(false);
 
-        expect(titleSpan(element)).not.toHaveFocus();
+        expect(getTitleElement(element)).not.toHaveFocus();
     });
 });
 
@@ -203,7 +206,10 @@ describe("deselect", () => {
 
         const deselected = "false";
 
-        expect(titleSpan(element)).toHaveAttribute("aria-selected", deselected);
+        expect(getTitleElement(element)).toHaveAttribute(
+            "aria-selected",
+            deselected,
+        );
     });
 
     it("removes the tabindex from the title span", () => {
@@ -212,13 +218,13 @@ describe("deselect", () => {
         nodeElement.select(false);
         nodeElement.deselect();
 
-        expect(titleSpan(element)).not.toHaveAttribute("tabindex");
+        expect(getTitleElement(element)).not.toHaveAttribute("tabindex");
     });
 
     it("blurs the title span", () => {
         const { element, nodeElement } = createNodeElement({ tabIndex: 0 });
 
-        const blur = vi.spyOn(titleSpan(element), "blur");
+        const blur = vi.spyOn(getTitleElement(element), "blur");
 
         nodeElement.select(true);
         nodeElement.deselect();

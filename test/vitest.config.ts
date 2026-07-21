@@ -20,7 +20,6 @@ export default defineConfig({
 
     setupFiles: [
       "./test/support/setupTests.ts",
-      "givens/setup.js",
       "jest-extended/all",
     ],
   },

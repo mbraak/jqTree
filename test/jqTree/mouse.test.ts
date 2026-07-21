@@ -4,17 +4,19 @@ import { userEvent } from "@testing-library/user-event";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { titleSpan, togglerLink } from "../support/testUtil";
+import { getTitleElement, getTogglerElement } from "../support/queries";
 
 describe("mouse", () => {
     beforeEach(() => {
-        $("body").append('<div id="tree1"></div>');
+        const element = document.createElement("div");
+        element.id = "tree1";
+        document.body.appendChild(element);
     });
 
     afterEach(() => {
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        $tree.remove();
+        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
     });
 
     it("selects a node and sets the focus when it is clicked", async () => {
@@ -26,7 +28,7 @@ describe("mouse", () => {
         expect(node.element).not.toBeSelectedTreeNode();
         expect(node.element).not.toBeFocusedTreeNode();
 
-        await userEvent.click(titleSpan(node.element as HTMLElement));
+        await userEvent.click(getTitleElement(node.element as HTMLElement));
 
         expect(node.element).toBeSelectedTreeNode();
     });
@@ -40,7 +42,7 @@ describe("mouse", () => {
 
         expect(node.element).toBeSelectedTreeNode();
 
-        await userEvent.click(titleSpan(node.element as HTMLElement));
+        await userEvent.click(getTitleElement(node.element as HTMLElement));
 
         expect(node.element).not.toBeSelectedTreeNode();
     });
@@ -53,7 +55,7 @@ describe("mouse", () => {
 
         expect(node.element).not.toBeOpenTreeNode();
 
-        await userEvent.click(togglerLink(node.element as HTMLElement));
+        await userEvent.click(getTogglerElement(node.element as HTMLElement));
 
         await waitFor(() => {
             expect(node.element).toBeOpenTreeNode();
@@ -69,7 +71,7 @@ describe("mouse", () => {
         expect(node.element).not.toBeSelectedTreeNode();
         expect(node.element).not.toBeOpenTreeNode();
 
-        await userEvent.click(togglerLink(node.element as HTMLElement));
+        await userEvent.click(getTogglerElement(node.element as HTMLElement));
 
         await waitFor(() => {
             expect(node.element).toBeOpenTreeNode();
@@ -88,7 +90,7 @@ describe("mouse", () => {
         expect(node.element).toBeSelectedTreeNode();
         expect(node.element).not.toBeOpenTreeNode();
 
-        await userEvent.click(togglerLink(node.element as HTMLElement));
+        await userEvent.click(getTogglerElement(node.element as HTMLElement));
 
         await waitFor(() => {
             expect(node.element).toBeOpenTreeNode();
