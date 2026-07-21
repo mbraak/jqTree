@@ -418,8 +418,8 @@ describe("options", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
-                onCreateLi: (node: INode, el: HTMLElement) => {
-                    getTitleElement(el).innerHTML =
+                onCreateLi: (node: INode, el: JQuery) => {
+                    getTitleElement(el.get(0) as HTMLElement).innerHTML =
                         `_${node.name}_`;
                 },
             });

@@ -1,5 +1,5 @@
 import type { HandleFinishedLoading } from "./dataLoader";
-import type { HtmlTreeOptions, IconElement } from "./htmlTree/options";
+import type { HtmlTreeOptions, IconElement, OnCreateLi } from "./htmlTree/options";
 import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 import type { Node, Position } from "./node";
@@ -378,10 +378,20 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const closedIcon = convertToIconElement(this.inputOptions.closedIcon);
         const openedIcon = convertToIconElement(this.inputOptions.openedIcon);
 
+        let onCreateLi: OnCreateLi | undefined = undefined;
+        const jqTreeOnCreateLi = this.inputOptions.onCreateLi;
+
+        if (jqTreeOnCreateLi) {
+            onCreateLi = (node: Node, el: HTMLElement, isSelected: boolean) => {
+                jqTreeOnCreateLi(node, jQuery(el), isSelected);
+            };
+        }
+
         return {
             ...this.inputOptions,
             closedIcon,
-            openedIcon
+            onCreateLi,
+            openedIcon,
         }
     }
 }
