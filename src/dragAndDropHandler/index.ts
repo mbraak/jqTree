@@ -1,16 +1,16 @@
 import type {
+    DragMethod,
+    OnCanMove,
+    OnCanMoveTo,
+    OnIsMoveHandle,
+} from "../htmlTree/options";
+import type {
     GetScrollLeft,
     GetTree,
     OpenNode,
     RefreshElements,
     TriggerEvent,
 } from "../jqtreeMethodTypes";
-import type {
-    DragMethod,
-    OnCanMove,
-    OnCanMoveTo,
-    OnIsMoveHandle,
-} from "../jqtreeOptions";
 import type { PositionInfo } from "../mouseUtils";
 import type { Node } from "../node";
 import type NodeElement from "../nodeElement";

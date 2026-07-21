@@ -111,7 +111,7 @@ export default class SimpleWidget<WidgetOptions> {
     constructor(el: HTMLElement, options: WidgetOptions) {
         this.$el = jQuery(el);
 
-        this.inputOptions = options;
+        this.inputOptions = options || {};
     }
 
     public static register(widgetClass: unknown, widgetName: string): void {

@@ -1,8 +1,8 @@
-import type { JQTreeOptions } from "../jqtreeOptions";
+import type { HtmlTreeOptions } from "./options";
 
 import { Node } from "../node";
 
-const defaults: JQTreeOptions = {
+const defaults: HtmlTreeOptions = {
   animationSpeed: "fast",
   autoEscape: true,
   autoOpen: false, // true / false / int (open n levels starting at 0)
@@ -27,7 +27,7 @@ const defaults: JQTreeOptions = {
   onLoadFailed: undefined,
   onLoading: undefined,
   onSetStateFromStorage: undefined,
-  openedIcon: "&#x25bc;",
+  openedIcon: undefined,
   openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
   // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
   // http://www.fileformat.info/info/unicode/char/25bc/index.htm
@@ -41,17 +41,18 @@ const defaults: JQTreeOptions = {
   useContextMenu: true,
 };
 
-const setDefaultOptions = (htmlElement: HTMLElement, inputOptions: Partial<JQTreeOptions>): JQTreeOptions => {
+const setDefaultOptions = (htmlElement: HTMLElement, inputOptions: Partial<HtmlTreeOptions>): HtmlTreeOptions => {
   const options = { ...defaults, ...inputOptions };
 
   options.dataUrl ??= htmlElement.dataset.url;
   options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
   options.closedIcon ??= getDefaultClosedIcon(options);
+  options.openedIcon ??= "&#x25bc;";
 
   return options;
 }
 
-const getDefaultClosedIcon = (options: JQTreeOptions): string => {
+const getDefaultClosedIcon = (options: HtmlTreeOptions): string => {
   if (options.rtl) {
     // triangle to the left
     return "&#x25c0;";

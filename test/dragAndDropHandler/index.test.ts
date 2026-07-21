@@ -1,12 +1,12 @@
 import { vi } from "vitest";
 
-import type { GetScrollLeft, GetTree, OpenNode } from "app/jqtreeMethodTypes";
 import type {
     DragMethod,
     OnCanMove,
     OnCanMoveTo,
     OnIsMoveHandle,
-} from "app/jqtreeOptions";
+} from "app/htmlTree/options";
+import type { GetScrollLeft, GetTree, OpenNode } from "app/jqtreeMethodTypes";
 
 import { DragAndDropHandler } from "app/dragAndDropHandler";
 import { Node } from "app/node";

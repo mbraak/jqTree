@@ -1,3 +1,4 @@
+import type { OnGetStateFromStorage, OnSetStateFromStorage } from "./htmlTree/options";
 import type {
     AddToSelection,
     GetNodeById,
@@ -7,7 +8,6 @@ import type {
     RefreshElements,
     RemoveFromSelection,
 } from "./jqtreeMethodTypes";
-import type { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
 import type { Node } from "./node";
 
 import { isInt } from "./util";

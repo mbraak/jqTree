@@ -1,5 +1,5 @@
+import type { IconElement, OnCreateLi } from "./htmlTree/options";
 import type { GetTree, IsNodeSelected } from "./jqtreeMethodTypes";
-import type { IconElement, OnCreateLi } from "./jqtreeOptions";
 import type { Node } from "./node";
 
 import { getBoolString } from "./util";

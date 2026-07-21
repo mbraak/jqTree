@@ -3,8 +3,8 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
+import type { DataFilter } from "app/htmlTree/options";
 import type { TriggerEvent } from "app/jqtreeMethodTypes";
-import type { DataFilter } from "app/jqtreeOptions";
 
 import DataLoader from "app/dataLoader";
 import RequestUrl from "app/requestUrl";

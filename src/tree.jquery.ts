@@ -1,6 +1,7 @@
 import type { HandleFinishedLoading } from "./dataLoader";
+import type { HtmlTreeOptions, IconElement } from "./htmlTree/options";
 import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
-import type { JQTreeOptions } from "./jqtreeOptions";
+import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 import type { Node, Position } from "./node";
 import type { SavedState } from "./saveStateHandler";
 
@@ -157,7 +158,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const htmlTree = new HtmlTree(
             {
                 htmlElement,
-                options: this.inputOptions,
+                options: this._transformInputOptions(),
                 overrideTriggerEventProvider: triggerJQueryEvent,
             }
         );
@@ -364,6 +365,26 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this._htmlTree.updateNode(node, data);
         return this._element;
     }
+
+    private _transformInputOptions(): Partial<HtmlTreeOptions> {
+        function convertToIconElement(jqtreeIconElement: JQTreeIconElement | undefined) {
+            if (jqtreeIconElement instanceof jQuery) {
+                return (jqtreeIconElement as JQuery).get(0);
+            } else {
+                return jqtreeIconElement as IconElement;
+            }
+        }
+
+        const closedIcon = convertToIconElement(this.inputOptions.closedIcon);
+        const openedIcon = convertToIconElement(this.inputOptions.openedIcon);
+
+        return {
+            ...this.inputOptions,
+            closedIcon,
+            openedIcon
+        }
+    }
 }
+
 
 SimpleWidget.register(JqTreeWidget, "tree");

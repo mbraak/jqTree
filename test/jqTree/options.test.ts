@@ -231,6 +231,20 @@ describe("options", () => {
         });
 
         it("renders a html element", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                closedIcon: $("<span class='abc'>test</span>"),
+                data: exampleData,
+            });
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            const toggler = getTogglerElement(node1.element as HTMLElement);
+            const span = toggler.querySelector("span.abc"); // eslint-disable-line testing-library/no-node-access
+
+            expect(span).toHaveTextContent("test");
+        });
+
+        it("renders a html element", () => {
             const icon = document.createElement("span");
             icon.className = "abc";
             icon.textContent = "test";

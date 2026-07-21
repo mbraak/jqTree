@@ -1,5 +1,5 @@
+import type { DataFilter, OnLoadFailed, OnLoading } from "./htmlTree/options";
 import type { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
-import type { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
 import type { Node } from "./node";
 import type RequestUrl from "./requestUrl";
 

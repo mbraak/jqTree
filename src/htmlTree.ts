@@ -1,6 +1,6 @@
 import type { HandleFinishedLoading } from "./dataLoader";
+import type { HtmlTreeOptions } from "./htmlTree/options";
 import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
-import type { JQTreeOptions } from "./jqtreeOptions";
 import type { PositionInfo } from "./mouseUtils";
 import type { Position } from "./node";
 import type { SavedState } from "./saveStateHandler";
@@ -26,7 +26,7 @@ export type TriggerEventProvider = (element: HTMLElement, eventName: string, val
 
 interface HtmlTreeParams {
   htmlElement: HTMLElement;
-  options: Partial<JQTreeOptions>,
+  options: Partial<HtmlTreeOptions>,
   overrideTriggerEventProvider?: TriggerEventProvider,
 }
 
@@ -38,7 +38,7 @@ export default class HtmlTree {
   public keyHandler: KeyHandler;
   public mouseHandler: MouseHandler;
   public nodeMap: WeakMap<HTMLElement, Node>;
-  public options: JQTreeOptions;
+  public options: HtmlTreeOptions;
   public renderer: ElementsRenderer;
   public saveStateHandler: SaveStateHandler;
   public scrollHandler: ScrollHandler;

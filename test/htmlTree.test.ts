@@ -1,12 +1,12 @@
 import type { TriggerEventProvider } from "app/htmlTree";
-import type { JQTreeOptions } from "app/jqtreeOptions";
+import type { HtmlTreeOptions } from "app/htmlTree/options";
 
 import HtmlTree from "app/htmlTree";
 import { Node } from "app/node";
 import version from "app/version";
 
 interface CreateHtmlTreeParams {
-    options?: Partial<JQTreeOptions>;
+    options?: Partial<HtmlTreeOptions>;
     overrideTriggerEvent?: TriggerEventProvider;
 }
 
