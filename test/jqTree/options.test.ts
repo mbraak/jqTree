@@ -6,7 +6,8 @@ import { vi } from "vitest";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { titleSpan, togglerLink } from "../support/testUtil";
+import { getTitleElement } from "../support/queries";
+import { togglerLink } from "../support/testUtil";
 
 const server = setupServer();
 
@@ -177,7 +178,7 @@ describe("options", () => {
 
             const node = $tree.tree("getNodeByName", "node1");
             const liElement = node?.element as HTMLElement;
-            const spanElement = titleSpan(liElement);
+            const spanElement = getTitleElement(liElement);
 
             // eslint-disable-next-line testing-library/no-node-access
             const nextSibling = spanElement.nextSibling as HTMLElement;
@@ -194,7 +195,7 @@ describe("options", () => {
 
             const node = $tree.tree("getNodeByName", "node1");
             const liElement = node?.element as HTMLElement;
-            const spanElement = titleSpan(liElement);
+            const spanElement = getTitleElement(liElement);
 
             // eslint-disable-next-line testing-library/no-node-access
             const nextSibling = spanElement.previousSibling as HTMLElement;
@@ -423,7 +424,7 @@ describe("options", () => {
             $tree.tree({
                 data: exampleData,
                 onCreateLi: (node: INode, el: JQuery) => {
-                    titleSpan(el.get(0) as HTMLElement).innerHTML =
+                    getTitleElement(el.get(0) as HTMLElement).innerHTML =
                         `_${node.name}_`;
                 },
             });
