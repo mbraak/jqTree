@@ -1,6 +1,5 @@
 import { waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
-import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest"
@@ -8,135 +7,89 @@ import { vi } from "vitest"
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { titleSpan } from "../support/testUtil";
-
-const context = describe;
+import { getTitleElement } from "../support/queries";
 
 describe("events", () => {
     beforeEach(() => {
-        $("body").append('<div id="tree1"></div>');
+        const element = document.createElement("div");
+        element.id = "tree1";
+        document.body.appendChild(element);
     });
 
     afterEach(() => {
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        $tree.remove();
+        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
     });
 
     describe("tree.click", () => {
-        interface Vars {
-            $tree: JQuery;
-            node1: INode;
-            titleSpan: HTMLElement;
-        }
-
-        const given = getGiven<Vars>();
-        given("node1", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-        given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            given.$tree.tree({ data: exampleData });
-        });
-
         it("fires tree.click", async () => {
-            const onClick = vi.fn();
-            given.$tree.on("tree.click", onClick);
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            await userEvent.click(given.titleSpan);
+            const onClick = vi.fn();
+            $tree.on("tree.click", onClick);
+
+            await userEvent.click(getTitleElement(node1.element as HTMLElement));
 
             expect(onClick).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: given.node1 }),
+                expect.objectContaining({ node: node1 }),
             );
         });
     });
 
     describe("tree.contextmenu", () => {
-        interface Vars {
-            $tree: JQuery;
-            node1: INode;
-            titleSpan: HTMLElement;
-        }
-
-        const given = getGiven<Vars>();
-        given("node1", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-        given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            given.$tree.tree({ data: exampleData });
-        });
-
         it("fires tree.contextmenu", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+
             const onContextMenu = vi.fn();
-            given.$tree.on("tree.contextmenu", onContextMenu);
+            $tree.on("tree.contextmenu", onContextMenu);
 
             await userEvent.pointer({
                 keys: "[MouseRight]",
-                target: given.titleSpan,
+                target: getTitleElement(node1.element as HTMLElement),
             });
 
             expect(onContextMenu).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: given.node1 }),
+                expect.objectContaining({ node: node1 }),
             );
         });
     });
 
     describe("tree.dblclick", () => {
-        interface Vars {
-            $tree: JQuery;
-            node1: INode;
-            titleSpan: HTMLElement;
-        }
-
-        const given = getGiven<Vars>();
-        given("node1", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-        given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            given.$tree.tree({ data: exampleData });
-        });
-
         it("fires tree.dblclick", async () => {
-            const onDoubleClick = vi.fn();
-            given.$tree.on("tree.dblclick", onDoubleClick);
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            await userEvent.dblClick(given.titleSpan);
+            const onDoubleClick = vi.fn();
+            $tree.on("tree.dblclick", onDoubleClick);
+
+            await userEvent.dblClick(getTitleElement(node1.element as HTMLElement));
 
             expect(onDoubleClick).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: given.node1 }),
+                expect.objectContaining({ node: node1 }),
             );
         });
     });
 
     describe("tree.init", () => {
-        interface Vars {
-            $tree: JQuery;
-        }
-        const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
+        it("is called with json data", () => {
+            const $tree = $("#tree1");
+            const onInit = vi.fn();
+            $tree.on("tree.init", onInit);
 
-        context("with json data", () => {
-            it("is called", () => {
-                const onInit = vi.fn();
-                given.$tree.on("tree.init", onInit);
-
-                given.$tree.tree({
-                    data: exampleData,
-                });
-
-                expect(onInit).toHaveBeenCalledExactlyOnceWith(expect.anything());
+            $tree.tree({
+                data: exampleData,
             });
+
+            expect(onInit).toHaveBeenCalledExactlyOnceWith(expect.anything());
         });
 
-        context("with data loaded from an url", () => {
+        describe("with data loaded from an url", () => {
             const server = setupServer(
                 http.get("/tree/", () => HttpResponse.json(exampleData)),
             );
@@ -150,91 +103,75 @@ describe("events", () => {
             });
 
             it("is called", async () => {
+                const $tree = $("#tree1");
                 const onInit = vi.fn();
-                given.$tree.on("tree.init", onInit);
+                $tree.on("tree.init", onInit);
 
-                given.$tree.tree({ dataUrl: "/tree/" });
+                $tree.tree({ dataUrl: "/tree/" });
 
                 await waitFor(() => {
-                    expect(onInit).toHaveBeenCalledExactlyOnceWith(expect.anything());
+                    expect(onInit).toHaveBeenCalledExactlyOnceWith(
+                        expect.anything(),
+                    );
                 });
             });
         });
     });
 
     describe("tree.load_data", () => {
-        interface Vars {
-            $tree: JQuery;
-        }
-        const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
+        it("fires tree.load_data when the tree is initialized with data", () => {
+            const $tree = $("#tree1");
+            const onLoadData = vi.fn();
+            $tree.on("tree.load_data", onLoadData);
 
-        context("when the tree is initialized with data", () => {
-            it("fires tree.load_data", () => {
-                const onLoadData = vi.fn();
-                given.$tree.on("tree.load_data", onLoadData);
+            $tree.tree({ data: exampleData });
 
-                given.$tree.tree({ data: exampleData });
-
-                expect(onLoadData).toHaveBeenCalledExactlyOnceWith(
-                    expect.objectContaining({ tree_data: exampleData }),
-                );
-            });
+            expect(onLoadData).toHaveBeenCalledExactlyOnceWith(
+                expect.objectContaining({ tree_data: exampleData }),
+            );
         });
     });
 
     describe("tree.select", () => {
-        interface Vars {
-            $tree: JQuery;
-            node1: INode;
-            titleSpan: HTMLElement;
-        }
-
-        const given = getGiven<Vars>();
-        given("node1", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-        given("titleSpan", () => titleSpan(given.node1.element as HTMLElement));
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            given.$tree.tree({
+        it("fires tree.select", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
                 data: exampleData,
             });
-        });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-        it("fires tree.select", async () => {
             const onSelect = vi.fn();
-            given.$tree.on("tree.select", onSelect);
+            $tree.on("tree.select", onSelect);
 
-            await userEvent.click(given.titleSpan);
+            await userEvent.click(getTitleElement(node1.element as HTMLElement));
 
             expect(onSelect).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({
                     deselected_node: null,
-                    node: given.node1,
+                    node: node1,
                 }),
             );
         });
 
-        context("when the node was selected", () => {
-            beforeEach(() => {
-                given.$tree.tree("selectNode", given.node1);
+        it("fires tree.select with node is null when the node was selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
             });
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1);
 
-            it("fires tree.select with node is null", async () => {
-                const onSelect = vi.fn();
-                given.$tree.on("tree.select", onSelect);
+            const onSelect = vi.fn();
+            $tree.on("tree.select", onSelect);
 
-                await userEvent.click(given.titleSpan);
+            await userEvent.click(getTitleElement(node1.element as HTMLElement));
 
-                expect(onSelect).toHaveBeenCalledExactlyOnceWith(
-                    expect.objectContaining({
-                        node: null,
-                        previous_node: given.node1,
-                    }),
-                );
-            });
+            expect(onSelect).toHaveBeenCalledExactlyOnceWith(
+                expect.objectContaining({
+                    node: null,
+                    previous_node: node1,
+                }),
+            );
         });
     });
 
