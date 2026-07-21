@@ -20,7 +20,7 @@
         "@tailwindcss/typography": "^0.5.20",
         "autoprefixer": "^10.5.4",
         "jquery": "^4.0.0",
-        "postcss": "^8.5.19",
+        "postcss": "^8.5.20",
         "postcss-cli": "^11.0.1",
         "postcss-import": "^16.1.1",
         "postcss-load-config": "^6.0.1",
