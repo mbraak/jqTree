@@ -1,5 +1,4 @@
 import { screen, waitFor } from "@testing-library/dom";
-import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
@@ -8,8 +7,6 @@ import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
 import { titleSpan, togglerLink } from "../support/testUtil";
-
-const context = describe;
 
 const server = setupServer();
 
@@ -38,151 +35,135 @@ describe("options", () => {
     });
 
     describe("autoEscape", () => {
-        interface Vars {
-            $tree: JQuery;
-            autoEscape: boolean;
-        }
-
-        const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            given.$tree.tree({
-                autoEscape: given.autoEscape,
+        it("escapes the node name when autoEscape is true", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoEscape: true,
                 data: ["<span>test</span>"],
             });
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "&lt;span&gt;test&lt;/span&gt;",
+                }),
+            ]);
         });
 
-        context("with autoEscape true", () => {
-            given("autoEscape", () => true);
-
-            it("escapes the node name", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        name: "&lt;span&gt;test&lt;/span&gt;",
-                    }),
-                ]);
+        it("doesn't escape the node name when autoEscape is false", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoEscape: false,
+                data: ["<span>test</span>"],
             });
-        });
 
-        context("with autoEscape false", () => {
-            given("autoEscape", () => false);
-
-            it("doesn't escape the node name", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        name: "<span>test</span>",
-                    }),
-                ]);
-            });
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "<span>test</span>",
+                }),
+            ]);
         });
     });
 
     describe("autoOpen", () => {
-        interface Vars {
-            $tree: JQuery;
-            autoOpen: boolean | number | string;
-        }
-
-        const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            given.$tree.tree({
-                autoOpen: given.autoOpen,
+        it("doesn't open any nodes with autoOpen false", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: false,
                 data: exampleData,
             });
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", open: false }),
+                expect.objectContaining({ name: "node2", open: false }),
+            ]);
         });
 
-        context("with autoOpen false", () => {
-            given("autoOpen", () => false);
-
-            it("doesn't open any nodes", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "node1", open: false }),
-                    expect.objectContaining({ name: "node2", open: false }),
-                ]);
+        it("opens all nodes with autoOpen true", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: true,
+                data: exampleData,
             });
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", open: true }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "node3",
+                            open: true,
+                        }),
+                    ],
+                    name: "node2",
+                    open: true,
+                }),
+            ]);
         });
 
-        context("with autoOpen true", () => {
-            given("autoOpen", () => true);
-
-            it("opens all nodes", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "node1", open: true }),
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({
-                                name: "node3",
-                                open: true,
-                            }),
-                        ],
-                        name: "node2",
-                        open: true,
-                    }),
-                ]);
+        it("opens level 0 with autoOpen 0", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: 0,
+                data: exampleData,
             });
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", open: true }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "node3",
+                            open: false,
+                        }),
+                    ],
+                    name: "node2",
+                    open: true,
+                }),
+            ]);
         });
 
-        context("with autoOpen 0", () => {
-            given("autoOpen", () => 0);
-
-            it("opens level 0", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "node1", open: true }),
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({
-                                name: "node3",
-                                open: false,
-                            }),
-                        ],
-                        name: "node2",
-                        open: true,
-                    }),
-                ]);
+        it("opens levels 1 with autoOpen 1", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: 1,
+                data: exampleData,
             });
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", open: true }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "node3",
+                            open: true,
+                        }),
+                    ],
+                    name: "node2",
+                    open: true,
+                }),
+            ]);
         });
 
-        context("with autoOpen 1", () => {
-            given("autoOpen", () => 1);
-
-            it("opens levels 1", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "node1", open: true }),
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({
-                                name: "node3",
-                                open: true,
-                            }),
-                        ],
-                        name: "node2",
-                        open: true,
-                    }),
-                ]);
+        it("opens levels 1 with autoOpen '1'", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: "1",
+                data: exampleData,
             });
-        });
 
-        context("with autoOpen '1'", () => {
-            given("autoOpen", () => "1");
-
-            it("opens levels 1", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({ name: "node1", open: true }),
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({
-                                name: "node3",
-                                open: true,
-                            }),
-                        ],
-                        name: "node2",
-                        open: true,
-                    }),
-                ]);
-            });
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1", open: true }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "node3",
+                            open: true,
+                        }),
+                    ],
+                    name: "node2",
+                    open: true,
+                }),
+            ]);
         });
     });
 
@@ -354,23 +335,14 @@ describe("options", () => {
             );
         });
 
-        interface Vars {
-            $tree: JQuery;
-        }
-        const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
-
         testCases.forEach(
             ({ dataUrl, expectedNode, expectedStructure, name }) => {
-                context(`with ${name}`, () => {
-                    it("loads the data from the url", async () => {
-                        given.$tree.tree({ dataUrl });
-                        await screen.findByText(expectedNode);
+                it(`loads the data from the url with ${name}`, async () => {
+                    const $tree = $("#tree1");
+                    $tree.tree({ dataUrl });
+                    await screen.findByText(expectedNode);
 
-                        expect(given.$tree).toHaveTreeStructure(
-                            expectedStructure,
-                        );
-                    });
+                    expect($tree).toHaveTreeStructure(expectedStructure);
                 });
             },
         );
@@ -378,14 +350,15 @@ describe("options", () => {
         it("loads the data and selects the node when the state contains a selected node", async () => {
             localStorage.setItem("tree", '{"selected_node":[124]}');
 
-            given.$tree.tree({
+            const $tree = $("#tree1");
+            $tree.tree({
                 dataUrl: "/tree/",
                 saveState: true,
             });
 
             await screen.findByText("node1");
 
-            expect((given.$tree.tree("getSelectedNode") as INode).name).toBe(
+            expect(($tree.tree("getSelectedNode") as INode).name).toBe(
                 "node2",
             );
         });
@@ -393,14 +366,15 @@ describe("options", () => {
         it("loads the data and doesn't selects a node when the state doesn't contain a selected node", async () => {
             localStorage.setItem("tree", "{}");
 
-            given.$tree.tree({
+            const $tree = $("#tree1");
+            $tree.tree({
                 dataUrl: "/tree/",
                 saveState: true,
             });
 
             await screen.findByText("node1");
 
-            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+            expect($tree.tree("getSelectedNode")).toBeFalse();
         });
     });
 
@@ -429,51 +403,32 @@ describe("options", () => {
     });
 
     describe("onCanSelectNode", () => {
-        interface Vars {
-            $tree: JQuery;
-            node1: INode;
-        }
-
-        const given = getGiven<Vars>();
-        given("node1", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            given.$tree.tree({
+        it("doesn't select the node", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
                 data: exampleData,
                 onCanSelectNode: (node: INode) => node.name !== "node1",
             });
-        });
 
-        it("doesn't select the node", () => {
-            given.$tree.tree("selectNode", given.node1);
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1);
 
-            expect(given.$tree.tree("getSelectedNode")).toBeFalse();
+            expect($tree.tree("getSelectedNode")).toBeFalse();
         });
     });
 
     describe("onCreateLi", () => {
-        interface Vars {
-            $tree: JQuery;
-        }
-
-        const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            given.$tree.tree({
+        it("is called when creating a node", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
                 data: exampleData,
                 onCreateLi: (node: INode, el: JQuery) => {
                     titleSpan(el.get(0) as HTMLElement).innerHTML =
                         `_${node.name}_`;
                 },
             });
-        });
 
-        it("is called when creating a node", () => {
-            expect(given.$tree).toHaveTreeStructure([
+            expect($tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "_node1_" }),
                 expect.objectContaining({ name: "_node2_" }),
             ]);
@@ -489,100 +444,80 @@ describe("options", () => {
 
         const getState = (): string => savedState;
 
-        interface Vars {
-            $tree: JQuery;
-            initialState: string;
-            node1: INode;
-        }
-
-        const given = getGiven<Vars>();
-        given("initialState", () => "");
-        given("node1", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-        given("$tree", () => $("#tree1"));
-
-        beforeEach(() => {
-            savedState = given.initialState;
-
-            given.$tree.tree({
+        const createTree = () => {
+            const $tree = $("#tree1");
+            $tree.tree({
                 autoOpen: false,
                 data: exampleData,
                 onGetStateFromStorage: getState,
                 onSetStateFromStorage: setState,
                 saveState: true,
             });
+
+            return $tree;
+        };
+
+        beforeEach(() => {
+            savedState = "";
         });
 
-        context("with an open and a selected node", () => {
-            beforeEach(() => {
-                given.$tree.tree("selectNode", given.node1);
-                given.$tree.tree("openNode", given.node1);
-            });
+        it("saves the state with an open and a selected node", () => {
+            const $tree = createTree();
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            it("saves the state", () => {
-                expect(JSON.parse(savedState)).toStrictEqual({
-                    open_nodes: [123],
-                    selected_node: [123],
-                });
+            $tree.tree("selectNode", node1);
+            $tree.tree("openNode", node1);
+
+            expect(JSON.parse(savedState)).toStrictEqual({
+                open_nodes: [123],
+                selected_node: [123],
             });
         });
 
-        context("with a saved state", () => {
-            given("initialState", () =>
-                JSON.stringify({
-                    open_nodes: [123],
-                    selected_node: [123],
+        it("restores the state with a saved state", () => {
+            savedState = JSON.stringify({
+                open_nodes: [123],
+                selected_node: [123],
+            });
+
+            const $tree = createTree();
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    open: true,
                 }),
-            );
-
-            it("restores the state", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        name: "node1",
-                        open: true,
-                    }),
-                    expect.objectContaining({ name: "node2", open: false }),
-                ]);
-                expect(given.node1.element).toBeSelectedTreeNode();
-            });
+                expect.objectContaining({ name: "node2", open: false }),
+            ]);
+            expect(node1.element).toBeSelectedTreeNode();
         });
     });
 
     describe("onLoadFailed", () => {
-        interface Vars {
-            $tree: JQuery;
-        }
+        it("calls onLoadFailed when the loading fails", async () => {
+            server.use(
+                http.get(
+                    "/tree/",
+                    () =>
+                        new HttpResponse("Internal server error", {
+                            status: 500,
+                        }),
+                ),
+            );
 
-        const given = getGiven<Vars>();
-        given("$tree", () => $("#tree1"));
+            const onLoadFailed = vi.fn();
 
-        context("when the loading fails", () => {
-            beforeEach(() => {
-                server.use(
-                    http.get(
-                        "/tree/",
-                        () =>
-                            new HttpResponse("Internal server error", {
-                                status: 500,
-                            }),
-                    ),
-                );
+            const $tree = $("#tree1");
+            $tree.tree({
+                dataUrl: "/tree/",
+                onLoadFailed,
             });
 
-            it("calls onLoadFailed", async () => {
-                const onLoadFailed = vi.fn();
-
-                given.$tree.tree({
-                    dataUrl: "/tree/",
-                    onLoadFailed,
-                });
-
-                await waitFor(() => {
-                    expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith(
-                        expect.objectContaining({ status: 500 }),
-                    );
-                });
+            await waitFor(() => {
+                expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith(
+                    expect.objectContaining({ status: 500 }),
+                );
             });
         });
     });
@@ -643,132 +578,101 @@ describe("options", () => {
     });
 
     describe("saveState", () => {
-        interface Vars {
-            $tree: JQuery;
-            node1: INode;
-            saveState: boolean | string;
-        }
-        const given = getGiven<Vars>();
-        given("node1", () =>
-            given.$tree.tree("getNodeByNameMustExist", "node1"),
-        );
-        given("$tree", () => $("#tree1"));
-
-        context("when a node is open and selected", () => {
-            beforeEach(() => {
-                given.$tree.tree({
-                    animationSpeed: 0,
-                    autoOpen: false,
-                    data: exampleData,
-                    saveState: given.saveState,
-                });
-
-                given.$tree.tree("selectNode", given.node1);
-                given.$tree.tree("openNode", given.node1);
+        const createTreeWithOpenSelectedNode = (
+            saveState: boolean | string,
+        ) => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+                saveState,
             });
 
-            context("when saveState is true", () => {
-                given("saveState", () => true);
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1);
+            $tree.tree("openNode", node1);
 
-                it("saves the state to local storage", () => {
-                    expect(localStorage.getItem("tree")).toBe(
-                        '{"open_nodes":[123],"selected_node":[123]}',
-                    );
-                });
-            });
+            return $tree;
+        };
 
-            context("when saveState is a string", () => {
-                given("saveState", () => "my-state");
+        it("saves the state to local storage when saveState is true", () => {
+            createTreeWithOpenSelectedNode(true);
 
-                it("uses the string as a key", () => {
-                    expect(localStorage.getItem("my-state")).toBe(
-                        '{"open_nodes":[123],"selected_node":[123]}',
-                    );
-                });
-            });
-
-            context("when saveState is false", () => {
-                given("saveState", () => false);
-
-                it("doesn't save to local storage", () => {
-                    expect(localStorage.getItem("tree")).toBeNull();
-                });
-            });
+            expect(localStorage.getItem("tree")).toBe(
+                '{"open_nodes":[123],"selected_node":[123]}',
+            );
         });
 
-        context("when there is a state in the local storage", () => {
-            given("saveState", () => true);
+        it("uses the string as a key when saveState is a string", () => {
+            createTreeWithOpenSelectedNode("my-state");
 
-            beforeEach(() => {
-                localStorage.setItem(
-                    "tree",
-                    '{"open_nodes":[123],"selected_node":[123]}',
-                );
+            expect(localStorage.getItem("my-state")).toBe(
+                '{"open_nodes":[123],"selected_node":[123]}',
+            );
+        });
 
-                given.$tree.tree({
-                    animationSpeed: 0,
-                    autoOpen: false,
-                    data: exampleData,
-                    saveState: given.saveState,
-                });
+        it("doesn't save to local storage when saveState is false", () => {
+            createTreeWithOpenSelectedNode(false);
+
+            expect(localStorage.getItem("tree")).toBeNull();
+        });
+
+        it("restores the state when there is a state in the local storage", () => {
+            localStorage.setItem(
+                "tree",
+                '{"open_nodes":[123],"selected_node":[123]}',
+            );
+
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+                saveState: true,
             });
 
-            it("restores the state", () => {
-                expect(given.$tree).toHaveTreeStructure([
-                    expect.objectContaining({
-                        name: "node1",
-                        open: true,
-                        selected: true,
-                    }),
-                    expect.objectContaining({
-                        name: "node2",
-                        open: false,
-                        selected: false,
-                    }),
-                ]);
-            });
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    name: "node1",
+                    open: true,
+                    selected: true,
+                }),
+                expect.objectContaining({
+                    name: "node2",
+                    open: false,
+                    selected: false,
+                }),
+            ]);
         });
     });
 
     describe("showEmptyFolder", () => {
-        context("when children attribute is an empty array", () => {
-            interface Vars {
-                $tree: JQuery;
-                showEmptyFolder: boolean;
-            }
-
-            const given = getGiven<Vars>();
-            given("$tree", () => $("#tree1"));
-
-            beforeEach(() => {
-                given.$tree.tree({
-                    data: [{ children: [], name: "parent1" }],
-                    showEmptyFolder: given.showEmptyFolder,
-                });
+        it("creates a child node with showEmptyFolder false", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: [{ children: [], name: "parent1" }],
+                showEmptyFolder: false,
             });
 
-            context("with showEmptyFolder false", () => {
-                given("showEmptyFolder", () => false);
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "parent1" }),
+            ]);
+        });
 
-                it("creates a child node", () => {
-                    expect(given.$tree).toHaveTreeStructure([
-                        expect.objectContaining({ name: "parent1" }),
-                    ]);
-                });
+        it("creates a folder with showEmptyFolder true", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: [{ children: [], name: "parent1" }],
+                showEmptyFolder: true,
             });
 
-            context("with showEmptyFolder true", () => {
-                given("showEmptyFolder", () => true);
-
-                it("creates a folder", () => {
-                    expect(given.$tree).toHaveTreeStructure([
-                        expect.objectContaining({
-                            children: [],
-                            name: "parent1",
-                        }),
-                    ]);
-                });
-            });
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    children: [],
+                    name: "parent1",
+                }),
+            ]);
         });
     });
 });
