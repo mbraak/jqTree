@@ -1,14 +1,11 @@
 import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
-import getGiven from "givens";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 
 import "app/tree.jquery";
 
-import { togglerLink } from "../support/testUtil";
-
-const context = describe;
+import { getTogglerElement } from "../support/queries";
 
 describe("load on demand", () => {
     const server = setupServer();
@@ -18,39 +15,10 @@ describe("load on demand", () => {
     });
 
     beforeEach(() => {
-        $("body").append('<div id="tree1"></div>');
+        const element = document.createElement("div");
+        element.id = "tree1";
+        document.body.appendChild(element);
     });
-
-    afterEach(() => {
-        server.resetHandlers();
-
-        const $tree = $("#tree1");
-        $tree.tree("destroy");
-        $tree.remove();
-        localStorage.clear();
-    });
-
-    afterAll(() => {
-        server.close();
-    });
-
-    interface Vars {
-        $tree: JQuery;
-        autoOpen: boolean;
-        node: INode;
-        savedState?: string;
-    }
-    const given = getGiven<Vars>();
-    given("autoOpen", () => false);
-    given("$tree", () => $("#tree1"));
-
-    const initialData = [
-        {
-            id: 1,
-            load_on_demand: true,
-            name: "parent-node",
-        },
-    ];
 
     beforeEach(() => {
         server.use(
@@ -69,21 +37,37 @@ describe("load on demand", () => {
         );
     });
 
-    beforeEach(() => {
-        if (given.savedState) {
-            localStorage.setItem("tree", given.savedState);
-        }
+    afterEach(() => {
+        server.resetHandlers();
 
-        given.$tree.tree({
-            autoOpen: given.autoOpen,
+        const $tree = $("#tree1");
+        $tree.tree("destroy");
+        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
+        localStorage.clear();
+    });
+
+    afterAll(() => {
+        server.close();
+    });
+
+    const initialData = [
+        {
+            id: 1,
+            load_on_demand: true,
+            name: "parent-node",
+        },
+    ];
+
+    it("creates a parent node without children", () => {
+        const $tree = $("#tree1");
+        $tree.tree({
+            autoOpen: false,
             data: initialData,
             dataUrl: "/tree/",
             saveState: true,
         });
-    });
 
-    it("creates a parent node without children", () => {
-        expect(given.$tree).toHaveTreeStructure([
+        expect($tree).toHaveTreeStructure([
             expect.objectContaining({
                 children: [],
                 name: "parent-node",
@@ -92,17 +76,22 @@ describe("load on demand", () => {
         ]);
     });
 
-    context("when the node is opened", () => {
-        given("node", () =>
-            given.$tree.tree("getNodeByNameMustExist", "parent-node"),
-        );
-
+    describe("when the node is opened", () => {
         it("loads the subtree", async () => {
-            const toggler = togglerLink(given.node.element as HTMLElement);
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: false,
+                data: initialData,
+                dataUrl: "/tree/",
+                saveState: true,
+            });
+            const node = $tree.tree("getNodeByNameMustExist", "parent-node");
+
+            const toggler = getTogglerElement(node.element as HTMLElement);
             await userEvent.click(toggler);
 
             await waitFor(() => {
-                expect(given.$tree).toHaveTreeStructure([
+                expect($tree).toHaveTreeStructure([
                     expect.objectContaining({
                         children: [
                             expect.objectContaining({
@@ -118,95 +107,120 @@ describe("load on demand", () => {
             await screen.findByText("loaded-on-demand");
         });
 
-        context("when the node is selected", () => {
-            beforeEach(() => {
-                given.$tree.tree("selectNode", given.node);
+        it("keeps the node selected when the node is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: false,
+                data: initialData,
+                dataUrl: "/tree/",
+                saveState: true,
             });
+            const node = $tree.tree("getNodeByNameMustExist", "parent-node");
+            $tree.tree("selectNode", node);
 
-            it("keeps the node selected", async () => {
-                expect(given.node.element).toBeSelectedTreeNode();
-                expect(given.node.element).toBeFocusedTreeNode();
+            expect(node.element).toBeSelectedTreeNode();
+            expect(node.element).toBeFocusedTreeNode();
 
-                const toggler = togglerLink(given.node.element as HTMLElement);
-                await userEvent.click(toggler);
+            const toggler = getTogglerElement(node.element as HTMLElement);
+            await userEvent.click(toggler);
 
-                await screen.findByText("loaded-on-demand");
+            await screen.findByText("loaded-on-demand");
 
-                expect(given.node.element).toBeSelectedTreeNode();
-            });
+            expect(node.element).toBeSelectedTreeNode();
         });
 
-        context("when the node is not selected", () => {
-            it("doesn't select the node", async () => {
-                expect(given.node.element).not.toBeSelectedTreeNode();
-
-                const toggler = togglerLink(given.node.element as HTMLElement);
-                await userEvent.click(toggler);
-
-                await screen.findByText("loaded-on-demand");
-
-                expect(given.node.element).not.toBeSelectedTreeNode();
+        it("doesn't select the node when the node is not selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: false,
+                data: initialData,
+                dataUrl: "/tree/",
+                saveState: true,
             });
+            const node = $tree.tree("getNodeByNameMustExist", "parent-node");
+
+            expect(node.element).not.toBeSelectedTreeNode();
+
+            const toggler = getTogglerElement(node.element as HTMLElement);
+            await userEvent.click(toggler);
+
+            await screen.findByText("loaded-on-demand");
+
+            expect(node.element).not.toBeSelectedTreeNode();
         });
 
-        context("when the node is selected and doesn't have the focus", () => {
-            beforeEach(() => {
-                given.$tree.tree("selectNode", given.node);
-                (document.activeElement as HTMLElement).blur(); // eslint-disable-line testing-library/no-node-access
+        it("keeps the node selected and not focused when the node is selected and doesn't have the focus", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: false,
+                data: initialData,
+                dataUrl: "/tree/",
+                saveState: true,
             });
+            const node = $tree.tree("getNodeByNameMustExist", "parent-node");
+            $tree.tree("selectNode", node);
+            (document.activeElement as HTMLElement).blur(); // eslint-disable-line testing-library/no-node-access
 
-            it("keeps the node selected and not focused", async () => {
-                expect(given.node.element).toBeSelectedTreeNode();
-                expect(given.node.element).not.toBeFocusedTreeNode();
+            expect(node.element).toBeSelectedTreeNode();
+            expect(node.element).not.toBeFocusedTreeNode();
 
-                const toggler = togglerLink(given.node.element as HTMLElement);
-                await userEvent.click(toggler);
+            const toggler = getTogglerElement(node.element as HTMLElement);
+            await userEvent.click(toggler);
 
-                await screen.findByText("loaded-on-demand");
+            await screen.findByText("loaded-on-demand");
 
-                expect(given.node.element).toBeSelectedTreeNode();
-                expect(given.node.element).not.toBeFocusedTreeNode();
-            });
+            expect(node.element).toBeSelectedTreeNode();
+            expect(node.element).not.toBeFocusedTreeNode();
         });
     });
 
-    context("with autoOpen is true", () => {
-        given("autoOpen", () => true);
-
-        it("loads the node on demand", async () => {
-            await screen.findByText("loaded-on-demand");
-
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({
-                            name: "loaded-on-demand",
-                        }),
-                    ],
-                    name: "parent-node",
-                    open: true,
-                }),
-            ]);
+    it("loads the node on demand with autoOpen true", async () => {
+        const $tree = $("#tree1");
+        $tree.tree({
+            autoOpen: true,
+            data: initialData,
+            dataUrl: "/tree/",
+            saveState: true,
         });
+
+        await screen.findByText("loaded-on-demand");
+
+        expect($tree).toHaveTreeStructure([
+            expect.objectContaining({
+                children: [
+                    expect.objectContaining({
+                        name: "loaded-on-demand",
+                    }),
+                ],
+                name: "parent-node",
+                open: true,
+            }),
+        ]);
     });
 
-    context("with a saved state with an opened node", () => {
-        given("savedState", () => '{"open_nodes":[1],"selected_node":[]}');
+    it("opens the node and loads its children on demand with a saved state with an opened node", async () => {
+        localStorage.setItem("tree", '{"open_nodes":[1],"selected_node":[]}');
 
-        it("opens the node and loads its children on demand", async () => {
-            await screen.findByText("loaded-on-demand");
-
-            expect(given.$tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({
-                            name: "loaded-on-demand",
-                        }),
-                    ],
-                    name: "parent-node",
-                    open: true,
-                }),
-            ]);
+        const $tree = $("#tree1");
+        $tree.tree({
+            autoOpen: false,
+            data: initialData,
+            dataUrl: "/tree/",
+            saveState: true,
         });
+
+        await screen.findByText("loaded-on-demand");
+
+        expect($tree).toHaveTreeStructure([
+            expect.objectContaining({
+                children: [
+                    expect.objectContaining({
+                        name: "loaded-on-demand",
+                    }),
+                ],
+                name: "parent-node",
+                open: true,
+            }),
+        ]);
     });
 });

@@ -1,4 +1,4 @@
-import { getChildren, singleChild } from "./testUtil";
+import { assertSingleElement, getTitleElement } from "./queries";
 
 export type TreeNode = TreeChild | TreeFolder;
 
@@ -18,13 +18,12 @@ interface TreeFolder {
 }
 
 const getTreeNode = (li: HTMLElement): TreeNode => {
-    const div = singleChild(li, "div", "jqtree-element");
-    const span = singleChild(div, "span", "jqtree-title");
+    const span = getTitleElement(li);
     const name = span.innerHTML;
     const selected = li.classList.contains("jqtree-selected");
 
     if (li.classList.contains("jqtree-folder")) {
-        const ulChildren = getChildren(li, "ul", "jqtree_common");
+        const ulChildren = li.querySelectorAll(":scope > ul.jqtree_common");
 
         const children =
             ulChildren.length === 1
@@ -47,11 +46,12 @@ const getTreeNode = (li: HTMLElement): TreeNode => {
     }
 };
 
-const getChildNodes = (ul: HTMLElement) =>
-    getChildren(ul, "li", "jqtree_common").map((li) => getTreeNode(li));
+const getChildNodes = (ul: HTMLElement) => Array.from(ul.querySelectorAll<HTMLElement>(":scope > li.jqtree_common")).map((li) => getTreeNode(li))
 
 const treeStructure = (el: HTMLElement): TreeStructure => {
-    return getChildNodes(singleChild(el, "ul", "jqtree-tree"));
+    const elements = el.querySelectorAll<HTMLElement>(":scope > ul.jqtree-tree");
+    assertSingleElement(el, elements, "tree");
+    return getChildNodes(elements[0] as HTMLElement);
 };
 
 export default treeStructure;

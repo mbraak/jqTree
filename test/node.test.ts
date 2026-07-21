@@ -1,101 +1,26 @@
-import getGiven from "givens";
 import "jest-extended";
 
 import { Node } from "app/node";
 
 import exampleData from "./support/exampleData";
 
-const context = describe;
-
 describe("addAfter", () => {
-    interface Vars {
-        node1: Node;
-        tree: Node;
-    }
+    it("returns the new node when moving after node1", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node1 = tree.getNodeByNameMustExist("node1");
 
-    const given = getGiven<Vars>();
-    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
-    given("tree", () => new Node().loadFromData(exampleData));
-
-    context("when moving after node1", () => {
-        it("returns the new node", () => {
-            expect(given.node1.addAfter("new node")).toMatchObject({
-                name: "new node",
-            });
-        });
-
-        it("adds after the node", () => {
-            given.node1.addAfter("new node");
-
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({ name: "node1" }),
-                    expect.objectContaining({ name: "new node" }),
-                    expect.objectContaining({ name: "node2" }),
-                ],
-            });
-        });
-    });
-
-    context("when moving after the root node", () => {
-        it("returns null", () => {
-            expect(given.tree.addAfter("new node")).toBeNull();
-        });
-
-        it("doesn't add anything", () => {
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({ name: "node1" }),
-                    expect.objectContaining({ name: "node2" }),
-                ],
-            });
-        });
-    });
-
-    context("when adding a node with children", () => {
-        it("adds the children", () => {
-            given.node1.addAfter({
-                children: ["newchild1", "newchild2"],
-                name: "new node",
-            });
-
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({ name: "node1" }),
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "newchild1" }),
-                            expect.objectContaining({ name: "newchild2" }),
-                        ],
-                        name: "new node",
-                    }),
-                    expect.objectContaining({ name: "node2" }),
-                ],
-            });
-        });
-    });
-});
-
-describe("addBefore", () => {
-    interface Vars {
-        node2: Node;
-        tree: Node;
-    }
-
-    const given = getGiven<Vars>();
-    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
-    given("tree", () => new Node().loadFromData(exampleData));
-
-    it("returns the new node", () => {
-        expect(given.node2.addBefore("new node")).toMatchObject({
+        expect(node1.addAfter("new node")).toMatchObject({
             name: "new node",
         });
     });
 
-    it("adds before the node", () => {
-        given.node2.addBefore("new node");
+    it("adds after the node when moving after node1", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node1 = tree.getNodeByNameMustExist("node1");
 
-        expect(given.tree).toMatchObject({
+        node1.addAfter("new node");
+
+        expect(tree).toMatchObject({
             children: [
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "new node" }),
@@ -104,61 +29,123 @@ describe("addBefore", () => {
         });
     });
 
-    context("with a root node", () => {
-        it("returns null", () => {
-            expect(given.tree.addBefore("new node")).toBeNull();
-        });
+    it("returns null when moving after the root node", () => {
+        const tree = new Node().loadFromData(exampleData);
 
-        it("does nothing", () => {
-            given.tree.addBefore("new node");
+        expect(tree.addAfter("new node")).toBeNull();
+    });
 
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({ name: "node1" }),
-                    expect.objectContaining({ name: "node2" }),
-                ],
-            });
+    it("doesn't add anything when moving after the root node", () => {
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ],
         });
     });
 
-    context("when adding a node with children", () => {
-        it("adds the children", () => {
-            given.node2.addBefore({
-                children: ["newchild1", "newchild2"],
-                name: "new node",
-            });
+    it("adds the children when adding a node with children", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node1 = tree.getNodeByNameMustExist("node1");
 
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({ name: "node1" }),
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "newchild1" }),
-                            expect.objectContaining({ name: "newchild2" }),
-                        ],
-                        name: "new node",
-                    }),
-                    expect.objectContaining({ name: "node2" }),
-                ],
-            });
+        node1.addAfter({
+            children: ["newchild1", "newchild2"],
+            name: "new node",
+        });
+
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({ name: "newchild1" }),
+                        expect.objectContaining({ name: "newchild2" }),
+                    ],
+                    name: "new node",
+                }),
+                expect.objectContaining({ name: "node2" }),
+            ],
+        });
+    });
+});
+
+describe("addBefore", () => {
+    it("returns the new node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node2 = tree.getNodeByNameMustExist("node2");
+
+        expect(node2.addBefore("new node")).toMatchObject({
+            name: "new node",
+        });
+    });
+
+    it("adds before the node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node2 = tree.getNodeByNameMustExist("node2");
+
+        node2.addBefore("new node");
+
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "new node" }),
+                expect.objectContaining({ name: "node2" }),
+            ],
+        });
+    });
+
+    it("returns null with a root node", () => {
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.addBefore("new node")).toBeNull();
+    });
+
+    it("does nothing with a root node", () => {
+        const tree = new Node().loadFromData(exampleData);
+
+        tree.addBefore("new node");
+
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ],
+        });
+    });
+
+    it("adds the children when adding a node with children", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node2 = tree.getNodeByNameMustExist("node2");
+
+        node2.addBefore({
+            children: ["newchild1", "newchild2"],
+            name: "new node",
+        });
+
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({ name: "newchild1" }),
+                        expect.objectContaining({ name: "newchild2" }),
+                    ],
+                    name: "new node",
+                }),
+                expect.objectContaining({ name: "node2" }),
+            ],
         });
     });
 });
 
 describe("addChild", () => {
-    interface Vars {
-        node: Node;
-    }
-
-    const given = getGiven<Vars>();
-    given("node", () => new Node());
-
-    beforeEach(() => {
-        given.node.addChild(new Node({ id: 100, name: "child1" }));
-    });
-
     it("adds the child", () => {
-        expect(given.node.children).toStrictEqual(
+        const node = new Node();
+        node.addChild(new Node({ id: 100, name: "child1" }));
+
+        expect(node.children).toStrictEqual(
             expect.arrayContaining([
                 expect.objectContaining({ id: 100, name: "child1" }),
             ]),
@@ -166,87 +153,61 @@ describe("addChild", () => {
     });
 
     it("sets the parent of the child", () => {
-        expect(given.node.children[0]?.parent).toStrictEqual(given.node);
+        const node = new Node();
+        node.addChild(new Node({ id: 100, name: "child1" }));
+
+        expect(node.children[0]?.parent).toStrictEqual(node);
     });
 });
 
 describe("addChildAtPosition", () => {
-    interface Vars {
-        child: Node;
-        index: number;
-        node: Node;
-    }
+    it("adds at the start with index 0", () => {
+        const child = new Node("new");
+        const node = new Node("new").loadFromData(["child1", "child2"]);
+        node.addChildAtPosition(child, 0);
 
-    const given = getGiven<Vars>();
-
-    given("child", () => new Node("new"));
-    given("node", () => new Node("new").loadFromData(["child1", "child2"]));
-
-    beforeEach(() => {
-        given.node.addChildAtPosition(given.child, given.index);
+        expect(node.children).toStrictEqual([
+            expect.objectContaining({ name: "new" }),
+            expect.objectContaining({ name: "child1" }),
+            expect.objectContaining({ name: "child2" }),
+        ]);
     });
 
-    context("with index 0", () => {
-        given("index", () => 0);
+    it("inserts at index 1", () => {
+        const child = new Node("new");
+        const node = new Node("new").loadFromData(["child1", "child2"]);
+        node.addChildAtPosition(child, 1);
 
-        it("adds at the start", () => {
-            expect(given.node.children).toStrictEqual([
-                expect.objectContaining({ name: "new" }),
-                expect.objectContaining({ name: "child1" }),
-                expect.objectContaining({ name: "child2" }),
-            ]);
-
-            expect(given.node.children).toStrictEqual([
-                expect.objectContaining({ name: "new" }),
-                expect.objectContaining({ name: "child1" }),
-                expect.objectContaining({ name: "child2" }),
-            ]);
-        });
+        expect(node.children).toStrictEqual([
+            expect.objectContaining({ name: "child1" }),
+            expect.objectContaining({ name: "new" }),
+            expect.objectContaining({ name: "child2" }),
+        ]);
     });
 
-    context("with index 1", () => {
-        given("index", () => 1);
+    it("adds at the end with a non existing index", () => {
+        const child = new Node("new");
+        const node = new Node("new").loadFromData(["child1", "child2"]);
+        node.addChildAtPosition(child, 99);
 
-        it("inserts at index 1", () => {
-            expect(given.node.children).toStrictEqual([
-                expect.objectContaining({ name: "child1" }),
-                expect.objectContaining({ name: "new" }),
-                expect.objectContaining({ name: "child2" }),
-            ]);
-        });
-    });
-
-    context("with non existing index", () => {
-        given("index", () => 99);
-
-        it("adds add the end", () => {
-            expect(given.node.children).toStrictEqual([
-                expect.objectContaining({ name: "child1" }),
-                expect.objectContaining({ name: "child2" }),
-                expect.objectContaining({ name: "new" }),
-            ]);
-        });
+        expect(node.children).toStrictEqual([
+            expect.objectContaining({ name: "child1" }),
+            expect.objectContaining({ name: "child2" }),
+            expect.objectContaining({ name: "new" }),
+        ]);
     });
 });
 
 describe("addParent", () => {
-    interface Vars {
-        node1: Node;
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("node1", () => new Node("node1"));
-    given("tree", () => new Node({}, true));
-
-    beforeEach(() => {
-        given.tree.addChild(given.node1);
-        given.node1.append("child1");
-    });
-
     it("adds a parent node", () => {
-        given.node1.addParent("parent1");
+        const node1 = new Node("node1");
+        const tree = new Node({}, true);
+        tree.addChild(node1);
+        node1.append("child1");
 
-        expect(given.tree).toMatchObject({
+        node1.addParent("parent1");
+
+        expect(tree).toMatchObject({
             children: [
                 expect.objectContaining({
                     children: [
@@ -265,30 +226,33 @@ describe("addParent", () => {
     });
 
     it("returns the new node", () => {
-        expect(given.node1.addParent("parent1")).toMatchObject({
+        const node1 = new Node("node1");
+        const tree = new Node({}, true);
+        tree.addChild(node1);
+        node1.append("child1");
+
+        expect(node1.addParent("parent1")).toMatchObject({
             name: "parent1",
         });
     });
 
-    context("with a root node", () => {
-        it("returns null", () => {
-            expect(given.tree.addParent("parent1")).toBeNull();
-        });
+    it("returns null with a root node", () => {
+        const node1 = new Node("node1");
+        const tree = new Node({}, true);
+        tree.addChild(node1);
+        node1.append("child1");
+
+        expect(tree.addParent("parent1")).toBeNull();
     });
 });
 
 describe("append", () => {
-    interface Vars {
-        node: Node;
-    }
-    const given = getGiven<Vars>();
-    given("node", () => new Node("node1"));
-
     it("appends a node", () => {
-        given.node.append("child1");
-        given.node.append("child2");
+        const node = new Node("node1");
+        node.append("child1");
+        node.append("child2");
 
-        expect(given.node).toMatchObject({
+        expect(node).toMatchObject({
             children: [
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
@@ -298,207 +262,177 @@ describe("append", () => {
     });
 
     it("returns the new node", () => {
-        expect(given.node.append("child1")).toMatchObject({ name: "child1" });
+        const node = new Node("node1");
+
+        expect(node.append("child1")).toMatchObject({ name: "child1" });
     });
 
-    context("when adding a node with children", () => {
-        it("adds the children", () => {
-            given.node.append({
-                children: ["newchild1", "newchild2"],
-                name: "new node",
-            });
+    it("adds the children when adding a node with children", () => {
+        const node = new Node("node1");
+        node.append({
+            children: ["newchild1", "newchild2"],
+            name: "new node",
+        });
 
-            expect(given.node).toMatchObject({
-                children: [
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "newchild1" }),
-                            expect.objectContaining({ name: "newchild2" }),
-                        ],
-                        name: "new node",
-                    }),
-                ],
-            });
+        expect(node).toMatchObject({
+            children: [
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({ name: "newchild1" }),
+                        expect.objectContaining({ name: "newchild2" }),
+                    ],
+                    name: "new node",
+                }),
+            ],
         });
     });
 });
 
 describe("constructor", () => {
-    interface Vars {
-        node: Node;
-        params: NodeData | undefined;
-    }
+    it("creates a node without parameters", () => {
+        const node = new Node();
 
-    const given = getGiven<Vars>();
-
-    given("node", () =>
-        given.params === undefined ? new Node() : new Node(given.params),
-    );
-
-    context("without parameters", () => {
-        it("creates a node", () => {
-            expect(given.node.name).toBe("");
-            expect(given.node.id).toBeUndefined();
-        });
+        expect(node.name).toBe("");
+        expect(node.id).toBeUndefined();
     });
 
-    context("with a string", () => {
-        given("params", () => "n1");
+    it("creates a node with a string", () => {
+        const node = new Node("n1");
 
-        it("creates a node", () => {
-            expect(given.node).toMatchObject({
-                children: [],
-                name: "n1",
-                parent: null,
-            });
-            expect(given.node.id).toBeUndefined();
+        expect(node).toMatchObject({
+            children: [],
+            name: "n1",
+            parent: null,
         });
-
-        it("sets isEmptyFolder to false", () => {
-            expect(given.node.isEmptyFolder).toBeFalse();
-        });
+        expect(node.id).toBeUndefined();
     });
 
-    context("with an object with a name property", () => {
-        given("params", () => ({
+    it("sets isEmptyFolder to false with a string", () => {
+        const node = new Node("n1");
+
+        expect(node.isEmptyFolder).toBeFalse();
+    });
+
+    it("creates a node with an object with a name property", () => {
+        const node = new Node({
             id: 123,
             name: "n1",
-        }));
+        });
 
-        it("creates a node", () => {
-            expect(given.node).toMatchObject({
-                id: 123,
-                name: "n1",
-            });
+        expect(node).toMatchObject({
+            id: 123,
+            name: "n1",
         });
     });
 
-    context("when the name property is null", () => {
-        given("params", () => ({
+    it("sets the name to an empty string when the name property is null", () => {
+        const node = new Node({
             name: null,
-        }));
-
-        it("sets the name to an empty string", () => {
-            expect(given.node.name).toBe("");
         });
+
+        expect(node.name).toBe("");
     });
 
-    context("with an object with more properties", () => {
-        given("params", () => ({
+    it("creates a node with an object with more properties", () => {
+        const node = new Node({
             color: "green",
             id: 123,
             name: "n1",
             url: "/abc",
-        }));
+        });
 
-        it("creates a node", () => {
-            expect(given.node).toMatchObject({
-                color: "green",
-                id: 123,
-                name: "n1",
-                url: "/abc",
-            });
+        expect(node).toMatchObject({
+            color: "green",
+            id: 123,
+            name: "n1",
+            url: "/abc",
         });
     });
 
-    context("with an object with a label property", () => {
-        given("params", () => ({
+    it("creates a node with an object with a label property", () => {
+        const node = new Node({
             id: 123,
             label: "n1",
             url: "/",
-        }));
-
-        it("creates a node", () => {
-            expect(given.node).toMatchObject({
-                id: 123,
-                name: "n1",
-                url: "/",
-            });
-            expect(given.node).not.toHaveProperty("label");
-            expect(given.node.children).toHaveLength(0);
-            expect(given.node.parent).toBeNull();
         });
+
+        expect(node).toMatchObject({
+            id: 123,
+            name: "n1",
+            url: "/",
+        });
+        expect(node).not.toHaveProperty("label");
+        expect(node.children).toHaveLength(0);
+        expect(node.parent).toBeNull();
     });
 
-    context("with an object with a parent", () => {
-        given("params", () => ({
+    it("doesn't set the parent with an object with a parent", () => {
+        const node = new Node({
             name: "n1",
             parent: "abc",
-        }));
-
-        it("doesn't set the parent", () => {
-            expect(given.node.name).toBe("n1");
-            expect(given.node.parent).toBeNull();
         });
+
+        expect(node.name).toBe("n1");
+        expect(node.parent).toBeNull();
     });
 
-    context("with an object with children", () => {
-        given("params", () => ({
+    it("doesn't set the children with an object with children", () => {
+        const node = new Node({
             children: ["c"],
             name: "n1",
-        }));
-
-        it("doesn't set the children", () => {
-            expect(given.node.name).toBe("n1");
-            expect(given.node.children).toHaveLength(0);
         });
 
-        it("sets isEmptyFolder to false", () => {
-            expect(given.node.isEmptyFolder).toBeFalse();
-        });
+        expect(node.name).toBe("n1");
+        expect(node.children).toHaveLength(0);
     });
 
-    context("when the data contains an empty children attribute", () => {
-        given("params", () => ({
+    it("sets isEmptyFolder to false with an object with children", () => {
+        const node = new Node({
+            children: ["c"],
+            name: "n1",
+        });
+
+        expect(node.isEmptyFolder).toBeFalse();
+    });
+
+    it("sets isEmptyFolder to true when the data contains an empty children attribute", () => {
+        const node = new Node({
             children: [],
             name: "n1",
-        }));
-
-        it("sets isEmptyFolder to true", () => {
-            expect(given.node.isEmptyFolder).toBeTrue()
         });
+
+        expect(node.isEmptyFolder).toBeTrue();
     });
 });
 
 describe("getChildIndex", () => {
-    interface Vars {
-        child2: Node;
-        node: Node;
-    }
-    const given = getGiven<Vars>();
-    given("child2", () => new Node("child2"));
-    given("node", () => new Node());
+    it("returns the index when a child exists", () => {
+        const child2 = new Node("child2");
+        const node = new Node();
+        node.addChild(new Node("child1"));
+        node.addChild(child2);
+        node.addChild(new Node("child3"));
 
-    beforeEach(() => {
-        given.node.addChild(new Node("child1"));
-        given.node.addChild(given.child2);
-        given.node.addChild(new Node("child3"));
+        expect(node.getChildIndex(child2)).toBe(1);
     });
 
-    context("when a child exists", () => {
-        it("returns the index", () => {
-            expect(given.node.getChildIndex(given.child2)).toBe(1);
-        });
-    });
+    it("returns -1 when a child doesn't exist", () => {
+        const node = new Node();
+        node.addChild(new Node("child1"));
+        node.addChild(new Node("child2"));
+        node.addChild(new Node("child3"));
 
-    context("when a child doesn't exist", () => {
-        it("returns -1", () => {
-            const nonExistingChild = new Node("non-existing");
+        const nonExistingChild = new Node("non-existing");
 
-            expect(given.node.getChildIndex(nonExistingChild)).toBe(-1);
-        });
+        expect(node.getChildIndex(nonExistingChild)).toBe(-1);
     });
 });
 
 describe("getData", () => {
-    interface Vars {
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
-
     it("returns the tree data", () => {
-        expect(given.tree.getData()).toStrictEqual([
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.getData()).toStrictEqual([
             expect.objectContaining({
                 children: [
                     expect.objectContaining({ name: "child1" }),
@@ -511,343 +445,262 @@ describe("getData", () => {
     });
 
     it("doesn't include internal attributes", () => {
-        expect(given.tree.getData()[0]).not.toContainAnyKeys([
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.getData()[0]).not.toContainAnyKeys([
             "element",
             "isEmptyFolder",
             "parent",
         ]);
     });
 
-    context("with includeParent parameter", () => {
-        it("returns the tree data including the node itself", () => {
-            expect(given.tree.getData(true)).toStrictEqual([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({ name: "node1" }),
-                        expect.objectContaining({ name: "node2" }),
-                    ],
-                }),
-            ]);
-        });
+    it("returns the tree data including the node itself with includeParent parameter", () => {
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.getData(true)).toStrictEqual([
+            expect.objectContaining({
+                children: [
+                    expect.objectContaining({ name: "node1" }),
+                    expect.objectContaining({ name: "node2" }),
+                ],
+            }),
+        ]);
     });
 });
 
 describe("getLastChild", () => {
-    interface Vars {
-        node: Node;
-    }
-    const given = getGiven<Vars>();
-    given("node", () => new Node());
+    it("returns null when a node has no children", () => {
+        const node = new Node();
 
-    context("when a node has no children", () => {
-        it("returns null", () => {
-            expect(given.node.getLastChild()).toBeNull();
+        expect(node.getLastChild()).toBeNull();
+    });
+
+    it("returns the last child when a node has children", () => {
+        const node = new Node();
+        node.append("child1");
+        node.append("child2");
+
+        expect(node.getLastChild()).toMatchObject({ name: "child2" });
+    });
+
+    it("returns the last child of that child when the last child is open and has children", () => {
+        const node = new Node();
+        node.append("child1");
+        node.append("child2");
+
+        const child2 = node.children[1] as Node;
+        child2.append("child2a");
+        child2.append("child2b");
+        child2.is_open = true;
+
+        expect(node.getLastChild()).toMatchObject({
+            name: "child2b",
         });
     });
 
-    context("when a node has children", () => {
-        beforeEach(() => {
-            given.node.append("child1");
-            given.node.append("child2");
-        });
+    it("returns the last child when the last child is closed and has children", () => {
+        const node = new Node();
+        node.append("child1");
+        node.append("child2");
 
-        it("returns the last child", () => {
-            expect(given.node.getLastChild()).toMatchObject({ name: "child2" });
-        });
+        const child2 = node.children[1] as Node;
+        child2.append("child2a");
+        child2.append("child2b");
 
-        context("when its last child is open and has children", () => {
-            beforeEach(() => {
-                const child2 = given.node.children[1];
-                child2?.append("child2a");
-                child2?.append("child2b");
-            });
-
-            context("and the last child is open", () => {
-                beforeEach(() => {
-                    const child2 = given.node.children[1];
-                    if (child2) {
-                        child2.is_open = true;
-                    }
-                });
-
-                it("returns the last child of that child", () => {
-                    expect(given.node.getLastChild()).toMatchObject({
-                        name: "child2b",
-                    });
-                });
-            });
-
-            context("and the last child is closed", () => {
-                it("returns the last child", () => {
-                    expect(given.node.getLastChild()).toMatchObject({
-                        name: "child2",
-                    });
-                });
-            });
+        expect(node.getLastChild()).toMatchObject({
+            name: "child2",
         });
     });
 });
 
 describe("getNextNode", () => {
-    interface Vars {
-        fromNode: Node;
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
+    it("returns the first child when the parent node is closed", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const fromNode = tree.getNodeByNameMustExist("node1");
 
-    context("with a parent node", () => {
-        given("fromNode", () => given.tree.getNodeByNameMustExist("node1"));
-
-        context("when the parent node is closed", () => {
-            it("returns the first child", () => {
-                expect(given.fromNode.getNextNode()).toMatchObject({
-                    name: "child1",
-                });
-            });
-        });
-
-        context("when the parent node is open", () => {
-            beforeEach(() => {
-                given.fromNode.is_open = true;
-            });
-
-            it("returns the first child", () => {
-                expect(given.fromNode.getNextNode()).toMatchObject({
-                    name: "child1",
-                });
-            });
+        expect(fromNode.getNextNode()).toMatchObject({
+            name: "child1",
         });
     });
 
-    context("with the node is the last child", () => {
-        given("fromNode", () => given.tree.getNodeByNameMustExist("child2"));
+    it("returns the first child when the parent node is open", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const fromNode = tree.getNodeByNameMustExist("node1");
+        fromNode.is_open = true;
 
-        it("returns the next sibling of the parent", () => {
-            expect(given.fromNode.getNextNode()).toMatchObject({
-                name: "node2",
-            });
+        expect(fromNode.getNextNode()).toMatchObject({
+            name: "child1",
         });
     });
 
-    context("with includeChildren is false", () => {
-        context("with an open parent node", () => {
-            given("fromNode", () => given.tree.getNodeByNameMustExist("node1"));
+    it("returns the next sibling of the parent when the node is the last child", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const fromNode = tree.getNodeByNameMustExist("child2");
 
-            beforeEach(() => {
-                given.fromNode.is_open = true;
-            });
+        expect(fromNode.getNextNode()).toMatchObject({
+            name: "node2",
+        });
+    });
 
-            it("returns the next sibling", () => {
-                expect(given.fromNode.getNextNode(false)).toMatchObject({
-                    name: "node2",
-                });
-            });
+    it("returns the next sibling with includeChildren false and an open parent node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const fromNode = tree.getNodeByNameMustExist("node1");
+        fromNode.is_open = true;
+
+        expect(fromNode.getNextNode(false)).toMatchObject({
+            name: "node2",
         });
     });
 });
 
 describe("getNextVisibleNode", () => {
-    interface Vars {
-        fromNode: Node;
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
+    it("returns the next sibling when the parent node is closed", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const fromNode = tree.getNodeByNameMustExist("node1");
 
-    context("with a parent node", () => {
-        given("fromNode", () => given.tree.getNodeByNameMustExist("node1"));
-
-        context("when the parent node is closed", () => {
-            it("returns the next sibling", () => {
-                expect(given.fromNode.getNextVisibleNode()).toMatchObject({
-                    name: "node2",
-                });
-            });
-        });
-
-        context("when the parent node is open", () => {
-            beforeEach(() => {
-                given.fromNode.is_open = true;
-            });
-
-            it("returns the first child", () => {
-                expect(given.fromNode.getNextVisibleNode()).toMatchObject({
-                    name: "child1",
-                });
-            });
+        expect(fromNode.getNextVisibleNode()).toMatchObject({
+            name: "node2",
         });
     });
 
-    context("with the node is the last child", () => {
-        given("fromNode", () => given.tree.getNodeByNameMustExist("child2"));
+    it("returns the first child when the parent node is open", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const fromNode = tree.getNodeByNameMustExist("node1");
+        fromNode.is_open = true;
 
-        it("returns the next sibling of the parent", () => {
-            expect(given.fromNode.getNextVisibleNode()).toMatchObject({
-                name: "node2",
-            });
+        expect(fromNode.getNextVisibleNode()).toMatchObject({
+            name: "child1",
         });
     });
 
-    context("with the tree node", () => {
-        given("fromNode", () => given.tree);
+    it("returns the next sibling of the parent when the node is the last child", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const fromNode = tree.getNodeByNameMustExist("child2");
 
-        it("returns null", () => {
-            expect(given.fromNode.getNextVisibleNode()).toBeNull();
+        expect(fromNode.getNextVisibleNode()).toMatchObject({
+            name: "node2",
         });
+    });
+
+    it("returns null with the tree node", () => {
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.getNextVisibleNode()).toBeNull();
     });
 });
 
 describe("getNextSibling", () => {
-    interface Vars {
-        node1: Node;
-        node2: Node;
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
-    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
-    given("tree", () => new Node().loadFromData(exampleData));
+    it("returns null with a tree", () => {
+        const tree = new Node().loadFromData(exampleData);
 
-    context("with a tree", () => {
-        it("returns null", () => {
-            expect(given.tree.getNextSibling()).toBeNull();
-        });
+        expect(tree.getNextSibling()).toBeNull();
     });
 
-    context("when the node is the last child", () => {
-        it("returns null", () => {
-            expect(given.node2.getNextSibling()).toBeNull();
-        });
+    it("returns null when the node is the last child", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node2 = tree.getNodeByNameMustExist("node2");
+
+        expect(node2.getNextSibling()).toBeNull();
     });
 
-    context("when the node is the first child", () => {
-        it("returns the second child", () => {
-            expect(given.node1.getNextSibling()).toBe(given.node2);
-        });
+    it("returns the second child when the node is the first child", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node1 = tree.getNodeByNameMustExist("node1");
+        const node2 = tree.getNodeByNameMustExist("node2");
+
+        expect(node1.getNextSibling()).toBe(node2);
     });
 });
 
 describe("getNodeByCallback", () => {
-    interface Vars {
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
+    it("returns the node when a matching node exists", () => {
+        const tree = new Node().loadFromData(exampleData);
 
-    context("when a matching node exists", () => {
-        it("returns the node", () => {
-            expect(
-                given.tree.getNodeByCallback((node) =>
-                    node.name.startsWith("chi"),
-                ),
-            ).toMatchObject({
-                name: "child1",
-            });
+        expect(
+            tree.getNodeByCallback((node) => node.name.startsWith("chi")),
+        ).toMatchObject({
+            name: "child1",
         });
     });
 
-    context("when no matching node exists", () => {
-        it("returns null", () => {
-            expect(given.tree.getNodeByCallback(() => false)).toBeNull();
-        });
+    it("returns null when no matching node exists", () => {
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.getNodeByCallback(() => false)).toBeNull();
     });
 });
 
 describe("getNodeByName", () => {
-    interface Vars {
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
+    it("returns the node when the node exists", () => {
+        const tree = new Node().loadFromData(exampleData);
 
-    context("when the node exists", () => {
-        it("returns the node", () => {
-            expect(given.tree.getNodeByName("child1")).toMatchObject({
-                id: 125,
-                name: "child1",
-            });
+        expect(tree.getNodeByName("child1")).toMatchObject({
+            id: 125,
+            name: "child1",
         });
     });
 
-    context("when the node doesn't exist", () => {
-        it("returns null", () => {
-            expect(given.tree.getNodeByName("non-existing")).toBeNull();
-        });
+    it("returns null when the node doesn't exist", () => {
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.getNodeByName("non-existing")).toBeNull();
     });
 });
 
 describe("getNodeByNameMustExist", () => {
-    interface Vars {
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
+    it("returns the node when the node exists", () => {
+        const tree = new Node().loadFromData(exampleData);
 
-    context("when the node exists", () => {
-        it("returns the node", () => {
-            expect(given.tree.getNodeByNameMustExist("child1")).toMatchObject({
-                id: 125,
-                name: "child1",
-            });
+        expect(tree.getNodeByNameMustExist("child1")).toMatchObject({
+            id: 125,
+            name: "child1",
         });
     });
 
-    context("when the node doesn't exist", () => {
-        it("throws an exception", () => {
-            expect(() =>
-                given.tree.getNodeByNameMustExist("non-existing"),
-            ).toThrow("Node with name non-existing not found");
-        });
+    it("throws an exception when the node doesn't exist", () => {
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(() => tree.getNodeByNameMustExist("non-existing")).toThrow(
+            "Node with name non-existing not found",
+        );
     });
 });
 
 describe("getParent", () => {
-    interface Vars {
-        child1: Node;
-        node1: Node;
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("child1", () => given.tree.getNodeByNameMustExist("child1"));
-    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
-    given("tree", () => new Node().loadFromData(exampleData));
+    it("returns null with a tree", () => {
+        const tree = new Node().loadFromData(exampleData);
 
-    context("with a tree", () => {
-        it("returns null", () => {
-            expect(given.tree.getParent()).toBeNull();
-        });
+        expect(tree.getParent()).toBeNull();
     });
 
-    context("with a node on the first level", () => {
-        it("returns null", () => {
-            expect(given.node1.getParent()).toBeNull();
-        });
+    it("returns null with a node on the first level", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node1 = tree.getNodeByNameMustExist("node1");
+
+        expect(node1.getParent()).toBeNull();
     });
 
-    context("with a node on the second level", () => {
-        it("returns the parent", () => {
-            expect(given.child1.getParent()).toMatchObject({
-                name: "node1",
-            });
+    it("returns the parent with a node on the second level", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const child1 = tree.getNodeByNameMustExist("child1");
+
+        expect(child1.getParent()).toMatchObject({
+            name: "node1",
         });
     });
 });
 
 describe("getPreviousNode", () => {
-    interface Vars {
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
-
     it("returns null with a tree node", () => {
-        expect(given.tree.getPreviousNode()).toBeNull();
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.getPreviousNode()).toBeNull();
     });
 
     it("returns the last child of the previous sibling when the previous node is closed and has children", () => {
-        given.tree.getNodeByNameMustExist("node2").is_open = false;
-        const node2 = given.tree.getNodeByNameMustExist("node2");
+        const tree = new Node().loadFromData(exampleData);
+        tree.getNodeByNameMustExist("node2").is_open = false;
+        const node2 = tree.getNodeByNameMustExist("node2");
 
         expect(node2.getPreviousNode()).toMatchObject({
             name: "child2",
@@ -855,8 +708,9 @@ describe("getPreviousNode", () => {
     });
 
     it("returns the last child of the previous sibling when the previous node is open and has children", () => {
-        given.tree.getNodeByNameMustExist("node2").is_open = true;
-        const node2 = given.tree.getNodeByNameMustExist("node2");
+        const tree = new Node().loadFromData(exampleData);
+        tree.getNodeByNameMustExist("node2").is_open = true;
+        const node2 = tree.getNodeByNameMustExist("node2");
 
         expect(node2.getPreviousNode()).toMatchObject({
             name: "child2",
@@ -864,7 +718,8 @@ describe("getPreviousNode", () => {
     });
 
     it("returns the first child if a node is the second child", () => {
-        const child2 = given.tree.getNodeByNameMustExist("child2");
+        const tree = new Node().loadFromData(exampleData);
+        const child2 = tree.getNodeByNameMustExist("child2");
 
         expect(child2.getPreviousNode()).toMatchObject({
             name: "child1",
@@ -872,7 +727,8 @@ describe("getPreviousNode", () => {
     });
 
     it("returns the parent with a node that is the first child", () => {
-        const node3 = given.tree.getNodeByNameMustExist("node3");
+        const tree = new Node().loadFromData(exampleData);
+        const node3 = tree.getNodeByNameMustExist("node3");
 
         expect(node3.getPreviousNode()).toMatchObject({
             name: "node2",
@@ -881,19 +737,16 @@ describe("getPreviousNode", () => {
 });
 
 describe("getPreviousVisibleNode", () => {
-    interface Vars {
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
-
     it("returns null with a tree node", () => {
-        expect(given.tree.getPreviousVisibleNode()).toBeNull();
+        const tree = new Node().loadFromData(exampleData);
+
+        expect(tree.getPreviousVisibleNode()).toBeNull();
     });
 
     it("returns the previous sibling when the previous sibling is closed and has children", () => {
-        given.tree.getNodeByNameMustExist("node2").is_open = false;
-        const node2 = given.tree.getNodeByNameMustExist("node2");
+        const tree = new Node().loadFromData(exampleData);
+        tree.getNodeByNameMustExist("node2").is_open = false;
+        const node2 = tree.getNodeByNameMustExist("node2");
 
         expect(node2.getPreviousVisibleNode()).toMatchObject({
             name: "node1",
@@ -901,8 +754,9 @@ describe("getPreviousVisibleNode", () => {
     });
 
     it("returns the last child of the previous sibling when the previous sibling is open and has children", () => {
-        given.tree.getNodeByNameMustExist("node1").is_open = true;
-        const node2 = given.tree.getNodeByNameMustExist("node2");
+        const tree = new Node().loadFromData(exampleData);
+        tree.getNodeByNameMustExist("node1").is_open = true;
+        const node2 = tree.getNodeByNameMustExist("node2");
 
         expect(node2.getPreviousVisibleNode()).toMatchObject({
             name: "child2",
@@ -910,7 +764,8 @@ describe("getPreviousVisibleNode", () => {
     });
 
     it("returns the first child if a node is the second child", () => {
-        const child2 = given.tree.getNodeByNameMustExist("child2");
+        const tree = new Node().loadFromData(exampleData);
+        const child2 = tree.getNodeByNameMustExist("child2");
 
         expect(child2.getPreviousVisibleNode()).toMatchObject({
             name: "child1",
@@ -918,7 +773,8 @@ describe("getPreviousVisibleNode", () => {
     });
 
     it("returns the parent when a node is the first child", () => {
-        const node3 = given.tree.getNodeByNameMustExist("node3");
+        const tree = new Node().loadFromData(exampleData);
+        const node3 = tree.getNodeByNameMustExist("node3");
 
         expect(node3.getPreviousVisibleNode()).toMatchObject({
             name: "node2",
@@ -927,68 +783,47 @@ describe("getPreviousVisibleNode", () => {
 });
 
 describe("getPreviousSibling", () => {
-    interface Vars {
-        node1: Node;
-        node2: Node;
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
-    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
-    given("tree", () => new Node().loadFromData(exampleData));
+    it("returns null with a tree", () => {
+        const tree = new Node().loadFromData(exampleData);
 
-    context("with a tree", () => {
-        it("returns null", () => {
-            expect(given.tree.getPreviousSibling()).toBeNull();
-        });
+        expect(tree.getPreviousSibling()).toBeNull();
     });
 
-    context("when the node is the first child", () => {
-        it("returns null", () => {
-            expect(given.node1.getPreviousSibling()).toBeNull();
-        });
+    it("returns null when the node is the first child", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node1 = tree.getNodeByNameMustExist("node1");
+
+        expect(node1.getPreviousSibling()).toBeNull();
     });
 
-    context("when the node is the second child", () => {
-        it("returns the first child", () => {
-            expect(given.node2.getPreviousSibling()).toBe(given.node1);
-        });
+    it("returns the first child when the node is the second child", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const node1 = tree.getNodeByNameMustExist("node1");
+        const node2 = tree.getNodeByNameMustExist("node2");
+
+        expect(node2.getPreviousSibling()).toBe(node1);
     });
 });
 
 describe("hasChildren", () => {
-    interface Vars {
-        node: Node;
-    }
-    const given = getGiven<Vars>();
-    given("node", () => new Node());
+    it("returns true when a node has children", () => {
+        const node = new Node();
+        node.addChild(new Node("child1"));
 
-    context("when a node has children", () => {
-        beforeEach(() => {
-            given.node.addChild(new Node("child1"));
-        });
-
-        it("returns true", () => {
-            expect(given.node.hasChildren()).toBeTrue();
-        });
+        expect(node.hasChildren()).toBeTrue();
     });
 
-    context("when a node doesn't have children", () => {
-        it("returns false", () => {
-            expect(given.node.hasChildren()).toBeFalse();
-        });
+    it("returns false when a node doesn't have children", () => {
+        const node = new Node();
+
+        expect(node.hasChildren()).toBeFalse();
     });
 });
 
 describe("initFromData", () => {
-    interface Vars {
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node());
-
-    beforeEach(() => {
-        given.tree.initFromData({
+    it("loads the data", () => {
+        const tree = new Node();
+        tree.initFromData({
             children: [
                 { id: 2, name: "child1" },
                 { id: 3, name: "child2" },
@@ -996,10 +831,8 @@ describe("initFromData", () => {
             id: 1,
             name: "node1",
         });
-    });
 
-    it("loads the data", () => {
-        expect(given.tree).toMatchObject({
+        expect(tree).toMatchObject({
             children: [
                 expect.objectContaining({ id: 2, name: "child1" }),
                 expect.objectContaining({ id: 3, name: "child2" }),
@@ -1011,85 +844,60 @@ describe("initFromData", () => {
 });
 
 describe("isFolder", () => {
-    interface Vars {
-        node: Node;
-    }
-    const given = getGiven<Vars>();
-    given("node", () => new Node());
+    it("returns false when the node has no children", () => {
+        const node = new Node();
 
-    context("when the node has no children", () => {
-        it("returns false", () => {
-            expect(given.node.isFolder()).toBeFalse();
-        });
-
-        context("when the node is loaded on demand", () => {
-            beforeEach(() => {
-                given.node.load_on_demand = true;
-            });
-
-            it("returns false", () => {
-                expect(given.node.isFolder()).toBeTrue();
-            });
-        });
+        expect(node.isFolder()).toBeFalse();
     });
 
-    context("when the node has a child", () => {
-        beforeEach(() => {
-            given.node.append("child1");
-        });
+    it("returns true when the node has no children and is loaded on demand", () => {
+        const node = new Node();
+        node.load_on_demand = true;
 
-        it("returns false", () => {
-            expect(given.node.isFolder()).toBeTrue();
-        });
+        expect(node.isFolder()).toBeTrue();
+    });
+
+    it("returns true when the node has a child", () => {
+        const node = new Node();
+        node.append("child1");
+
+        expect(node.isFolder()).toBeTrue();
     });
 });
 
 describe("iterate", () => {
-    interface Vars {
-        tree: Node;
-        visited: [string, number][];
-        visitor: (node: Node, level: number) => boolean;
-    }
-    const given = getGiven<Vars>();
-    given("tree", () => new Node().loadFromData(exampleData));
-    given("visited", () => []);
+    it("visits all nodes when the visitor function returns true", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const visited: [string, number][] = [];
 
-    beforeEach(() => {
-        given.tree.iterate(given.visitor);
-    });
-
-    context("when the visitor function returns true", () => {
-        const visitAllNodes = (node: Node, level: number) => {
-            given.visited.push([node.name, level]);
+        tree.iterate((node, level) => {
+            visited.push([node.name, level]);
             return true;
-        };
-        given("visitor", () => visitAllNodes);
-
-        it("visits all nodes", () => {
-            expect(given.visited).toStrictEqual([
-                ["node1", 0],
-                ["child1", 1],
-                ["child2", 1],
-                ["node2", 0],
-                ["node3", 1],
-                ["child3", 2],
-            ]);
         });
+
+        expect(visited).toStrictEqual([
+            ["node1", 0],
+            ["child1", 1],
+            ["child2", 1],
+            ["node2", 0],
+            ["node3", 1],
+            ["child3", 2],
+        ]);
     });
 
-    context("when the visitor function returns false", () => {
-        const visitNodes = (node: Node, level: number) => {
-            given.visited.push([node.name, level]);
-            return false;
-        };
-        given("visitor", () => visitNodes);
+    it("stops the iteration for the current node when the visitor function returns false", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const visited: [string, number][] = [];
 
-        it("stops the iteration for the current node", () => {
-            expect(given.visited).toStrictEqual([
-                ["node1", 0],
-                ["node2", 0],
-            ]);
+        tree.iterate((node, level) => {
+            visited.push([node.name, level]);
+            return false;
         });
+
+        expect(visited).toStrictEqual([
+            ["node1", 0],
+            ["node2", 0],
+        ]);
     });
 });
 
@@ -1155,139 +963,116 @@ describe("loadFromData", () => {
 });
 
 describe("moveNode", () => {
-    interface Vars {
-        child1: Node;
-        child2: Node;
-        node1: Node;
-        node2: Node;
-        tree: Node;
-    }
+    it("moves the node when moving after a node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const child2 = tree.getNodeByNameMustExist("child2");
+        const node2 = tree.getNodeByNameMustExist("node2");
 
-    const given = getGiven<Vars>();
+        expect(tree.moveNode(child2, node2, "after")).toBeTrue();
 
-    given("child1", () => given.tree.getNodeByNameMustExist("child1"));
-    given("child2", () => given.tree.getNodeByNameMustExist("child2"));
-    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
-    given("node2", () => given.tree.getNodeByNameMustExist("node2"));
-    given("tree", () => new Node().loadFromData(exampleData));
-
-    context("when moving after a node", () => {
-        it("moves the node", () => {
-            expect(
-                given.tree.moveNode(given.child2, given.node2, "after"),
-            ).toBeTrue();
-
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({
-                        children: [expect.objectContaining({ name: "child1" })],
-                        name: "node1",
-                    }),
-                    expect.objectContaining({ name: "node2" }),
-                    expect.objectContaining({ name: "child2" }),
-                ],
-                name: "",
-            });
-        });
-
-        context("when the target is the root node", () => {
-            it("returns false", () => {
-                expect(
-                    given.tree.moveNode(given.child2, given.tree, "after"),
-                ).toBeFalse();
-            });
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({
+                    children: [expect.objectContaining({ name: "child1" })],
+                    name: "node1",
+                }),
+                expect.objectContaining({ name: "node2" }),
+                expect.objectContaining({ name: "child2" }),
+            ],
+            name: "",
         });
     });
 
-    context("when moving inside a node", () => {
-        it("moves the node", () => {
-            expect(
-                given.tree.moveNode(given.child1, given.node2, "inside"),
-            ).toBeTrue();
+    it("returns false when moving after a node and the target is the root node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const child2 = tree.getNodeByNameMustExist("child2");
 
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({
-                        children: [expect.objectContaining({ name: "child2" })],
-                        name: "node1",
-                    }),
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "child1" }),
-                            expect.objectContaining({ name: "node3" }),
-                        ],
-                        name: "node2",
-                    }),
-                ],
-                name: "",
-            });
+        expect(tree.moveNode(child2, tree, "after")).toBeFalse();
+    });
+
+    it("moves the node when moving inside a node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const child1 = tree.getNodeByNameMustExist("child1");
+        const node2 = tree.getNodeByNameMustExist("node2");
+
+        expect(tree.moveNode(child1, node2, "inside")).toBeTrue();
+
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({
+                    children: [expect.objectContaining({ name: "child2" })],
+                    name: "node1",
+                }),
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({ name: "child1" }),
+                        expect.objectContaining({ name: "node3" }),
+                    ],
+                    name: "node2",
+                }),
+            ],
+            name: "",
         });
     });
 
-    context("when moving before a node", () => {
-        it("moves the node", () => {
-            expect(
-                given.tree.moveNode(given.child2, given.child1, "before"),
-            ).toBeTrue();
+    it("moves the node when moving before a node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const child1 = tree.getNodeByNameMustExist("child1");
+        const child2 = tree.getNodeByNameMustExist("child2");
 
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "child2" }),
-                            expect.objectContaining({ name: "child1" }),
-                        ],
-                        name: "node1",
-                    }),
-                    expect.objectContaining({ name: "node2" }),
-                ],
-                name: "",
-            });
-        });
+        expect(tree.moveNode(child2, child1, "before")).toBeTrue();
 
-        context("when the target is the root node", () => {
-            it("returns false", () => {
-                expect(
-                    given.tree.moveNode(given.child2, given.tree, "before"),
-                ).toBeFalse();
-            });
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({ name: "child2" }),
+                        expect.objectContaining({ name: "child1" }),
+                    ],
+                    name: "node1",
+                }),
+                expect.objectContaining({ name: "node2" }),
+            ],
+            name: "",
         });
     });
 
-    context("when the moved node is a parent of the target node", () => {
-        it("doesn't move the node", () => {
-            expect(
-                given.tree.moveNode(given.node1, given.child1, "before"),
-            ).toBeFalse();
+    it("returns false when moving before a node and the target is the root node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const child2 = tree.getNodeByNameMustExist("child2");
 
-            expect(given.tree).toMatchObject({
-                children: [
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "child1" }),
-                            expect.objectContaining({ name: "child2" }),
-                        ],
-                        name: "node1",
-                    }),
-                    expect.objectContaining({ name: "node2" }),
-                ],
-            });
+        expect(tree.moveNode(child2, tree, "before")).toBeFalse();
+    });
+
+    it("doesn't move the node when the moved node is a parent of the target node", () => {
+        const tree = new Node().loadFromData(exampleData);
+        const child1 = tree.getNodeByNameMustExist("child1");
+        const node1 = tree.getNodeByNameMustExist("node1");
+
+        expect(tree.moveNode(node1, child1, "before")).toBeFalse();
+
+        expect(tree).toMatchObject({
+            children: [
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({ name: "child1" }),
+                        expect.objectContaining({ name: "child2" }),
+                    ],
+                    name: "node1",
+                }),
+                expect.objectContaining({ name: "node2" }),
+            ],
         });
     });
 });
 
 describe("prepend", () => {
-    interface Vars {
-        node: Node;
-    }
-    const given = getGiven<Vars>();
-    given("node", () => new Node("node1"));
-
     it("prepends a node", () => {
-        given.node.prepend("child2");
-        given.node.prepend("child1");
+        const node = new Node("node1");
+        node.prepend("child2");
+        node.prepend("child1");
 
-        expect(given.node).toMatchObject({
+        expect(node).toMatchObject({
             children: [
                 expect.objectContaining({ name: "child1" }),
                 expect.objectContaining({ name: "child2" }),
@@ -1296,52 +1081,44 @@ describe("prepend", () => {
         });
     });
 
-    context("when prepending a node with children", () => {
-        it("adds the children", () => {
-            given.node.prepend({
-                children: ["newchild1", "newchild2"],
-                name: "new node",
-            });
+    it("adds the children when prepending a node with children", () => {
+        const node = new Node("node1");
+        node.prepend({
+            children: ["newchild1", "newchild2"],
+            name: "new node",
+        });
 
-            expect(given.node).toMatchObject({
-                children: [
-                    expect.objectContaining({
-                        children: [
-                            expect.objectContaining({ name: "newchild1" }),
-                            expect.objectContaining({ name: "newchild2" }),
-                        ],
-                        name: "new node",
-                    }),
-                ],
-            });
+        expect(node).toMatchObject({
+            children: [
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({ name: "newchild1" }),
+                        expect.objectContaining({ name: "newchild2" }),
+                    ],
+                    name: "new node",
+                }),
+            ],
         });
     });
 
     it("sets the isEmptyFolder attribute to true when the node data has empty children", () => {
-        given.node.prepend({
+        const node = new Node("node1");
+        node.prepend({
             children: [],
             name: "test1",
         });
 
-        expect((given.node.children[0] as Node).isEmptyFolder).toBeTrue();
+        expect((node.children[0] as Node).isEmptyFolder).toBeTrue();
     });
 });
 
 describe("remove", () => {
-    interface Vars {
-        child1: Node;
-        tree: Node;
-    }
-    const given = getGiven<Vars>();
-    given("child1", () => given.tree.getNodeByNameMustExist("child1"));
-    given("tree", () => new Node().loadFromData(exampleData));
-
-    beforeEach(() => {
-        given.child1.remove();
-    });
-
     it("removes the node", () => {
-        expect(given.tree).toMatchObject({
+        const tree = new Node().loadFromData(exampleData);
+        const child1 = tree.getNodeByNameMustExist("child1");
+        child1.remove();
+
+        expect(tree).toMatchObject({
             children: [
                 expect.objectContaining({
                     children: [expect.objectContaining({ name: "child2" })],
@@ -1354,24 +1131,13 @@ describe("remove", () => {
 });
 
 describe("removeChild", () => {
-    interface Vars {
-        child1: Node;
-        node1: Node;
-        tree: Node;
-    }
-
-    const given = getGiven<Vars>();
-
-    given("child1", () => given.tree.getNodeByNameMustExist("child1"));
-    given("node1", () => given.tree.getNodeByNameMustExist("node1"));
-    given("tree", () => new Node().loadFromData(exampleData));
-
-    beforeEach(() => {
-        given.node1.removeChild(given.child1);
-    });
-
     it("removes the child", () => {
-        expect(given.node1.children).toStrictEqual([
+        const tree = new Node().loadFromData(exampleData);
+        const child1 = tree.getNodeByNameMustExist("child1");
+        const node1 = tree.getNodeByNameMustExist("node1");
+        node1.removeChild(child1);
+
+        expect(node1.children).toStrictEqual([
             expect.objectContaining({ name: "child2" }),
         ]);
     });
