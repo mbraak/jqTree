@@ -6,8 +6,7 @@ import { vi } from "vitest";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTitleElement } from "../support/queries";
-import { togglerLink } from "../support/testUtil";
+import { getTitleElement, getTogglerElement } from "../support/queries";
 
 const server = setupServer();
 
@@ -530,7 +529,7 @@ describe("options", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(
-                togglerLink(node1.element as HTMLElement).innerHTML,
+                getTogglerElement(node1.element as HTMLElement).innerHTML,
             ).toBe("◀");
         });
 
@@ -540,7 +539,7 @@ describe("options", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(
-                togglerLink(node1.element as HTMLElement).innerHTML,
+                getTogglerElement(node1.element as HTMLElement).innerHTML,
             ).toBe("►");
         });
 
@@ -551,7 +550,7 @@ describe("options", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(
-                togglerLink(node1.element as HTMLElement).innerHTML,
+                getTogglerElement(node1.element as HTMLElement).innerHTML,
             ).toBe("◀");
         });
 
@@ -562,7 +561,7 @@ describe("options", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(
-                togglerLink(node1.element as HTMLElement).innerHTML,
+                getTogglerElement(node1.element as HTMLElement).innerHTML,
             ).toBe("►");
         });
 
@@ -573,7 +572,7 @@ describe("options", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(
-                togglerLink(node1.element as HTMLElement).innerHTML,
+                getTogglerElement(node1.element as HTMLElement).innerHTML,
             ).toBe("◀");
         });
     });
