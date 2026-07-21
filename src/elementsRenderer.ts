@@ -110,10 +110,10 @@ export default class ElementsRenderer {
             div.innerHTML = value;
 
             return document.createTextNode(div.innerHTML);
-        } else if ((value as HTMLElement).nodeType) {
-            return value as HTMLElement;
+        } else if (value.nodeType) {
+            return value;
         } else {
-            return jQuery(value)[0];
+            return undefined;
         }
     }
 

@@ -7,7 +7,7 @@ export type DataUrl = DataUrlFunction | string;
 
 export type DragMethod = (node: Node, event: Event | Touch) => void;
 
-export type IconElement = HTMLElement | JQuery | string;
+export type IconElement = HTMLElement | string;
 
 export interface JQTreeOptions {
     animationSpeed: AnimationSpeed;
