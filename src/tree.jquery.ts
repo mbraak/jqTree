@@ -6,7 +6,6 @@ import type { Node, Position } from "./node";
 import type { SavedState } from "./saveStateHandler";
 
 import HtmlTree from "./htmlTree";
-import SimpleWidget from "./simple.widget";
 
 interface SelectNodeOptions {
     mustSetFocus?: boolean;
@@ -26,9 +25,18 @@ const triggerJQueryEvent = (
     return !event.isDefaultPrevented();
 }
 
-export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
+export class JqTreeWidget {
+    [key: string]: unknown;
+
     private _element: JQuery;
     private _htmlTree: HtmlTree;
+    private _inputOptions: Partial<JQTreeOptions>;
+
+    constructor(el: HTMLElement, options: Partial<JQTreeOptions>) {
+        this._element = jQuery(el);
+
+        this._inputOptions = options;
+    }
 
     public addNodeAfter(
         newNodeInfo: NodeData,
@@ -87,7 +95,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     public deinit(): void {
         this._element.off();
         this._htmlTree.deinit();
-        super.deinit();
+    }
+
+    public destroy(): void {
+        this.deinit();
     }
 
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
@@ -150,10 +161,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public init(): void {
-        super.init();
-
-        this._element = this.$el;
-        const htmlElement = this.$el.get(0) as HTMLElement;
+        const htmlElement = this._element.get(0) as HTMLElement;
 
         const htmlTree = new HtmlTree(
             {
@@ -375,11 +383,11 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             }
         }
 
-        const closedIcon = convertToIconElement(this.inputOptions.closedIcon);
-        const openedIcon = convertToIconElement(this.inputOptions.openedIcon);
+        const closedIcon = convertToIconElement(this._inputOptions.closedIcon);
+        const openedIcon = convertToIconElement(this._inputOptions.openedIcon);
 
         let onCreateLi: OnCreateLi | undefined = undefined;
-        const jqTreeOnCreateLi = this.inputOptions.onCreateLi;
+        const jqTreeOnCreateLi = this._inputOptions.onCreateLi;
 
         if (jqTreeOnCreateLi) {
             onCreateLi = (node: Node, el: HTMLElement, isSelected: boolean) => {
@@ -388,7 +396,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         }
 
         return {
-            ...this.inputOptions,
+            ...this._inputOptions,
             closedIcon,
             onCreateLi,
             openedIcon,
@@ -397,4 +405,97 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 }
 
 
-SimpleWidget.register(JqTreeWidget, "tree");
+const register = (): void => {
+    const getWidgetData = (
+        el: HTMLElement,
+        dataKey: string,
+    ): JqTreeWidget | null => {
+        const widget = jQuery.data(el, dataKey) as unknown;
+
+        if (widget && widget instanceof JqTreeWidget) {
+            return widget;
+        } else {
+            return null;
+        }
+    };
+
+    const createWidget = ($el: JQuery, options: null | Partial<JQTreeOptions>): JQuery => {
+        for (const el of $el.get()) {
+            const existingWidget = getWidgetData(el, "jqtree");
+
+            if (!existingWidget) {
+                const widget = new JqTreeWidget(el, options ?? {});
+
+                if (!jQuery.data(el, "jqtree")) {
+                    jQuery.data(el, "jqtree", widget);
+                }
+
+                // Call init after setting data, so we can call methods
+                widget.init();
+            }
+        }
+
+        return $el;
+    };
+
+    const destroyWidget = ($el: JQuery): void => {
+        for (const el of $el.get()) {
+            const widget = getWidgetData(el, "jqtree");
+
+            if (widget) {
+                widget.destroy();
+            }
+
+            jQuery.removeData(el, "jqtree");
+        }
+    };
+
+    const callFunction = (
+        $el: JQuery,
+        functionName: string,
+        args: unknown[],
+    ): unknown => {
+        let result = null;
+
+        for (const el of $el.get()) {
+            const widget = jQuery.data(el, "jqtree") as unknown;
+
+            if (widget && widget instanceof JqTreeWidget) {
+                const widgetFunction = widget[functionName];
+
+                if (widgetFunction && typeof widgetFunction === "function") {
+                    result = widgetFunction.apply(widget, args) as unknown;
+                }
+            }
+        }
+
+        return result;
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    (jQuery.fn as any).tree = function (
+        this: JQuery,
+        argument1: unknown,
+        ...args: unknown[]
+    ) {
+        if (!argument1) {
+            return createWidget(this, null);
+        } else if (typeof argument1 === "object") {
+            const options = argument1 as unknown;
+            return createWidget(this, options as JQTreeOptions);
+        } else if (typeof argument1 === "string" && argument1[0] !== "_") {
+            const functionName = argument1;
+
+            if (argument1 === "destroy") {
+                destroyWidget(this);
+                return undefined;
+            } else {
+                return callFunction(this, functionName, args);
+            }
+        } else {
+            return undefined;
+        }
+    };
+};
+
+register();
