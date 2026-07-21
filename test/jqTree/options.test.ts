@@ -211,9 +211,10 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const $button = $tree.find("a.jqtree-toggler:first");
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            const toggler = getTogglerElement(node1.element as HTMLElement);
 
-            expect($button.text()).toBe("closed");
+            expect(toggler).toHaveTextContent("closed");
         });
 
         it("escapes html", () => {
@@ -223,9 +224,10 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const $button = $tree.find("a.jqtree-toggler:first");
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            const toggler = getTogglerElement(node1.element as HTMLElement);
 
-            expect($button.text()).toBe("<span>test</span>");
+            expect(toggler).toHaveTextContent("<span>test</span>");
         });
 
         it("renders a jquery element", () => {
@@ -235,9 +237,11 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const $span = $tree.find("a.jqtree-toggler:first span.abc");
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            const toggler = getTogglerElement(node1.element as HTMLElement);
+            const span = toggler.querySelector("span.abc"); // eslint-disable-line testing-library/no-node-access
 
-            expect($span.text()).toBe("test");
+            expect(span).toHaveTextContent("test");
         });
 
         it("renders a html element", () => {
@@ -251,9 +255,11 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const $span = $tree.find("a.jqtree-toggler:first span.abc");
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            const toggler = getTogglerElement(node1.element as HTMLElement);
+            const span = toggler.querySelector("span.abc"); // eslint-disable-line testing-library/no-node-access
 
-            expect($span.text()).toBe("test");
+            expect(span).toHaveTextContent("test");
         });
 
         it("renders a default when the option is empty", () => {
@@ -263,9 +269,10 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const $span = $tree.find("a.jqtree-toggler:first");
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            const toggler = getTogglerElement(node1.element as HTMLElement);
 
-            expect($span.text()).toBe("►");
+            expect(toggler).toHaveTextContent("►");
         });
     });
 
