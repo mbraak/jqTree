@@ -99,9 +99,6 @@ importers:
       eslint-plugin-testing-library:
         specifier: ^7.16.2
         version: 7.16.2(eslint@9.39.4)(typescript@6.0.3)
-      givens:
-        specifier: ^1.3.9
-        version: 1.3.9
       jest-extended:
         specifier: ^7.0.0
         version: 7.0.0(typescript@6.0.3)
@@ -2331,9 +2328,6 @@ packages:
 
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
-
-  givens@1.3.9:
-    resolution: {integrity: sha512-4hYlStsEIaYeYvZTZwgD5yOS2WVP0dcDsOBqeImdEM8eLuclvv0IEMlQQ1kuA5DN4he7wVH1jsYtNe9uininxg==}
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -5590,8 +5584,6 @@ snapshots:
   get-tsconfig@4.14.0:
     dependencies:
       resolve-pkg-maps: 1.0.0
-
-  givens@1.3.9: {}
 
   glob-parent@5.1.2:
     dependencies:
