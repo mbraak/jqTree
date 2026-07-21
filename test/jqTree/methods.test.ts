@@ -1561,6 +1561,22 @@ describe("methods", () => {
             expect(node.element).toBeFocusedTreeNode();
         });
 
+        it("leaves the node unchanged with empty data", () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                autoOpen: true,
+                data: exampleData,
+            });
+
+            const node = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("updateNode", node, "");
+
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({ name: "node1" }),
+                expect.objectContaining({ name: "node2" }),
+            ]);
+        });
+
         it("throws an error without a node parameter", () => {
             const $tree = $("#tree1");
             $tree.tree({
