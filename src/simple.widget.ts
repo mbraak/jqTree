@@ -102,8 +102,6 @@ const register = (widgetClass: unknown, widgetName: string): void => {
 export default class SimpleWidget<WidgetOptions> {
     [key: string]: unknown;
 
-    protected static defaults: unknown = {};
-
     public $el: JQuery;
 
     protected inputOptions: Partial<WidgetOptions>;
