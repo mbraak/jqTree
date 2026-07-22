@@ -94,7 +94,7 @@ export default class DataLoader {
         const $el = jQuery(element);
 
         if (this._onLoading) {
-            this._onLoading(isLoading, node, $el);
+            this._onLoading(isLoading, node, element);
         }
 
         this._triggerEvent("tree.loading_data", {

@@ -7,10 +7,17 @@ export type JQTreeOnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => 
 
 export type JQTreeOnIsMoveHandle = (el: JQuery) => boolean;
 
+export type JQTreeOnLoading = (
+    isLoading: boolean,
+    node: Node | null,
+    element: JQuery,
+) => void;
+
 export type JQTreeOptions = Modify<HtmlTreeOptions, {
     closedIcon?: JQTreeIconElement;
     onCreateLi?: JQTreeOnCreateLi;
     onIsMoveHandle?: JQTreeOnIsMoveHandle;
+    onLoading?: JQTreeOnLoading;
     openedIcon?: JQTreeIconElement;
 }>
 

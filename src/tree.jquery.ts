@@ -1,5 +1,5 @@
 import type { HandleFinishedLoading } from "./dataLoader";
-import type { HtmlTreeOptions, IconElement, OnCreateLi, OnIsMoveHandle } from "./htmlTree/options";
+import type { HtmlTreeOptions, IconElement, OnCreateLi, OnIsMoveHandle, OnLoading } from "./htmlTree/options";
 import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 import type { Node, Position } from "./node";
@@ -402,11 +402,21 @@ export class JqTreeWidget {
             onIsMoveHandle = (el: HTMLElement) => jqTreeOnIsMoveHandle(jQuery(el))
         }
 
+        let onLoading: OnLoading | undefined = undefined;
+        const jqTreeOnLoading = this._inputOptions.onLoading;
+
+        if (jqTreeOnLoading) {
+            onLoading = (isLoading: boolean, node: Node | null, element: HTMLElement) => {
+                jqTreeOnLoading(isLoading, node, jQuery(element))
+            }
+        }
+
         return {
             ...this._inputOptions,
             closedIcon,
             onCreateLi,
             onIsMoveHandle,
+            onLoading,
             openedIcon,
         }
     }
