@@ -378,6 +378,7 @@ export class JqTreeWidget {
         function convertToIconElement(jqtreeIconElement: JQTreeIconElement | undefined) {
             if (jqtreeIconElement instanceof jQuery) {
                 return (jqtreeIconElement as JQuery).get(0);
+
             } else {
                 return jqtreeIconElement as IconElement;
             }
@@ -392,6 +393,7 @@ export class JqTreeWidget {
         if (jqTreeOnCreateLi) {
             onCreateLi = (node: Node, el: HTMLElement, isSelected: boolean) => {
                 jqTreeOnCreateLi(node, jQuery(el), isSelected);
+
             };
         }
 
@@ -421,7 +423,6 @@ export class JqTreeWidget {
         }
     }
 }
-
 
 const register = (): void => {
     const getWidgetData = (
