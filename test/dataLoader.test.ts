@@ -158,7 +158,7 @@ describe("loadFromUrl", () => {
                 1,
                 true,
                 null,
-                jQuery(treeElement)
+                treeElement
             );
         });
 
@@ -167,7 +167,7 @@ describe("loadFromUrl", () => {
                 2,
                 false,
                 null,
-                jQuery(treeElement)
+                treeElement
             );
         });
     });
