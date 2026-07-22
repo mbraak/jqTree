@@ -63,7 +63,7 @@ describe("loadFromUrl", () => {
             triggerEvent,
         });
 
-        return { dataLoader, loadData, onLoadFailed, onLoading, triggerEvent };
+        return { dataLoader, loadData, onLoadFailed, onLoading, treeElement, triggerEvent };
     }
 
     it("does nothing when urlInfo is empty", () => {
@@ -155,7 +155,7 @@ describe("loadFromUrl", () => {
     it("calls onLoading", async () => {
         setupResponse();
 
-        const { dataLoader, onLoading } = createDataLoader();
+        const { dataLoader, onLoading, treeElement } = createDataLoader();
         dataLoader.loadFromUrl("/test", null, null);
 
         await waitFor(() => {
@@ -163,7 +163,7 @@ describe("loadFromUrl", () => {
                 1,
                 true,
                 null,
-                expect.objectContaining({})
+                jQuery(treeElement)
             );
         });
 
@@ -172,7 +172,7 @@ describe("loadFromUrl", () => {
                 2,
                 false,
                 null,
-                expect.objectContaining({})
+                jQuery(treeElement)
             );
         });
     });
