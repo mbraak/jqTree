@@ -127,27 +127,29 @@ describe("loadFromUrl", () => {
     it("triggers tree.loading_data events", async () => {
         setupResponse();
 
-        const { dataLoader, triggerEvent } = createDataLoader();
+        const { dataLoader, treeElement, triggerEvent } = createDataLoader();
         dataLoader.loadFromUrl("/test", null, null);
 
         await waitFor(() => {
             expect(triggerEvent).toHaveBeenNthCalledWith(
                 1,
                 "tree.loading_data",
-                expect.objectContaining({
+                {
+                    $el: jQuery(treeElement),
                     isLoading: true,
                     node: null
-                })
+                }
             );
         });
         await waitFor(() => {
             expect(triggerEvent).toHaveBeenNthCalledWith(
                 2,
                 "tree.loading_data",
-                expect.objectContaining({
+                {
+                    $el: jQuery(treeElement),
                     isLoading: false,
                     node: null
-                })
+                }
             );
         });
     });
