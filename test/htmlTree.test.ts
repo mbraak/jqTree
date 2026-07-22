@@ -17,60 +17,28 @@ const createHtmlTree = ({
     const htmlElement = document.createElement("div");
     document.body.append(htmlElement);
 
-    return new HtmlTree({
+    const htmlTree = new HtmlTree({
         htmlElement,
         options,
         overrideTriggerEventProvider: overrideTriggerEvent,
     });
+
+    return { htmlElement, htmlTree };
 };
 
 describe("HtmlTree", () => {
     describe("constructor", () => {
-        it("stores the html element and options", () => {
-            const htmlElement = document.createElement("div");
-
-            const htmlTree = new HtmlTree({
-                htmlElement,
-                options: { tabIndex: 5 },
-            });
-
-            expect(htmlTree.htmlElement).toBe(htmlElement);
-            expect(htmlTree.options.tabIndex).toBe(5);
-        });
-
         it("creates a root node", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             expect(htmlTree.tree).toBeInstanceOf(Node);
             expect(htmlTree.tree.tree).toBe(htmlTree.tree);
-        });
-
-        it("creates a select node handler that resolves nodes from the tree", () => {
-            const htmlTree = createHtmlTree();
-
-            const node = new Node({ id: 123, name: "node1" });
-            htmlTree.tree.addChild(node);
-            htmlTree.selectNodeHandler.addToSelection(node);
-
-            expect(htmlTree.selectNodeHandler.getSelectedNode()).toBe(node);
-        });
-
-        it("sets the default options", () => {
-            const htmlTree = createHtmlTree({});
-
-            expect(htmlTree.options).toMatchObject({
-                autoEscape: true,
-                closedIcon: "&#x25ba;",
-                nodeClass: Node,
-                rtl: false,
-                tabIndex: 0,
-            });
         });
     });
 
     describe("addNodeAfter", () => {
         it("adds a node after the existing node and returns it", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const node1 = new Node({ id: 1, name: "node1" });
             const node2 = new Node({ id: 2, name: "node2" });
@@ -92,7 +60,7 @@ describe("HtmlTree", () => {
 
     describe("addNodeBefore", () => {
         it("adds a node before the existing node and returns it", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const node1 = new Node({ id: 1, name: "node1" });
             const node2 = new Node({ id: 2, name: "node2" });
@@ -114,7 +82,7 @@ describe("HtmlTree", () => {
 
     describe("addParentNode", () => {
         it("adds a parent above the existing node and returns it", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const node = new Node({ id: 1, name: "node1" });
             htmlTree.tree.addChild(node);
@@ -136,7 +104,7 @@ describe("HtmlTree", () => {
         });
 
         it("returns null when the existing node has no parent", () => {
-            const htmlTree = createHtmlTree({});
+            const { htmlTree } = createHtmlTree();
 
             const newNode = htmlTree.addParentNode(
                 { name: "new-parent" },
@@ -149,7 +117,7 @@ describe("HtmlTree", () => {
 
     describe("appendNode", () => {
         it("appends a node to the parent node and returns it", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const parentNode = new Node({ id: 1, name: "parent" });
             htmlTree.tree.addChild(parentNode);
@@ -169,82 +137,64 @@ describe("HtmlTree", () => {
 
     describe("deselectNodes", () => {
         it("deselects selected nodes under the parent node", () => {
-            const htmlTree = createHtmlTree();
-            htmlTree.tree.loadFromData([
-                {
-                    children: [
-                        { id: 2, name: "child1" },
-                        { id: 3, name: "child2" },
-                    ],
-                    id: 1,
-                    name: "node1",
-                },
-            ]);
+            const { htmlTree } = createHtmlTree();
+            htmlTree.loadData(
+                [
+                    {
+                        children: [
+                            { id: 2, name: "child1" },
+                            { id: 3, name: "child2" },
+                        ],
+                        id: 1,
+                        name: "node1",
+                    }
+                ],
+            )
             const parentNode = htmlTree.tree.children[0] as Node;
-            htmlTree.selectNodeHandler.addToSelection(
+            htmlTree.addToSelection(
                 parentNode.children[0] as Node,
             );
-            htmlTree.selectNodeHandler.addToSelection(
+            htmlTree.addToSelection(
                 parentNode.children[1] as Node,
             );
 
             htmlTree.deselectNodes(parentNode);
 
-            expect(htmlTree.selectNodeHandler.getSelectedNodes()).toHaveLength(
+            expect(htmlTree.getSelectedNodes()).toHaveLength(
                 0,
             );
         });
 
         it("keeps the selection of nodes outside the parent node", () => {
-            const htmlTree = createHtmlTree();
-            htmlTree.tree.loadFromData([
-                {
-                    children: [{ id: 2, name: "child1" }],
-                    id: 1,
-                    name: "node1",
-                },
-                { id: 3, name: "node2" },
-            ]);
+            const { htmlTree } = createHtmlTree();
+            htmlTree.loadData(
+                [
+                    {
+                        children: [{ id: 2, name: "child1" }],
+                        id: 1,
+                        name: "node1",
+                    },
+                    { id: 3, name: "node2" },
+                ]
+            );
             const parentNode = htmlTree.tree.children[0] as Node;
             const otherNode = htmlTree.tree.children[1] as Node;
-            htmlTree.selectNodeHandler.addToSelection(
+            htmlTree.addToSelection(
                 parentNode.children[0] as Node,
             );
-            htmlTree.selectNodeHandler.addToSelection(otherNode);
+            htmlTree.addToSelection(otherNode);
 
             htmlTree.deselectNodes(parentNode);
 
-            expect(htmlTree.selectNodeHandler.getSelectedNodes()).toStrictEqual(
+            expect(htmlTree.getSelectedNodes()).toStrictEqual(
                 [otherNode],
             );
         });
     });
 
-    describe("setNodeElement", () => {
-        it("maps the element to the node", () => {
-            const htmlTree = createHtmlTree();
-            const element = document.createElement("li");
-            const node = new Node();
-
-            htmlTree.setNodeElement(element, node);
-
-            expect(htmlTree.nodeMap.get(element)).toBe(node);
-        });
-    });
-
-    describe("setOption", () => {
-        it("sets the value of an option", () => {
-            const htmlTree = createHtmlTree();
-
-            htmlTree.setOption("autoEscape", false);
-
-            expect(htmlTree.options.autoEscape).toBeFalse();
-        });
-    });
-
     describe("getNode", () => {
         it("returns the node for the closest jqtree li element", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const liElement = document.createElement("li");
             liElement.classList.add("jqtree_common");
@@ -258,14 +208,14 @@ describe("HtmlTree", () => {
         });
 
         it("returns null when there is no jqtree li element", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             const element = document.createElement("span");
 
             expect(htmlTree.getNode(element)).toBeNull();
         });
 
         it("returns null when the li element is not in the node map", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             const liElement = document.createElement("li");
             liElement.classList.add("jqtree_common");
 
@@ -275,7 +225,7 @@ describe("HtmlTree", () => {
 
     describe("getNodeById", () => {
         it("returns the node with the id", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const node = new Node({ id: 123, name: "node1" });
             htmlTree.tree.addChild(node);
@@ -284,7 +234,7 @@ describe("HtmlTree", () => {
         });
 
         it("returns null when there is no node with the id", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             expect(htmlTree.getNodeById(123)).toBeNull();
         });
@@ -292,29 +242,34 @@ describe("HtmlTree", () => {
 
     describe("getSelectedNode", () => {
         it("returns the selected node", () => {
-            const htmlTree = createHtmlTree();
-
-            const node = new Node({ id: 123, name: "node1" });
-            htmlTree.tree.addChild(node);
-            htmlTree.selectNodeHandler.addToSelection(node);
+            const { htmlTree } = createHtmlTree();
+            htmlTree.loadData([
+                { id: 123, name: "node1" }
+            ]);
+            const node = htmlTree.getNodeByName("node1") as Node;
+            htmlTree.addToSelection(node);
 
             expect(htmlTree.getSelectedNode()).toBe(node);
         });
 
         it("returns false when no node is selected", () => {
-            expect(createHtmlTree().getSelectedNode()).toBeFalse();
+            const { htmlTree } = createHtmlTree();
+
+            expect(htmlTree.getSelectedNode()).toBeFalse();
         });
     });
 
     describe("getVersion", () => {
         it("returns the version", () => {
-            expect(createHtmlTree().getVersion()).toBe(version);
+            const { htmlTree } = createHtmlTree();
+
+            expect(htmlTree.getVersion()).toBe(version);
         });
     });
 
     describe("containsElement", () => {
         it("returns true when the element belongs to the tree", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const liElement = document.createElement("li");
             liElement.classList.add("jqtree_common");
@@ -327,7 +282,7 @@ describe("HtmlTree", () => {
         });
 
         it("returns false when the element belongs to another tree", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const liElement = document.createElement("li");
             liElement.classList.add("jqtree_common");
@@ -341,7 +296,7 @@ describe("HtmlTree", () => {
         });
 
         it("returns false when the element is not part of any tree", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             const element = document.createElement("span");
 
             expect(htmlTree.containsElement(element)).toBeFalse();
@@ -350,7 +305,7 @@ describe("HtmlTree", () => {
 
     describe("isFocusOnTree", () => {
         it("returns true when a span of the tree has the focus", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const liElement = document.createElement("li");
             liElement.classList.add("jqtree_common");
@@ -369,13 +324,13 @@ describe("HtmlTree", () => {
         });
 
         it("returns false when nothing of the tree has the focus", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             expect(htmlTree.isFocusOnTree()).toBeFalse();
         });
 
         it("returns false when the focused element is not a span", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const liElement = document.createElement("li");
             liElement.classList.add("jqtree_common");
@@ -394,7 +349,7 @@ describe("HtmlTree", () => {
 
     describe("moveNode", () => {
         it("moves the node relative to the target node", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const node1 = new Node({ id: 1, name: "node1" });
             const node2 = new Node({ id: 2, name: "node2" });
@@ -416,7 +371,7 @@ describe("HtmlTree", () => {
 
     describe("prependNode", () => {
         it("prepends a node to the parent node and returns it", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             const parentNode = new Node({ id: 1, name: "parent" });
             htmlTree.tree.addChild(parentNode);
@@ -436,7 +391,7 @@ describe("HtmlTree", () => {
 
     describe("removeNode", () => {
         it("removes the node and its children from the tree", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             htmlTree.tree.loadFromData([
                 {
                     children: [{ id: 2, name: "child1" }],
@@ -457,19 +412,19 @@ describe("HtmlTree", () => {
         });
 
         it("removes the node from the selection", () => {
-            const htmlTree = createHtmlTree();
-            htmlTree.tree.loadFromData([{ id: 1, name: "node1" }]);
+            const { htmlTree } = createHtmlTree();
+            htmlTree.loadData([{ id: 1, name: "node1" }]);
             const node = htmlTree.tree.children[0] as Node;
-            htmlTree.selectNodeHandler.addToSelection(node);
+            htmlTree.addToSelection(node);
 
             htmlTree.removeNode(node);
 
-            expect(htmlTree.selectNodeHandler.isNodeSelected(node)).toBeFalse();
+            expect(htmlTree.isNodeSelected(node)).toBeFalse();
         });
 
         it("removes selected children of the node from the selection", () => {
-            const htmlTree = createHtmlTree();
-            htmlTree.tree.loadFromData([
+            const { htmlTree } = createHtmlTree();
+            htmlTree.loadData([
                 {
                     children: [{ id: 2, name: "child1" }],
                     id: 1,
@@ -478,11 +433,11 @@ describe("HtmlTree", () => {
             ]);
             const node = htmlTree.tree.children[0] as Node;
             const childNode = node.children[0] as Node;
-            htmlTree.selectNodeHandler.addToSelection(childNode);
+            htmlTree.addToSelection(childNode);
 
             htmlTree.removeNode(node);
 
-            expect(htmlTree.selectNodeHandler.getSelectedNodes()).toHaveLength(
+            expect(htmlTree.getSelectedNodes()).toHaveLength(
                 0,
             );
         });
@@ -490,7 +445,7 @@ describe("HtmlTree", () => {
 
     describe("toJson", () => {
         it("returns the tree as a json string", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
 
             htmlTree.tree.loadFromData([
                 {
@@ -507,15 +462,17 @@ describe("HtmlTree", () => {
         });
 
         it("returns an empty array for an empty tree", () => {
-            expect(createHtmlTree().toJson()).toBe("[]");
+            const { htmlTree } = createHtmlTree();
+
+            expect(htmlTree.toJson()).toBe("[]");
         });
     });
 
     describe("triggerEvent", () => {
         it("dispatches a custom event on the html element by default", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlElement, htmlTree } = createHtmlTree();
             const listener = vi.fn();
-            htmlTree.htmlElement.addEventListener("tree.test", listener);
+            htmlElement.addEventListener("tree.test", listener);
 
             const result = htmlTree.triggerEvent("tree.test", { a: 1 });
 
@@ -525,12 +482,12 @@ describe("HtmlTree", () => {
 
         it("uses the override trigger event when provided", () => {
             const overrideTriggerEvent = vi.fn().mockReturnValue(false);
-            const htmlTree = createHtmlTree({ overrideTriggerEvent });
+            const { htmlElement, htmlTree } = createHtmlTree({ overrideTriggerEvent });
 
             const result = htmlTree.triggerEvent("tree.test", { a: 1 });
 
             expect(overrideTriggerEvent).toHaveBeenCalledWith(
-                htmlTree.htmlElement,
+                htmlElement,
                 "tree.test",
                 { a: 1 },
             );
@@ -540,7 +497,7 @@ describe("HtmlTree", () => {
 
     describe("updateNode", () => {
         it("updates the data of the node", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             htmlTree.tree.loadFromData([{ id: 1, name: "node1" }]);
             const node = htmlTree.tree.children[0] as Node;
 
@@ -551,7 +508,7 @@ describe("HtmlTree", () => {
         });
 
         it("updates the id index when the id is changed", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             htmlTree.tree.loadFromData([{ id: 1, name: "node1" }]);
             const node = htmlTree.tree.children[0] as Node;
 
@@ -563,7 +520,7 @@ describe("HtmlTree", () => {
         });
 
         it("replaces the children when the data contains children", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             htmlTree.tree.loadFromData([
                 {
                     children: [{ id: 2, name: "old-child" }],
@@ -584,7 +541,7 @@ describe("HtmlTree", () => {
         });
 
         it("removes the children when the data contains an empty children array", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             htmlTree.tree.loadFromData([
                 {
                     children: [{ id: 2, name: "child1" }],
@@ -602,26 +559,26 @@ describe("HtmlTree", () => {
 
     describe("getAutoOpenMaxLevel", () => {
         it("returns -1 when the autoOpen option is true", () => {
-            const htmlTree = createHtmlTree({ options: { autoOpen: true } });
+            const { htmlTree } = createHtmlTree({ options: { autoOpen: true } });
 
             expect(htmlTree.getAutoOpenMaxLevel()).toBe(-1);
         });
 
         it("returns the autoOpen option when it is a number", () => {
-            const htmlTree = createHtmlTree({ options: { autoOpen: 2 } });
+            const { htmlTree } = createHtmlTree({ options: { autoOpen: 2 } });
 
             expect(htmlTree.getAutoOpenMaxLevel()).toBe(2);
         });
 
         it("parses the autoOpen option when it is a string", () => {
-            const htmlTree = createHtmlTree();
+            const { htmlTree } = createHtmlTree();
             htmlTree.setOption("autoOpen", "3");
 
             expect(htmlTree.getAutoOpenMaxLevel()).toBe(3);
         });
 
         it("returns 0 when the autoOpen option is false", () => {
-            const htmlTree = createHtmlTree({ options: { autoOpen: false } });
+            const { htmlTree } = createHtmlTree({ options: { autoOpen: false } });
 
             expect(htmlTree.getAutoOpenMaxLevel()).toBe(0);
         });
