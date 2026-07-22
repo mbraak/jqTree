@@ -199,6 +199,7 @@ describe("events", () => {
             await waitFor(() => {
                 expect(onLoading).toHaveBeenCalledExactlyOnceWith(
                     expect.objectContaining({
+                        $el: $tree,
                         isLoading: true,
                         node: null,
                     }),
@@ -208,6 +209,7 @@ describe("events", () => {
             await waitFor(() => {
                 expect(onLoading).toHaveBeenLastCalledWith(
                     expect.objectContaining({
+                        $el: $tree,
                         isLoading: false,
                         node: null,
                     }),
