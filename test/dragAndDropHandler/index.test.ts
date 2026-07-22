@@ -215,8 +215,7 @@ describe("DragAndDropHandler", () => {
             tree.addChild(node2);
 
             const onIsMoveHandle = vi.fn(
-                (jQueryElement: JQuery) =>
-                    jQueryElement.get(0) === node1.element,
+                (el: HTMLElement) => el === node1.element
             );
             const { dragAndDropHandler } = createDragAndDropHandler({
                 onIsMoveHandle,

@@ -1,5 +1,5 @@
 import type { HandleFinishedLoading } from "./dataLoader";
-import type { HtmlTreeOptions, IconElement, OnCreateLi } from "./htmlTree/options";
+import type { HtmlTreeOptions, IconElement, OnCreateLi, OnIsMoveHandle } from "./htmlTree/options";
 import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 import type { Node, Position } from "./node";
@@ -395,10 +395,18 @@ export class JqTreeWidget {
             };
         }
 
+        let onIsMoveHandle: OnIsMoveHandle | undefined = undefined;
+        const jqTreeOnIsMoveHandle = this._inputOptions.onIsMoveHandle;
+
+        if (jqTreeOnIsMoveHandle) {
+            onIsMoveHandle = (el: HTMLElement) => jqTreeOnIsMoveHandle(jQuery(el))
+        }
+
         return {
             ...this._inputOptions,
             closedIcon,
             onCreateLi,
+            onIsMoveHandle,
             openedIcon,
         }
     }

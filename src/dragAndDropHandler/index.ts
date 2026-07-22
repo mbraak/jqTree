@@ -124,7 +124,7 @@ export class DragAndDropHandler {
             return null;
         }
 
-        if (this._onIsMoveHandle && !this._onIsMoveHandle(jQuery(element))) {
+        if (this._onIsMoveHandle && !this._onIsMoveHandle(element)) {
             return null;
         }
 

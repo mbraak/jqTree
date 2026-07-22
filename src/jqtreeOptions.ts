@@ -5,10 +5,14 @@ export type JQTreeIconElement = IconElement | JQuery;
 
 export type JQTreeOnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 
+export type JQTreeOnIsMoveHandle = (el: JQuery) => boolean;
+
 export type JQTreeOptions = Modify<HtmlTreeOptions, {
     closedIcon?: JQTreeIconElement;
     onCreateLi?: JQTreeOnCreateLi;
+    onIsMoveHandle?: JQTreeOnIsMoveHandle;
     openedIcon?: JQTreeIconElement;
 }>
 
 type Modify<T, R> = Omit<T, keyof R> & R;
+
