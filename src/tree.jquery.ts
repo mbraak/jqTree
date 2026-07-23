@@ -292,7 +292,7 @@ export class JqTreeWidget {
     }
 
     public reload(onFinished?: HandleFinishedLoading): JQuery {
-        this._htmlTree.loadDataFromUrl(null, null, onFinished);
+        this._htmlTree.loadDataFromUrl(undefined, undefined, onFinished);
         return this._element;
     }
 
@@ -406,7 +406,7 @@ export class JqTreeWidget {
         const jqTreeOnLoading = this._inputOptions.onLoading;
 
         if (jqTreeOnLoading) {
-            onLoading = (isLoading: boolean, node: Node | null, element: HTMLElement) => {
+            onLoading = (isLoading: boolean, node: Node | undefined, element: HTMLElement) => {
                 jqTreeOnLoading(isLoading, node, jQuery(element))
             }
         }

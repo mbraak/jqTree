@@ -179,7 +179,7 @@ export default class HtmlTree {
     * Add a 'node' query parameter for loading on demand
     * Add a 'selected_node' query parameter if a node is selected.
   */
-  public createRequestUrl(node: Node | null): null | RequestUrl {
+  public createRequestUrl(node?: Node): null | RequestUrl {
     const dataUrl = this._options.dataUrl;
 
     let url;
@@ -339,10 +339,10 @@ export default class HtmlTree {
     if (this._options.data) {
       this.loadData(this._options.data);
     } else {
-      const dataUrl = this.createRequestUrl(null);
+      const dataUrl = this.createRequestUrl();
 
       if (dataUrl) {
-        this.loadDataFromUrl(null, null, null);
+        this.loadDataFromUrl();
       } else {
         this.loadData([]);
       }
@@ -425,9 +425,9 @@ export default class HtmlTree {
   }
 
   public loadDataFromUrl(
-    inputUrl: null | string,
-    parentNode: Node | null,
-    onFinished: HandleFinishedLoading | null,
+    inputUrl?: string,
+    parentNode?: Node,
+    onFinished?: HandleFinishedLoading,
   ): void {
     const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
 
@@ -443,7 +443,7 @@ export default class HtmlTree {
   ): void {
     node.is_loading = true;
 
-    this.loadDataFromUrl(null, node, () => {
+    this.loadDataFromUrl(undefined, node, () => {
       this.openNodeInternal(node, slide, onFinished);
     });
   }
