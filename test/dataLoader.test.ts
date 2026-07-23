@@ -63,7 +63,7 @@ describe("loadFromUrl", () => {
             triggerEvent,
         });
 
-        return { dataLoader, loadData, onLoadFailed, onLoading, triggerEvent };
+        return { dataLoader, loadData, onLoadFailed, onLoading, treeElement, triggerEvent };
     }
 
     it("does nothing when urlInfo is empty", () => {
@@ -127,27 +127,29 @@ describe("loadFromUrl", () => {
     it("triggers tree.loading_data events", async () => {
         setupResponse();
 
-        const { dataLoader, triggerEvent } = createDataLoader();
+        const { dataLoader, treeElement, triggerEvent } = createDataLoader();
         dataLoader.loadFromUrl("/test", null, null);
 
         await waitFor(() => {
             expect(triggerEvent).toHaveBeenNthCalledWith(
                 1,
                 "tree.loading_data",
-                expect.objectContaining({
+                {
+                    $el: jQuery(treeElement),
                     isLoading: true,
                     node: null
-                })
+                }
             );
         });
         await waitFor(() => {
             expect(triggerEvent).toHaveBeenNthCalledWith(
                 2,
                 "tree.loading_data",
-                expect.objectContaining({
+                {
+                    $el: jQuery(treeElement),
                     isLoading: false,
                     node: null
-                })
+                }
             );
         });
     });
@@ -155,7 +157,7 @@ describe("loadFromUrl", () => {
     it("calls onLoading", async () => {
         setupResponse();
 
-        const { dataLoader, onLoading } = createDataLoader();
+        const { dataLoader, onLoading, treeElement } = createDataLoader();
         dataLoader.loadFromUrl("/test", null, null);
 
         await waitFor(() => {
@@ -163,7 +165,7 @@ describe("loadFromUrl", () => {
                 1,
                 true,
                 null,
-                expect.objectContaining({})
+                jQuery(treeElement)
             );
         });
 
@@ -172,7 +174,7 @@ describe("loadFromUrl", () => {
                 2,
                 false,
                 null,
-                expect.objectContaining({})
+                jQuery(treeElement)
             );
         });
     });

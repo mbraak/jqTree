@@ -501,6 +501,30 @@ describe("options", () => {
         });
     });
 
+    describe("onIsMoveHandle", () => {
+        it("is called with a jQuery element", () => {
+            const onIsMoveHandle = vi.fn(() => true);
+
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+                dragAndDrop: true,
+                onIsMoveHandle,
+            });
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            const titleElement = getTitleElement(node1.element as HTMLElement);
+
+            titleElement.dispatchEvent(
+                new MouseEvent("mousedown", { bubbles: true, button: 0 }),
+            );
+
+            expect(onIsMoveHandle).toHaveBeenCalledExactlyOnceWith(
+                expect.objectContaining({ 0: titleElement }),
+            );
+        });
+    });
+
     describe("onLoadFailed", () => {
         it("calls onLoadFailed when the loading fails", async () => {
             server.use(
