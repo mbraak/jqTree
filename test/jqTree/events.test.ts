@@ -197,22 +197,24 @@ describe("events", () => {
             $tree.tree({ dataUrl: "/tree/" });
 
             await waitFor(() => {
-                expect(onLoading).toHaveBeenCalledExactlyOnceWith(
+                expect(onLoading).toHaveBeenNthCalledWith(
+                    1,
                     expect.objectContaining({
                         $el: $tree,
                         isLoading: true,
                         node: null,
-                    }),
+                    })
                 );
             });
 
             await waitFor(() => {
-                expect(onLoading).toHaveBeenLastCalledWith(
+                expect(onLoading).toHaveBeenNthCalledWith(
+                    2,
                     expect.objectContaining({
                         $el: $tree,
                         isLoading: false,
                         node: null,
-                    }),
+                    })
                 );
             });
         });
@@ -237,6 +239,9 @@ describe("events", () => {
 
             $tree.tree({ dataUrl: "/tree/", onLoading });
 
+            await waitFor(() => {
+                expect(onLoading).toHaveBeenNthCalledWith(1, true, null, $tree);
+            });
             await waitFor(() => {
                 expect(onLoading).toHaveBeenNthCalledWith(2, false, null, $tree);
             });
