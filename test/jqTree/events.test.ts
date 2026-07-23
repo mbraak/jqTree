@@ -240,6 +240,9 @@ describe("events", () => {
             $tree.tree({ dataUrl: "/tree/", onLoading });
 
             await waitFor(() => {
+                expect(onLoading).toHaveBeenNthCalledWith(1, true, undefined, $tree);
+            });
+            await waitFor(() => {
                 expect(onLoading).toHaveBeenNthCalledWith(2, false, undefined, $tree);
             });
         });
