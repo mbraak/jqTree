@@ -9,8 +9,8 @@ export type JQTreeOnIsMoveHandle = (el: JQuery) => boolean;
 
 export type JQTreeOnLoading = (
     isLoading: boolean,
-    node: Node | null,
-    element: JQuery,
+    node: Node | undefined,
+    $el: JQuery,
 ) => void;
 
 export type JQTreeOptions = Modify<HtmlTreeOptions, {
@@ -22,4 +22,3 @@ export type JQTreeOptions = Modify<HtmlTreeOptions, {
 }>
 
 type Modify<T, R> = Omit<T, keyof R> & R;
-

@@ -18,7 +18,7 @@ export type IsFocusOnTree = () => boolean;
 
 export type IsNodeSelected = (node: Node) => boolean;
 
-export type LoadData = (data: NodeData[], parentNode: Node | null) => void;
+export type LoadData = (data: NodeData[], parentNode?: Node) => void;
 
 export type OnFinishOpenNode = (node: Node) => void;
 

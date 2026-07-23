@@ -42,16 +42,16 @@ export default class DataLoader {
 
     public loadFromUrl(
         url: RequestUrl,
-        parentNode: Node | null,
-        onFinished: HandleFinishedLoading | null,
+        parentNode?: Node,
+        onFinished?: HandleFinishedLoading,
     ): void {
         const element = this._getDomElement(parentNode);
         this._addLoadingClass(element);
-        this._notifyLoading(true, parentNode, element);
+        this._notifyLoading(true, element, parentNode);
 
         const stopLoading = (): void => {
             this._removeLoadingClass(element);
-            this._notifyLoading(false, parentNode, element);
+            this._notifyLoading(false, element, parentNode);
         };
 
         const handleSuccess = (data: NodeData[]): void => {
@@ -78,7 +78,7 @@ export default class DataLoader {
         element.classList.add("jqtree-loading");
     }
 
-    private _getDomElement(parentNode: Node | null): HTMLElement {
+    private _getDomElement(parentNode?: Node): HTMLElement {
         if (parentNode?.element) {
             return parentNode.element;
         } else {
@@ -88,8 +88,8 @@ export default class DataLoader {
 
     private _notifyLoading(
         isLoading: boolean,
-        node: Node | null,
         element: HTMLElement,
+        node?: Node,
     ): void {
         const $el = jQuery(element);
 
@@ -100,7 +100,7 @@ export default class DataLoader {
         this._triggerEvent("tree.loading_data", {
             $el,
             isLoading,
-            node,
+            node: node ?? null,
         });
     }
 

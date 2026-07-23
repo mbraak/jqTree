@@ -186,7 +186,7 @@ export class JqTreeWidget {
         return this._htmlTree.isNodeSelected(node);
     }
 
-    public loadData(data: NodeData[], parentNode: Node | null): JQuery {
+    public loadData(data: NodeData[], parentNode?: Node): JQuery {
         this._htmlTree.loadData(data, parentNode);
         return this._element;
     }
@@ -206,7 +206,7 @@ export class JqTreeWidget {
         loadDataFromUrl(node1, function() { console.log('finished'); });
     */
     public loadDataFromUrl(
-        param1: Node | null | string,
+        param1?: Node | string,
         param2?: HandleFinishedLoading | Node | null,
         param3?: HandleFinishedLoading,
     ): JQuery {
@@ -214,15 +214,15 @@ export class JqTreeWidget {
             // first parameter is url
             this._htmlTree.loadDataFromUrl(
                 param1,
-                param2 as Node | null,
-                param3 ?? null,
+                param2 as Node | undefined,
+                param3,
             );
         } else {
             // first parameter is not url
             this._htmlTree.loadDataFromUrl(
-                null,
+                undefined,
                 param1,
-                param2 as HandleFinishedLoading | null,
+                param2 as HandleFinishedLoading | undefined,
             );
         }
 
@@ -291,7 +291,7 @@ export class JqTreeWidget {
         return this._element;
     }
 
-    public reload(onFinished: HandleFinishedLoading | null): JQuery {
+    public reload(onFinished?: HandleFinishedLoading): JQuery {
         this._htmlTree.loadDataFromUrl(null, null, onFinished);
         return this._element;
     }
@@ -378,7 +378,6 @@ export class JqTreeWidget {
         function convertToIconElement(jqtreeIconElement: JQTreeIconElement | undefined) {
             if (jqtreeIconElement instanceof jQuery) {
                 return (jqtreeIconElement as JQuery).get(0);
-
             } else {
                 return jqtreeIconElement as IconElement;
             }
@@ -393,7 +392,6 @@ export class JqTreeWidget {
         if (jqTreeOnCreateLi) {
             onCreateLi = (node: Node, el: HTMLElement, isSelected: boolean) => {
                 jqTreeOnCreateLi(node, jQuery(el), isSelected);
-
             };
         }
 
