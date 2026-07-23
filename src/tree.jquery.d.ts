@@ -29,7 +29,7 @@ interface IJQTreeOptions {
     onGetStateFromStorage?: () => string;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: Response) => void;
-    onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
+    onLoading?: (isLoading: boolean, node?: INode, $el: JQuery) => void;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: HTMLElement | JQuery | string;
     openFolderDelay?: false | number;
@@ -84,7 +84,7 @@ interface IJQTreePlugin {
     (
         behavior: "loadDataFromUrl",
         param1?: INode | null | string,
-        param2?: (() => void) | INode | null,
+        param2?: (() => void) | INode,
         param3?: () => void,
     ): JQuery;
     (behavior: "moveDown"): JQuery;

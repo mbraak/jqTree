@@ -294,7 +294,7 @@ export class JqTreeWidget {
         return this._selectNodeHandler.isNodeSelected(node);
     }
 
-    public loadData(data: NodeData[], parentNode: Node | null): JQuery {
+    public loadData(data: NodeData[], parentNode?: Node): JQuery {
         this._doLoadData(data, parentNode);
         return this._element;
     }
@@ -314,7 +314,7 @@ export class JqTreeWidget {
         loadDataFromUrl(node1, function() { console.log('finished'); });
     */
     public loadDataFromUrl(
-        param1: Node | null | string,
+        param1?: Node | string,
         param2?: HandleFinishedLoading | Node | null,
         param3?: HandleFinishedLoading,
     ): JQuery {
@@ -322,15 +322,15 @@ export class JqTreeWidget {
             // first parameter is url
             this._doLoadDataFromUrl(
                 param1,
-                param2 as Node | null,
-                param3 ?? null,
+                param2 as Node | undefined,
+                param3,
             );
         } else {
             // first parameter is not url
             this._doLoadDataFromUrl(
-                null,
+                undefined,
                 param1,
-                param2 as HandleFinishedLoading | null,
+                param2 as HandleFinishedLoading | undefined,
             );
         }
 
@@ -430,8 +430,8 @@ export class JqTreeWidget {
         return this._element;
     }
 
-    public reload(onFinished: HandleFinishedLoading | null): JQuery {
-        this._doLoadDataFromUrl(null, null, onFinished);
+    public reload(onFinished?: HandleFinishedLoading): JQuery {
+        this._doLoadDataFromUrl(undefined, undefined, onFinished);
         return this._element;
     }
 
@@ -765,7 +765,7 @@ export class JqTreeWidget {
         });
     }
 
-    private _createRequestUrl(node: Node | null): null | RequestUrl {
+    private _createRequestUrl(node?: Node): null | RequestUrl {
         const dataUrl = this._options.dataUrl;
         let url;
 
@@ -810,7 +810,7 @@ export class JqTreeWidget {
         }
     }
 
-    private _doLoadData(data: NodeData[] | null, parentNode: Node | null): void {
+    private _doLoadData(data: NodeData[] | null, parentNode?: Node): void {
         if (data) {
             if (parentNode) {
                 this._deselectNodes(parentNode);
@@ -831,9 +831,9 @@ export class JqTreeWidget {
     }
 
     private _doLoadDataFromUrl(
-        inputUrl: null | string,
-        parentNode: Node | null,
-        onFinished: HandleFinishedLoading | null,
+        inputUrl?: string,
+        parentNode?: Node,
+        onFinished?: HandleFinishedLoading,
     ): void {
         const url = inputUrl ? new RequestUrl(inputUrl) : this._createRequestUrl(parentNode);
 
@@ -958,14 +958,14 @@ export class JqTreeWidget {
 
     private _initData(): void {
         if (this._options.data) {
-            this._doLoadData(this._options.data, null);
+            this._doLoadData(this._options.data);
         } else {
-            const dataUrl = this._createRequestUrl(null);
+            const dataUrl = this._createRequestUrl();
 
             if (dataUrl) {
-                this._doLoadDataFromUrl(null, null, null);
+                this._doLoadDataFromUrl();
             } else {
-                this._doLoadData([], null);
+                this._doLoadData([]);
             }
         }
     }
@@ -1023,7 +1023,7 @@ export class JqTreeWidget {
     ): void {
         node.is_loading = true;
 
-        this._doLoadDataFromUrl(null, node, () => {
+        this._doLoadDataFromUrl(undefined, node, () => {
             this._openNodeInternal(node, slide, onFinished);
         });
     }

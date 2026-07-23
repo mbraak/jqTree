@@ -62,10 +62,10 @@ export type OnLoadFailed = (response: Response) => void;
 
 export type OnLoading = (
     isLoading: boolean,
-    node: Node | null,
+    node: Node | undefined,
     $el: JQuery,
 ) => void;
 
 export type OnSetStateFromStorage = ((data: string) => void) | undefined;
 
-type DataUrlFunction = (node: Node | null) => string;
+type DataUrlFunction = (node?: Node) => string;
