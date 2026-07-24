@@ -8,7 +8,6 @@ import "app/tree.jquery";
 import __version__ from "app/version";
 
 import exampleData from "../support/exampleData";
-import { getTitleElement } from "../support/queries";
 
 const server = setupServer();
 
@@ -1295,10 +1294,8 @@ describe("methods", () => {
                 selectable: false,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-
             $tree.tree("setOption", "selectable", true);
-            await userEvent.click(getTitleElement(node1.element as HTMLElement));
+            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
 
             expect($tree.tree("getSelectedNode")).toMatchObject({
                 name: "node1",
