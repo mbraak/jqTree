@@ -12,12 +12,9 @@ describe("accessibility", () => {
     });
 
     afterEach(() => {
-        const treeElement = document.querySelector('#tree1');
-
-        if (treeElement) {
-            $(treeElement).tree("destroy");
-            treeElement.remove();
-        }
+        const $tree = $("#tree1");
+        $tree.tree("destroy");
+        document.body.innerHTML = "";
     });
 
     it("has an accessible ui", async () => {

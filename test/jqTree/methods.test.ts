@@ -17,9 +17,7 @@ describe("methods", () => {
     });
 
     beforeEach(() => {
-        const element = document.createElement("div");
-        element.id = "tree1";
-        document.body.appendChild(element);
+        document.body.innerHTML = '<div id="tree1"></div>';
     });
 
     afterEach(() => {
@@ -27,7 +25,7 @@ describe("methods", () => {
 
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
+        document.body.innerHTML = "";
         localStorage.clear();
     });
 
