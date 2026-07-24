@@ -4,7 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTogglerElement } from "../support/queries";
+import { getTreeButton } from "../support/queries";
 
 describe("mouse", () => {
     beforeEach(() => {
@@ -58,8 +58,7 @@ describe("mouse", () => {
 
         expect(treeItem).not.toBeAriaExpanded();
 
-        const node = $tree.tree("getNodeByNameMustExist", "node1");
-        await userEvent.click(getTogglerElement(node.element as HTMLElement));
+        await userEvent.click(getTreeButton(treeItem));
 
         await waitFor(() => {
             expect(treeItem).toBeAriaExpanded();
@@ -70,13 +69,12 @@ describe("mouse", () => {
         const $tree = $("#tree1");
         $tree.tree({ data: exampleData });
 
-        const node = $tree.tree("getNodeByNameMustExist", "node1");
         const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
         expect(treeItem).not.toBeAriaSelected();
         expect(treeItem).not.toBeAriaExpanded();
 
-        await userEvent.click(getTogglerElement(node.element as HTMLElement));
+        await userEvent.click(getTreeButton(treeItem));
 
         await waitFor(() => {
             expect(treeItem).toBeAriaExpanded();
@@ -97,7 +95,7 @@ describe("mouse", () => {
         expect(treeItem).toBeAriaSelected();
         expect(treeItem).not.toBeAriaExpanded();
 
-        await userEvent.click(getTogglerElement(node.element as HTMLElement));
+        await userEvent.click(getTreeButton(treeItem));
 
         await waitFor(() => {
             expect(treeItem).toBeAriaExpanded();

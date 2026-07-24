@@ -28,3 +28,18 @@ export const assertSingleElement = (container: HTMLElement, elements: NodeListOf
     throw queryHelpers.getElementError(`Found multiple ${name} elements`, container);
   }
 }
+
+export const getTreeButton = (treeElement: HTMLElement) => {
+  if (treeElement.role != "treeitem") {
+    throw new Error("Element must have role treeitem");
+  }
+
+  const parent = treeElement.parentElement; // eslint-disable-line testing-library/no-node-access
+  if (!parent) {
+    throw new Error("Element must have a parent");
+  }
+
+  const elements = parent.querySelectorAll(":scope > a.jqtree-toggler"); // eslint-disable-line testing-library/no-node-access
+  assertSingleElement(parent, elements, 'tree button');
+  return elements[0] as HTMLElement;
+};
