@@ -5,7 +5,7 @@ import { setupServer } from "msw/node";
 
 import "app/tree.jquery";
 
-import { getTogglerElement } from "../support/queries";
+import { getTreeButton } from "../support/queries";
 
 describe("load on demand", () => {
     const server = setupServer();
@@ -83,10 +83,9 @@ describe("load on demand", () => {
                 dataUrl: "/tree/",
                 saveState: true,
             });
-            const node = $tree.tree("getNodeByNameMustExist", "parent-node");
-
-            const toggler = getTogglerElement(node.element as HTMLElement);
-            await userEvent.click(toggler);
+            const treeItem = screen.getByRole("treeitem", { name: "parent-node" });
+            const button = getTreeButton(treeItem);
+            await userEvent.click(button);
 
             await waitFor(() => {
                 expect($tree).toHaveTreeStructure([
@@ -102,7 +101,7 @@ describe("load on demand", () => {
                 ]);
             });
 
-            await screen.findByText("loaded-on-demand");
+            await screen.findByRole("treeitem", { name: "loaded-on-demand" })
         });
 
         it("keeps the node selected when the node is selected", async () => {
@@ -116,15 +115,17 @@ describe("load on demand", () => {
             const node = $tree.tree("getNodeByNameMustExist", "parent-node");
             $tree.tree("selectNode", node);
 
-            expect(node.element).toBeSelectedTreeNode();
-            expect(node.element).toBeFocusedTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "parent-node" });
 
-            const toggler = getTogglerElement(node.element as HTMLElement);
-            await userEvent.click(toggler);
+            expect(treeItem).toBeAriaSelected();
+            expect(treeItem).toHaveFocus();
 
-            await screen.findByText("loaded-on-demand");
+            const button = getTreeButton(treeItem);
+            await userEvent.click(button);
 
-            expect(node.element).toBeSelectedTreeNode();
+            await screen.findByRole("treeitem", { name: "loaded-on-demand" })
+
+            expect(treeItem).toBeAriaSelected();
         });
 
         it("doesn't select the node when the node is not selected", async () => {
@@ -135,16 +136,16 @@ describe("load on demand", () => {
                 dataUrl: "/tree/",
                 saveState: true,
             });
-            const node = $tree.tree("getNodeByNameMustExist", "parent-node");
+            const treeItem = screen.getByRole("treeitem", { name: "parent-node" });
 
-            expect(node.element).not.toBeSelectedTreeNode();
+            expect(treeItem).not.toBeAriaSelected();
 
-            const toggler = getTogglerElement(node.element as HTMLElement);
-            await userEvent.click(toggler);
+            const button = getTreeButton(treeItem);
+            await userEvent.click(button);
 
-            await screen.findByText("loaded-on-demand");
+            await screen.findByRole("treeitem", { name: "loaded-on-demand" })
 
-            expect(node.element).not.toBeSelectedTreeNode();
+            expect(treeItem).not.toBeAriaSelected();
         });
 
         it("keeps the node selected and not focused when the node is selected and doesn't have the focus", async () => {
@@ -159,16 +160,18 @@ describe("load on demand", () => {
             $tree.tree("selectNode", node);
             (document.activeElement as HTMLElement).blur(); // eslint-disable-line testing-library/no-node-access
 
-            expect(node.element).toBeSelectedTreeNode();
-            expect(node.element).not.toBeFocusedTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "parent-node" });
 
-            const toggler = getTogglerElement(node.element as HTMLElement);
-            await userEvent.click(toggler);
+            expect(treeItem).toBeAriaSelected();
+            expect(treeItem).not.toHaveFocus();
 
-            await screen.findByText("loaded-on-demand");
+            const button = getTreeButton(treeItem);
+            await userEvent.click(button);
 
-            expect(node.element).toBeSelectedTreeNode();
-            expect(node.element).not.toBeFocusedTreeNode();
+            await screen.findByRole("treeitem", { name: "loaded-on-demand" })
+
+            expect(treeItem).toBeAriaSelected();
+            expect(treeItem).not.toHaveFocus();
         });
     });
 
@@ -181,7 +184,7 @@ describe("load on demand", () => {
             saveState: true,
         });
 
-        await screen.findByText("loaded-on-demand");
+        await screen.findByRole("treeitem", { name: "loaded-on-demand" })
 
         expect($tree).toHaveTreeStructure([
             expect.objectContaining({
@@ -207,7 +210,7 @@ describe("load on demand", () => {
             saveState: true,
         });
 
-        await screen.findByText("loaded-on-demand");
+        await screen.findByRole("treeitem", { name: "loaded-on-demand" })
 
         expect($tree).toHaveTreeStructure([
             expect.objectContaining({

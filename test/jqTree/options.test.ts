@@ -6,7 +6,7 @@ import { vi } from "vitest";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTitleElement, getTreeButton } from "../support/queries";
+import { getTreeButton } from "../support/queries";
 
 const server = setupServer();
 
@@ -423,9 +423,11 @@ describe("options", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
-                onCreateLi: (node: INode, el: JQuery) => {
-                    getTitleElement(el.get(0) as HTMLElement).innerHTML =
-                        `_${node.name}_`;
+                onCreateLi: (node: INode, $el: JQuery) => {
+                    const htmlElement = $el.get(0) as HTMLElement;
+                    // eslint-disable-next-line testing-library/no-node-access
+                    const titleElement = htmlElement.querySelector(":scope > .jqtree-element > .jqtree-title") as HTMLElement;
+                    titleElement.innerHTML = `_${node.name}_`;
                 },
             });
 
@@ -509,15 +511,13 @@ describe("options", () => {
                 onIsMoveHandle,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            const titleElement = getTitleElement(node1.element as HTMLElement);
-
-            titleElement.dispatchEvent(
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            treeItem.dispatchEvent(
                 new MouseEvent("mousedown", { bubbles: true, button: 0 }),
             );
 
             expect(onIsMoveHandle).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ 0: titleElement }),
+                expect.objectContaining({ 0: treeItem }),
             );
         });
     });
