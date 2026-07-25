@@ -56,7 +56,7 @@ export default class HtmlTree {
     this.tree = new Node({}, true);
     this._nodeMap = new WeakMap();
 
-    this.init();
+    this._init();
   }
 
   // Add a node after an existing node.
@@ -103,11 +103,11 @@ export default class HtmlTree {
 
   public addToSelection(node: Node, mustSetFocus?: boolean) {
     this._selectNodeHandler.addToSelection(node);
-    this.openParents(node);
+    this._openParents(node);
 
-    this.getNodeElementForNode(node).select(mustSetFocus ?? true);
+    this._getNodeElementForNode(node).select(mustSetFocus ?? true);
 
-    this.saveState();
+    this._saveState();
   }
 
   // Add a node as child of another node.
@@ -123,91 +123,13 @@ export default class HtmlTree {
     const slide = slideParam ?? this._options.slide;
 
     if (node.isFolder() || node.isEmptyFolder) {
-      this.createFolderElement(node).close(
+      this._createFolderElement(node).close(
         slide,
         this._options.animationSpeed,
       );
 
-      this.saveState();
+      this._saveState();
     }
-  }
-
-  // Is this HTML element part of the tree?
-  public containsElement(element: HTMLElement): boolean {
-    const node = this.getNode(element);
-
-    return node?.tree === this.tree;
-  }
-
-  public createFolderElement(node: Node) {
-    const closedIconElement = this._renderer.closedIconElement;
-    const getScrollLeft = this._scrollHandler.getScrollLeft.bind(
-      this._scrollHandler,
-    );
-    const openedIconElement = this._renderer.openedIconElement;
-    const tabIndex = this._options.tabIndex;
-    const treeElement = this._htmlElement;
-    const triggerEvent = this.triggerEvent.bind(this);
-
-    return new FolderElement({
-      closedIconElement,
-      getScrollLeft,
-      node,
-      openedIconElement,
-      tabIndex,
-      treeElement,
-      triggerEvent,
-    });
-  }
-
-  public createNodeElement(node: Node) {
-    const getScrollLeft = this._scrollHandler.getScrollLeft.bind(
-      this._scrollHandler,
-    );
-    const tabIndex = this._options.tabIndex;
-    const treeElement = this._htmlElement;
-
-    return new NodeElement({
-      getScrollLeft,
-      node,
-      tabIndex,
-      treeElement,
-    });
-  }
-
-  /* Create a RequestUrl based on the url in the options.
-    * Add a 'node' query parameter for loading on demand
-    * Add a 'selected_node' query parameter if a node is selected.
-  */
-  public createRequestUrl(node?: Node): null | RequestUrl {
-    const dataUrl = this._options.dataUrl;
-
-    let url;
-
-    if (typeof dataUrl === "function") {
-      url = dataUrl(node);
-    } else {
-      url = dataUrl;
-    }
-
-    if (!url) {
-      return null;
-    }
-
-    const requestUrl = new RequestUrl(url);
-
-    if (node?.id) {
-      // Load on demand of a subtree; add node parameter
-      requestUrl.setSearchParam('node', node.id.toString());
-    } else {
-      // Add selected_node parameter
-      const selectedNodeId = this.getNodeIdToBeSelected();
-      if (selectedNodeId) {
-        requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
-      }
-    }
-
-    return requestUrl;
   }
 
   public deinit(): void {
@@ -217,35 +139,6 @@ export default class HtmlTree {
     this._mouseHandler.deinit();
 
     this.tree = new Node({}, true);
-  }
-
-  public deselectCurrentNode(): void {
-    const node = this.getSelectedNode();
-    if (node) {
-      this.removeFromSelection(node);
-    }
-  }
-
-  // Deselect the children of the node.
-  public deselectNodes(parentNode: Node): void {
-    const selectedNodesUnderParent =
-      this._selectNodeHandler.getSelectedNodesUnder(parentNode);
-    for (const n of selectedNodesUnderParent) {
-      this._selectNodeHandler.removeFromSelection(n);
-    }
-  }
-
-  // Get the maximum level for auto open
-  public getAutoOpenMaxLevel(): number {
-    if (this._options.autoOpen === true) {
-      return -1;
-    } else if (typeof this._options.autoOpen === "number") {
-      return this._options.autoOpen;
-    } else if (typeof this._options.autoOpen === "string") {
-      return parseInt(this._options.autoOpen, 10);
-    } else {
-      return 0;
-    }
   }
 
   // Return the tree node for an HTMl element.
@@ -273,31 +166,6 @@ export default class HtmlTree {
 
   public getNodeByNameMustExist(name: string): Node {
     return this.tree.getNodeByNameMustExist(name);
-  }
-
-  public getNodeElement(element: HTMLElement): NodeElement | null {
-    const node = this.getNode(element);
-    if (node) {
-      return this.getNodeElementForNode(node);
-    } else {
-      return null;
-    }
-  }
-
-  public getNodeElementForNode(node: Node): NodeElement {
-    if (node.isFolder()) {
-      return this.createFolderElement(node);
-    } else {
-      return this.createNodeElement(node);
-    }
-  }
-
-  public getNodeIdToBeSelected(): NodeId | null {
-    if (this._options.saveState) {
-      return this._saveStateHandler.getNodeIdToBeSelected();
-    } else {
-      return null;
-    }
   }
 
   public getNodesByProperty(key: string, value: unknown): Node[] {
@@ -329,88 +197,21 @@ export default class HtmlTree {
     return __version__;
   }
 
-  public init(): void {
-    this._connectHandlers();
-
-    this.initData();
-  }
-
-  public initData(): void {
-    if (this._options.data) {
-      this.loadData(this._options.data);
-    } else {
-      const dataUrl = this.createRequestUrl();
-
-      if (dataUrl) {
-        this.loadDataFromUrl();
-      } else {
-        this.loadData([]);
-      }
-    }
-  }
-
-  public initTree(data: NodeData[]): void {
-    const doInit = (): void => {
-      if (!this._isInitialized) {
-        this._isInitialized = true;
-        this.triggerEvent("tree.init");
-      }
-    };
-
-    this.tree = new this._options.nodeClass(
-      null,
-      true,
-      this._options.nodeClass,
-    );
-
-    this._selectNodeHandler.clear();
-
-    this.tree.loadFromData(data);
-
-    const mustLoadOnDemand = this.setInitialState();
-
-    this.refreshElements(null);
-
-    if (!mustLoadOnDemand) {
-      doInit();
-    } else {
-      // Load data on demand and then init the tree
-      this.setInitialStateOnDemand(doInit);
-    }
-  }
-
   public isDragging(): boolean {
     return this._dndHandler.isDragging;
-  }
-
-  // Does an HTML element of the tree have the focus?
-  public isFocusOnTree(): boolean {
-    const activeElement = document.activeElement;
-
-    return activeElement?.tagName === "SPAN" && this.containsElement(activeElement as HTMLElement);
   }
 
   public isNodeSelected(node: Node): boolean {
     return this._selectNodeHandler.isNodeSelected(node);
   }
 
-  public isSelectedNodeInSubtree(subtree: Node): boolean {
-    const selectedNode = this.getSelectedNode();
-
-    if (!selectedNode) {
-      return false;
-    } else {
-      return subtree === selectedNode || subtree.isParentOf(selectedNode);
-    }
-  }
-
   public loadData(data: NodeData[] | null, parentNode?: Node): void {
     if (data) {
       if (parentNode) {
-        this.deselectNodes(parentNode);
-        this.loadSubtree(data, parentNode);
+        this._deselectNodes(parentNode);
+        this._loadSubtree(data, parentNode);
       } else {
-        this.initTree(data);
+        this._initTree(data);
       }
 
       if (this.isDragging()) {
@@ -418,7 +219,7 @@ export default class HtmlTree {
       }
     }
 
-    this.triggerEvent("tree.load_data", {
+    this._triggerEvent("tree.load_data", {
       parent_node: parentNode,
       tree_data: data,
     });
@@ -429,67 +230,10 @@ export default class HtmlTree {
     parentNode?: Node,
     onFinished?: HandleFinishedLoading,
   ): void {
-    const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
+    const url = inputUrl ? new RequestUrl(inputUrl) : this._createRequestUrl(parentNode);
 
     if (url) {
       this._dataLoader.loadFromUrl(url, parentNode, onFinished);
-    }
-  }
-
-  public loadFolderOnDemand(
-    node: Node,
-    slide = true,
-    onFinished?: OnFinishOpenNode,
-  ): void {
-    node.is_loading = true;
-
-    this.loadDataFromUrl(undefined, node, () => {
-      this.openNodeInternal(node, slide, onFinished);
-    });
-  }
-
-  public loadSubtree(data: NodeData[], parentNode: Node): void {
-    parentNode.loadFromData(data);
-
-    parentNode.load_on_demand = false;
-    parentNode.is_loading = false;
-
-    this.refreshElements(parentNode);
-  }
-
-  public mouseCapture(positionInfo: PositionInfo): boolean | null {
-    if (this._options.dragAndDrop) {
-      return this._dndHandler.mouseCapture(positionInfo);
-    } else {
-      return false;
-    }
-  }
-
-  public mouseDrag(positionInfo: PositionInfo): boolean {
-    if (this._options.dragAndDrop) {
-      const result = this._dndHandler.mouseDrag(positionInfo);
-
-      this._scrollHandler.checkScrolling(positionInfo);
-      return result;
-    } else {
-      return false;
-    }
-  }
-
-  public mouseStart(positionInfo: PositionInfo): boolean {
-    if (this._options.dragAndDrop) {
-      return this._dndHandler.mouseStart(positionInfo);
-    } else {
-      return false;
-    }
-  }
-
-  public mouseStop(positionInfo: PositionInfo): boolean {
-    if (this._options.dragAndDrop) {
-      this._scrollHandler.stopScrolling();
-      return this._dndHandler.mouseStop(positionInfo);
-    } else {
-      return false;
     }
   }
 
@@ -541,60 +285,10 @@ export default class HtmlTree {
 
     const [slide, onFinished] = parseParams();
 
-    this.openNodeInternal(node, slide, onFinished);
+    this._openNodeInternal(node, slide, onFinished);
   }
 
-  public openNodeInternal(
-    node: Node,
-    slide = true,
-    onFinished?: OnFinishOpenNode,
-  ): void {
-    const doOpenNode = (
-      _node: Node,
-      _slide: boolean,
-      _onFinished?: OnFinishOpenNode,
-    ): void => {
-      if (!node.children.length) {
-        return;
-      }
-
-      const folderElement = this.createFolderElement(_node);
-      folderElement.open(
-        _onFinished,
-        _slide,
-        this._options.animationSpeed,
-      );
-    };
-
-    if (node.isFolder() || node.isEmptyFolder) {
-      if (node.load_on_demand) {
-        this.loadFolderOnDemand(node, slide, onFinished);
-      } else {
-        let parent = node.parent;
-
-        while (parent) {
-          // nb: do not open root element
-          if (parent.parent) {
-            doOpenNode(parent, false);
-          }
-          parent = parent.parent;
-        }
-
-        doOpenNode(node, slide, onFinished);
-        this.saveState();
-      }
-    }
-  }
-
-  public openParents(node: Node) {
-    const parent = node.parent;
-
-    if (parent?.parent && !parent.is_open) {
-      this.openNode(parent, false);
-    }
-  }
-
-  // Add a node before another node. 
+  // Add a node before another node.
   public prependNode(newNodeInfo: NodeData, parentNode: Node): Node {
     const node = parentNode.prepend(newNodeInfo);
 
@@ -608,18 +302,18 @@ export default class HtmlTree {
     from_node: redraw this subtree
   */
   public refreshElements(fromNode: Node | null): void {
-    const mustSetFocus = this.isFocusOnTree();
+    const mustSetFocus = this._isFocusOnTree();
     const mustSelect = fromNode
-      ? this.isSelectedNodeInSubtree(fromNode)
+      ? this._isSelectedNodeInSubtree(fromNode)
       : false;
 
     this._renderer.render(fromNode);
 
     if (mustSelect) {
-      this.selectCurrentNode(mustSetFocus);
+      this._selectCurrentNode(mustSetFocus);
     }
 
-    this.triggerEvent("tree.refresh");
+    this._triggerEvent("tree.refresh");
   }
 
   public refreshHitAreas() {
@@ -629,8 +323,8 @@ export default class HtmlTree {
   public removeFromSelection(node: Node) {
     this._selectNodeHandler.removeFromSelection(node);
 
-    this.getNodeElementForNode(node).deselect();
-    this.saveState();
+    this._getNodeElementForNode(node).deselect();
+    this._saveState();
   }
 
   // Remove the node from the tree.
@@ -640,12 +334,6 @@ export default class HtmlTree {
     const parent = node.parent;
     node.remove();
     this.refreshElements(parent);
-  }
-
-  public saveState(): void {
-    if (this._options.saveState) {
-      this._saveStateHandler.saveState();
-    }
   }
 
   public scrollToNode(node: Node) {
@@ -660,14 +348,6 @@ export default class HtmlTree {
     this._scrollHandler.scrollToY(top);
   }
 
-  public selectCurrentNode(mustSetFocus: boolean): void {
-    const node = this.getSelectedNode();
-    if (node) {
-      const nodeElement = this.getNodeElementForNode(node);
-      nodeElement.select(mustSetFocus);
-    }
-  }
-
   public selectNode(
     node: Node | null,
     optionsParam?: SelectNodeOptions,
@@ -680,7 +360,7 @@ export default class HtmlTree {
 
     if (!node) {
       // Called with empty node -> deselect current node
-      this.deselectCurrentNode();
+      this._deselectCurrentNode();
       saveState();
       return;
     }
@@ -704,147 +384,25 @@ export default class HtmlTree {
 
     if (this._selectNodeHandler.isNodeSelected(node)) {
       if (selectOptions.mustToggle) {
-        this.deselectCurrentNode();
-        this.triggerEvent("tree.select", {
+        this._deselectCurrentNode();
+        this._triggerEvent("tree.select", {
           node: null,
           previous_node: node,
         });
       }
     } else {
       const deselectedNode = this.getSelectedNode() || null;
-      this.deselectCurrentNode();
+      this._deselectCurrentNode();
       this.addToSelection(node, selectOptions.mustSetFocus);
 
-      this.triggerEvent("tree.select", {
+      this._triggerEvent("tree.select", {
         deselected_node: deselectedNode,
         node,
       });
-      this.openParents(node);
+      this._openParents(node);
     }
 
     saveState();
-  }
-
-  // Set initial state, either by restoring the state or auto-opening nodes
-  // result: must load nodes on demand?
-  public setInitialState(): boolean {
-    const restoreState = (): [boolean, boolean] => {
-      // result: is state restored, must load on demand?
-      if (!this._options.saveState) {
-        return [false, false];
-      } else {
-        const state = this._saveStateHandler.getStateFromStorage();
-
-        if (!state) {
-          return [false, false];
-        } else {
-          const mustLoadOnDemand =
-            this._saveStateHandler.setInitialState(state);
-
-          // return true: the state is restored
-          return [true, mustLoadOnDemand];
-        }
-      }
-    };
-
-    const autoOpenNodes = (): boolean => {
-      // result: must load on demand?
-      if (this._options.autoOpen === false) {
-        return false;
-      }
-
-      const maxLevel = this.getAutoOpenMaxLevel();
-      let mustLoadOnDemand = false;
-
-      this.tree.iterate((node: Node, level: number) => {
-        if (node.load_on_demand) {
-          mustLoadOnDemand = true;
-          return false;
-        } else if (!node.hasChildren()) {
-          return false;
-        } else {
-          node.is_open = true;
-          return level !== maxLevel;
-        }
-      });
-
-      return mustLoadOnDemand;
-    };
-
-    let [isRestored, mustLoadOnDemand] = restoreState(); // eslint-disable-line prefer-const
-
-    if (!isRestored) {
-      mustLoadOnDemand = autoOpenNodes();
-    }
-
-    return mustLoadOnDemand;
-  }
-
-  // Set the initial state for nodes that are loaded on demand
-  // Call cb_finished when done
-  public setInitialStateOnDemand(cbFinished: () => void): void {
-    const restoreState = (): boolean => {
-      if (!this._options.saveState) {
-        return false;
-      } else {
-        const state = this._saveStateHandler.getStateFromStorage();
-
-        if (!state) {
-          return false;
-        } else {
-          this._saveStateHandler.setInitialStateOnDemand(
-            state,
-            cbFinished,
-          );
-
-          return true;
-        }
-      }
-    };
-
-    const autoOpenNodes = (): void => {
-      const maxLevel = this.getAutoOpenMaxLevel();
-      let loadingCount = 0;
-
-      const loadAndOpenNode = (node: Node): void => {
-        loadingCount += 1;
-        this.openNodeInternal(node, false, () => {
-          loadingCount -= 1;
-          openNodes();
-        });
-      };
-
-      const openNodes = (): void => {
-        this.tree.iterate((node: Node, level: number) => {
-          if (node.load_on_demand) {
-            if (!node.is_loading) {
-              loadAndOpenNode(node);
-            }
-
-            return false;
-          } else {
-            this.openNodeInternal(node, false);
-
-            return level !== maxLevel;
-          }
-        });
-
-        if (loadingCount === 0) {
-          cbFinished();
-        }
-      };
-
-      openNodes();
-    };
-
-    if (!restoreState()) {
-      autoOpenNodes();
-    }
-  }
-
-  // Set this HTML element to this node in the node map.
-  public setNodeElement(element: HTMLElement, node: Node) {
-    this._nodeMap.set(element, node);
   }
 
   public setOption(option: string, value: unknown) {
@@ -869,10 +427,6 @@ export default class HtmlTree {
   // Return tree as json string.
   public toJson(): string {
     return JSON.stringify(this.tree.getData());
-  }
-
-  public triggerEvent(eventName: string, values?: Record<string, unknown>): boolean {
-    return this._triggerEventProvider(this._htmlElement, eventName, values)
   }
 
   // Update the data of a node in the tree.
@@ -933,20 +487,20 @@ export default class HtmlTree {
     } = this._options;
 
     const closeNode = this.closeNode.bind(this);
-    const getNodeElement = this.getNodeElement.bind(this);
-    const getNodeElementForNode = this.getNodeElementForNode.bind(this);
+    const getNodeElement = this._getNodeElement.bind(this);
+    const getNodeElementForNode = this._getNodeElementForNode.bind(this);
     const getNodeById = this.getNodeById.bind(this);
     const getSelectedNode = this.getSelectedNode.bind(this);
     const getTree = this.getTree.bind(this);
-    const isFocusOnTree = this.isFocusOnTree.bind(this);
+    const isFocusOnTree = this._isFocusOnTree.bind(this);
     const loadData = this.loadData.bind(this);
-    const openNode = this.openNodeInternal.bind(this);
+    const openNode = this._openNodeInternal.bind(this);
     const refreshElements = this.refreshElements.bind(this);
     const refreshHitAreas = this.refreshHitAreas.bind(this);
     const selectNode = this.selectNode.bind(this);
-    const setNodeElement = this.setNodeElement.bind(this);
+    const setNodeElement = this._setNodeElement.bind(this);
     const treeElement = this._htmlElement;
-    const triggerEvent = this.triggerEvent.bind(this);
+    const triggerEvent = this._triggerEvent.bind(this);
 
     const selectNodeHandler = new SelectNodeHandler({
       getNodeById,
@@ -1019,7 +573,7 @@ export default class HtmlTree {
       selectNode,
     });
 
-    const _renderer = new ElementsRenderer({
+    const renderer = new ElementsRenderer({
       autoEscape,
       buttonLeft,
       closedIcon,
@@ -1036,10 +590,10 @@ export default class HtmlTree {
     });
 
     const getNode = this.getNode.bind(this);
-    const onMouseCapture = this.mouseCapture.bind(this);
-    const onMouseDrag = this.mouseDrag.bind(this);
-    const onMouseStart = this.mouseStart.bind(this);
-    const onMouseStop = this.mouseStop.bind(this);
+    const onMouseCapture = this._mouseCapture.bind(this);
+    const onMouseDrag = this._mouseDrag.bind(this);
+    const onMouseStart = this._mouseStart.bind(this);
+    const onMouseStop = this._mouseStop.bind(this);
 
     const mouseHandler = new MouseHandler({
       element: treeElement,
@@ -1059,9 +613,455 @@ export default class HtmlTree {
     this._dndHandler = dndHandler;
     this._keyHandler = keyHandler;
     this._mouseHandler = mouseHandler;
-    this._renderer = _renderer;
+    this._renderer = renderer;
     this._saveStateHandler = saveStateHandler;
     this._scrollHandler = scrollHandler;
     this._selectNodeHandler = selectNodeHandler;
+  }
+
+  // Is this HTML element part of the tree?
+  private _containsElement(element: HTMLElement): boolean {
+    const node = this.getNode(element);
+
+    return node?.tree === this.tree;
+  }
+
+  private _createFolderElement(node: Node) {
+    const closedIconElement = this._renderer.closedIconElement;
+    const getScrollLeft = this._scrollHandler.getScrollLeft.bind(
+      this._scrollHandler,
+    );
+    const openedIconElement = this._renderer.openedIconElement;
+    const tabIndex = this._options.tabIndex;
+    const treeElement = this._htmlElement;
+    const triggerEvent = this._triggerEvent.bind(this);
+
+    return new FolderElement({
+      closedIconElement,
+      getScrollLeft,
+      node,
+      openedIconElement,
+      tabIndex,
+      treeElement,
+      triggerEvent,
+    });
+  }
+
+  private _createNodeElement(node: Node) {
+    const getScrollLeft = this._scrollHandler.getScrollLeft.bind(
+      this._scrollHandler,
+    );
+    const tabIndex = this._options.tabIndex;
+    const treeElement = this._htmlElement;
+
+    return new NodeElement({
+      getScrollLeft,
+      node,
+      tabIndex,
+      treeElement,
+    });
+  }
+
+  /* Create a RequestUrl based on the url in the options.
+    * Add a 'node' query parameter for loading on demand
+    * Add a 'selected_node' query parameter if a node is selected.
+  */
+  private _createRequestUrl(node?: Node): null | RequestUrl {
+    const dataUrl = this._options.dataUrl;
+
+    let url;
+
+    if (typeof dataUrl === "function") {
+      url = dataUrl(node);
+    } else {
+      url = dataUrl;
+    }
+
+    if (!url) {
+      return null;
+    }
+
+    const requestUrl = new RequestUrl(url);
+
+    if (node?.id) {
+      // Load on demand of a subtree; add node parameter
+      requestUrl.setSearchParam('node', node.id.toString());
+    } else {
+      // Add selected_node parameter
+      const selectedNodeId = this._getNodeIdToBeSelected();
+      if (selectedNodeId) {
+        requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
+      }
+    }
+
+    return requestUrl;
+  }
+
+  private _deselectCurrentNode(): void {
+    const node = this.getSelectedNode();
+    if (node) {
+      this.removeFromSelection(node);
+    }
+  }
+
+  // Deselect the children of the node.
+  private _deselectNodes(parentNode: Node): void {
+    const selectedNodesUnderParent =
+      this._selectNodeHandler.getSelectedNodesUnder(parentNode);
+    for (const n of selectedNodesUnderParent) {
+      this._selectNodeHandler.removeFromSelection(n);
+    }
+  }
+
+  // Get the maximum level for auto open
+  private _getAutoOpenMaxLevel(): number {
+    if (this._options.autoOpen === true) {
+      return -1;
+    } else if (typeof this._options.autoOpen === "number") {
+      return this._options.autoOpen;
+    } else if (typeof this._options.autoOpen === "string") {
+      return parseInt(this._options.autoOpen, 10);
+    } else {
+      return 0;
+    }
+  }
+
+  private _getNodeElement(element: HTMLElement): NodeElement | null {
+    const node = this.getNode(element);
+    if (node) {
+      return this._getNodeElementForNode(node);
+    } else {
+      return null;
+    }
+  }
+
+  private _getNodeElementForNode(node: Node): NodeElement {
+    if (node.isFolder()) {
+      return this._createFolderElement(node);
+    } else {
+      return this._createNodeElement(node);
+    }
+  }
+
+  private _getNodeIdToBeSelected(): NodeId | null {
+    if (this._options.saveState) {
+      return this._saveStateHandler.getNodeIdToBeSelected();
+    } else {
+      return null;
+    }
+  }
+
+  private _init(): void {
+    this._connectHandlers();
+
+    this._initData();
+  }
+
+  private _initData(): void {
+    if (this._options.data) {
+      this.loadData(this._options.data);
+    } else {
+      const dataUrl = this._createRequestUrl();
+
+      if (dataUrl) {
+        this.loadDataFromUrl();
+      } else {
+        this.loadData([]);
+      }
+    }
+  }
+
+  private _initTree(data: NodeData[]): void {
+    const doInit = (): void => {
+      if (!this._isInitialized) {
+        this._isInitialized = true;
+        this._triggerEvent("tree.init");
+      }
+    };
+
+    this.tree = new this._options.nodeClass(
+      null,
+      true,
+      this._options.nodeClass,
+    );
+
+    this._selectNodeHandler.clear();
+
+    this.tree.loadFromData(data);
+
+    const mustLoadOnDemand = this._setInitialState();
+
+    this.refreshElements(null);
+
+    if (!mustLoadOnDemand) {
+      doInit();
+    } else {
+      // Load data on demand and then init the tree
+      this._setInitialStateOnDemand(doInit);
+    }
+  }
+
+  // Does an HTML element of the tree have the focus?
+  private _isFocusOnTree(): boolean {
+    const activeElement = document.activeElement;
+
+    return activeElement?.tagName === "SPAN" && this._containsElement(activeElement as HTMLElement);
+  }
+
+  private _isSelectedNodeInSubtree(subtree: Node): boolean {
+    const selectedNode = this.getSelectedNode();
+
+    if (!selectedNode) {
+      return false;
+    } else {
+      return subtree === selectedNode || subtree.isParentOf(selectedNode);
+    }
+  }
+
+  private _loadFolderOnDemand(
+    node: Node,
+    slide = true,
+    onFinished?: OnFinishOpenNode,
+  ): void {
+    node.is_loading = true;
+
+    this.loadDataFromUrl(undefined, node, () => {
+      this._openNodeInternal(node, slide, onFinished);
+    });
+  }
+
+  private _loadSubtree(data: NodeData[], parentNode: Node): void {
+    parentNode.loadFromData(data);
+
+    parentNode.load_on_demand = false;
+    parentNode.is_loading = false;
+
+    this.refreshElements(parentNode);
+  }
+
+  private _mouseCapture(positionInfo: PositionInfo): boolean | null {
+    if (this._options.dragAndDrop) {
+      return this._dndHandler.mouseCapture(positionInfo);
+    } else {
+      return false;
+    }
+  }
+
+  private _mouseDrag(positionInfo: PositionInfo): boolean {
+    if (this._options.dragAndDrop) {
+      const result = this._dndHandler.mouseDrag(positionInfo);
+
+      this._scrollHandler.checkScrolling(positionInfo);
+      return result;
+    } else {
+      return false;
+    }
+  }
+
+  private _mouseStart(positionInfo: PositionInfo): boolean {
+    if (this._options.dragAndDrop) {
+      return this._dndHandler.mouseStart(positionInfo);
+    } else {
+      return false;
+    }
+  }
+
+  private _mouseStop(positionInfo: PositionInfo): boolean {
+    if (this._options.dragAndDrop) {
+      this._scrollHandler.stopScrolling();
+      return this._dndHandler.mouseStop(positionInfo);
+    } else {
+      return false;
+    }
+  }
+
+  private _openNodeInternal(
+    node: Node,
+    slide = true,
+    onFinished?: OnFinishOpenNode,
+  ): void {
+    const doOpenNode = (
+      _node: Node,
+      _slide: boolean,
+      _onFinished?: OnFinishOpenNode,
+    ): void => {
+      if (!node.children.length) {
+        return;
+      }
+
+      const folderElement = this._createFolderElement(_node);
+      folderElement.open(
+        _onFinished,
+        _slide,
+        this._options.animationSpeed,
+      );
+    };
+
+    if (node.isFolder() || node.isEmptyFolder) {
+      if (node.load_on_demand) {
+        this._loadFolderOnDemand(node, slide, onFinished);
+      } else {
+        let parent = node.parent;
+
+        while (parent) {
+          // nb: do not open root element
+          if (parent.parent) {
+            doOpenNode(parent, false);
+          }
+          parent = parent.parent;
+        }
+
+        doOpenNode(node, slide, onFinished);
+        this._saveState();
+      }
+    }
+  }
+
+  private _openParents(node: Node) {
+    const parent = node.parent;
+
+    if (parent?.parent && !parent.is_open) {
+      this.openNode(parent, false);
+    }
+  }
+
+  private _saveState(): void {
+    if (this._options.saveState) {
+      this._saveStateHandler.saveState();
+    }
+  }
+
+  private _selectCurrentNode(mustSetFocus: boolean): void {
+    const node = this.getSelectedNode();
+    if (node) {
+      const nodeElement = this._getNodeElementForNode(node);
+      nodeElement.select(mustSetFocus);
+    }
+  }
+
+  // Set initial state, either by restoring the state or auto-opening nodes
+  // result: must load nodes on demand?
+  private _setInitialState(): boolean {
+    const restoreState = (): [boolean, boolean] => {
+      // result: is state restored, must load on demand?
+      if (!this._options.saveState) {
+        return [false, false];
+      } else {
+        const state = this._saveStateHandler.getStateFromStorage();
+
+        if (!state) {
+          return [false, false];
+        } else {
+          const mustLoadOnDemand =
+            this._saveStateHandler.setInitialState(state);
+
+          // return true: the state is restored
+          return [true, mustLoadOnDemand];
+        }
+      }
+    };
+
+    const autoOpenNodes = (): boolean => {
+      // result: must load on demand?
+      if (this._options.autoOpen === false) {
+        return false;
+      }
+
+      const maxLevel = this._getAutoOpenMaxLevel();
+      let mustLoadOnDemand = false;
+
+      this.tree.iterate((node: Node, level: number) => {
+        if (node.load_on_demand) {
+          mustLoadOnDemand = true;
+          return false;
+        } else if (!node.hasChildren()) {
+          return false;
+        } else {
+          node.is_open = true;
+          return level !== maxLevel;
+        }
+      });
+
+      return mustLoadOnDemand;
+    };
+
+    let [isRestored, mustLoadOnDemand] = restoreState(); // eslint-disable-line prefer-const
+
+    if (!isRestored) {
+      mustLoadOnDemand = autoOpenNodes();
+    }
+
+    return mustLoadOnDemand;
+  }
+
+  // Set the initial state for nodes that are loaded on demand
+  // Call cb_finished when done
+  private _setInitialStateOnDemand(cbFinished: () => void): void {
+    const restoreState = (): boolean => {
+      if (!this._options.saveState) {
+        return false;
+      } else {
+        const state = this._saveStateHandler.getStateFromStorage();
+
+        if (!state) {
+          return false;
+        } else {
+          this._saveStateHandler.setInitialStateOnDemand(
+            state,
+            cbFinished,
+          );
+
+          return true;
+        }
+      }
+    };
+
+    const autoOpenNodes = (): void => {
+      const maxLevel = this._getAutoOpenMaxLevel();
+      let loadingCount = 0;
+
+      const loadAndOpenNode = (node: Node): void => {
+        loadingCount += 1;
+        this._openNodeInternal(node, false, () => {
+          loadingCount -= 1;
+          openNodes();
+        });
+      };
+
+      const openNodes = (): void => {
+        this.tree.iterate((node: Node, level: number) => {
+          if (node.load_on_demand) {
+            if (!node.is_loading) {
+              loadAndOpenNode(node);
+            }
+
+            return false;
+          } else {
+            this._openNodeInternal(node, false);
+
+            return level !== maxLevel;
+          }
+        });
+
+        if (loadingCount === 0) {
+          cbFinished();
+        }
+      };
+
+      openNodes();
+    };
+
+    if (!restoreState()) {
+      autoOpenNodes();
+    }
+  }
+
+  // Set this HTML element to this node in the node map.
+  private _setNodeElement(element: HTMLElement, node: Node) {
+    this._nodeMap.set(element, node);
+  }
+
+  private _triggerEvent(eventName: string, values?: Record<string, unknown>): boolean {
+    return this._triggerEventProvider(this._htmlElement, eventName, values)
   }
 }
