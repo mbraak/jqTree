@@ -1,3 +1,4 @@
+import { screen } from "@testing-library/dom";
 import { vi } from "vitest";
 
 import ElementsRenderer from "app/elementsRenderer";
@@ -6,7 +7,7 @@ import BorderDropHint from "app/nodeElement/borderDropHint";
 import FolderElement from "app/nodeElement/folderElement";
 import GhostDropHint from "app/nodeElement/ghostDropHint";
 
-import { getTogglerElement } from "../support/queries";
+import { getTreeButton, getTreeListElement } from "../support/queries";
 
 interface CreateFolderElementParams {
     closedIconElement?: HTMLElement | Text;
@@ -41,7 +42,8 @@ const createFolderElement = ({
     renderer.renderFromRoot();
 
     if (!isOpen) {
-        const ul = getUl(folderNode.element as HTMLElement);
+        // eslint-disable-next-line testing-library/no-node-access
+        const ul = (folderNode.element as HTMLElement).querySelector(":scope > ul") as HTMLElement;
         ul.style.display = "none";
     }
 
@@ -56,20 +58,8 @@ const createFolderElement = ({
         triggerEvent,
     });
 
-    const element = folderNode.element as HTMLElement;
-
-    return { element, folderElement, folderNode, treeElement, triggerEvent };
+    return { folderElement, folderNode, triggerEvent };
 };
-
-const getButton = (element: HTMLElement) => getTogglerElement(element);
-
-const getUl = (element: HTMLElement) =>
-    element.querySelector(":scope > ul") as HTMLUListElement;
-
-const getTitleSpan = (element: HTMLElement) =>
-    element.querySelector(
-        ":scope > .jqtree-element > span.jqtree-title",
-    ) as HTMLSpanElement;
 
 describe("close", () => {
     beforeEach(() => {
@@ -77,22 +67,26 @@ describe("close", () => {
     });
 
     it("closes an open node without animation", () => {
-        const { element, folderElement, folderNode } = createFolderElement({
+        const { folderElement, folderNode } = createFolderElement({
             isOpen: true,
         });
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+        expect(treeItem).toBeAriaExpanded();
 
         folderElement.close(false, 0);
 
-        const collapsed = "false";
-
         expect(folderNode.is_open).toBeFalse();
-        expect(element).toBeClosedTreeNode();
-        expect(getButton(element)).toHaveClass("jqtree-closed");
-        expect(getUl(element)).not.toBeVisible();
-        expect(getTitleSpan(element)).toHaveAttribute(
-            "aria-expanded",
-            collapsed,
-        );
+        expect(treeItem).not.toBeAriaExpanded();
+        expect(getTreeButton(treeItem)).toHaveClass("jqtree-closed");
+
+        const treeListElement = getTreeListElement(treeItem);
+
+        // eslint-disable-next-line testing-library/no-node-access
+        expect(treeListElement.querySelector("ul")).not.toBeVisible();
+
+        // eslint-disable-next-line vitest/max-expects
+        expect(treeItem).toHaveAttribute("aria-expanded", "false");
     });
 
     it("triggers the tree.close event", () => {
@@ -126,25 +120,26 @@ describe("close", () => {
         const closedIconElement = document.createElement("span");
         closedIconElement.classList.add("closed-icon");
 
-        const { element, folderElement } = createFolderElement({
+        const { folderElement } = createFolderElement({
             closedIconElement,
             isOpen: true,
         });
-
         folderElement.close(false, 0);
-        const button = getButton(element);
 
-        expect(button.children).toHaveLength(1);
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+        const button = getTreeButton(treeItem)
+
         expect(button.children[0]).toHaveClass("closed-icon");
         expect(button.children[0]).not.toBe(closedIconElement);
     });
 
     it("closes the node with animation", async () => {
-        const { element, folderElement } = createFolderElement({
+        const { folderElement } = createFolderElement({
             isOpen: true,
         });
-
-        const ul = getUl(element);
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+        // eslint-disable-next-line testing-library/no-node-access
+        const ul = getTreeListElement(treeItem).querySelector(":scope > ul[role=group]") as HTMLElement;
         const animate = vi.spyOn(ul, "animate");
 
         folderElement.close(true, 123);
@@ -155,7 +150,7 @@ describe("close", () => {
 
         await ul.getAnimations()[0]?.finished;
 
-        expect(element).toBeClosedTreeNode();
+        expect(treeItem).not.toBeAriaExpanded();
         expect(ul).not.toBeVisible();
     });
 });
@@ -166,17 +161,28 @@ describe("open", () => {
     });
 
     it("opens a closed node without animation", () => {
-        const { element, folderElement, folderNode } = createFolderElement({
+        const { folderElement, folderNode } = createFolderElement({
             isOpen: false,
         });
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+        expect(treeItem).not.toBeAriaExpanded();
 
         folderElement.open(undefined, false, 0);
 
         expect(folderNode.is_open).toBeTrue();
-        expect(element).toBeOpenTreeNode();
-        expect(getButton(element)).not.toHaveClass("jqtree-closed");
-        expect(getUl(element)).toBeVisible();
-        expect(getTitleSpan(element)).toHaveAttribute("aria-expanded", "true");
+        expect(treeItem).toBeAriaExpanded();
+
+        const button = getTreeButton(treeItem);
+
+        expect(button).not.toHaveClass("jqtree-closed");
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const ul = getTreeListElement(treeItem).querySelector(":scope > ul[role=group]") as HTMLElement;
+
+        expect(ul).toBeVisible();
+        // eslint-disable-next-line vitest/max-expects
+        expect(treeItem).toHaveAttribute("aria-expanded", "true");
     });
 
     it("triggers the tree.open event", () => {
@@ -221,25 +227,30 @@ describe("open", () => {
         const openedIconElement = document.createElement("span");
         openedIconElement.classList.add("opened-icon");
 
-        const { element, folderElement } = createFolderElement({
+        const { folderElement } = createFolderElement({
             isOpen: false,
             openedIconElement,
         });
 
         folderElement.open(undefined, false, 0);
-        const button = getButton(element);
 
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+        const button = getTreeButton(treeItem);
+
+        // eslint-disable-next-line testing-library/no-node-access
         expect(button.children).toHaveLength(1);
         expect(button.children[0]).toHaveClass("opened-icon");
         expect(button.children[0]).not.toBe(openedIconElement);
     });
 
     it("opens the node with animation", async () => {
-        const { element, folderElement } = createFolderElement({
+        const { folderElement } = createFolderElement({
             isOpen: false,
         });
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
-        const ul = getUl(element);
+        // eslint-disable-next-line testing-library/no-node-access
+        const ul = getTreeListElement(treeItem).querySelector(":scope > ul[role=group]") as HTMLElement;
         const animate = vi.spyOn(ul, "animate");
 
         folderElement.open(undefined, true, 456);
@@ -251,7 +262,7 @@ describe("open", () => {
 
         await ul.getAnimations()[0]?.finished;
 
-        expect(element).toBeOpenTreeNode();
+        expect(treeItem).toBeAriaExpanded();
     });
 });
 
