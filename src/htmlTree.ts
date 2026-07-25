@@ -806,7 +806,7 @@ export default class HtmlTree {
 
   private _loadFolderOnDemand(
     node: Node,
-    slide = true,
+    slide: boolean,
     onFinished?: OnFinishOpenNode,
   ): void {
     node.is_loading = true;
