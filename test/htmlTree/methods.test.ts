@@ -11,6 +11,7 @@ import HtmlTree from "app/htmlTree";
 import __version__ from "app/version";
 
 import exampleData from "../support/exampleData";
+import { getTreeListElement } from "../support/queries";
 
 const server = setupServer();
 
@@ -682,6 +683,33 @@ describe("methods", () => {
       );
 
       expect(tree.getSelectedNode()).toBeFalse();
+    });
+
+    it("keeps the drag and drop state when a node is being dragged", async () => {
+      const tree = createHtmlTree({
+        data: exampleData,
+        dragAndDrop: true,
+        startDndDelay: 0,
+      });
+
+      const user = userEvent.setup();
+      const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+      await user.pointer([
+        { keys: "[MouseLeft>]", target: treeItem },
+        { coords: { x: 5, y: 5 }, target: treeItem },
+      ]);
+
+      expect(tree.isDragging()).toBeTrue();
+
+      tree.loadData(["new-child1"], tree.getNodeByNameMustExist("node2"));
+
+      expect(tree.isDragging()).toBeTrue();
+      expect(
+        getTreeListElement(screen.getByRole("treeitem", { name: "node1" })),
+      ).toHaveClass("jqtree-moving");
+
+      await user.pointer({ keys: "[/MouseLeft]", target: treeItem });
     });
 
     it("doesn't deselect the node when the selected child is under another node", () => {
