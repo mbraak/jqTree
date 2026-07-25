@@ -579,6 +579,76 @@ describe("methods", () => {
     });
   });
 
+  describe("isDragging", () => {
+    it("returns false when no node is being dragged", () => {
+      const tree = createHtmlTree({
+        data: exampleData,
+        dragAndDrop: true,
+      });
+
+      expect(tree.isDragging()).toBeFalse();
+    });
+
+    it("returns true while a node is being dragged", async () => {
+      const tree = createHtmlTree({
+        data: exampleData,
+        dragAndDrop: true,
+        startDndDelay: 0,
+      });
+
+      const user = userEvent.setup();
+      const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+      await user.pointer([
+        { keys: "[MouseLeft>]", target: treeItem },
+        { coords: { x: 5, y: 5 }, target: treeItem },
+      ]);
+
+      expect(tree.isDragging()).toBeTrue();
+
+      await user.pointer({ keys: "[/MouseLeft]", target: treeItem });
+    });
+
+    it("returns false after the drag has finished", async () => {
+      const tree = createHtmlTree({
+        data: exampleData,
+        dragAndDrop: true,
+        startDndDelay: 0,
+      });
+
+      const user = userEvent.setup();
+      const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+      await user.pointer([
+        { keys: "[MouseLeft>]", target: treeItem },
+        { coords: { x: 5, y: 5 }, target: treeItem },
+        { keys: "[/MouseLeft]", target: treeItem },
+      ]);
+
+      expect(tree.isDragging()).toBeFalse();
+    });
+
+    it("returns false when dragAndDrop is false", async () => {
+      const tree = createHtmlTree({
+        data: exampleData,
+        dragAndDrop: false,
+        startDndDelay: 0,
+      });
+
+      const user = userEvent.setup();
+      const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+      await user.pointer([
+        { keys: "[MouseLeft>]", target: treeItem },
+        { coords: { x: 5, y: 5 }, target: treeItem },
+      ]);
+
+      expect(tree.isDragging()).toBeFalse();
+
+      await user.pointer({ keys: "[/MouseLeft]", target: treeItem });
+    });
+  });
+
   describe("isNodeSelected", () => {
     it("returns true when the node is selected", () => {
       const tree = createHtmlTree({ data: exampleData });
