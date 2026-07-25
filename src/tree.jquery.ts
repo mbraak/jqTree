@@ -282,7 +282,7 @@ export class JqTreeWidget {
     }
 
     public refresh(): JQuery {
-        this._htmlTree.refreshElements(null);
+        this._htmlTree.refresh();
         return this._element;
     }
 

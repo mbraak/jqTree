@@ -67,7 +67,7 @@ export default class HtmlTree {
     const newNode = existingNode.addAfter(newNodeInfo);
 
     if (newNode) {
-      this.refreshElements(existingNode.parent);
+      this._refreshElements(existingNode.parent);
     }
 
     return newNode;
@@ -81,7 +81,7 @@ export default class HtmlTree {
     const newNode = existingNode.addBefore(newNodeInfo);
 
     if (newNode) {
-      this.refreshElements(existingNode.parent);
+      this._refreshElements(existingNode.parent);
     }
 
     return newNode;
@@ -95,7 +95,7 @@ export default class HtmlTree {
     const newNode = existingNode.addParent(newNodeInfo);
 
     if (newNode) {
-      this.refreshElements(newNode.parent);
+      this._refreshElements(newNode.parent);
     }
 
     return newNode;
@@ -114,7 +114,7 @@ export default class HtmlTree {
   public appendNode(newNodeInfo: NodeData, parentNode: Node): Node {
     const node = parentNode.append(newNodeInfo);
 
-    this.refreshElements(parentNode);
+    this._refreshElements(parentNode);
 
     return node;
   }
@@ -251,7 +251,7 @@ export default class HtmlTree {
     position: Position,
   ): void {
     this.tree.moveNode(node, targetNode, position);
-    this.refreshElements(null);
+    this._refreshElements(null);
   }
 
   public moveUp() {
@@ -292,28 +292,13 @@ export default class HtmlTree {
   public prependNode(newNodeInfo: NodeData, parentNode: Node): Node {
     const node = parentNode.prepend(newNodeInfo);
 
-    this.refreshElements(parentNode);
+    this._refreshElements(parentNode);
 
     return node;
   }
 
-  /*
-  Redraw the tree or part of the tree.
-    from_node: redraw this subtree
-  */
-  public refreshElements(fromNode: Node | null): void {
-    const mustSetFocus = this._isFocusOnTree();
-    const mustSelect = fromNode
-      ? this._isSelectedNodeInSubtree(fromNode)
-      : false;
-
-    this._renderer.render(fromNode);
-
-    if (mustSelect) {
-      this._selectCurrentNode(mustSetFocus);
-    }
-
-    this._triggerEvent("tree.refresh");
+  public refresh() {
+    this._refreshElements(null);
   }
 
   public refreshHitAreas() {
@@ -333,7 +318,7 @@ export default class HtmlTree {
 
     const parent = node.parent;
     node.remove();
-    this.refreshElements(parent);
+    this._refreshElements(parent);
   }
 
   public scrollToNode(node: Node) {
@@ -411,7 +396,7 @@ export default class HtmlTree {
 
   public setState(state: SavedState) {
     this._saveStateHandler.setInitialState(state);
-    this.refreshElements(null);
+    this._refreshElements(null);
   }
 
   public toggle(node: Node, slideParam: boolean | null = null) {
@@ -456,7 +441,7 @@ export default class HtmlTree {
       }
     }
 
-    this.refreshElements(node);
+    this._refreshElements(node);
   }
 
   private _connectHandlers() {
@@ -495,7 +480,7 @@ export default class HtmlTree {
     const isFocusOnTree = this._isFocusOnTree.bind(this);
     const loadData = this.loadData.bind(this);
     const openNode = this._openNodeInternal.bind(this);
-    const refreshElements = this.refreshElements.bind(this);
+    const refreshElements = this._refreshElements.bind(this);
     const refreshHitAreas = this.refreshHitAreas.bind(this);
     const selectNode = this.selectNode.bind(this);
     const setNodeElement = this._setNodeElement.bind(this);
@@ -791,7 +776,7 @@ export default class HtmlTree {
 
     const mustLoadOnDemand = this._setInitialState();
 
-    this.refreshElements(null);
+    this._refreshElements(null);
 
     if (!mustLoadOnDemand) {
       doInit();
@@ -836,7 +821,7 @@ export default class HtmlTree {
     parentNode.load_on_demand = false;
     parentNode.is_loading = false;
 
-    this.refreshElements(parentNode);
+    this._refreshElements(parentNode);
   }
 
   private _mouseCapture(positionInfo: PositionInfo): boolean | null {
@@ -923,6 +908,25 @@ export default class HtmlTree {
     if (parent?.parent && !parent.is_open) {
       this.openNode(parent, false);
     }
+  }
+
+  /*
+  Redraw the tree or part of the tree.
+    from_node: redraw this subtree
+  */
+  private _refreshElements(fromNode: Node | null): void {
+    const mustSetFocus = this._isFocusOnTree();
+    const mustSelect = fromNode
+      ? this._isSelectedNodeInSubtree(fromNode)
+      : false;
+
+    this._renderer.render(fromNode);
+
+    if (mustSelect) {
+      this._selectCurrentNode(mustSetFocus);
+    }
+
+    this._triggerEvent("tree.refresh");
   }
 
   private _saveState(): void {
