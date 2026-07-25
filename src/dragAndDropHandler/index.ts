@@ -429,8 +429,6 @@ export class DragAndDropHandler {
 
         // add new drop hint
         const nodeElement = this._getNodeElementForNode(this.hoveredArea.node);
-        this._previousGhost = nodeElement.addDropHint(
-            this.hoveredArea.position,
-        );
+        this._previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
     }
 }
