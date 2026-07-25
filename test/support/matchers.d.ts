@@ -2,10 +2,8 @@ import 'vitest'
 
 declare module 'vitest' {
     interface Matchers<R = any> {
-        toBeClosedTreeNode(): R;
-        toBeFocusedTreeNode(): R;
-        toBeOpenTreeNode(): R;
-        toBeSelectedTreeNode(): R;
+        toBeAriaExpanded(): R;
+        toBeAriaSelected(): R;
         toHaveTreeStructure(treeStructure: any): R;
     }
 }

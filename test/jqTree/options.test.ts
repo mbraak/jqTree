@@ -6,7 +6,7 @@ import { vi } from "vitest";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTitleElement, getTogglerElement } from "../support/queries";
+import { getTreeButton } from "../support/queries";
 
 const server = setupServer();
 
@@ -16,9 +16,7 @@ describe("options", () => {
     });
 
     beforeEach(() => {
-        const element = document.createElement("div");
-        element.id = "tree1";
-        document.body.appendChild(element);
+        document.body.innerHTML = '<div id="tree1"></div>';
     });
 
     afterEach(() => {
@@ -26,7 +24,7 @@ describe("options", () => {
 
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
+        document.body.innerHTML = "";
         localStorage.clear();
     });
 
@@ -175,12 +173,10 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const node = $tree.tree("getNodeByName", "node1");
-            const liElement = node?.element as HTMLElement;
-            const spanElement = getTitleElement(liElement);
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
             // eslint-disable-next-line testing-library/no-node-access
-            const nextSibling = spanElement.nextSibling as HTMLElement;
+            const nextSibling = treeItem.nextSibling as HTMLElement;
 
             expect(nextSibling).toHaveClass("jqtree-toggler");
         });
@@ -192,12 +188,10 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const node = $tree.tree("getNodeByName", "node1");
-            const liElement = node?.element as HTMLElement;
-            const spanElement = getTitleElement(liElement);
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
             // eslint-disable-next-line testing-library/no-node-access
-            const nextSibling = spanElement.previousSibling as HTMLElement;
+            const nextSibling = treeItem.previousSibling as HTMLElement;
 
             expect(nextSibling).toHaveClass("jqtree-toggler");
         });
@@ -211,10 +205,10 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            const toggler = getTogglerElement(node1.element as HTMLElement);
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
 
-            expect(toggler).toHaveTextContent("closed");
+            expect(button).toHaveTextContent("closed");
         });
 
         it("escapes html", () => {
@@ -224,10 +218,10 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            const toggler = getTogglerElement(node1.element as HTMLElement);
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
 
-            expect(toggler).toHaveTextContent("<span>test</span>");
+            expect(button).toHaveTextContent("<span>test</span>");
         });
 
         it("renders a html element", () => {
@@ -237,9 +231,9 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            const toggler = getTogglerElement(node1.element as HTMLElement);
-            const span = toggler.querySelector("span.abc"); // eslint-disable-line testing-library/no-node-access
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
+            const span = button.querySelector("span.abc"); // eslint-disable-line testing-library/no-node-access
 
             expect(span).toHaveTextContent("test");
         });
@@ -255,9 +249,9 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            const toggler = getTogglerElement(node1.element as HTMLElement);
-            const span = toggler.querySelector("span.abc"); // eslint-disable-line testing-library/no-node-access
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
+            const span = button.querySelector("span.abc"); // eslint-disable-line testing-library/no-node-access
 
             expect(span).toHaveTextContent("test");
         });
@@ -269,10 +263,10 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            const toggler = getTogglerElement(node1.element as HTMLElement);
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
 
-            expect(toggler).toHaveTextContent("►");
+            expect(button).toHaveTextContent("►");
         });
     });
 
@@ -292,9 +286,9 @@ describe("options", () => {
                 dataUrl: "/tree/",
             });
 
-            await screen.findByText("node2");
+            await screen.findByRole("treeitem", { name: "node2" });
 
-            expect(screen.queryByText("node1")).not.toBeInTheDocument();
+            expect(screen.queryByRole("treeitem", { name: "node1" })).not.toBeInTheDocument();
             expect(dataFilter).toHaveBeenCalledExactlyOnceWith(exampleData);
         });
     });
@@ -336,7 +330,7 @@ describe("options", () => {
                 it(`loads the data from the url with ${name}`, async () => {
                     const $tree = $("#tree1");
                     $tree.tree({ dataUrl });
-                    await screen.findByText(expectedNode);
+                    await screen.findByRole("treeitem", { name: expectedNode });
 
                     expect($tree).toHaveTreeStructure(expectedStructure);
                 });
@@ -352,7 +346,7 @@ describe("options", () => {
                 saveState: true,
             });
 
-            await screen.findByText("node1");
+            await screen.findByRole("treeitem", { name: "node1" })
 
             expect(($tree.tree("getSelectedNode") as INode).name).toBe(
                 "node2",
@@ -368,7 +362,7 @@ describe("options", () => {
                 saveState: true,
             });
 
-            await screen.findByText("node1");
+            await screen.findByRole("treeitem", { name: "node1" })
 
             expect($tree.tree("getSelectedNode")).toBeFalse();
         });
@@ -389,7 +383,7 @@ describe("options", () => {
 
             $tree.tree();
 
-            await screen.findByText("node1");
+            await screen.findByRole("treeitem", { name: "node1" })
 
             expect($tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
@@ -418,9 +412,11 @@ describe("options", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
-                onCreateLi: (node: INode, el: JQuery) => {
-                    getTitleElement(el.get(0) as HTMLElement).innerHTML =
-                        `_${node.name}_`;
+                onCreateLi: (node: INode, $el: JQuery) => {
+                    const htmlElement = $el.get(0) as HTMLElement;
+                    // eslint-disable-next-line testing-library/no-node-access
+                    const titleElement = htmlElement.querySelector(":scope > .jqtree-element > .jqtree-title") as HTMLElement;
+                    titleElement.innerHTML = `_${node.name}_`;
                 },
             });
 
@@ -477,7 +473,7 @@ describe("options", () => {
             });
 
             const $tree = createTree();
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            //const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect($tree).toHaveTreeStructure([
                 expect.objectContaining({
@@ -486,7 +482,10 @@ describe("options", () => {
                 }),
                 expect.objectContaining({ name: "node2", open: false }),
             ]);
-            expect(node1.element).toBeSelectedTreeNode();
+
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+            expect(treeItem).toBeAriaSelected();
         });
     });
 
@@ -501,15 +500,13 @@ describe("options", () => {
                 onIsMoveHandle,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            const titleElement = getTitleElement(node1.element as HTMLElement);
-
-            titleElement.dispatchEvent(
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            treeItem.dispatchEvent(
                 new MouseEvent("mousedown", { bubbles: true, button: 0 }),
             );
 
             expect(onIsMoveHandle).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ 0: titleElement }),
+                expect.objectContaining({ 0: treeItem }),
             );
         });
     });
@@ -546,54 +543,54 @@ describe("options", () => {
         it("has a different closed icon when the rtl option is true", () => {
             const $tree = $("#tree1");
             $tree.tree({ data: exampleData, rtl: true });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            expect(
-                getTogglerElement(node1.element as HTMLElement).innerHTML,
-            ).toBe("◀");
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
+
+            expect(button).toHaveTextContent("◀");
         });
 
         it("has the default closed icon when the rtl option is false", () => {
             const $tree = $("#tree1");
             $tree.tree({ data: exampleData, rtl: false });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            expect(
-                getTogglerElement(node1.element as HTMLElement).innerHTML,
-            ).toBe("►");
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
+
+            expect(button).toHaveTextContent("►");
         });
 
         it("has a different closed icon when the rtl data option is true", () => {
             const $tree = $("#tree1");
             $tree.attr("data-rtl", "true");
             $tree.tree({ data: exampleData });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            expect(
-                getTogglerElement(node1.element as HTMLElement).innerHTML,
-            ).toBe("◀");
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
+
+            expect(button).toHaveTextContent("◀");
         });
 
         it("has the default closed icon when the rtl data option is false", () => {
             const $tree = $("#tree1");
             $tree.attr("data-rtl", "false");
             $tree.tree({ data: exampleData });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            expect(
-                getTogglerElement(node1.element as HTMLElement).innerHTML,
-            ).toBe("►");
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
+
+            expect(button).toHaveTextContent("►");
         });
 
         it("has a different closed icon when the rtl data option has no value", () => {
             const $tree = $("#tree1");
             $tree.attr("data-rtl", "");
             $tree.tree({ data: exampleData });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
-            expect(
-                getTogglerElement(node1.element as HTMLElement).innerHTML,
-            ).toBe("◀");
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const button = getTreeButton(treeItem);
+
+            expect(button).toHaveTextContent("◀");
         });
     });
 

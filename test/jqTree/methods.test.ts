@@ -8,7 +8,6 @@ import "app/tree.jquery";
 import __version__ from "app/version";
 
 import exampleData from "../support/exampleData";
-import { getTitleElement } from "../support/queries";
 
 const server = setupServer();
 
@@ -18,9 +17,7 @@ describe("methods", () => {
     });
 
     beforeEach(() => {
-        const element = document.createElement("div");
-        element.id = "tree1";
-        document.body.appendChild(element);
+        document.body.innerHTML = '<div id="tree1"></div>';
     });
 
     afterEach(() => {
@@ -28,7 +25,7 @@ describe("methods", () => {
 
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
+        document.body.innerHTML = "";
         localStorage.clear();
     });
 
@@ -317,7 +314,9 @@ describe("methods", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("closeNode", node1, false);
 
-            expect(node1.element).toBeClosedTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+            expect(treeItem).not.toBeAriaExpanded();
         });
 
         it("throws an error without a node parameter", () => {
@@ -903,7 +902,9 @@ describe("methods", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("openNode", node1, false);
 
-            expect(node1.element).toBeOpenTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+            expect(treeItem).toBeAriaExpanded();
         });
 
         it("calls the function with onFinished parameter", async () => {
@@ -1221,8 +1222,11 @@ describe("methods", () => {
             $tree.tree("selectNode", node2);
             $tree.tree("selectNode", node1);
 
-            expect(node1.element).toBeSelectedTreeNode();
-            expect(node2.element).not.toBeSelectedTreeNode();
+            const treeItem1 = screen.getByRole("treeitem", { name: "node1" });
+            const treeItem2 = screen.getByRole("treeitem", { name: "node2" });
+
+            expect(treeItem1).toBeAriaSelected();
+            expect(treeItem2).not.toBeAriaSelected();
         });
 
         it("selects the node when the node is not selected", () => {
@@ -1235,10 +1239,12 @@ describe("methods", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("selectNode", node1);
 
-            expect(node1.element).toBeSelectedTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+            expect(treeItem).toBeAriaSelected();
         });
 
-        it("deselects the node when the node is selected", () => {
+        it("deselects the node when the node is selected twice", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
@@ -1247,10 +1253,11 @@ describe("methods", () => {
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("selectNode", node1);
-
             $tree.tree("selectNode", node1);
 
-            expect(node1.element).not.toBeSelectedTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+            expect(treeItem).not.toBeAriaSelected();
         });
 
         it("deselects the current node with a null parameter", () => {
@@ -1295,10 +1302,8 @@ describe("methods", () => {
                 selectable: false,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-
             $tree.tree("setOption", "selectable", true);
-            await userEvent.click(getTitleElement(node1.element as HTMLElement));
+            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
 
             expect($tree.tree("getSelectedNode")).toMatchObject({
                 name: "node1",
@@ -1359,7 +1364,9 @@ describe("methods", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("toggle", node1, false);
 
-            expect(node1.element).toBeOpenTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+            expect(treeItem).toBeAriaExpanded();
         });
 
         it("closes the node when the node is open", () => {
@@ -1372,7 +1379,9 @@ describe("methods", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("toggle", node1, false);
 
-            expect(node1.element).toBeClosedTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+            expect(treeItem).not.toBeAriaExpanded();
         });
 
         it("throws an error without a node parameter", () => {
@@ -1555,10 +1564,11 @@ describe("methods", () => {
 
             const node = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("selectNode", node);
-
             $tree.tree("updateNode", node, { name: 'node1_changed' });
 
-            expect(node.element).toBeFocusedTreeNode();
+            const treeItem = screen.getByRole("treeitem", { name: "node1_changed" });
+
+            expect(treeItem).toHaveFocus();
         });
 
         it("leaves the node unchanged with empty data", () => {
