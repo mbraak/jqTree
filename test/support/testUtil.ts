@@ -10,13 +10,6 @@ interface Rect {
     y: number;
 }
 
-export const assertJqTreeFolder = (el: HTMLElement) => {
-    /* istanbul ignore if @preserve */
-    if (!el.classList.contains("jqtree-folder")) {
-        throw new Error("Node is not a folder");
-    }
-};
-
 const mockLayout = (element: HTMLElement, rect: Rect) => {
     vi.spyOn(element, "clientHeight", "get").mockReturnValue(rect.height);
     vi.spyOn(element, "clientWidth", "get").mockReturnValue(rect.width);

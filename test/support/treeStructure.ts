@@ -1,5 +1,3 @@
-import { assertSingleElement, getTitleElement } from "./queries";
-
 export type TreeNode = TreeChild | TreeFolder;
 
 export type TreeStructure = TreeNode[];
@@ -18,7 +16,7 @@ interface TreeFolder {
 }
 
 const getTreeNode = (li: HTMLElement): TreeNode => {
-    const span = getTitleElement(li);
+    const span = li.querySelector(":scope > .jqtree-element > .jqtree-title") as HTMLElement;
     const name = span.innerHTML;
     const selected = li.classList.contains("jqtree-selected");
 
@@ -49,9 +47,8 @@ const getTreeNode = (li: HTMLElement): TreeNode => {
 const getChildNodes = (ul: HTMLElement) => Array.from(ul.querySelectorAll<HTMLElement>(":scope > li.jqtree_common")).map((li) => getTreeNode(li))
 
 const treeStructure = (el: HTMLElement): TreeStructure => {
-    const elements = el.querySelectorAll<HTMLElement>(":scope > ul.jqtree-tree");
-    assertSingleElement(el, elements, "tree");
-    return getChildNodes(elements[0] as HTMLElement);
+    const element = el.querySelector<HTMLElement>(":scope > ul.jqtree-tree") as HTMLElement;
+    return getChildNodes(element);
 };
 
 export default treeStructure;

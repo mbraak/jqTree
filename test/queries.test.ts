@@ -1,129 +1,135 @@
-import { getTitleElement, getTogglerElement } from "./support/queries";
+import { getTreeButton, getTreeListElement } from "./support/queries";
 
+// Create the html for a tree node:
+//
+//   <li>
+//     <div class="jqtree-element">
+//       <span class="jqtree-title" role="treeitem"></span>
+//     </div>
+//   </li>
 const createNode = () => {
     const li = document.createElement("li");
+
     const nodeElement = document.createElement("div");
     nodeElement.className = "jqtree-element";
     li.append(nodeElement);
-    return { li, nodeElement };
+
+    const treeElement = document.createElement("span");
+    treeElement.className = "jqtree-title";
+    treeElement.setAttribute("role", "treeitem");
+    nodeElement.append(treeElement);
+
+    return { li, nodeElement, treeElement };
 };
 
-describe("getTitleElement", () => {
-    it("returns the title element", () => {
-        const { li, nodeElement } = createNode();
-        const title = document.createElement("span");
-        title.className = "jqtree-title";
-        nodeElement.append(title);
+const createTogglerElement = () => {
+    const toggler = document.createElement("a");
+    toggler.className = "jqtree-toggler";
+    return toggler;
+};
 
-        expect(getTitleElement(li)).toBe(title);
-    });
-
-    it("only returns a title element that is a direct child of the node element", () => {
-        const { li, nodeElement } = createNode();
-        const title = document.createElement("span");
-        title.className = "jqtree-title";
-        nodeElement.append(title);
-
-        // A nested title (e.g. in a child node) should be ignored.
-        const nestedTitle = document.createElement("span");
-        nestedTitle.className = "jqtree-title";
-        title.append(nestedTitle);
-
-        expect(getTitleElement(li)).toBe(title);
-    });
-
-    it("throws when the node element is missing", () => {
-        const li = document.createElement("li");
-
-        expect(() => getTitleElement(li)).toThrow("Unable to find node element");
-    });
-
-    it("throws when there are multiple node elements", () => {
-        const li = document.createElement("li");
-
-        for (let i = 0; i < 2; i++) {
-            const nodeElement = document.createElement("div");
-            nodeElement.className = "jqtree-element";
-            li.append(nodeElement);
-        }
-
-        expect(() => getTitleElement(li)).toThrow("Found multiple node elements");
-    });
-
-    it("throws when the title element is missing", () => {
-        const { li } = createNode();
-
-        expect(() => getTitleElement(li)).toThrow(
-            "Unable to find title element",
-        );
-    });
-
-    it("throws when there are multiple title elements", () => {
-        const { li, nodeElement } = createNode();
-
-        for (let i = 0; i < 2; i++) {
-            const title = document.createElement("span");
-            title.className = "jqtree-title";
-            nodeElement.append(title);
-        }
-
-        expect(() => getTitleElement(li)).toThrow(
-            "Found multiple title elements",
-        );
-    });
-});
-
-describe("getTogglerElement", () => {
+describe("getTreeButton", () => {
     it("returns the toggler element", () => {
-        const { li, nodeElement } = createNode();
-        const toggler = document.createElement("a");
-        toggler.className = "jqtree-toggler";
+        const { nodeElement, treeElement } = createNode();
+        const toggler = createTogglerElement();
         nodeElement.append(toggler);
 
-        expect(getTogglerElement(li)).toBe(toggler);
+        expect(getTreeButton(treeElement)).toBe(toggler);
     });
 
-    it("only returns a toggler element that is a direct child of the node element", () => {
-        const { li, nodeElement } = createNode();
-        const toggler = document.createElement("a");
-        toggler.className = "jqtree-toggler";
+    it("only returns a toggler element that is a sibling of the tree element", () => {
+        const { nodeElement, treeElement } = createNode();
+        const toggler = createTogglerElement();
         nodeElement.append(toggler);
 
         // A nested toggler (e.g. in a child node) should be ignored.
-        const nestedToggler = document.createElement("a");
-        nestedToggler.className = "jqtree-toggler";
-        toggler.append(nestedToggler);
+        treeElement.append(createTogglerElement());
 
-        expect(getTogglerElement(li)).toBe(toggler);
+        expect(getTreeButton(treeElement)).toBe(toggler);
     });
 
-    it("throws when the node element is missing", () => {
-        const li = document.createElement("li");
+    it("throws when the element doesn't have role treeitem", () => {
+        const { nodeElement, treeElement } = createNode();
+        nodeElement.append(createTogglerElement());
+        treeElement.removeAttribute("role");
 
-        expect(() => getTogglerElement(li)).toThrow(
-            "Unable to find node element",
+        expect(() => getTreeButton(treeElement)).toThrow(
+            "Element must have role treeitem",
+        );
+    });
+
+    it("throws when the tree element doesn't have a parent", () => {
+        const { nodeElement, treeElement } = createNode();
+        treeElement.remove();
+        nodeElement.append(createTogglerElement());
+
+        expect(() => getTreeButton(treeElement)).toThrow(
+            "Tree element must have a parent",
         );
     });
 
     it("throws when the toggler element is missing", () => {
-        const { li } = createNode();
+        const { treeElement } = createNode();
 
-        expect(() => getTogglerElement(li)).toThrow(
-            "Unable to find toggler element",
+        expect(() => getTreeButton(treeElement)).toThrow(
+            "Unable to find tree button element",
         );
     });
 
     it("throws when there are multiple toggler elements", () => {
-        const { li, nodeElement } = createNode();
+        const { nodeElement, treeElement } = createNode();
 
         for (let i = 0; i < 2; i++) {
-            const toggler = document.createElement("a");
-            toggler.className = "jqtree-toggler";
-            nodeElement.append(toggler);
+            nodeElement.append(createTogglerElement());
         }
 
-        expect(() => getTogglerElement(li)).toThrow(
-            "Found multiple toggler elements",
+        expect(() => getTreeButton(treeElement)).toThrow(
+            "Found multiple tree button elements",
+        );
+    });
+});
+
+describe("getTreeListElement", () => {
+    it("returns the list element of the tree element", () => {
+        const { li, treeElement } = createNode();
+
+        expect(getTreeListElement(treeElement)).toBe(li);
+    });
+
+    it("throws when the element doesn't have role treeitem", () => {
+        const { treeElement } = createNode();
+        treeElement.removeAttribute("role");
+
+        expect(() => getTreeListElement(treeElement)).toThrow(
+            "Element must have role treeitem",
+        );
+    });
+
+    it("throws when the tree element doesn't have a parent", () => {
+        const { treeElement } = createNode();
+        treeElement.remove();
+
+        expect(() => getTreeListElement(treeElement)).toThrow(
+            "Tree element must have a parent",
+        );
+    });
+
+    it("throws when the parent of the tree element doesn't have a parent", () => {
+        const { nodeElement, treeElement } = createNode();
+        nodeElement.remove();
+
+        expect(() => getTreeListElement(treeElement)).toThrow(
+            "Tree element must have a parent",
+        );
+    });
+
+    it("throws when the element isn't in a list element", () => {
+        const { nodeElement, treeElement } = createNode();
+        const div = document.createElement("div");
+        div.append(nodeElement);
+
+        expect(() => getTreeListElement(treeElement)).toThrow(
+            "Must be a list element",
         );
     });
 });

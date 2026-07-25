@@ -4,15 +4,13 @@ import exampleData from "../support/exampleData";
 
 describe("create with data", () => {
     beforeEach(() => {
-        const element = document.createElement("div");
-        element.id = "tree1";
-        document.body.appendChild(element);
+        document.body.innerHTML = '<div id="tree1"></div>';
     });
 
     afterEach(() => {
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        (document.getElementById("tree1") as HTMLElement).remove();
+        document.body.innerHTML = "";
     });
 
     it("creates a tree", () => {

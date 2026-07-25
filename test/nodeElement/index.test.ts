@@ -1,10 +1,12 @@
+import { screen } from "@testing-library/dom";
+
 import ElementsRenderer from "app/elementsRenderer";
 import { Node } from "app/node";
 import NodeElement from "app/nodeElement";
 import BorderDropHint from "app/nodeElement/borderDropHint";
 import GhostDropHint from "app/nodeElement/ghostDropHint";
 
-import { getTitleElement } from "../support/queries";
+import { getTreeListElement } from "../support/queries";
 
 interface CreateNodeElementParams {
     tabIndex?: number;
@@ -38,9 +40,7 @@ const createNodeElement = ({ tabIndex }: CreateNodeElementParams = {}) => {
         treeElement,
     });
 
-    const element = node.element as HTMLElement;
-
-    return { element, node, nodeElement, treeElement };
+    return { node, nodeElement };
 };
 
 describe("init", () => {
@@ -133,54 +133,58 @@ describe("select", () => {
     });
 
     it("adds the selected class to the element", () => {
-        const { element, nodeElement } = createNodeElement();
-
+        const { nodeElement } = createNodeElement();
         nodeElement.select(false);
 
-        expect(element).toHaveClass("jqtree-selected");
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+        const listElement = getTreeListElement(treeItem);
+
+        expect(listElement).toHaveClass("jqtree-selected");
     });
 
     it("sets aria-selected to true on the title span", () => {
-        const { element, nodeElement } = createNodeElement();
-
+        const { nodeElement } = createNodeElement();
         nodeElement.select(false);
 
-        expect(getTitleElement(element)).toHaveAttribute(
-            "aria-selected",
-            "true",
-        );
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+        expect(treeItem).toBeAriaSelected();
     });
 
     it("sets the tabindex on the title span when a tabIndex is given", () => {
-        const { element, nodeElement } = createNodeElement({ tabIndex: 0 });
-
+        const { nodeElement } = createNodeElement({ tabIndex: 0 });
         nodeElement.select(false);
 
-        expect(getTitleElement(element)).toHaveAttribute("tabindex", "0");
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+        expect(treeItem).toHaveAttribute("tabindex", "0");
     });
 
     it("doesn't set the tabindex on the title span when no tabIndex is given", () => {
-        const { element, nodeElement } = createNodeElement();
-
+        const { nodeElement } = createNodeElement();
         nodeElement.select(false);
 
-        expect(getTitleElement(element)).not.toHaveAttribute("tabindex");
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+        expect(treeItem).not.toHaveAttribute("tabindex");
     });
 
     it("focuses the title span when mustSetFocus is true", () => {
-        const { element, nodeElement } = createNodeElement({ tabIndex: 0 });
-
+        const { nodeElement } = createNodeElement({ tabIndex: 0 });
         nodeElement.select(true);
 
-        expect(getTitleElement(element)).toHaveFocus();
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+        expect(treeItem).toHaveFocus();
     });
 
     it("doesn't focus the title span when mustSetFocus is false", () => {
-        const { element, nodeElement } = createNodeElement({ tabIndex: 0 });
-
+        const { nodeElement } = createNodeElement({ tabIndex: 0 });
         nodeElement.select(false);
 
-        expect(getTitleElement(element)).not.toHaveFocus();
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+        expect(treeItem).not.toHaveFocus();
     });
 });
 
@@ -190,41 +194,42 @@ describe("deselect", () => {
     });
 
     it("removes the selected class from the element", () => {
-        const { element, nodeElement } = createNodeElement();
-
+        const { nodeElement } = createNodeElement();
         nodeElement.select(false);
         nodeElement.deselect();
 
-        expect(element).not.toHaveClass("jqtree-selected");
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+        const listElement = getTreeListElement(treeItem);
+
+        expect(listElement).not.toHaveClass("jqtree-selected");
     });
 
     it("sets aria-selected to false on the title span", () => {
-        const { element, nodeElement } = createNodeElement();
+        const { nodeElement } = createNodeElement();
 
         nodeElement.select(false);
         nodeElement.deselect();
 
-        const deselected = "false";
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
-        expect(getTitleElement(element)).toHaveAttribute(
-            "aria-selected",
-            deselected,
-        );
+        expect(treeItem).toHaveAttribute("aria-selected", "false");
     });
 
     it("removes the tabindex from the title span", () => {
-        const { element, nodeElement } = createNodeElement({ tabIndex: 0 });
+        const { nodeElement } = createNodeElement({ tabIndex: 0 });
 
         nodeElement.select(false);
         nodeElement.deselect();
 
-        expect(getTitleElement(element)).not.toHaveAttribute("tabindex");
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+        expect(treeItem).not.toHaveAttribute("tabindex");
     });
 
     it("blurs the title span", () => {
-        const { element, nodeElement } = createNodeElement({ tabIndex: 0 });
-
-        const blur = vi.spyOn(getTitleElement(element), "blur");
+        const { nodeElement } = createNodeElement({ tabIndex: 0 });
+        const treeItem = screen.getByRole("treeitem", { name: "node1" });
+        const blur = vi.spyOn(treeItem, "blur");
 
         nodeElement.select(true);
         nodeElement.deselect();
