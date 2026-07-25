@@ -706,9 +706,10 @@ export default class HtmlTree {
       return this._options.autoOpen;
     } else if (typeof this._options.autoOpen === "string") {
       return parseInt(this._options.autoOpen, 10);
-    } else {
-      return 0;
     }
+
+    /* istanbul ignore next @preserve */
+    return 0;
   }
 
   private _getNodeElement(element: HTMLElement): NodeElement | null {
