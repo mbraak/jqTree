@@ -1,4 +1,4 @@
-import { waitFor } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -7,31 +7,29 @@ import { vi } from "vitest"
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTitleElement } from "../support/queries";
 
 describe("events", () => {
     beforeEach(() => {
-        const element = document.createElement("div");
-        element.id = "tree1";
-        document.body.appendChild(element);
+        document.body.innerHTML = '<div id="tree1"></div>';
     });
 
     afterEach(() => {
         const $tree = $("#tree1");
         $tree.tree("destroy");
-        (document.getElementById("tree1") as HTMLElement).remove(); // eslint-disable-line testing-library/no-node-access
+        document.body.innerHTML = "";
     });
 
     describe("tree.click", () => {
         it("fires tree.click", async () => {
             const $tree = $("#tree1");
             $tree.tree({ data: exampleData });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             const onClick = vi.fn();
             $tree.on("tree.click", onClick);
 
-            await userEvent.click(getTitleElement(node1.element as HTMLElement));
+            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(onClick).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({ node: node1 }),
@@ -43,15 +41,16 @@ describe("events", () => {
         it("fires tree.contextmenu", async () => {
             const $tree = $("#tree1");
             $tree.tree({ data: exampleData });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             const onContextMenu = vi.fn();
             $tree.on("tree.contextmenu", onContextMenu);
 
             await userEvent.pointer({
                 keys: "[MouseRight]",
-                target: getTitleElement(node1.element as HTMLElement),
+                target: screen.getByRole("treeitem", { name: "node1" }),
             });
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(onContextMenu).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({ node: node1 }),
@@ -63,12 +62,13 @@ describe("events", () => {
         it("fires tree.dblclick", async () => {
             const $tree = $("#tree1");
             $tree.tree({ data: exampleData });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             const onDoubleClick = vi.fn();
             $tree.on("tree.dblclick", onDoubleClick);
 
-            await userEvent.dblClick(getTitleElement(node1.element as HTMLElement));
+            await userEvent.dblClick(screen.getByRole("treeitem", { name: "node1" }));
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(onDoubleClick).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({ node: node1 }),
@@ -138,12 +138,13 @@ describe("events", () => {
             $tree.tree({
                 data: exampleData,
             });
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             const onSelect = vi.fn();
             $tree.on("tree.select", onSelect);
 
-            await userEvent.click(getTitleElement(node1.element as HTMLElement));
+            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(onSelect).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({
@@ -164,7 +165,7 @@ describe("events", () => {
             const onSelect = vi.fn();
             $tree.on("tree.select", onSelect);
 
-            await userEvent.click(getTitleElement(node1.element as HTMLElement));
+            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
 
             expect(onSelect).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({
