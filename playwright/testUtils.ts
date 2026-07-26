@@ -21,10 +21,6 @@ export const locateTitle = (page: Page, title: string) =>
 export const findNodeElement = async (page: Page, title: string) => {
     const titleElement = await locateTitle(page, title).elementHandle();
 
-    if (!titleElement) {
-        throw new Error(`Title element not found: ${title}`);
-    }
-
     const nodeElement = await titleElement.evaluateHandle((el) => {
         const li = el.closest("li");
 
@@ -121,10 +117,6 @@ export const getNodeRect = async (
     title: string,
 ): Promise<BoundingBox> => {
     const titleElement = await locateTitle(page, title).elementHandle();
-
-    if (!titleElement) {
-        throw Error("Element not found");
-    }
 
     const rect = await getRect(titleElement as ElementHandle<HTMLElement>);
     return rect;
