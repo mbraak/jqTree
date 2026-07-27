@@ -3,8 +3,8 @@ config
 css
 devserver
 docs
-src/playwright
-src/test
+playwright
+test
 .editorconfig
 .eslintrc
 .prettier
