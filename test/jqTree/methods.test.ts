@@ -8,6 +8,7 @@ import "app/tree.jquery";
 import __version__ from "app/version";
 
 import exampleData from "../support/exampleData";
+import { getTreeListElement } from "../support/queries";
 
 const server = setupServer();
 
@@ -770,6 +771,34 @@ describe("methods", () => {
             expect($tree.tree("getSelectedNode")).toBeFalse();
         });
 
+        it("keeps the drag and drop state when a node is being dragged", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                data: exampleData,
+                dragAndDrop: true,
+                startDndDelay: 0,
+            })
+
+            const user = userEvent.setup();
+            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+
+            await user.pointer([
+                { keys: "[MouseLeft>]", target: treeItem },
+                { coords: { x: 5, y: 5 }, target: treeItem },
+            ]);
+
+            expect($tree.tree("isDragging")).toBeTrue();
+
+            $tree.tree("loadData", ["new-child1"], $tree.tree("getNodeByNameMustExist", "node2"));
+
+            expect($tree.tree("isDragging")).toBeTrue();
+            expect(
+                getTreeListElement(screen.getByRole("treeitem", { name: "node1" })),
+            ).toHaveClass("jqtree-moving");
+
+            await user.pointer({ keys: "[/MouseLeft]", target: treeItem });
+        });
+
         it("doesn't deselect the node when the selected child is under another node", () => {
             const $tree = $("#tree1");
             $tree.tree({
@@ -794,6 +823,8 @@ describe("methods", () => {
                 name: "child1",
             });
         });
+
+
     });
 
     describe("loadDataFromUrl", () => {
