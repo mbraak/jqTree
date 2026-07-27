@@ -593,7 +593,7 @@ var jqtree = (function (exports) {
               this._refreshElements(null);
             }
           };
-          const event = this._triggerEvent("tree.move", {
+          if (this._triggerEvent("tree.move", {
             move_info: {
               do_move: doMove,
               moved_node: movedNode,
@@ -602,8 +602,7 @@ var jqtree = (function (exports) {
               previous_parent: previousParent,
               target_node: targetNode
             }
-          });
-          if (!event.isDefaultPrevented()) {
+          })) {
             doMove();
           }
         }
@@ -1128,11 +1127,10 @@ var jqtree = (function (exports) {
             break;
           case "label":
             {
-              const event = this._triggerEvent("tree.click", {
+              if (this._triggerEvent("tree.click", {
                 click_event: e,
                 node: clickTarget.node
-              });
-              if (!event.isDefaultPrevented()) {
+              })) {
                 this._onClickTitle(clickTarget.node);
               }
               break;
@@ -3686,7 +3684,7 @@ var jqtree = (function (exports) {
       _triggerEvent(eventName, values) {
         const event = jQuery.Event(eventName, values);
         this._element.trigger(event);
-        return event;
+        return !event.isDefaultPrevented();
       }
     }
     SimpleWidget.register(JqTreeWidget, "tree");

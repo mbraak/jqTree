@@ -1258,10 +1258,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private _triggerEvent(
         eventName: string,
         values?: Record<string, unknown>,
-    ): JQuery.Event {
+    ): boolean {
         const event = jQuery.Event(eventName, values);
         this._element.trigger(event);
-        return event;
+        return !event.isDefaultPrevented();
     }
 }
 
