@@ -78,7 +78,7 @@ var jqtree = (function (exports) {
       _notifyLoading(isLoading, element, node) {
         const $el = jQuery(element);
         if (this._onLoading) {
-          this._onLoading(isLoading, node, $el);
+          this._onLoading(isLoading, node, element);
         }
         this._triggerEvent("tree.loading_data", {
           $el,
@@ -427,7 +427,7 @@ var jqtree = (function (exports) {
         if (!this._mustCaptureElement(element)) {
           return null;
         }
-        if (this._onIsMoveHandle && !this._onIsMoveHandle(jQuery(element))) {
+        if (this._onIsMoveHandle && !this._onIsMoveHandle(element)) {
           return null;
         }
         let nodeElement = this._getNodeElement(element);
@@ -740,7 +740,7 @@ var jqtree = (function (exports) {
         } else if (value.nodeType) {
           return value;
         } else {
-          return jQuery(value)[0];
+          return undefined;
         }
       }
       _createDomElements(element, children, isRootNode, level) {
@@ -800,7 +800,7 @@ var jqtree = (function (exports) {
         const li = mustShowFolder ? this._createFolderLi(node, level, isSelected) : this._createNodeLi(node, level, isSelected);
         this._attachNodeData(node, li);
         if (this._onCreateLi) {
-          this._onCreateLi(node, jQuery(li), isSelected);
+          this._onCreateLi(node, li, isSelected);
         }
         return li;
       }
@@ -903,403 +903,6 @@ var jqtree = (function (exports) {
       }
     }
 
-<<<<<<< HEAD
-=======
-    class KeyHandler {
-      _closeNode;
-      _getSelectedNode;
-      _isFocusOnTree;
-      _keyboardSupport;
-      _openNode;
-      _originalSelectNode;
-      constructor({
-        closeNode,
-        getSelectedNode,
-        isFocusOnTree,
-        keyboardSupport,
-        openNode,
-        selectNode
-      }) {
-        this._closeNode = closeNode;
-        this._getSelectedNode = getSelectedNode;
-        this._isFocusOnTree = isFocusOnTree;
-        this._keyboardSupport = keyboardSupport;
-        this._openNode = openNode;
-        this._originalSelectNode = selectNode;
-        if (keyboardSupport) {
-          document.addEventListener("keydown", this._handleKeyDown);
-        }
-      }
-      deinit() {
-        if (this._keyboardSupport) {
-          document.removeEventListener("keydown", this._handleKeyDown);
-        }
-      }
-      moveDown(selectedNode) {
-        return this._selectNode(selectedNode.getNextVisibleNode());
-      }
-      moveUp(selectedNode) {
-        return this._selectNode(selectedNode.getPreviousVisibleNode());
-      }
-      _canHandleKeyboard() {
-        return this._keyboardSupport && this._isFocusOnTree();
-      }
-      _handleKeyDown = e => {
-        if (!this._canHandleKeyboard()) {
-          return;
-        }
-        let isKeyHandled = false;
-        const selectedNode = this._getSelectedNode();
-        if (selectedNode) {
-          switch (e.key) {
-            case "ArrowDown":
-              isKeyHandled = this.moveDown(selectedNode);
-              break;
-            case "ArrowLeft":
-              isKeyHandled = this._moveLeft(selectedNode);
-              break;
-            case "ArrowRight":
-              isKeyHandled = this._moveRight(selectedNode);
-              break;
-            case "ArrowUp":
-              isKeyHandled = this.moveUp(selectedNode);
-              break;
-          }
-        }
-        if (isKeyHandled) {
-          e.preventDefault();
-        }
-      };
-      _moveLeft(selectedNode) {
-        if (selectedNode.isFolder() && selectedNode.is_open) {
-          // Left on an open node closes the node
-          this._closeNode(selectedNode);
-          return true;
-        } else {
-          // Left on a closed or end node moves focus to the node's parent
-          return this._selectNode(selectedNode.getParent());
-        }
-      }
-      _moveRight(selectedNode) {
-        if (!selectedNode.isFolder()) {
-          return false;
-        } else {
-          // folder node
-          if (selectedNode.is_open) {
-            // Right moves to the first child of an open node
-            return this._selectNode(selectedNode.getNextVisibleNode());
-          } else {
-            // Right expands a closed node
-            this._openNode(selectedNode);
-            return true;
-          }
-        }
-      }
-
-      /* Select the node.
-       * Don't do anything if the node is null.
-       * Result: a different node was selected.
-       */
-      _selectNode(node) {
-        if (!node) {
-          return false;
-        } else {
-          this._originalSelectNode(node);
-          return true;
-        }
-      }
-    }
-
-    const getPositionInfoFromMouseEvent = e => ({
-      originalEvent: e,
-      pageX: e.pageX,
-      pageY: e.pageY,
-      target: e.target
-    });
-    const getPositionInfoFromTouch = (touch, e) => ({
-      originalEvent: e,
-      pageX: touch.pageX,
-      pageY: touch.pageY,
-      target: touch.target
-    });
-
-    class MouseHandler {
-      _element;
-      _getMouseDelay;
-      _getNode;
-      _isMouseDelayMet;
-      _isMouseStarted;
-      _mouseDelayTimer;
-      _mouseDownInfo;
-      _onClickButton;
-      _onClickTitle;
-      _onMouseCapture;
-      _onMouseDrag;
-      _onMouseStart;
-      _onMouseStop;
-      _triggerEvent;
-      _useContextMenu;
-      constructor({
-        element,
-        getMouseDelay,
-        getNode,
-        onClickButton,
-        onClickTitle,
-        onMouseCapture,
-        onMouseDrag,
-        onMouseStart,
-        onMouseStop,
-        triggerEvent,
-        useContextMenu
-      }) {
-        this._element = element;
-        this._getMouseDelay = getMouseDelay;
-        this._getNode = getNode;
-        this._onClickButton = onClickButton;
-        this._onClickTitle = onClickTitle;
-        this._onMouseCapture = onMouseCapture;
-        this._onMouseDrag = onMouseDrag;
-        this._onMouseStart = onMouseStart;
-        this._onMouseStop = onMouseStop;
-        this._triggerEvent = triggerEvent;
-        this._useContextMenu = useContextMenu;
-        element.addEventListener("click", this._handleClick);
-        element.addEventListener("dblclick", this._handleDblclick);
-        element.addEventListener("mousedown", this._mouseDown, {
-          passive: false
-        });
-        element.addEventListener("touchstart", this._touchStart, {
-          passive: false
-        });
-        if (useContextMenu) {
-          element.addEventListener("contextmenu", this._handleContextmenu);
-        }
-        this._isMouseStarted = false;
-        this._mouseDelayTimer = null;
-        this._isMouseDelayMet = false;
-        this._mouseDownInfo = null;
-      }
-      deinit() {
-        this._element.removeEventListener("click", this._handleClick);
-        this._element.removeEventListener("dblclick", this._handleDblclick);
-        if (this._useContextMenu) {
-          this._element.removeEventListener("contextmenu", this._handleContextmenu);
-        }
-        this._element.removeEventListener("mousedown", this._mouseDown);
-        this._element.removeEventListener("touchstart", this._touchStart);
-        this._removeMouseMoveEventListeners();
-      }
-      _getClickTarget(element) {
-        const button = element.closest(".jqtree-toggler");
-        if (button) {
-          const node = this._getNode(button);
-          if (node) {
-            return {
-              node,
-              type: "button"
-            };
-          }
-        } else {
-          const jqTreeElement = element.closest(".jqtree-element");
-          if (jqTreeElement) {
-            const node = this._getNode(jqTreeElement);
-            if (node) {
-              return {
-                node,
-                type: "label"
-              };
-            }
-          }
-        }
-        return null;
-      }
-      _handleClick = e => {
-        if (!e.target) {
-          return;
-        }
-        const clickTarget = this._getClickTarget(e.target);
-        if (!clickTarget) {
-          return;
-        }
-        switch (clickTarget.type) {
-          case "button":
-            this._onClickButton(clickTarget.node);
-            e.preventDefault();
-            e.stopPropagation();
-            break;
-          case "label":
-            {
-              if (this._triggerEvent("tree.click", {
-                click_event: e,
-                node: clickTarget.node
-              })) {
-                this._onClickTitle(clickTarget.node);
-              }
-              break;
-            }
-        }
-      };
-      _handleContextmenu = e => {
-        if (!e.target) {
-          return;
-        }
-        const div = e.target.closest("ul.jqtree-tree .jqtree-element");
-        if (div) {
-          const node = this._getNode(div);
-          if (node) {
-            e.preventDefault();
-            e.stopPropagation();
-            this._triggerEvent("tree.contextmenu", {
-              click_event: e,
-              node
-            });
-            return false;
-          }
-        }
-        return null;
-      };
-      _handleDblclick = e => {
-        if (!e.target) {
-          return;
-        }
-        const clickTarget = this._getClickTarget(e.target);
-        if (clickTarget?.type === "label") {
-          this._triggerEvent("tree.dblclick", {
-            click_event: e,
-            node: clickTarget.node
-          });
-        }
-      };
-      _handleMouseDown(positionInfo) {
-        // We may have missed mouseup (out of window)
-        if (this._isMouseStarted) {
-          this._handleMouseUp(positionInfo);
-        }
-        this._mouseDownInfo = positionInfo;
-        if (!this._onMouseCapture(positionInfo)) {
-          return false;
-        }
-        this._handleStartMouse();
-        return true;
-      }
-      _handleMouseMove(e, positionInfo) {
-        if (this._isMouseStarted) {
-          this._onMouseDrag(positionInfo);
-          if (e.cancelable) {
-            e.preventDefault();
-          }
-          return;
-        }
-        if (!this._isMouseDelayMet) {
-          return;
-        }
-        if (this._mouseDownInfo) {
-          this._isMouseStarted = this._onMouseStart(this._mouseDownInfo);
-        }
-        if (this._isMouseStarted) {
-          this._onMouseDrag(positionInfo);
-          if (e.cancelable) {
-            e.preventDefault();
-          }
-        } else {
-          this._handleMouseUp(positionInfo);
-        }
-      }
-      _handleMouseUp(positionInfo) {
-        this._removeMouseMoveEventListeners();
-        this._isMouseDelayMet = false;
-        this._mouseDownInfo = null;
-        if (this._isMouseStarted) {
-          this._isMouseStarted = false;
-          this._onMouseStop(positionInfo);
-        }
-      }
-      _handleStartMouse() {
-        document.addEventListener("mousemove", this._mouseMove, {
-          passive: false
-        });
-        document.addEventListener("touchmove", this._touchMove, {
-          passive: false
-        });
-        document.addEventListener("mouseup", this._mouseUp, {
-          passive: false
-        });
-        document.addEventListener("touchend", this._touchEnd, {
-          passive: false
-        });
-        const mouseDelay = this._getMouseDelay();
-        if (mouseDelay) {
-          this._startMouseDelayTimer(mouseDelay);
-        } else {
-          this._isMouseDelayMet = true;
-        }
-      }
-      _mouseDown = e => {
-        // Left mouse button?
-        if (e.button !== 0) {
-          return;
-        }
-        const result = this._handleMouseDown(getPositionInfoFromMouseEvent(e));
-        if (result && e.cancelable) {
-          e.preventDefault();
-        }
-      };
-      _mouseMove = e => {
-        this._handleMouseMove(e, getPositionInfoFromMouseEvent(e));
-      };
-      _mouseUp = e => {
-        this._handleMouseUp(getPositionInfoFromMouseEvent(e));
-      };
-      _removeMouseMoveEventListeners() {
-        document.removeEventListener("mousemove", this._mouseMove);
-        document.removeEventListener("touchmove", this._touchMove);
-        document.removeEventListener("mouseup", this._mouseUp);
-        document.removeEventListener("touchend", this._touchEnd);
-      }
-      _startMouseDelayTimer(mouseDelay) {
-        if (this._mouseDelayTimer) {
-          clearTimeout(this._mouseDelayTimer);
-        }
-        this._mouseDelayTimer = window.setTimeout(() => {
-          if (this._mouseDownInfo) {
-            this._isMouseDelayMet = true;
-          }
-        }, mouseDelay);
-        this._isMouseDelayMet = false;
-      }
-      _touchEnd = e => {
-        if (e.touches.length > 1) {
-          return;
-        }
-        const touch = e.touches[0];
-        if (!touch) {
-          return;
-        }
-        this._handleMouseUp(getPositionInfoFromTouch(touch, e));
-      };
-      _touchMove = e => {
-        if (e.touches.length > 1) {
-          return;
-        }
-        const touch = e.touches[0];
-        if (!touch) {
-          return;
-        }
-        this._handleMouseMove(e, getPositionInfoFromTouch(touch, e));
-      };
-      _touchStart = e => {
-        if (e.touches.length > 1) {
-          return;
-        }
-        const touch = e.touches[0];
-        if (!touch) {
-          return;
-        }
-        this._handleMouseDown(getPositionInfoFromTouch(touch, e));
-      };
-    }
-
->>>>>>> replace-jquery
     const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
 
     class Node {
@@ -1849,7 +1452,7 @@ var jqtree = (function (exports) {
       onLoadFailed: undefined,
       onLoading: undefined,
       onSetStateFromStorage: undefined,
-      openedIcon: "&#x25bc;",
+      openedIcon: undefined,
       openFolderDelay: 500,
       // The delay for opening a folder during drag and drop; the value is in milliseconds
       // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
@@ -1875,6 +1478,7 @@ var jqtree = (function (exports) {
       options.dataUrl ??= htmlElement.dataset.url;
       options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
       options.closedIcon ??= getDefaultClosedIcon(options);
+      options.openedIcon ??= "&#x25bc;";
       return options;
     };
     const getDefaultClosedIcon = options => {
@@ -3153,41 +2757,40 @@ var jqtree = (function (exports) {
 
     const version = "1.8.11";
 
-<<<<<<< HEAD
     class HtmlTree {
-      dataLoader;
-      dndHandler;
-      htmlElement;
-      isInitialized;
-      keyHandler;
-      mouseHandler;
-      nodeMap;
-      options;
-      renderer;
-      saveStateHandler;
-      scrollHandler;
-      selectNodeHandler;
       tree;
+      _dataLoader;
+      _dndHandler;
+      _htmlElement;
+      _isInitialized;
+      _keyHandler;
+      _mouseHandler;
+      _nodeMap;
+      _options;
+      _renderer;
+      _saveStateHandler;
+      _scrollHandler;
+      _selectNodeHandler;
       _triggerEventProvider;
       constructor({
         htmlElement,
         options,
         overrideTriggerEventProvider
       }) {
-        this.htmlElement = htmlElement;
-        this.options = setDefaultOptions(htmlElement, options);
+        this._htmlElement = htmlElement;
+        this._options = setDefaultOptions(htmlElement, options);
         this._triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
-        this.isInitialized = false;
+        this._isInitialized = false;
         this.tree = new Node({}, true);
-        this.nodeMap = new WeakMap();
-        this.init();
+        this._nodeMap = new WeakMap();
+        this._init();
       }
 
       // Add a node after an existing node.
       addNodeAfter(newNodeInfo, existingNode) {
         const newNode = existingNode.addAfter(newNodeInfo);
         if (newNode) {
-          this.refreshElements(existingNode.parent);
+          this._refreshElements(existingNode.parent);
         }
         return newNode;
       }
@@ -3196,7 +2799,7 @@ var jqtree = (function (exports) {
       addNodeBefore(newNodeInfo, existingNode) {
         const newNode = existingNode.addBefore(newNodeInfo);
         if (newNode) {
-          this.refreshElements(existingNode.parent);
+          this._refreshElements(existingNode.parent);
         }
         return newNode;
       }
@@ -3205,132 +2808,42 @@ var jqtree = (function (exports) {
       addParentNode(newNodeInfo, existingNode) {
         const newNode = existingNode.addParent(newNodeInfo);
         if (newNode) {
-          this.refreshElements(newNode.parent);
+          this._refreshElements(newNode.parent);
         }
         return newNode;
       }
       addToSelection(node, mustSetFocus) {
-        this.selectNodeHandler.addToSelection(node);
-        this.openParents(node);
-        this.getNodeElementForNode(node).select(mustSetFocus ?? true);
-        this.saveState();
+        this._selectNodeHandler.addToSelection(node);
+        this._openParents(node);
+        this._getNodeElementForNode(node).select(mustSetFocus ?? true);
+        this._saveState();
       }
 
       // Add a node as child of another node.
       appendNode(newNodeInfo, parentNode) {
         const node = parentNode.append(newNodeInfo);
-        this.refreshElements(parentNode);
+        this._refreshElements(parentNode);
         return node;
       }
       closeNode(node, slideParam) {
-        const slide = slideParam ?? this.options.slide;
+        const slide = slideParam ?? this._options.slide;
         if (node.isFolder() || node.isEmptyFolder) {
-          this.createFolderElement(node).close(slide, this.options.animationSpeed);
-          this.saveState();
+          this._createFolderElement(node).close(slide, this._options.animationSpeed);
+          this._saveState();
         }
-      }
-
-      // Is this HTML element part of the tree?
-      containsElement(element) {
-        const node = this.getNode(element);
-        return node?.tree === this.tree;
-      }
-      createFolderElement(node) {
-        const closedIconElement = this.renderer.closedIconElement;
-        const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
-        const openedIconElement = this.renderer.openedIconElement;
-        const tabIndex = this.options.tabIndex;
-        const treeElement = this.htmlElement;
-        const triggerEvent = this.triggerEvent.bind(this);
-        return new FolderElement({
-          closedIconElement,
-          getScrollLeft,
-          node,
-          openedIconElement,
-          tabIndex,
-          treeElement,
-          triggerEvent
-        });
-      }
-      createNodeElement(node) {
-        const getScrollLeft = this.scrollHandler.getScrollLeft.bind(this.scrollHandler);
-        const tabIndex = this.options.tabIndex;
-        const treeElement = this.htmlElement;
-        return new NodeElement({
-          getScrollLeft,
-          node,
-          tabIndex,
-          treeElement
-        });
-      }
-
-      /* Create a RequestUrl based on the url in the options.
-        * Add a 'node' query parameter for loading on demand
-        * Add a 'selected_node' query parameter if a node is selected.
-      */
-      createRequestUrl(node) {
-        const dataUrl = this.options.dataUrl;
-        let url;
-        if (typeof dataUrl === "function") {
-          url = dataUrl(node);
-        } else {
-          url = dataUrl;
-        }
-        if (!url) {
-          return null;
-        }
-        const requestUrl = new RequestUrl(url);
-        if (node?.id) {
-          // Load on demand of a subtree; add node parameter
-          requestUrl.setSearchParam('node', node.id.toString());
-        } else {
-          // Add selected_node parameter
-          const selectedNodeId = this.getNodeIdToBeSelected();
-          if (selectedNodeId) {
-            requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
-          }
-        }
-        return requestUrl;
       }
       deinit() {
-        this.htmlElement.textContent = '';
-        this.keyHandler.deinit();
-        this.mouseHandler.deinit();
+        this._htmlElement.textContent = '';
+        this._keyHandler.deinit();
+        this._mouseHandler.deinit();
         this.tree = new Node({}, true);
-      }
-      deselectCurrentNode() {
-        const node = this.getSelectedNode();
-        if (node) {
-          this.removeFromSelection(node);
-        }
-      }
-
-      // Deselect the children of the node.
-      deselectNodes(parentNode) {
-        const selectedNodesUnderParent = this.selectNodeHandler.getSelectedNodesUnder(parentNode);
-        for (const n of selectedNodesUnderParent) {
-          this.selectNodeHandler.removeFromSelection(n);
-        }
-      }
-
-      // Get the maximum level for auto open
-      getAutoOpenMaxLevel() {
-        if (this.options.autoOpen === true) {
-          return -1;
-        } else if (typeof this.options.autoOpen === "number") {
-          return this.options.autoOpen;
-        } else if (typeof this.options.autoOpen === "string") {
-          return parseInt(this.options.autoOpen, 10);
-        } else {
-          return 0;
-        }
       }
 
       // Return the tree node for an HTMl element.
       getNode(element) {
         const liElement = element.closest("li.jqtree_common");
         if (liElement) {
-          return this.nodeMap.get(liElement) ?? null;
+          return this._nodeMap.get(liElement) ?? null;
         } else {
           return null;
         }
@@ -3347,44 +2860,22 @@ var jqtree = (function (exports) {
       getNodeByNameMustExist(name) {
         return this.tree.getNodeByNameMustExist(name);
       }
-      getNodeElement(element) {
-        const node = this.getNode(element);
-        if (node) {
-          return this.getNodeElementForNode(node);
-        } else {
-          return null;
-        }
-      }
-      getNodeElementForNode(node) {
-        if (node.isFolder()) {
-          return this.createFolderElement(node);
-        } else {
-          return this.createNodeElement(node);
-        }
-      }
-      getNodeIdToBeSelected() {
-        if (this.options.saveState) {
-          return this.saveStateHandler.getNodeIdToBeSelected();
-        } else {
-          return null;
-        }
-      }
       getNodesByProperty(key, value) {
         return this.tree.getNodesByProperty(key, value);
       }
 
       // Return the node that is selected.
       getSelectedNode() {
-        return this.selectNodeHandler.getSelectedNode();
+        return this._selectNodeHandler.getSelectedNode();
       }
       getSelectedNodes() {
-        return this.selectNodeHandler.getSelectedNodes();
+        return this._selectNodeHandler.getSelectedNodes();
       }
       getState() {
-        return this.saveStateHandler.getState();
+        return this._saveStateHandler.getState();
       }
       getStateFromStorage() {
-        return this.saveStateHandler.getStateFromStorage();
+        return this._saveStateHandler.getStateFromStorage();
       }
       getTree() {
         return this.tree;
@@ -3392,143 +2883,51 @@ var jqtree = (function (exports) {
       getVersion() {
         return version;
       }
-      init() {
-        this._connectHandlers();
-        this.initData();
-      }
-      initData() {
-        if (this.options.data) {
-          this.loadData(this.options.data, null);
-        } else {
-          const dataUrl = this.createRequestUrl(null);
-          if (dataUrl) {
-            this.loadDataFromUrl(null, null, null);
-          } else {
-            this.loadData([], null);
-          }
-        }
-      }
-      initTree(data) {
-        const doInit = () => {
-          if (!this.isInitialized) {
-            this.isInitialized = true;
-            this.triggerEvent("tree.init");
-          }
-        };
-        this.tree = new this.options.nodeClass(null, true, this.options.nodeClass);
-        this.selectNodeHandler.clear();
-        this.tree.loadFromData(data);
-        const mustLoadOnDemand = this.setInitialState();
-        this.refreshElements(null);
-        if (!mustLoadOnDemand) {
-          doInit();
-        } else {
-          // Load data on demand and then init the tree
-          this.setInitialStateOnDemand(doInit);
-        }
-      }
       isDragging() {
-        return this.dndHandler.isDragging;
-      }
-
-      // Does an HTML element of the tree have the focus?
-      isFocusOnTree() {
-        const activeElement = document.activeElement;
-        return activeElement?.tagName === "SPAN" && this.containsElement(activeElement);
+        return this._dndHandler.isDragging;
       }
       isNodeSelected(node) {
-        return this.selectNodeHandler.isNodeSelected(node);
-      }
-      isSelectedNodeInSubtree(subtree) {
-        const selectedNode = this.getSelectedNode();
-        if (!selectedNode) {
-          return false;
-        } else {
-          return subtree === selectedNode || subtree.isParentOf(selectedNode);
-        }
+        return this._selectNodeHandler.isNodeSelected(node);
       }
       loadData(data, parentNode) {
         if (data) {
           if (parentNode) {
-            this.deselectNodes(parentNode);
-            this.loadSubtree(data, parentNode);
+            this._deselectNodes(parentNode);
+            this._loadSubtree(data, parentNode);
           } else {
-            this.initTree(data);
+            this._initTree(data);
           }
           if (this.isDragging()) {
-            this.dndHandler.refresh();
+            this._dndHandler.refresh();
           }
         }
-        this.triggerEvent("tree.load_data", {
+        this._triggerEvent("tree.load_data", {
           parent_node: parentNode,
           tree_data: data
         });
       }
       loadDataFromUrl(inputUrl, parentNode, onFinished) {
-        const url = inputUrl ? new RequestUrl(inputUrl) : this.createRequestUrl(parentNode);
+        const url = inputUrl ? new RequestUrl(inputUrl) : this._createRequestUrl(parentNode);
         if (url) {
-          this.dataLoader.loadFromUrl(url, parentNode, onFinished);
-        }
-      }
-      loadFolderOnDemand(node, slide = true, onFinished) {
-        node.is_loading = true;
-        this.loadDataFromUrl(null, node, () => {
-          this.openNodeInternal(node, slide, onFinished);
-        });
-      }
-      loadSubtree(data, parentNode) {
-        parentNode.loadFromData(data);
-        parentNode.load_on_demand = false;
-        parentNode.is_loading = false;
-        this.refreshElements(parentNode);
-      }
-      mouseCapture(positionInfo) {
-        if (this.options.dragAndDrop) {
-          return this.dndHandler.mouseCapture(positionInfo);
-        } else {
-          return false;
-        }
-      }
-      mouseDrag(positionInfo) {
-        if (this.options.dragAndDrop) {
-          const result = this.dndHandler.mouseDrag(positionInfo);
-          this.scrollHandler.checkScrolling(positionInfo);
-          return result;
-        } else {
-          return false;
-        }
-      }
-      mouseStart(positionInfo) {
-        if (this.options.dragAndDrop) {
-          return this.dndHandler.mouseStart(positionInfo);
-        } else {
-          return false;
-        }
-      }
-      mouseStop(positionInfo) {
-        if (this.options.dragAndDrop) {
-          this.scrollHandler.stopScrolling();
-          return this.dndHandler.mouseStop(positionInfo);
-        } else {
-          return false;
+          this._dataLoader.loadFromUrl(url, parentNode, onFinished);
         }
       }
       moveDown() {
         const selectedNode = this.getSelectedNode();
         if (selectedNode) {
-          this.keyHandler.moveDown(selectedNode);
+          this._keyHandler.moveDown(selectedNode);
         }
       }
 
       // Move a node inside the tree.
       moveNode(node, targetNode, position) {
         this.tree.moveNode(node, targetNode, position);
-        this.refreshElements(null);
+        this._refreshElements(null);
       }
       moveUp() {
         const selectedNode = this.getSelectedNode();
         if (selectedNode) {
-          this.keyHandler.moveUp(selectedNode);
+          this._keyHandler.moveUp(selectedNode);
         }
       }
       openNode(node, param1, param2) {
@@ -3542,109 +2941,55 @@ var jqtree = (function (exports) {
             slide = param1;
             onFinished = param2;
           }
-          slide ??= this.options.slide;
+          slide ??= this._options.slide;
           return [slide, onFinished];
         };
         const [slide, onFinished] = parseParams();
-        this.openNodeInternal(node, slide, onFinished);
-      }
-      openNodeInternal(node, slide = true, onFinished) {
-        const doOpenNode = (_node, _slide, _onFinished) => {
-          if (!node.children.length) {
-            return;
-          }
-          const folderElement = this.createFolderElement(_node);
-          folderElement.open(_onFinished, _slide, this.options.animationSpeed);
-        };
-        if (node.isFolder() || node.isEmptyFolder) {
-          if (node.load_on_demand) {
-            this.loadFolderOnDemand(node, slide, onFinished);
-          } else {
-            let parent = node.parent;
-            while (parent) {
-              // nb: do not open root element
-              if (parent.parent) {
-                doOpenNode(parent, false);
-              }
-              parent = parent.parent;
-            }
-            doOpenNode(node, slide, onFinished);
-            this.saveState();
-          }
-        }
-      }
-      openParents(node) {
-        const parent = node.parent;
-        if (parent?.parent && !parent.is_open) {
-          this.openNode(parent, false);
-        }
+        this._openNodeInternal(node, slide, onFinished);
       }
 
-      // Add a node before another node. 
+      // Add a node before another node.
       prependNode(newNodeInfo, parentNode) {
         const node = parentNode.prepend(newNodeInfo);
-        this.refreshElements(parentNode);
+        this._refreshElements(parentNode);
         return node;
       }
-
-      /*
-      Redraw the tree or part of the tree.
-        from_node: redraw this subtree
-      */
-      refreshElements(fromNode) {
-        const mustSetFocus = this.isFocusOnTree();
-        const mustSelect = fromNode ? this.isSelectedNodeInSubtree(fromNode) : false;
-        this.renderer.render(fromNode);
-        if (mustSelect) {
-          this.selectCurrentNode(mustSetFocus);
-        }
-        this.triggerEvent("tree.refresh");
+      refresh() {
+        this._refreshElements(null);
       }
       refreshHitAreas() {
-        this.dndHandler.refresh();
+        this._dndHandler.refresh();
       }
       removeFromSelection(node) {
-        this.selectNodeHandler.removeFromSelection(node);
-        this.getNodeElementForNode(node).deselect();
-        this.saveState();
+        this._selectNodeHandler.removeFromSelection(node);
+        this._getNodeElementForNode(node).deselect();
+        this._saveState();
       }
 
       // Remove the node from the tree.
       removeNode(node) {
-        this.selectNodeHandler.removeFromSelection(node, true); // including children
+        this._selectNodeHandler.removeFromSelection(node, true); // including children
 
         const parent = node.parent;
         node.remove();
-        this.refreshElements(parent);
-      }
-      saveState() {
-        if (this.options.saveState) {
-          this.saveStateHandler.saveState();
-        }
+        this._refreshElements(parent);
       }
       scrollToNode(node) {
         if (!node.element) {
           return;
         }
-        const top = getOffsetTop(node.element) - getOffsetTop(this.htmlElement);
-        this.scrollHandler.scrollToY(top);
-      }
-      selectCurrentNode(mustSetFocus) {
-        const node = this.getSelectedNode();
-        if (node) {
-          const nodeElement = this.getNodeElementForNode(node);
-          nodeElement.select(mustSetFocus);
-        }
+        const top = getOffsetTop(node.element) - getOffsetTop(this._htmlElement);
+        this._scrollHandler.scrollToY(top);
       }
       selectNode(node, optionsParam) {
         const saveState = () => {
-          if (this.options.saveState) {
-            this.saveStateHandler.saveState();
+          if (this._options.saveState) {
+            this._saveStateHandler.saveState();
           }
         };
         if (!node) {
           // Called with empty node -> deselect current node
-          this.deselectCurrentNode();
+          this._deselectCurrentNode();
           saveState();
           return;
         }
@@ -3657,145 +3002,44 @@ var jqtree = (function (exports) {
           ...(optionsParam ?? {})
         };
         const canSelect = () => {
-          if (this.options.onCanSelectNode) {
-            return this.options.selectable && this.options.onCanSelectNode(node);
+          if (this._options.onCanSelectNode) {
+            return this._options.selectable && this._options.onCanSelectNode(node);
           } else {
-            return this.options.selectable;
+            return this._options.selectable;
           }
         };
         if (!canSelect()) {
           return;
         }
-        if (this.selectNodeHandler.isNodeSelected(node)) {
+        if (this._selectNodeHandler.isNodeSelected(node)) {
           if (selectOptions.mustToggle) {
-            this.deselectCurrentNode();
-            this.triggerEvent("tree.select", {
+            this._deselectCurrentNode();
+            this._triggerEvent("tree.select", {
               node: null,
               previous_node: node
             });
           }
         } else {
           const deselectedNode = this.getSelectedNode() || null;
-          this.deselectCurrentNode();
+          this._deselectCurrentNode();
           this.addToSelection(node, selectOptions.mustSetFocus);
-          this.triggerEvent("tree.select", {
+          this._triggerEvent("tree.select", {
             deselected_node: deselectedNode,
             node
           });
-          this.openParents(node);
+          this._openParents(node);
         }
         saveState();
       }
-
-      // Set initial state, either by restoring the state or auto-opening nodes
-      // result: must load nodes on demand?
-      setInitialState() {
-        const restoreState = () => {
-          // result: is state restored, must load on demand?
-          if (!this.options.saveState) {
-            return [false, false];
-          } else {
-            const state = this.saveStateHandler.getStateFromStorage();
-            if (!state) {
-              return [false, false];
-            } else {
-              const mustLoadOnDemand = this.saveStateHandler.setInitialState(state);
-
-              // return true: the state is restored
-              return [true, mustLoadOnDemand];
-            }
-          }
-        };
-        const autoOpenNodes = () => {
-          // result: must load on demand?
-          if (this.options.autoOpen === false) {
-            return false;
-          }
-          const maxLevel = this.getAutoOpenMaxLevel();
-          let mustLoadOnDemand = false;
-          this.tree.iterate((node, level) => {
-            if (node.load_on_demand) {
-              mustLoadOnDemand = true;
-              return false;
-            } else if (!node.hasChildren()) {
-              return false;
-            } else {
-              node.is_open = true;
-              return level !== maxLevel;
-            }
-          });
-          return mustLoadOnDemand;
-        };
-        let [isRestored, mustLoadOnDemand] = restoreState(); // eslint-disable-line prefer-const
-
-        if (!isRestored) {
-          mustLoadOnDemand = autoOpenNodes();
-        }
-        return mustLoadOnDemand;
-      }
-
-      // Set the initial state for nodes that are loaded on demand
-      // Call cb_finished when done
-      setInitialStateOnDemand(cbFinished) {
-        const restoreState = () => {
-          if (!this.options.saveState) {
-            return false;
-          } else {
-            const state = this.saveStateHandler.getStateFromStorage();
-            if (!state) {
-              return false;
-            } else {
-              this.saveStateHandler.setInitialStateOnDemand(state, cbFinished);
-              return true;
-            }
-          }
-        };
-        const autoOpenNodes = () => {
-          const maxLevel = this.getAutoOpenMaxLevel();
-          let loadingCount = 0;
-          const loadAndOpenNode = node => {
-            loadingCount += 1;
-            this.openNodeInternal(node, false, () => {
-              loadingCount -= 1;
-              openNodes();
-            });
-          };
-          const openNodes = () => {
-            this.tree.iterate((node, level) => {
-              if (node.load_on_demand) {
-                if (!node.is_loading) {
-                  loadAndOpenNode(node);
-                }
-                return false;
-              } else {
-                this.openNodeInternal(node, false);
-                return level !== maxLevel;
-              }
-            });
-            if (loadingCount === 0) {
-              cbFinished();
-            }
-          };
-          openNodes();
-        };
-        if (!restoreState()) {
-          autoOpenNodes();
-        }
-      }
-
-      // Set this HTML element to this node in the node map.
-      setNodeElement(element, node) {
-        this.nodeMap.set(element, node);
-      }
       setOption(option, value) {
-        this.options[option] = value;
+        this._options[option] = value;
       }
       setState(state) {
-        this.saveStateHandler.setInitialState(state);
-        this.refreshElements(null);
+        this._saveStateHandler.setInitialState(state);
+        this._refreshElements(null);
       }
       toggle(node, slideParam = null) {
-        const slide = slideParam ?? this.options.slide;
+        const slide = slideParam ?? this._options.slide;
         if (node.is_open) {
           this.closeNode(node, slide);
         } else {
@@ -3806,9 +3050,6 @@ var jqtree = (function (exports) {
       // Return tree as json string.
       toJson() {
         return JSON.stringify(this.tree.getData());
-      }
-      triggerEvent(eventName, values) {
-        return this._triggerEventProvider(this.htmlElement, eventName, values);
       }
 
       // Update the data of a node in the tree.
@@ -3827,640 +3068,8 @@ var jqtree = (function (exports) {
             node.loadFromData(data.children);
           }
         }
-        this.refreshElements(node);
+        this._refreshElements(node);
       }
-      _connectHandlers() {
-        const {
-          autoEscape,
-          buttonLeft,
-          closedIcon,
-          dataFilter,
-          dragAndDrop,
-          keyboardSupport,
-          onCanMove,
-          onCanMoveTo,
-          onCreateLi,
-          onDragMove,
-          onDragStop,
-          onGetStateFromStorage,
-          onIsMoveHandle,
-          onLoadFailed,
-          onLoading,
-          onSetStateFromStorage,
-          openedIcon,
-          openFolderDelay,
-          rtl,
-          saveState,
-          showEmptyFolder,
-          slide,
-          tabIndex
-        } = this.options;
-        const closeNode = this.closeNode.bind(this);
-        const getNodeElement = this.getNodeElement.bind(this);
-        const getNodeElementForNode = this.getNodeElementForNode.bind(this);
-        const getNodeById = this.getNodeById.bind(this);
-        const getSelectedNode = this.getSelectedNode.bind(this);
-        const getTree = this.getTree.bind(this);
-        const isFocusOnTree = this.isFocusOnTree.bind(this);
-        const loadData = this.loadData.bind(this);
-        const openNode = this.openNodeInternal.bind(this);
-        const refreshElements = this.refreshElements.bind(this);
-        const refreshHitAreas = this.refreshHitAreas.bind(this);
-        const selectNode = this.selectNode.bind(this);
-        const setNodeElement = this.setNodeElement.bind(this);
-        const treeElement = this.htmlElement;
-        const triggerEvent = this.triggerEvent.bind(this);
-        const selectNodeHandler = new SelectNodeHandler({
-          getNodeById
-        });
-        const addToSelection = selectNodeHandler.addToSelection.bind(selectNodeHandler);
-        const getSelectedNodes = selectNodeHandler.getSelectedNodes.bind(selectNodeHandler);
-        const isNodeSelected = selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
-        const removeFromSelection = selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
-        const getMouseDelay = () => this.options.startDndDelay ?? 0;
-        const dataLoader = new DataLoader({
-          dataFilter,
-          loadData,
-          onLoadFailed,
-          onLoading,
-          treeElement,
-          triggerEvent
-        });
-        const saveStateHandler = new SaveStateHandler({
-          addToSelection,
-          getNodeById,
-          getSelectedNodes,
-          getTree,
-          onGetStateFromStorage,
-          onSetStateFromStorage,
-          openNode,
-          refreshElements,
-          removeFromSelection,
-          saveState
-        });
-        const scrollHandler = new ScrollHandler({
-          refreshHitAreas,
-          treeElement
-        });
-        const getScrollLeft = scrollHandler.getScrollLeft.bind(scrollHandler);
-        const dndHandler = new DragAndDropHandler({
-          autoEscape,
-          getNodeElement,
-          getNodeElementForNode,
-          getScrollLeft,
-          getTree,
-          onCanMove,
-          onCanMoveTo,
-          onDragMove,
-          onDragStop,
-          onIsMoveHandle,
-          openFolderDelay,
-          openNode,
-          refreshElements,
-          slide,
-          treeElement,
-          triggerEvent
-        });
-        const keyHandler = new KeyHandler({
-          closeNode,
-          getSelectedNode,
-          isFocusOnTree,
-          keyboardSupport,
-          openNode,
-          selectNode
-        });
-        const renderer = new ElementsRenderer({
-          autoEscape,
-          buttonLeft,
-          closedIcon,
-          dragAndDrop,
-          getTree,
-          htmlElement: treeElement,
-          isNodeSelected,
-          onCreateLi,
-          openedIcon,
-          rtl,
-          setNodeElement,
-          showEmptyFolder,
-          tabIndex
-        });
-        const getNode = this.getNode.bind(this);
-        const onMouseCapture = this.mouseCapture.bind(this);
-        const onMouseDrag = this.mouseDrag.bind(this);
-        const onMouseStart = this.mouseStart.bind(this);
-        const onMouseStop = this.mouseStop.bind(this);
-        const mouseHandler = new MouseHandler({
-          element: treeElement,
-          getMouseDelay,
-          getNode,
-          onClickButton: this.toggle.bind(this),
-          onClickTitle: this.selectNode.bind(this),
-          onMouseCapture,
-          onMouseDrag,
-          onMouseStart,
-          onMouseStop,
-          triggerEvent,
-          useContextMenu: this.options.useContextMenu
-        });
-        this.dataLoader = dataLoader;
-        this.dndHandler = dndHandler;
-        this.keyHandler = keyHandler;
-        this.mouseHandler = mouseHandler;
-        this.renderer = renderer;
-        this.saveStateHandler = saveStateHandler;
-        this.scrollHandler = scrollHandler;
-        this.selectNodeHandler = selectNodeHandler;
-      }
-    }
-
-    const register = (widgetClass, widgetName) => {
-      const getDataKey = () => `simple_widget_${widgetName}`;
-      const getWidgetData = (el, dataKey) => {
-        const widget = jQuery.data(el, dataKey);
-        if (widget && widget instanceof SimpleWidget) {
-          return widget;
-        } else {
-          return null;
-        }
-      };
-      const createWidget = ($el, options) => {
-        const dataKey = getDataKey();
-        for (const el of $el.get()) {
-          const existingWidget = getWidgetData(el, dataKey);
-          if (!existingWidget) {
-            const simpleWidgetClass = widgetClass;
-            const widget = new simpleWidgetClass(el, options);
-            if (!jQuery.data(el, dataKey)) {
-              jQuery.data(el, dataKey, widget);
-            }
-
-            // Call init after setting data, so we can call methods
-            widget.init();
-          }
-        }
-        return $el;
-      };
-      const destroyWidget = $el => {
-        const dataKey = getDataKey();
-        for (const el of $el.get()) {
-          const widget = getWidgetData(el, dataKey);
-          if (widget) {
-            widget.destroy();
-          }
-          jQuery.removeData(el, dataKey);
-        }
-      };
-      const callFunction = ($el, functionName, args) => {
-        let result = null;
-        for (const el of $el.get()) {
-          const widget = jQuery.data(el, getDataKey());
-          if (widget && widget instanceof SimpleWidget) {
-            const simpleWidget = widget;
-            const widgetFunction = simpleWidget[functionName];
-            if (widgetFunction && typeof widgetFunction === "function") {
-              result = widgetFunction.apply(widget, args);
-            }
-          }
-        }
-        return result;
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      jQuery.fn[widgetName] = function (argument1, ...args) {
-        if (!argument1) {
-          return createWidget(this, null);
-        } else if (typeof argument1 === "object") {
-          const options = argument1;
-          return createWidget(this, options);
-        } else if (typeof argument1 === "string" && argument1[0] !== "_") {
-          const functionName = argument1;
-          if (argument1 === "destroy") {
-            destroyWidget(this);
-            return undefined;
-          } else {
-            return callFunction(this, functionName, args);
-          }
-        } else {
-          return undefined;
-        }
-      };
-    };
-    class SimpleWidget {
-      static defaults = {};
-      $el;
-      inputOptions;
-      constructor(el, options) {
-        this.$el = jQuery(el);
-        this.inputOptions = options;
-      }
-      static register(widgetClass, widgetName) {
-        register(widgetClass, widgetName);
-      }
-      deinit() {
-        //
-      }
-      destroy() {
-        this.deinit();
-      }
-      init() {
-        //
-      }
-    }
-
-    const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
-    const PARAM_IS_EMPTY = "Parameter is empty: ";
-    const triggerJQueryEvent = (element, eventName, values) => {
-      const event = jQuery.Event(eventName, values);
-      jQuery(element).trigger(event);
-      return !event.isDefaultPrevented();
-    };
-    class JqTreeWidget extends SimpleWidget {
-      _element;
-      _htmlTree;
-=======
-    const defaults = {
-      animationSpeed: "fast",
-      autoEscape: true,
-      autoOpen: false,
-      // true / false / int (open n levels starting at 0)
-      buttonLeft: true,
-      // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
-      // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-      closedIcon: undefined,
-      data: undefined,
-      dataFilter: undefined,
-      dataUrl: undefined,
-      dragAndDrop: false,
-      keyboardSupport: true,
-      nodeClass: Node,
-      onCanMove: undefined,
-      // Can this node be moved?
-      onCanMoveTo: undefined,
-      // Can this node be moved to this position? function(moved_node, target_node, position)
-      onCanSelectNode: undefined,
-      onCreateLi: undefined,
-      onDragMove: undefined,
-      onDragStop: undefined,
-      onGetStateFromStorage: undefined,
-      onIsMoveHandle: undefined,
-      onLoadFailed: undefined,
-      onLoading: undefined,
-      onSetStateFromStorage: undefined,
-      openedIcon: "&#x25bc;",
-      openFolderDelay: 500,
-      // The delay for opening a folder during drag and drop; the value is in milliseconds
-      // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-      // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-      rtl: undefined,
-      // right-to-left support; true / false (default)
-      saveState: false,
-      // true / false / string (cookie name)
-      selectable: true,
-      showEmptyFolder: false,
-      slide: true,
-      // must display slide animation?
-      startDndDelay: 300,
-      // The delay for starting dnd (in milliseconds)
-      tabIndex: 0,
-      useContextMenu: true
-    };
-    const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
-    const PARAM_IS_EMPTY = "Parameter is empty: ";
-    class JqTreeWidget {
-      _dataLoader;
-      _dndHandler;
-      _element;
-      _htmlElement;
-      _isInitialized;
-      _keyHandler;
-      _mouseHandler;
-      _nodeMap;
-      _options;
-      _renderer;
-      _saveStateHandler;
-      _scrollHandler;
-      _selectNodeHandler;
-      _tree;
-      constructor(el, options) {
-        this._htmlElement = el;
-        this._element = jQuery(el);
-        this._options = {
-          ...defaults,
-          ...options
-        };
-      }
->>>>>>> replace-jquery
-      addNodeAfter(newNodeInfo, existingNode) {
-        return this._htmlTree.addNodeAfter(newNodeInfo, existingNode);
-      }
-      addNodeBefore(newNodeInfo, existingNode) {
-        if (!existingNode) {
-          throw Error(PARAM_IS_EMPTY + "existingNode");
-        }
-        return this._htmlTree.addNodeBefore(newNodeInfo, existingNode);
-      }
-      addParentNode(newNodeInfo, existingNode) {
-        if (!existingNode) {
-          throw Error(PARAM_IS_EMPTY + "existingNode");
-        }
-        return this._htmlTree.addParentNode(newNodeInfo, existingNode);
-      }
-      addToSelection(node, mustSetFocus) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-        this._htmlTree.addToSelection(node, mustSetFocus);
-        return this._element;
-      }
-      appendNode(newNodeInfo, parentNodeParam) {
-        const parentNode = parentNodeParam ?? this._htmlTree.tree;
-        return this._htmlTree.appendNode(newNodeInfo, parentNode);
-      }
-      closeNode(node, slideParam) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-<<<<<<< HEAD
-        this._htmlTree.closeNode(node, slideParam);
-=======
-        const slide = slideParam ?? this._options.slide;
-        if (node.isFolder() || node.isEmptyFolder) {
-          this._createFolderElement(node).close(slide, this._options.animationSpeed);
-          this._saveState();
-        }
->>>>>>> replace-jquery
-        return this._element;
-      }
-      deinit() {
-        this._element.off();
-<<<<<<< HEAD
-        this._htmlTree.deinit();
-        super.deinit();
-=======
-        this._keyHandler.deinit();
-        this._mouseHandler.deinit();
-        this._tree = new Node({}, true);
-        this._nodeMap = new WeakMap();
-      }
-      destroy() {
-        this.deinit();
->>>>>>> replace-jquery
-      }
-      getNodeByCallback(callback) {
-        return this._htmlTree.getNodeByCallback(callback);
-      }
-      getNodeByHtmlElement(inputElement) {
-        const element = inputElement instanceof HTMLElement ? inputElement : inputElement.get(0);
-        if (!element) {
-          return null;
-        }
-        return this._htmlTree.getNode(element);
-      }
-      getNodeById(nodeId) {
-        return this._htmlTree.getNodeById(nodeId);
-      }
-      getNodeByName(name) {
-        return this._htmlTree.getNodeByName(name);
-      }
-      getNodeByNameMustExist(name) {
-        return this._htmlTree.getNodeByNameMustExist(name);
-      }
-      getNodesByProperty(key, value) {
-        return this._htmlTree.getNodesByProperty(key, value);
-      }
-      getSelectedNode() {
-        return this._htmlTree.getSelectedNode();
-      }
-      getSelectedNodes() {
-        return this._htmlTree.getSelectedNodes();
-      }
-      getState() {
-        return this._htmlTree.getState();
-      }
-      getStateFromStorage() {
-        return this._htmlTree.getStateFromStorage();
-      }
-      getTree() {
-        return this._htmlTree.getTree();
-      }
-      getVersion() {
-        return this._htmlTree.getVersion();
-      }
-      init() {
-<<<<<<< HEAD
-        super.init();
-        this._element = this.$el;
-        const htmlElement = this.$el.get(0);
-        const htmlTree = new HtmlTree({
-          htmlElement,
-          options: this.inputOptions,
-          overrideTriggerEventProvider: triggerJQueryEvent
-        });
-        this._htmlTree = htmlTree;
-=======
-        const htmlElement = this._element.get(0);
-        this._htmlElement = htmlElement;
-        this._isInitialized = false;
-        this._nodeMap = new WeakMap();
-        this._options.dataUrl ??= htmlElement.dataset.url;
-        const dataRtl = htmlElement.dataset.rtl;
-        let rtlValue = undefined;
-        if (dataRtl == "") {
-          rtlValue = true;
-        } else if (dataRtl === "false") {
-          rtlValue = false;
-        } else {
-          rtlValue = Boolean(dataRtl);
-        }
-        this._options.rtl ??= rtlValue;
-        this._options.closedIcon ??= this._getDefaultClosedIcon();
-        this._connectHandlers();
-        this._initData();
->>>>>>> replace-jquery
-      }
-      isDragging() {
-        return this._htmlTree.isDragging();
-      }
-      isNodeSelected(node) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-        return this._htmlTree.isNodeSelected(node);
-      }
-      loadData(data, parentNode) {
-        this._htmlTree.loadData(data, parentNode);
-        return this._element;
-      }
-
-      /*
-      signatures:
-      - loadDataFromUrl(url, parent_node=null, on_finished=null)
-          loadDataFromUrl('/my_data');
-          loadDataFromUrl('/my_data', node1);
-          loadDataFromUrl('/my_data', node1, function() { console.log('finished'); });
-          loadDataFromUrl('/my_data', null, function() { console.log('finished'); });
-       - loadDataFromUrl(parent_node=null, on_finished=null)
-          loadDataFromUrl();
-          loadDataFromUrl(node1);
-          loadDataFromUrl(null, function() { console.log('finished'); });
-          loadDataFromUrl(node1, function() { console.log('finished'); });
-      */
-      loadDataFromUrl(param1, param2, param3) {
-        if (typeof param1 === "string") {
-          // first parameter is url
-<<<<<<< HEAD
-          this._htmlTree.loadDataFromUrl(param1, param2, param3 ?? null);
-        } else {
-          // first parameter is not url
-          this._htmlTree.loadDataFromUrl(null, param1, param2);
-=======
-          this._doLoadDataFromUrl(param1, param2, param3);
-        } else {
-          // first parameter is not url
-          this._doLoadDataFromUrl(undefined, param1, param2);
->>>>>>> replace-jquery
-        }
-        return this._element;
-      }
-      moveDown() {
-        this._htmlTree.moveDown();
-        return this._element;
-      }
-      moveNode(node, targetNode, position) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-        if (!targetNode) {
-          throw Error(PARAM_IS_EMPTY + "targetNode");
-        }
-        if (!position) {
-          throw Error(PARAM_IS_EMPTY + "position");
-        }
-        this._htmlTree.moveNode(node, targetNode, position);
-        return this._element;
-      }
-      moveUp() {
-        this._htmlTree.moveUp();
-        return this._element;
-      }
-      openNode(node, param1, param2) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-<<<<<<< HEAD
-        this._htmlTree.openNode(node, param1, param2);
-=======
-        const parseParams = () => {
-          let onFinished;
-          let slide;
-          if (typeof param1 === "function") {
-            onFinished = param1;
-            slide = null;
-          } else {
-            slide = param1;
-            onFinished = param2;
-          }
-          slide ??= this._options.slide;
-          return [slide, onFinished];
-        };
-        const [slide, onFinished] = parseParams();
-        this._openNodeInternal(node, slide, onFinished);
->>>>>>> replace-jquery
-        return this._element;
-      }
-      prependNode(newNodeInfo, parentNodeParam) {
-        const parentNode = parentNodeParam ?? this._htmlTree.tree;
-        return this._htmlTree.prependNode(newNodeInfo, parentNode);
-      }
-      refresh() {
-        this._htmlTree.refreshElements(null);
-        return this._element;
-      }
-      refreshHitAreas() {
-        this._htmlTree.refreshHitAreas();
-        return this._element;
-      }
-      reload(onFinished) {
-<<<<<<< HEAD
-        this._htmlTree.loadDataFromUrl(null, null, onFinished);
-=======
-        this._doLoadDataFromUrl(undefined, undefined, onFinished);
->>>>>>> replace-jquery
-        return this._element;
-      }
-      removeFromSelection(node) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-        this._htmlTree.removeFromSelection(node);
-        return this._element;
-      }
-      removeNode(node) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-        if (!node.parent) {
-          throw Error("Node has no parent");
-        }
-        this._htmlTree.removeNode(node);
-        return this._element;
-      }
-      scrollToNode(node) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-        this._htmlTree.scrollToNode(node);
-        return this._element;
-      }
-      selectNode(node, optionsParam) {
-        this._htmlTree.selectNode(node, optionsParam);
-        return this._element;
-      }
-      setOption(option, value) {
-<<<<<<< HEAD
-        this._htmlTree.setOption(option, value);
-=======
-        this._options[option] = value;
->>>>>>> replace-jquery
-        return this._element;
-      }
-      setState(state) {
-        if (state) {
-          this._htmlTree.setState(state);
-        }
-        return this._element;
-      }
-      toggle(node, slideParam = null) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-<<<<<<< HEAD
-        this._htmlTree.toggle(node, slideParam);
-=======
-        const slide = slideParam ?? this._options.slide;
-        if (node.is_open) {
-          this.closeNode(node, slide);
-        } else {
-          this.openNode(node, slide);
-        }
->>>>>>> replace-jquery
-        return this._element;
-      }
-      toJson() {
-        return this._htmlTree.toJson();
-      }
-      updateNode(node, data) {
-        if (!node) {
-          throw Error(NODE_PARAM_IS_EMPTY);
-        }
-        if (!data) {
-          return this._element;
-        }
-        this._htmlTree.updateNode(node, data);
-        return this._element;
-      }
-<<<<<<< HEAD
-=======
       _connectHandlers() {
         const {
           autoEscape,
@@ -4576,7 +3185,7 @@ var jqtree = (function (exports) {
           showEmptyFolder,
           tabIndex
         });
-        const getNode = this._getNode.bind(this);
+        const getNode = this.getNode.bind(this);
         const onMouseCapture = this._mouseCapture.bind(this);
         const onMouseDrag = this._mouseDrag.bind(this);
         const onMouseStart = this._mouseStart.bind(this);
@@ -4586,7 +3195,7 @@ var jqtree = (function (exports) {
           getMouseDelay,
           getNode,
           onClickButton: this.toggle.bind(this),
-          onClickTitle: this._doSelectNode.bind(this),
+          onClickTitle: this.selectNode.bind(this),
           onMouseCapture,
           onMouseDrag,
           onMouseStart,
@@ -4603,15 +3212,18 @@ var jqtree = (function (exports) {
         this._scrollHandler = scrollHandler;
         this._selectNodeHandler = selectNodeHandler;
       }
+
+      // Is this HTML element part of the tree?
       _containsElement(element) {
-        const node = this._getNode(element);
-        return node?.tree === this._tree;
+        const node = this.getNode(element);
+        return node?.tree === this.tree;
       }
       _createFolderElement(node) {
         const closedIconElement = this._renderer.closedIconElement;
         const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
         const openedIconElement = this._renderer.openedIconElement;
         const tabIndex = this._options.tabIndex;
+        const treeElement = this._htmlElement;
         const triggerEvent = this._triggerEvent.bind(this);
         return new FolderElement({
           closedIconElement,
@@ -4619,20 +3231,26 @@ var jqtree = (function (exports) {
           node,
           openedIconElement,
           tabIndex,
-          treeElement: this._htmlElement,
+          treeElement,
           triggerEvent
         });
       }
       _createNodeElement(node) {
         const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
         const tabIndex = this._options.tabIndex;
+        const treeElement = this._htmlElement;
         return new NodeElement({
           getScrollLeft,
           node,
           tabIndex,
-          treeElement: this._htmlElement
+          treeElement
         });
       }
+
+      /* Create a RequestUrl based on the url in the options.
+        * Add a 'node' query parameter for loading on demand
+        * Add a 'selected_node' query parameter if a node is selected.
+      */
       _createRequestUrl(node) {
         const dataUrl = this._options.dataUrl;
         let url;
@@ -4663,85 +3281,16 @@ var jqtree = (function (exports) {
           this.removeFromSelection(node);
         }
       }
+
+      // Deselect the children of the node.
       _deselectNodes(parentNode) {
         const selectedNodesUnderParent = this._selectNodeHandler.getSelectedNodesUnder(parentNode);
         for (const n of selectedNodesUnderParent) {
           this._selectNodeHandler.removeFromSelection(n);
         }
       }
-      _doLoadData(data, parentNode) {
-        if (data) {
-          if (parentNode) {
-            this._deselectNodes(parentNode);
-            this._loadSubtree(data, parentNode);
-          } else {
-            this._initTree(data);
-          }
-          if (this.isDragging()) {
-            this._dndHandler.refresh();
-          }
-        }
-        this._triggerEvent("tree.load_data", {
-          parent_node: parentNode,
-          tree_data: data
-        });
-      }
-      _doLoadDataFromUrl(inputUrl, parentNode, onFinished) {
-        const url = inputUrl ? new RequestUrl(inputUrl) : this._createRequestUrl(parentNode);
-        if (url) {
-          this._dataLoader.loadFromUrl(url, parentNode, onFinished);
-        }
-      }
-      _doSelectNode(node, optionsParam) {
-        const saveState = () => {
-          if (this._options.saveState) {
-            this._saveStateHandler.saveState();
-          }
-        };
-        if (!node) {
-          // Called with empty node -> deselect current node
-          this._deselectCurrentNode();
-          saveState();
-          return;
-        }
-        const defaultOptions = {
-          mustSetFocus: true,
-          mustToggle: true
-        };
-        const selectOptions = {
-          ...defaultOptions,
-          ...(optionsParam ?? {})
-        };
-        const canSelect = () => {
-          if (this._options.onCanSelectNode) {
-            return this._options.selectable && this._options.onCanSelectNode(node);
-          } else {
-            return this._options.selectable;
-          }
-        };
-        if (!canSelect()) {
-          return;
-        }
-        if (this._selectNodeHandler.isNodeSelected(node)) {
-          if (selectOptions.mustToggle) {
-            this._deselectCurrentNode();
-            this._triggerEvent("tree.select", {
-              node: null,
-              previous_node: node
-            });
-          }
-        } else {
-          const deselectedNode = this.getSelectedNode() || null;
-          this._deselectCurrentNode();
-          this.addToSelection(node, selectOptions.mustSetFocus);
-          this._triggerEvent("tree.select", {
-            deselected_node: deselectedNode,
-            node
-          });
-          this._openParents(node);
-        }
-        saveState();
-      }
+
+      // Get the maximum level for auto open
       _getAutoOpenMaxLevel() {
         if (this._options.autoOpen === true) {
           return -1;
@@ -4749,29 +3298,13 @@ var jqtree = (function (exports) {
           return this._options.autoOpen;
         } else if (typeof this._options.autoOpen === "string") {
           return parseInt(this._options.autoOpen, 10);
-        } else {
-          return 0;
         }
-      }
-      _getDefaultClosedIcon() {
-        if (this._options.rtl) {
-          // triangle to the left
-          return "&#x25c0;";
-        } else {
-          // triangle to the right
-          return "&#x25ba;";
-        }
-      }
-      _getNode(element) {
-        const liElement = element.closest("li.jqtree_common");
-        if (liElement) {
-          return this._nodeMap.get(liElement) ?? null;
-        } else {
-          return null;
-        }
+
+        /* istanbul ignore next @preserve */
+        return 0;
       }
       _getNodeElement(element) {
-        const node = this._getNode(element);
+        const node = this.getNode(element);
         if (node) {
           return this._getNodeElementForNode(node);
         } else {
@@ -4792,15 +3325,19 @@ var jqtree = (function (exports) {
           return null;
         }
       }
+      _init() {
+        this._connectHandlers();
+        this._initData();
+      }
       _initData() {
         if (this._options.data) {
-          this._doLoadData(this._options.data);
+          this.loadData(this._options.data);
         } else {
           const dataUrl = this._createRequestUrl();
           if (dataUrl) {
-            this._doLoadDataFromUrl();
+            this.loadDataFromUrl();
           } else {
-            this._doLoadData([]);
+            this.loadData([]);
           }
         }
       }
@@ -4811,9 +3348,9 @@ var jqtree = (function (exports) {
             this._triggerEvent("tree.init");
           }
         };
-        this._tree = new this._options.nodeClass(null, true, this._options.nodeClass);
+        this.tree = new this._options.nodeClass(null, true, this._options.nodeClass);
         this._selectNodeHandler.clear();
-        this._tree.loadFromData(data);
+        this.tree.loadFromData(data);
         const mustLoadOnDemand = this._setInitialState();
         this._refreshElements(null);
         if (!mustLoadOnDemand) {
@@ -4823,6 +3360,8 @@ var jqtree = (function (exports) {
           this._setInitialStateOnDemand(doInit);
         }
       }
+
+      // Does an HTML element of the tree have the focus?
       _isFocusOnTree() {
         const activeElement = document.activeElement;
         return activeElement?.tagName === "SPAN" && this._containsElement(activeElement);
@@ -4835,9 +3374,9 @@ var jqtree = (function (exports) {
           return subtree === selectedNode || subtree.isParentOf(selectedNode);
         }
       }
-      _loadFolderOnDemand(node, slide = true, onFinished) {
+      _loadFolderOnDemand(node, slide, onFinished) {
         node.is_loading = true;
-        this._doLoadDataFromUrl(undefined, node, () => {
+        this.loadDataFromUrl(undefined, node, () => {
           this._openNodeInternal(node, slide, onFinished);
         });
       }
@@ -4912,7 +3451,7 @@ var jqtree = (function (exports) {
 
       /*
       Redraw the tree or part of the tree.
-       from_node: redraw this subtree
+        from_node: redraw this subtree
       */
       _refreshElements(fromNode) {
         const mustSetFocus = this._isFocusOnTree();
@@ -4962,7 +3501,7 @@ var jqtree = (function (exports) {
           }
           const maxLevel = this._getAutoOpenMaxLevel();
           let mustLoadOnDemand = false;
-          this._tree.iterate((node, level) => {
+          this.tree.iterate((node, level) => {
             if (node.load_on_demand) {
               mustLoadOnDemand = true;
               return false;
@@ -5010,7 +3549,7 @@ var jqtree = (function (exports) {
             });
           };
           const openNodes = () => {
-            this._tree.iterate((node, level) => {
+            this.tree.iterate((node, level) => {
               if (node.load_on_demand) {
                 if (!node.is_loading) {
                   loadAndOpenNode(node);
@@ -5031,15 +3570,293 @@ var jqtree = (function (exports) {
           autoOpenNodes();
         }
       }
+
+      // Set this HTML element to this node in the node map.
       _setNodeElement(element, node) {
         this._nodeMap.set(element, node);
       }
       _triggerEvent(eventName, values) {
-        const event = jQuery.Event(eventName, values);
-        this._element.trigger(event);
-        return !event.isDefaultPrevented();
+        return this._triggerEventProvider(this._htmlElement, eventName, values);
       }
->>>>>>> replace-jquery
+    }
+
+    const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
+    const PARAM_IS_EMPTY = "Parameter is empty: ";
+    const triggerJQueryEvent = (element, eventName, values) => {
+      const event = jQuery.Event(eventName, values);
+      jQuery(element).trigger(event);
+      return !event.isDefaultPrevented();
+    };
+    class JqTreeWidget {
+      _element;
+      _htmlTree;
+      _inputOptions;
+      constructor(el, options) {
+        this._element = jQuery(el);
+        this._inputOptions = options;
+      }
+      addNodeAfter(newNodeInfo, existingNode) {
+        return this._htmlTree.addNodeAfter(newNodeInfo, existingNode);
+      }
+      addNodeBefore(newNodeInfo, existingNode) {
+        if (!existingNode) {
+          throw Error(PARAM_IS_EMPTY + "existingNode");
+        }
+        return this._htmlTree.addNodeBefore(newNodeInfo, existingNode);
+      }
+      addParentNode(newNodeInfo, existingNode) {
+        if (!existingNode) {
+          throw Error(PARAM_IS_EMPTY + "existingNode");
+        }
+        return this._htmlTree.addParentNode(newNodeInfo, existingNode);
+      }
+      addToSelection(node, mustSetFocus) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        this._htmlTree.addToSelection(node, mustSetFocus);
+        return this._element;
+      }
+      appendNode(newNodeInfo, parentNodeParam) {
+        const parentNode = parentNodeParam ?? this._htmlTree.tree;
+        return this._htmlTree.appendNode(newNodeInfo, parentNode);
+      }
+      closeNode(node, slideParam) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        this._htmlTree.closeNode(node, slideParam);
+        return this._element;
+      }
+      deinit() {
+        this._element.off();
+        this._htmlTree.deinit();
+      }
+      destroy() {
+        this.deinit();
+      }
+      getNodeByCallback(callback) {
+        return this._htmlTree.getNodeByCallback(callback);
+      }
+      getNodeByHtmlElement(inputElement) {
+        const element = inputElement instanceof HTMLElement ? inputElement : inputElement.get(0);
+        if (!element) {
+          return null;
+        }
+        return this._htmlTree.getNode(element);
+      }
+      getNodeById(nodeId) {
+        return this._htmlTree.getNodeById(nodeId);
+      }
+      getNodeByName(name) {
+        return this._htmlTree.getNodeByName(name);
+      }
+      getNodeByNameMustExist(name) {
+        return this._htmlTree.getNodeByNameMustExist(name);
+      }
+      getNodesByProperty(key, value) {
+        return this._htmlTree.getNodesByProperty(key, value);
+      }
+      getSelectedNode() {
+        return this._htmlTree.getSelectedNode();
+      }
+      getSelectedNodes() {
+        return this._htmlTree.getSelectedNodes();
+      }
+      getState() {
+        return this._htmlTree.getState();
+      }
+      getStateFromStorage() {
+        return this._htmlTree.getStateFromStorage();
+      }
+      getTree() {
+        return this._htmlTree.getTree();
+      }
+      getVersion() {
+        return this._htmlTree.getVersion();
+      }
+      init() {
+        const htmlElement = this._element.get(0);
+        const htmlTree = new HtmlTree({
+          htmlElement,
+          options: this._transformInputOptions(),
+          overrideTriggerEventProvider: triggerJQueryEvent
+        });
+        this._htmlTree = htmlTree;
+      }
+      isDragging() {
+        return this._htmlTree.isDragging();
+      }
+      isNodeSelected(node) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        return this._htmlTree.isNodeSelected(node);
+      }
+      loadData(data, parentNode) {
+        this._htmlTree.loadData(data, parentNode);
+        return this._element;
+      }
+
+      /*
+      signatures:
+      - loadDataFromUrl(url, parent_node=null, on_finished=null)
+          loadDataFromUrl('/my_data');
+          loadDataFromUrl('/my_data', node1);
+          loadDataFromUrl('/my_data', node1, function() { console.log('finished'); });
+          loadDataFromUrl('/my_data', null, function() { console.log('finished'); });
+       - loadDataFromUrl(parent_node=null, on_finished=null)
+          loadDataFromUrl();
+          loadDataFromUrl(node1);
+          loadDataFromUrl(null, function() { console.log('finished'); });
+          loadDataFromUrl(node1, function() { console.log('finished'); });
+      */
+      loadDataFromUrl(param1, param2, param3) {
+        if (typeof param1 === "string") {
+          // first parameter is url
+          this._htmlTree.loadDataFromUrl(param1, param2, param3);
+        } else {
+          // first parameter is not url
+          this._htmlTree.loadDataFromUrl(undefined, param1, param2);
+        }
+        return this._element;
+      }
+      moveDown() {
+        this._htmlTree.moveDown();
+        return this._element;
+      }
+      moveNode(node, targetNode, position) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        if (!targetNode) {
+          throw Error(PARAM_IS_EMPTY + "targetNode");
+        }
+        if (!position) {
+          throw Error(PARAM_IS_EMPTY + "position");
+        }
+        this._htmlTree.moveNode(node, targetNode, position);
+        return this._element;
+      }
+      moveUp() {
+        this._htmlTree.moveUp();
+        return this._element;
+      }
+      openNode(node, param1, param2) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        this._htmlTree.openNode(node, param1, param2);
+        return this._element;
+      }
+      prependNode(newNodeInfo, parentNodeParam) {
+        const parentNode = parentNodeParam ?? this._htmlTree.tree;
+        return this._htmlTree.prependNode(newNodeInfo, parentNode);
+      }
+      refresh() {
+        this._htmlTree.refresh();
+        return this._element;
+      }
+      reload(onFinished) {
+        this._htmlTree.loadDataFromUrl(undefined, undefined, onFinished);
+        return this._element;
+      }
+      removeFromSelection(node) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        this._htmlTree.removeFromSelection(node);
+        return this._element;
+      }
+      removeNode(node) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        if (!node.parent) {
+          throw Error("Node has no parent");
+        }
+        this._htmlTree.removeNode(node);
+        return this._element;
+      }
+      scrollToNode(node) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        this._htmlTree.scrollToNode(node);
+        return this._element;
+      }
+      selectNode(node, optionsParam) {
+        this._htmlTree.selectNode(node, optionsParam);
+        return this._element;
+      }
+      setOption(option, value) {
+        this._htmlTree.setOption(option, value);
+        return this._element;
+      }
+      setState(state) {
+        if (state) {
+          this._htmlTree.setState(state);
+        }
+        return this._element;
+      }
+      toggle(node, slideParam = null) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        this._htmlTree.toggle(node, slideParam);
+        return this._element;
+      }
+      toJson() {
+        return this._htmlTree.toJson();
+      }
+      updateNode(node, data) {
+        if (!node) {
+          throw Error(NODE_PARAM_IS_EMPTY);
+        }
+        if (!data) {
+          return this._element;
+        }
+        this._htmlTree.updateNode(node, data);
+        return this._element;
+      }
+      _transformInputOptions() {
+        function convertToIconElement(jqtreeIconElement) {
+          if (jqtreeIconElement instanceof jQuery) {
+            return jqtreeIconElement.get(0);
+          } else {
+            return jqtreeIconElement;
+          }
+        }
+        const closedIcon = convertToIconElement(this._inputOptions.closedIcon);
+        const openedIcon = convertToIconElement(this._inputOptions.openedIcon);
+        let onCreateLi = undefined;
+        const jqTreeOnCreateLi = this._inputOptions.onCreateLi;
+        if (jqTreeOnCreateLi) {
+          onCreateLi = (node, el, isSelected) => {
+            jqTreeOnCreateLi(node, jQuery(el), isSelected);
+          };
+        }
+        let onIsMoveHandle = undefined;
+        const jqTreeOnIsMoveHandle = this._inputOptions.onIsMoveHandle;
+        if (jqTreeOnIsMoveHandle) {
+          onIsMoveHandle = el => jqTreeOnIsMoveHandle(jQuery(el));
+        }
+        let onLoading = undefined;
+        const jqTreeOnLoading = this._inputOptions.onLoading;
+        if (jqTreeOnLoading) {
+          onLoading = (isLoading, node, element) => {
+            jqTreeOnLoading(isLoading, node, jQuery(element));
+          };
+        }
+        return {
+          ...this._inputOptions,
+          closedIcon,
+          onCreateLi,
+          onIsMoveHandle,
+          onLoading,
+          openedIcon
+        };
+      }
     }
     const register = () => {
       const getWidgetData = (el, dataKey) => {

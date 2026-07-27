@@ -286,11 +286,6 @@ export class JqTreeWidget {
         return this._element;
     }
 
-    public refreshHitAreas(): JQuery {
-        this._htmlTree.refreshHitAreas();
-        return this._element;
-    }
-
     public reload(onFinished?: HandleFinishedLoading): JQuery {
         this._htmlTree.loadDataFromUrl(undefined, undefined, onFinished);
         return this._element;
@@ -378,6 +373,7 @@ export class JqTreeWidget {
         function convertToIconElement(jqtreeIconElement: JQTreeIconElement | undefined) {
             if (jqtreeIconElement instanceof jQuery) {
                 return (jqtreeIconElement as JQuery).get(0);
+
             } else {
                 return jqtreeIconElement as IconElement;
             }
