@@ -37,4 +37,4 @@ export type SelectNode = (node: Node) => void;
 export type TriggerEvent = (
     eventName: string,
     values?: Record<string, unknown>,
-) => JQuery.Event;
+) => boolean;

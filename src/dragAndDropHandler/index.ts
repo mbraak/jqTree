@@ -345,7 +345,7 @@ export class DragAndDropHandler {
                 }
             };
 
-            const event = this._triggerEvent("tree.move", {
+            if (this._triggerEvent("tree.move", {
                 move_info: {
                     do_move: doMove,
                     moved_node: movedNode,
@@ -354,9 +354,7 @@ export class DragAndDropHandler {
                     previous_parent: previousParent,
                     target_node: targetNode,
                 },
-            });
-
-            if (!event.isDefaultPrevented()) {
+            })) {
                 doMove();
             }
         }
