@@ -70,15 +70,40 @@ test.describe("without dragAndDrop", () => {
     });
 
     test("displays a tree", async ({ page }) => {
-        const treeItem1 = page.getByRole("treeitem", { name: "Saurischia" });
-        const treeItem2 = page.getByRole("treeitem", { name: "Ornithischians" });
-        const treeItem3 = page.getByRole("treeitem", { name: "Coelophysoids" });
+        const structure = await getTreeStructure(page);
 
-        await expect(treeItem1).toBeVisible();
-        await expect(treeItem2).toBeVisible();
-
-        // The parent of this tree item is closed.
-        await expect(treeItem3).toBeHidden();
+        expect(structure).toEqual([
+            expect.objectContaining({
+                children: [
+                    expect.objectContaining({ name: "Herrerasaurians" }),
+                    expect.objectContaining({ name: "Theropods" }),
+                    expect.objectContaining({ name: "Sauropodomorphs" }),
+                ],
+                name: "Saurischia",
+                open: true,
+            }),
+            expect.objectContaining({
+                children: [
+                    expect.objectContaining({
+                        name: "Heterodontosaurids",
+                    }),
+                    expect.objectContaining({
+                        name: "Thyreophorans",
+                        open: false,
+                    }),
+                    expect.objectContaining({
+                        name: "Ornithopods",
+                        open: false,
+                    }),
+                    expect.objectContaining({
+                        name: "Pachycephalosaurians",
+                    }),
+                    expect.objectContaining({ name: "Ceratopsians" }),
+                ],
+                name: "Ornithischians",
+                open: true,
+            }),
+        ]);
 
         const screenshot = await page.screenshot();
         expect(screenshot).toMatchSnapshot();
