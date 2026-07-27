@@ -3353,11 +3353,11 @@ var jqtree = (function (exports) {
         this.tree.loadFromData(data);
         const mustLoadOnDemand = this._setInitialState();
         this._refreshElements(null);
-        if (!mustLoadOnDemand) {
-          doInit();
-        } else {
+        if (mustLoadOnDemand) {
           // Load data on demand and then init the tree
           this._setInitialStateOnDemand(doInit);
+        } else {
+          doInit();
         }
       }
 
@@ -3526,16 +3526,12 @@ var jqtree = (function (exports) {
       // Call cb_finished when done
       _setInitialStateOnDemand(cbFinished) {
         const restoreState = () => {
-          if (!this._options.saveState) {
+          const state = this._saveStateHandler.getStateFromStorage();
+          if (!state) {
             return false;
           } else {
-            const state = this._saveStateHandler.getStateFromStorage();
-            if (!state) {
-              return false;
-            } else {
-              this._saveStateHandler.setInitialStateOnDemand(state, cbFinished);
-              return true;
-            }
+            this._saveStateHandler.setInitialStateOnDemand(state, cbFinished);
+            return true;
           }
         };
         const autoOpenNodes = () => {
