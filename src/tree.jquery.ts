@@ -990,11 +990,11 @@ export class JqTreeWidget {
 
         this._refreshElements(null);
 
-        if (!mustLoadOnDemand) {
-            doInit();
-        } else {
+        if (mustLoadOnDemand) {
             // Load data on demand and then init the tree
             this._setInitialStateOnDemand(doInit);
+        } else {
+            doInit();
         }
     }
 
@@ -1213,21 +1213,17 @@ export class JqTreeWidget {
     // Call cb_finished when done
     private _setInitialStateOnDemand(cbFinished: () => void): void {
         const restoreState = (): boolean => {
-            if (!this._options.saveState) {
+            const state = this._saveStateHandler.getStateFromStorage();
+
+            if (!state) {
                 return false;
             } else {
-                const state = this._saveStateHandler.getStateFromStorage();
+                this._saveStateHandler.setInitialStateOnDemand(
+                    state,
+                    cbFinished,
+                );
 
-                if (!state) {
-                    return false;
-                } else {
-                    this._saveStateHandler.setInitialStateOnDemand(
-                        state,
-                        cbFinished,
-                    );
-
-                    return true;
-                }
+                return true;
             }
         };
 
