@@ -12,7 +12,7 @@
     "types": "./src/tree.jquery.d.ts",
     "repository": {
         "type": "git",
-        "url": "https://github.com/mbraak/jqtree"
+        "url": "git+https://github.com/mbraak/jqtree.git"
     },
     "scripts": {
         "ci": "pnpm lint && pnpm tsc && pnpm test",
