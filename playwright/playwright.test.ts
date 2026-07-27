@@ -4,14 +4,10 @@ import { expect, test } from "@playwright/test";
 
 import { initCoverage, saveCoverage } from "./coverage";
 import {
-    boundingBox,
     dragAndDrop,
-    findNodeElement,
     getNodeRect,
-    getSelectedNodeName,
     getTreeStructure,
     moveMouseToNode,
-    selectNode,
     sleep,
 } from "./testUtils";
 
@@ -74,21 +70,25 @@ test.describe("without dragAndDrop", () => {
     });
 
     test("displays a tree", async ({ page }) => {
-        await expect(page.locator("body")).toHaveText(/.*Saurischia.*/);
-        await expect(page.locator("body")).toHaveText(/.*Ornithischians.*/);
-        await expect(page.locator("body")).toHaveText(/.*Coelophysoids.*/);
+        const treeItem1 = page.getByRole("treeitem", { name: "Saurischia" });
+        const treeItem2 = page.getByRole("treeitem", { name: "Ornithischians" });
+        const treeItem3 = page.getByRole("treeitem", { name: "Coelophysoids" });
+
+        await expect(treeItem1).toBeVisible();
+        await expect(treeItem2).toBeVisible();
+
+        // The parent of this tree item is closed.
+        await expect(treeItem3).toBeHidden();
 
         const screenshot = await page.screenshot();
         expect(screenshot).toMatchSnapshot();
     });
 
     test("selects a node", async ({ page }) => {
-        await expect(page.locator("body")).toHaveText(/.*Saurischia.*/);
+        const treeItem = page.getByRole("treeitem", { name: "Saurischia" });
+        await treeItem.click();
 
-        const saurischia = await findNodeElement(page, "Saurischia");
-        await selectNode(saurischia);
-
-        expect(await getSelectedNodeName(page)).toBe("Saurischia");
+        await expect(treeItem).toHaveAttribute("aria-selected", "true");
 
         const screenshot = await page.screenshot();
         expect(screenshot).toMatchSnapshot();
@@ -588,7 +588,12 @@ test.describe("autoscroll when the container is scrollable horizontally", () => 
         await page.mouse.down();
         await sleep(page, 200);
 
-        const containerBox = await boundingBox(container);
+        const containerBox = await container.boundingBox();
+
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (!containerBox) {
+            throw new Error('Could not determine bounding box for container');
+        }
 
         await page.mouse.move(
             containerBox.x + containerBox.width,
@@ -607,7 +612,12 @@ test.describe("autoscroll when the container is scrollable horizontally", () => 
         await sleep(page, 200);
 
         const container = page.locator("#container");
-        const containerBox = await boundingBox(container);
+        const containerBox = await container.boundingBox();
+
+        // eslint-disable-next-line playwright/no-conditional-in-test
+        if (!containerBox) {
+            throw new Error('Could not determine bounding box for container');
+        }
 
         await page.mouse.move(
             containerBox.x + containerBox.width,
