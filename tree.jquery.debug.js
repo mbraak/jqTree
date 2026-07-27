@@ -1,5 +1,5 @@
 /*
-JqTree 1.8.11
+JqTree 1.9.0
 
 Copyright 2026 Marco Braak
 
@@ -2732,7 +2732,7 @@ var jqtree = (function (exports) {
       }
     }
 
-    const version = "1.8.11";
+    const version = "1.9.0";
 
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
