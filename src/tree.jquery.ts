@@ -576,7 +576,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const loadData = this.loadData.bind(this);
         const openNode = this._openNodeInternal.bind(this);
         const refreshElements = this._refreshElements.bind(this);
-        const refreshHitAreas = this._dndHandler.refresh.bind(this._dndHandler);
         const selectNode = this.selectNode.bind(this);
         const treeElement = this._htmlElement;
         const triggerEvent = this._triggerEvent.bind(this);
@@ -594,6 +593,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const removeFromSelection =
             selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
         const getMouseDelay = () => this.options.startDndDelay ?? 0;
+
+        const refreshHitAreas = () => {
+            dndHandler.refresh();
+        }
 
         const dataLoader = new DataLoader({
             dataFilter,
