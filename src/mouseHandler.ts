@@ -163,12 +163,10 @@ class MouseHandler {
                 break;
 
             case "label": {
-                const event = this._triggerEvent("tree.click", {
+                if (this._triggerEvent("tree.click", {
                     click_event: e,
                     node: clickTarget.node,
-                });
-
-                if (!event.isDefaultPrevented()) {
+                })) {
                     this._onClickTitle(clickTarget.node);
                 }
                 break;
