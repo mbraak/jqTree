@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### Development version
+
+- Issue #1000. Add isDragging to type definition.
+
 #### 1.9.0 (july 27 2026)
 
 - Issue #985. Use CSS animations instead of jQuery animations.

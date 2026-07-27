@@ -79,6 +79,7 @@ interface IJQTreePlugin {
     (behavior: "getStateFromStorage"): INode | null;
     (behavior: "getTree"): INode;
     (behavior: "getVersion"): string;
+    (behavior: "isDragging"): boolean;
     (behavior: "isNodeSelected", node: INode): boolean;
     (behavior: "loadData", data: NodeData[], parentNode?: INode): JQuery;
     (
