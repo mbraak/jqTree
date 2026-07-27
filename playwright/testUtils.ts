@@ -1,4 +1,4 @@
-import type { ElementHandle, Locator, Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 import type { TreeStructure } from "../test/support/treeStructure";
 
@@ -11,59 +11,6 @@ interface BoundingBox {
 
 export const sleep = async (page: Page, timeout: number) => {
     await page.waitForTimeout(timeout); // eslint-disable-line playwright/no-wait-for-timeout
-};
-
-export const locateTitle = (page: Page, title: string) =>
-    page.locator(".jqtree-title", {
-        hasText: title,
-    });
-
-export const findNodeElement = async (page: Page, title: string) => {
-    const titleElement = await locateTitle(page, title).elementHandle();
-
-    const nodeElement = await titleElement.evaluateHandle((el) => {
-        const li = el.closest("li");
-
-        if (!li) {
-            throw Error("Node element not found");
-        }
-
-        return li;
-    });
-
-    return nodeElement;
-};
-
-export const selectNode = async (nodeElement: ElementHandle) => {
-    const titleHandle = await nodeElement.$(".jqtree-title");
-
-    if (!titleHandle) {
-        throw new Error("Could not select: title element not found");
-    }
-
-    await titleHandle.click();
-};
-
-export const boundingBox = async (locator: Locator) => {
-    const result = await locator.boundingBox();
-
-    if (!result) {
-        throw new Error("Empty boundingBox");
-    }
-
-    return result;
-};
-
-const getRect = async (
-    elementHandle: ElementHandle<HTMLElement>,
-): Promise<BoundingBox> => {
-    const boundingBox = await elementHandle.boundingBox();
-
-    if (!boundingBox) {
-        throw new Error("No bounding box");
-    }
-
-    return boundingBox;
 };
 
 export const getTreeStructure = async (page: Page) => {
@@ -116,10 +63,14 @@ export const getNodeRect = async (
     page: Page,
     title: string,
 ): Promise<BoundingBox> => {
-    const titleElement = await locateTitle(page, title).elementHandle();
+    const treeItem = page.getByRole("treeitem", { name: title });
+    const boundingBox = await treeItem.boundingBox();
 
-    const rect = await getRect(titleElement as ElementHandle<HTMLElement>);
-    return rect;
+    if (!boundingBox) {
+        throw new Error(`Could not determine bounding box for tree element ${title}`)
+    }
+
+    return boundingBox;
 };
 
 export const moveMouseToNode = async (page: Page, title: string) => {
@@ -140,12 +91,4 @@ export const dragAndDrop = async (
 
     await moveMouseToNode(page, toTitle);
     await page.mouse.up();
-};
-
-export const getSelectedNodeName = async (page: Page) => {
-    return await page.evaluate(`
-            const $tree = jQuery("#tree1");
-            const node = $tree.tree('getSelectedNode');
-            node?.name;
-        `);
 };
