@@ -8,6 +8,7 @@ name: changelog
 - Issue #985. Use CSS animations instead of jQuery animations.
 - Issue #986. Reduce the bundle size by about 18% by mangling private properties.
 - Issue #953. Do not explicitly parse the server response as JSON. That is already handled by jquery.ajax.
+- Issue #995. Remove the undocumented replaceHitAareas function from the public API.
 
 #### 1.8.11 (january 24 2026)
 
