@@ -404,11 +404,6 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         return this._element;
     }
 
-    public refreshHitAreas(): JQuery {
-        this._dndHandler.refresh();
-        return this._element;
-    }
-
     public reload(onFinished: HandleFinishedLoading | null): JQuery {
         this._doLoadDataFromUrl(null, null, onFinished);
         return this._element;
@@ -581,7 +576,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const loadData = this.loadData.bind(this);
         const openNode = this._openNodeInternal.bind(this);
         const refreshElements = this._refreshElements.bind(this);
-        const refreshHitAreas = this.refreshHitAreas.bind(this);
+        const refreshHitAreas = this._dndHandler.refresh.bind(this._dndHandler);
         const selectNode = this.selectNode.bind(this);
         const treeElement = this._htmlElement;
         const triggerEvent = this._triggerEvent.bind(this);
