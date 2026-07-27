@@ -118,9 +118,7 @@ describe("handleClick", () => {
             }
         });
 
-        const triggerEvent = vi.fn<TriggerEvent>(() =>
-            jQuery.Event("tree.click"),
-        );
+        const triggerEvent = vi.fn<TriggerEvent>(() => true);
         const onClickTitle = vi.fn();
 
         createMouseHandler({ element, getNode, onClickTitle, triggerEvent });
@@ -135,7 +133,7 @@ describe("handleClick", () => {
         expect(onClickTitle).toHaveBeenCalledExactlyOnceWith(node);
     });
 
-    it("doesn't call onClickTitle when the default of tree.click is prevented", () => {
+    it("doesn't call onClickTitle when the tree.click event is cancelled", () => {
         const element = document.createElement("div");
 
         const label = document.createElement("div");
@@ -154,11 +152,7 @@ describe("handleClick", () => {
             }
         });
 
-        const triggerEvent = vi.fn<TriggerEvent>(() => {
-            const treeClickEvent = jQuery.Event("tree.click");
-            treeClickEvent.preventDefault();
-            return treeClickEvent;
-        });
+        const triggerEvent = vi.fn<TriggerEvent>(() => false);
         const onClickTitle = vi.fn();
 
         createMouseHandler({ element, getNode, onClickTitle, triggerEvent });
