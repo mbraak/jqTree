@@ -68,7 +68,7 @@ describe("keyboard support", () => {
     });
 
     describe("with key up", () => {
-        it("selects the next node when a node is selected", async () => {
+        it("selects the previous node when a node is selected", async () => {
             const $tree = $("#tree1");
             $tree.tree({
                 animationSpeed: 0,
