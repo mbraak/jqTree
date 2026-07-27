@@ -2961,10 +2961,6 @@ var jqtree = (function (exports) {
         this._refreshElements(null);
         return this._element;
       }
-      refreshHitAreas() {
-        this._dndHandler.refresh();
-        return this._element;
-      }
       reload(onFinished) {
         this._doLoadDataFromUrl(undefined, undefined, onFinished);
         return this._element;
@@ -3093,7 +3089,6 @@ var jqtree = (function (exports) {
         const loadData = this.loadData.bind(this);
         const openNode = this._openNodeInternal.bind(this);
         const refreshElements = this._refreshElements.bind(this);
-        const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
         const setNodeElement = this._setNodeElement.bind(this);
         const treeElement = this._htmlElement;
@@ -3106,6 +3101,9 @@ var jqtree = (function (exports) {
         const isNodeSelected = selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
         const removeFromSelection = selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
         const getMouseDelay = () => this._options.startDndDelay ?? 0;
+        const refreshHitAreas = () => {
+          dndHandler.refresh();
+        };
         const dataLoader = new DataLoader({
           dataFilter,
           loadData,

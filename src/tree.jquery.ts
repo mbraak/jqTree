@@ -425,11 +425,6 @@ export class JqTreeWidget {
         return this._element;
     }
 
-    public refreshHitAreas(): JQuery {
-        this._dndHandler.refresh();
-        return this._element;
-    }
-
     public reload(onFinished?: HandleFinishedLoading): JQuery {
         this._doLoadDataFromUrl(undefined, undefined, onFinished);
         return this._element;
@@ -602,7 +597,6 @@ export class JqTreeWidget {
         const loadData = this.loadData.bind(this);
         const openNode = this._openNodeInternal.bind(this);
         const refreshElements = this._refreshElements.bind(this);
-        const refreshHitAreas = this.refreshHitAreas.bind(this);
         const selectNode = this.selectNode.bind(this);
         const setNodeElement = this._setNodeElement.bind(this);
         const treeElement = this._htmlElement;
@@ -621,6 +615,10 @@ export class JqTreeWidget {
         const removeFromSelection =
             selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
         const getMouseDelay = () => this._options.startDndDelay ?? 0;
+
+        const refreshHitAreas = () => {
+            dndHandler.refresh();
+        }
 
         const dataLoader = new DataLoader({
             dataFilter,
