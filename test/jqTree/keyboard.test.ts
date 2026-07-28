@@ -355,5 +355,27 @@ describe("keyboard support", () => {
                 name: "node1",
             });
         });
+
+        it("does nothing when no element has the focus", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+            });
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1, { mustSetFocus: false });
+
+            expect(
+                screen.getByRole("treeitem", { name: "node1" }),
+            ).not.toHaveFocus();
+
+            await userEvent.keyboard("{ArrowDown}");
+
+            expect($tree.tree("getSelectedNode")).toMatchObject({
+                name: "node1",
+            });
+        });
     });
 });
