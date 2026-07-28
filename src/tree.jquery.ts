@@ -977,7 +977,9 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     // Does an element in the tree have the focus?
     private _isFocusOnTree(): boolean {
         const activeElement = document.activeElement;
+        console.log('activeElement', activeElement);
 
+        /* istanbul ignore if */
         if (!activeElement) {
             return false;
         }
