@@ -1,3 +1,4 @@
+import { screen } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 
 import "app/tree.jquery";
@@ -287,6 +288,71 @@ describe("keyboard support", () => {
 
             expect($tree.tree("getSelectedNode")).toMatchObject({
                 name: "child1",
+            });
+        });
+    });
+
+    describe("when the focus is not on the title of a node", () => {
+        // Add a link and an input to every node
+        const createTree = () => {
+            const $tree = $("#tree1");
+            $tree.tree({
+                animationSpeed: 0,
+                autoOpen: false,
+                data: exampleData,
+                onCreateLi: (node: INode, $li: JQuery) => {
+                    // eslint-disable-next-line testing-library/no-node-access
+                    const element = $li.get(0)?.querySelector(":scope > .jqtree-element");
+                    element?.insertAdjacentHTML(
+                        "beforeend",
+                        `<a href="#">link-${node.name}</a><input aria-label="input-${node.name}">`,
+                    );
+                },
+            });
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1);
+
+            return $tree;
+        };
+
+        it("handles the key when the focus is on a link in a node", async () => {
+            const $tree = createTree();
+
+            screen.getByRole("link", { name: "link-node1" }).focus();
+
+            await userEvent.keyboard("{ArrowDown}");
+
+            expect($tree.tree("getSelectedNode")).toMatchObject({
+                name: "node2",
+            });
+        });
+
+        it("does nothing when the focus is on an input in a node", async () => {
+            const $tree = createTree();
+
+            screen.getByRole("textbox", { name: "input-node1" }).focus();
+
+            await userEvent.keyboard("{ArrowDown}");
+
+            expect($tree.tree("getSelectedNode")).toMatchObject({
+                name: "node1",
+            });
+        });
+
+        it("does nothing when the focus is outside the tree", async () => {
+            const $tree = createTree();
+
+            document.body.insertAdjacentHTML(
+                "beforeend",
+                '<span tabindex="0">outside the tree</span>',
+            );
+            screen.getByText("outside the tree").focus();
+
+            await userEvent.keyboard("{ArrowDown}");
+
+            expect($tree.tree("getSelectedNode")).toMatchObject({
+                name: "node1",
             });
         });
     });
