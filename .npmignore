@@ -6,6 +6,6 @@ docs
 playwright
 test
 .editorconfig
-.eslintrc
 .prettier
+eslint.config.mjs
 tsconfig.json
