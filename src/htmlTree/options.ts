@@ -1,5 +1,5 @@
-import type { AnimationSpeed } from "../animation";
-import type { Node } from "../node";
+import type { AnimationSpeed } from "./animation";
+import type { Node } from "./node";
 
 export type DataFilter = (data: unknown) => NodeData[];
 

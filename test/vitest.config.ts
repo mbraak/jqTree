@@ -4,7 +4,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      'app': path.resolve(__dirname, '../src')
+      'app': path.resolve(__dirname, '../src'),
+      'htmlTree': path.resolve(__dirname, '../src/htmlTree')
     },
   },
   test: {

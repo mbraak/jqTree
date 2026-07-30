@@ -4,11 +4,11 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
-import type { HtmlTreeOptions } from "app/htmlTree/options";
-import type { Node } from "app/node";
+import type { Node } from "htmlTree/node";
+import type { HtmlTreeOptions } from "htmlTree/options";
 
-import HtmlTree from "app/htmlTree";
-import __version__ from "app/version";
+import HtmlTree from "htmlTree";
+import __version__ from "htmlTree/version";
 
 import exampleData from "../support/exampleData";
 import { getTreeListElement } from "../support/queries";

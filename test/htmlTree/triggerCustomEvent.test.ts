@@ -1,4 +1,4 @@
-import triggerCustomEvent from "app/htmlTree/triggerCustomEvent";
+import triggerCustomEvent from "htmlTree/triggerCustomEvent";
 
 describe("triggerCustomEvent", () => {
     let element: HTMLElement;

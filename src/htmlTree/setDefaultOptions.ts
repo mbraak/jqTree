@@ -1,6 +1,6 @@
 import type { HtmlTreeOptions } from "./options";
 
-import { Node } from "../node";
+import { Node } from "./node";
 
 const defaults: HtmlTreeOptions = {
   animationSpeed: "fast",

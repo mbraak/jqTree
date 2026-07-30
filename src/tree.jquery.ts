@@ -1,9 +1,9 @@
-import type { HandleFinishedLoading } from "./dataLoader";
+import type { HandleFinishedLoading } from "./htmlTree/dataLoader";
+import type { OnFinishOpenNode } from "./htmlTree/methodTypes";
+import type { Node, Position } from "./htmlTree/node";
 import type { HtmlTreeOptions, IconElement, OnCreateLi, OnIsMoveHandle, OnLoading } from "./htmlTree/options";
-import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
+import type { SavedState } from "./htmlTree/saveStateHandler";
 import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
-import type { Node, Position } from "./node";
-import type { SavedState } from "./saveStateHandler";
 
 import HtmlTree from "./htmlTree";
 

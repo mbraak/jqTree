@@ -1,5 +1,5 @@
+import type { Node } from "./htmlTree/node";
 import type { HtmlTreeOptions, IconElement } from "./htmlTree/options";
-import type { Node } from "./node";
 
 export type JQTreeIconElement = IconElement | JQuery;
 

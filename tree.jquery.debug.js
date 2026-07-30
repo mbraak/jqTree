@@ -76,12 +76,11 @@ var jqtree = (function (exports) {
         }
       }
       _notifyLoading(isLoading, element, node) {
-        const $el = jQuery(element);
         if (this._onLoading) {
           this._onLoading(isLoading, node, element);
         }
         this._triggerEvent("tree.loading_data", {
-          $el,
+          element,
           isLoading,
           node: node ?? null
         });
@@ -903,6 +902,400 @@ var jqtree = (function (exports) {
       }
     }
 
+    class KeyHandler {
+      _closeNode;
+      _getSelectedNode;
+      _isFocusOnTree;
+      _keyboardSupport;
+      _openNode;
+      _originalSelectNode;
+      constructor({
+        closeNode,
+        getSelectedNode,
+        isFocusOnTree,
+        keyboardSupport,
+        openNode,
+        selectNode
+      }) {
+        this._closeNode = closeNode;
+        this._getSelectedNode = getSelectedNode;
+        this._isFocusOnTree = isFocusOnTree;
+        this._keyboardSupport = keyboardSupport;
+        this._openNode = openNode;
+        this._originalSelectNode = selectNode;
+        if (keyboardSupport) {
+          document.addEventListener("keydown", this._handleKeyDown);
+        }
+      }
+      deinit() {
+        if (this._keyboardSupport) {
+          document.removeEventListener("keydown", this._handleKeyDown);
+        }
+      }
+      moveDown(selectedNode) {
+        return this._selectNode(selectedNode.getNextVisibleNode());
+      }
+      moveUp(selectedNode) {
+        return this._selectNode(selectedNode.getPreviousVisibleNode());
+      }
+      _canHandleKeyboard() {
+        return this._keyboardSupport && this._isFocusOnTree();
+      }
+      _handleKeyDown = e => {
+        if (!this._canHandleKeyboard()) {
+          return;
+        }
+        let isKeyHandled = false;
+        const selectedNode = this._getSelectedNode();
+        if (selectedNode) {
+          switch (e.key) {
+            case "ArrowDown":
+              isKeyHandled = this.moveDown(selectedNode);
+              break;
+            case "ArrowLeft":
+              isKeyHandled = this._moveLeft(selectedNode);
+              break;
+            case "ArrowRight":
+              isKeyHandled = this._moveRight(selectedNode);
+              break;
+            case "ArrowUp":
+              isKeyHandled = this.moveUp(selectedNode);
+              break;
+          }
+        }
+        if (isKeyHandled) {
+          e.preventDefault();
+        }
+      };
+      _moveLeft(selectedNode) {
+        if (selectedNode.isFolder() && selectedNode.is_open) {
+          // Left on an open node closes the node
+          this._closeNode(selectedNode);
+          return true;
+        } else {
+          // Left on a closed or end node moves focus to the node's parent
+          return this._selectNode(selectedNode.getParent());
+        }
+      }
+      _moveRight(selectedNode) {
+        if (!selectedNode.isFolder()) {
+          return false;
+        } else {
+          // folder node
+          if (selectedNode.is_open) {
+            // Right moves to the first child of an open node
+            return this._selectNode(selectedNode.getNextVisibleNode());
+          } else {
+            // Right expands a closed node
+            this._openNode(selectedNode);
+            return true;
+          }
+        }
+      }
+
+      /* Select the node.
+       * Don't do anything if the node is null.
+       * Result: a different node was selected.
+       */
+      _selectNode(node) {
+        if (!node) {
+          return false;
+        } else {
+          this._originalSelectNode(node);
+          return true;
+        }
+      }
+    }
+
+    const getPositionInfoFromMouseEvent = e => ({
+      originalEvent: e,
+      pageX: e.pageX,
+      pageY: e.pageY,
+      target: e.target
+    });
+    const getPositionInfoFromTouch = (touch, e) => ({
+      originalEvent: e,
+      pageX: touch.pageX,
+      pageY: touch.pageY,
+      target: touch.target
+    });
+
+    class MouseHandler {
+      _element;
+      _getMouseDelay;
+      _getNode;
+      _isMouseDelayMet;
+      _isMouseStarted;
+      _mouseDelayTimer;
+      _mouseDownInfo;
+      _onClickButton;
+      _onClickTitle;
+      _onMouseCapture;
+      _onMouseDrag;
+      _onMouseStart;
+      _onMouseStop;
+      _triggerEvent;
+      _useContextMenu;
+      constructor({
+        element,
+        getMouseDelay,
+        getNode,
+        onClickButton,
+        onClickTitle,
+        onMouseCapture,
+        onMouseDrag,
+        onMouseStart,
+        onMouseStop,
+        triggerEvent,
+        useContextMenu
+      }) {
+        this._element = element;
+        this._getMouseDelay = getMouseDelay;
+        this._getNode = getNode;
+        this._onClickButton = onClickButton;
+        this._onClickTitle = onClickTitle;
+        this._onMouseCapture = onMouseCapture;
+        this._onMouseDrag = onMouseDrag;
+        this._onMouseStart = onMouseStart;
+        this._onMouseStop = onMouseStop;
+        this._triggerEvent = triggerEvent;
+        this._useContextMenu = useContextMenu;
+        element.addEventListener("click", this._handleClick);
+        element.addEventListener("dblclick", this._handleDblclick);
+        element.addEventListener("mousedown", this._mouseDown, {
+          passive: false
+        });
+        element.addEventListener("touchstart", this._touchStart, {
+          passive: false
+        });
+        if (useContextMenu) {
+          element.addEventListener("contextmenu", this._handleContextmenu);
+        }
+        this._isMouseStarted = false;
+        this._mouseDelayTimer = null;
+        this._isMouseDelayMet = false;
+        this._mouseDownInfo = null;
+      }
+      deinit() {
+        this._element.removeEventListener("click", this._handleClick);
+        this._element.removeEventListener("dblclick", this._handleDblclick);
+        if (this._useContextMenu) {
+          this._element.removeEventListener("contextmenu", this._handleContextmenu);
+        }
+        this._element.removeEventListener("mousedown", this._mouseDown);
+        this._element.removeEventListener("touchstart", this._touchStart);
+        this._removeMouseMoveEventListeners();
+      }
+      _getClickTarget(element) {
+        const button = element.closest(".jqtree-toggler");
+        if (button) {
+          const node = this._getNode(button);
+          if (node) {
+            return {
+              node,
+              type: "button"
+            };
+          }
+        } else {
+          const jqTreeElement = element.closest(".jqtree-element");
+          if (jqTreeElement) {
+            const node = this._getNode(jqTreeElement);
+            if (node) {
+              return {
+                node,
+                type: "label"
+              };
+            }
+          }
+        }
+        return null;
+      }
+      _handleClick = e => {
+        if (!e.target) {
+          return;
+        }
+        const clickTarget = this._getClickTarget(e.target);
+        if (!clickTarget) {
+          return;
+        }
+        switch (clickTarget.type) {
+          case "button":
+            this._onClickButton(clickTarget.node);
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+          case "label":
+            {
+              if (this._triggerEvent("tree.click", {
+                click_event: e,
+                node: clickTarget.node
+              })) {
+                this._onClickTitle(clickTarget.node);
+              }
+              break;
+            }
+        }
+      };
+      _handleContextmenu = e => {
+        if (!e.target) {
+          return;
+        }
+        const div = e.target.closest("ul.jqtree-tree .jqtree-element");
+        if (div) {
+          const node = this._getNode(div);
+          if (node) {
+            e.preventDefault();
+            e.stopPropagation();
+            this._triggerEvent("tree.contextmenu", {
+              click_event: e,
+              node
+            });
+            return false;
+          }
+        }
+        return null;
+      };
+      _handleDblclick = e => {
+        if (!e.target) {
+          return;
+        }
+        const clickTarget = this._getClickTarget(e.target);
+        if (clickTarget?.type === "label") {
+          this._triggerEvent("tree.dblclick", {
+            click_event: e,
+            node: clickTarget.node
+          });
+        }
+      };
+      _handleMouseDown(positionInfo) {
+        // We may have missed mouseup (out of window)
+        if (this._isMouseStarted) {
+          this._handleMouseUp(positionInfo);
+        }
+        this._mouseDownInfo = positionInfo;
+        if (!this._onMouseCapture(positionInfo)) {
+          return false;
+        }
+        this._handleStartMouse();
+        return true;
+      }
+      _handleMouseMove(e, positionInfo) {
+        if (this._isMouseStarted) {
+          this._onMouseDrag(positionInfo);
+          if (e.cancelable) {
+            e.preventDefault();
+          }
+          return;
+        }
+        if (!this._isMouseDelayMet) {
+          return;
+        }
+        if (this._mouseDownInfo) {
+          this._isMouseStarted = this._onMouseStart(this._mouseDownInfo);
+        }
+        if (this._isMouseStarted) {
+          this._onMouseDrag(positionInfo);
+          if (e.cancelable) {
+            e.preventDefault();
+          }
+        } else {
+          this._handleMouseUp(positionInfo);
+        }
+      }
+      _handleMouseUp(positionInfo) {
+        this._removeMouseMoveEventListeners();
+        this._isMouseDelayMet = false;
+        this._mouseDownInfo = null;
+        if (this._isMouseStarted) {
+          this._isMouseStarted = false;
+          this._onMouseStop(positionInfo);
+        }
+      }
+      _handleStartMouse() {
+        document.addEventListener("mousemove", this._mouseMove, {
+          passive: false
+        });
+        document.addEventListener("touchmove", this._touchMove, {
+          passive: false
+        });
+        document.addEventListener("mouseup", this._mouseUp, {
+          passive: false
+        });
+        document.addEventListener("touchend", this._touchEnd, {
+          passive: false
+        });
+        const mouseDelay = this._getMouseDelay();
+        if (mouseDelay) {
+          this._startMouseDelayTimer(mouseDelay);
+        } else {
+          this._isMouseDelayMet = true;
+        }
+      }
+      _mouseDown = e => {
+        // Left mouse button?
+        if (e.button !== 0) {
+          return;
+        }
+        const result = this._handleMouseDown(getPositionInfoFromMouseEvent(e));
+        if (result && e.cancelable) {
+          e.preventDefault();
+        }
+      };
+      _mouseMove = e => {
+        this._handleMouseMove(e, getPositionInfoFromMouseEvent(e));
+      };
+      _mouseUp = e => {
+        this._handleMouseUp(getPositionInfoFromMouseEvent(e));
+      };
+      _removeMouseMoveEventListeners() {
+        document.removeEventListener("mousemove", this._mouseMove);
+        document.removeEventListener("touchmove", this._touchMove);
+        document.removeEventListener("mouseup", this._mouseUp);
+        document.removeEventListener("touchend", this._touchEnd);
+      }
+      _startMouseDelayTimer(mouseDelay) {
+        if (this._mouseDelayTimer) {
+          clearTimeout(this._mouseDelayTimer);
+        }
+        this._mouseDelayTimer = window.setTimeout(() => {
+          if (this._mouseDownInfo) {
+            this._isMouseDelayMet = true;
+          }
+        }, mouseDelay);
+        this._isMouseDelayMet = false;
+      }
+      _touchEnd = e => {
+        if (e.touches.length > 1) {
+          return;
+        }
+        const touch = e.touches[0];
+        if (!touch) {
+          return;
+        }
+        this._handleMouseUp(getPositionInfoFromTouch(touch, e));
+      };
+      _touchMove = e => {
+        if (e.touches.length > 1) {
+          return;
+        }
+        const touch = e.touches[0];
+        if (!touch) {
+          return;
+        }
+        this._handleMouseMove(e, getPositionInfoFromTouch(touch, e));
+      };
+      _touchStart = e => {
+        if (e.touches.length > 1) {
+          return;
+        }
+        const touch = e.touches[0];
+        if (!touch) {
+          return;
+        }
+        this._handleMouseDown(getPositionInfoFromTouch(touch, e));
+      };
+    }
+
     const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
 
     class Node {
@@ -1422,488 +1815,6 @@ var jqtree = (function (exports) {
         this.tree = parent.tree;
         this.tree?.addNodeToIndex(this);
       }
-    }
-
-    const defaults = {
-      animationSpeed: "fast",
-      autoEscape: true,
-      autoOpen: false,
-      // true / false / int (open n levels starting at 0)
-      buttonLeft: true,
-      // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
-      // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-      closedIcon: undefined,
-      data: undefined,
-      dataFilter: undefined,
-      dataUrl: undefined,
-      dragAndDrop: false,
-      keyboardSupport: true,
-      nodeClass: Node,
-      onCanMove: undefined,
-      // Can this node be moved?
-      onCanMoveTo: undefined,
-      // Can this node be moved to this position? function(moved_node, target_node, position)
-      onCanSelectNode: undefined,
-      onCreateLi: undefined,
-      onDragMove: undefined,
-      onDragStop: undefined,
-      onGetStateFromStorage: undefined,
-      onIsMoveHandle: undefined,
-      onLoadFailed: undefined,
-      onLoading: undefined,
-      onSetStateFromStorage: undefined,
-      openedIcon: undefined,
-      openFolderDelay: 500,
-      // The delay for opening a folder during drag and drop; the value is in milliseconds
-      // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-      // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-      rtl: undefined,
-      // right-to-left support; true / false (default)
-      saveState: false,
-      // true / false / string (cookie name)
-      selectable: true,
-      showEmptyFolder: false,
-      slide: true,
-      // must display slide animation?
-      startDndDelay: 300,
-      // The delay for starting dnd (in milliseconds)
-      tabIndex: 0,
-      useContextMenu: true
-    };
-    const setDefaultOptions = (htmlElement, inputOptions) => {
-      const options = {
-        ...defaults,
-        ...inputOptions
-      };
-      options.dataUrl ??= htmlElement.dataset.url;
-      options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
-      options.closedIcon ??= getDefaultClosedIcon(options);
-      options.openedIcon ??= "&#x25bc;";
-      return options;
-    };
-    const getDefaultClosedIcon = options => {
-      if (options.rtl) {
-        // triangle to the left
-        return "&#x25c0;";
-      } else {
-        // triangle to the right
-        return "&#x25ba;";
-      }
-    };
-    const getRtlOptionFromHTMLElement = htmlElement => {
-      const dataRtl = htmlElement.dataset.rtl;
-      if (dataRtl == "") {
-        return true;
-      } else if (dataRtl === "false") {
-        return false;
-      } else {
-        return Boolean(dataRtl);
-      }
-    };
-
-    // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
-    const triggerCustomEvent = (element, eventName, values) => {
-      const event = new CustomEvent(eventName, {
-        bubbles: true,
-        cancelable: true,
-        detail: values
-      });
-      element.dispatchEvent(event);
-      return !event.defaultPrevented;
-    };
-
-    class KeyHandler {
-      _closeNode;
-      _getSelectedNode;
-      _isFocusOnTree;
-      _keyboardSupport;
-      _openNode;
-      _originalSelectNode;
-      constructor({
-        closeNode,
-        getSelectedNode,
-        isFocusOnTree,
-        keyboardSupport,
-        openNode,
-        selectNode
-      }) {
-        this._closeNode = closeNode;
-        this._getSelectedNode = getSelectedNode;
-        this._isFocusOnTree = isFocusOnTree;
-        this._keyboardSupport = keyboardSupport;
-        this._openNode = openNode;
-        this._originalSelectNode = selectNode;
-        if (keyboardSupport) {
-          document.addEventListener("keydown", this._handleKeyDown);
-        }
-      }
-      deinit() {
-        if (this._keyboardSupport) {
-          document.removeEventListener("keydown", this._handleKeyDown);
-        }
-      }
-      moveDown(selectedNode) {
-        return this._selectNode(selectedNode.getNextVisibleNode());
-      }
-      moveUp(selectedNode) {
-        return this._selectNode(selectedNode.getPreviousVisibleNode());
-      }
-      _canHandleKeyboard() {
-        return this._keyboardSupport && this._isFocusOnTree();
-      }
-      _handleKeyDown = e => {
-        if (!this._canHandleKeyboard()) {
-          return;
-        }
-        let isKeyHandled = false;
-        const selectedNode = this._getSelectedNode();
-        if (selectedNode) {
-          switch (e.key) {
-            case "ArrowDown":
-              isKeyHandled = this.moveDown(selectedNode);
-              break;
-            case "ArrowLeft":
-              isKeyHandled = this._moveLeft(selectedNode);
-              break;
-            case "ArrowRight":
-              isKeyHandled = this._moveRight(selectedNode);
-              break;
-            case "ArrowUp":
-              isKeyHandled = this.moveUp(selectedNode);
-              break;
-          }
-        }
-        if (isKeyHandled) {
-          e.preventDefault();
-        }
-      };
-      _moveLeft(selectedNode) {
-        if (selectedNode.isFolder() && selectedNode.is_open) {
-          // Left on an open node closes the node
-          this._closeNode(selectedNode);
-          return true;
-        } else {
-          // Left on a closed or end node moves focus to the node's parent
-          return this._selectNode(selectedNode.getParent());
-        }
-      }
-      _moveRight(selectedNode) {
-        if (!selectedNode.isFolder()) {
-          return false;
-        } else {
-          // folder node
-          if (selectedNode.is_open) {
-            // Right moves to the first child of an open node
-            return this._selectNode(selectedNode.getNextVisibleNode());
-          } else {
-            // Right expands a closed node
-            this._openNode(selectedNode);
-            return true;
-          }
-        }
-      }
-
-      /* Select the node.
-       * Don't do anything if the node is null.
-       * Result: a different node was selected.
-       */
-      _selectNode(node) {
-        if (!node) {
-          return false;
-        } else {
-          this._originalSelectNode(node);
-          return true;
-        }
-      }
-    }
-
-    const getPositionInfoFromMouseEvent = e => ({
-      originalEvent: e,
-      pageX: e.pageX,
-      pageY: e.pageY,
-      target: e.target
-    });
-    const getPositionInfoFromTouch = (touch, e) => ({
-      originalEvent: e,
-      pageX: touch.pageX,
-      pageY: touch.pageY,
-      target: touch.target
-    });
-
-    class MouseHandler {
-      _element;
-      _getMouseDelay;
-      _getNode;
-      _isMouseDelayMet;
-      _isMouseStarted;
-      _mouseDelayTimer;
-      _mouseDownInfo;
-      _onClickButton;
-      _onClickTitle;
-      _onMouseCapture;
-      _onMouseDrag;
-      _onMouseStart;
-      _onMouseStop;
-      _triggerEvent;
-      _useContextMenu;
-      constructor({
-        element,
-        getMouseDelay,
-        getNode,
-        onClickButton,
-        onClickTitle,
-        onMouseCapture,
-        onMouseDrag,
-        onMouseStart,
-        onMouseStop,
-        triggerEvent,
-        useContextMenu
-      }) {
-        this._element = element;
-        this._getMouseDelay = getMouseDelay;
-        this._getNode = getNode;
-        this._onClickButton = onClickButton;
-        this._onClickTitle = onClickTitle;
-        this._onMouseCapture = onMouseCapture;
-        this._onMouseDrag = onMouseDrag;
-        this._onMouseStart = onMouseStart;
-        this._onMouseStop = onMouseStop;
-        this._triggerEvent = triggerEvent;
-        this._useContextMenu = useContextMenu;
-        element.addEventListener("click", this._handleClick);
-        element.addEventListener("dblclick", this._handleDblclick);
-        element.addEventListener("mousedown", this._mouseDown, {
-          passive: false
-        });
-        element.addEventListener("touchstart", this._touchStart, {
-          passive: false
-        });
-        if (useContextMenu) {
-          element.addEventListener("contextmenu", this._handleContextmenu);
-        }
-        this._isMouseStarted = false;
-        this._mouseDelayTimer = null;
-        this._isMouseDelayMet = false;
-        this._mouseDownInfo = null;
-      }
-      deinit() {
-        this._element.removeEventListener("click", this._handleClick);
-        this._element.removeEventListener("dblclick", this._handleDblclick);
-        if (this._useContextMenu) {
-          this._element.removeEventListener("contextmenu", this._handleContextmenu);
-        }
-        this._element.removeEventListener("mousedown", this._mouseDown);
-        this._element.removeEventListener("touchstart", this._touchStart);
-        this._removeMouseMoveEventListeners();
-      }
-      _getClickTarget(element) {
-        const button = element.closest(".jqtree-toggler");
-        if (button) {
-          const node = this._getNode(button);
-          if (node) {
-            return {
-              node,
-              type: "button"
-            };
-          }
-        } else {
-          const jqTreeElement = element.closest(".jqtree-element");
-          if (jqTreeElement) {
-            const node = this._getNode(jqTreeElement);
-            if (node) {
-              return {
-                node,
-                type: "label"
-              };
-            }
-          }
-        }
-        return null;
-      }
-      _handleClick = e => {
-        if (!e.target) {
-          return;
-        }
-        const clickTarget = this._getClickTarget(e.target);
-        if (!clickTarget) {
-          return;
-        }
-        switch (clickTarget.type) {
-          case "button":
-            this._onClickButton(clickTarget.node);
-            e.preventDefault();
-            e.stopPropagation();
-            break;
-          case "label":
-            {
-              if (this._triggerEvent("tree.click", {
-                click_event: e,
-                node: clickTarget.node
-              })) {
-                this._onClickTitle(clickTarget.node);
-              }
-              break;
-            }
-        }
-      };
-      _handleContextmenu = e => {
-        if (!e.target) {
-          return;
-        }
-        const div = e.target.closest("ul.jqtree-tree .jqtree-element");
-        if (div) {
-          const node = this._getNode(div);
-          if (node) {
-            e.preventDefault();
-            e.stopPropagation();
-            this._triggerEvent("tree.contextmenu", {
-              click_event: e,
-              node
-            });
-            return false;
-          }
-        }
-        return null;
-      };
-      _handleDblclick = e => {
-        if (!e.target) {
-          return;
-        }
-        const clickTarget = this._getClickTarget(e.target);
-        if (clickTarget?.type === "label") {
-          this._triggerEvent("tree.dblclick", {
-            click_event: e,
-            node: clickTarget.node
-          });
-        }
-      };
-      _handleMouseDown(positionInfo) {
-        // We may have missed mouseup (out of window)
-        if (this._isMouseStarted) {
-          this._handleMouseUp(positionInfo);
-        }
-        this._mouseDownInfo = positionInfo;
-        if (!this._onMouseCapture(positionInfo)) {
-          return false;
-        }
-        this._handleStartMouse();
-        return true;
-      }
-      _handleMouseMove(e, positionInfo) {
-        if (this._isMouseStarted) {
-          this._onMouseDrag(positionInfo);
-          if (e.cancelable) {
-            e.preventDefault();
-          }
-          return;
-        }
-        if (!this._isMouseDelayMet) {
-          return;
-        }
-        if (this._mouseDownInfo) {
-          this._isMouseStarted = this._onMouseStart(this._mouseDownInfo);
-        }
-        if (this._isMouseStarted) {
-          this._onMouseDrag(positionInfo);
-          if (e.cancelable) {
-            e.preventDefault();
-          }
-        } else {
-          this._handleMouseUp(positionInfo);
-        }
-      }
-      _handleMouseUp(positionInfo) {
-        this._removeMouseMoveEventListeners();
-        this._isMouseDelayMet = false;
-        this._mouseDownInfo = null;
-        if (this._isMouseStarted) {
-          this._isMouseStarted = false;
-          this._onMouseStop(positionInfo);
-        }
-      }
-      _handleStartMouse() {
-        document.addEventListener("mousemove", this._mouseMove, {
-          passive: false
-        });
-        document.addEventListener("touchmove", this._touchMove, {
-          passive: false
-        });
-        document.addEventListener("mouseup", this._mouseUp, {
-          passive: false
-        });
-        document.addEventListener("touchend", this._touchEnd, {
-          passive: false
-        });
-        const mouseDelay = this._getMouseDelay();
-        if (mouseDelay) {
-          this._startMouseDelayTimer(mouseDelay);
-        } else {
-          this._isMouseDelayMet = true;
-        }
-      }
-      _mouseDown = e => {
-        // Left mouse button?
-        if (e.button !== 0) {
-          return;
-        }
-        const result = this._handleMouseDown(getPositionInfoFromMouseEvent(e));
-        if (result && e.cancelable) {
-          e.preventDefault();
-        }
-      };
-      _mouseMove = e => {
-        this._handleMouseMove(e, getPositionInfoFromMouseEvent(e));
-      };
-      _mouseUp = e => {
-        this._handleMouseUp(getPositionInfoFromMouseEvent(e));
-      };
-      _removeMouseMoveEventListeners() {
-        document.removeEventListener("mousemove", this._mouseMove);
-        document.removeEventListener("touchmove", this._touchMove);
-        document.removeEventListener("mouseup", this._mouseUp);
-        document.removeEventListener("touchend", this._touchEnd);
-      }
-      _startMouseDelayTimer(mouseDelay) {
-        if (this._mouseDelayTimer) {
-          clearTimeout(this._mouseDelayTimer);
-        }
-        this._mouseDelayTimer = window.setTimeout(() => {
-          if (this._mouseDownInfo) {
-            this._isMouseDelayMet = true;
-          }
-        }, mouseDelay);
-        this._isMouseDelayMet = false;
-      }
-      _touchEnd = e => {
-        if (e.touches.length > 1) {
-          return;
-        }
-        const touch = e.touches[0];
-        if (!touch) {
-          return;
-        }
-        this._handleMouseUp(getPositionInfoFromTouch(touch, e));
-      };
-      _touchMove = e => {
-        if (e.touches.length > 1) {
-          return;
-        }
-        const touch = e.touches[0];
-        if (!touch) {
-          return;
-        }
-        this._handleMouseMove(e, getPositionInfoFromTouch(touch, e));
-      };
-      _touchStart = e => {
-        if (e.touches.length > 1) {
-          return;
-        }
-        const touch = e.touches[0];
-        if (!touch) {
-          return;
-        }
-        this._handleMouseDown(getPositionInfoFromTouch(touch, e));
-      };
     }
 
     class BorderDropHint {
@@ -2755,6 +2666,94 @@ var jqtree = (function (exports) {
       }
     }
 
+    const defaults = {
+      animationSpeed: "fast",
+      autoEscape: true,
+      autoOpen: false,
+      // true / false / int (open n levels starting at 0)
+      buttonLeft: true,
+      // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
+      // http://www.fileformat.info/info/unicode/char/25ba/index.htm
+      closedIcon: undefined,
+      data: undefined,
+      dataFilter: undefined,
+      dataUrl: undefined,
+      dragAndDrop: false,
+      keyboardSupport: true,
+      nodeClass: Node,
+      onCanMove: undefined,
+      // Can this node be moved?
+      onCanMoveTo: undefined,
+      // Can this node be moved to this position? function(moved_node, target_node, position)
+      onCanSelectNode: undefined,
+      onCreateLi: undefined,
+      onDragMove: undefined,
+      onDragStop: undefined,
+      onGetStateFromStorage: undefined,
+      onIsMoveHandle: undefined,
+      onLoadFailed: undefined,
+      onLoading: undefined,
+      onSetStateFromStorage: undefined,
+      openedIcon: undefined,
+      openFolderDelay: 500,
+      // The delay for opening a folder during drag and drop; the value is in milliseconds
+      // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+      // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+      rtl: undefined,
+      // right-to-left support; true / false (default)
+      saveState: false,
+      // true / false / string (cookie name)
+      selectable: true,
+      showEmptyFolder: false,
+      slide: true,
+      // must display slide animation?
+      startDndDelay: 300,
+      // The delay for starting dnd (in milliseconds)
+      tabIndex: 0,
+      useContextMenu: true
+    };
+    const setDefaultOptions = (htmlElement, inputOptions) => {
+      const options = {
+        ...defaults,
+        ...inputOptions
+      };
+      options.dataUrl ??= htmlElement.dataset.url;
+      options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
+      options.closedIcon ??= getDefaultClosedIcon(options);
+      options.openedIcon ??= "&#x25bc;";
+      return options;
+    };
+    const getDefaultClosedIcon = options => {
+      if (options.rtl) {
+        // triangle to the left
+        return "&#x25c0;";
+      } else {
+        // triangle to the right
+        return "&#x25ba;";
+      }
+    };
+    const getRtlOptionFromHTMLElement = htmlElement => {
+      const dataRtl = htmlElement.dataset.rtl;
+      if (dataRtl == "") {
+        return true;
+      } else if (dataRtl === "false") {
+        return false;
+      } else {
+        return Boolean(dataRtl);
+      }
+    };
+
+    // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
+    const triggerCustomEvent = (element, eventName, values) => {
+      const event = new CustomEvent(eventName, {
+        bubbles: true,
+        cancelable: true,
+        detail: values
+      });
+      element.dispatchEvent(event);
+      return !event.defaultPrevented;
+    };
+
     const version = "1.9.0";
 
     class HtmlTree {
@@ -3212,12 +3211,6 @@ var jqtree = (function (exports) {
         this._scrollHandler = scrollHandler;
         this._selectNodeHandler = selectNodeHandler;
       }
-
-      // Is this HTML element part of the tree?
-      _containsElement(element) {
-        const node = this.getNode(element);
-        return node?.tree === this.tree;
-      }
       _createFolderElement(node) {
         const closedIconElement = this._renderer.closedIconElement;
         const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
@@ -3364,7 +3357,19 @@ var jqtree = (function (exports) {
       // Does an HTML element of the tree have the focus?
       _isFocusOnTree() {
         const activeElement = document.activeElement;
-        return activeElement?.tagName === "SPAN" && this._containsElement(activeElement);
+
+        /* istanbul ignore if */
+        if (!activeElement) {
+          return false;
+        }
+
+        // The keyboard must still work for input elements.
+        const tagName = activeElement.tagName;
+        if (tagName !== "A" && tagName !== "SPAN") {
+          return false;
+        }
+        const node = this.getNode(activeElement);
+        return node?.tree === this.tree;
       }
       _isSelectedNodeInSubtree(subtree) {
         const selectedNode = this.getSelectedNode();
@@ -3578,7 +3583,15 @@ var jqtree = (function (exports) {
 
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
-    const triggerJQueryEvent = (element, eventName, values) => {
+    const triggerJQueryEvent = (element, eventName, inputValues) => {
+      let values = inputValues;
+      if (inputValues?.element) {
+        values = {
+          ...values,
+          $el: jQuery(inputValues.element)
+        };
+        delete values.element;
+      }
       const event = jQuery.Event(eventName, values);
       jQuery(element).trigger(event);
       return !event.isDefaultPrevented();

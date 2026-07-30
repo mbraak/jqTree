@@ -1,5 +1,5 @@
-import setDefaultOptions from "app/htmlTree/setDefaultOptions";
-import { Node } from "app/node";
+import { Node } from "htmlTree/node";
+import setDefaultOptions from "htmlTree/setDefaultOptions";
 
 describe("setDefaultOptions", () => {
     describe("defaults", () => {

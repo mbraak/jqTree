@@ -1,8 +1,8 @@
 import { userEvent } from "@testing-library/user-event";
 
-import type { HtmlTreeOptions } from "app/htmlTree/options";
+import type { HtmlTreeOptions } from "htmlTree/options";
 
-import HtmlTree from "app/htmlTree";
+import HtmlTree from "htmlTree";
 
 import exampleData from "../support/exampleData";
 
