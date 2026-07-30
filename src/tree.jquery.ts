@@ -723,12 +723,6 @@ export class JqTreeWidget {
         this._selectNodeHandler = selectNodeHandler;
     }
 
-    private _containsElement(element: HTMLElement): boolean {
-        const node = this._getNode(element);
-
-        return node?.tree === this._tree;
-    }
-
     private _createFolderElement(node: Node) {
         const closedIconElement = this._renderer.closedIconElement;
         const getScrollLeft = this._scrollHandler.getScrollLeft.bind(
@@ -998,10 +992,23 @@ export class JqTreeWidget {
         }
     }
 
+    // Does an element in the tree have the focus?
     private _isFocusOnTree(): boolean {
         const activeElement = document.activeElement;
 
-        return activeElement?.tagName === "SPAN" && this._containsElement(activeElement as HTMLElement);
+        /* istanbul ignore if */
+        if (!activeElement) {
+            return false;
+        }
+
+        // The keyboard must still work for input elements.
+        const tagName = activeElement.tagName;
+        if (tagName !== "A" && tagName !== "SPAN") {
+            return false;
+        }
+
+        const node = this._getNode(activeElement as HTMLElement);
+        return node?.tree === this._tree;
     }
 
     private _isSelectedNodeInSubtree(subtree: Node): boolean {

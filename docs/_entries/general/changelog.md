@@ -6,6 +6,7 @@ name: changelog
 #### Development version
 
 - Issue #1000. Add isDragging to type definition.
+- Issue #1004. Fix keyboard support when the focused element is a link.
 
 #### 1.9.0 (july 27 2026)
 

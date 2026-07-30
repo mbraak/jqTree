@@ -3197,10 +3197,6 @@ var jqtree = (function (exports) {
         this._scrollHandler = scrollHandler;
         this._selectNodeHandler = selectNodeHandler;
       }
-      _containsElement(element) {
-        const node = this._getNode(element);
-        return node?.tree === this._tree;
-      }
       _createFolderElement(node) {
         const closedIconElement = this._renderer.closedIconElement;
         const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
@@ -3417,9 +3413,23 @@ var jqtree = (function (exports) {
           doInit();
         }
       }
+
+      // Does an element in the tree have the focus?
       _isFocusOnTree() {
         const activeElement = document.activeElement;
-        return activeElement?.tagName === "SPAN" && this._containsElement(activeElement);
+
+        /* istanbul ignore if */
+        if (!activeElement) {
+          return false;
+        }
+
+        // The keyboard must still work for input elements.
+        const tagName = activeElement.tagName;
+        if (tagName !== "A" && tagName !== "SPAN") {
+          return false;
+        }
+        const node = this._getNode(activeElement);
+        return node?.tree === this._tree;
       }
       _isSelectedNodeInSubtree(subtree) {
         const selectedNode = this.getSelectedNode();
