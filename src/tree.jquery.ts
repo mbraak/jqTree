@@ -373,7 +373,6 @@ export class JqTreeWidget {
         function convertToIconElement(jqtreeIconElement: JQTreeIconElement | undefined) {
             if (jqtreeIconElement instanceof jQuery) {
                 return (jqtreeIconElement as JQuery).get(0);
-
             } else {
                 return jqtreeIconElement as IconElement;
             }
