@@ -128,7 +128,7 @@ describe("loadFromUrl", () => {
                 1,
                 "tree.loading_data",
                 {
-                    $el: jQuery(treeElement),
+                    element: treeElement,
                     isLoading: true,
                     node: null
                 }
@@ -139,7 +139,7 @@ describe("loadFromUrl", () => {
                 2,
                 "tree.loading_data",
                 {
-                    $el: jQuery(treeElement),
+                    element: treeElement,
                     isLoading: false,
                     node: null
                 }

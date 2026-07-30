@@ -18,8 +18,15 @@ const PARAM_IS_EMPTY = "Parameter is empty: ";
 const triggerJQueryEvent = (
     element: HTMLElement,
     eventName: string,
-    values?: Record<string, unknown>,
+    inputValues?: Record<string, unknown>,
 ): boolean => {
+    let values: Record<string, unknown> | undefined = inputValues;
+
+    if (inputValues?.element) {
+        values = { ...values, $el: jQuery(inputValues.element) };
+        delete values.element;
+    }
+
     const event = jQuery.Event(eventName, values);
     jQuery(element).trigger(event);
     return !event.isDefaultPrevented();

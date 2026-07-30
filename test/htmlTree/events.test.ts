@@ -255,6 +255,7 @@ describe("events", () => {
         expect(onLoading).toHaveBeenNthCalledWith(
           1,
           expect.objectContaining({
+            element: htmlElement,
             isLoading: true,
             node: null,
           }),
@@ -265,6 +266,7 @@ describe("events", () => {
         expect(onLoading).toHaveBeenNthCalledWith(
           2,
           expect.objectContaining({
+            element: htmlElement,
             isLoading: false,
             node: null,
           }),

@@ -91,14 +91,12 @@ export default class DataLoader {
         element: HTMLElement,
         node?: Node,
     ): void {
-        const $el = jQuery(element);
-
         if (this._onLoading) {
             this._onLoading(isLoading, node, element);
         }
 
         this._triggerEvent("tree.loading_data", {
-            $el,
+            element,
             isLoading,
             node: node ?? null,
         });
