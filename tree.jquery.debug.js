@@ -3471,6 +3471,8 @@ var jqtree = (function (exports) {
       // Does an element in the tree have the focus?
       _isFocusOnTree() {
         const activeElement = document.activeElement;
+
+        /* istanbul ignore if */
         if (!activeElement) {
           return false;
         }

@@ -24,8 +24,8 @@ interface IJQTreeOptions {
     onCanMove?: (node: INode) => boolean;
     onCanSelectNode?: (node: INode) => boolean;
     onCreateLi?: (node: INode, el: JQuery, isSelected: boolean) => void;
-    onDragMove?: (node: INode, event: JQuery.Event | Touch) => void;
-    onDragStop?: (node: INode, event: JQuery.Event | Touch) => void;
+    onDragMove?: (node: INode, event: Event | Touch) => void;
+    onDragStop?: (node: INode, event: Event | Touch) => void;
     onGetStateFromStorage?: () => string;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: JQuery.jqXHR) => void;

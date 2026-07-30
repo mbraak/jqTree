@@ -9,7 +9,7 @@ Function that is called when a node is dragged **outside** the tree. This functi
 * The function signature is function(node, event);
 
 {% highlight js %}
-function handleStop(node: Node, e: JQueryEventObject) {
+function handleStop(node: Node, e: Event) {
     //
 }
 
