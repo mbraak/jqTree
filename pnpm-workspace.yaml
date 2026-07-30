@@ -1,4 +1,5 @@
 allowBuilds:
-  esbuild: true
-  msw: true
-  unrs-resolver: true
+    esbuild: true
+    msw: true
+    unrs-resolver: true
+    eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c: true
