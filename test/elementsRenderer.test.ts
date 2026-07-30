@@ -253,6 +253,22 @@ describe("renderFromRoot", () => {
         expect(onCreateLi).toHaveBeenCalledWith(node, jQuery(node.element as HTMLElement), false);
     });
 
+    it("sets the node as jQuery data on the list element", () => {
+        const { renderer, tree } = createRenderer();
+
+        renderer.renderFromRoot();
+
+        const node = tree.getNodeByNameMustExist("node1");
+        const child = tree.getNodeByNameMustExist("child1");
+
+        expect(
+            jQuery(getTreeListElement(getTreeItem("node1"))).data("node"),
+        ).toBe(node);
+        expect(
+            jQuery(getTreeListElement(getTreeItem("child1"))).data("node"),
+        ).toBe(child);
+    });
+
     it("renders the root list as a tree", () => {
         const { renderer } = createRenderer();
 
