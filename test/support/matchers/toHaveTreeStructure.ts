@@ -6,10 +6,13 @@ import treeStructure from "../treeStructure";
 
 export function toHaveTreeStructure(
   this: MatcherState,
-  $el: JQuery,
+  element: HTMLElement | JQuery,
   expectedStructure: TreeStructure,
 ) {
-  const el = $el.get(0) as HTMLElement;
+  const el =
+    element instanceof HTMLElement
+      ? element
+      : (element.get(0) as HTMLElement);
   const receivedStructure = treeStructure(el);
 
   /* istanbul ignore next @preserve */
