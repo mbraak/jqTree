@@ -7,6 +7,7 @@ name: changelog
 
 - Issue #1000. Add isDragging to type definition.
 - Issue #1004. Fix keyboard support when the focused element is a link.
+- Issue #1009. Fix types and documentation for onDragMove and onDragStop.
 
 #### 1.9.0 (july 27 2026)
 
