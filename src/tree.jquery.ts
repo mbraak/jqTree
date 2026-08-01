@@ -29,7 +29,7 @@ const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";
 
 export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
-    protected static defaults: JQTreeOptions = {
+    protected static _defaults: JQTreeOptions = {
         animationSpeed: "fast",
         autoEscape: true,
         autoOpen: false, // true / false / int (open n levels starting at 0)
