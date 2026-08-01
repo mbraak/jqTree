@@ -61,7 +61,7 @@ class FolderElement extends NodeElement {
         const doClose = (): void => {
             this.element.classList.add("jqtree-closed");
 
-            const titleSpan = this.getTitleSpan();
+            const titleSpan = this._getTitleSpan();
             titleSpan.setAttribute("aria-expanded", "false");
 
             this._triggerEvent("tree.close", {
@@ -69,7 +69,7 @@ class FolderElement extends NodeElement {
             });
         };
 
-        const ul = this.getUl();
+        const ul = this._getUl();
 
         if (slide) {
             slideUp(ul, animationSpeed, doClose);
@@ -104,7 +104,7 @@ class FolderElement extends NodeElement {
         const doOpen = (): void => {
             this.element.classList.remove("jqtree-closed");
 
-            const titleSpan = this.getTitleSpan();
+            const titleSpan = this._getTitleSpan();
             titleSpan.setAttribute("aria-expanded", "true");
 
             if (onFinished) {
@@ -116,7 +116,7 @@ class FolderElement extends NodeElement {
             });
         };
 
-        const ul = this.getUl();
+        const ul = this._getUl();
 
         if (slide) {
             slideDown(ul, animationSpeed, doOpen);
@@ -126,7 +126,7 @@ class FolderElement extends NodeElement {
         }
     }
 
-    protected mustShowBorderDropHint(position: Position): boolean {
+    protected _mustShowBorderDropHint(position: Position): boolean {
         return !this.node.is_open && position === "inside";
     }
 

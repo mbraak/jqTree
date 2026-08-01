@@ -36,10 +36,10 @@ export default class DocumentScrollParent extends ScrollParent {
         this._documentScrollWidth = undefined;
     }
 
-    protected getNewHorizontalScrollDirection(
+    protected _getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined {
-        const scrollLeft = this.container.scrollLeft;
+        const scrollLeft = this._container.scrollLeft;
         const windowWidth = window.innerWidth;
 
         const isNearRightEdge = pageX > windowWidth - 20;
@@ -56,10 +56,10 @@ export default class DocumentScrollParent extends ScrollParent {
         return undefined;
     }
 
-    protected getNewVerticalScrollDirection(
+    protected _getNewVerticalScrollDirection(
         pageY: number,
     ): undefined | VerticalScrollDirection {
-        const scrollTop = this.container.scrollTop;
+        const scrollTop = this._container.scrollTop;
         const distanceTop = pageY - scrollTop;
 
         if (distanceTop < 20) {
@@ -77,28 +77,28 @@ export default class DocumentScrollParent extends ScrollParent {
 
     private _canScrollDown() {
         return (
-            this.container.scrollTop + this.container.clientHeight <
+            this._container.scrollTop + this._container.clientHeight <
             this._getDocumentScrollHeight()
         );
     }
 
     private _canScrollRight() {
         return (
-            this.container.scrollLeft + this.container.clientWidth <
+            this._container.scrollLeft + this._container.clientWidth <
             this._getDocumentScrollWidth()
         );
     }
 
     private _getDocumentScrollHeight() {
         // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
-        this._documentScrollHeight ??= this.container.scrollHeight;
+        this._documentScrollHeight ??= this._container.scrollHeight;
 
         return this._documentScrollHeight;
     }
 
     private _getDocumentScrollWidth() {
         // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
-        this._documentScrollWidth ??= this.container.scrollWidth;
+        this._documentScrollWidth ??= this._container.scrollWidth;
 
         return this._documentScrollWidth;
     }

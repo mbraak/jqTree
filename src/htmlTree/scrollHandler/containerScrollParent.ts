@@ -15,15 +15,15 @@ export default class ContainerScrollParent extends ScrollParent {
     public stopScrolling() {
         super.stopScrolling();
 
-        this.horizontalScrollDirection = undefined;
-        this.verticalScrollDirection = undefined;
+        this._horizontalScrollDirection = undefined;
+        this._verticalScrollDirection = undefined;
     }
 
-    protected getNewHorizontalScrollDirection(
+    protected _getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined {
-        const scrollParentOffset = getElementPosition(this.container);
-        const containerWidth = this.container.getBoundingClientRect().width;
+        const scrollParentOffset = getElementPosition(this._container);
+        const containerWidth = this._container.getBoundingClientRect().width;
 
         const rightEdge = scrollParentOffset.left + containerWidth;
         const leftEdge = scrollParentOffset.left;
@@ -39,7 +39,7 @@ export default class ContainerScrollParent extends ScrollParent {
         return undefined;
     }
 
-    protected getNewVerticalScrollDirection(
+    protected _getNewVerticalScrollDirection(
         pageY: number,
     ): undefined | VerticalScrollDirection {
         if (pageY < this._getScrollParentTop()) {
@@ -56,7 +56,7 @@ export default class ContainerScrollParent extends ScrollParent {
     private _getScrollParentBottom() {
         if (this._scrollParentBottom == null) {
             const containerHeight =
-                this.container.getBoundingClientRect().height;
+                this._container.getBoundingClientRect().height;
             this._scrollParentBottom =
                 this._getScrollParentTop() + containerHeight;
         }
@@ -65,7 +65,7 @@ export default class ContainerScrollParent extends ScrollParent {
     }
 
     private _getScrollParentTop() {
-        this._scrollParentTop ??= getOffsetTop(this.container);
+        this._scrollParentTop ??= getOffsetTop(this._container);
 
         return this._scrollParentTop;
     }
