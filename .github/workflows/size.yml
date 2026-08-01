@@ -22,6 +22,8 @@ jobs:
                   build-script: pnpm run production
                   pattern: "./lib/**/*.js"
                   exclude: "{./lib/**/*.d.js,./lib/playwright/**,./lib/test/**}"
+                  comment-key: files
+                  compression: "none"
 
     bundle-size-job:
         runs-on: ubuntu-latest
@@ -43,3 +45,5 @@ jobs:
                   build-script: pnpm run production
                   pattern: "./tree.jquery.js"
                   exclude: "{./lib/**/*.d.js,./lib/playwright/**,./lib/test/**}"
+                  comment-key: bundle
+                  compression: "none"
