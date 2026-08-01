@@ -61,6 +61,26 @@ export default [
         },
     },
     {
+        files: ["src/**/*.ts"],
+        rules: {
+            "@typescript-eslint/naming-convention": [
+                "error",
+                {
+                    selector: "memberLike",
+                    modifiers: ["private"],
+                    format: [],
+                    leadingUnderscore: "require",
+                },
+                {
+                    selector: "memberLike",
+                    modifiers: ["protected"],
+                    format: [],
+                    leadingUnderscore: "require",
+                },
+            ],
+        },
+    },
+    {
         files: ["test/**/*.ts"],
         ...vitestPlugin.configs.all,
     },
