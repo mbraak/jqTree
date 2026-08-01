@@ -102,7 +102,7 @@ const register = (widgetClass: unknown, widgetName: string): void => {
 export default class SimpleWidget<WidgetOptions> {
     [key: string]: unknown;
 
-    protected static defaults: unknown = {};
+    protected static _defaults: unknown = {};
 
     public $el: JQuery;
 
@@ -112,7 +112,7 @@ export default class SimpleWidget<WidgetOptions> {
         this.$el = jQuery(el);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const defaults = (this.constructor as any).defaults as WidgetOptions;
+        const defaults = (this.constructor as any)._defaults as WidgetOptions;
         this.options = { ...defaults, ...options };
     }
 
