@@ -7,33 +7,33 @@ interface ConstructorParams {
 }
 
 export abstract class ScrollParent {
-    protected container: HTMLElement;
-    protected horizontalScrollDirection?: HorizontalScrollDirection;
-    protected horizontalScrollTimeout?: number;
+    protected _container: HTMLElement;
+    protected _horizontalScrollDirection?: HorizontalScrollDirection;
+    protected _horizontalScrollTimeout?: number;
 
-    protected refreshHitAreas: () => void;
-    protected verticalScrollDirection?: VerticalScrollDirection;
-    protected verticalScrollTimeout?: number;
+    protected _refreshHitAreas: () => void;
+    protected _verticalScrollDirection?: VerticalScrollDirection;
+    protected _verticalScrollTimeout?: number;
 
     constructor({ container, refreshHitAreas }: ConstructorParams) {
-        this.container = container;
-        this.refreshHitAreas = refreshHitAreas;
+        this._container = container;
+        this._refreshHitAreas = refreshHitAreas;
     }
 
     public checkHorizontalScrolling(pageX: number): void {
         const newHorizontalScrollDirection =
-            this.getNewHorizontalScrollDirection(pageX);
+            this._getNewHorizontalScrollDirection(pageX);
 
-        if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
-            this.horizontalScrollDirection = newHorizontalScrollDirection;
+        if (this._horizontalScrollDirection !== newHorizontalScrollDirection) {
+            this._horizontalScrollDirection = newHorizontalScrollDirection;
 
-            if (this.horizontalScrollTimeout != null) {
-                window.clearTimeout(this.horizontalScrollTimeout);
+            if (this._horizontalScrollTimeout != null) {
+                window.clearTimeout(this._horizontalScrollTimeout);
             }
 
             if (newHorizontalScrollDirection) {
-                this.horizontalScrollTimeout = window.setTimeout(
-                    this.scrollHorizontally.bind(this),
+                this._horizontalScrollTimeout = window.setTimeout(
+                    this._scrollHorizontally.bind(this),
                     40,
                 );
             }
@@ -42,19 +42,19 @@ export abstract class ScrollParent {
 
     public checkVerticalScrolling(pageY: number) {
         const newVerticalScrollDirection =
-            this.getNewVerticalScrollDirection(pageY);
+            this._getNewVerticalScrollDirection(pageY);
 
-        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
-            this.verticalScrollDirection = newVerticalScrollDirection;
+        if (this._verticalScrollDirection !== newVerticalScrollDirection) {
+            this._verticalScrollDirection = newVerticalScrollDirection;
 
-            if (this.verticalScrollTimeout != null) {
-                window.clearTimeout(this.verticalScrollTimeout);
-                this.verticalScrollTimeout = undefined;
+            if (this._verticalScrollTimeout != null) {
+                window.clearTimeout(this._verticalScrollTimeout);
+                this._verticalScrollTimeout = undefined;
             }
 
             if (newVerticalScrollDirection) {
-                this.verticalScrollTimeout = window.setTimeout(
-                    this.scrollVertically.bind(this),
+                this._verticalScrollTimeout = window.setTimeout(
+                    this._scrollVertically.bind(this),
                     40,
                 );
             }
@@ -62,56 +62,56 @@ export abstract class ScrollParent {
     }
 
     public getScrollLeft(): number {
-        return this.container.scrollLeft;
+        return this._container.scrollLeft;
     }
 
     public scrollToY(top: number): void {
-        this.container.scrollTop = top;
+        this._container.scrollTop = top;
     }
 
     public stopScrolling() {
-        this.horizontalScrollDirection = undefined;
-        this.verticalScrollDirection = undefined;
+        this._horizontalScrollDirection = undefined;
+        this._verticalScrollDirection = undefined;
     }
 
-    protected abstract getNewHorizontalScrollDirection(
+    protected abstract _getNewHorizontalScrollDirection(
         pageX: number,
     ): HorizontalScrollDirection | undefined;
-    protected abstract getNewVerticalScrollDirection(
+    protected abstract _getNewVerticalScrollDirection(
         pageY: number,
     ): undefined | VerticalScrollDirection;
 
-    protected scrollHorizontally() {
-        if (!this.horizontalScrollDirection) {
+    protected _scrollHorizontally() {
+        if (!this._horizontalScrollDirection) {
             return;
         }
 
-        const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
-        this.container.scrollBy({
+        const distance = this._horizontalScrollDirection === "left" ? -20 : 20;
+        this._container.scrollBy({
             behavior: "instant",
             left: distance,
             top: 0,
         });
 
-        this.refreshHitAreas();
+        this._refreshHitAreas();
 
-        setTimeout(this.scrollHorizontally.bind(this), 40);
+        setTimeout(this._scrollHorizontally.bind(this), 40);
     }
 
-    protected scrollVertically() {
-        if (!this.verticalScrollDirection) {
+    protected _scrollVertically() {
+        if (!this._verticalScrollDirection) {
             return;
         }
 
-        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        this.container.scrollBy({
+        const distance = this._verticalScrollDirection === "top" ? -20 : 20;
+        this._container.scrollBy({
             behavior: "instant",
             left: 0,
             top: distance,
         });
 
-        this.refreshHitAreas();
+        this._refreshHitAreas();
 
-        setTimeout(this.scrollVertically.bind(this), 40);
+        setTimeout(this._scrollVertically.bind(this), 40);
     }
 }

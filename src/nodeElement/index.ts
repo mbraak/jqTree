@@ -33,7 +33,7 @@ class NodeElement {
     }
 
     public addDropHint(position: Position): DropHint {
-        if (this.mustShowBorderDropHint(position)) {
+        if (this._mustShowBorderDropHint(position)) {
             return new BorderDropHint(this.element, this._getScrollLeft());
         } else {
             return new GhostDropHint(this.node, this.element, position);
@@ -43,7 +43,7 @@ class NodeElement {
     public deselect(): void {
         this.element.classList.remove("jqtree-selected");
 
-        const titleSpan = this.getTitleSpan();
+        const titleSpan = this._getTitleSpan();
         titleSpan.removeAttribute("tabindex");
         titleSpan.setAttribute("aria-selected", "false");
 
@@ -61,7 +61,7 @@ class NodeElement {
     public select(mustSetFocus: boolean): void {
         this.element.classList.add("jqtree-selected");
 
-        const titleSpan = this.getTitleSpan();
+        const titleSpan = this._getTitleSpan();
         const tabIndex = this._tabIndex;
 
         // Check for null or undefined
@@ -76,17 +76,17 @@ class NodeElement {
         }
     }
 
-    protected getTitleSpan(): HTMLSpanElement {
+    protected _getTitleSpan(): HTMLSpanElement {
         return this.element.querySelector(
             ":scope > .jqtree-element > span.jqtree-title",
         ) as HTMLSpanElement;
     }
 
-    protected getUl(): HTMLUListElement {
+    protected _getUl(): HTMLUListElement {
         return this.element.querySelector(":scope > ul") as HTMLUListElement;
     }
 
-    protected mustShowBorderDropHint(position: Position): boolean {
+    protected _mustShowBorderDropHint(position: Position): boolean {
         return position === "inside";
     }
 }
