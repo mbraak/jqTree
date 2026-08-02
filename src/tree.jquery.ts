@@ -1043,39 +1043,41 @@ export class JqTreeWidget {
     }
 
     private _mouseCapture(positionInfo: PositionInfo): boolean | null {
-        if (this._options.dragAndDrop) {
-            return this._dndHandler.mouseCapture(positionInfo);
-        } else {
+        if (!this._options.dragAndDrop) {
             return false;
         }
+
+        return this._dndHandler.mouseCapture(positionInfo);
     }
 
     private _mouseDrag(positionInfo: PositionInfo): boolean {
-        if (this._options.dragAndDrop) {
-            const result = this._dndHandler.mouseDrag(positionInfo);
-
-            this._scrollHandler.checkScrolling(positionInfo);
-            return result;
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
             return false;
         }
+
+        const result = this._dndHandler.mouseDrag(positionInfo);
+        this._scrollHandler.checkScrolling(positionInfo);
+        return result;
     }
 
     private _mouseStart(positionInfo: PositionInfo): boolean {
-        if (this._options.dragAndDrop) {
-            return this._dndHandler.mouseStart(positionInfo);
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
             return false;
         }
+
+        return this._dndHandler.mouseStart(positionInfo);
     }
 
     private _mouseStop(positionInfo: PositionInfo): boolean {
-        if (this._options.dragAndDrop) {
-            this._scrollHandler.stopScrolling();
-            return this._dndHandler.mouseStop(positionInfo);
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
             return false;
         }
+
+        this._scrollHandler.stopScrolling();
+        return this._dndHandler.mouseStop(positionInfo);
     }
 
     private _openNodeInternal(
