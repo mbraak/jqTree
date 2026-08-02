@@ -3,7 +3,10 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
-import "app/tree.jquery";
+import type { Node } from "htmlTree/node";
+import type { HtmlTreeOptions } from "htmlTree/options";
+
+import HtmlTree from "htmlTree";
 
 import exampleData from "../support/exampleData";
 import { getTreeButton } from "../support/queries";
@@ -11,19 +14,32 @@ import { getTreeButton } from "../support/queries";
 const server = setupServer();
 
 describe("options", () => {
+    let htmlElement: HTMLElement;
+    let htmlTree: HtmlTree | undefined;
+
+    const createHtmlTree = (options: Partial<HtmlTreeOptions> = {}) => {
+        htmlTree = new HtmlTree({ htmlElement, options });
+
+        return htmlTree;
+    };
+
     beforeAll(() => {
         server.listen();
     });
 
     beforeEach(() => {
-        document.body.innerHTML = '<div id="tree1"></div>';
+        document.body.innerHTML = "";
+
+        htmlElement = document.createElement("div");
+        document.body.append(htmlElement);
     });
 
     afterEach(() => {
         server.resetHandlers();
 
-        const $tree = $("#tree1");
-        $tree.tree("destroy");
+        htmlTree?.deinit();
+        htmlTree = undefined;
+
         document.body.innerHTML = "";
         localStorage.clear();
     });
@@ -34,13 +50,12 @@ describe("options", () => {
 
     describe("autoEscape", () => {
         it("escapes the node name when autoEscape is true", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 autoEscape: true,
                 data: ["<span>test</span>"],
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "&lt;span&gt;test&lt;/span&gt;",
                 }),
@@ -48,13 +63,12 @@ describe("options", () => {
         });
 
         it("doesn't escape the node name when autoEscape is false", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 autoEscape: false,
                 data: ["<span>test</span>"],
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "<span>test</span>",
                 }),
@@ -64,26 +78,24 @@ describe("options", () => {
 
     describe("autoOpen", () => {
         it("doesn't open any nodes with autoOpen false", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 autoOpen: false,
                 data: exampleData,
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: false }),
                 expect.objectContaining({ name: "node2", open: false }),
             ]);
         });
 
         it("opens all nodes with autoOpen true", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 autoOpen: true,
                 data: exampleData,
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
                     children: [
@@ -99,13 +111,12 @@ describe("options", () => {
         });
 
         it("opens level 0 with autoOpen 0", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 autoOpen: 0,
                 data: exampleData,
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
                     children: [
@@ -121,13 +132,12 @@ describe("options", () => {
         });
 
         it("opens levels 1 with autoOpen 1", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 autoOpen: 1,
                 data: exampleData,
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
                     children: [
@@ -143,13 +153,12 @@ describe("options", () => {
         });
 
         it("opens levels 1 with autoOpen '1'", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
-                autoOpen: "1",
-                data: exampleData,
-            });
+            const tree = createHtmlTree({ data: [] });
 
-            expect($tree).toHaveTreeStructure([
+            tree.setOption("autoOpen", "1");
+            tree.loadData(exampleData);
+
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1", open: true }),
                 expect.objectContaining({
                     children: [
@@ -167,8 +176,7 @@ describe("options", () => {
 
     describe("buttonLeft", () => {
         it("renders the button on the right when buttonLeft is false", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 buttonLeft: false,
                 data: exampleData,
             });
@@ -182,8 +190,7 @@ describe("options", () => {
         });
 
         it("renders the button on the left when buttonLeft is true", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 buttonLeft: true,
                 data: exampleData,
             });
@@ -191,16 +198,15 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
             // eslint-disable-next-line testing-library/no-node-access
-            const nextSibling = treeItem.previousSibling as HTMLElement;
+            const previousSibling = treeItem.previousSibling as HTMLElement;
 
-            expect(nextSibling).toHaveClass("jqtree-toggler");
+            expect(previousSibling).toHaveClass("jqtree-toggler");
         });
     });
 
     describe("closedIcon", () => {
         it("renders a string", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 closedIcon: "closed",
                 data: exampleData,
             });
@@ -212,8 +218,7 @@ describe("options", () => {
         });
 
         it("escapes html", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 closedIcon: "<span>test</span>",
                 data: exampleData,
             });
@@ -225,26 +230,11 @@ describe("options", () => {
         });
 
         it("renders a html element", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
-                closedIcon: $("<span class='abc'>test</span>"),
-                data: exampleData,
-            });
-
-            const treeItem = screen.getByRole("treeitem", { name: "node1" });
-            const button = getTreeButton(treeItem);
-            const span = button.querySelector("span.abc"); // eslint-disable-line testing-library/no-node-access
-
-            expect(span).toHaveTextContent("test");
-        });
-
-        it("renders a html element", () => {
             const icon = document.createElement("span");
             icon.className = "abc";
             icon.textContent = "test";
 
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 closedIcon: icon,
                 data: exampleData,
             });
@@ -257,8 +247,7 @@ describe("options", () => {
         });
 
         it("renders a default when the option is empty", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 closedIcon: undefined,
                 data: exampleData,
             });
@@ -277,18 +266,19 @@ describe("options", () => {
             );
 
             const dataFilter = vi.fn((data) => [
-                (data as number[])[1] as unknown as NodeData,
+                (data as NodeData[])[1] as NodeData,
             ]);
 
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 dataFilter,
                 dataUrl: "/tree/",
             });
 
             await screen.findByRole("treeitem", { name: "node2" });
 
-            expect(screen.queryByRole("treeitem", { name: "node1" })).not.toBeInTheDocument();
+            expect(
+                screen.queryByRole("treeitem", { name: "node1" }),
+            ).not.toBeInTheDocument();
             expect(dataFilter).toHaveBeenCalledExactlyOnceWith(exampleData);
         });
     });
@@ -316,23 +306,17 @@ describe("options", () => {
 
         beforeEach(() => {
             server.use(
-                http.get("/tree/", ({ request }) => {
-                    const nodeName = request.headers.get("node");
-                    const data = nodeName ? [nodeName] : exampleData;
-
-                    return HttpResponse.json(data);
-                }),
+                http.get("/tree/", () => HttpResponse.json(exampleData)),
             );
         });
 
         testCases.forEach(
             ({ dataUrl, expectedNode, expectedStructure, name }) => {
                 it(`loads the data from the url with ${name}`, async () => {
-                    const $tree = $("#tree1");
-                    $tree.tree({ dataUrl });
+                    createHtmlTree({ dataUrl });
                     await screen.findByRole("treeitem", { name: expectedNode });
 
-                    expect($tree).toHaveTreeStructure(expectedStructure);
+                    expect(htmlElement).toHaveTreeStructure(expectedStructure);
                 });
             },
         );
@@ -340,52 +324,41 @@ describe("options", () => {
         it("loads the data and selects the node when the state contains a selected node", async () => {
             localStorage.setItem("tree", '{"selected_node":[124]}');
 
-            const $tree = $("#tree1");
-            $tree.tree({
+            const tree = createHtmlTree({
                 dataUrl: "/tree/",
                 saveState: true,
             });
 
-            await screen.findByRole("treeitem", { name: "node1" })
+            await screen.findByRole("treeitem", { name: "node1" });
 
-            expect(($tree.tree("getSelectedNode") as INode).name).toBe(
-                "node2",
-            );
+            expect(tree.getSelectedNode()).toMatchObject({ name: "node2" });
         });
 
-        it("loads the data and doesn't selects a node when the state doesn't contain a selected node", async () => {
+        it("loads the data and doesn't select a node when the state doesn't contain a selected node", async () => {
             localStorage.setItem("tree", "{}");
 
-            const $tree = $("#tree1");
-            $tree.tree({
+            const tree = createHtmlTree({
                 dataUrl: "/tree/",
                 saveState: true,
             });
 
-            await screen.findByRole("treeitem", { name: "node1" })
+            await screen.findByRole("treeitem", { name: "node1" });
 
-            expect($tree.tree("getSelectedNode")).toBeFalse();
+            expect(tree.getSelectedNode()).toBeFalse();
         });
     });
 
     describe("data-url in html", () => {
         it("loads the data from the url", async () => {
-            server.use(
-                http.get(
-                    "/tree",
-                    () => HttpResponse.json(exampleData)
-                ),
-            );
+            server.use(http.get("/tree", () => HttpResponse.json(exampleData)));
 
-            const $tree = $("#tree1");
-            const treeElement = $tree.get(0) as HTMLElement;
-            treeElement.dataset.url = "/tree";
+            htmlElement.dataset.url = "/tree";
 
-            $tree.tree();
+            createHtmlTree();
 
-            await screen.findByRole("treeitem", { name: "node1" })
+            await screen.findByRole("treeitem", { name: "node1" });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
@@ -394,33 +367,32 @@ describe("options", () => {
 
     describe("onCanSelectNode", () => {
         it("doesn't select the node", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            const tree = createHtmlTree({
                 data: exampleData,
-                onCanSelectNode: (node: INode) => node.name !== "node1",
+                onCanSelectNode: (node: Node) => node.name !== "node1",
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            $tree.tree("selectNode", node1);
+            const node1 = tree.getNodeByNameMustExist("node1");
+            tree.selectNode(node1);
 
-            expect($tree.tree("getSelectedNode")).toBeFalse();
+            expect(tree.getSelectedNode()).toBeFalse();
         });
     });
 
     describe("onCreateLi", () => {
         it("is called when creating a node", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 data: exampleData,
-                onCreateLi: (node: INode, $el: JQuery) => {
-                    const htmlElement = $el.get(0) as HTMLElement;
+                onCreateLi: (node: Node, element: HTMLElement) => {
                     // eslint-disable-next-line testing-library/no-node-access
-                    const titleElement = htmlElement.querySelector(":scope > .jqtree-element > .jqtree-title") as HTMLElement;
+                    const titleElement = element.querySelector(
+                        ":scope > .jqtree-element > .jqtree-title",
+                    ) as HTMLElement;
                     titleElement.innerHTML = `_${node.name}_`;
                 },
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({ name: "_node1_" }),
                 expect.objectContaining({ name: "_node2_" }),
             ]);
@@ -436,9 +408,8 @@ describe("options", () => {
 
         const getState = (): string => savedState;
 
-        const createTree = () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+        const createTree = () =>
+            createHtmlTree({
                 autoOpen: false,
                 data: exampleData,
                 onGetStateFromStorage: getState,
@@ -446,36 +417,28 @@ describe("options", () => {
                 saveState: true,
             });
 
-            return $tree;
-        };
-
         beforeEach(() => {
             savedState = "";
         });
 
         it("saves the state with an open and a selected node", () => {
-            const $tree = createTree();
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            const tree = createTree();
+            const node1 = tree.getNodeByNameMustExist("node1");
 
-            $tree.tree("selectNode", node1);
-            $tree.tree("openNode", node1);
+            tree.selectNode(node1);
+            tree.openNode(node1);
 
-            expect(JSON.parse(savedState)).toStrictEqual({
-                open_nodes: [123],
-                selected_node: [123],
-            });
+            expect(savedState).toBe(
+                '{"open_nodes":[123],"selected_node":[123]}',
+            );
         });
 
         it("restores the state with a saved state", () => {
-            savedState = JSON.stringify({
-                open_nodes: [123],
-                selected_node: [123],
-            });
+            savedState = '{"open_nodes":[123],"selected_node":[123]}';
 
-            const $tree = createTree();
-            //const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            createTree();
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
                     open: true,
@@ -490,11 +453,10 @@ describe("options", () => {
     });
 
     describe("onIsMoveHandle", () => {
-        it("is called with a jQuery element", () => {
+        it("is called with an html element", () => {
             const onIsMoveHandle = vi.fn(() => true);
 
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 data: exampleData,
                 dragAndDrop: true,
                 onIsMoveHandle,
@@ -505,9 +467,7 @@ describe("options", () => {
                 new MouseEvent("mousedown", { bubbles: true, button: 0 }),
             );
 
-            expect(onIsMoveHandle).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ 0: treeItem }),
-            );
+            expect(onIsMoveHandle).toHaveBeenCalledExactlyOnceWith(treeItem);
         });
     });
 
@@ -525,8 +485,7 @@ describe("options", () => {
 
             const onLoadFailed = vi.fn();
 
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 dataUrl: "/tree/",
                 onLoadFailed,
             });
@@ -541,8 +500,7 @@ describe("options", () => {
 
     describe("rtl", () => {
         it("has a different closed icon when the rtl option is true", () => {
-            const $tree = $("#tree1");
-            $tree.tree({ data: exampleData, rtl: true });
+            createHtmlTree({ data: exampleData, rtl: true });
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
@@ -551,8 +509,7 @@ describe("options", () => {
         });
 
         it("has the default closed icon when the rtl option is false", () => {
-            const $tree = $("#tree1");
-            $tree.tree({ data: exampleData, rtl: false });
+            createHtmlTree({ data: exampleData, rtl: false });
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
@@ -561,9 +518,8 @@ describe("options", () => {
         });
 
         it("has a different closed icon when the rtl data option is true", () => {
-            const $tree = $("#tree1");
-            $tree.attr("data-rtl", "true");
-            $tree.tree({ data: exampleData });
+            htmlElement.dataset.rtl = "true";
+            createHtmlTree({ data: exampleData });
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
@@ -572,9 +528,8 @@ describe("options", () => {
         });
 
         it("has the default closed icon when the rtl data option is false", () => {
-            const $tree = $("#tree1");
-            $tree.attr("data-rtl", "false");
-            $tree.tree({ data: exampleData });
+            htmlElement.dataset.rtl = "false";
+            createHtmlTree({ data: exampleData });
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
@@ -583,9 +538,8 @@ describe("options", () => {
         });
 
         it("has a different closed icon when the rtl data option has no value", () => {
-            const $tree = $("#tree1");
-            $tree.attr("data-rtl", "");
-            $tree.tree({ data: exampleData });
+            htmlElement.dataset.rtl = "";
+            createHtmlTree({ data: exampleData });
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
@@ -598,19 +552,18 @@ describe("options", () => {
         const createTreeWithOpenSelectedNode = (
             saveState: boolean | string,
         ) => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            const tree = createHtmlTree({
                 animationSpeed: 0,
                 autoOpen: false,
                 data: exampleData,
                 saveState,
             });
 
-            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
-            $tree.tree("selectNode", node1);
-            $tree.tree("openNode", node1);
+            const node1 = tree.getNodeByNameMustExist("node1");
+            tree.selectNode(node1);
+            tree.openNode(node1);
 
-            return $tree;
+            return tree;
         };
 
         it("saves the state to local storage when saveState is true", () => {
@@ -641,15 +594,14 @@ describe("options", () => {
                 '{"open_nodes":[123],"selected_node":[123]}',
             );
 
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 animationSpeed: 0,
                 autoOpen: false,
                 data: exampleData,
                 saveState: true,
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({
                     name: "node1",
                     open: true,
@@ -666,25 +618,23 @@ describe("options", () => {
 
     describe("showEmptyFolder", () => {
         it("creates a child node with showEmptyFolder false", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 data: [{ children: [], name: "parent1" }],
                 showEmptyFolder: false,
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({ name: "parent1" }),
             ]);
         });
 
         it("creates a folder with showEmptyFolder true", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
+            createHtmlTree({
                 data: [{ children: [], name: "parent1" }],
                 showEmptyFolder: true,
             });
 
-            expect($tree).toHaveTreeStructure([
+            expect(htmlElement).toHaveTreeStructure([
                 expect.objectContaining({
                     children: [],
                     name: "parent1",
