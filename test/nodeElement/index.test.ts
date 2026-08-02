@@ -19,6 +19,8 @@ const createNodeElement = ({ tabIndex }: CreateNodeElementParams = {}) => {
     const treeElement = document.createElement("div");
     document.body.append(treeElement);
 
+    const setNodeElement = vi.fn();
+
     const renderer = new ElementsRenderer({
         autoEscape: true,
         buttonLeft: false,
@@ -26,6 +28,7 @@ const createNodeElement = ({ tabIndex }: CreateNodeElementParams = {}) => {
         getTree: () => tree,
         htmlElement: treeElement,
         isNodeSelected: () => false,
+        setNodeElement,
         showEmptyFolder: false,
     });
     renderer.renderFromRoot();

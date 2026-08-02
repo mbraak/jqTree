@@ -7,6 +7,7 @@ import type { TriggerEvent } from "app/jqtreeMethodTypes";
 import type { DataFilter } from "app/jqtreeOptions";
 
 import DataLoader from "app/dataLoader";
+import RequestUrl from "app/requestUrl";
 
 describe("loadFromUrl", () => {
     const server = setupServer();
@@ -66,22 +67,14 @@ describe("loadFromUrl", () => {
         return { dataLoader, loadData, onLoadFailed, onLoading, treeElement, triggerEvent };
     }
 
-    it("does nothing when urlInfo is empty", () => {
-        const { dataLoader, triggerEvent } = createDataLoader();
-
-        dataLoader.loadFromUrl(null, null, null);
-
-        expect(triggerEvent).not.toHaveBeenCalled();
-    });
-
     it("calls loadData with the parsed json data", async () => {
         setupResponse();
 
         const { dataLoader, loadData } = createDataLoader();
-        dataLoader.loadFromUrl("/test", null, null);
+        dataLoader.loadFromUrl(new RequestUrl("/test"));
 
         await waitFor(() => {
-            expect(loadData).toHaveBeenCalledExactlyOnceWith({ key1: "value1" }, null);
+            expect(loadData).toHaveBeenCalledExactlyOnceWith({ key1: "value1" }, undefined);
         });
     });
 
@@ -91,7 +84,7 @@ describe("loadFromUrl", () => {
         const onFinished = vi.fn();
 
         const { dataLoader, } = createDataLoader();
-        dataLoader.loadFromUrl("/test", null, onFinished);
+        dataLoader.loadFromUrl(new RequestUrl("/test"), undefined, onFinished);
 
         await waitFor(() => {
             expect(onFinished).toHaveBeenCalledExactlyOnceWith();
@@ -102,7 +95,7 @@ describe("loadFromUrl", () => {
         setupErrorResponse(404);
 
         const { dataLoader, onLoadFailed } = createDataLoader();
-        dataLoader.loadFromUrl("/test", null, null);
+        dataLoader.loadFromUrl(new RequestUrl("/test"));
 
         await waitFor(() => {
             expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith(
@@ -115,7 +108,7 @@ describe("loadFromUrl", () => {
         setupErrorResponse(500);
 
         const { dataLoader, onLoadFailed } = createDataLoader();
-        dataLoader.loadFromUrl("/test", null, null);
+        dataLoader.loadFromUrl(new RequestUrl("/test"));
 
         await waitFor(() => {
             expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith(
@@ -128,7 +121,7 @@ describe("loadFromUrl", () => {
         setupResponse();
 
         const { dataLoader, treeElement, triggerEvent } = createDataLoader();
-        dataLoader.loadFromUrl("/test", null, null);
+        dataLoader.loadFromUrl(new RequestUrl("/test"));
 
         await waitFor(() => {
             expect(triggerEvent).toHaveBeenNthCalledWith(
@@ -158,13 +151,13 @@ describe("loadFromUrl", () => {
         setupResponse();
 
         const { dataLoader, onLoading, treeElement } = createDataLoader();
-        dataLoader.loadFromUrl("/test", null, null);
+        dataLoader.loadFromUrl(new RequestUrl("/test"));
 
         await waitFor(() => {
             expect(onLoading).toHaveBeenNthCalledWith(
                 1,
                 true,
-                null,
+                undefined,
                 jQuery(treeElement)
             );
         });
@@ -173,7 +166,7 @@ describe("loadFromUrl", () => {
             expect(onLoading).toHaveBeenNthCalledWith(
                 2,
                 false,
-                null,
+                undefined,
                 jQuery(treeElement)
             );
         });
@@ -185,10 +178,10 @@ describe("loadFromUrl", () => {
         const dataFilter = () => ["changed"]
 
         const { dataLoader, loadData } = createDataLoader(dataFilter);
-        dataLoader.loadFromUrl("/test", null, null);
+        dataLoader.loadFromUrl(new RequestUrl("/test"));
 
         await waitFor(() => {
-            expect(loadData).toHaveBeenCalledExactlyOnceWith(["changed"], null);
+            expect(loadData).toHaveBeenCalledExactlyOnceWith(["changed"], undefined);
         });
     });
 
@@ -206,7 +199,7 @@ describe("loadFromUrl", () => {
         );
 
         const { dataLoader } = createDataLoader();
-        dataLoader.loadFromUrl("/test", null, null);
+        dataLoader.loadFromUrl(new RequestUrl("/test"));
 
         await waitFor(() => {
             const url = new URL(requestUrl);

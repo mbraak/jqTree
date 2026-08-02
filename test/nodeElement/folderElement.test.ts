@@ -30,6 +30,8 @@ const createFolderElement = ({
     const treeElement = document.createElement("div");
     document.body.append(treeElement);
 
+    const setNodeElement = vi.fn();
+
     const renderer = new ElementsRenderer({
         autoEscape: true,
         buttonLeft: false,
@@ -37,6 +39,7 @@ const createFolderElement = ({
         getTree: () => tree,
         htmlElement: treeElement,
         isNodeSelected: () => false,
+        setNodeElement,
         showEmptyFolder: false,
     });
     renderer.renderFromRoot();

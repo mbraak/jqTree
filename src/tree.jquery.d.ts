@@ -5,9 +5,9 @@ interface ClickNodeEvent {
     previous_node?: INode;
 }
 
-type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
+type DataUrl = DataUrlFunction | string;
 
-type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
+type DataUrlFunction = (node?: Node) => string;
 
 interface IJQTreeOptions {
     animationSpeed?: number | string;
@@ -28,8 +28,8 @@ interface IJQTreeOptions {
     onDragStop?: (node: INode, event: Event | Touch) => void;
     onGetStateFromStorage?: () => string;
     onIsMoveHandle?: (el: JQuery) => boolean;
-    onLoadFailed?: (response: JQuery.jqXHR) => void;
-    onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
+    onLoadFailed?: (response: Response) => void;
+    onLoading?: (isLoading: boolean, node?: INode, $el: JQuery) => void;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: HTMLElement | JQuery | string;
     openFolderDelay?: false | number;
@@ -85,7 +85,7 @@ interface IJQTreePlugin {
     (
         behavior: "loadDataFromUrl",
         param1?: INode | null | string,
-        param2?: (() => void) | INode | null,
+        param2?: (() => void) | INode,
         param3?: () => void,
     ): JQuery;
     (behavior: "moveDown"): JQuery;
