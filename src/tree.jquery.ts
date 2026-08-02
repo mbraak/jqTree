@@ -17,7 +17,6 @@ import { getOffsetTop } from "./positionUtils";
 import SaveStateHandler from "./saveStateHandler";
 import ScrollHandler from "./scrollHandler";
 import SelectNodeHandler from "./selectNodeHandler";
-import SimpleWidget from "./simple.widget";
 import __version__ from "./version";
 
 interface SelectNodeOptions {
@@ -25,48 +24,50 @@ interface SelectNodeOptions {
     mustToggle?: boolean;
 }
 
+const defaults: JQTreeOptions = {
+    animationSpeed: "fast",
+    autoEscape: true,
+    autoOpen: false, // true / false / int (open n levels starting at 0)
+    buttonLeft: true,
+    // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
+    // http://www.fileformat.info/info/unicode/char/25ba/index.htm
+    closedIcon: undefined,
+    data: undefined,
+    dataFilter: undefined,
+    dataUrl: undefined,
+    dragAndDrop: false,
+    keyboardSupport: true,
+    nodeClass: Node,
+    onCanMove: undefined, // Can this node be moved?
+    onCanMoveTo: undefined, // Can this node be moved to this position? function(moved_node, target_node, position)
+    onCanSelectNode: undefined,
+    onCreateLi: undefined,
+    onDragMove: undefined,
+    onDragStop: undefined,
+    onGetStateFromStorage: undefined,
+    onIsMoveHandle: undefined,
+    onLoadFailed: undefined,
+    onLoading: undefined,
+    onSetStateFromStorage: undefined,
+    openedIcon: "&#x25bc;",
+    openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
+    // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+    // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+    rtl: undefined, // right-to-left support; true / false (default)
+    saveState: false, // true / false / string (cookie name)
+    selectable: true,
+    showEmptyFolder: false,
+    slide: true, // must display slide animation?
+    startDndDelay: 300, // The delay for starting dnd (in milliseconds)
+    tabIndex: 0,
+    useContextMenu: true,
+};
+
 const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";
 
-export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
-    protected static _defaults: JQTreeOptions = {
-        animationSpeed: "fast",
-        autoEscape: true,
-        autoOpen: false, // true / false / int (open n levels starting at 0)
-        buttonLeft: true,
-        // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
-        // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-        closedIcon: undefined,
-        data: undefined,
-        dataFilter: undefined,
-        dataUrl: undefined,
-        dragAndDrop: false,
-        keyboardSupport: true,
-        nodeClass: Node,
-        onCanMove: undefined, // Can this node be moved?
-        onCanMoveTo: undefined, // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanSelectNode: undefined,
-        onCreateLi: undefined,
-        onDragMove: undefined,
-        onDragStop: undefined,
-        onGetStateFromStorage: undefined,
-        onIsMoveHandle: undefined,
-        onLoadFailed: undefined,
-        onLoading: undefined,
-        onSetStateFromStorage: undefined,
-        openedIcon: "&#x25bc;",
-        openFolderDelay: 500, // The delay for opening a folder during drag and drop; the value is in milliseconds
-        // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-        // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-        rtl: undefined, // right-to-left support; true / false (default)
-        saveState: false, // true / false / string (cookie name)
-        selectable: true,
-        showEmptyFolder: false,
-        slide: true, // must display slide animation?
-        startDndDelay: 300, // The delay for starting dnd (in milliseconds)
-        tabIndex: 0,
-        useContextMenu: true,
-    };
+export class JqTreeWidget {
+    [key: string]: unknown;
 
     private _dataLoader: DataLoader;
     private _dndHandler: DragAndDropHandler;
@@ -75,11 +76,18 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private _isInitialized: boolean;
     private _keyHandler: KeyHandler;
     private _mouseHandler: MouseHandler;
+    private _options: JQTreeOptions;
     private _renderer: ElementsRenderer;
     private _saveStateHandler: SaveStateHandler;
     private _scrollHandler: ScrollHandler;
     private _selectNodeHandler: SelectNodeHandler;
     private _tree: Node;
+
+    constructor(el: HTMLElement, options: Partial<JQTreeOptions>) {
+        this._htmlElement = el;
+        this._element = jQuery(el);
+        this._options = { ...defaults, ...options };
+    }
 
     public addNodeAfter(
         newNodeInfo: NodeData,
@@ -158,12 +166,12 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const slide = slideParam ?? this.options.slide;
+        const slide = slideParam ?? this._options.slide;
 
         if (node.isFolder() || node.isEmptyFolder) {
             this._createFolderElement(node).close(
                 slide,
-                this.options.animationSpeed,
+                this._options.animationSpeed,
             );
 
             this._saveState();
@@ -180,8 +188,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         this._mouseHandler.deinit();
 
         this._tree = new Node({}, true);
+    }
 
-        super.deinit();
+    public destroy(): void {
+        this.deinit();
     }
 
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
@@ -244,18 +254,16 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public init(): void {
-        super.init();
-
-        this._element = this.$el;
-        this._htmlElement = this._element.get(0) as HTMLElement;
+        const htmlElement = this._element.get(0) as HTMLElement;
+        this._htmlElement = htmlElement;
         this._isInitialized = false;
 
-        this.options.dataUrl ??= this._element.data("url");
+        this._options.dataUrl ??= this._element.data("url");
 
         const dataRtl = this._element.data("rtl") as unknown;
-        this.options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
+        this._options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
 
-        this.options.closedIcon ??= this._getDefaultClosedIcon();
+        this._options.closedIcon ??= this._getDefaultClosedIcon();
 
         this._connectHandlers();
         this._initData();
@@ -378,7 +386,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
                 onFinished = param2 as OnFinishOpenNode;
             }
 
-            slide ??= this.options.slide;
+            slide ??= this._options.slide;
 
             return [slide, onFinished];
         };
@@ -467,7 +475,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     public setOption(option: string, value: unknown): JQuery {
-        (this.options as unknown as Record<string, unknown>)[option] = value;
+        (this._options as unknown as Record<string, unknown>)[option] = value;
         return this._element;
     }
 
@@ -485,7 +493,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        const slide = slideParam ?? this.options.slide;
+        const slide = slideParam ?? this._options.slide;
 
         if (node.is_open) {
             this.closeNode(node, slide);
@@ -564,7 +572,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             showEmptyFolder,
             slide,
             tabIndex,
-        } = this.options;
+        } = this._options;
 
         const closeNode = this.closeNode.bind(this);
         const getNodeElement = this._getNodeElement.bind(this);
@@ -592,7 +600,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
         const removeFromSelection =
             selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
-        const getMouseDelay = () => this.options.startDndDelay ?? 0;
+        const getMouseDelay = () => this._options.startDndDelay ?? 0;
 
         const refreshHitAreas = () => {
             dndHandler.refresh();
@@ -687,7 +695,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             onMouseStart,
             onMouseStop,
             triggerEvent,
-            useContextMenu: this.options.useContextMenu,
+            useContextMenu: this._options.useContextMenu,
         });
 
         this._dataLoader = dataLoader;
@@ -706,7 +714,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             this._scrollHandler,
         );
         const openedIconElement = this._renderer.openedIconElement;
-        const tabIndex = this.options.tabIndex;
+        const tabIndex = this._options.tabIndex;
         const triggerEvent = this._triggerEvent.bind(this);
 
         return new FolderElement({
@@ -724,7 +732,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const getScrollLeft = this._scrollHandler.getScrollLeft.bind(
             this._scrollHandler,
         );
-        const tabIndex = this.options.tabIndex;
+        const tabIndex = this._options.tabIndex;
 
         return new NodeElement({
             getScrollLeft,
@@ -784,7 +792,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         optionsParam?: SelectNodeOptions,
     ): void {
         const saveState = (): void => {
-            if (this.options.saveState) {
+            if (this._options.saveState) {
                 this._saveStateHandler.saveState();
             }
         };
@@ -799,13 +807,13 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
         const selectOptions = { ...defaultOptions, ...(optionsParam ?? {}) };
 
         const canSelect = (): boolean => {
-            if (this.options.onCanSelectNode) {
+            if (this._options.onCanSelectNode) {
                 return (
-                    this.options.selectable &&
-                    this.options.onCanSelectNode(node)
+                    this._options.selectable &&
+                    this._options.onCanSelectNode(node)
                 );
             } else {
-                return this.options.selectable;
+                return this._options.selectable;
             }
         };
 
@@ -837,12 +845,12 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _getAutoOpenMaxLevel(): number {
-        if (this.options.autoOpen === true) {
+        if (this._options.autoOpen === true) {
             return -1;
-        } else if (typeof this.options.autoOpen === "number") {
-            return this.options.autoOpen;
-        } else if (typeof this.options.autoOpen === "string") {
-            return parseInt(this.options.autoOpen, 10);
+        } else if (typeof this._options.autoOpen === "number") {
+            return this._options.autoOpen;
+        } else if (typeof this._options.autoOpen === "string") {
+            return parseInt(this._options.autoOpen, 10);
         } else {
             return 0;
         }
@@ -872,7 +880,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             }
         };
 
-        const dataUrl = this.options.dataUrl;
+        const dataUrl = this._options.dataUrl;
         if (typeof dataUrl === "function") {
             return dataUrl(node);
         } else if (typeof dataUrl === "string") {
@@ -886,7 +894,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _getDefaultClosedIcon(): string {
-        if (this.options.rtl) {
+        if (this._options.rtl) {
             // triangle to the left
             return "&#x25c0;";
         } else {
@@ -923,7 +931,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _getNodeIdToBeSelected(): NodeId | null {
-        if (this.options.saveState) {
+        if (this._options.saveState) {
             return this._saveStateHandler.getNodeIdToBeSelected();
         } else {
             return null;
@@ -931,8 +939,8 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _initData(): void {
-        if (this.options.data) {
-            this._doLoadData(this.options.data, null);
+        if (this._options.data) {
+            this._doLoadData(this._options.data, null);
         } else {
             const dataUrl = this._getDataUrlInfo(null);
 
@@ -952,10 +960,10 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             }
         };
 
-        this._tree = new this.options.nodeClass(
+        this._tree = new this._options.nodeClass(
             null,
             true,
-            this.options.nodeClass,
+            this._options.nodeClass,
         );
 
         this._selectNodeHandler.clear();
@@ -1025,7 +1033,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _mouseCapture(positionInfo: PositionInfo): boolean | null {
-        if (this.options.dragAndDrop) {
+        if (this._options.dragAndDrop) {
             return this._dndHandler.mouseCapture(positionInfo);
         } else {
             return false;
@@ -1033,7 +1041,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _mouseDrag(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this._options.dragAndDrop) {
             const result = this._dndHandler.mouseDrag(positionInfo);
 
             this._scrollHandler.checkScrolling(positionInfo);
@@ -1044,7 +1052,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _mouseStart(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this._options.dragAndDrop) {
             return this._dndHandler.mouseStart(positionInfo);
         } else {
             return false;
@@ -1052,7 +1060,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _mouseStop(positionInfo: PositionInfo): boolean {
-        if (this.options.dragAndDrop) {
+        if (this._options.dragAndDrop) {
             this._scrollHandler.stopScrolling();
             return this._dndHandler.mouseStop(positionInfo);
         } else {
@@ -1078,7 +1086,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
             folderElement.open(
                 _onFinished,
                 _slide,
-                this.options.animationSpeed,
+                this._options.animationSpeed,
             );
         };
 
@@ -1130,7 +1138,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 
     private _saveState(): void {
-        if (this.options.saveState) {
+        if (this._options.saveState) {
             this._saveStateHandler.saveState();
         }
     }
@@ -1148,7 +1156,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     private _setInitialState(): boolean {
         const restoreState = (): [boolean, boolean] => {
             // result: is state restored, must load on demand?
-            if (!this.options.saveState) {
+            if (!this._options.saveState) {
                 return [false, false];
             } else {
                 const state = this._saveStateHandler.getStateFromStorage();
@@ -1167,7 +1175,7 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
 
         const autoOpenNodes = (): boolean => {
             // result: must load on demand?
-            if (this.options.autoOpen === false) {
+            if (this._options.autoOpen === false) {
                 return false;
             }
 
@@ -1266,4 +1274,97 @@ export class JqTreeWidget extends SimpleWidget<JQTreeOptions> {
     }
 }
 
-SimpleWidget.register(JqTreeWidget, "tree");
+const register = (): void => {
+    const getWidgetData = (
+        el: HTMLElement,
+        dataKey: string,
+    ): JqTreeWidget | null => {
+        const widget = jQuery.data(el, dataKey) as unknown;
+
+        if (widget && widget instanceof JqTreeWidget) {
+            return widget;
+        } else {
+            return null;
+        }
+    };
+
+    const createWidget = ($el: JQuery, options: null | Partial<JQTreeOptions>): JQuery => {
+        for (const el of $el.get()) {
+            const existingWidget = getWidgetData(el, "jqtree");
+
+            if (!existingWidget) {
+                const widget = new JqTreeWidget(el, options ?? {});
+
+                if (!jQuery.data(el, "jqtree")) {
+                    jQuery.data(el, "jqtree", widget);
+                }
+
+                // Call init after setting data, so we can call methods
+                widget.init();
+            }
+        }
+
+        return $el;
+    };
+
+    const destroyWidget = ($el: JQuery): void => {
+        for (const el of $el.get()) {
+            const widget = getWidgetData(el, "jqtree");
+
+            if (widget) {
+                widget.destroy();
+            }
+
+            jQuery.removeData(el, "jqtree");
+        }
+    };
+
+    const callFunction = (
+        $el: JQuery,
+        functionName: string,
+        args: unknown[],
+    ): unknown => {
+        let result = null;
+
+        for (const el of $el.get()) {
+            const widget = jQuery.data(el, "jqtree") as unknown;
+
+            if (widget && widget instanceof JqTreeWidget) {
+                const widgetFunction = widget[functionName];
+
+                if (widgetFunction && typeof widgetFunction === "function") {
+                    result = widgetFunction.apply(widget, args) as unknown;
+                }
+            }
+        }
+
+        return result;
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    (jQuery.fn as any).tree = function (
+        this: JQuery,
+        argument1: unknown,
+        ...args: unknown[]
+    ) {
+        if (!argument1) {
+            return createWidget(this, null);
+        } else if (typeof argument1 === "object") {
+            const options = argument1 as unknown;
+            return createWidget(this, options as JQTreeOptions);
+        } else if (typeof argument1 === "string" && argument1[0] !== "_") {
+            const functionName = argument1;
+
+            if (argument1 === "destroy") {
+                destroyWidget(this);
+                return undefined;
+            } else {
+                return callFunction(this, functionName, args);
+            }
+        } else {
+            return undefined;
+        }
+    };
+};
+
+register();
