@@ -3416,35 +3416,34 @@ var jqtree = (function (exports) {
         this._refreshElements(parentNode);
       }
       _mouseCapture(positionInfo) {
-        if (this._options.dragAndDrop) {
-          return this._dndHandler.mouseCapture(positionInfo);
-        } else {
+        if (!this._options.dragAndDrop) {
           return false;
         }
+        return this._dndHandler.mouseCapture(positionInfo);
       }
       _mouseDrag(positionInfo) {
-        if (this._options.dragAndDrop) {
-          const result = this._dndHandler.mouseDrag(positionInfo);
-          this._scrollHandler.checkScrolling(positionInfo);
-          return result;
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
           return false;
         }
+        const result = this._dndHandler.mouseDrag(positionInfo);
+        this._scrollHandler.checkScrolling(positionInfo);
+        return result;
       }
       _mouseStart(positionInfo) {
-        if (this._options.dragAndDrop) {
-          return this._dndHandler.mouseStart(positionInfo);
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
           return false;
         }
+        return this._dndHandler.mouseStart(positionInfo);
       }
       _mouseStop(positionInfo) {
-        if (this._options.dragAndDrop) {
-          this._scrollHandler.stopScrolling();
-          return this._dndHandler.mouseStop(positionInfo);
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
           return false;
         }
+        this._scrollHandler.stopScrolling();
+        return this._dndHandler.mouseStop(positionInfo);
       }
       _openNodeInternal(node, slide = true, onFinished) {
         const doOpenNode = (_node, _slide, _onFinished) => {
