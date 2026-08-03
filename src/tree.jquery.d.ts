@@ -1,13 +1,9 @@
-interface ClickNodeEvent {
+interface IJQTreeClickNodeEvent {
     click_event: JQuery.ClickEvent;
-    deselected_node?: INode | null;
-    node: INode;
-    previous_node?: INode;
+    deselected_node?: JQTreeNode | null;
+    node: JQTreeNode;
+    previous_node?: JQTreeNode;
 }
-
-type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
-
-type DataUrlFunction = (node?: Node) => JQuery.AjaxSettings;
 
 interface IJQTreeOptions {
     animationSpeed?: number | string;
@@ -16,20 +12,20 @@ interface IJQTreeOptions {
     buttonLeft?: boolean;
     closedIcon?: HTMLElement | JQuery | string;
     data?: NodeData[];
-    dataFilter?: (data: NodeData[]) => NodeData[];
-    dataUrl?: DataUrl;
+    dataFilter?: (data: JQTreeNodeData[]) => JQTreeNodeData[];
+    dataUrl?: ((node?: Node) => JQuery.AjaxSettings) | JQuery.AjaxSettings | string;
     dragAndDrop?: boolean;
     keyboardSupport?: boolean;
     nodeClass?: any;
-    onCanMove?: (node: INode) => boolean;
+    onCanMove?: (node: JQTreeNode) => boolean;
     onCanSelectNode?: (node: INode) => boolean;
-    onCreateLi?: (node: INode, el: JQuery, isSelected: boolean) => void;
-    onDragMove?: (node: INode, event: Event | Touch) => void;
-    onDragStop?: (node: INode, event: Event | Touch) => void;
+    onCreateLi?: (node: JQTreeNode, el: JQuery, isSelected: boolean) => void;
+    onDragMove?: (node: JQTreeNode, event: Event | Touch) => void;
+    onDragStop?: (node: JQTreeNode, event: Event | Touch) => void;
     onGetStateFromStorage?: () => string;
     onIsMoveHandle?: (el: JQuery) => boolean;
     onLoadFailed?: (response: JQuery.jqXHR) => void;
-    onLoading?: (isLoading: boolean, node: INode, $el: JQuery) => void;
+    onLoading?: (isLoading: boolean, node: JQTreeNode, $el: JQuery) => void;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: HTMLElement | JQuery | string;
     openFolderDelay?: false | number;
@@ -49,17 +45,17 @@ interface IJQTreePlugin {
         behavior: "addNodeAfter",
         newNodeInfo: NodeData,
         existingNode: INode,
-    ): INode | null;
+    ): JQTreeNode | null;
     (
         behavior: "addNodeBefore",
         newNodeInfo: NodeData,
         existingNode: INode,
-    ): INode | null;
+    ): JQTreeNode | null;
     (
         behavior: "addParentNode",
         newNodeInfo: NodeData,
         existingNode: INode,
-    ): INode | null;
+    ): JQTreeNode | null;
     (behavior: "addToSelection", node: INode, mustSetFocus?: boolean): JQuery;
     (behavior: "appendNode", newNodeInfo: NodeData, parentNode?: INode): INode;
     (behavior: "closeNode", node: INode, slide?: boolean): JQuery;
@@ -67,25 +63,25 @@ interface IJQTreePlugin {
     (
         behavior: "getNodeByCallback",
         callback: (node: INode) => boolean,
-    ): INode | null;
-    (behavior: "getNodeByHtmlElement", element: Element | JQuery): INode | null;
-    (behavior: "getNodeById", id: NodeId): INode | null;
-    (behavior: "getNodeByName", name: string): INode | null;
-    (behavior: "getNodeByNameMustExist", name: string): INode;
-    (behavior: "getNodesByProperty", key: string, value: unknown): INode[];
-    (behavior: "getSelectedNode"): false | INode;
-    (behavior: "getSelectedNodes"): INode[];
-    (behavior: "getState"): null | SavedState;
-    (behavior: "getStateFromStorage"): INode | null;
-    (behavior: "getTree"): INode;
+    ): JQTreeNode | null;
+    (behavior: "getNodeByHtmlElement", element: Element | JQuery): JQTreeNode | null;
+    (behavior: "getNodeById", id: NodeId): JQTreeNode | null;
+    (behavior: "getNodeByName", name: string): JQTreeNode | null;
+    (behavior: "getNodeByNameMustExist", name: string): JQTreeNode;
+    (behavior: "getNodesByProperty", key: string, value: unknown): JQTreeNode[];
+    (behavior: "getSelectedNode"): false | JQTreeNode;
+    (behavior: "getSelectedNodes"): JQTreeNode[];
+    (behavior: "getState"): JQTreeSavedState | null;
+    (behavior: "getStateFromStorage"): JQTreeNode | null;
+    (behavior: "getTree"): JQTreeNode;
     (behavior: "getVersion"): string;
     (behavior: "isDragging"): boolean;
-    (behavior: "isNodeSelected", node: INode): boolean;
-    (behavior: "loadData", data: NodeData[], parentNode?: INode): JQuery;
+    (behavior: "isNodeSelected", node: JQTreeNode): boolean;
+    (behavior: "loadData", data: NodeData[], parentNode?: JQTreeNode): JQuery;
     (
         behavior: "loadDataFromUrl",
-        param1?: INode | null | string,
-        param2?: (() => void) | INode | null,
+        param1?: JQTreeNode | null | string,
+        param2?: (() => void) | JQTreeNode | null,
         param3?: () => void,
     ): JQuery;
     (behavior: "moveDown"): JQuery;
@@ -96,8 +92,8 @@ interface IJQTreePlugin {
         position: "after" | "before" | "inside",
     ): JQuery;
     (behavior: "moveUp"): JQuery;
-    (behavior: "openNode", node: INode): JQuery;
-    (behavior: "openNode", node: INode, slide: boolean): JQuery;
+    (behavior: "openNode", node: JQTreeNode): JQuery;
+    (behavior: "openNode", node: JQTreeNode, slide: boolean): JQuery;
     (
         behavior: "openNode",
         node: INode,
@@ -112,55 +108,54 @@ interface IJQTreePlugin {
     (behavior: "prependNode", newNodeInfo: NodeData, parentNode?: INode): INode;
     (behavior: "refresh"): JQuery;
     (behavior: "reload", onFinished?: () => void): JQuery;
-    (behavior: "removeFromSelection", node: INode): JQuery;
-    (behavior: "removeNode", node: INode): JQuery;
-    (behavior: "scrollToNode", node: INode): JQuery;
+    (behavior: "removeFromSelection", node: JQTreeNode): JQuery;
+    (behavior: "removeNode", node: JQTreeNode): JQuery;
+    (behavior: "scrollToNode", node: JQTreeNode): JQuery;
     (
         behavior: "selectNode",
-        node: INode | null,
+        node: JQTreeNode | null,
         optionsParam?: SelectNodeOptions,
     ): JQuery;
     (behavior: "setOption", option: string, value: unknown): JQuery;
     (behavior: "setState", options: Record<string, unknown>): JQuery;
-    (behavior: "toggle", node: INode, slideParam?: boolean): JQuery;
+    (behavior: "toggle", node: JQTreeNode, slideParam?: boolean): JQuery;
     (behavior: "toJson"): string;
-    (behavior: "updateNode", node: INode, data: NodeData): JQuery;
+    (behavior: "updateNode", node: JQTreeNode, data: NodeData): JQuery;
 }
 
-interface INode {
+interface JQTreeNode {
     [key: string]: unknown;
     children: INode[];
     element?: HTMLElement;
     id?: NodeId;
     is_open: boolean;
-    iterate(callback: IterateCallback): void;
+    iterate(callback: (node: JQTreeNode, level: number) => boolean): void;
 
     name: string;
 
-    parent: INode | null;
+    parent: JQTreeNode | null;
 }
-type IterateCallback = (node: INode, level: number) => boolean;
+
+type JQTreeNodeData = JQTreeNodeRecord | string;
+
+type JQTreeNodeId = number | string;
+
+interface JQTreeNodeRecord {
+    [key: string]: unknown;
+    children?: JQTreeNodeData[];
+    id?: JQTreeNodeId;
+}
+
+interface JQTreeSavedState {
+    open_nodes: JQTreeNodeId[];
+    selected_node: JQTreeNodeId[];
+}
+
+interface JQTreeSelectNodeOptions {
+    mustSetFocus?: boolean;
+    mustToggle?: boolean;
+}
 
 interface JQuery {
     tree: IJQTreePlugin;
-}
-
-type NodeData = NodeRecord | string;
-
-type NodeId = number | string;
-
-interface NodeRecord {
-    [key: string]: unknown;
-    children?: NodeData[];
-    id?: NodeId;
-}
-
-interface SavedState {
-    open_nodes: NodeId[];
-    selected_node: NodeId[];
-}
-
-interface SelectNodeOptions {
-    mustSetFocus?: boolean;
-    mustToggle?: boolean;
 }

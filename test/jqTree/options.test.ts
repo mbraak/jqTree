@@ -277,7 +277,7 @@ describe("options", () => {
             );
 
             const dataFilter = vi.fn((data) => [
-                (data as number[])[1] as unknown as NodeData,
+                (data as number[])[1] as unknown as JQTreeNodeData,
             ]);
 
             const $tree = $("#tree1");
@@ -359,7 +359,7 @@ describe("options", () => {
 
             await screen.findByRole("treeitem", { name: "node1" })
 
-            expect(($tree.tree("getSelectedNode") as INode).name).toBe(
+            expect(($tree.tree("getSelectedNode") as JQTreeNode).name).toBe(
                 "node2",
             );
         });
@@ -408,7 +408,7 @@ describe("options", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
-                onCanSelectNode: (node: INode) => node.name !== "node1",
+                onCanSelectNode: (node: JQTreeNode) => node.name !== "node1",
             });
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
@@ -423,7 +423,7 @@ describe("options", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
-                onCreateLi: (node: INode, $el: JQuery) => {
+                onCreateLi: (node: JQTreeNode, $el: JQuery) => {
                     const htmlElement = $el.get(0) as HTMLElement;
                     // eslint-disable-next-line testing-library/no-node-access
                     const titleElement = htmlElement.querySelector(":scope > .jqtree-element > .jqtree-title") as HTMLElement;

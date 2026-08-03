@@ -1,6 +1,6 @@
 import type { LoadData, TriggerEvent } from "./jqtreeMethodTypes";
 import type { DataFilter, OnLoadFailed, OnLoading } from "./jqtreeOptions";
-import type { Node } from "./node";
+import type { Node, NodeData } from "./node";
 
 export type HandleFinishedLoading = () => void;
 

@@ -2,6 +2,7 @@ import { screen } from "@testing-library/dom";
 
 import type { GetTree, IsNodeSelected } from "app/jqtreeMethodTypes";
 import type { IconElement, OnCreateLi } from "app/jqtreeOptions";
+import type { NodeData } from "app/node";
 
 import ElementsRenderer from "app/elementsRenderer";
 import { Node } from "app/node";

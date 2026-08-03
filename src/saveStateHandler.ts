@@ -8,7 +8,7 @@ import type {
     RemoveFromSelection,
 } from "./jqtreeMethodTypes";
 import type { OnGetStateFromStorage, OnSetStateFromStorage } from "./jqtreeOptions";
-import type { Node } from "./node";
+import type { Node, NodeId } from "./node";
 
 import { isInt } from "./util";
 
