@@ -1915,7 +1915,7 @@ var jqtree = (function (exports) {
         this.init(node);
       }
       addDropHint(position) {
-        if (this.mustShowBorderDropHint(position)) {
+        if (this._mustShowBorderDropHint(position)) {
           return new BorderDropHint(this.element, this._getScrollLeft());
         } else {
           return new GhostDropHint(this.node, this.element, position);
@@ -1923,7 +1923,7 @@ var jqtree = (function (exports) {
       }
       deselect() {
         this.element.classList.remove("jqtree-selected");
-        const titleSpan = this.getTitleSpan();
+        const titleSpan = this._getTitleSpan();
         titleSpan.removeAttribute("tabindex");
         titleSpan.setAttribute("aria-selected", "false");
         titleSpan.blur();
@@ -1935,7 +1935,7 @@ var jqtree = (function (exports) {
       }
       select(mustSetFocus) {
         this.element.classList.add("jqtree-selected");
-        const titleSpan = this.getTitleSpan();
+        const titleSpan = this._getTitleSpan();
         const tabIndex = this._tabIndex;
 
         // Check for null or undefined
@@ -1947,13 +1947,13 @@ var jqtree = (function (exports) {
           titleSpan.focus();
         }
       }
-      getTitleSpan() {
+      _getTitleSpan() {
         return this.element.querySelector(":scope > .jqtree-element > span.jqtree-title");
       }
-      getUl() {
+      _getUl() {
         return this.element.querySelector(":scope > ul");
       }
-      mustShowBorderDropHint(position) {
+      _mustShowBorderDropHint(position) {
         return position === "inside";
       }
     }
@@ -2033,13 +2033,13 @@ var jqtree = (function (exports) {
         }
         const doClose = () => {
           this.element.classList.add("jqtree-closed");
-          const titleSpan = this.getTitleSpan();
+          const titleSpan = this._getTitleSpan();
           titleSpan.setAttribute("aria-expanded", "false");
           this._triggerEvent("tree.close", {
             node: this.node
           });
         };
-        const ul = this.getUl();
+        const ul = this._getUl();
         if (slide) {
           slideUp(ul, animationSpeed, doClose);
         } else {
@@ -2062,7 +2062,7 @@ var jqtree = (function (exports) {
         }
         const doOpen = () => {
           this.element.classList.remove("jqtree-closed");
-          const titleSpan = this.getTitleSpan();
+          const titleSpan = this._getTitleSpan();
           titleSpan.setAttribute("aria-expanded", "true");
           if (onFinished) {
             onFinished(this.node);
@@ -2071,7 +2071,7 @@ var jqtree = (function (exports) {
             node: this.node
           });
         };
-        const ul = this.getUl();
+        const ul = this._getUl();
         if (slide) {
           slideDown(ul, animationSpeed, doOpen);
         } else {
@@ -2079,7 +2079,7 @@ var jqtree = (function (exports) {
           doOpen();
         }
       }
-      mustShowBorderDropHint(position) {
+      _mustShowBorderDropHint(position) {
         return !this.node.is_open && position === "inside";
       }
       _getButton() {
@@ -2286,79 +2286,79 @@ var jqtree = (function (exports) {
     }
 
     class ScrollParent {
-      container;
-      horizontalScrollDirection;
-      horizontalScrollTimeout;
-      refreshHitAreas;
-      verticalScrollDirection;
-      verticalScrollTimeout;
+      _container;
+      _horizontalScrollDirection;
+      _horizontalScrollTimeout;
+      _refreshHitAreas;
+      _verticalScrollDirection;
+      _verticalScrollTimeout;
       constructor({
         container,
         refreshHitAreas
       }) {
-        this.container = container;
-        this.refreshHitAreas = refreshHitAreas;
+        this._container = container;
+        this._refreshHitAreas = refreshHitAreas;
       }
       checkHorizontalScrolling(pageX) {
-        const newHorizontalScrollDirection = this.getNewHorizontalScrollDirection(pageX);
-        if (this.horizontalScrollDirection !== newHorizontalScrollDirection) {
-          this.horizontalScrollDirection = newHorizontalScrollDirection;
-          if (this.horizontalScrollTimeout != null) {
-            window.clearTimeout(this.horizontalScrollTimeout);
+        const newHorizontalScrollDirection = this._getNewHorizontalScrollDirection(pageX);
+        if (this._horizontalScrollDirection !== newHorizontalScrollDirection) {
+          this._horizontalScrollDirection = newHorizontalScrollDirection;
+          if (this._horizontalScrollTimeout != null) {
+            window.clearTimeout(this._horizontalScrollTimeout);
           }
           if (newHorizontalScrollDirection) {
-            this.horizontalScrollTimeout = window.setTimeout(this.scrollHorizontally.bind(this), 40);
+            this._horizontalScrollTimeout = window.setTimeout(this._scrollHorizontally.bind(this), 40);
           }
         }
       }
       checkVerticalScrolling(pageY) {
-        const newVerticalScrollDirection = this.getNewVerticalScrollDirection(pageY);
-        if (this.verticalScrollDirection !== newVerticalScrollDirection) {
-          this.verticalScrollDirection = newVerticalScrollDirection;
-          if (this.verticalScrollTimeout != null) {
-            window.clearTimeout(this.verticalScrollTimeout);
-            this.verticalScrollTimeout = undefined;
+        const newVerticalScrollDirection = this._getNewVerticalScrollDirection(pageY);
+        if (this._verticalScrollDirection !== newVerticalScrollDirection) {
+          this._verticalScrollDirection = newVerticalScrollDirection;
+          if (this._verticalScrollTimeout != null) {
+            window.clearTimeout(this._verticalScrollTimeout);
+            this._verticalScrollTimeout = undefined;
           }
           if (newVerticalScrollDirection) {
-            this.verticalScrollTimeout = window.setTimeout(this.scrollVertically.bind(this), 40);
+            this._verticalScrollTimeout = window.setTimeout(this._scrollVertically.bind(this), 40);
           }
         }
       }
       getScrollLeft() {
-        return this.container.scrollLeft;
+        return this._container.scrollLeft;
       }
       scrollToY(top) {
-        this.container.scrollTop = top;
+        this._container.scrollTop = top;
       }
       stopScrolling() {
-        this.horizontalScrollDirection = undefined;
-        this.verticalScrollDirection = undefined;
+        this._horizontalScrollDirection = undefined;
+        this._verticalScrollDirection = undefined;
       }
-      scrollHorizontally() {
-        if (!this.horizontalScrollDirection) {
+      _scrollHorizontally() {
+        if (!this._horizontalScrollDirection) {
           return;
         }
-        const distance = this.horizontalScrollDirection === "left" ? -20 : 20;
-        this.container.scrollBy({
+        const distance = this._horizontalScrollDirection === "left" ? -20 : 20;
+        this._container.scrollBy({
           behavior: "instant",
           left: distance,
           top: 0
         });
-        this.refreshHitAreas();
-        setTimeout(this.scrollHorizontally.bind(this), 40);
+        this._refreshHitAreas();
+        setTimeout(this._scrollHorizontally.bind(this), 40);
       }
-      scrollVertically() {
-        if (!this.verticalScrollDirection) {
+      _scrollVertically() {
+        if (!this._verticalScrollDirection) {
           return;
         }
-        const distance = this.verticalScrollDirection === "top" ? -20 : 20;
-        this.container.scrollBy({
+        const distance = this._verticalScrollDirection === "top" ? -20 : 20;
+        this._container.scrollBy({
           behavior: "instant",
           left: 0,
           top: distance
         });
-        this.refreshHitAreas();
-        setTimeout(this.scrollVertically.bind(this), 40);
+        this._refreshHitAreas();
+        setTimeout(this._scrollVertically.bind(this), 40);
       }
     }
 
@@ -2367,12 +2367,12 @@ var jqtree = (function (exports) {
       _scrollParentTop;
       stopScrolling() {
         super.stopScrolling();
-        this.horizontalScrollDirection = undefined;
-        this.verticalScrollDirection = undefined;
+        this._horizontalScrollDirection = undefined;
+        this._verticalScrollDirection = undefined;
       }
-      getNewHorizontalScrollDirection(pageX) {
-        const scrollParentOffset = getElementPosition(this.container);
-        const containerWidth = this.container.getBoundingClientRect().width;
+      _getNewHorizontalScrollDirection(pageX) {
+        const scrollParentOffset = getElementPosition(this._container);
+        const containerWidth = this._container.getBoundingClientRect().width;
         const rightEdge = scrollParentOffset.left + containerWidth;
         const leftEdge = scrollParentOffset.left;
         const isNearRightEdge = pageX > rightEdge - 20;
@@ -2384,7 +2384,7 @@ var jqtree = (function (exports) {
         }
         return undefined;
       }
-      getNewVerticalScrollDirection(pageY) {
+      _getNewVerticalScrollDirection(pageY) {
         if (pageY < this._getScrollParentTop()) {
           return "top";
         }
@@ -2395,13 +2395,13 @@ var jqtree = (function (exports) {
       }
       _getScrollParentBottom() {
         if (this._scrollParentBottom == null) {
-          const containerHeight = this.container.getBoundingClientRect().height;
+          const containerHeight = this._container.getBoundingClientRect().height;
           this._scrollParentBottom = this._getScrollParentTop() + containerHeight;
         }
         return this._scrollParentBottom;
       }
       _getScrollParentTop() {
-        this._scrollParentTop ??= getOffsetTop(this.container);
+        this._scrollParentTop ??= getOffsetTop(this._container);
         return this._scrollParentTop;
       }
     }
@@ -2429,8 +2429,8 @@ var jqtree = (function (exports) {
         this._documentScrollHeight = undefined;
         this._documentScrollWidth = undefined;
       }
-      getNewHorizontalScrollDirection(pageX) {
-        const scrollLeft = this.container.scrollLeft;
+      _getNewHorizontalScrollDirection(pageX) {
+        const scrollLeft = this._container.scrollLeft;
         const windowWidth = window.innerWidth;
         const isNearRightEdge = pageX > windowWidth - 20;
         const isNearLeftEdge = pageX - scrollLeft < 20;
@@ -2442,8 +2442,8 @@ var jqtree = (function (exports) {
         }
         return undefined;
       }
-      getNewVerticalScrollDirection(pageY) {
-        const scrollTop = this.container.scrollTop;
+      _getNewVerticalScrollDirection(pageY) {
+        const scrollTop = this._container.scrollTop;
         const distanceTop = pageY - scrollTop;
         if (distanceTop < 20) {
           return "top";
@@ -2455,19 +2455,19 @@ var jqtree = (function (exports) {
         return undefined;
       }
       _canScrollDown() {
-        return this.container.scrollTop + this.container.clientHeight < this._getDocumentScrollHeight();
+        return this._container.scrollTop + this._container.clientHeight < this._getDocumentScrollHeight();
       }
       _canScrollRight() {
-        return this.container.scrollLeft + this.container.clientWidth < this._getDocumentScrollWidth();
+        return this._container.scrollLeft + this._container.clientWidth < this._getDocumentScrollWidth();
       }
       _getDocumentScrollHeight() {
         // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
-        this._documentScrollHeight ??= this.container.scrollHeight;
+        this._documentScrollHeight ??= this._container.scrollHeight;
         return this._documentScrollHeight;
       }
       _getDocumentScrollWidth() {
         // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
-        this._documentScrollWidth ??= this.container.scrollWidth;
+        this._documentScrollWidth ??= this._container.scrollWidth;
         return this._documentScrollWidth;
       }
     }
@@ -2632,157 +2632,57 @@ var jqtree = (function (exports) {
       }
     }
 
-    const register = (widgetClass, widgetName) => {
-      const getDataKey = () => `simple_widget_${widgetName}`;
-      const getWidgetData = (el, dataKey) => {
-        const widget = jQuery.data(el, dataKey);
-        if (widget && widget instanceof SimpleWidget) {
-          return widget;
-        } else {
-          return null;
-        }
-      };
-      const createWidget = ($el, options) => {
-        const dataKey = getDataKey();
-        for (const el of $el.get()) {
-          const existingWidget = getWidgetData(el, dataKey);
-          if (!existingWidget) {
-            const simpleWidgetClass = widgetClass;
-            const widget = new simpleWidgetClass(el, options);
-            if (!jQuery.data(el, dataKey)) {
-              jQuery.data(el, dataKey, widget);
-            }
-
-            // Call init after setting data, so we can call methods
-            widget.init();
-          }
-        }
-        return $el;
-      };
-      const destroyWidget = $el => {
-        const dataKey = getDataKey();
-        for (const el of $el.get()) {
-          const widget = getWidgetData(el, dataKey);
-          if (widget) {
-            widget.destroy();
-          }
-          jQuery.removeData(el, dataKey);
-        }
-      };
-      const callFunction = ($el, functionName, args) => {
-        let result = null;
-        for (const el of $el.get()) {
-          const widget = jQuery.data(el, getDataKey());
-          if (widget && widget instanceof SimpleWidget) {
-            const simpleWidget = widget;
-            const widgetFunction = simpleWidget[functionName];
-            if (widgetFunction && typeof widgetFunction === "function") {
-              result = widgetFunction.apply(widget, args);
-            }
-          }
-        }
-        return result;
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      jQuery.fn[widgetName] = function (argument1, ...args) {
-        if (!argument1) {
-          return createWidget(this, null);
-        } else if (typeof argument1 === "object") {
-          const options = argument1;
-          return createWidget(this, options);
-        } else if (typeof argument1 === "string" && argument1[0] !== "_") {
-          const functionName = argument1;
-          if (argument1 === "destroy") {
-            destroyWidget(this);
-            return undefined;
-          } else {
-            return callFunction(this, functionName, args);
-          }
-        } else {
-          return undefined;
-        }
-      };
-    };
-    class SimpleWidget {
-      static defaults = {};
-      $el;
-      options;
-      constructor(el, options) {
-        this.$el = jQuery(el);
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const defaults = this.constructor.defaults;
-        this.options = {
-          ...defaults,
-          ...options
-        };
-      }
-      static register(widgetClass, widgetName) {
-        register(widgetClass, widgetName);
-      }
-      deinit() {
-        //
-      }
-      destroy() {
-        this.deinit();
-      }
-      init() {
-        //
-      }
-    }
-
     const version = "1.9.0";
 
+    const defaults = {
+      animationSpeed: "fast",
+      autoEscape: true,
+      autoOpen: false,
+      // true / false / int (open n levels starting at 0)
+      buttonLeft: true,
+      // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
+      // http://www.fileformat.info/info/unicode/char/25ba/index.htm
+      closedIcon: undefined,
+      data: undefined,
+      dataFilter: undefined,
+      dataUrl: undefined,
+      dragAndDrop: false,
+      keyboardSupport: true,
+      nodeClass: Node,
+      onCanMove: undefined,
+      // Can this node be moved?
+      onCanMoveTo: undefined,
+      // Can this node be moved to this position? function(moved_node, target_node, position)
+      onCanSelectNode: undefined,
+      onCreateLi: undefined,
+      onDragMove: undefined,
+      onDragStop: undefined,
+      onGetStateFromStorage: undefined,
+      onIsMoveHandle: undefined,
+      onLoadFailed: undefined,
+      onLoading: undefined,
+      onSetStateFromStorage: undefined,
+      openedIcon: "&#x25bc;",
+      openFolderDelay: 500,
+      // The delay for opening a folder during drag and drop; the value is in milliseconds
+      // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+      // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+      rtl: undefined,
+      // right-to-left support; true / false (default)
+      saveState: false,
+      // true / false / string (cookie name)
+      selectable: true,
+      showEmptyFolder: false,
+      slide: true,
+      // must display slide animation?
+      startDndDelay: 300,
+      // The delay for starting dnd (in milliseconds)
+      tabIndex: 0,
+      useContextMenu: true
+    };
     const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
     const PARAM_IS_EMPTY = "Parameter is empty: ";
-    class JqTreeWidget extends SimpleWidget {
-      static defaults = {
-        animationSpeed: "fast",
-        autoEscape: true,
-        autoOpen: false,
-        // true / false / int (open n levels starting at 0)
-        buttonLeft: true,
-        // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
-        // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-        closedIcon: undefined,
-        data: undefined,
-        dataFilter: undefined,
-        dataUrl: undefined,
-        dragAndDrop: false,
-        keyboardSupport: true,
-        nodeClass: Node,
-        onCanMove: undefined,
-        // Can this node be moved?
-        onCanMoveTo: undefined,
-        // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanSelectNode: undefined,
-        onCreateLi: undefined,
-        onDragMove: undefined,
-        onDragStop: undefined,
-        onGetStateFromStorage: undefined,
-        onIsMoveHandle: undefined,
-        onLoadFailed: undefined,
-        onLoading: undefined,
-        onSetStateFromStorage: undefined,
-        openedIcon: "&#x25bc;",
-        openFolderDelay: 500,
-        // The delay for opening a folder during drag and drop; the value is in milliseconds
-        // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-        // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-        rtl: undefined,
-        // right-to-left support; true / false (default)
-        saveState: false,
-        // true / false / string (cookie name)
-        selectable: true,
-        showEmptyFolder: false,
-        slide: true,
-        // must display slide animation?
-        startDndDelay: 300,
-        // The delay for starting dnd (in milliseconds)
-        tabIndex: 0,
-        useContextMenu: true
-      };
+    class JqTreeWidget {
       _dataLoader;
       _dndHandler;
       _element;
@@ -2790,11 +2690,20 @@ var jqtree = (function (exports) {
       _isInitialized;
       _keyHandler;
       _mouseHandler;
+      _options;
       _renderer;
       _saveStateHandler;
       _scrollHandler;
       _selectNodeHandler;
       _tree;
+      constructor(el, options) {
+        this._htmlElement = el;
+        this._element = jQuery(el);
+        this._options = {
+          ...defaults,
+          ...options
+        };
+      }
       addNodeAfter(newNodeInfo, existingNode) {
         const newNode = existingNode.addAfter(newNodeInfo);
         if (newNode) {
@@ -2842,9 +2751,9 @@ var jqtree = (function (exports) {
         if (!node) {
           throw Error(NODE_PARAM_IS_EMPTY);
         }
-        const slide = slideParam ?? this.options.slide;
+        const slide = slideParam ?? this._options.slide;
         if (node.isFolder() || node.isEmptyFolder) {
-          this._createFolderElement(node).close(slide, this.options.animationSpeed);
+          this._createFolderElement(node).close(slide, this._options.animationSpeed);
           this._saveState();
         }
         return this._element;
@@ -2855,7 +2764,9 @@ var jqtree = (function (exports) {
         this._keyHandler.deinit();
         this._mouseHandler.deinit();
         this._tree = new Node({}, true);
-        super.deinit();
+      }
+      destroy() {
+        this.deinit();
       }
       getNodeByCallback(callback) {
         return this._tree.getNodeByCallback(callback);
@@ -2898,14 +2809,13 @@ var jqtree = (function (exports) {
         return version;
       }
       init() {
-        super.init();
-        this._element = this.$el;
-        this._htmlElement = this._element.get(0);
+        const htmlElement = this._element.get(0);
+        this._htmlElement = htmlElement;
         this._isInitialized = false;
-        this.options.dataUrl ??= this._element.data("url");
+        this._options.dataUrl ??= this._element.data("url");
         const dataRtl = this._element.data("rtl");
-        this.options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
-        this.options.closedIcon ??= this._getDefaultClosedIcon();
+        this._options.rtl ??= dataRtl === '' ? true : Boolean(dataRtl);
+        this._options.closedIcon ??= this._getDefaultClosedIcon();
         this._connectHandlers();
         this._initData();
       }
@@ -2988,7 +2898,7 @@ var jqtree = (function (exports) {
             slide = param1;
             onFinished = param2;
           }
-          slide ??= this.options.slide;
+          slide ??= this._options.slide;
           return [slide, onFinished];
         };
         const [slide, onFinished] = parseParams();
@@ -3048,7 +2958,7 @@ var jqtree = (function (exports) {
         return this._element;
       }
       setOption(option, value) {
-        this.options[option] = value;
+        this._options[option] = value;
         return this._element;
       }
       setState(state) {
@@ -3062,7 +2972,7 @@ var jqtree = (function (exports) {
         if (!node) {
           throw Error(NODE_PARAM_IS_EMPTY);
         }
-        const slide = slideParam ?? this.options.slide;
+        const slide = slideParam ?? this._options.slide;
         if (node.is_open) {
           this.closeNode(node, slide);
         } else {
@@ -3122,7 +3032,7 @@ var jqtree = (function (exports) {
           showEmptyFolder,
           slide,
           tabIndex
-        } = this.options;
+        } = this._options;
         const closeNode = this.closeNode.bind(this);
         const getNodeElement = this._getNodeElement.bind(this);
         const getNodeElementForNode = this._getNodeElementForNode.bind(this);
@@ -3143,7 +3053,7 @@ var jqtree = (function (exports) {
         const getSelectedNodes = selectNodeHandler.getSelectedNodes.bind(selectNodeHandler);
         const isNodeSelected = selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
         const removeFromSelection = selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
-        const getMouseDelay = () => this.options.startDndDelay ?? 0;
+        const getMouseDelay = () => this._options.startDndDelay ?? 0;
         const refreshHitAreas = () => {
           dndHandler.refresh();
         };
@@ -3228,7 +3138,7 @@ var jqtree = (function (exports) {
           onMouseStart,
           onMouseStop,
           triggerEvent,
-          useContextMenu: this.options.useContextMenu
+          useContextMenu: this._options.useContextMenu
         });
         this._dataLoader = dataLoader;
         this._dndHandler = dndHandler;
@@ -3243,7 +3153,7 @@ var jqtree = (function (exports) {
         const closedIconElement = this._renderer.closedIconElement;
         const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
         const openedIconElement = this._renderer.openedIconElement;
-        const tabIndex = this.options.tabIndex;
+        const tabIndex = this._options.tabIndex;
         const triggerEvent = this._triggerEvent.bind(this);
         return new FolderElement({
           closedIconElement,
@@ -3257,7 +3167,7 @@ var jqtree = (function (exports) {
       }
       _createNodeElement(node) {
         const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
-        const tabIndex = this.options.tabIndex;
+        const tabIndex = this._options.tabIndex;
         return new NodeElement({
           getScrollLeft,
           node,
@@ -3300,7 +3210,7 @@ var jqtree = (function (exports) {
       }
       _doSelectNode(node, optionsParam) {
         const saveState = () => {
-          if (this.options.saveState) {
+          if (this._options.saveState) {
             this._saveStateHandler.saveState();
           }
         };
@@ -3319,10 +3229,10 @@ var jqtree = (function (exports) {
           ...(optionsParam ?? {})
         };
         const canSelect = () => {
-          if (this.options.onCanSelectNode) {
-            return this.options.selectable && this.options.onCanSelectNode(node);
+          if (this._options.onCanSelectNode) {
+            return this._options.selectable && this._options.onCanSelectNode(node);
           } else {
-            return this.options.selectable;
+            return this._options.selectable;
           }
         };
         if (!canSelect()) {
@@ -3349,12 +3259,12 @@ var jqtree = (function (exports) {
         saveState();
       }
       _getAutoOpenMaxLevel() {
-        if (this.options.autoOpen === true) {
+        if (this._options.autoOpen === true) {
           return -1;
-        } else if (typeof this.options.autoOpen === "number") {
-          return this.options.autoOpen;
-        } else if (typeof this.options.autoOpen === "string") {
-          return parseInt(this.options.autoOpen, 10);
+        } else if (typeof this._options.autoOpen === "number") {
+          return this._options.autoOpen;
+        } else if (typeof this._options.autoOpen === "string") {
+          return parseInt(this._options.autoOpen, 10);
         } else {
           return 0;
         }
@@ -3385,7 +3295,7 @@ var jqtree = (function (exports) {
             }
           }
         };
-        const dataUrl = this.options.dataUrl;
+        const dataUrl = this._options.dataUrl;
         if (typeof dataUrl === "function") {
           return dataUrl(node);
         } else if (typeof dataUrl === "string") {
@@ -3398,7 +3308,7 @@ var jqtree = (function (exports) {
         }
       }
       _getDefaultClosedIcon() {
-        if (this.options.rtl) {
+        if (this._options.rtl) {
           // triangle to the left
           return "&#x25c0;";
         } else {
@@ -3430,15 +3340,15 @@ var jqtree = (function (exports) {
         }
       }
       _getNodeIdToBeSelected() {
-        if (this.options.saveState) {
+        if (this._options.saveState) {
           return this._saveStateHandler.getNodeIdToBeSelected();
         } else {
           return null;
         }
       }
       _initData() {
-        if (this.options.data) {
-          this._doLoadData(this.options.data, null);
+        if (this._options.data) {
+          this._doLoadData(this._options.data, null);
         } else {
           const dataUrl = this._getDataUrlInfo(null);
           if (dataUrl) {
@@ -3455,7 +3365,7 @@ var jqtree = (function (exports) {
             this._triggerEvent("tree.init");
           }
         };
-        this._tree = new this.options.nodeClass(null, true, this.options.nodeClass);
+        this._tree = new this._options.nodeClass(null, true, this._options.nodeClass);
         this._selectNodeHandler.clear();
         this._tree.loadFromData(data);
         const mustLoadOnDemand = this._setInitialState();
@@ -3506,35 +3416,34 @@ var jqtree = (function (exports) {
         this._refreshElements(parentNode);
       }
       _mouseCapture(positionInfo) {
-        if (this.options.dragAndDrop) {
-          return this._dndHandler.mouseCapture(positionInfo);
-        } else {
+        if (!this._options.dragAndDrop) {
           return false;
         }
+        return this._dndHandler.mouseCapture(positionInfo);
       }
       _mouseDrag(positionInfo) {
-        if (this.options.dragAndDrop) {
-          const result = this._dndHandler.mouseDrag(positionInfo);
-          this._scrollHandler.checkScrolling(positionInfo);
-          return result;
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
           return false;
         }
+        const result = this._dndHandler.mouseDrag(positionInfo);
+        this._scrollHandler.checkScrolling(positionInfo);
+        return result;
       }
       _mouseStart(positionInfo) {
-        if (this.options.dragAndDrop) {
-          return this._dndHandler.mouseStart(positionInfo);
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
           return false;
         }
+        return this._dndHandler.mouseStart(positionInfo);
       }
       _mouseStop(positionInfo) {
-        if (this.options.dragAndDrop) {
-          this._scrollHandler.stopScrolling();
-          return this._dndHandler.mouseStop(positionInfo);
-        } else {
+        /* istanbul ignore if */
+        if (!this._options.dragAndDrop) {
           return false;
         }
+        this._scrollHandler.stopScrolling();
+        return this._dndHandler.mouseStop(positionInfo);
       }
       _openNodeInternal(node, slide = true, onFinished) {
         const doOpenNode = (_node, _slide, _onFinished) => {
@@ -3542,7 +3451,7 @@ var jqtree = (function (exports) {
             return;
           }
           const folderElement = this._createFolderElement(_node);
-          folderElement.open(_onFinished, _slide, this.options.animationSpeed);
+          folderElement.open(_onFinished, _slide, this._options.animationSpeed);
         };
         if (node.isFolder() || node.isEmptyFolder) {
           if (node.load_on_demand) {
@@ -3582,7 +3491,7 @@ var jqtree = (function (exports) {
         this._triggerEvent("tree.refresh");
       }
       _saveState() {
-        if (this.options.saveState) {
+        if (this._options.saveState) {
           this._saveStateHandler.saveState();
         }
       }
@@ -3599,7 +3508,7 @@ var jqtree = (function (exports) {
       _setInitialState() {
         const restoreState = () => {
           // result: is state restored, must load on demand?
-          if (!this.options.saveState) {
+          if (!this._options.saveState) {
             return [false, false];
           } else {
             const state = this._saveStateHandler.getStateFromStorage();
@@ -3615,7 +3524,7 @@ var jqtree = (function (exports) {
         };
         const autoOpenNodes = () => {
           // result: must load on demand?
-          if (this.options.autoOpen === false) {
+          if (this._options.autoOpen === false) {
             return false;
           }
           const maxLevel = this._getAutoOpenMaxLevel();
@@ -3691,7 +3600,74 @@ var jqtree = (function (exports) {
         return !event.isDefaultPrevented();
       }
     }
-    SimpleWidget.register(JqTreeWidget, "tree");
+    const register = () => {
+      const getWidgetData = (el, dataKey) => {
+        const widget = jQuery.data(el, dataKey);
+        if (widget && widget instanceof JqTreeWidget) {
+          return widget;
+        } else {
+          return null;
+        }
+      };
+      const createWidget = ($el, options) => {
+        for (const el of $el.get()) {
+          const existingWidget = getWidgetData(el, "jqtree");
+          if (!existingWidget) {
+            const widget = new JqTreeWidget(el, options ?? {});
+            if (!jQuery.data(el, "jqtree")) {
+              jQuery.data(el, "jqtree", widget);
+            }
+
+            // Call init after setting data, so we can call methods
+            widget.init();
+          }
+        }
+        return $el;
+      };
+      const destroyWidget = $el => {
+        for (const el of $el.get()) {
+          const widget = getWidgetData(el, "jqtree");
+          if (widget) {
+            widget.destroy();
+          }
+          jQuery.removeData(el, "jqtree");
+        }
+      };
+      const callFunction = ($el, functionName, args) => {
+        let result = null;
+        for (const el of $el.get()) {
+          const widget = jQuery.data(el, "jqtree");
+          if (widget && widget instanceof JqTreeWidget) {
+            const widgetFunction = widget[functionName];
+            if (widgetFunction && typeof widgetFunction === "function") {
+              result = widgetFunction.apply(widget, args);
+            }
+          }
+        }
+        return result;
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      jQuery.fn.tree = function (argument1, ...args) {
+        if (!argument1) {
+          return createWidget(this, null);
+        } else if (typeof argument1 === "object") {
+          const options = argument1;
+          return createWidget(this, options);
+        } else if (typeof argument1 === "string" && argument1[0] !== "_") {
+          const functionName = argument1;
+          if (argument1 === "destroy") {
+            destroyWidget(this);
+            return undefined;
+          } else {
+            return callFunction(this, functionName, args);
+          }
+        } else {
+          return undefined;
+        }
+      };
+    };
+    register();
 
     exports.JqTreeWidget = JqTreeWidget;
 
