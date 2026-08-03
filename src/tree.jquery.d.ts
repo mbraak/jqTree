@@ -137,7 +137,7 @@ interface JQTreePlugin {
     (
         behavior: "selectNode",
         node: JQTreeNode | null,
-        optionsParam?: SelectNodeOptions,
+        optionsParam?: JQTreeSelectNodeOptions,
     ): JQuery;
     (behavior: "setOption", option: string, value: unknown): JQuery;
     (behavior: "setState", options: Record<string, unknown>): JQuery;
