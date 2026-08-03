@@ -355,7 +355,7 @@ describe("methods", () => {
             const $tree = $("#tree1");
             $tree.tree({ data: exampleData });
 
-            const callback = (node: INode) => node.name.startsWith("chi");
+            const callback = (node: JQTreeNode) => node.name.startsWith("chi");
 
             expect($tree.tree("getNodeByCallback", callback)).toMatchObject({
                 name: "child1",
@@ -1101,7 +1101,7 @@ describe("methods", () => {
             $tree.tree({ data: exampleData });
 
             const tree = $tree.tree("getTree");
-            (tree.children[0] as INode).name = "node1a";
+            (tree.children[0] as JQTreeNode).name = "node1a";
 
             expect($tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
@@ -1177,8 +1177,8 @@ describe("methods", () => {
                 data: exampleData,
             });
 
-            const child1 = $tree.tree("getNodeByName", "child1") as INode;
-            const child2 = $tree.tree("getNodeByName", "child2") as INode;
+            const child1 = $tree.tree("getNodeByName", "child1") as JQTreeNode;
+            const child2 = $tree.tree("getNodeByName", "child2") as JQTreeNode;
             $tree.tree("addToSelection", child1);
             $tree.tree("addToSelection", child2);
 
@@ -1200,7 +1200,7 @@ describe("methods", () => {
             expect(() => {
                 $tree.tree(
                     "removeFromSelection",
-                    undefined as unknown as INode,
+                    undefined as unknown as JQTreeNode,
                 );
             }).toThrow("Node parameter is empty");
         });
@@ -1298,7 +1298,7 @@ describe("methods", () => {
             });
 
             expect(() => {
-                $tree.tree("scrollToNode", undefined as unknown as INode);
+                $tree.tree("scrollToNode", undefined as unknown as JQTreeNode);
             }).toThrow("Node parameter is empty");
         });
 
@@ -1308,7 +1308,7 @@ describe("methods", () => {
                 data: exampleData,
             });
 
-            const result = $tree.tree("scrollToNode", {} as unknown as INode);
+            const result = $tree.tree("scrollToNode", {} as unknown as JQTreeNode);
 
             expect(result).toStrictEqual($tree);
         });

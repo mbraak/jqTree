@@ -7,7 +7,7 @@ import type {
     RefreshElements,
     RemoveFromSelection,
 } from "./methodTypes";
-import type { Node } from "./node";
+import type { Node, NodeId } from "./node";
 import type { OnGetStateFromStorage, OnSetStateFromStorage } from "./options";
 
 import { isInt } from "./util";

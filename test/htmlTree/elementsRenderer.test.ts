@@ -1,6 +1,7 @@
 import { screen } from "@testing-library/dom";
 
 import type { GetTree, IsNodeSelected } from "htmlTree/methodTypes";
+import type { NodeData } from "htmlTree/node";
 import type { IconElement, OnCreateLi } from "htmlTree/options";
 
 import ElementsRenderer from "htmlTree/elementsRenderer";

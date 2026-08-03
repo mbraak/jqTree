@@ -1,16 +1,12 @@
+import type { SelectNodeOptions } from "./htmlTree"
 import type { HandleFinishedLoading } from "./htmlTree/dataLoader";
 import type { OnFinishOpenNode } from "./htmlTree/methodTypes";
-import type { Node, Position } from "./htmlTree/node";
+import type { Node, NodeData, NodeId, Position } from "./htmlTree/node";
 import type { HtmlTreeOptions, IconElement, OnCreateLi, OnIsMoveHandle, OnLoading } from "./htmlTree/options";
 import type { SavedState } from "./htmlTree/saveStateHandler";
 import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 
 import HtmlTree from "./htmlTree";
-
-interface SelectNodeOptions {
-    mustSetFocus?: boolean;
-    mustToggle?: boolean;
-}
 
 const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";

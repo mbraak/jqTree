@@ -1,3 +1,5 @@
+import type { NodeData, NodeRecord } from "./node";
+
 interface NodeRecordWithChildren extends NodeRecord {
     children: NodeData[];
 }

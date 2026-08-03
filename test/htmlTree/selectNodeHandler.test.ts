@@ -8,11 +8,11 @@ describe("getSelectedNodesUnder", () => {
         const child = new Node({ id: 2 });
         node.addChild(child);
 
-        const nodeMap = new Map<NodeId, Node>();
+        const nodeMap = new Map<JQTreeNodeId, Node>();
         nodeMap.set(1, node);
         nodeMap.set(2, child);
 
-        const getNodeById = (id: NodeId) => nodeMap.get(id) ?? null;
+        const getNodeById = (id: JQTreeNodeId) => nodeMap.get(id) ?? null;
 
         const selectNodeHandler = new SelectNodeHandler({ getNodeById });
         selectNodeHandler.addToSelection(child);

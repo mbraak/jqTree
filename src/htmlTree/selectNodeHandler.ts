@@ -1,5 +1,5 @@
 import type { GetNodeById } from "./methodTypes";
-import type { Node } from "./node";
+import type { Node, NodeId } from "./node";
 
 interface SelectNodeHandlerParameters {
     getNodeById: GetNodeById;

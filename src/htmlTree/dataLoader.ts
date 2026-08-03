@@ -1,5 +1,5 @@
 import type { LoadData, TriggerEvent } from "./methodTypes";
-import type { Node } from "./node";
+import type { Node, NodeData } from "./node";
 import type { DataFilter, OnLoadFailed, OnLoading } from "./options";
 import type RequestUrl from "./requestUrl";
 

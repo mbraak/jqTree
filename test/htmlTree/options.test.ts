@@ -3,7 +3,7 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
-import type { Node } from "htmlTree/node";
+import type { Node, NodeData } from "htmlTree/node";
 import type { HtmlTreeOptions } from "htmlTree/options";
 
 import HtmlTree from "htmlTree";

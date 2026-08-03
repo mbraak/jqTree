@@ -1,7 +1,7 @@
 import type { HandleFinishedLoading } from "./dataLoader";
 import type { OnFinishOpenNode } from "./methodTypes";
 import type { PositionInfo } from "./mouseUtils";
-import type { Position } from "./node";
+import type { NodeData, NodeId, Position } from "./node";
 import type { HtmlTreeOptions } from "./options";
 import type { SavedState } from "./saveStateHandler";
 
@@ -21,6 +21,11 @@ import SelectNodeHandler from "./selectNodeHandler";
 import setDefaultOptions from "./setDefaultOptions";
 import triggerCustomEvent from "./triggerCustomEvent";
 import __version__ from "./version";
+
+export interface SelectNodeOptions {
+  mustSetFocus?: boolean;
+  mustToggle?: boolean;
+}
 
 export type TriggerEventProvider = (element: HTMLElement, eventName: string, values?: Record<string, unknown>) => boolean;
 
