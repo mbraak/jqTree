@@ -1,10 +1,20 @@
 import { isNodeRecordWithChildren } from "./nodeUtils";
 
+export type NodeData = NodeRecord | string;
+
+export type NodeId = number | string;
+
+export interface NodeRecord {
+    [key: string]: unknown;
+    children?: NodeData[];
+    id?: NodeId;
+}
+
 export type Position = "after" | "before" | "inside";
 
 type IterateCallback = (node: Node, level: number) => boolean;
 
-export class Node implements INode {
+export class Node {
     [key: string]: unknown;
 
     public children: Node[];

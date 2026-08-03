@@ -2,7 +2,7 @@ import type { HandleFinishedLoading } from "./dataLoader";
 import type { OnFinishOpenNode } from "./jqtreeMethodTypes";
 import type { JQTreeOptions } from "./jqtreeOptions";
 import type { PositionInfo } from "./mouseUtils";
-import type { Position } from "./node";
+import type { NodeData, NodeId, Position } from "./node";
 import type { SavedState } from "./saveStateHandler";
 
 import DataLoader from "./dataLoader";

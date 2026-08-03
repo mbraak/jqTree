@@ -1,4 +1,4 @@
-import type { Node } from "./node";
+import type { Node, NodeData, NodeId } from "./node";
 
 export type AddToSelection = (node: Node) => void;
 
