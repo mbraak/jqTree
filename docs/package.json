@@ -22,9 +22,9 @@
         "jquery": "^4.0.0",
         "postcss": "^8.5.26",
         "postcss-cli": "^11.0.1",
-        "postcss-import": "^16.1.1",
+        "postcss-import": "^17",
         "postcss-load-config": "^6.0.1",
-        "postcss-nested": "^7.0.2",
+        "postcss-nested": "^8",
         "tailwindcss": "^4.3.3"
     },
     "msw": {

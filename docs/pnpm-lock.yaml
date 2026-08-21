@@ -34,14 +34,14 @@ importers:
         specifier: ^11.0.1
         version: 11.0.1(jiti@2.7.0)(postcss@8.5.26)
       postcss-import:
-        specifier: ^16.1.1
-        version: 16.1.1(postcss@8.5.26)
+        specifier: ^17
+        version: 17.0.0(postcss@8.5.26)
       postcss-load-config:
         specifier: ^6.0.1
         version: 6.0.1(jiti@2.7.0)(postcss@8.5.26)(yaml@2.9.0)
       postcss-nested:
-        specifier: ^7.0.2
-        version: 7.0.2(postcss@8.5.26)
+        specifier: ^8
+        version: 8.0.1(postcss@8.5.26)
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -662,9 +662,9 @@ packages:
     peerDependencies:
       postcss: ^8.0.0
 
-  postcss-import@16.1.1:
-    resolution: {integrity: sha512-2xVS1NCZAfjtVdvXiyegxzJ447GyqCeEI5V7ApgQVOWnros1p5lGNovJNapwPpMombyFBfqDwt7AD3n2l0KOfQ==}
-    engines: {node: '>=18.0.0'}
+  postcss-import@17.0.0:
+    resolution: {integrity: sha512-qzVMJhcq39KweT7Fp0HcjE5YxL5yI854Q3CtufxDuZKO9HLQUp2rptB9+U0MIj3pT1ZEVXoqnpeC1mSkfYuz4Q==}
+    engines: {node: '>=22.0.0'}
     peerDependencies:
       postcss: ^8.0.0
 
@@ -701,9 +701,9 @@ packages:
       yaml:
         optional: true
 
-  postcss-nested@7.0.2:
-    resolution: {integrity: sha512-5osppouFc0VR9/VYzYxO03VaDa3e8F23Kfd6/9qcZTUI8P58GIYlArOET2Wq0ywSl2o2PjELhYOFI4W7l5QHKw==}
-    engines: {node: '>=18.0'}
+  postcss-nested@8.0.1:
+    resolution: {integrity: sha512-PvSIwDVh1NTw939iu4FBK+oeZfSm0cbErFAjXCTPiStammzobBNE2SiQNezy8Xp+Oud2uLXaLpTauv3UdxWjbQ==}
+    engines: {node: ^22.0.0 || ^24.0.0 || >= 26.0.0}
     peerDependencies:
       postcss: ^8.2.14
 
@@ -1380,7 +1380,7 @@ snapshots:
       - jiti
       - tsx
 
-  postcss-import@16.1.1(postcss@8.5.26):
+  postcss-import@17.0.0(postcss@8.5.26):
     dependencies:
       postcss: 8.5.26
       postcss-value-parser: 4.2.0
@@ -1403,7 +1403,7 @@ snapshots:
       postcss: 8.5.26
       yaml: 2.9.0
 
-  postcss-nested@7.0.2(postcss@8.5.26):
+  postcss-nested@8.0.1(postcss@8.5.26):
     dependencies:
       postcss: 8.5.26
       postcss-selector-parser: 7.1.4
