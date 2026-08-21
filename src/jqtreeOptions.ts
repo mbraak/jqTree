@@ -1,7 +1,6 @@
-import type { Node } from "./htmlTree/node";
-import type { HtmlTreeOptions, IconElement } from "./htmlTree/options";
+import type { HtmlTreeOptions, Node } from "html-tree";
 
-export type JQTreeIconElement = IconElement | JQuery;
+export type JQTreeIconElement = HTMLElement | JQuery | string;
 
 export type JQTreeOnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 

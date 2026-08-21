@@ -18,9 +18,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "paths": {
-            "app/*": ["./src/*"],
-            "htmlTree": ["./src/htmlTree/index"],
-            "htmlTree/*": ["./src/htmlTree/*"]
+            "app/*": ["./src/*"]
         },
         "rootDir": "./",
         "skipLibCheck": true,

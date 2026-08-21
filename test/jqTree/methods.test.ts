@@ -5,7 +5,7 @@ import { setupServer } from "msw/node";
 import { vi } from "vitest";
 
 import "app/tree.jquery";
-import __version__ from "htmlTree/version";
+import __version__ from "app/version";
 
 import exampleData from "../support/exampleData";
 import { getTreeListElement } from "../support/queries";

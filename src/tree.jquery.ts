@@ -1,12 +1,20 @@
-import type { SelectNodeOptions } from "./htmlTree"
-import type { HandleFinishedLoading } from "./htmlTree/dataLoader";
-import type { OnFinishOpenNode } from "./htmlTree/methodTypes";
-import type { Node, NodeData, NodeId, Position } from "./htmlTree/node";
-import type { HtmlTreeOptions, IconElement, OnCreateLi, OnIsMoveHandle, OnLoading } from "./htmlTree/options";
-import type { SavedState } from "./htmlTree/saveStateHandler";
+import type { HandleFinishedLoading, HtmlTreeOptions, Node, NodeData, NodeId, Position, SavedState, SelectNodeOptions } from "html-tree"
+
+import HtmlTree from "html-tree";
+
 import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 
-import HtmlTree from "./htmlTree";
+import __version__ from "./version";
+
+type IconElement = HTMLElement | string
+type OnCreateLi = (node: Node, el: HTMLElement, isSelected: boolean) => void;
+type OnFinishOpenNode = (node: Node) => void;
+type OnIsMoveHandle = (el: HTMLElement) => boolean;
+type OnLoading = (
+    isLoading: boolean,
+    node: Node | undefined,
+    element: HTMLElement,
+) => void;
 
 const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";
@@ -160,16 +168,17 @@ export class JqTreeWidget {
     }
 
     public getVersion(): string {
-        return this._htmlTree.getVersion();
+        return __version__;
     }
 
     public init(): void {
         const htmlElement = this._element.get(0) as HTMLElement;
+        const options = this._transformInputOptions();
 
         const htmlTree = new HtmlTree(
             {
+                ...options,
                 htmlElement,
-                options: this._transformInputOptions(),
                 overrideTriggerEventProvider: triggerJQueryEvent,
             }
         );

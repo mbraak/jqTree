@@ -120,7 +120,7 @@ export default [
             "perfectionist/sort-imports": [
                 "error",
                 {
-                    internalPattern: ["^app", "^htmlTree"],
+                    internalPattern: ["^app"],
                 },
             ],
         },

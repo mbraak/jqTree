@@ -28,6 +28,9 @@
         "playwright": "pnpm build-with-coverage && playwright test --config playwright/playwright.config.js",
         "test": "pnpm vitest && pnpm playwright"
     },
+    "dependencies": {
+        "html-tree": "file:/Users/marcobraak/upload/html-tree/package"
+    },
     "peerDependencies": {
         "jquery": ">= 3"
     },

@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+import "jest-extended";
 import jQuery from "jquery";
 import { mockAnimationsApi } from "jsdom-testing-mocks";
 
