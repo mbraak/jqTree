@@ -178,8 +178,11 @@ export class JqTreeWidget {
         const htmlTree = new HtmlTree(
             {
                 ...options,
+                classPrefix: "jqtree",
+                commonClassName: "jqtree_common",
                 htmlElement,
                 overrideTriggerEventProvider: triggerJQueryEvent,
+                treeClassName: "jqtree-tree"
             }
         );
 

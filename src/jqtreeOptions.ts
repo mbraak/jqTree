@@ -12,7 +12,10 @@ export type JQTreeOnLoading = (
     $el: JQuery,
 ) => void;
 
-export type JQTreeOptions = Modify<HtmlTreeOptions, {
+/* The class name options are set by jqTree itself, so they are not part of the
+ * jqTree options.
+ */
+export type JQTreeOptions = Modify<Omit<HtmlTreeOptions, "classPrefix" | "commonClassName" | "treeClassName">, {
     closedIcon?: JQTreeIconElement;
     onCreateLi?: JQTreeOnCreateLi;
     onIsMoveHandle?: JQTreeOnIsMoveHandle;
