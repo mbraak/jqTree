@@ -31,6 +31,12 @@ const triggerJQueryEvent = (
         delete values.element;
     }
 
+    if (eventName === "tree.deselect") {
+        const event = jQuery.Event("tree.select", { node: null, previous_node: values?.node });
+        jQuery(element).trigger(event);
+        return true;
+    }
+
     const event = jQuery.Event(eventName, values);
     jQuery(element).trigger(event);
     return !event.isDefaultPrevented();
