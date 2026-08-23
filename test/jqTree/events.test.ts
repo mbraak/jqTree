@@ -138,6 +138,29 @@ describe("events", () => {
             expect(onLoadData).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({ tree_data: exampleData }),
             );
+            expect(onLoadData.mock.calls[0]?.[0]).not.toHaveProperty(
+                "parent_node",
+            );
+        });
+
+        it("fires tree.load_data with the parent node when data is loaded into a parent", () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData });
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+
+            const onLoadData = vi.fn();
+            $tree.on("tree.load_data", onLoadData);
+
+            const childData = [{ id: 200, name: "child3" }];
+            $tree.tree("loadData", childData, node1);
+
+            expect(onLoadData).toHaveBeenCalledExactlyOnceWith(
+                expect.objectContaining({
+                    parent_node: node1,
+                    tree_data: childData,
+                }),
+            );
         });
     });
 
