@@ -31,13 +31,23 @@ const triggerJQueryEvent = (
         delete values.element;
     }
 
-    if (eventName === "tree.deselect") {
-        const event = jQuery.Event("tree.select", { node: null, previous_node: values?.node });
-        jQuery(element).trigger(event);
-        return true;
+    // eslint-disable-next-line no-prototype-builtins
+    if (values?.hasOwnProperty("deselectedNode")) {
+        values.deselected_node = values.deselectedNode;
+        delete values.deselectedNode;
+    } else if (values?.hasOwnProperty("originalEvent")) { // eslint-disable-line no-prototype-builtins
+        values.click_event = values.originalEvent;
+        delete values.originalEvent;
     }
 
-    const event = jQuery.Event(eventName, values);
+    let event: JQuery.Event;
+
+    if (eventName === "tree.deselect") {
+        event = jQuery.Event("tree.select", { node: null, previous_node: values?.node });
+    } else {
+        event = jQuery.Event(eventName, values);
+    }
+
     jQuery(element).trigger(event);
     return !event.isDefaultPrevented();
 }
@@ -219,7 +229,7 @@ export class JqTreeWidget {
         loadDataFromUrl('/my_data', node1);
         loadDataFromUrl('/my_data', node1, function() { console.log('finished'); });
         loadDataFromUrl('/my_data', null, function() { console.log('finished'); });
-
+ 
     - loadDataFromUrl(parent_node=null, on_finished=null)
         loadDataFromUrl();
         loadDataFromUrl(node1);

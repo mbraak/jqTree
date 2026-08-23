@@ -32,7 +32,10 @@ describe("events", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(onClick).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: node1 }),
+                expect.objectContaining({
+                    click_event: expect.any(MouseEvent), // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+                    node: node1,
+                }),
             );
         });
     });
@@ -53,7 +56,10 @@ describe("events", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(onContextMenu).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: node1 }),
+                expect.objectContaining({
+                    click_event: expect.any(MouseEvent), // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+                    node: node1,
+                }),
             );
         });
     });
@@ -71,7 +77,10 @@ describe("events", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect(onDoubleClick).toHaveBeenCalledExactlyOnceWith(
-                expect.objectContaining({ node: node1 }),
+                expect.objectContaining({
+                    click_event: expect.any(MouseEvent), // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+                    node: node1,
+                }),
             );
         });
     });

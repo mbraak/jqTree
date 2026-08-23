@@ -1,10 +1,3 @@
-interface JQTreeClickNodeEvent {
-    click_event: JQuery.ClickEvent;
-    deselected_node?: JQTreeNode | null;
-    node: JQTreeNode;
-    previous_node?: JQTreeNode;
-}
-
 interface JQTreeNode {
     [key: string]: unknown;
     children: JQTreeNode[];
