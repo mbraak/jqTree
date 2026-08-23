@@ -1,47 +1,45 @@
+// Attributes of html-tree events that have a different name in the jqTree api.
+// Attributes that are not listed here are passed on unchanged; e.g. 'node' and
+// 'isLoading'.
+const attributeNames: Record<string, string> = {
+  deselectedNode: "deselected_node",
+  originalEvent: "click_event",
+  parentNode: "parent_node",
+  treeData: "tree_data",
+};
+
+const convertValues = (
+  values: Record<string, unknown>,
+): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(values).map(([key, value]) => [
+      attributeNames[key] ?? key,
+      value,
+    ]),
+  );
+
 const triggerJQueryEvent = (
   element: HTMLElement,
   eventName: string,
   inputValues?: Record<string, unknown>,
 ): boolean => {
-  let values: Record<string, unknown> | undefined = inputValues;
+  const values = inputValues ? convertValues(inputValues) : undefined;
 
-  if (inputValues?.element) {
-    values = { ...values, $el: jQuery(inputValues.element) };
+  if (values?.element) {
+    values.$el = jQuery(values.element as HTMLElement);
     delete values.element;
   }
 
-  // eslint-disable-next-line no-prototype-builtins
-  if (values?.hasOwnProperty("deselectedNode")) {
-    values.deselected_node = values.deselectedNode;
-    delete values.deselectedNode;
-  }
-
-  if (values?.hasOwnProperty("originalEvent")) { // eslint-disable-line no-prototype-builtins
-    values.click_event = values.originalEvent;
-    delete values.originalEvent;
-  }
-
-  if (values?.hasOwnProperty("parentNode")) { // eslint-disable-line no-prototype-builtins
-    values.parent_node = values.parentNode;
-    delete values.parentNode;
-  }
-
-  if (values?.hasOwnProperty("treeData")) { // eslint-disable-line no-prototype-builtins
-    values.tree_data = values.treeData;
-    delete values.treeData;
-  }
-
-
-  let event: JQuery.Event;
-
-  if (eventName === "tree.deselect") {
-    event = jQuery.Event("tree.select", { node: null, previous_node: values?.node });
-  } else {
-    event = jQuery.Event(eventName, values);
-  }
+  const event =
+    eventName === "tree.deselect"
+      ? jQuery.Event("tree.select", {
+        node: null,
+        previous_node: values?.node,
+      })
+      : jQuery.Event(eventName, values);
 
   jQuery(element).trigger(event);
   return !event.isDefaultPrevented();
-}
+};
 
 export default triggerJQueryEvent;
