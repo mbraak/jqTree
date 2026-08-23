@@ -4,6 +4,7 @@ import HtmlTree from "html-tree";
 
 import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 
+import triggerJQueryEvent from "./triggerJQueryEvent";
 import __version__ from "./version";
 
 type IconElement = HTMLElement | string
@@ -18,39 +19,6 @@ type OnLoading = (
 
 const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";
-
-const triggerJQueryEvent = (
-    element: HTMLElement,
-    eventName: string,
-    inputValues?: Record<string, unknown>,
-): boolean => {
-    let values: Record<string, unknown> | undefined = inputValues;
-
-    if (inputValues?.element) {
-        values = { ...values, $el: jQuery(inputValues.element) };
-        delete values.element;
-    }
-
-    // eslint-disable-next-line no-prototype-builtins
-    if (values?.hasOwnProperty("deselectedNode")) {
-        values.deselected_node = values.deselectedNode;
-        delete values.deselectedNode;
-    } else if (values?.hasOwnProperty("originalEvent")) { // eslint-disable-line no-prototype-builtins
-        values.click_event = values.originalEvent;
-        delete values.originalEvent;
-    }
-
-    let event: JQuery.Event;
-
-    if (eventName === "tree.deselect") {
-        event = jQuery.Event("tree.select", { node: null, previous_node: values?.node });
-    } else {
-        event = jQuery.Event(eventName, values);
-    }
-
-    jQuery(element).trigger(event);
-    return !event.isDefaultPrevented();
-}
 
 export class JqTreeWidget {
     [key: string]: unknown;
