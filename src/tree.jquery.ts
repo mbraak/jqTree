@@ -8,14 +8,16 @@ import triggerJQueryEvent from "./triggerJQueryEvent";
 import __version__ from "./version";
 
 type IconElement = HTMLElement | string
+
+interface LoadingDataEvent {
+    $el: JQuery;
+    isLoading: boolean;
+    node: Node | null;
+}
+
 type OnCreateLi = (node: Node, el: HTMLElement, isSelected: boolean) => void;
 type OnFinishOpenNode = (node: Node) => void;
 type OnIsMoveHandle = (el: HTMLElement) => boolean;
-type OnLoading = (
-    isLoading: boolean,
-    node: Node | undefined,
-    element: HTMLElement,
-) => void;
 
 const NODE_PARAM_IS_EMPTY = "Node parameter is empty";
 const PARAM_IS_EMPTY = "Parameter is empty: ";
@@ -157,6 +159,9 @@ export class JqTreeWidget {
 
     public init(): void {
         const htmlElement = this._element.get(0) as HTMLElement;
+
+        this._element.on("tree.loading_data", this._handleLoadingDataEvent.bind(this));
+
         const options = this._transformInputOptions();
 
         const htmlTree = new HtmlTree(
@@ -368,6 +373,15 @@ export class JqTreeWidget {
         return this._element;
     }
 
+    private _handleLoadingDataEvent(e: JQuery.TriggeredEvent) {
+        const jqTreeOnLoading = this._inputOptions.onLoading;
+
+        if (jqTreeOnLoading) {
+            const { $el, isLoading, node } = e as unknown as LoadingDataEvent;
+            jqTreeOnLoading(isLoading, node ?? undefined, $el)
+        }
+    }
+
     private _transformInputOptions(): Partial<HtmlTreeOptions> {
         function convertToIconElement(jqtreeIconElement: JQTreeIconElement | undefined) {
             if (jqtreeIconElement instanceof jQuery) {
@@ -396,21 +410,11 @@ export class JqTreeWidget {
             onIsMoveHandle = (el: HTMLElement) => jqTreeOnIsMoveHandle(jQuery(el))
         }
 
-        let onLoading: OnLoading | undefined = undefined;
-        const jqTreeOnLoading = this._inputOptions.onLoading;
-
-        if (jqTreeOnLoading) {
-            onLoading = (isLoading: boolean, node: Node | undefined, element: HTMLElement) => {
-                jqTreeOnLoading(isLoading, node, jQuery(element))
-            }
-        }
-
         return {
             ...this._inputOptions,
             closedIcon,
             onCreateLi,
             onIsMoveHandle,
-            onLoading,
             openedIcon,
         }
     }
