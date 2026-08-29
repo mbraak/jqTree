@@ -1,4 +1,4 @@
-import type { HandleFinishedLoading, HtmlTreeOptions, Node, NodeData, NodeId, Position, SavedState, SelectNodeOptions } from "html-tree"
+import type { HtmlTreeOptions, Node, NodeData, NodeId, Position, SavedState, SelectNodeOptions } from "html-tree"
 
 import HtmlTree from "html-tree";
 
@@ -211,24 +211,34 @@ export class JqTreeWidget {
     */
     public loadDataFromUrl(
         param1?: Node | string,
-        param2?: HandleFinishedLoading | Node | null,
-        param3?: HandleFinishedLoading,
+        param2?: (() => void) | Node,
+        param3?: () => void,
     ): JQuery {
+        let parentNode: Node | undefined;
+        let onFinishedLoading: (() => void) | undefined;
+        let url: string | undefined;
+
+        // first parameter is url
         if (typeof param1 === "string") {
-            // first parameter is url
-            this._htmlTree.loadDataFromUrl(
-                param1,
-                param2 as Node | undefined,
-                param3,
-            );
+            url = param1;
+            parentNode = param2 as (Node | undefined);
+            onFinishedLoading = param3;
+
         } else {
             // first parameter is not url
-            this._htmlTree.loadDataFromUrl(
-                undefined,
-                param1,
-                param2 as HandleFinishedLoading | undefined,
-            );
+            parentNode = param1;
+            onFinishedLoading = param2 as (() => void) | undefined;
         }
+
+        this._htmlTree.loadDataFromUrl(url, parentNode)
+            .then(() => {
+                if (onFinishedLoading) {
+                    onFinishedLoading();
+                }
+            })
+            .catch((error: unknown) => {
+                throw error;
+            });
 
         return this._element;
     }
@@ -290,8 +300,16 @@ export class JqTreeWidget {
         return this._element;
     }
 
-    public reload(onFinished?: HandleFinishedLoading): JQuery {
-        this._htmlTree.loadDataFromUrl(undefined, undefined, onFinished);
+    public reload(onFinished?: () => void): JQuery {
+        this._htmlTree.loadDataFromUrl(undefined, undefined).then(
+            () => {
+                if (onFinished) {
+                    onFinished();
+                }
+            }
+        ).catch((error: unknown) => {
+            throw error;
+        });
         return this._element;
     }
 
