@@ -453,16 +453,18 @@ describe("options", () => {
             savedState = "";
         });
 
-        it("saves the state with an open and a selected node", () => {
+        it("saves the state with an open and a selected node", async () => {
             const $tree = createTree();
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             $tree.tree("selectNode", node1);
             $tree.tree("openNode", node1);
 
-            expect(JSON.parse(savedState)).toStrictEqual({
-                open_nodes: [123],
-                selected_node: [123],
+            await waitFor(() => {
+                expect(JSON.parse(savedState)).toStrictEqual({
+                    open_nodes: [123],
+                    selected_node: [123],
+                });
             });
         });
 
@@ -473,7 +475,6 @@ describe("options", () => {
             });
 
             const $tree = createTree();
-            //const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect($tree).toHaveTreeStructure([
                 expect.objectContaining({
@@ -613,20 +614,24 @@ describe("options", () => {
             return $tree;
         };
 
-        it("saves the state to local storage when saveState is true", () => {
+        it("saves the state to local storage when saveState is true", async () => {
             createTreeWithOpenSelectedNode(true);
 
-            expect(localStorage.getItem("tree")).toBe(
-                '{"open_nodes":[123],"selected_node":[123]}',
-            );
+            await waitFor(() => {
+                expect(localStorage.getItem("tree")).toBe(
+                    '{"open_nodes":[123],"selected_node":[123]}',
+                );
+            });
         });
 
-        it("uses the string as a key when saveState is a string", () => {
+        it("uses the string as a key when saveState is a string", async () => {
             createTreeWithOpenSelectedNode("my-state");
 
-            expect(localStorage.getItem("my-state")).toBe(
-                '{"open_nodes":[123],"selected_node":[123]}',
-            );
+            await waitFor(() => {
+                expect(localStorage.getItem("my-state")).toBe(
+                    '{"open_nodes":[123],"selected_node":[123]}',
+                );
+            });
         });
 
         it("doesn't save to local storage when saveState is false", () => {

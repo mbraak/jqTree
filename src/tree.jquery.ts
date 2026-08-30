@@ -285,7 +285,21 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._htmlTree.openNode(node, param1, param2);
+        let onFinished: null | OnFinishOpenNode = null;
+        let slide: boolean | undefined = undefined;
+
+        if (typeof param1 === "function") {
+            onFinished = param1;
+            slide = param2 as boolean | undefined;
+        } else {
+            slide = param1;
+        }
+
+        void this._htmlTree.openNode(node, slide).then(() => {
+            if (onFinished) {
+                onFinished(node);
+            }
+        });
         return this._element;
     }
 

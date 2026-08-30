@@ -519,22 +519,24 @@ describe("methods", () => {
     });
 
     describe("getState", () => {
-        it("returns the state", () => {
+        it("returns the state", async () => {
             const $tree = $("#tree1");
             $tree.tree({ data: exampleData });
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("openNode", node1, false);
 
-            expect($tree.tree("getState")).toStrictEqual({
-                open_nodes: [123],
-                selected_node: [],
+            await waitFor(() => {
+                expect($tree.tree("getState")).toStrictEqual({
+                    open_nodes: [123],
+                    selected_node: [],
+                });
             });
         });
     });
 
     describe("getStateFromStorage", () => {
-        it("returns the state", () => {
+        it("returns the state", async () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
@@ -544,9 +546,11 @@ describe("methods", () => {
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("openNode", node1, false);
 
-            expect($tree.tree("getStateFromStorage")).toStrictEqual({
-                open_nodes: [123],
-                selected_node: [],
+            await waitFor(() => {
+                expect($tree.tree("getStateFromStorage")).toStrictEqual({
+                    open_nodes: [123],
+                    selected_node: [],
+                });
             });
         });
     });
