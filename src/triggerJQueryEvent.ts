@@ -46,20 +46,49 @@ const triggerJQueryEvent = (
   eventName: string,
   inputValues?: Record<string, unknown>,
 ): boolean => {
-  const values = inputValues ? convertValues(inputValues) : undefined;
+  const values = inputValues ? convertValues(inputValues) : {};
 
-  if (values?.element) {
+  if (values.element) {
     values.$el = jQuery(values.element as HTMLElement);
     delete values.element;
   }
 
-  const event =
-    eventName === "tree.deselect"
-      ? jQuery.Event("tree.select", {
+  let event: JQuery.Event;
+
+  switch (eventName) {
+    case "tree.deselect":
+      event = jQuery.Event("tree.select", {
         node: null,
-        previous_node: values?.node,
-      })
-      : jQuery.Event(eventName, values);
+        previous_node: values.node,
+      });
+      break;
+
+    case "tree.loaded_data":
+      event = jQuery.Event("tree.loading_data", {
+        ...values,
+        isLoading: false,
+        node: values.node ?? null
+      });
+      break;
+
+    case "tree.loading_data":
+      event = jQuery.Event("tree.loading_data", {
+        ...values,
+        isLoading: true,
+        node: values.node ?? null
+      });
+      break;
+
+    case "tree.set_data":
+      values.parent_node = values.node;
+      delete values.node;
+      event = jQuery.Event("tree.load_data", values);
+      break;
+
+    default:
+      event = jQuery.Event(eventName, values);
+      break;
+  }
 
   jQuery(element).trigger(event);
   return !event.isDefaultPrevented();
