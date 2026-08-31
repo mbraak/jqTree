@@ -9,6 +9,10 @@ import __version__ from "./version";
 
 type IconElement = HTMLElement | string
 
+interface LoadFailedEvent {
+    response: Response;
+}
+
 interface LoadingDataEvent {
     $el: JQuery;
     isLoading: boolean;
@@ -84,7 +88,7 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._htmlTree.closeNode(node, slideParam);
+        this._htmlTree.closeNode(node, slideParam ?? undefined);
 
         return this._element;
     }
@@ -161,6 +165,7 @@ export class JqTreeWidget {
         const htmlElement = this._element.get(0) as HTMLElement;
 
         this._element.on("tree.loading_data", this._handleLoadingDataEvent.bind(this));
+        this._element.on("tree.load_failed", this._handleLoadFailedEvent.bind(this));
 
         const options = this._transformInputOptions();
 
@@ -403,6 +408,15 @@ export class JqTreeWidget {
 
         this._htmlTree.updateNode(node, data);
         return this._element;
+    }
+
+    private _handleLoadFailedEvent(e: JQuery.TriggeredEvent) {
+        const jqTreeOnLoadFailed = this._inputOptions.onLoadFailed;
+
+        if (jqTreeOnLoadFailed) {
+            const { response } = e as unknown as LoadFailedEvent;
+            jqTreeOnLoadFailed(response);
+        }
     }
 
     private _handleLoadingDataEvent(e: JQuery.TriggeredEvent) {

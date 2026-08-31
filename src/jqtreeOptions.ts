@@ -6,6 +6,8 @@ export type JQTreeOnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => 
 
 export type JQTreeOnIsMoveHandle = (el: JQuery) => boolean;
 
+export type JQTreeOnLoadFailed = (el: Response) => void;
+
 export type JQTreeOnLoading = (
     isLoading: boolean,
     node: Node | undefined,
@@ -19,6 +21,7 @@ export type JQTreeOptions = Modify<Omit<HtmlTreeOptions, "classPrefix" | "common
     closedIcon?: JQTreeIconElement;
     onCreateLi?: JQTreeOnCreateLi;
     onIsMoveHandle?: JQTreeOnIsMoveHandle;
+    onLoadFailed?: JQTreeOnLoadFailed;
     onLoading?: JQTreeOnLoading;
     openedIcon?: JQTreeIconElement;
 }>
