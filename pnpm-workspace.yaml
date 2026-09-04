@@ -2,3 +2,5 @@ allowBuilds:
   esbuild: true
   msw: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - tree-element@0.1.0
