@@ -12,8 +12,8 @@ importers:
         specifier: '>= 3'
         version: 4.0.0
       tree-element:
-        specifier: file:/Users/marcobraak/upload/tree-element/package
-        version: file:../upload/tree-element/package
+        specifier: ^0.1.0
+        version: 0.1.0
     devDependencies:
       '@babel/cli':
         specifier: ^8.0.4
@@ -3197,8 +3197,8 @@ packages:
     resolution: {integrity: sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==}
     engines: {node: '>=20'}
 
-  tree-element@file:../upload/tree-element/package:
-    resolution: {directory: ../upload/tree-element/package, type: directory}
+  tree-element@0.1.0:
+    resolution: {integrity: sha512-K2q4jZnJ3Pn2kBguzbrkANTv8Fjqmrkrn6eLRWIqCEzc26smOb1ZOI1a3xyh4CMdjqATWPFJWczgdbwKakMxYQ==}
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -6411,7 +6411,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  tree-element@file:../upload/tree-element/package: {}
+  tree-element@0.1.0: {}
 
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:
