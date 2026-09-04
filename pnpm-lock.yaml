@@ -8,12 +8,12 @@ importers:
 
   .:
     dependencies:
-      html-tree:
-        specifier: file:/Users/marcobraak/upload/html-tree/package
-        version: file:../upload/html-tree/package
       jquery:
         specifier: '>= 3'
         version: 4.0.0
+      tree-element:
+        specifier: file:/Users/marcobraak/upload/tree-element/package
+        version: file:../upload/tree-element/package
     devDependencies:
       '@babel/cli':
         specifier: ^8.0.4
@@ -2396,9 +2396,6 @@ packages:
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
 
-  html-tree@file:../upload/html-tree/package:
-    resolution: {directory: ../upload/html-tree/package, type: directory}
-
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
@@ -3199,6 +3196,9 @@ packages:
   tr46@6.0.0:
     resolution: {integrity: sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==}
     engines: {node: '>=20'}
+
+  tree-element@file:../upload/tree-element/package:
+    resolution: {directory: ../upload/tree-element/package, type: directory}
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -5675,8 +5675,6 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
-  html-tree@file:../upload/html-tree/package: {}
-
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
@@ -6412,6 +6410,8 @@ snapshots:
   tr46@6.0.0:
     dependencies:
       punycode: 2.3.1
+
+  tree-element@file:../upload/tree-element/package: {}
 
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:

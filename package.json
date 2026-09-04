@@ -29,7 +29,7 @@
         "test": "pnpm vitest && pnpm playwright"
     },
     "dependencies": {
-        "html-tree": "file:/Users/marcobraak/upload/html-tree/package"
+        "tree-element": "file:/Users/marcobraak/upload/tree-element/package"
     },
     "peerDependencies": {
         "jquery": ">= 3"

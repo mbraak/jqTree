@@ -1,4 +1,4 @@
-import type { HtmlTreeOptions, Node } from "html-tree";
+import type { Node, TreeElementOptions } from "tree-element";
 
 export type JQTreeIconElement = HTMLElement | JQuery | string;
 
@@ -17,7 +17,7 @@ export type JQTreeOnLoading = (
 /* The class name options are set by jqTree itself, so they are not part of the
  * jqTree options.
  */
-export type JQTreeOptions = Modify<Omit<HtmlTreeOptions, "classPrefix" | "commonClassName" | "treeClassName">, {
+export type JQTreeOptions = Modify<Omit<TreeElementOptions, "classPrefix" | "commonClassName" | "treeClassName">, {
     closedIcon?: JQTreeIconElement;
     onCreateLi?: JQTreeOnCreateLi;
     onIsMoveHandle?: JQTreeOnIsMoveHandle;

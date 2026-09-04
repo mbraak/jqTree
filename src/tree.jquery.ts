@@ -1,6 +1,6 @@
-import type { HtmlTreeOptions, Node, NodeData, NodeId, Position, SavedState, SelectNodeOptions } from "html-tree"
+import type { Node, NodeData, NodeId, Position, SavedState, SelectNodeOptions, TreeElementOptions } from "tree-element"
 
-import HtmlTree from "html-tree";
+import TreeElement from "tree-element";
 
 import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 
@@ -30,8 +30,8 @@ export class JqTreeWidget {
     [key: string]: unknown;
 
     private _element: JQuery;
-    private _htmlTree: HtmlTree;
     private _inputOptions: Partial<JQTreeOptions>;
+    private _treeElement: TreeElement;
 
     constructor(el: HTMLElement, options: Partial<JQTreeOptions>) {
         this._element = jQuery(el);
@@ -43,7 +43,7 @@ export class JqTreeWidget {
         newNodeInfo: NodeData,
         existingNode: Node,
     ): Node | null {
-        return this._htmlTree.addNodeAfter(newNodeInfo, existingNode);
+        return this._treeElement.addNodeAfter(newNodeInfo, existingNode);
     }
 
     public addNodeBefore(
@@ -54,7 +54,7 @@ export class JqTreeWidget {
             throw Error(PARAM_IS_EMPTY + "existingNode");
         }
 
-        return this._htmlTree.addNodeBefore(newNodeInfo, existingNode);
+        return this._treeElement.addNodeBefore(newNodeInfo, existingNode);
     }
 
     public addParentNode(
@@ -65,7 +65,7 @@ export class JqTreeWidget {
             throw Error(PARAM_IS_EMPTY + "existingNode");
         }
 
-        return this._htmlTree.addParentNode(newNodeInfo, existingNode);
+        return this._treeElement.addParentNode(newNodeInfo, existingNode);
     }
 
     public addToSelection(node?: Node, mustSetFocus?: boolean): JQuery {
@@ -73,14 +73,14 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._htmlTree.addToSelection(node, mustSetFocus);
+        this._treeElement.addToSelection(node, mustSetFocus);
         return this._element;
     }
 
     public appendNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
-        const parentNode = parentNodeParam ?? this._htmlTree.tree;
+        const parentNode = parentNodeParam ?? this._treeElement.tree;
 
-        return this._htmlTree.appendNode(newNodeInfo, parentNode);
+        return this._treeElement.appendNode(newNodeInfo, parentNode);
     }
 
     public closeNode(node?: Node, slideParam?: boolean | null): JQuery {
@@ -88,14 +88,14 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._htmlTree.closeNode(node, slideParam ?? undefined);
+        this._treeElement.closeNode(node, slideParam ?? undefined);
 
         return this._element;
     }
 
     public deinit(): void {
         this._element.off();
-        this._htmlTree.deinit();
+        this._treeElement.deinit();
     }
 
     public destroy(): void {
@@ -103,7 +103,7 @@ export class JqTreeWidget {
     }
 
     public getNodeByCallback(callback: (node: Node) => boolean): Node | null {
-        return this._htmlTree.getNodeByCallback(callback);
+        return this._treeElement.getNodeByCallback(callback);
     }
 
     public getNodeByHtmlElement(
@@ -118,43 +118,43 @@ export class JqTreeWidget {
             return null;
         }
 
-        return this._htmlTree.getNode(element);
+        return this._treeElement.getNode(element);
     }
 
     public getNodeById(nodeId: NodeId): Node | null {
-        return this._htmlTree.getNodeById(nodeId);
+        return this._treeElement.getNodeById(nodeId);
     }
 
     public getNodeByName(name: string): Node | null {
-        return this._htmlTree.getNodeByName(name);
+        return this._treeElement.getNodeByName(name);
     }
 
     public getNodeByNameMustExist(name: string): Node {
-        return this._htmlTree.getNodeByNameMustExist(name);
+        return this._treeElement.getNodeByNameMustExist(name);
     }
 
     public getNodesByProperty(key: string, value: unknown): Node[] {
-        return this._htmlTree.getNodesByProperty(key, value);
+        return this._treeElement.getNodesByProperty(key, value);
     }
 
     public getSelectedNode(): false | Node {
-        return this._htmlTree.getSelectedNode();
+        return this._treeElement.getSelectedNode();
     }
 
     public getSelectedNodes(): Node[] {
-        return this._htmlTree.getSelectedNodes();
+        return this._treeElement.getSelectedNodes();
     }
 
     public getState(): null | SavedState {
-        return this._htmlTree.getState();
+        return this._treeElement.getState();
     }
 
     public getStateFromStorage(): null | SavedState {
-        return this._htmlTree.getStateFromStorage();
+        return this._treeElement.getStateFromStorage();
     }
 
     public getTree(): Node {
-        return this._htmlTree.getTree();
+        return this._treeElement.getTree();
     }
 
     public getVersion(): string {
@@ -169,7 +169,7 @@ export class JqTreeWidget {
 
         const options = this._transformInputOptions();
 
-        const htmlTree = new HtmlTree(
+        const treeElement = new TreeElement(
             {
                 ...options,
                 classPrefix: "jqtree",
@@ -180,11 +180,11 @@ export class JqTreeWidget {
             }
         );
 
-        this._htmlTree = htmlTree;
+        this._treeElement = treeElement;
     }
 
     public isDragging(): boolean {
-        return this._htmlTree.isDragging();
+        return this._treeElement.isDragging();
     }
 
     public isNodeSelected(node?: Node): boolean {
@@ -192,11 +192,11 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        return this._htmlTree.isNodeSelected(node);
+        return this._treeElement.isNodeSelected(node);
     }
 
     public loadData(data: NodeData[], parentNode?: Node): JQuery {
-        this._htmlTree.loadData(data, parentNode);
+        this._treeElement.loadData(data, parentNode);
         return this._element;
     }
 
@@ -235,7 +235,7 @@ export class JqTreeWidget {
             onFinishedLoading = param2 as (() => void) | undefined;
         }
 
-        this._htmlTree.loadDataFromUrl(url, parentNode)
+        this._treeElement.loadDataFromUrl(url, parentNode)
             .then(() => {
                 if (onFinishedLoading) {
                     onFinishedLoading();
@@ -249,7 +249,7 @@ export class JqTreeWidget {
     }
 
     public moveDown(): JQuery {
-        this._htmlTree.moveDown();
+        this._treeElement.moveDown();
 
         return this._element;
     }
@@ -271,13 +271,13 @@ export class JqTreeWidget {
             throw Error(PARAM_IS_EMPTY + "position");
         }
 
-        this._htmlTree.moveNode(node, targetNode, position);
+        this._treeElement.moveNode(node, targetNode, position);
 
         return this._element;
     }
 
     public moveUp(): JQuery {
-        this._htmlTree.moveUp();
+        this._treeElement.moveUp();
         return this._element;
     }
 
@@ -300,7 +300,7 @@ export class JqTreeWidget {
             slide = param1;
         }
 
-        void this._htmlTree.openNode(node, slide).then(() => {
+        void this._treeElement.openNode(node, slide).then(() => {
             if (onFinished) {
                 onFinished(node);
             }
@@ -309,18 +309,18 @@ export class JqTreeWidget {
     }
 
     public prependNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
-        const parentNode = parentNodeParam ?? this._htmlTree.tree;
+        const parentNode = parentNodeParam ?? this._treeElement.tree;
 
-        return this._htmlTree.prependNode(newNodeInfo, parentNode);
+        return this._treeElement.prependNode(newNodeInfo, parentNode);
     }
 
     public refresh(): JQuery {
-        this._htmlTree.refresh();
+        this._treeElement.refresh();
         return this._element;
     }
 
     public reload(onFinished?: () => void): JQuery {
-        this._htmlTree.loadDataFromUrl(undefined, undefined).then(
+        this._treeElement.loadDataFromUrl(undefined, undefined).then(
             () => {
                 if (onFinished) {
                     onFinished();
@@ -337,7 +337,7 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._htmlTree.removeFromSelection(node);
+        this._treeElement.removeFromSelection(node);
         return this._element;
     }
 
@@ -350,7 +350,7 @@ export class JqTreeWidget {
             throw Error("Node has no parent");
         }
 
-        this._htmlTree.removeNode(node);
+        this._treeElement.removeNode(node);
         return this._element;
     }
 
@@ -359,7 +359,7 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._htmlTree.scrollToNode(node);
+        this._treeElement.scrollToNode(node);
         return this._element;
     }
 
@@ -367,18 +367,18 @@ export class JqTreeWidget {
         node: Node | null,
         optionsParam?: SelectNodeOptions,
     ): JQuery {
-        this._htmlTree.selectNode(node, optionsParam);
+        this._treeElement.selectNode(node, optionsParam);
         return this._element;
     }
 
     public setOption(option: string, value: unknown): JQuery {
-        this._htmlTree.setOption(option, value);
+        this._treeElement.setOption(option, value);
         return this._element;
     }
 
     public setState(state?: SavedState): JQuery {
         if (state) {
-            this._htmlTree.setState(state);
+            this._treeElement.setState(state);
         }
 
         return this._element;
@@ -389,12 +389,12 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._htmlTree.toggle(node, slideParam);
+        this._treeElement.toggle(node, slideParam);
         return this._element;
     }
 
     public toJson(): string {
-        return this._htmlTree.toJson();
+        return this._treeElement.toJson();
     }
 
     public updateNode(node?: Node, data?: NodeData): JQuery {
@@ -406,7 +406,7 @@ export class JqTreeWidget {
             return this._element;
         }
 
-        this._htmlTree.updateNode(node, data);
+        this._treeElement.updateNode(node, data);
         return this._element;
     }
 
@@ -428,7 +428,7 @@ export class JqTreeWidget {
         }
     }
 
-    private _transformInputOptions(): Partial<HtmlTreeOptions> {
+    private _transformInputOptions(): Partial<TreeElementOptions> {
         function convertToIconElement(jqtreeIconElement: JQTreeIconElement | undefined) {
             if (jqtreeIconElement instanceof jQuery) {
                 return (jqtreeIconElement as JQuery).get(0);

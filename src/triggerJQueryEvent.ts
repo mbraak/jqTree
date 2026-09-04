@@ -1,4 +1,4 @@
-// Attributes of html-tree events that have a different name in the jqTree api.
+// Attributes of tree-element events that have a different name in the jqTree api.
 // Attributes that are not listed here are passed on unchanged; e.g. 'node' and
 // 'isLoading'.
 const attributeNames: Record<string, string> = {

@@ -1,4 +1,4 @@
-import type { Node } from "html-tree";
+import type { Node } from "tree-element";
 
 import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
 import { vi } from "vitest";
