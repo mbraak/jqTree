@@ -28,6 +28,9 @@
         "playwright": "pnpm build-with-coverage && playwright test --config playwright/playwright.config.js",
         "test": "pnpm vitest && pnpm playwright"
     },
+    "dependencies": {
+        "tree-element": "^0.1.0"
+    },
     "peerDependencies": {
         "jquery": ">= 3"
     },
@@ -75,6 +78,7 @@
         "prettier": "^3.9.6",
         "rollup": "^4.62.2",
         "rollup-plugin-serve": "^3.0.0",
+        "rollup-plugin-tsconfig-paths": "^1.5.2",
         "tslib": "^2.8.1",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.65.0",

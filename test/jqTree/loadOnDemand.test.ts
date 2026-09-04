@@ -186,17 +186,19 @@ describe("load on demand", () => {
 
         await screen.findByRole("treeitem", { name: "loaded-on-demand" })
 
-        expect($tree).toHaveTreeStructure([
-            expect.objectContaining({
-                children: [
-                    expect.objectContaining({
-                        name: "loaded-on-demand",
-                    }),
-                ],
-                name: "parent-node",
-                open: true,
-            }),
-        ]);
+        await waitFor(() => {
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "loaded-on-demand",
+                        }),
+                    ],
+                    name: "parent-node",
+                    open: true,
+                }),
+            ]);
+        });
     });
 
     it("opens the node and loads its children on demand with a saved state with an opened node", async () => {
@@ -212,16 +214,18 @@ describe("load on demand", () => {
 
         await screen.findByRole("treeitem", { name: "loaded-on-demand" })
 
-        expect($tree).toHaveTreeStructure([
-            expect.objectContaining({
-                children: [
-                    expect.objectContaining({
-                        name: "loaded-on-demand",
-                    }),
-                ],
-                name: "parent-node",
-                open: true,
-            }),
-        ]);
+        await waitFor(() => {
+            expect($tree).toHaveTreeStructure([
+                expect.objectContaining({
+                    children: [
+                        expect.objectContaining({
+                            name: "loaded-on-demand",
+                        }),
+                    ],
+                    name: "parent-node",
+                    open: true,
+                }),
+            ]);
+        });
     });
 });

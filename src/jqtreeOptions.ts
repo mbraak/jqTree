@@ -1,71 +1,29 @@
-import type { AnimationSpeed } from "./animation";
-import type { Node } from "./node";
+import type { Node, TreeElementOptions } from "tree-element";
 
-export type DataFilter = (data: unknown) => NodeData[];
+export type JQTreeIconElement = HTMLElement | JQuery | string;
 
-export type DataUrl = DataUrlFunction | JQuery.AjaxSettings | string;
+export type JQTreeOnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
 
-export type DragMethod = (node: Node, event: Event | Touch) => void;
+export type JQTreeOnIsMoveHandle = (el: JQuery) => boolean;
 
-export type IconElement = HTMLElement | JQuery | string;
+export type JQTreeOnLoadFailed = (el: Response) => void;
 
-export interface JQTreeOptions {
-    animationSpeed: AnimationSpeed;
-    autoEscape: boolean;
-    autoOpen: boolean | number;
-    buttonLeft: boolean;
-    closedIcon?: IconElement;
-    data?: NodeData[];
-    dataFilter?: DataFilter;
-    dataUrl?: DataUrl;
-    dragAndDrop: boolean;
-    keyboardSupport: boolean;
-    nodeClass: typeof Node;
-    onCanMove?: OnCanMove;
-    onCanMoveTo?: OnCanMoveTo;
-    onCanSelectNode?: (node: Node) => boolean;
-    onCreateLi?: OnCreateLi;
-    onDragMove?: DragMethod;
-    onDragStop?: DragMethod;
-    onGetStateFromStorage?: OnGetStateFromStorage;
-    onIsMoveHandle?: OnIsMoveHandle;
-    onLoadFailed?: OnLoadFailed;
-    onLoading?: OnLoading;
-    onSetStateFromStorage?: OnSetStateFromStorage;
-    openedIcon?: IconElement;
-    openFolderDelay: false | number;
-    rtl?: boolean;
-    saveState: boolean | string;
-    selectable: boolean;
-    showEmptyFolder: boolean;
-    slide: boolean;
-    startDndDelay?: number;
-    tabIndex?: number;
-    useContextMenu: boolean;
-}
-
-export type OnCanMove = ((node: Node) => boolean) | undefined;
-
-export type OnCanMoveTo = (
-    node: Node,
-    targetNode: Node,
-    positionName: string,
-) => boolean;
-
-export type OnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => void;
-
-export type OnGetStateFromStorage = (() => string) | undefined;
-
-export type OnIsMoveHandle = (el: JQuery) => boolean;
-
-export type OnLoadFailed = (response: JQuery.jqXHR) => void;
-
-export type OnLoading = (
+export type JQTreeOnLoading = (
     isLoading: boolean,
-    node: Node | null,
+    node: Node | undefined,
     $el: JQuery,
 ) => void;
 
-export type OnSetStateFromStorage = ((data: string) => void) | undefined;
+/* The class name options are set by jqTree itself, so they are not part of the
+ * jqTree options.
+ */
+export type JQTreeOptions = Modify<Omit<TreeElementOptions, "classPrefix" | "commonClassName" | "treeClassName">, {
+    closedIcon?: JQTreeIconElement;
+    onCreateLi?: JQTreeOnCreateLi;
+    onIsMoveHandle?: JQTreeOnIsMoveHandle;
+    onLoadFailed?: JQTreeOnLoadFailed;
+    onLoading?: JQTreeOnLoading;
+    openedIcon?: JQTreeIconElement;
+}>
 
-type DataUrlFunction = (node: Node | null) => JQuery.AjaxSettings;
+type Modify<T, R> = Omit<T, keyof R> & R;

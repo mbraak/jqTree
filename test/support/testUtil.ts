@@ -1,7 +1,7 @@
+import type { Node } from "tree-element";
+
 import { mockElementBoundingClientRect } from "jsdom-testing-mocks";
 import { vi } from "vitest";
-
-import type { Node } from "app/node";
 
 interface Rect {
     height: number;

@@ -224,7 +224,7 @@ describe("options", () => {
             expect(button).toHaveTextContent("<span>test</span>");
         });
 
-        it("renders a jquery element", () => {
+        it("renders a html element", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 closedIcon: $("<span class='abc'>test</span>"),
@@ -277,7 +277,7 @@ describe("options", () => {
             );
 
             const dataFilter = vi.fn((data) => [
-                (data as number[])[1] as unknown as NodeData,
+                (data as number[])[1] as unknown as JQTreeNodeData,
             ]);
 
             const $tree = $("#tree1");
@@ -307,18 +307,7 @@ describe("options", () => {
                 name: "string",
             },
             {
-                dataUrl: {
-                    headers: { node: "test-node" },
-                    url: "/tree/",
-                },
-                expectedNode: "test-node",
-                expectedStructure: [
-                    expect.objectContaining({ name: "test-node" }),
-                ],
-                name: "object with url and headers",
-            },
-            {
-                dataUrl: () => ({ url: "/tree/" }),
+                dataUrl: () => "/tree/",
                 expectedNode: "node1",
                 expectedStructure: exampleStructure,
                 name: "function",
@@ -359,7 +348,7 @@ describe("options", () => {
 
             await screen.findByRole("treeitem", { name: "node1" })
 
-            expect(($tree.tree("getSelectedNode") as INode).name).toBe(
+            expect(($tree.tree("getSelectedNode") as JQTreeNode).name).toBe(
                 "node2",
             );
         });
@@ -408,7 +397,7 @@ describe("options", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
-                onCanSelectNode: (node: INode) => node.name !== "node1",
+                onCanSelectNode: (node: JQTreeNode) => node.name !== "node1",
             });
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
@@ -423,7 +412,7 @@ describe("options", () => {
             const $tree = $("#tree1");
             $tree.tree({
                 data: exampleData,
-                onCreateLi: (node: INode, $el: JQuery) => {
+                onCreateLi: (node: JQTreeNode, $el: JQuery) => {
                     const htmlElement = $el.get(0) as HTMLElement;
                     // eslint-disable-next-line testing-library/no-node-access
                     const titleElement = htmlElement.querySelector(":scope > .jqtree-element > .jqtree-title") as HTMLElement;
@@ -464,16 +453,18 @@ describe("options", () => {
             savedState = "";
         });
 
-        it("saves the state with an open and a selected node", () => {
+        it("saves the state with an open and a selected node", async () => {
             const $tree = createTree();
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             $tree.tree("selectNode", node1);
             $tree.tree("openNode", node1);
 
-            expect(JSON.parse(savedState)).toStrictEqual({
-                open_nodes: [123],
-                selected_node: [123],
+            await waitFor(() => {
+                expect(JSON.parse(savedState)).toStrictEqual({
+                    open_nodes: [123],
+                    selected_node: [123],
+                });
             });
         });
 
@@ -484,7 +475,6 @@ describe("options", () => {
             });
 
             const $tree = createTree();
-            //const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
             expect($tree).toHaveTreeStructure([
                 expect.objectContaining({
@@ -624,20 +614,24 @@ describe("options", () => {
             return $tree;
         };
 
-        it("saves the state to local storage when saveState is true", () => {
+        it("saves the state to local storage when saveState is true", async () => {
             createTreeWithOpenSelectedNode(true);
 
-            expect(localStorage.getItem("tree")).toBe(
-                '{"open_nodes":[123],"selected_node":[123]}',
-            );
+            await waitFor(() => {
+                expect(localStorage.getItem("tree")).toBe(
+                    '{"open_nodes":[123],"selected_node":[123]}',
+                );
+            });
         });
 
-        it("uses the string as a key when saveState is a string", () => {
+        it("uses the string as a key when saveState is a string", async () => {
             createTreeWithOpenSelectedNode("my-state");
 
-            expect(localStorage.getItem("my-state")).toBe(
-                '{"open_nodes":[123],"selected_node":[123]}',
-            );
+            await waitFor(() => {
+                expect(localStorage.getItem("my-state")).toBe(
+                    '{"open_nodes":[123],"selected_node":[123]}',
+                );
+            });
         });
 
         it("doesn't save to local storage when saveState is false", () => {
