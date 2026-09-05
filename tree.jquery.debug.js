@@ -1,5 +1,5 @@
 /*
-JqTree 1.9.0
+JqTree 1.9.1
 
 Copyright 2026 Marco Braak
 
@@ -2632,7 +2632,7 @@ var jqtree = (function (exports) {
       }
     }
 
-    const version = "1.9.0";
+    const version = "1.9.1";
 
     const defaults = {
       animationSpeed: "fast",
