@@ -88,8 +88,8 @@ importers:
         specifier: ^5.10.1
         version: 5.10.1(@testing-library/dom@10.4.1)(eslint@10.9.1(supports-color@7.2.0))
       eslint-plugin-jest-extended:
-        specifier: github:Aesthermortis/eslint-plugin-jest-extended#v4.0.0
-        version: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c(eslint@10.9.1(supports-color@7.2.0))
+        specifier: github:Aesthermortis/eslint-plugin-jest-extended
+        version: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0767a292476be78588ba2e3190ee11c3ef7582bf(eslint@10.9.1(supports-color@7.2.0))
       eslint-plugin-perfectionist:
         specifier: ^5.11.0
         version: 5.11.0(eslint@10.9.1(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
@@ -2150,8 +2150,8 @@ packages:
       '@testing-library/dom':
         optional: true
 
-  eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c}
+  eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0767a292476be78588ba2e3190ee11c3ef7582bf:
+    resolution: {gitHosted: true, integrity: sha512-79l5Y0q7zmhy0Hrxaj1G3PPMZdD2Sh7l+PlnH+e0Rs7cC1DenyzZ/F19S74rL3xiFI7mfbo43VUGd7fZbDVMoQ==, tarball: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0767a292476be78588ba2e3190ee11c3ef7582bf}
     version: 4.0.0
     engines: {node: '>=24.0.0', npm: '>=11.0.0'}
     peerDependencies:
@@ -2870,10 +2870,6 @@ packages:
 
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
-
-  postcss@8.5.26:
-    resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
-    engines: {node: ^10 || ^12 || >=14}
 
   postcss@8.5.28:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
@@ -5358,7 +5354,7 @@ snapshots:
     optionalDependencies:
       '@testing-library/dom': 10.4.1
 
-  eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c(eslint@10.9.1(supports-color@7.2.0)):
+  eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0767a292476be78588ba2e3190ee11c3ef7582bf(eslint@10.9.1(supports-color@7.2.0)):
     dependencies:
       eslint: 10.9.1(supports-color@7.2.0)
 
@@ -6019,12 +6015,6 @@ snapshots:
 
   postcss-value-parser@4.2.0: {}
 
-  postcss@8.5.26:
-    dependencies:
-      nanoid: 3.3.18
-      picocolors: 1.1.1
-      source-map-js: 1.2.1
-
   postcss@8.5.28:
     dependencies:
       nanoid: 3.3.18
@@ -6389,7 +6379,7 @@ snapshots:
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.7
-      postcss: 8.5.26
+      postcss: 8.5.28
       rolldown: 1.0.2
       tinyglobby: 0.2.17
     optionalDependencies:
