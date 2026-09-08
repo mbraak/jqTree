@@ -13,8 +13,7 @@ jobs:
               with:
                   version: 12
                   cache: true
-            - name: Install packages
-              run: pnpm install
+                  run_install: true
             - name: Check compressed size
               uses: preactjs/compressed-size-action@v3
               with:

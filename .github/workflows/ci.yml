@@ -17,6 +17,7 @@ jobs:
               with:
                   version: 12
                   cache: true
+                  run_install: true
             - uses: actions/cache@v6
               name: Setup Playwright browsers cache
               with:
@@ -24,9 +25,6 @@ jobs:
                   key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
                   restore-keys: |
                       ${{ runner.os }}-playwright-
-            - name: Install packages
-              run: |
-                  pnpm install
             - name: Build
               run: |
                   pnpm run production
