@@ -88,8 +88,8 @@ importers:
         specifier: ^5.10.1
         version: 5.10.1(@testing-library/dom@10.4.1)(eslint@10.10.0(supports-color@7.2.0))
       eslint-plugin-jest-extended:
-        specifier: github:Aesthermortis/eslint-plugin-jest-extended#v4.0.0
-        version: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c(eslint@10.10.0(supports-color@7.2.0))
+        specifier: github:Aesthermortis/eslint-plugin-jest-extended
+        version: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0767a292476be78588ba2e3190ee11c3ef7582bf(eslint@10.10.0(supports-color@7.2.0))
       eslint-plugin-perfectionist:
         specifier: ^5.11.0
         version: 5.11.0(eslint@10.10.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
@@ -2169,8 +2169,8 @@ packages:
       '@testing-library/dom':
         optional: true
 
-  eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c}
+  eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0767a292476be78588ba2e3190ee11c3ef7582bf:
+    resolution: {gitHosted: true, integrity: sha512-79l5Y0q7zmhy0Hrxaj1G3PPMZdD2Sh7l+PlnH+e0Rs7cC1DenyzZ/F19S74rL3xiFI7mfbo43VUGd7fZbDVMoQ==, tarball: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0767a292476be78588ba2e3190ee11c3ef7582bf}
     version: 4.0.0
     engines: {node: '>=24.0.0', npm: '>=11.0.0'}
     peerDependencies:
@@ -5401,7 +5401,7 @@ snapshots:
     optionalDependencies:
       '@testing-library/dom': 10.4.1
 
-  eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c(eslint@10.10.0(supports-color@7.2.0)):
+  eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0767a292476be78588ba2e3190ee11c3ef7582bf(eslint@10.10.0(supports-color@7.2.0)):
     dependencies:
       eslint: 10.10.0(supports-color@7.2.0)
 
