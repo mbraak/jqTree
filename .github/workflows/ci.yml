@@ -16,7 +16,7 @@ jobs:
               uses: pnpm/setup@v2
               with:
                   runtime: node@24
-                  version: 12
+                  version: 11
                   cache: true
             - uses: actions/cache@v6
               name: Setup Playwright browsers cache

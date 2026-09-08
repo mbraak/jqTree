@@ -12,7 +12,7 @@ jobs:
               uses: pnpm/setup@v2
               with:
                   runtime: node@24
-                  version: 12
+                  version: 11
                   cache: true
             - name: Check compressed size
               uses: preactjs/compressed-size-action@v3

@@ -2170,7 +2170,7 @@ packages:
         optional: true
 
   eslint-plugin-jest-extended@https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c:
-    resolution: {gitHosted: true, integrity: sha512-P5F8KTrHvWrzKS6f1rWeAO9m09CqWowRoM4yhlctcEX71iOCkKD2eBkONCQ8o+qYkZh8RPYXakdJ1aQWe1Dz9Q==, tarball: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/Aesthermortis/eslint-plugin-jest-extended/tar.gz/0b24376411f45e9f3f11f9104cc9966ebc80dd8c}
     version: 4.0.0
     engines: {node: '>=24.0.0', npm: '>=11.0.0'}
     peerDependencies:
