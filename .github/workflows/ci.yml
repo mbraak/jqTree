@@ -15,7 +15,6 @@ jobs:
             - name: Setup node
               uses: pnpm/action-setup@v6
               with:
-                  runtime: node@24
                   version: 12
                   cache: true
             - uses: actions/cache@v6
