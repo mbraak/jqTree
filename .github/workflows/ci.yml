@@ -16,19 +16,7 @@ jobs:
               uses: actions/setup-node@v7
               with:
                   node-version: "24"
-            - name: Install pnpm
-              run: npm install -g pnpm
-            - name: Get pnpm store directory
-              id: pnpm-cache
-              run: |
-                  echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v6
-              name: Setup pnpm cache
-              with:
-                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-                  key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-                  restore-keys: |
-                      ${{ runner.os }}-pnpm-store-
+                  cache: "pnpm"
             - uses: actions/cache@v6
               name: Setup Playwright browsers cache
               with:
