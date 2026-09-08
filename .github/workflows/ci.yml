@@ -13,10 +13,11 @@ jobs:
             - name: Check out repository code
               uses: actions/checkout@v7
             - name: Setup node
-              uses: actions/setup-node@v7
+              uses: pnpm/setup@v6
               with:
-                  node-version: "24"
-                  cache: "pnpm"
+                  runtime: node@24
+                  version: 12
+                  cache: true
             - uses: actions/cache@v6
               name: Setup Playwright browsers cache
               with:
