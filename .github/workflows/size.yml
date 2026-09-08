@@ -9,7 +9,7 @@ jobs:
             - name: Check out repository code
               uses: actions/checkout@v7
             - name: Setup node
-              uses: pnpm/setup@v6
+              uses: pnpm/action-setup@v6
               with:
                   runtime: node@24
                   version: 12
