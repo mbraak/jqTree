@@ -291,7 +291,7 @@ export class JqTreeWidget {
         }
 
         let onFinished: null | OnFinishOpenNode = null;
-        let slide: boolean | undefined = undefined;
+        let slide: boolean | undefined;
 
         if (typeof param1 === "function") {
             onFinished = param1;
