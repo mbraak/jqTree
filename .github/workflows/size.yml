@@ -16,10 +16,11 @@ jobs:
               run: npm install -g pnpm
             - name: Install packages
               run: pnpm install
+            - name: Build
+              run: pnpm run production
             - name: Check compressed size
               uses: preactjs/compressed-size-action@v3
               with:
-                  build-script: pnpm run production
                   pattern: "./lib/**/*.js"
                   exclude: "{./lib/**/*.d.js,./lib/playwright/**,./lib/test/**}"
                   comment-key: files
@@ -39,10 +40,11 @@ jobs:
               run: npm install -g pnpm
             - name: Install packages
               run: pnpm install
+            - name: Build
+              run: pnpm run production
             - name: Check compressed size
               uses: preactjs/compressed-size-action@v3
               with:
-                  build-script: pnpm run production
                   pattern: "./tree.jquery.js"
                   exclude: "{./lib/**/*.d.js,./lib/playwright/**,./lib/test/**}"
                   comment-key: bundle
