@@ -3,6 +3,7 @@ import jsonfile from "jsonfile";
 import template from "lodash/template.js";
 import { babel } from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
+import tsConfigPaths from "rollup-plugin-tsconfig-paths";
 import serve from "rollup-plugin-serve";
 import terser from "@rollup/plugin-terser";
 
@@ -35,7 +36,7 @@ const babelPlugin = babel({
     extensions: [".ts"],
 });
 
-const plugins = [resolvePlugin, babelPlugin];
+const plugins = [tsConfigPaths(), resolvePlugin, babelPlugin];
 
 if (!debugBuild) {
     const terserPlugin = terser({

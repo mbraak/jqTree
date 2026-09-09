@@ -3,6 +3,12 @@ title: Changelog
 name: changelog
 ---
 
+#### development
+
+- #1018. Use the tree-element library. JQtree is now a thin wrapper around tree-element.
+    - Almost everything should work the same.
+    - Changed: the `onLoadFailed` callback now has `Response` as parameter.
+
 #### 1.9.1 (september 5 2026)
 
 - Issue #1000. Add isDragging to type definition.

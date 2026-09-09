@@ -300,7 +300,7 @@ describe("keyboard support", () => {
                 animationSpeed: 0,
                 autoOpen: false,
                 data: exampleData,
-                onCreateLi: (node: INode, $li: JQuery) => {
+                onCreateLi: (node: JQTreeNode, $li: JQuery) => {
                     // eslint-disable-next-line testing-library/no-node-access
                     const element = $li.get(0)?.querySelector(":scope > .jqtree-element");
                     element?.insertAdjacentHTML(
