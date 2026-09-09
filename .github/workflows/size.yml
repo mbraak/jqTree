@@ -19,7 +19,7 @@ jobs:
             - name: Check compressed size
               uses: mbraak/compressed-size-action@master
               with:
-                  build-script: pnpm run production
+                  build-script: production
                   pattern: |
                       ./tree.jquery.j
                       ./lib/**/*.js
