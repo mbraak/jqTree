@@ -14,12 +14,11 @@ jobs:
                   node-version: "24"
             - name: Install pnpm
               run: npm install -g pnpm
-            - name: Install packages
-              run: pnpm install
             - name: Check compressed size
               uses: mbraak/compressed-size-action@master
               with:
                   build-script: production
+                  install-script: pnpm install
                   pattern: |
                       ./tree.jquery.js
                       ./lib/**/*.js
