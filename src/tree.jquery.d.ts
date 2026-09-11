@@ -2,7 +2,7 @@ interface JQTreeNode {
     [key: string]: unknown;
     children: JQTreeNode[];
     element?: HTMLElement;
-    id?: NodeId;
+    id?: JQTreeNodeId;
     is_open: boolean;
     iterate(callback: (node: JQTreeNode, level: number) => boolean): void;
 
