@@ -4422,7 +4422,7 @@ var jqtree = (function (exports) {
         throw Error(NODE_PARAM_IS_EMPTY);
       }
       let onFinished = null;
-      let slide = undefined;
+      let slide;
       if (typeof param1 === "function") {
         onFinished = param1;
         slide = param2;
