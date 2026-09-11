@@ -8,6 +8,7 @@ name: changelog
 - #1018. Use the tree-element library. JQtree is now a thin wrapper around tree-element.
     - Almost everything should work the same.
     - Changed: the `onLoadFailed` callback now has `Response` as parameter.
+    - Changed: types are prefixed with `JQTree`. E.g. `JQTreeNode`.
 
 #### 1.9.1 (september 5 2026)
 
