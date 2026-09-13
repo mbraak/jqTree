@@ -6,7 +6,7 @@ const __dirname = import.meta.dirname;
 export default defineConfig({
   resolve: {
     alias: {
-      'app': path.resolve(__dirname, '../src')
+      'app': path.resolve(__dirname, '../src'),
     },
   },
   test: {
