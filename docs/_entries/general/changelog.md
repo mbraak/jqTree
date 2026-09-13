@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### development
+#### 2.0.0 (september 13 2026)
 
 - #1018. Use the tree-element library. JQtree is now a thin wrapper around tree-element.
     - Almost everything should work the same.
