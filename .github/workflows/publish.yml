@@ -1,0 +1,44 @@
+name: Publish to npm
+
+on:
+    push:
+        tags:
+            - "[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+    contents: read
+    id-token: write
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out repository code
+              uses: actions/checkout@v7
+            - name: Setup node
+              uses: actions/setup-node@v7
+              with:
+                  node-version: "24"
+                  registry-url: "https://registry.npmjs.org"
+            - name: Install pnpm
+              run: npm install -g pnpm
+            - name: Check that the tag matches package.json
+              run: |
+                  package_version=$(node -p "require('./package.json').version")
+                  if [ "$package_version" != "$GITHUB_REF_NAME" ]; then
+                      echo "Tag $GITHUB_REF_NAME does not match package.json version $package_version" >&2
+                      exit 1
+                  fi
+            - name: Install packages
+              run: pnpm install
+            - name: Lint
+              run: pnpm run lint
+            - name: Check types
+              run: pnpm run tsc
+            - name: Run vitest tests
+              run: pnpm run vitest
+            - name: Build
+              run: pnpm run production
+            - name: Publish
+              run: npm publish
