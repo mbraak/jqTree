@@ -23,6 +23,7 @@
         "devserver": "SERVE=true rollup --config config/rollup.config.mjs --watch",
         "devserver-with-coverage": "COVERAGE=true SERVE=true rollup --config config/rollup.config.mjs",
         "build-with-coverage": "COVERAGE=true rollup --config config/rollup.config.mjs",
+        "bump-version": "./config/bump-version",
         "prettier": "prettier src/*.ts --write --tab-width 4",
         "tsc": "tsc --noEmit --project tsconfig.json",
         "playwright": "pnpm build-with-coverage && playwright test --config playwright/playwright.config.js",
