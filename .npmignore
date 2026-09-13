@@ -9,3 +9,4 @@ test
 .prettier
 eslint.config.mjs
 tsconfig.json
+developer_docs
