@@ -3,6 +3,17 @@ title: Changelog
 name: changelog
 ---
 
+#### Development
+
+- Change the `onLoadFailed` callback.
+    - Handle a network error that throws an exception. The callback has an `error` parameter.
+    - For error responses the parameter is a Response object.
+    - The callback parameter type is `{ error?: unknown, response?: Response }`
+
+#### 2.0.1 (september 14 2026)
+
+- Include correct version number.
+
 #### 2.0.0 (september 13 2026)
 
 - #1018. Use the tree-element library. JQtree is now a thin wrapper around tree-element.

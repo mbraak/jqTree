@@ -10,7 +10,9 @@ needed on your machine.
 1. Make sure `dev` is up to date and CI is green.
 
 2. Bump the version. This updates `package.json`, `bower.json`,
-   `src/version.ts` and `docs/_config.yml` in one go:
+   `src/version.ts` and `docs/_config.yml` in one go, then runs
+   `pnpm production` so the committed `tree.jquery.js`, `tree.jquery.debug.js`
+   and `jqtree.css` are rebuilt with the new version number:
 
     ```sh
     pnpm bump-version 1.9.2
