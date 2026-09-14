@@ -513,7 +513,7 @@ describe("options", () => {
     });
 
     describe("onLoadFailed", () => {
-        it("calls onLoadFailed when the loading fails", async () => {
+        it("calls onLoadFailed with the response when the loading fails", async () => {
             server.use(
                 http.get(
                     "/tree/",
@@ -533,9 +533,32 @@ describe("options", () => {
             });
 
             await waitFor(() => {
-                expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith(
-                    expect.objectContaining({ status: 500 }),
-                );
+                expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith({
+                    response: expect.objectContaining({ status: 500 }) as Response,
+                });
+            });
+        });
+
+        it("calls onLoadFailed with the error when the request fails with a network error", async () => {
+            server.use(
+                http.get("/tree", () => HttpResponse.error()),
+            );
+
+            const onLoadFailed = vi.fn();
+
+            const $tree = $("#tree1");
+            $tree.tree({
+                dataUrl: "/tree/",
+                onLoadFailed,
+            });
+
+            await waitFor(() => {
+                expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith({
+                    error: expect.objectContaining({
+                        message: "Failed to fetch",
+                        name: "TypeError",
+                    }) as TypeError,
+                });
             });
         });
     });

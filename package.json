@@ -30,7 +30,7 @@
         "test": "pnpm vitest && pnpm playwright"
     },
     "dependencies": {
-        "tree-element": "^0.1.0"
+        "tree-element": "^0.1.1"
     },
     "peerDependencies": {
         "jquery": ">= 3"

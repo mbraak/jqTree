@@ -6,7 +6,7 @@ export type JQTreeOnCreateLi = (node: Node, el: JQuery, isSelected: boolean) => 
 
 export type JQTreeOnIsMoveHandle = (el: JQuery) => boolean;
 
-export type JQTreeOnLoadFailed = (el: Response) => void;
+export type JQTreeOnLoadFailed = ({ error, response }: { error?: unknown, response?: Response }) => void;
 
 export type JQTreeOnLoading = (
     isLoading: boolean,
