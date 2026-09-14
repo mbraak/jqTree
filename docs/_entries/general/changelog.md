@@ -3,6 +3,10 @@ title: Changelog
 name: changelog
 ---
 
+#### 2.0.1 (september 14 2026)
+
+- Include correct version number.
+
 #### 2.0.0 (september 13 2026)
 
 - #1018. Use the tree-element library. JQtree is now a thin wrapper around tree-element.
