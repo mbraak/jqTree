@@ -1,5 +1,6 @@
 #!/bin/sh
-# Bump the jqTree version in every file that contains it.
+# Bump the jqTree version in every file that contains it, then rebuild the
+# distribution files so tree.jquery.js and friends carry the new version too.
 # Usage: pnpm bump-version 1.9.2
 
 set -e
@@ -41,6 +42,7 @@ replace() {
 }
 
 old_pattern=$(echo "$old_version" | sed 's/\./\\./g')
+new_pattern=$(echo "$new_version" | sed 's/\./\\./g')
 
 # Only touch the line that holds the jqTree version, so a dependency
 # that happens to share the same version number is left alone.
@@ -50,6 +52,18 @@ replace src/version.ts "\(const version = \"\)$old_pattern"
 replace docs/_config.yml "\(jqtree_version: \)$old_pattern"
 
 echo "Bumped $old_version -> $new_version"
+echo
+echo "Building distribution files..."
+pnpm production
+
+for file in tree.jquery.js tree.jquery.debug.js; do
+    if ! grep -q "JqTree $new_pattern" "$file"; then
+        echo "Built $file does not contain version $new_version" >&2
+        exit 1
+    fi
+    echo "Built $file"
+done
+
 echo
 echo "Next steps:"
 echo "  git commit -am 'Release $new_version'"
