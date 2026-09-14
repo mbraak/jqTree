@@ -10,7 +10,8 @@ import __version__ from "./version";
 type IconElement = HTMLElement | string
 
 interface LoadFailedEvent {
-    response: Response;
+    error?: unknown;
+    response?: Response;
 }
 
 interface LoadingDataEvent {
@@ -414,8 +415,8 @@ export class JqTreeWidget {
         const jqTreeOnLoadFailed = this._inputOptions.onLoadFailed;
 
         if (jqTreeOnLoadFailed) {
-            const { response } = e as unknown as LoadFailedEvent;
-            jqTreeOnLoadFailed(response);
+            const { error, response } = e as unknown as LoadFailedEvent;
+            jqTreeOnLoadFailed({ error, response });
         }
     }
 

@@ -4516,9 +4516,13 @@ var jqtree = (function (exports) {
       const jqTreeOnLoadFailed = this._inputOptions.onLoadFailed;
       if (jqTreeOnLoadFailed) {
         const {
+          error,
           response
         } = e;
-        jqTreeOnLoadFailed(response);
+        jqTreeOnLoadFailed({
+          error,
+          response
+        });
       }
     }
     _handleLoadingDataEvent(e) {
