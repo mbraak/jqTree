@@ -3,7 +3,7 @@ title: Changelog
 name: changelog
 ---
 
-#### Development
+#### 2.0.2 (september 14 2026)
 
 - Change the `onLoadFailed` callback.
     - Handle a network error that throws an exception. The callback has an `error` parameter.
