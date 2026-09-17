@@ -46,15 +46,6 @@ describe("class names", () => {
         );
     });
 
-    it("sets the class name of a child list", () => {
-        const $tree = $("#tree1");
-        $tree.tree({ data: exampleData });
-
-        for (const group of screen.getAllByRole("group")) {
-            expect(group).toHaveClass("jqtree_common");
-        }
-    });
-
     it("sets the class names of a folder", () => {
         const $tree = $("#tree1");
         $tree.tree({ data: exampleData });

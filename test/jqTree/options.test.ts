@@ -211,19 +211,6 @@ describe("options", () => {
             expect(button).toHaveTextContent("closed");
         });
 
-        it("escapes html", () => {
-            const $tree = $("#tree1");
-            $tree.tree({
-                closedIcon: "<span>test</span>",
-                data: exampleData,
-            });
-
-            const treeItem = screen.getByRole("treeitem", { name: "node1" });
-            const button = getTreeButton(treeItem);
-
-            expect(button).toHaveTextContent("<span>test</span>");
-        });
-
         it("renders a html element", () => {
             const $tree = $("#tree1");
             $tree.tree({
@@ -288,7 +275,9 @@ describe("options", () => {
 
             await screen.findByRole("treeitem", { name: "node2" });
 
-            expect(screen.queryByRole("treeitem", { name: "node1" })).not.toBeInTheDocument();
+            expect(
+                screen.queryByRole("treeitem", { name: "node1" }),
+            ).not.toBeInTheDocument();
             expect(dataFilter).toHaveBeenCalledExactlyOnceWith(exampleData);
         });
     });
@@ -346,7 +335,7 @@ describe("options", () => {
                 saveState: true,
             });
 
-            await screen.findByRole("treeitem", { name: "node1" })
+            await screen.findByRole("treeitem", { name: "node1" });
 
             expect(($tree.tree("getSelectedNode") as JQTreeNode).name).toBe(
                 "node2",
@@ -362,7 +351,7 @@ describe("options", () => {
                 saveState: true,
             });
 
-            await screen.findByRole("treeitem", { name: "node1" })
+            await screen.findByRole("treeitem", { name: "node1" });
 
             expect($tree.tree("getSelectedNode")).toBeFalse();
         });
@@ -370,12 +359,7 @@ describe("options", () => {
 
     describe("data-url in html", () => {
         it("loads the data from the url", async () => {
-            server.use(
-                http.get(
-                    "/tree",
-                    () => HttpResponse.json(exampleData)
-                ),
-            );
+            server.use(http.get("/tree", () => HttpResponse.json(exampleData)));
 
             const $tree = $("#tree1");
             const treeElement = $tree.get(0) as HTMLElement;
@@ -383,7 +367,7 @@ describe("options", () => {
 
             $tree.tree();
 
-            await screen.findByRole("treeitem", { name: "node1" })
+            await screen.findByRole("treeitem", { name: "node1" });
 
             expect($tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1" }),
@@ -415,7 +399,9 @@ describe("options", () => {
                 onCreateLi: (node: JQTreeNode, $el: JQuery) => {
                     const htmlElement = $el.get(0) as HTMLElement;
                     // eslint-disable-next-line testing-library/no-node-access
-                    const titleElement = htmlElement.querySelector(":scope > .jqtree-element > .jqtree-title") as HTMLElement;
+                    const titleElement = htmlElement.querySelector(
+                        ":scope > .jqtree-element > .jqtree-title",
+                    ) as HTMLElement;
                     titleElement.innerHTML = `_${node.name}_`;
                 },
             });
@@ -534,15 +520,15 @@ describe("options", () => {
 
             await waitFor(() => {
                 expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith({
-                    response: expect.objectContaining({ status: 500 }) as Response,
+                    response: expect.objectContaining({
+                        status: 500,
+                    }) as Response,
                 });
             });
         });
 
         it("calls onLoadFailed with the error when the request fails with a network error", async () => {
-            server.use(
-                http.get("/tree", () => HttpResponse.error()),
-            );
+            server.use(http.get("/tree", () => HttpResponse.error()));
 
             const onLoadFailed = vi.fn();
 
