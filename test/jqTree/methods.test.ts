@@ -88,7 +88,7 @@ describe("methods", () => {
     });
 
     describe("addParentNode", () => {
-        it("adds the parent node", () => {
+        it("adds the parent node", async () => {
             const $tree = $("#tree1");
             $tree.tree({
                 autoOpen: true,
@@ -96,23 +96,30 @@ describe("methods", () => {
             });
 
             const child1 = $tree.tree("getNodeByNameMustExist", "child1");
-            $tree.tree("addParentNode", "new-parent-node", child1);
+            const newParentNode = $tree.tree(
+                "addParentNode",
+                "new-parent-node",
+                child1,
+            );
+            $tree.tree("openNode", newParentNode as JQTreeNode, false);
 
-            expect($tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({
-                            children: [
-                                expect.objectContaining({ name: "child1" }),
-                                expect.objectContaining({ name: "child2" }),
-                            ],
-                            name: "new-parent-node",
-                        }),
-                    ],
-                    name: "node1",
-                }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
+            await waitFor(() => {
+                expect($tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({
+                                children: [
+                                    expect.objectContaining({ name: "child1" }),
+                                    expect.objectContaining({ name: "child2" }),
+                                ],
+                                name: "new-parent-node",
+                            }),
+                        ],
+                        name: "node1",
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
         });
 
         it("throws an error without an existingNode parameter", () => {
@@ -298,9 +305,7 @@ describe("methods", () => {
             };
             $tree.tree("appendNode", nodeData);
 
-            expect($tree.tree("getNodeById", 99)).toMatchObject(
-                nodeData,
-            );
+            expect($tree.tree("getNodeById", 99)).toMatchObject(nodeData);
         });
     });
 
@@ -686,52 +691,68 @@ describe("methods", () => {
     });
 
     describe("loadData", () => {
-        it("replaces the whole tree when the node parameter is empty", () => {
+        it("replaces the whole tree when the node parameter is empty", async () => {
             const $tree = $("#tree1");
             $tree.tree({ data: ["initial1"] });
 
             $tree.tree("loadData", exampleData);
 
-            expect($tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({ name: "child1" }),
-                        expect.objectContaining({ name: "child2" }),
-                    ],
-                    name: "node1",
-                }),
-                expect.objectContaining({
-                    children: [expect.objectContaining({ name: "node3" })],
-                    name: "node2",
-                }),
-            ]);
-        });
-
-        it("loads the data under the node with a node parameter", () => {
-            const $tree = $("#tree1");
-            $tree.tree({ data: ["initial1"] });
-
             $tree.tree(
-                "loadData",
-                exampleData,
-                $tree.tree("getNodeByNameMustExist", "initial1"),
+                "openNode",
+                $tree.tree("getNodeByName", "node1") as JQTreeNode,
+                false,
+            );
+            $tree.tree(
+                "openNode",
+                $tree.tree("getNodeByName", "node2") as JQTreeNode,
+                false,
             );
 
-            expect($tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({
-                            children: [
-                                expect.objectContaining({ name: "child1" }),
-                                expect.objectContaining({ name: "child2" }),
-                            ],
-                            name: "node1",
-                        }),
-                        expect.objectContaining({ name: "node2" }),
-                    ],
-                    name: "initial1",
-                }),
-            ]);
+            await waitFor(() => {
+                expect($tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({ name: "child1" }),
+                            expect.objectContaining({ name: "child2" }),
+                        ],
+                        name: "node1",
+                    }),
+                    expect.objectContaining({
+                        children: [expect.objectContaining({ name: "node3" })],
+                        name: "node2",
+                    }),
+                ]);
+            });
+        });
+
+        it("loads the data under the node with a node parameter", async () => {
+            const $tree = $("#tree1");
+
+            $tree.tree({ autoOpen: true, data: ["initial1"] });
+
+            const parentNode = $tree.tree("getNodeByNameMustExist", "initial1");
+            $tree.tree("loadData", exampleData, parentNode);
+
+            const node1 = $tree.tree("getNodeByName", "node1");
+            $tree.tree("openNode", node1 as JQTreeNode);
+
+            await waitFor(() => {
+                expect($tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({
+                                children: [
+                                    expect.objectContaining({ name: "child1" }),
+                                    expect.objectContaining({ name: "child2" }),
+                                ],
+                                name: "node1",
+                            }),
+                            expect.objectContaining({ name: "node2" }),
+                        ],
+                        name: "initial1",
+                    }),
+                ]);
+            });
         });
 
         it("deselects the node with a node parameter which has a selected child", () => {
@@ -781,7 +802,7 @@ describe("methods", () => {
                 data: exampleData,
                 dragAndDrop: true,
                 startDndDelay: 0,
-            })
+            });
 
             const user = userEvent.setup();
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
@@ -793,11 +814,17 @@ describe("methods", () => {
 
             expect($tree.tree("isDragging")).toBeTrue();
 
-            $tree.tree("loadData", ["new-child1"], $tree.tree("getNodeByNameMustExist", "node2"));
+            $tree.tree(
+                "loadData",
+                ["new-child1"],
+                $tree.tree("getNodeByNameMustExist", "node2"),
+            );
 
             expect($tree.tree("isDragging")).toBeTrue();
             expect(
-                getTreeListElement(screen.getByRole("treeitem", { name: "node1" })),
+                getTreeListElement(
+                    screen.getByRole("treeitem", { name: "node1" }),
+                ),
             ).toHaveClass("jqtree-moving");
 
             await user.pointer({ keys: "[/MouseLeft]", target: treeItem });
@@ -827,8 +854,6 @@ describe("methods", () => {
                 name: "child1",
             });
         });
-
-
     });
 
     describe("loadDataFromUrl", () => {
@@ -854,26 +879,40 @@ describe("methods", () => {
                 http.get("/tree/", () => HttpResponse.json(["new1", "new2"])),
             );
 
+            let loading: boolean | null = null;
+
+            const handleLoading = (isLoading: boolean) => {
+                loading = isLoading;
+            };
+
             const $tree = $("#tree1");
-            $tree.tree({ data: ["initial1", "initial2"] });
+            $tree.tree({
+                autoOpen: true,
+                data: ["initial1", "initial2"],
+                onLoading: handleLoading,
+            });
 
-            const parentNode = $tree.tree(
-                "getNodeByNameMustExist",
-                "initial1",
-            );
+            const parentNode = $tree.tree("getNodeByNameMustExist", "initial1");
             $tree.tree("loadDataFromUrl", "/tree/", parentNode);
-            await screen.findByText("new1");
 
-            expect($tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({ name: "new1" }),
-                        expect.objectContaining({ name: "new2" }),
-                    ],
-                    name: "initial1",
-                }),
-                expect.objectContaining({ name: "initial2" }),
-            ]);
+            await waitFor(() => {
+                expect(loading).toBeFalse();
+            });
+
+            $tree.tree("openNode", parentNode, false);
+
+            await waitFor(() => {
+                expect($tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({ name: "new1" }),
+                            expect.objectContaining({ name: "new2" }),
+                        ],
+                        name: "initial1",
+                    }),
+                    expect.objectContaining({ name: "initial2" }),
+                ]);
+            });
         });
 
         it("loads the data from dataUrl without a url parameter", async () => {
@@ -1080,7 +1119,7 @@ describe("methods", () => {
 
         it("prepends the node to the parent with a parent node", () => {
             const $tree = $("#tree1");
-            $tree.tree({ data: exampleData });
+            $tree.tree({ autoOpen: true, data: exampleData });
 
             const parent = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("prependNode", "prepended-node", parent);
@@ -1213,7 +1252,7 @@ describe("methods", () => {
     describe("removeNode", () => {
         it("removes the node with a child node", () => {
             const $tree = $("#tree1");
-            $tree.tree({ data: exampleData });
+            $tree.tree({ autoOpen: true, data: exampleData });
 
             const node = $tree.tree("getNodeByNameMustExist", "child1");
             $tree.tree("removeNode", node);
@@ -1244,7 +1283,7 @@ describe("methods", () => {
 
         it("removes the node with a parent node and its children", () => {
             const $tree = $("#tree1");
-            $tree.tree({ data: exampleData });
+            $tree.tree({ autoOpen: true, data: exampleData });
 
             const node = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("removeNode", node);
@@ -1312,7 +1351,10 @@ describe("methods", () => {
                 data: exampleData,
             });
 
-            const result = $tree.tree("scrollToNode", {} as unknown as JQTreeNode);
+            const result = $tree.tree(
+                "scrollToNode",
+                {} as unknown as JQTreeNode,
+            );
 
             expect(result).toStrictEqual($tree);
         });
@@ -1412,7 +1454,9 @@ describe("methods", () => {
             });
 
             $tree.tree("setOption", "selectable", true);
-            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.click(
+                screen.getByRole("treeitem", { name: "node1" }),
+            );
 
             expect($tree.tree("getSelectedNode")).toMatchObject({
                 name: "node1",
@@ -1568,9 +1612,7 @@ describe("methods", () => {
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
-            expect($tree.tree("getNodeById", 999)).toMatchObject(
-                nodeData,
-            );
+            expect($tree.tree("getNodeById", 999)).toMatchObject(nodeData);
         });
 
         it("updates the node with an object containing a property", () => {
@@ -1593,7 +1635,7 @@ describe("methods", () => {
             });
         });
 
-        it("adds the child node when adding a child to a child node", () => {
+        it("adds the child node when adding a child to a child node", async () => {
             const $tree = $("#tree1");
             $tree.tree({
                 autoOpen: true,
@@ -1603,23 +1645,27 @@ describe("methods", () => {
             const node = $tree.tree("getNodeByNameMustExist", "child1");
             $tree.tree("updateNode", node, { children: ["new-child"] });
 
-            expect($tree).toHaveTreeStructure([
-                expect.objectContaining({
-                    children: [
-                        expect.objectContaining({
-                            children: [
-                                expect.objectContaining({
-                                    name: "new-child",
-                                }),
-                            ],
-                            name: "child1",
-                        }),
-                        expect.objectContaining({ name: "child2" }),
-                    ],
-                    name: "node1",
-                }),
-                expect.objectContaining({ name: "node2" }),
-            ]);
+            $tree.tree("openNode", node, false);
+
+            await waitFor(() => {
+                expect($tree).toHaveTreeStructure([
+                    expect.objectContaining({
+                        children: [
+                            expect.objectContaining({
+                                children: [
+                                    expect.objectContaining({
+                                        name: "new-child",
+                                    }),
+                                ],
+                                name: "child1",
+                            }),
+                            expect.objectContaining({ name: "child2" }),
+                        ],
+                        name: "node1",
+                    }),
+                    expect.objectContaining({ name: "node2" }),
+                ]);
+            });
         });
 
         it("removes the children when removing the children", () => {
@@ -1654,14 +1700,14 @@ describe("methods", () => {
             const node = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("selectNode", node);
 
-            $tree.tree("updateNode", node, { name: 'node1_changed' });
+            $tree.tree("updateNode", node, { name: "node1_changed" });
 
             expect($tree).toHaveTreeStructure([
                 expect.objectContaining({ name: "node1_changed" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
 
-            expect($tree.tree('getSelectedNode')).toStrictEqual(node);
+            expect($tree.tree("getSelectedNode")).toStrictEqual(node);
         });
 
         it("keeps the focus on the node when the node was selected", () => {
@@ -1673,9 +1719,11 @@ describe("methods", () => {
 
             const node = $tree.tree("getNodeByNameMustExist", "node1");
             $tree.tree("selectNode", node);
-            $tree.tree("updateNode", node, { name: 'node1_changed' });
+            $tree.tree("updateNode", node, { name: "node1_changed" });
 
-            const treeItem = screen.getByRole("treeitem", { name: "node1_changed" });
+            const treeItem = screen.getByRole("treeitem", {
+                name: "node1_changed",
+            });
 
             expect(treeItem).toHaveFocus();
         });

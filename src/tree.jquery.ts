@@ -1,4 +1,12 @@
-import type { Node, NodeData, NodeId, Position, SavedState, SelectNodeOptions, TreeElementOptions } from "tree-element"
+import type {
+    Node,
+    NodeData,
+    NodeId,
+    Position,
+    SavedState,
+    SelectNodeOptions,
+    TreeElementOptions,
+} from "tree-element";
 
 import TreeElement from "tree-element";
 
@@ -7,7 +15,7 @@ import type { JQTreeIconElement, JQTreeOptions } from "./jqtreeOptions";
 import triggerJQueryEvent from "./triggerJQueryEvent";
 import __version__ from "./version";
 
-type IconElement = HTMLElement | string
+type IconElement = HTMLElement | string;
 
 interface LoadFailedEvent {
     error?: unknown;
@@ -79,7 +87,7 @@ export class JqTreeWidget {
     }
 
     public appendNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
-        const parentNode = parentNodeParam ?? this._treeElement.tree;
+        const parentNode = parentNodeParam ?? this._treeElement.getTree();
 
         return this._treeElement.appendNode(newNodeInfo, parentNode);
     }
@@ -139,7 +147,7 @@ export class JqTreeWidget {
     }
 
     public getSelectedNode(): false | Node {
-        return this._treeElement.getSelectedNode();
+        return this._treeElement.getSelectedNode() ?? false;
     }
 
     public getSelectedNodes(): Node[] {
@@ -165,21 +173,25 @@ export class JqTreeWidget {
     public init(): void {
         const htmlElement = this._element.get(0) as HTMLElement;
 
-        this._element.on("tree.loading_data", this._handleLoadingDataEvent.bind(this));
-        this._element.on("tree.load_failed", this._handleLoadFailedEvent.bind(this));
+        this._element.on(
+            "tree.loading_data",
+            this._handleLoadingDataEvent.bind(this),
+        );
+        this._element.on(
+            "tree.load_failed",
+            this._handleLoadFailedEvent.bind(this),
+        );
 
         const options = this._transformInputOptions();
 
-        const treeElement = new TreeElement(
-            {
-                ...options,
-                classPrefix: "jqtree",
-                commonClassName: "jqtree_common",
-                htmlElement,
-                overrideTriggerEventProvider: triggerJQueryEvent,
-                treeClassName: "jqtree-tree"
-            }
-        );
+        const treeElement = new TreeElement({
+            ...options,
+            classPrefix: "jqtree",
+            commonClassName: "jqtree_common",
+            htmlElement,
+            overrideTriggerEventProvider: triggerJQueryEvent,
+            treeClassName: "jqtree-tree",
+        });
 
         this._treeElement = treeElement;
     }
@@ -227,16 +239,16 @@ export class JqTreeWidget {
         // first parameter is url
         if (typeof param1 === "string") {
             url = param1;
-            parentNode = param2 as (Node | undefined);
+            parentNode = param2 as Node | undefined;
             onFinishedLoading = param3;
-
         } else {
             // first parameter is not url
             parentNode = param1;
             onFinishedLoading = param2 as (() => void) | undefined;
         }
 
-        this._treeElement.loadDataFromUrl(url, parentNode)
+        this._treeElement
+            .loadDataFromUrl(url, parentNode)
             .then(() => {
                 if (onFinishedLoading) {
                     onFinishedLoading();
@@ -310,7 +322,7 @@ export class JqTreeWidget {
     }
 
     public prependNode(newNodeInfo: NodeData, parentNodeParam?: Node): Node {
-        const parentNode = parentNodeParam ?? this._treeElement.tree;
+        const parentNode = parentNodeParam ?? this._treeElement.getTree();
 
         return this._treeElement.prependNode(newNodeInfo, parentNode);
     }
@@ -321,15 +333,16 @@ export class JqTreeWidget {
     }
 
     public reload(onFinished?: () => void): JQuery {
-        this._treeElement.loadDataFromUrl(undefined, undefined).then(
-            () => {
+        this._treeElement
+            .loadDataFromUrl(undefined, undefined)
+            .then(() => {
                 if (onFinished) {
                     onFinished();
                 }
-            }
-        ).catch((error: unknown) => {
-            throw error;
-        });
+            })
+            .catch((error: unknown) => {
+                throw error;
+            });
         return this._element;
     }
 
@@ -425,12 +438,14 @@ export class JqTreeWidget {
 
         if (jqTreeOnLoading) {
             const { $el, isLoading, node } = e as unknown as LoadingDataEvent;
-            jqTreeOnLoading(isLoading, node ?? undefined, $el)
+            jqTreeOnLoading(isLoading, node ?? undefined, $el);
         }
     }
 
     private _transformInputOptions(): Partial<TreeElementOptions> {
-        function convertToIconElement(jqtreeIconElement: JQTreeIconElement | undefined) {
+        function convertToIconElement(
+            jqtreeIconElement: JQTreeIconElement | undefined,
+        ) {
             if (jqtreeIconElement instanceof jQuery) {
                 return (jqtreeIconElement as JQuery).get(0);
             } else {
@@ -454,7 +469,8 @@ export class JqTreeWidget {
         const jqTreeOnIsMoveHandle = this._inputOptions.onIsMoveHandle;
 
         if (jqTreeOnIsMoveHandle) {
-            onIsMoveHandle = (el: HTMLElement) => jqTreeOnIsMoveHandle(jQuery(el))
+            onIsMoveHandle = (el: HTMLElement) =>
+                jqTreeOnIsMoveHandle(jQuery(el));
         }
 
         return {
@@ -463,7 +479,7 @@ export class JqTreeWidget {
             onCreateLi,
             onIsMoveHandle,
             openedIcon,
-        }
+        };
     }
 }
 
@@ -481,7 +497,10 @@ const register = (): void => {
         }
     };
 
-    const createWidget = ($el: JQuery, options: null | Partial<JQTreeOptions>): JQuery => {
+    const createWidget = (
+        $el: JQuery,
+        options: null | Partial<JQTreeOptions>,
+    ): JQuery => {
         for (const el of $el.get()) {
             const existingWidget = getWidgetData(el, "jqtree");
 

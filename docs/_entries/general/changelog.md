@@ -3,6 +3,13 @@ title: Changelog
 name: changelog
 ---
 
+#### Development
+
+- The options `closedIcon` and `openedIcon` render a string as html instead of as text.
+- Make rendering faster by using templates.
+- The children of a closed folder are rendered when the folder is opened, instead of when the tree is rendered.
+- The method `setState` saves the state to storage when `saveState` is enabled.
+
 #### 2.0.2 (september 14 2026)
 
 - Change the `onLoadFailed` callback.
