@@ -1,7 +1,8 @@
-import "@testing-library/jest-dom";
-import "jest-extended";
+import "@testing-library/jest-dom/vitest";
+import * as matchers from "jest-extended";
 import jQuery from "jquery";
 import { mockAnimationsApi } from "jsdom-testing-mocks";
+import { expect } from "vitest";
 
 import "./jqTreeMatchers";
 
@@ -11,6 +12,8 @@ declare global {
         jQuery: JQueryStatic;
     }
 }
+
+expect.extend(matchers);
 
 mockAnimationsApi();
 
