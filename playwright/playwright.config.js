@@ -10,7 +10,8 @@ const config = {
     ],
     testDir: "./",
     webServer: {
-        command: "pnpm devserver-with-coverage",
+        command:
+            "COVERAGE=true SERVE=true rollup --config config/rollup.config.mjs",
         cwd: "..",
         port: 8080,
     },
