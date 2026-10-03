@@ -18,7 +18,6 @@
         "@tailwindcss/cli": "^4.3.3",
         "@tailwindcss/postcss": "^4.3.3",
         "@tailwindcss/typography": "^0.5.20",
-        "autoprefixer": "^10.6.0",
         "jquery": "^4.0.0",
         "postcss": "^8.5.28",
         "postcss-cli": "^12",
