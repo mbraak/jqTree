@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "jquery": "^4.0.0",
-        "msw": "^2.15.0"
+        "msw": "^3"
     },
     "devDependencies": {
         "@tailwindcss/cli": "^4.3.3",
