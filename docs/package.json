@@ -12,18 +12,18 @@
     },
     "dependencies": {
         "jquery": "^4.0.0",
-        "msw": "^3"
+        "msw": "^3.0.3"
     },
     "devDependencies": {
         "@tailwindcss/cli": "^4.3.3",
         "@tailwindcss/postcss": "^4.3.3",
         "@tailwindcss/typography": "^0.5.20",
         "jquery": "^4.0.0",
-        "postcss": "^8.5.28",
-        "postcss-cli": "^12",
-        "postcss-import": "^17",
+        "postcss": "^8.5.30",
+        "postcss-cli": "^12.0.0",
+        "postcss-import": "^17.0.1",
         "postcss-load-config": "^6.0.1",
-        "postcss-nested": "^8",
+        "postcss-nested": "^8.0.1",
         "tailwindcss": "^4.3.3"
     },
     "msw": {
