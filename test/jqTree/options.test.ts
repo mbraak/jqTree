@@ -541,7 +541,7 @@ describe("options", () => {
             await waitFor(() => {
                 expect(onLoadFailed).toHaveBeenCalledExactlyOnceWith({
                     error: expect.objectContaining({
-                        message: "Failed to fetch",
+                        message: "fetch failed",
                         name: "TypeError",
                     }) as TypeError,
                 });
