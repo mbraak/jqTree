@@ -9,3 +9,4 @@ peerDependencyRules:
     "@rollup/plugin-babel>@babel/core": "8"
 overrides:
   "@istanbuljs/load-nyc-config>js-yaml": ^4.1.0
+  "babel-plugin-istanbul>test-exclude": ^8.0.0
