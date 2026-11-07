@@ -1,21 +1,28 @@
 name: Compressed Size
 on: [pull_request]
 
+permissions: {}
+
 jobs:
     size-job:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pull-requests: write # post the size report comment
 
         steps:
             - name: Check out repository code
-              uses: actions/checkout@v7
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - name: Setup node
-              uses: actions/setup-node@v7
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version: "24"
             - name: Install pnpm
-              run: npm install -g pnpm
+              uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
             - name: Check compressed size
-              uses: mbraak/compressed-size-action@master
+              uses: mbraak/compressed-size-action@9a2c79fe7cecbf65b3a6f91fd84c4204a642527c # master
               with:
                   build-script: production
                   install-script: pnpm install
