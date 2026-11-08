@@ -5,24 +5,29 @@ on:
         tags:
             - "[0-9]+.[0-9]+.[0-9]+"
 
-permissions:
-    contents: read
-    id-token: write
+permissions: {}
 
 jobs:
     publish:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write # npm trusted publishing and provenance
 
         steps:
             - name: Check out repository code
-              uses: actions/checkout@v7
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - name: Setup node
-              uses: actions/setup-node@v7
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version: "24"
                   registry-url: "https://registry.npmjs.org"
+                  # No caches in the publish job, so a poisoned cache cannot end up in the package
+                  package-manager-cache: false
             - name: Install pnpm
-              run: npm install -g pnpm
+              uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
             - name: Check that the tag matches package.json
               run: |
                   package_version=$(node -p "require('./package.json').version")

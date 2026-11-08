@@ -2,34 +2,40 @@ name: Continuous integration
 
 on: [push]
 
+permissions: {}
+
 jobs:
     runner-job:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
 
         env:
             CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
         steps:
             - name: Check out repository code
-              uses: actions/checkout@v7
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - name: Setup node
-              uses: actions/setup-node@v7
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version: "24"
             - name: Install pnpm
-              run: npm install -g pnpm
+              uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
             - name: Get pnpm store directory
               id: pnpm-cache
               run: |
                   echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-            - uses: actions/cache@v6
+            - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               name: Setup pnpm cache
               with:
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
                   restore-keys: |
                       ${{ runner.os }}-pnpm-store-
-            - uses: actions/cache@v6
+            - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               name: Setup Playwright browsers cache
               with:
                   path: /home/runner/.cache/ms-playwright/
@@ -61,7 +67,7 @@ jobs:
               run: pnpm run playwright
             - name: Screenshots artifact
               if: always()
-              uses: actions/upload-artifact@v7
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
                   if-no-files-found: ignore
                   name: screenshots
@@ -69,7 +75,7 @@ jobs:
             - name: Merge coverage
               run: cp js-coverage/coverage-final.json .nyc_output/coverage_jsdom.json
             - name: Codecov
-              uses: codecov/codecov-action@v7
+              uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
               with:
                   directory: .nyc_output
                   verbose: true
