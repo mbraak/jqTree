@@ -2,6 +2,7 @@ import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import TreeElement from "tree-element";
 import { vi } from "vitest";
 
 import "app/tree.jquery";
@@ -824,9 +825,9 @@ describe("methods", () => {
             );
 
             expect($tree.tree("isDragging")).toBeTrue();
-            expect(
-                screen.getByRole("treeitem", { name: "node1" }),
-            ).toHaveClass("jqtree-moving");
+            expect(screen.getByRole("treeitem", { name: "node1" })).toHaveClass(
+                "jqtree-moving",
+            );
 
             await user.pointer({ keys: "[/MouseLeft]", target: treeItem });
         });
@@ -1161,6 +1162,22 @@ describe("methods", () => {
                 expect.objectContaining({ name: "node1a" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
+        });
+    });
+
+    describe("refreshHitAreas", () => {
+        it("refreshes the hit areas of tree-element", () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData, dragAndDrop: true });
+
+            const refreshHitAreas = vi.spyOn(
+                TreeElement.prototype,
+                "refreshHitAreas",
+            );
+
+            $tree.tree("refreshHitAreas");
+
+            expect(refreshHitAreas).toHaveBeenCalledExactlyOnceWith();
         });
     });
 

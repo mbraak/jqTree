@@ -333,6 +333,11 @@ export class JqTreeWidget {
         return this._element;
     }
 
+    public refreshHitAreas(): JQuery {
+        this._treeElement.refreshHitAreas();
+        return this._element;
+    }
+
     public reload(onFinished?: () => void): JQuery {
         this._treeElement
             .loadDataFromUrl(undefined, undefined)

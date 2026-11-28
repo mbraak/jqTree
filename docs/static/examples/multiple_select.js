@@ -1,23 +1,17 @@
 var $tree = $("#tree1");
+
 $tree.tree({
     data: ExampleData.exampleData,
-    autoOpen: true
+    autoOpen: true,
+    multiSelect: true
 });
-$tree.on("tree.click", function(e) {
-    // Disable single selection
-    e.preventDefault();
 
-    var selected_node = e.node;
+// Show the selected nodes. tree.select is triggered when a node is added to
+// the selection or removed from it.
+$tree.on("tree.select", function() {
+    var names = $tree.tree("getSelectedNodes").map(function(node) {
+        return node.name;
+    });
 
-    if (selected_node.id == undefined) {
-        console.log(
-            "The multiple selection functions require that nodes have an id"
-        );
-    }
-
-    if ($tree.tree("isNodeSelected", selected_node)) {
-        $tree.tree("removeFromSelection", selected_node);
-    } else {
-        $tree.tree("addToSelection", selected_node);
-    }
+    $("#selected-nodes").text(names.length ? names.join(", ") : "none");
 });
