@@ -10,6 +10,7 @@ import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
 import mockLayout from "../support/mockLayout";
+import { getTreeTitle } from "../support/queries";
 
 interface MoveEvent {
     move_info: { do_move: () => void };
@@ -34,7 +35,7 @@ describe("events", () => {
             const onClick = vi.fn();
             $tree.on("tree.click", onClick);
 
-            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.click(getTreeTitle(screen.getByRole("treeitem", { name: "node1" })));
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
@@ -57,7 +58,9 @@ describe("events", () => {
 
             await userEvent.pointer({
                 keys: "[MouseRight]",
-                target: screen.getByRole("treeitem", { name: "node1" }),
+                target: getTreeTitle(
+                    screen.getByRole("treeitem", { name: "node1" }),
+                ),
             });
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
@@ -79,7 +82,7 @@ describe("events", () => {
             const onDoubleClick = vi.fn();
             $tree.on("tree.dblclick", onDoubleClick);
 
-            await userEvent.dblClick(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.dblClick(getTreeTitle(screen.getByRole("treeitem", { name: "node1" })));
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
@@ -312,7 +315,7 @@ describe("events", () => {
             const onSelect = vi.fn();
             $tree.on("tree.select", onSelect);
 
-            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.click(getTreeTitle(screen.getByRole("treeitem", { name: "node1" })));
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
@@ -335,7 +338,7 @@ describe("events", () => {
             const onSelect = vi.fn();
             $tree.on("tree.select", onSelect);
 
-            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.click(getTreeTitle(screen.getByRole("treeitem", { name: "node1" })));
 
             expect(onSelect).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({

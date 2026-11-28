@@ -6,9 +6,16 @@ import { vi } from "vitest";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTreeButton } from "../support/queries";
+import { getTreeButton, getTreeTitle } from "../support/queries";
 
 const server = setupServer();
+
+// The default icons: svg triangles that point right (closed, ltr) and left
+// (closed, rtl)
+const triangleRight =
+    "<svg width=\"0.8em\" height=\"0.8em\" viewBox=\"0 0 10 10\" focusable=\"false\"><polygon points=\"0.5,0.5 0.5,9.5 9.5,5\" fill=\"currentColor\"></polygon></svg>";
+const triangleLeft =
+    "<svg width=\"0.8em\" height=\"0.8em\" viewBox=\"0 0 10 10\" focusable=\"false\"><polygon points=\"9.5,0.5 9.5,9.5 0.5,5\" fill=\"currentColor\"></polygon></svg>";
 
 describe("options", () => {
     beforeAll(() => {
@@ -173,10 +180,12 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const title = getTreeTitle(
+                screen.getByRole("treeitem", { name: "node1" }),
+            );
 
             // eslint-disable-next-line testing-library/no-node-access
-            const nextSibling = treeItem.nextSibling as HTMLElement;
+            const nextSibling = title.nextSibling as HTMLElement;
 
             expect(nextSibling).toHaveClass("jqtree-toggler");
         });
@@ -188,12 +197,14 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const title = getTreeTitle(
+                screen.getByRole("treeitem", { name: "node1" }),
+            );
 
             // eslint-disable-next-line testing-library/no-node-access
-            const nextSibling = treeItem.previousSibling as HTMLElement;
+            const previousSibling = title.previousSibling as HTMLElement;
 
-            expect(nextSibling).toHaveClass("jqtree-toggler");
+            expect(previousSibling).toHaveClass("jqtree-toggler");
         });
     });
 
@@ -253,7 +264,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("►");
+            expect(button.innerHTML).toBe(triangleRight);
         });
     });
 
@@ -557,7 +568,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("◀");
+            expect(button.innerHTML).toBe(triangleLeft);
         });
 
         it("has the default closed icon when the rtl option is false", () => {
@@ -567,7 +578,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("►");
+            expect(button.innerHTML).toBe(triangleRight);
         });
 
         it("has a different closed icon when the rtl data option is true", () => {
@@ -578,7 +589,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("◀");
+            expect(button.innerHTML).toBe(triangleLeft);
         });
 
         it("has the default closed icon when the rtl data option is false", () => {
@@ -589,7 +600,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("►");
+            expect(button.innerHTML).toBe(triangleRight);
         });
 
         it("has a different closed icon when the rtl data option has no value", () => {
@@ -600,7 +611,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("◀");
+            expect(button.innerHTML).toBe(triangleLeft);
         });
     });
 

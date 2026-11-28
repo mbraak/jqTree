@@ -28,6 +28,13 @@ ul.jqtree-tree {
     }
 
     ul.jqtree-tree .jqtree-toggler {
+        /* The default icon is an svg of 0.8em. The toggler is 1em wide, so
+           with its margin of 0.5em the title of a folder lines up with the
+           title of a child node, which has a margin of 1.5em. */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1em;
         border-bottom: none;
         color: #333;
         text-decoration: none;

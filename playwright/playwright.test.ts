@@ -7,6 +7,7 @@ import type { TreeStructure } from "../test/support/treeStructure";
 import { initCoverage, saveCoverage } from "./coverage";
 import {
     dragAndDrop,
+    getNodeElement,
     getNodeRect,
     getTreeStructure,
     moveMouseToNode,
@@ -116,7 +117,7 @@ test.describe("without dragAndDrop", () => {
 
     test("selects a node", async ({ page }) => {
         const treeItem = page.getByRole("treeitem", { name: "Saurischia" });
-        await treeItem.click();
+        await getNodeElement(page, "Saurischia").click();
 
         await expect(treeItem).toHaveAttribute("aria-selected", "true");
 

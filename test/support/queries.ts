@@ -8,34 +8,29 @@ const assertSingleElement = (container: HTMLElement, elements: NodeListOf<Elemen
   }
 }
 
+/* The treeitem is the li of the node. The toggler is in the element div of
+ * the node, not in the li of a child node.
+ */
 export const getTreeButton = (treeElement: HTMLElement) => {
   if (treeElement.role != "treeitem") {
     throw new Error("Element must have role treeitem");
   }
 
-  const parent = treeElement.parentElement; // eslint-disable-line testing-library/no-node-access
-  if (!parent) {
-    throw new Error("Tree element must have a parent");
-  }
-
-  const elements = parent.querySelectorAll(":scope > a.jqtree-toggler"); // eslint-disable-line testing-library/no-node-access
-  assertSingleElement(parent, elements, 'tree button');
+  const elements = treeElement.querySelectorAll(":scope > .jqtree-element > .jqtree-toggler"); // eslint-disable-line testing-library/no-node-access
+  assertSingleElement(treeElement, elements, 'tree button');
   return elements[0] as HTMLElement;
 };
 
-export const getTreeListElement = (treeElement: HTMLElement) => {
+/* The title of the node. Click this instead of the treeitem: the li of a
+ * folder also contains its children, and tree-element only handles clicks on
+ * the element div of a node.
+ */
+export const getTreeTitle = (treeElement: HTMLElement) => {
   if (treeElement.role != "treeitem") {
     throw new Error("Element must have role treeitem");
   }
 
-  const parentOfParent = treeElement.parentElement?.parentElement; // eslint-disable-line testing-library/no-node-access
-  if (!parentOfParent) {
-    throw new Error("Tree element must have a parent");
-  }
-
-  if (parentOfParent.tagName != "LI") {
-    throw new Error("Must be a list element");
-  }
-
-  return parentOfParent;
+  const elements = treeElement.querySelectorAll(":scope > .jqtree-element > .jqtree-title"); // eslint-disable-line testing-library/no-node-access
+  assertSingleElement(treeElement, elements, 'tree title');
+  return elements[0] as HTMLElement;
 };

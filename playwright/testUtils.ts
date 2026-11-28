@@ -59,12 +59,19 @@ export const getTreeStructure = async (page: Page) => {
     return JSON.parse(structure) as TreeStructure;
 };
 
+export const getNodeElement = (page: Page, title: string) =>
+    page
+        .getByRole("treeitem", { name: title })
+        .locator(":scope > .jqtree-element");
+
 export const getNodeRect = async (
     page: Page,
     title: string,
 ): Promise<BoundingBox> => {
-    const treeItem = page.getByRole("treeitem", { name: title });
-    const boundingBox = await treeItem.boundingBox();
+    // The treeitem is the li, which also contains the children of a folder.
+    // Use the element div: the row of the node itself.
+    const element = getNodeElement(page, title);
+    const boundingBox = await element.boundingBox();
 
     if (!boundingBox) {
         throw new Error(`Could not determine bounding box for tree element ${title}`)

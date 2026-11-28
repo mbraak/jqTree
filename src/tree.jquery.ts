@@ -382,7 +382,11 @@ export class JqTreeWidget {
         node: Node | null,
         optionsParam?: SelectNodeOptions,
     ): JQuery {
-        this._treeElement.selectNode(node, optionsParam);
+        // jqTree toggles by default: selecting the selected node deselects it
+        this._treeElement.selectNode(node, {
+            mustToggle: true,
+            ...optionsParam,
+        });
         return this._element;
     }
 

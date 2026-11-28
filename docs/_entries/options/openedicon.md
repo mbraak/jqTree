@@ -3,18 +3,21 @@ title: openedIcon
 name: options-openedicon
 ---
 
-A character or symbol to display on opened nodes. The default is '&amp;#x25bc;' (&#x25bc;)
+A character, symbol or icon to display on opened nodes. The default is an svg triangle that points down.
 
 The value can be a:
 
--   **string**. E.g. a unicode character or a text.
-    -   The text is escaped.
+-   **string**. E.g. a unicode character, a text or html.
+    -   The string is rendered as html, so escape text that can contain `<` or `&`. Don't use input from users.
 -   **html element**. E.g. for an icon
 -   **JQuery element**. Also for an icon
 
 {% highlight js %}
 // String
 $('#tree1').tree({ openedIcon: '-' });
+
+// Html string
+$('#tree1').tree({ openedIcon: '<i class="icon"></i>' });
 
 // Html element
 const icon = document.createElement("span");
