@@ -9,6 +9,12 @@ name: changelog
 - Make rendering faster by using templates.
 - The children of a closed folder are rendered when the folder is opened, instead of when the tree is rendered.
 - The method `setState` saves the state to storage when `saveState` is enabled.
+- The default `closedIcon` and `openedIcon` are svg triangles instead of the characters &#x25ba; and &#x25bc;.
+- The `li` of a node is the treeitem and gets the focus, instead of the title.
+- The methods `openNode`, `closeNode` and `toggle` update the DOM a moment after they return, also without animation. `node.is_open` changes immediately. Use the `onFinished` callback of `openNode`, or the `tree.open` and `tree.close` events, to run code after the DOM is updated.
+- Add the options `multiSelect`, `ariaLabel` and `ariaLabelledBy`, the event `tree.activate` and the function `refreshHitAreas`.
+- Add `onCanMoveTo` to the type definition, and fix the type of `onLoadFailed`.
+- The type definition of `setOption` only accepts the options that can be changed after the tree is created. The other options throw an error.
 
 #### 2.0.2 (september 14 2026)
 

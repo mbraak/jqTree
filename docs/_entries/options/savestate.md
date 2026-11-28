@@ -39,3 +39,5 @@ $('#tree1').tree({
     saveState: 'tree1'
 });
 {% endhighlight %}
+
+To save the state somewhere other than localStorage, use the options [onGetStateFromStorage](#options-ongetstatefromstorage) and [onSetStateFromStorage](#options-onsetstatefromstorage).

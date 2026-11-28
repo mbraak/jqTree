@@ -4,12 +4,13 @@ import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { vi } from "vitest"
+import { vi } from "vitest";
 
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
 import mockLayout from "../support/mockLayout";
+import { getTreeTitle } from "../support/queries";
 
 interface MoveEvent {
     move_info: { do_move: () => void };
@@ -26,6 +27,28 @@ describe("events", () => {
         document.body.innerHTML = "";
     });
 
+    describe("tree.activate", () => {
+        it("fires tree.activate when Enter is pressed on the selected node", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData });
+
+            const onActivate = vi.fn();
+            $tree.on("tree.activate", onActivate);
+
+            const node1 = $tree.tree("getNodeByNameMustExist", "node1");
+            $tree.tree("selectNode", node1);
+
+            await userEvent.keyboard("{Enter}");
+
+            expect(onActivate).toHaveBeenCalledExactlyOnceWith(
+                expect.objectContaining({
+                    click_event: expect.any(KeyboardEvent), // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+                    node: node1,
+                }),
+            );
+        });
+    });
+
     describe("tree.click", () => {
         it("fires tree.click", async () => {
             const $tree = $("#tree1");
@@ -34,7 +57,9 @@ describe("events", () => {
             const onClick = vi.fn();
             $tree.on("tree.click", onClick);
 
-            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.click(
+                getTreeTitle(screen.getByRole("treeitem", { name: "node1" })),
+            );
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
@@ -57,7 +82,9 @@ describe("events", () => {
 
             await userEvent.pointer({
                 keys: "[MouseRight]",
-                target: screen.getByRole("treeitem", { name: "node1" }),
+                target: getTreeTitle(
+                    screen.getByRole("treeitem", { name: "node1" }),
+                ),
             });
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
@@ -79,7 +106,9 @@ describe("events", () => {
             const onDoubleClick = vi.fn();
             $tree.on("tree.dblclick", onDoubleClick);
 
-            await userEvent.dblClick(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.dblClick(
+                getTreeTitle(screen.getByRole("treeitem", { name: "node1" })),
+            );
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
@@ -312,7 +341,9 @@ describe("events", () => {
             const onSelect = vi.fn();
             $tree.on("tree.select", onSelect);
 
-            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.click(
+                getTreeTitle(screen.getByRole("treeitem", { name: "node1" })),
+            );
 
             const node1 = $tree.tree("getNodeByNameMustExist", "node1");
 
@@ -335,7 +366,9 @@ describe("events", () => {
             const onSelect = vi.fn();
             $tree.on("tree.select", onSelect);
 
-            await userEvent.click(screen.getByRole("treeitem", { name: "node1" }));
+            await userEvent.click(
+                getTreeTitle(screen.getByRole("treeitem", { name: "node1" })),
+            );
 
             expect(onSelect).toHaveBeenCalledExactlyOnceWith(
                 expect.objectContaining({
@@ -374,7 +407,7 @@ describe("events", () => {
                         $el: $tree,
                         isLoading: true,
                         node: null,
-                    })
+                    }),
                 );
             });
 
@@ -385,7 +418,7 @@ describe("events", () => {
                         $el: $tree,
                         isLoading: false,
                         node: null,
-                    })
+                    }),
                 );
             });
         });
@@ -411,10 +444,20 @@ describe("events", () => {
             $tree.tree({ dataUrl: "/tree/", onLoading });
 
             await waitFor(() => {
-                expect(onLoading).toHaveBeenNthCalledWith(1, true, undefined, $tree);
+                expect(onLoading).toHaveBeenNthCalledWith(
+                    1,
+                    true,
+                    undefined,
+                    $tree,
+                );
             });
             await waitFor(() => {
-                expect(onLoading).toHaveBeenNthCalledWith(2, false, undefined, $tree);
+                expect(onLoading).toHaveBeenNthCalledWith(
+                    2,
+                    false,
+                    undefined,
+                    $tree,
+                );
             });
         });
     });

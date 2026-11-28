@@ -2,13 +2,14 @@ import { screen, waitFor } from "@testing-library/dom";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
+import TreeElement from "tree-element";
 import { vi } from "vitest";
 
 import "app/tree.jquery";
 import __version__ from "app/version";
 
 import exampleData from "../support/exampleData";
-import { getTreeListElement } from "../support/queries";
+import { getTreeTitle } from "../support/queries";
 
 const server = setupServer();
 
@@ -310,7 +311,7 @@ describe("methods", () => {
     });
 
     describe("closeNode", () => {
-        it("closes the node", () => {
+        it("closes the node", async () => {
             const $tree = $("#tree1");
             $tree.tree({
                 autoOpen: true,
@@ -322,7 +323,10 @@ describe("methods", () => {
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
-            expect(treeItem).not.toBeAriaExpanded();
+            // The element is updated after the (empty) animation
+            await waitFor(() => {
+                expect(treeItem).not.toBeAriaExpanded();
+            });
         });
 
         it("throws an error without a node parameter", () => {
@@ -821,11 +825,9 @@ describe("methods", () => {
             );
 
             expect($tree.tree("isDragging")).toBeTrue();
-            expect(
-                getTreeListElement(
-                    screen.getByRole("treeitem", { name: "node1" }),
-                ),
-            ).toHaveClass("jqtree-moving");
+            expect(screen.getByRole("treeitem", { name: "node1" })).toHaveClass(
+                "jqtree-moving",
+            );
 
             await user.pointer({ keys: "[/MouseLeft]", target: treeItem });
         });
@@ -1040,7 +1042,7 @@ describe("methods", () => {
     });
 
     describe("openNode", () => {
-        it("opens the node", () => {
+        it("opens the node", async () => {
             const $tree = $("#tree1");
             $tree.tree({
                 autoOpen: false,
@@ -1052,7 +1054,10 @@ describe("methods", () => {
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
-            expect(treeItem).toBeAriaExpanded();
+            // The element is updated after the (empty) animation
+            await waitFor(() => {
+                expect(treeItem).toBeAriaExpanded();
+            });
         });
 
         it("calls the function with onFinished parameter", async () => {
@@ -1157,6 +1162,22 @@ describe("methods", () => {
                 expect.objectContaining({ name: "node1a" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
+        });
+    });
+
+    describe("refreshHitAreas", () => {
+        it("refreshes the hit areas of tree-element", () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData, dragAndDrop: true });
+
+            const refreshHitAreas = vi.spyOn(
+                TreeElement.prototype,
+                "refreshHitAreas",
+            );
+
+            $tree.tree("refreshHitAreas");
+
+            expect(refreshHitAreas).toHaveBeenCalledExactlyOnceWith();
         });
     });
 
@@ -1455,7 +1476,7 @@ describe("methods", () => {
 
             $tree.tree("setOption", "selectable", true);
             await userEvent.click(
-                screen.getByRole("treeitem", { name: "node1" }),
+                getTreeTitle(screen.getByRole("treeitem", { name: "node1" })),
             );
 
             expect($tree.tree("getSelectedNode")).toMatchObject({
@@ -1507,7 +1528,7 @@ describe("methods", () => {
     });
 
     describe("toggle", () => {
-        it("opens the node when the node is closed", () => {
+        it("opens the node when the node is closed", async () => {
             const $tree = $("#tree1");
             $tree.tree({
                 autoOpen: false,
@@ -1519,10 +1540,13 @@ describe("methods", () => {
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
-            expect(treeItem).toBeAriaExpanded();
+            // The element is updated after the (empty) animation
+            await waitFor(() => {
+                expect(treeItem).toBeAriaExpanded();
+            });
         });
 
-        it("closes the node when the node is open", () => {
+        it("closes the node when the node is open", async () => {
             const $tree = $("#tree1");
             $tree.tree({
                 autoOpen: true,
@@ -1534,7 +1558,10 @@ describe("methods", () => {
 
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
 
-            expect(treeItem).not.toBeAriaExpanded();
+            // The element is updated after the (empty) animation
+            await waitFor(() => {
+                expect(treeItem).not.toBeAriaExpanded();
+            });
         });
 
         it("throws an error without a node parameter", () => {

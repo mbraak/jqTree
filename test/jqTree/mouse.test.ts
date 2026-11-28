@@ -4,7 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTreeButton } from "../support/queries";
+import { getTreeButton, getTreeTitle } from "../support/queries";
 
 describe("mouse", () => {
     beforeEach(() => {
@@ -26,7 +26,7 @@ describe("mouse", () => {
         expect(treeItem).not.toBeAriaSelected();
         expect(treeItem).not.toHaveFocus();
 
-        await userEvent.click(treeItem);
+        await userEvent.click(getTreeTitle(treeItem));
 
         expect(treeItem).toBeAriaSelected();
         expect(treeItem).toHaveFocus();
@@ -43,7 +43,7 @@ describe("mouse", () => {
 
         expect(treeItem).toBeAriaSelected();
 
-        await userEvent.click(treeItem);
+        await userEvent.click(getTreeTitle(treeItem));
 
         expect(treeItem).not.toBeAriaSelected();
     });

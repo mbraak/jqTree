@@ -1,3 +1,17 @@
+// The options that setOption can change. The other options can only be set
+// when the tree is created.
+type JQTreeChangeableOption =
+    | "animationSpeed"
+    | "dataUrl"
+    | "dragAndDrop"
+    | "keyboardSupport"
+    | "multiSelect"
+    | "onCanSelectNode"
+    | "selectable"
+    | "slide"
+    | "startDndDelay"
+    | "tabIndex";
+
 interface JQTreeNode {
     [key: string]: unknown;
     children: JQTreeNode[];
@@ -23,6 +37,8 @@ interface JQTreeNodeRecord {
 
 interface JQTreeOptions {
     animationSpeed?: number | string;
+    ariaLabel?: string;
+    ariaLabelledBy?: string;
     autoEscape?: boolean;
     autoOpen?: boolean | number | string;
     buttonLeft?: boolean;
@@ -32,15 +48,21 @@ interface JQTreeOptions {
     dataUrl?: ((node?: Node) => string) | string;
     dragAndDrop?: boolean;
     keyboardSupport?: boolean;
+    multiSelect?: boolean;
     nodeClass?: any;
     onCanMove?: (node: JQTreeNode) => boolean;
+    onCanMoveTo?: (
+        movedNode: JQTreeNode,
+        targetNode: JQTreeNode,
+        position: string,
+    ) => boolean;
     onCanSelectNode?: (node: JQTreeNode) => boolean;
     onCreateLi?: (node: JQTreeNode, el: JQuery, isSelected: boolean) => void;
     onDragMove?: (node: JQTreeNode, event: Event | Touch) => void;
     onDragStop?: (node: JQTreeNode, event: Event | Touch) => void;
     onGetStateFromStorage?: () => string;
     onIsMoveHandle?: (el: JQuery) => boolean;
-    onLoadFailed?: (response: Response) => void;
+    onLoadFailed?: (params: { error?: unknown; response?: Response }) => void;
     onLoading?: (isLoading: boolean, node: JQTreeNode, $el: JQuery) => void;
     onSetStateFromStorage?: (data: string) => void;
     openedIcon?: HTMLElement | JQuery | string;
@@ -123,6 +145,7 @@ interface JQTreePlugin {
     ): JQuery;
     (behavior: "prependNode", newNodeInfo: NodeData, parentNode?: JQTreeNode): JQTreeNode;
     (behavior: "refresh"): JQuery;
+    (behavior: "refreshHitAreas"): JQuery;
     (behavior: "reload", onFinished?: () => void): JQuery;
     (behavior: "removeFromSelection", node: JQTreeNode): JQuery;
     (behavior: "removeNode", node: JQTreeNode): JQuery;
@@ -132,7 +155,7 @@ interface JQTreePlugin {
         node: JQTreeNode | null,
         optionsParam?: JQTreeSelectNodeOptions,
     ): JQuery;
-    (behavior: "setOption", option: string, value: unknown): JQuery;
+    (behavior: "setOption", option: JQTreeChangeableOption, value: unknown): JQuery;
     (behavior: "setState", options: Record<string, unknown>): JQuery;
     (behavior: "toggle", node: JQTreeNode, slideParam?: boolean): JQuery;
     (behavior: "toJson"): string;

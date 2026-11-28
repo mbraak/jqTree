@@ -27,6 +27,13 @@ ul.jqtree-tree {
     }
 
     .jqtree-toggler {
+        /* The default icon is an svg of 0.8em. The toggler is 1em wide, so
+           with its margin of 0.5em the title of a folder lines up with the
+           title of a child node, which has a margin of 1.5em. */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1em;
         border-bottom: none;
         color: #333;
         text-decoration: none;
@@ -63,6 +70,19 @@ ul.jqtree-tree {
     .jqtree-title {
         color: #1c4257;
         vertical-align: middle;
+    }
+
+    /* The li is the treeitem, so it gets the focus. Show the focus ring around
+       the title, not around the li with all its children. */
+    li.jqtree_common:focus {
+        outline: none;
+    }
+
+    li.jqtree_common:focus-visible > .jqtree-element .jqtree-title {
+        /* Same as the default focus ring of the browser. Browsers without
+           -webkit-focus-ring-color ignore the second line. */
+        outline: auto;
+        outline-color: -webkit-focus-ring-color;
     }
 
     .jqtree-title-button-left {

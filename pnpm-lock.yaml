@@ -174,8 +174,8 @@ importers:
         specifier: '>= 3'
         version: 4.1.0
       tree-element:
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.4.1
+        version: 0.4.1
     devDependencies:
       '@babel/cli':
         specifier: ^8.1.0
@@ -3136,8 +3136,8 @@ packages:
     resolution: {integrity: sha512-BcDSDW+SIGWVOns1Zm6Yg91q9AEj7eaID0QDY9oIqJD1A8dscNwMcl9Sms2DeuWCNov1X0/oXanHGYQBSLwZsg==}
     engines: {node: ^22.14.0 || >=24.0.0}
 
-  tree-element@0.2.0:
-    resolution: {integrity: sha512-Csdx6UUf6lzfu1dBySPfmO5EB/PVFCHy2T+JXnvOwQsSYhPK/ZXbpAHIATACkxaNQvB2jvjn/5X5QBKWZL7nPw==}
+  tree-element@0.4.1:
+    resolution: {integrity: sha512-o1imhbjAZ4vnCe3ZwhgQnuQKbPR6+9kdQm6RtmwA2l9qnX2kfejGP9uj/qxSEEBcnnrZ6U+nMVh94G6gDSt9jA==}
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -6111,7 +6111,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  tree-element@0.2.0: {}
+  tree-element@0.4.1: {}
 
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:

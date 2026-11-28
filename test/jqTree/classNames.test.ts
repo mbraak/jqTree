@@ -19,21 +19,28 @@ describe("class names", () => {
         document.body.innerHTML = "";
     });
 
-    const getElementDiv = (name: string) => {
-        const title = screen.getByRole("treeitem", { name });
+    // The li of a node is the treeitem
+    const getLi = (name: string) => screen.getByRole("treeitem", { name });
 
+    const getElementDiv = (name: string) => {
         // eslint-disable-next-line testing-library/no-node-access
-        return title.parentElement as HTMLElement;
+        return getLi(name).querySelector(
+            ":scope > .jqtree-element",
+        ) as HTMLElement;
     };
 
-    const getLi = (name: string) => {
+    const getTitle = (name: string) => {
         // eslint-disable-next-line testing-library/no-node-access
-        return getElementDiv(name).parentElement as HTMLElement;
+        return getElementDiv(name).querySelector(
+            ".jqtree-title",
+        ) as HTMLElement;
     };
 
     const getToggler = (name: string) => {
         // eslint-disable-next-line testing-library/no-node-access
-        return getElementDiv(name).querySelector("a") as HTMLElement;
+        return getElementDiv(name).querySelector(
+            ".jqtree-toggler",
+        ) as HTMLElement;
     };
 
     it("sets the class names of the tree element", () => {
@@ -91,7 +98,7 @@ describe("class names", () => {
         const $tree = $("#tree1");
         $tree.tree({ data: exampleData });
 
-        expect(screen.getByRole("treeitem", { name: "node1" })).toHaveClass(
+        expect(getTitle("node1")).toHaveClass(
             "jqtree_common",
             "jqtree-title",
             "jqtree-title-folder",
@@ -103,7 +110,7 @@ describe("class names", () => {
         const $tree = $("#tree1");
         $tree.tree({ autoOpen: 0, data: exampleData });
 
-        const title = screen.getByRole("treeitem", { name: "child1" });
+        const title = getTitle("child1");
 
         expect(title).toHaveClass(
             "jqtree_common",
@@ -117,9 +124,7 @@ describe("class names", () => {
         const $tree = $("#tree1");
         $tree.tree({ buttonLeft: false, data: exampleData });
 
-        expect(screen.getByRole("treeitem", { name: "node1" })).toHaveClass(
-            "jqtree-title-button-right",
-        );
+        expect(getTitle("node1")).toHaveClass("jqtree-title-button-right");
     });
 
     it("sets the class names of the toggler", () => {

@@ -1,4 +1,5 @@
 import type {
+    ChangeableOption,
     Node,
     NodeData,
     NodeId,
@@ -97,7 +98,7 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._treeElement.closeNode(node, slideParam ?? undefined);
+        void this._treeElement.closeNode(node, slideParam ?? undefined);
 
         return this._element;
     }
@@ -332,6 +333,11 @@ export class JqTreeWidget {
         return this._element;
     }
 
+    public refreshHitAreas(): JQuery {
+        this._treeElement.refreshHitAreas();
+        return this._element;
+    }
+
     public reload(onFinished?: () => void): JQuery {
         this._treeElement
             .loadDataFromUrl(undefined, undefined)
@@ -381,11 +387,15 @@ export class JqTreeWidget {
         node: Node | null,
         optionsParam?: SelectNodeOptions,
     ): JQuery {
-        this._treeElement.selectNode(node, optionsParam);
+        // jqTree toggles by default: selecting the selected node deselects it
+        this._treeElement.selectNode(node, {
+            mustToggle: true,
+            ...optionsParam,
+        });
         return this._element;
     }
 
-    public setOption(option: string, value: unknown): JQuery {
+    public setOption(option: ChangeableOption, value: unknown): JQuery {
         this._treeElement.setOption(option, value);
         return this._element;
     }
@@ -403,7 +413,7 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._treeElement.toggle(node, slideParam);
+        void this._treeElement.toggle(node, slideParam);
         return this._element;
     }
 

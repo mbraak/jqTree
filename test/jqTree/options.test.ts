@@ -1,4 +1,5 @@
 import { screen, waitFor } from "@testing-library/dom";
+import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { vi } from "vitest";
@@ -6,9 +7,16 @@ import { vi } from "vitest";
 import "app/tree.jquery";
 
 import exampleData from "../support/exampleData";
-import { getTreeButton } from "../support/queries";
+import { getTreeButton, getTreeTitle } from "../support/queries";
 
 const server = setupServer();
+
+// The default icons: svg triangles that point right (closed, ltr) and left
+// (closed, rtl)
+const triangleRight =
+    '<svg width="0.8em" height="0.8em" viewBox="0 0 10 10" focusable="false"><polygon points="0.5,0.5 0.5,9.5 9.5,5" fill="currentColor"></polygon></svg>';
+const triangleLeft =
+    '<svg width="0.8em" height="0.8em" viewBox="0 0 10 10" focusable="false"><polygon points="9.5,0.5 9.5,9.5 0.5,5" fill="currentColor"></polygon></svg>';
 
 describe("options", () => {
     beforeAll(() => {
@@ -30,6 +38,33 @@ describe("options", () => {
 
     afterAll(() => {
         server.close();
+    });
+
+    describe("ariaLabel", () => {
+        it("sets aria-label on the tree", () => {
+            const $tree = $("#tree1");
+            $tree.tree({ ariaLabel: "Categories", data: exampleData });
+
+            expect(
+                screen.getByRole("tree", { name: "Categories" }),
+            ).toBeInTheDocument();
+        });
+    });
+
+    describe("ariaLabelledBy", () => {
+        it("sets aria-labelledby on the tree", () => {
+            document.body.insertAdjacentHTML(
+                "afterbegin",
+                '<h2 id="tree-heading">Categories</h2>',
+            );
+
+            const $tree = $("#tree1");
+            $tree.tree({ ariaLabelledBy: "tree-heading", data: exampleData });
+
+            expect(
+                screen.getByRole("tree", { name: "Categories" }),
+            ).toBeInTheDocument();
+        });
     });
 
     describe("autoEscape", () => {
@@ -173,10 +208,12 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const title = getTreeTitle(
+                screen.getByRole("treeitem", { name: "node1" }),
+            );
 
             // eslint-disable-next-line testing-library/no-node-access
-            const nextSibling = treeItem.nextSibling as HTMLElement;
+            const nextSibling = title.nextSibling as HTMLElement;
 
             expect(nextSibling).toHaveClass("jqtree-toggler");
         });
@@ -188,12 +225,14 @@ describe("options", () => {
                 data: exampleData,
             });
 
-            const treeItem = screen.getByRole("treeitem", { name: "node1" });
+            const title = getTreeTitle(
+                screen.getByRole("treeitem", { name: "node1" }),
+            );
 
             // eslint-disable-next-line testing-library/no-node-access
-            const nextSibling = treeItem.previousSibling as HTMLElement;
+            const previousSibling = title.previousSibling as HTMLElement;
 
-            expect(nextSibling).toHaveClass("jqtree-toggler");
+            expect(previousSibling).toHaveClass("jqtree-toggler");
         });
     });
 
@@ -253,7 +292,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("►");
+            expect(button.innerHTML).toBe(triangleRight);
         });
     });
 
@@ -373,6 +412,37 @@ describe("options", () => {
                 expect.objectContaining({ name: "node1" }),
                 expect.objectContaining({ name: "node2" }),
             ]);
+        });
+    });
+
+    describe("multiSelect", () => {
+        it("adds a clicked node to the selection", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData, multiSelect: true });
+
+            await userEvent.click(
+                getTreeTitle(screen.getByRole("treeitem", { name: "node1" })),
+            );
+            await userEvent.click(
+                getTreeTitle(screen.getByRole("treeitem", { name: "node2" })),
+            );
+
+            expect(
+                $tree.tree("getSelectedNodes").map((node) => node.name),
+            ).toStrictEqual(["node1", "node2"]);
+        });
+
+        it("removes a clicked node from the selection when it is selected", async () => {
+            const $tree = $("#tree1");
+            $tree.tree({ data: exampleData, multiSelect: true });
+
+            const node1Title = getTreeTitle(
+                screen.getByRole("treeitem", { name: "node1" }),
+            );
+            await userEvent.click(node1Title);
+            await userEvent.click(node1Title);
+
+            expect($tree.tree("getSelectedNodes")).toStrictEqual([]);
         });
     });
 
@@ -557,7 +627,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("◀");
+            expect(button.innerHTML).toBe(triangleLeft);
         });
 
         it("has the default closed icon when the rtl option is false", () => {
@@ -567,7 +637,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("►");
+            expect(button.innerHTML).toBe(triangleRight);
         });
 
         it("has a different closed icon when the rtl data option is true", () => {
@@ -578,7 +648,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("◀");
+            expect(button.innerHTML).toBe(triangleLeft);
         });
 
         it("has the default closed icon when the rtl data option is false", () => {
@@ -589,7 +659,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("►");
+            expect(button.innerHTML).toBe(triangleRight);
         });
 
         it("has a different closed icon when the rtl data option has no value", () => {
@@ -600,7 +670,7 @@ describe("options", () => {
             const treeItem = screen.getByRole("treeitem", { name: "node1" });
             const button = getTreeButton(treeItem);
 
-            expect(button).toHaveTextContent("◀");
+            expect(button.innerHTML).toBe(triangleLeft);
         });
     });
 
