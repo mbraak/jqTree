@@ -23,10 +23,15 @@ describe("accessibility", () => {
             data: exampleData,
         });
 
-        const rules = axe.getRules(["cat.color"]).map(({ ruleId: id }) => ({
-            enabled: false,
-            id,
-        }));
+        // Disable rules that need a canvas, which jsdom doesn't implement:
+        // - the color rules
+        // - label-content-name-mismatch (measures text to detect icon ligatures)
+        const disabledRuleIds = [
+            ...axe.getRules(["cat.color"]).map(({ ruleId }) => ruleId),
+            "label-content-name-mismatch",
+        ];
+
+        const rules = disabledRuleIds.map((id) => ({ enabled: false, id }));
 
         axe.configure({ rules })
 

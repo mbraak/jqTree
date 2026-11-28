@@ -4,6 +4,7 @@ allowBuilds:
     unrs-resolver: true
 minimumReleaseAgeExclude:
   - tree-element@0.2.0
+  - cspell-dictionary@10.5.2
 peerDependencyRules:
   allowedVersions:
     "@rollup/plugin-babel>@babel/core": "8"
