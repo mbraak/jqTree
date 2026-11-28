@@ -65,6 +65,19 @@ ul.jqtree-tree {
         vertical-align: middle;
     }
 
+    /* The li is the treeitem, so it gets the focus. Show the focus ring around
+       the title, not around the li with all its children. */
+    li.jqtree_common:focus {
+        outline: none;
+    }
+
+    li.jqtree_common:focus-visible > .jqtree-element .jqtree-title {
+        /* Same as the default focus ring of the browser. Browsers without
+           -webkit-focus-ring-color ignore the second line. */
+        outline: auto;
+        outline-color: -webkit-focus-ring-color;
+    }
+
     .jqtree-title-button-left {
         margin-left: 1.5em;
 
