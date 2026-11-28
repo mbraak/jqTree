@@ -1,4 +1,5 @@
 import type {
+    ChangeableOption,
     Node,
     NodeData,
     NodeId,
@@ -97,7 +98,7 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._treeElement.closeNode(node, slideParam ?? undefined);
+        void this._treeElement.closeNode(node, slideParam ?? undefined);
 
         return this._element;
     }
@@ -385,7 +386,7 @@ export class JqTreeWidget {
         return this._element;
     }
 
-    public setOption(option: string, value: unknown): JQuery {
+    public setOption(option: ChangeableOption, value: unknown): JQuery {
         this._treeElement.setOption(option, value);
         return this._element;
     }
@@ -403,7 +404,7 @@ export class JqTreeWidget {
             throw Error(NODE_PARAM_IS_EMPTY);
         }
 
-        this._treeElement.toggle(node, slideParam);
+        void this._treeElement.toggle(node, slideParam);
         return this._element;
     }
 
